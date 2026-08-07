@@ -24,7 +24,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\Molecula
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\MolecularSequenceRepository;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\MolecularSequenceStructureVariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\MolecularSequenceVariant;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -91,7 +91,7 @@ class MolecularSequenceResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/sequence-type|4.3.0', strength: 'required')]
         public ?SequenceTypeType $type = null,
         /** @var int|null coordinateSystem Base number of coordinate system (0 for 0-based numbering or coordinates, inclusive start, exclusive end, 1 for 1-based numbering, inclusive start, inclusive end) */
-        #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?int $coordinateSystem = null,
         /** @var Reference|null patient Who and/or what this is about */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]

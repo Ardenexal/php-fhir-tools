@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -105,7 +106,7 @@ class AuditEventEntityDetail extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|TimePrimitive|DateTimePrimitive|Period|Base64BinaryPrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

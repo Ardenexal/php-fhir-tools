@@ -27,18 +27,18 @@ enum TransportIntent: string
     /** Order */
     case order = 'order';
 
-    /** Option */
-    case option = 'option';
-
-    /** original-order */
+    /** Original Order */
     case originalorder = 'original-order';
 
-    /** reflex-order */
+    /** Reflex Order */
     case reflexorder = 'reflex-order';
 
-    /** filler-order */
+    /** Filler Order */
     case fillerorder = 'filler-order';
 
-    /** instance-order */
+    /** Instance Order */
     case instanceorder = 'instance-order';
+
+    /** Option */
+    case option = 'option';
 }

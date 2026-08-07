@@ -14,4 +14,16 @@ enum ProvenanceEntityRole: string
 {
     /** Derivation */
     case derivation = 'derivation';
+
+    /** Revision */
+    case revision = 'revision';
+
+    /** Quotation */
+    case quotation = 'quotation';
+
+    /** Source */
+    case source = 'source';
+
+    /** Removal */
+    case removal = 'removal';
 }

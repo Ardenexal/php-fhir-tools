@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
@@ -57,15 +58,113 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
      * false-positive one — `containedToContainer`, which the Java reference validator passes with zero
      * issues, reported two `ref-1` errors.
      *
-     * `ConstraintValidator::$context->getRoot()` is the object originally handed to
-     * `Validator::validate()`, which is the FHIR resource — precisely what these variables mean.
-     * On a nested node it stays the root rather than the node, which is the whole point.
+     * The binding is the **nearest enclosing resource**, not the validation root. FHIR defines
+     * `%resource` as "the resource that contains the original node", and resources nest: a `Coverage`
+     * inside `Parameters.parameter.resource` carries its own `contained`, and a `#payer` reference
+     * within it must resolve against *that* Coverage. Binding the validation root instead made
+     * `ref-1` fail on every such reference, because `Parameters` has no `contained` of its own.
+     *
+     * Walking the property path is what makes this possible: Symfony hands us the root object plus a
+     * path like `parameter[1].resource.payor[0]`, so the deepest `#[FhirResource]` along that path is
+     * the enclosing resource. Falling back to the root keeps the common top-level case unchanged.
      */
     private function rootResourceContext(): EvaluationContext
     {
         $root = $this->context->getRoot();
+        if (!is_object($root)) {
+            return new EvaluationContext(null);
+        }
 
-        return new EvaluationContext(is_object($root) ? $root : null);
+        return new EvaluationContext($this->nearestEnclosingResource($root, (string) $this->context->getPropertyPath()));
+    }
+
+    /**
+     * Walk `$path` from `$root`, returning the deepest object that is itself a FHIR resource.
+     *
+     * Navigation is deliberately forgiving — an unreadable or absent segment simply stops the walk and
+     * returns the best resource found so far, which is always at least the root. Binding a slightly
+     * shallower resource degrades an invariant to its previous behaviour; throwing here would abort
+     * validation of an otherwise valid document.
+     */
+    private function nearestEnclosingResource(object $root, string $path): object
+    {
+        $nearest = $root;
+        $current = $root;
+
+        foreach (self::pathSegments($path) as $segment) {
+            if (!is_object($current) && !is_array($current)) {
+                break;
+            }
+
+            $next = self::readSegment($current, $segment);
+            if ($next === null) {
+                break;
+            }
+
+            $current = $next;
+            if (is_object($current) && self::isResource($current)) {
+                $nearest = $current;
+            }
+        }
+
+        return $nearest;
+    }
+
+    /**
+     * Split `parameter[1].resource.payor[0]` into `['parameter', '1', 'resource', 'payor', '0']`.
+     *
+     * @return list<string>
+     */
+    private static function pathSegments(string $path): array
+    {
+        if ($path === '') {
+            return [];
+        }
+
+        $normalized = str_replace(['[', ']'], ['.', ''], $path);
+
+        return array_values(array_filter(explode('.', $normalized), static fn (string $s): bool => $s !== ''));
+    }
+
+    private static function readSegment(mixed $current, string $segment): mixed
+    {
+        if (is_array($current)) {
+            return $current[$segment] ?? null;
+        }
+
+        if (!is_object($current) || !property_exists($current, $segment)) {
+            return null;
+        }
+
+        // Typed properties on generated models may be declared but never assigned; reading one of
+        // those is an Error, not a null. See the property_exists footgun in model-object-initialization.
+        try {
+            if (!(new \ReflectionProperty($current, $segment))->isInitialized($current)) {
+                return null;
+            }
+        } catch (\ReflectionException) {
+            // Dynamic property — readable.
+        }
+
+        return $current->{$segment};
+    }
+
+    /**
+     * Whether this object is a FHIR resource, checking ancestors too.
+     *
+     * `#[FhirResource]` is not inherited by reflection, and the marker sits on both the concrete
+     * class and `AbstractResource`, so the walk covers generated subclasses either way. The attribute
+     * is the version-agnostic test — `AbstractResource` itself is declared once per FHIR version.
+     */
+    private static function isResource(object $value): bool
+    {
+        for ($class = new \ReflectionClass($value); $class !== false; $class = $class->getParentClass()) {
+            if ($class->getAttributes(FhirResource::class) !== []) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function validate(mixed $value, Constraint $constraint): void

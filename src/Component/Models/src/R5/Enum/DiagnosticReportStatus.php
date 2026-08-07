@@ -18,11 +18,23 @@ enum DiagnosticReportStatus: string
     /** Partial */
     case partial = 'partial';
 
+    /** Preliminary */
+    case preliminary = 'preliminary';
+
+    /** Modified */
+    case modified = 'modified';
+
     /** Final */
     case final = 'final';
 
     /** Amended */
     case amended = 'amended';
+
+    /** Corrected */
+    case corrected = 'corrected';
+
+    /** Appended */
+    case appended = 'appended';
 
     /** Cancelled */
     case cancelled = 'cancelled';

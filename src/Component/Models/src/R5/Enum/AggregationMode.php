@@ -17,4 +17,7 @@ enum AggregationMode: string
 
     /** Referenced */
     case referenced = 'referenced';
+
+    /** Bundled */
+    case bundled = 'bundled';
 }

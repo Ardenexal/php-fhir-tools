@@ -21,6 +21,15 @@ enum GoalLifecycleStatus: string
     /** Accepted */
     case accepted = 'accepted';
 
+    /** Active */
+    case active = 'active';
+
+    /** On Hold */
+    case onhold = 'on-hold';
+
+    /** Completed */
+    case completed = 'completed';
+
     /** Cancelled */
     case cancelled = 'cancelled';
 

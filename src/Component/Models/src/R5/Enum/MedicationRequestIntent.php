@@ -21,6 +21,18 @@ enum MedicationRequestIntent: string
     /** Order */
     case order = 'order';
 
+    /** Original Order */
+    case originalorder = 'original-order';
+
+    /** Reflex Order */
+    case reflexorder = 'reflex-order';
+
+    /** Filler Order */
+    case fillerorder = 'filler-order';
+
+    /** Instance Order */
+    case instanceorder = 'instance-order';
+
     /** Option */
     case option = 'option';
 }

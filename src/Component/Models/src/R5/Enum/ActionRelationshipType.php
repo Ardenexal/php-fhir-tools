@@ -15,9 +15,27 @@ enum ActionRelationshipType: string
     /** Before */
     case before = 'before';
 
+    /** Before Start */
+    case beforestart = 'before-start';
+
+    /** Before End */
+    case beforeend = 'before-end';
+
     /** Concurrent */
     case concurrent = 'concurrent';
 
+    /** Concurrent With Start */
+    case concurrentwithstart = 'concurrent-with-start';
+
+    /** Concurrent With End */
+    case concurrentwithend = 'concurrent-with-end';
+
     /** After */
     case after = 'after';
+
+    /** After Start */
+    case afterstart = 'after-start';
+
+    /** After End */
+    case afterend = 'after-end';
 }

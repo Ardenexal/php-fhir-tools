@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -98,7 +99,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
                 ],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public CodeableConcept|bool|Quantity|Range|Reference|IdPrimitive|null $value = null,
         /** @var CodeableConcept|null offset Reference point for valueQuantity or valueRange */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]

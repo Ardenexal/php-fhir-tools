@@ -15,6 +15,12 @@ enum ConditionVerificationStatus: string
     /** Unconfirmed */
     case unconfirmed = 'unconfirmed';
 
+    /** Provisional */
+    case provisional = 'provisional';
+
+    /** Differential */
+    case differential = 'differential';
+
     /** Confirmed */
     case confirmed = 'confirmed';
 

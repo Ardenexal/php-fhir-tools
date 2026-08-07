@@ -29,4 +29,7 @@ enum NameUse: string
 
     /** Old */
     case old = 'old';
+
+    /** Name changed for Marriage */
+    case namechangedformarriage = 'maiden';
 }

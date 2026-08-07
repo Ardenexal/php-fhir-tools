@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\TestScriptRequestMethodCode
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -118,7 +118,7 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $sourceId = null,
         /** @var bool|null stopTestOnFail If this assert fails, will the current test execution stop? */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $stopTestOnFail = null,
         /** @var IdPrimitive|null validateProfileId Profile Id of validation profile reference */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
@@ -127,7 +127,7 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $value = null,
         /** @var bool|null warningOnly Will this assert produce a warning only on error? */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $warningOnly = null,
         /** @var array<TestScriptSetupActionAssertRequirement> requirement Links or references to the testing requirements */
         #[FhirProperty(

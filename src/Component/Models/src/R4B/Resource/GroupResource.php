@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Group\GroupCharacteristic;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Group\GroupMember;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -87,7 +88,7 @@ class GroupResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-type|4.3.0', strength: 'required')]
         public ?GroupTypeType $type = null,
         /** @var bool|null actual Descriptive or actual */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $actual = null,
         /** @var CodeableConcept|null code Kind of Group members */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]

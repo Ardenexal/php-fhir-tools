@@ -66,6 +66,15 @@ enum EventTiming: string
     /** C */
     case c = 'C';
 
+    /** CD */
+    case cd = 'CD';
+
+    /** CM */
+    case cm = 'CM';
+
+    /** CV */
+    case cv = 'CV';
+
     /** HS */
     case hs = 'HS';
 
@@ -95,13 +104,4 @@ enum EventTiming: string
 
     /** WAKE */
     case wake = 'WAKE';
-
-    /** CM */
-    case cm = 'CM';
-
-    /** CD */
-    case cd = 'CD';
-
-    /** CV */
-    case cv = 'CV';
 }

@@ -15,6 +15,30 @@ enum ConceptMapEquivalence: string
     /** Related To */
     case relatedto = 'relatedto';
 
+    /** Equivalent */
+    case equivalent = 'equivalent';
+
+    /** Equal */
+    case equal = 'equal';
+
+    /** Wider */
+    case wider = 'wider';
+
+    /** Subsumes */
+    case subsumes = 'subsumes';
+
+    /** Narrower */
+    case narrower = 'narrower';
+
+    /** Specializes */
+    case specializes = 'specializes';
+
+    /** Inexact */
+    case inexact = 'inexact';
+
     /** Unmatched */
     case unmatched = 'unmatched';
+
+    /** Disjoint */
+    case disjoint = 'disjoint';
 }

@@ -30,6 +30,9 @@ enum CarePlanActivityStatus: string
     /** Cancelled */
     case cancelled = 'cancelled';
 
+    /** Stopped */
+    case stopped = 'stopped';
+
     /** Unknown */
     case unknown = 'unknown';
 

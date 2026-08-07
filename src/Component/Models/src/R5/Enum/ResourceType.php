@@ -15,6 +15,222 @@ enum ResourceType: string
     /** Base */
     case base = 'Base';
 
+    /** Element */
+    case element = 'Element';
+
+    /** BackboneElement */
+    case backboneelement = 'BackboneElement';
+
+    /** DataType */
+    case datatype = 'DataType';
+
+    /** Address */
+    case address = 'Address';
+
+    /** Annotation */
+    case annotation = 'Annotation';
+
+    /** Attachment */
+    case attachment = 'Attachment';
+
+    /** Availability */
+    case availability = 'Availability';
+
+    /** BackboneType */
+    case backbonetype = 'BackboneType';
+
+    /** Dosage */
+    case dosage = 'Dosage';
+
+    /** ElementDefinition */
+    case elementdefinition = 'ElementDefinition';
+
+    /** MarketingStatus */
+    case marketingstatus = 'MarketingStatus';
+
+    /** ProductShelfLife */
+    case productshelflife = 'ProductShelfLife';
+
+    /** Timing */
+    case timing = 'Timing';
+
+    /** CodeableConcept */
+    case codeableconcept = 'CodeableConcept';
+
+    /** CodeableReference */
+    case codeablereference = 'CodeableReference';
+
+    /** Coding */
+    case coding = 'Coding';
+
+    /** ContactDetail */
+    case contactdetail = 'ContactDetail';
+
+    /** ContactPoint */
+    case contactpoint = 'ContactPoint';
+
+    /** Contributor */
+    case contributor = 'Contributor';
+
+    /** DataRequirement */
+    case datarequirement = 'DataRequirement';
+
+    /** Expression */
+    case expression = 'Expression';
+
+    /** ExtendedContactDetail */
+    case extendedcontactdetail = 'ExtendedContactDetail';
+
+    /** Extension */
+    case extension = 'Extension';
+
+    /** HumanName */
+    case humanname = 'HumanName';
+
+    /** Identifier */
+    case identifier = 'Identifier';
+
+    /** Meta */
+    case meta = 'Meta';
+
+    /** MonetaryComponent */
+    case monetarycomponent = 'MonetaryComponent';
+
+    /** Money */
+    case money = 'Money';
+
+    /** Narrative */
+    case narrative = 'Narrative';
+
+    /** ParameterDefinition */
+    case parameterdefinition = 'ParameterDefinition';
+
+    /** Period */
+    case period = 'Period';
+
+    /** PrimitiveType */
+    case primitivetype = 'PrimitiveType';
+
+    /** base64Binary */
+    case base64_binary = 'base64Binary';
+
+    /** boolean */
+    case boolean = 'boolean';
+
+    /** date */
+    case date = 'date';
+
+    /** dateTime */
+    case datetime = 'dateTime';
+
+    /** decimal */
+    case decimal = 'decimal';
+
+    /** instant */
+    case instant = 'instant';
+
+    /** integer */
+    case integer = 'integer';
+
+    /** positiveInt */
+    case positiveint = 'positiveInt';
+
+    /** unsignedInt */
+    case unsignedint = 'unsignedInt';
+
+    /** integer64 */
+    case integer64 = 'integer64';
+
+    /** string */
+    case string = 'string';
+
+    /** code */
+    case code = 'code';
+
+    /** id */
+    case id = 'id';
+
+    /** markdown */
+    case markdown = 'markdown';
+
+    /** time */
+    case time = 'time';
+
+    /** uri */
+    case uri = 'uri';
+
+    /** canonical */
+    case canonical = 'canonical';
+
+    /** oid */
+    case oid = 'oid';
+
+    /** url */
+    case url = 'url';
+
+    /** uuid */
+    case uuid = 'uuid';
+
+    /** Quantity */
+    case quantity = 'Quantity';
+
+    /** Age */
+    case age = 'Age';
+
+    /** Count */
+    case count = 'Count';
+
+    /** Distance */
+    case distance = 'Distance';
+
+    /** Duration */
+    case duration = 'Duration';
+
+    /** Range */
+    case range = 'Range';
+
+    /** Ratio */
+    case ratio = 'Ratio';
+
+    /** RatioRange */
+    case ratiorange = 'RatioRange';
+
+    /** Reference */
+    case reference = 'Reference';
+
+    /** RelatedArtifact */
+    case relatedartifact = 'RelatedArtifact';
+
+    /** SampledData */
+    case sampleddata = 'SampledData';
+
+    /** Signature */
+    case signature = 'Signature';
+
+    /** TriggerDefinition */
+    case triggerdefinition = 'TriggerDefinition';
+
+    /** UsageContext */
+    case usagecontext = 'UsageContext';
+
+    /** VirtualServiceDetail */
+    case virtualservicedetail = 'VirtualServiceDetail';
+
+    /** xhtml */
+    case xhtml = 'xhtml';
+
+    /** Resource */
+    case resource = 'Resource';
+
+    /** Binary */
+    case binary = 'Binary';
+
+    /** Bundle */
+    case bundle = 'Bundle';
+
+    /** DomainResource */
+    case domainresource = 'DomainResource';
+
     /** Account */
     case account = 'Account';
 
@@ -48,9 +264,6 @@ enum ResourceType: string
     /** Basic */
     case basic = 'Basic';
 
-    /** Binary */
-    case binary = 'Binary';
-
     /** BiologicallyDerivedProduct */
     case biologicallyderivedproduct = 'BiologicallyDerivedProduct';
 
@@ -60,8 +273,8 @@ enum ResourceType: string
     /** BodyStructure */
     case bodystructure = 'BodyStructure';
 
-    /** Bundle */
-    case bundle = 'Bundle';
+    /** CanonicalResource */
+    case canonicalresource = 'CanonicalResource';
 
     /** CapabilityStatement */
     case capabilitystatement = 'CapabilityStatement';
@@ -306,6 +519,9 @@ enum ResourceType: string
     /** MessageHeader */
     case messageheader = 'MessageHeader';
 
+    /** MetadataResource */
+    case metadataresource = 'MetadataResource';
+
     /** MolecularSequence */
     case molecularsequence = 'MolecularSequence';
 
@@ -341,9 +557,6 @@ enum ResourceType: string
 
     /** PackagedProductDefinition */
     case packagedproductdefinition = 'PackagedProductDefinition';
-
-    /** Parameters */
-    case parameters = 'Parameters';
 
     /** Patient */
     case patient = 'Patient';
@@ -488,4 +701,7 @@ enum ResourceType: string
 
     /** VisionPrescription */
     case visionprescription = 'VisionPrescription';
+
+    /** Parameters */
+    case parameters = 'Parameters';
 }

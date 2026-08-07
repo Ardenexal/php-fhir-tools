@@ -17,4 +17,7 @@ enum AllergyIntoleranceClinicalStatusCodes: string
 
     /** Inactive */
     case inactive = 'inactive';
+
+    /** Resolved */
+    case resolved = 'resolved';
 }

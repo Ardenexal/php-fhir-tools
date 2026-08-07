@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\MimeTypesType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestScriptRequestMethodCodeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description Evaluates the results of previous operations to determine if the server under test behaves appropriately.
@@ -119,7 +119,7 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $value = null,
         /** @var bool|null warningOnly Will this assert produce a warning only on error? */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $warningOnly = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

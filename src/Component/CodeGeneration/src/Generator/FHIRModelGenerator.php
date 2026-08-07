@@ -15,6 +15,7 @@ use Nette\PhpGenerator\PromotedParameter;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -811,7 +812,12 @@ class FHIRModelGenerator implements GeneratorInterface
                 $param->addAttribute(FhirProperty::class, $attributeArgs);
                 $this->addCascadeIfNested($param, $propertyKind);
                 if ($isNullable === false) {
-                    $param->addAttribute(NotBlank::class);
+                    // NotBlank treats `false`, `0` and `''` as blank, but for FHIR "required" means
+                    // present, not truthy. A required boolean legitimately carries false —
+                    // `Questionnaire.item.enableWhen.answerBoolean: false` is a valid answer — and
+                    // NotBlank rejected every one of them. NotNull is the correct constraint wherever
+                    // the property can hold a falsy scalar.
+                    $param->addAttribute(self::requiresNotNullRatherThanNotBlank($types) ? NotNull::class : NotBlank::class);
                 }
             }
 
@@ -1051,6 +1057,27 @@ class FHIRModelGenerator implements GeneratorInterface
         }
 
         return $this->resolvePropertyKindFromCode($types[0]['code'] ?? '');
+    }
+
+    /**
+     * Whether a required property must use `NotNull` instead of `NotBlank`.
+     *
+     * Symfony's `NotBlank` rejects `false`, `0`, `'0'` and `''`. FHIR cardinality means *present*, not
+     * *truthy*, so any property whose PHP type admits a falsy scalar needs `NotNull`. Booleans are the
+     * common case — `enableWhen.answerBoolean: false` is a perfectly valid answer that `NotBlank`
+     * rejected — and choice types are included because a `value[x]` can resolve to `bool` or `int`.
+     *
+     * @param array<int|string, string> $types PHP type names for the property
+     */
+    private static function requiresNotNullRatherThanNotBlank(array $types): bool
+    {
+        foreach ($types as $type) {
+            if (in_array(ltrim($type, '?'), ['bool', 'int', 'float', 'mixed'], true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

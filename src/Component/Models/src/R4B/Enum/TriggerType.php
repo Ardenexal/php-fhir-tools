@@ -21,6 +21,15 @@ enum TriggerType: string
     /** Data Changed */
     case datachanged = 'data-changed';
 
+    /** Data Added */
+    case dataadded = 'data-added';
+
+    /** Data Updated */
+    case dataupdated = 'data-modified';
+
+    /** Data Removed */
+    case dataremoved = 'data-removed';
+
     /** Data Accessed */
     case dataaccessed = 'data-accessed';
 

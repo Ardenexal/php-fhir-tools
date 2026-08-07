@@ -24,6 +24,9 @@ enum DetectedIssueStatus: string
     /** Amended */
     case amended = 'amended';
 
+    /** Corrected */
+    case corrected = 'corrected';
+
     /** Cancelled */
     case cancelled = 'cancelled';
 

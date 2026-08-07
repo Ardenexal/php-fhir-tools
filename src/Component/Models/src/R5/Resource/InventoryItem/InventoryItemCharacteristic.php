@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -113,7 +114,7 @@ class InventoryItemCharacteristic extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public StringPrimitive|string|int|bool|UrlPrimitive|DateTimePrimitive|Quantity|Range|Ratio|Annotation|Address|Duration|CodeableConcept|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

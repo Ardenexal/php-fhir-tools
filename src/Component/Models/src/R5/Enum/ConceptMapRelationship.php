@@ -15,6 +15,15 @@ enum ConceptMapRelationship: string
     /** Related To */
     case relatedto = 'related-to';
 
+    /** Equivalent */
+    case equivalent = 'equivalent';
+
+    /** Source Is Narrower Than Target */
+    case sourceisnarrowerthantarget = 'source-is-narrower-than-target';
+
+    /** Source Is Broader Than Target */
+    case sourceisbroaderthantarget = 'source-is-broader-than-target';
+
     /** Not Related To */
     case notrelatedto = 'not-related-to';
 }

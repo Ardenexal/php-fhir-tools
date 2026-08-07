@@ -20,4 +20,43 @@ enum QuestionnaireItemType: string
 
     /** Question */
     case question = 'question';
+
+    /** Boolean */
+    case boolean = 'boolean';
+
+    /** Decimal */
+    case decimal = 'decimal';
+
+    /** Integer */
+    case integer = 'integer';
+
+    /** Date */
+    case date = 'date';
+
+    /** Date Time */
+    case datetime = 'dateTime';
+
+    /** Time */
+    case time = 'time';
+
+    /** String */
+    case string = 'string';
+
+    /** Text */
+    case text = 'text';
+
+    /** Url */
+    case url = 'url';
+
+    /** Coding */
+    case coding = 'coding';
+
+    /** Attachment */
+    case attachment = 'attachment';
+
+    /** Reference */
+    case reference = 'reference';
+
+    /** Quantity */
+    case quantity = 'quantity';
 }

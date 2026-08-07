@@ -15,6 +15,9 @@ enum AllergyIntoleranceVerificationStatus: string
     /** Unconfirmed */
     case unconfirmed = 'unconfirmed';
 
+    /** Presumed */
+    case presumed = 'presumed';
+
     /** Confirmed */
     case confirmed = 'confirmed';
 

@@ -15,8 +15,20 @@ enum ConditionClinicalStatusCodes: string
     /** Active */
     case active = 'active';
 
+    /** Recurrence */
+    case recurrence = 'recurrence';
+
+    /** Relapse */
+    case relapse = 'relapse';
+
     /** Inactive */
     case inactive = 'inactive';
+
+    /** Remission */
+    case remission = 'remission';
+
+    /** Resolved */
+    case resolved = 'resolved';
 
     /** Unknown */
     case unknown = 'unknown';

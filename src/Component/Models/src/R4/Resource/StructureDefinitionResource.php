@@ -32,6 +32,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinition\Structu
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinition\StructureDefinitionMapping;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinition\StructureDefinitionSnapshot;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -277,7 +278,7 @@ class StructureDefinitionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/structure-definition-kind|4.0.1', strength: 'required')]
         public ?StructureDefinitionKindType $kind = null,
         /** @var bool|null abstract Whether the structure is abstract */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $abstract = null,
         /** @var array<StructureDefinitionContext> context If an extension, where it can be used in instances */
         #[FhirProperty(

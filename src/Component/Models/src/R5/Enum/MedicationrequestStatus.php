@@ -21,6 +21,15 @@ enum MedicationrequestStatus: string
     /** Ended */
     case ended = 'ended';
 
+    /** Stopped */
+    case stopped = 'stopped';
+
+    /** Completed */
+    case completed = 'completed';
+
+    /** Cancelled */
+    case cancelled = 'cancelled';
+
     /** Entered in Error */
     case enteredinerror = 'entered-in-error';
 
