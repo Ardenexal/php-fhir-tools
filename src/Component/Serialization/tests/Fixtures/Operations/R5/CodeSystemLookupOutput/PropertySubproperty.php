@@ -2,28 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Metadata\Tests\Unit\Attribute\Fixture;
+namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R5\CodeSystemLookupOutput;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirOperationParameter;
 
 /**
- * The `part[]` children of {@see LookupOutputFixture}'s `property` group.
+ * The `part[]` children of `property.subproperty` in the R5 `$lookup` output.
  *
- * `value` here is polymorphic and carries the seven-variant set AllowedTypeReader resolves for
- * CodeSystem/$lookup. The variant shape is deliberately identical to FhirProperty::$variants and
- * PropertyVariantMetadata — operations reuse the existing choice machinery rather than a parallel one.
- *
- * Note `phpType` holds a fully-qualified class name for complex and primitive types, and a PHP
- * builtin name for scalars, matching what the generated models carry (see
- * `Models/R4/Resource/Parameters/ParametersParameter.php`). A bare 'Coding' would read as a correct
- * example and produce a class name the mapper cannot instantiate.
- *
- * The FQCNs here are written as strings and deliberately NOT resolved: Metadata sits below Models in
- * the dependency graph (Models requires Metadata, not the reverse), so a Metadata test must not
- * load a Models class. The resolvability check belongs to the Serialization operation fixtures,
- * which legitimately depend on Models.
+ * The class name is keyed by parameter path (`property` + `subproperty`), not by the parameter's own
+ * name. Keying by name alone would collide with {@see Property}'s own `value`, and both `value`
+ * parameters carry the same seven-variant choice while differing in cardinality — `property.value`
+ * is `0..1` but `property.subproperty.value` is `1..1`. A name-keyed scheme would silently merge them.
  */
-final class LookupOutputPropertyFixture
+final class PropertySubproperty
 {
     public function __construct(
         #[FhirOperationParameter(
@@ -33,13 +24,18 @@ final class LookupOutputPropertyFixture
             min: 1,
             max: '1',
             type: 'code',
+            documentation: 'The sub-property code.',
         )]
         public readonly ?string $code = null,
+        /**
+         * `min: 1` here, unlike `property.value` which is `0..1` — the one genuine shape difference
+         * between the two levels.
+         */
         #[FhirOperationParameter(
             name: 'value',
             phpName: 'value',
             use: 'out',
-            min: 0,
+            min: 1,
             max: '1',
             type: 'Element',
             variants: [
@@ -51,8 +47,30 @@ final class LookupOutputPropertyFixture
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'valueInteger'],
                 ['fhirType' => 'string', 'propertyKind' => 'primitive', 'phpType' => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive', 'jsonKey' => 'valueString'],
             ],
+            documentation: 'The value of the sub-property.',
         )]
         public readonly mixed $value = null,
+        #[FhirOperationParameter(
+            name: 'description',
+            phpName: 'description',
+            use: 'out',
+            min: 0,
+            max: '1',
+            type: 'string',
+            documentation: 'Human-readable representation of the sub-property value.',
+        )]
+        public readonly ?string $description = null,
+        /** R5-only. */
+        #[FhirOperationParameter(
+            name: 'source',
+            phpName: 'source',
+            use: 'out',
+            min: 0,
+            max: '1',
+            type: 'canonical',
+            documentation: 'The system that defines the property.',
+        )]
+        public readonly ?string $source = null,
     ) {
     }
 }

@@ -270,25 +270,65 @@ final class FhirOperationParameterTest extends TestCase
     }
 
     /**
-     * Complex variants carry a resolvable FQCN in `phpType`, not a bare type name.
+     * Non-scalar variants carry a fully-qualified class name in `phpType`, not a bare type name.
      *
-     * PropertyVariantMetadata documents phpType as "FQCN for class types", and the serializer
-     * instantiates it directly. A bare 'Coding' passes a keys-only check and fails at runtime.
+     * PropertyVariantMetadata documents phpType as "FQCN for class types" and the serializer
+     * instantiates it directly, so a bare 'Coding' passes a keys-only check and fails at runtime.
+     *
+     * Asserted by shape, not by `class_exists()`: Models requires Metadata, so a Metadata test that
+     * loaded a Models class would invert the dependency graph. Resolvability is checked where it
+     * belongs, in the Serialization operation fixtures.
      */
-    public function testComplexVariantsCarryAResolvableFqcn(): void
+    public function testNonScalarVariantsCarryAFullyQualifiedClassName(): void
     {
         $value = self::attributesOf(LookupOutputPropertyFixture::class)['value'];
         self::assertNotNull($value->variants);
 
-        $complex = array_filter($value->variants, static fn (array $v): bool => $v['propertyKind'] === 'complex');
-        self::assertNotEmpty($complex);
+        $classTyped = array_filter(
+            $value->variants,
+            static fn (array $v): bool => in_array($v['propertyKind'], ['complex', 'primitive'], true),
+        );
+        self::assertNotEmpty($classTyped);
 
-        foreach ($complex as $variant) {
-            self::assertTrue(
-                class_exists($variant['phpType']),
-                sprintf('Variant phpType "%s" does not resolve to a class.', $variant['phpType']),
+        foreach ($classTyped as $variant) {
+            self::assertStringContainsString(
+                '\\',
+                $variant['phpType'],
+                sprintf('Variant "%s" carries a bare type name where an FQCN is required.', $variant['fhirType']),
+            );
+            self::assertStringStartsNotWith('\\', $variant['phpType'], 'FQCNs are stored unprefixed.');
+        }
+
+        $scalars = array_filter($value->variants, static fn (array $v): bool => $v['propertyKind'] === 'scalar');
+
+        foreach ($scalars as $variant) {
+            self::assertContains(
+                $variant['phpType'],
+                ['bool', 'int', 'float', 'string'],
+                sprintf('Scalar variant "%s" must carry a PHP builtin.', $variant['fhirType']),
             );
         }
+    }
+
+    /**
+     * `decimal` is carried as a PHP string, not a float.
+     *
+     * FHIR requires decimal precision to be preserved on round-trip, and a float silently loses it
+     * (`1.10` becomes `1.1`). The generated models already do this — see the value[x] variants on
+     * `Models/R4/Resource/Parameters/ParametersParameter.php` — and operations must match.
+     */
+    public function testDecimalIsCarriedAsAStringToPreservePrecision(): void
+    {
+        $value = self::attributesOf(LookupOutputPropertyFixture::class)['value'];
+        self::assertNotNull($value->variants);
+
+        $decimal = array_values(array_filter(
+            $value->variants,
+            static fn (array $v): bool => $v['fhirType'] === 'decimal',
+        ));
+
+        self::assertCount(1, $decimal);
+        self::assertSame('string', $decimal[0]['phpType'], 'decimal as float loses precision on round-trip.');
     }
 
     /**
