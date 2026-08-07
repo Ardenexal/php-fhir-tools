@@ -47,6 +47,7 @@ use Symfony\Component\Validator\Constraints\Valid;
     severity: 'warning',
     expression: '$this.where(element[0].mustSupport=\'true\').exists().not()',
     human: 'The root element of a profile should not have mustSupport = true',
+    bestPractice: true,
 )]
 #[FHIRPathInvariant(
     key: 'sdf-8b',

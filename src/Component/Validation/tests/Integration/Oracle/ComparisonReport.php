@@ -50,6 +50,22 @@ final class ComparisonReport
     }
 
     /**
+     * Cases where our warning count differs from Java's.
+     *
+     * Warnings never gate landing the cascade — they do not affect validity. But the specification
+     * suite asserts them, so re-seeding while these disagree writes an unreviewed count in as
+     * correct. This is the list a reviewer must read before the re-seeding gate.
+     *
+     * @return list<CaseComparison>
+     */
+    public function warningMismatches(): array
+    {
+        return array_values(
+            array_filter($this->comparisons, static fn (CaseComparison $c): bool => !$c->warningsAgree()),
+        );
+    }
+
+    /**
      * Cases dropped because validation itself threw. This must be empty; anything here is a crash
      * being silently scored as "not a false positive".
      *

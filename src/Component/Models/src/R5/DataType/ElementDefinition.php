@@ -122,6 +122,7 @@ use Symfony\Component\Validator\Constraints\Valid;
     severity: 'warning',
     expression: 'fixed.exists().not()',
     human: 'pattern[x] should be used rather than fixed[x]',
+    bestPractice: true,
 )]
 #[FHIRPathInvariant(
     key: 'eld-25',

@@ -73,6 +73,7 @@ if ($asJson) {
         'skipped'          => $report->skippedCount(),
         'skipsByReason'    => $report->skipHistogram(),
         'crashedCases'     => $report->crashedCases(),
+        'warningMismatch'  => count($report->warningMismatches()),
         'wallClockSeconds' => round($report->wallClockSeconds, 2),
         'aboveFamilies'    => $report->aboveFamilyHistogram(),
         'cases'            => array_map(static fn (CaseComparison $c): array => [
@@ -83,6 +84,9 @@ if ($asJson) {
             'java'            => $c->javaErrorCount,
             'families'        => $c->families,
             'skewedByFilter'  => $c->isSkewedByKnownGapFilter(),
+            'oursWarnings'    => $c->ourWarningCount,
+            'javaWarnings'    => $c->javaWarningCount,
+            'warningClass'    => $c->warningClassification()->value,
         ], $report->comparisons),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
 
@@ -138,6 +142,23 @@ if ($crashed !== []) {
         count($crashed),
         implode("\n  ", $crashed),
     );
+}
+
+// Warnings do not affect validity, so they do not gate the exit code — but re-seeding while they
+// disagree writes an unreviewed count in as correct, so they must be visible.
+$warningMismatches = $report->warningMismatches();
+if ($warningMismatches !== []) {
+    printf(
+        "\nWARNING COUNTS differ from Java on %d case(s). These do not block landing, but they DO\n"
+        . "block re-seeding — read them before running seed-outcomes.php:\n",
+        count($warningMismatches),
+    );
+    foreach (array_slice($warningMismatches, 0, 15) as $c) {
+        printf("  %-52s ours=%-3d java=%-3d\n", substr($c->name, 0, 52), $c->ourWarningCount, $c->javaWarningCount);
+    }
+    if (count($warningMismatches) > 15) {
+        printf("  … and %d more (use --json for the full list)\n", count($warningMismatches) - 15);
+    }
 }
 
 $exitCode = $report->aboveCount() === 0 && $crashed === [] ? 0 : 1;

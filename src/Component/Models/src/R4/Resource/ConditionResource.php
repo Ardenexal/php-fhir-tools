@@ -41,6 +41,7 @@ use Symfony\Component\Validator\Constraints\Valid;
     severity: 'warning',
     expression: 'clinicalStatus.exists() or verificationStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/condition-ver-status\' and code = \'entered-in-error\').exists() or category.select($this=\'problem-list-item\').empty()',
     human: 'Condition.clinicalStatus SHALL be present if verificationStatus is not entered-in-error and category is problem-list-item',
+    bestPractice: true,
 )]
 #[FHIRPathInvariant(
     key: 'con-4',

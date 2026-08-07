@@ -195,6 +195,37 @@ final class JavaOutcomeComparisonTest extends TestCase
         self::assertSame(0, $report->skipHistogram()['validate-crashed']);
     }
 
+    /**
+     * Warnings are classified separately and must never gate landing — they do not affect validity.
+     * They do gate re-seeding, because seed-outcomes.php writes warning counts into the expectations.
+     */
+    public function testWarningsAreClassifiedIndependentlyOfErrors(): void
+    {
+        $agreesOnErrorsNotWarnings = new CaseComparison(
+            name: 'noisy',
+            ourErrorCount: 1,
+            ourErrorCountUnfiltered: 1,
+            ourWarningCount: 16,
+            javaErrorCount: 1,
+            javaWarningCount: 0,
+        );
+
+        self::assertSame(Classification::Equal, $agreesOnErrorsNotWarnings->classification());
+        self::assertSame(Classification::Above, $agreesOnErrorsNotWarnings->warningClassification());
+        self::assertFalse($agreesOnErrorsNotWarnings->warningsAgree());
+
+        $report = new ComparisonReport([
+            $agreesOnErrorsNotWarnings,
+            self::comparison('quiet', ours: 0, java: 0, families: []),
+        ]);
+
+        // Errors agree everywhere, so nothing blocks landing...
+        self::assertSame(0, $report->aboveCount());
+        // ...but the warning disagreement must still be visible to a reviewer.
+        self::assertCount(1, $report->warningMismatches());
+        self::assertSame('noisy', $report->warningMismatches()[0]->name);
+    }
+
     public function testFamilyClassifierPrefersInvariantKey(): void
     {
         $classifier = new ViolationFamilyClassifier();

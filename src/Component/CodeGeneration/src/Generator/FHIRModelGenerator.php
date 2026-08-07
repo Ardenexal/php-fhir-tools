@@ -370,12 +370,7 @@ class FHIRModelGenerator implements GeneratorInterface
             if ($constraintSource !== null && $constraintSource !== $sdUrl) {
                 continue;
             }
-            $class->addAttribute(FHIRPathInvariant::class, [
-                'key'        => $constraint['key'],
-                'severity'   => $constraint['severity'],
-                'expression' => $expression,
-                'human'      => $constraint['human'],
-            ]);
+            $class->addAttribute(FHIRPathInvariant::class, self::invariantAttributeArgs($constraint, $expression));
         }
 
         // Inject FHIRExtensionsTrait into Element and DomainResource base classes so that all
@@ -563,12 +558,7 @@ class FHIRModelGenerator implements GeneratorInterface
                     if ($constraintSource !== null && $constraintSource !== $sdUrl) {
                         continue;
                     }
-                    $childClass->addAttribute(FHIRPathInvariant::class, [
-                        'key'        => $constraint['key'],
-                        'severity'   => $constraint['severity'],
-                        'expression' => $expression,
-                        'human'      => $constraint['human'],
-                    ]);
+                    $childClass->addAttribute(FHIRPathInvariant::class, self::invariantAttributeArgs($constraint, $expression));
                 }
 
                 if (isset($propertyElement['_properties'])) {
@@ -1061,6 +1051,46 @@ class FHIRModelGenerator implements GeneratorInterface
         }
 
         return $this->resolvePropertyKindFromCode($types[0]['code'] ?? '');
+    }
+
+    /**
+     * Build the `#[FHIRPathInvariant]` arguments for one StructureDefinition constraint.
+     *
+     * `bestPractice` is emitted only when true, so the vast majority of invariants keep their
+     * existing three-argument form and the regen diff stays readable. The flag comes from the
+     * `elementdefinition-bestpractice` extension, which marks a constraint as a recommendation
+     * rather than a conformance rule — the HL7 Java reference validator does not report those by
+     * default, and reporting them buried real findings (475 of our 767 R4 warnings were `dom-6`).
+     * In R4 only `dom-6` and `con-3` carry it, over 189 declarations.
+     *
+     * @param array<string, mixed> $constraint
+     *
+     * @return array<string, mixed>
+     */
+    private static function invariantAttributeArgs(array $constraint, string $expression): array
+    {
+        $args = [
+            'key'        => $constraint['key'],
+            'severity'   => $constraint['severity'],
+            'expression' => $expression,
+            'human'      => $constraint['human'],
+        ];
+
+        foreach ($constraint['extension'] ?? [] as $extension) {
+            if (!is_array($extension)) {
+                continue;
+            }
+
+            $url = $extension['url'] ?? '';
+            if (is_string($url)
+                && str_ends_with($url, '/elementdefinition-bestpractice')
+                && ($extension['valueBoolean'] ?? false) === true) {
+                $args['bestPractice'] = true;
+                break;
+            }
+        }
+
+        return $args;
     }
 
     /**

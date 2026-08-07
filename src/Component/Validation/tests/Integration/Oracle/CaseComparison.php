@@ -53,4 +53,22 @@ final class CaseComparison
     {
         return $this->ourErrorCountUnfiltered - $this->ourErrorCount;
     }
+
+    /**
+     * How our warning count compares with Java's.
+     *
+     * Tracked separately from {@see classification()} because warnings do not affect validity and
+     * must never gate landing the cascade — but they are still asserted by the specification suite,
+     * and re-seeding while they disagree bakes an unreviewed count in as correct. An error-only
+     * comparison reporting "zero ABOVE" does not mean "agrees with Java".
+     */
+    public function warningClassification(): Classification
+    {
+        return Classification::compare($this->ourWarningCount, $this->javaWarningCount);
+    }
+
+    public function warningsAgree(): bool
+    {
+        return $this->warningClassification() === Classification::Equal;
+    }
 }

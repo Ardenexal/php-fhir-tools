@@ -150,6 +150,37 @@ final class NestedInvariantCascadeTest extends TestCase
         );
     }
 
+    /**
+     * Best-practice constraints are recommendations, not conformance rules, and are off by default.
+     *
+     * `dom-6` ("a resource should have narrative") fires on essentially every resource. Reporting it
+     * accounted for 475 of 767 warnings across the R4 conformance corpus, burying real findings; the
+     * HL7 Java reference validator does not report best-practice constraints by default either.
+     *
+     * The flag reaches the validator only because the generator copies
+     * `elementdefinition-bestpractice` from the StructureDefinition into `#[FHIRPathInvariant]`. If
+     * that emission regresses, this test fails — which is the point, since the symptom would
+     * otherwise be a quiet flood of warnings.
+     */
+    public function testBestPracticeInvariantsAreNotReportedByDefault(): void
+    {
+        // A Patient with no narrative violates dom-6 and nothing else.
+        $json = json_encode([
+            'resourceType' => 'Patient',
+            'id'           => 'no-narrative',
+        ], JSON_THROW_ON_ERROR);
+
+        $resource = FHIRSerializationService::createDefault(FhirVersion::R4)->deserialize($json);
+        $report   = OracleValidationServiceFactory::create(FhirVersion::R4)->validate($resource);
+
+        $keys = array_map(
+            static fn (FHIRValidationViolation $v): ?string => $v->invariantKey,
+            [...$report->errors(), ...$report->warnings()],
+        );
+
+        self::assertNotContains('dom-6', $keys, 'dom-6 is best-practice and must be silent by default');
+    }
+
     /** @return list<FHIRValidationViolation> */
     private function validateFixture(string $file, FhirVersion $version): array
     {

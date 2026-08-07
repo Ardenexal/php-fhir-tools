@@ -58,6 +58,7 @@ use Symfony\Component\Validator\Constraints\Valid;
     severity: 'warning',
     expression: 'text.`div`.exists()',
     human: 'A resource should have narrative for robust management',
+    bestPractice: true,
 )]
 abstract class AbstractDomainResource extends AbstractResource
 {

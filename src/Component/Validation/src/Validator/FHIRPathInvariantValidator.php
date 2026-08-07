@@ -25,9 +25,19 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 final class FHIRPathInvariantValidator extends ConstraintValidator
 {
+    /**
+     * @param bool $reportBestPractice Whether to evaluate constraints marked
+     *                                 `elementdefinition-bestpractice`. Off by default, matching the
+     *                                 HL7 Java reference validator: these express a recommendation,
+     *                                 not a conformance rule, so reporting them buries real findings
+     *                                 — `dom-6` ("a resource should have narrative") alone accounted
+     *                                 for 475 of 767 warnings across the R4 conformance corpus. Turn
+     *                                 on to audit narrative and other best-practice coverage.
+     */
     public function __construct(
         private readonly FHIRPathService $pathService,
         private readonly FHIRValidationMessageRegistry $messageRegistry,
+        private readonly bool $reportBestPractice = false,
     ) {
     }
 
@@ -65,6 +75,13 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
         }
 
         if ($value === null) {
+            return;
+        }
+
+        // A best-practice constraint is a recommendation, not a conformance rule. Skip before
+        // evaluating rather than after: these fire on almost every resource, so the saved FHIRPath
+        // evaluations are the bulk of them.
+        if ($constraint->bestPractice && !$this->reportBestPractice) {
             return;
         }
 

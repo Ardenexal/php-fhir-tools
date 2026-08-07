@@ -70,6 +70,7 @@ use Symfony\Component\Validator\Constraints\Valid;
     severity: 'warning',
     expression: 'originatingAppointment.exists().not() or recurrenceTemplate.exists().not()',
     human: 'An appointment may have an originatingAppointment or recurrenceTemplate, but not both',
+    bestPractice: true,
 )]
 #[FHIRPathInvariant(
     key: 'app-7',
