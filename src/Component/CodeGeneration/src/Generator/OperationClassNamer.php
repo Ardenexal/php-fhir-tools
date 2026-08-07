@@ -36,10 +36,18 @@ use function Symfony\Component\String\u;
 final class OperationClassNamer
 {
     /**
-     * PHP reserved words that cannot stand alone as a class name or property name.
+     * PHP reserved words that cannot stand alone as a **class** name.
      *
-     * `use`, `return` and `default` all occur as real parameter names in the core packages —
-     * `designation.use` on `$lookup` is the case D3 warns about.
+     * Class names only. PHP reserves neither property names nor parameter names, so
+     * `public readonly ?Coding $use` is legal and `new Designation(use: $coding)` works — M01's
+     * hand-written `Designation` did exactly that, with a test proving it readable by direct access,
+     * nullsafe access and reflection.
+     *
+     * Applying this list to property names too was a real bug: it emitted `$useParameter` for
+     * `designation.use`, which silently broke an M01 assertion. `assertNull($d->use)` on the
+     * generated class reads a property that does not exist, gets null, and passes — green for
+     * exactly the reason N28 names as the weakest proof shape. Class names genuinely need the guard
+     * (`…\Designation\Use` is a fatal parse error); properties never did.
      */
     private const array RESERVED_WORDS = [
         'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone',
@@ -85,7 +93,7 @@ final class OperationClassNamer
             $code = is_string($definition['id'] ?? null) ? $definition['id'] : '';
         }
 
-        $stem = $this->pascal($resource) . $this->pascal($code);
+        $stem = $this->guardClassName($this->pascal($resource) . $this->pascal($code));
 
         if ($stem === '') {
             throw GenerationException::operationNamingFailed(sprintf('Cannot derive a class name for OperationDefinition "%s": resource and code both produce an empty identifier.', is_string($definition['url'] ?? null) ? $definition['url'] : '(no url)'));
@@ -108,7 +116,7 @@ final class OperationClassNamer
     public function partClassName(string $use, array $path): string
     {
         $segments = array_map(fn (string $segment): string => $this->pascal($segment), $path);
-        $name     = $this->pascal($use) . implode('', $segments);
+        $name     = $this->guardClassName($this->pascal($use) . implode('', $segments));
 
         if ($name === '' || $segments === []) {
             throw GenerationException::operationNamingFailed(sprintf('Cannot derive a nested class name for the "%s" parameter path [%s].', $use, implode('.', $path)));
@@ -135,12 +143,10 @@ final class OperationClassNamer
 
         // Numeric-leading guard: `2fa` would be a parse error. Ported from the enum-case footgun,
         // where the same slugging surface crashed on codes it could not turn into identifiers.
+        // No reserved-word guard here — see RESERVED_WORDS. A property named `use` is legal, and
+        // escaping it silently diverges the generated class from what callers expect.
         if (ctype_digit($name[0])) {
             $name = 'p' . ucfirst($name);
-        }
-
-        if (in_array(strtolower($name), self::RESERVED_WORDS, true)) {
-            $name .= 'Parameter';
         }
 
         return $name;
@@ -164,6 +170,16 @@ final class OperationClassNamer
 
             $seen[$name] = $source;
         }
+    }
+
+    /**
+     * Suffix a class name that collides with a PHP reserved word.
+     *
+     * Only class names need this. `…\Designation\Use` is a fatal parse error; `$use` is not.
+     */
+    private function guardClassName(string $name): string
+    {
+        return in_array(strtolower($name), self::RESERVED_WORDS, true) ? $name . 'Operation' : $name;
     }
 
     /**

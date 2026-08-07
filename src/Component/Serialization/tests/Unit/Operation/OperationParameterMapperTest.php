@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit\Operation;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Operation\CodeSystemLookup\CodeSystemLookupInput as R4Input;
+use Ardenexal\FHIRTools\Component\Models\R4\Operation\CodeSystemLookup\CodeSystemLookupOutput as R4Output;
+use Ardenexal\FHIRTools\Component\Models\R5\Operation\CodeSystemLookup\CodeSystemLookupInput as R5Input;
+use Ardenexal\FHIRTools\Component\Models\R5\Operation\CodeSystemLookup\CodeSystemLookupOutput as R5Output;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Operation\OperationMappingException;
 use Ardenexal\FHIRTools\Component\Serialization\Operation\OperationParameterMapper;
 use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\ProfiledParametersResource;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R4\CodeSystemLookupInput as R4Input;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R4\CodeSystemLookupOutput as R4Output;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R5\CodeSystemLookupInput as R5Input;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R5\CodeSystemLookupOutput as R5Output;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -27,9 +27,24 @@ use PHPUnit\Framework\TestCase;
  * Round-trip identity alone would prove the mapper is *a* bijection, not the *correct* one — an
  * identity function would pass. So the intermediate structure is asserted too: which slot each
  * value lands in, what the wire names are, and that the emitted parameters satisfy `inv-1`.
+ *
+ * ## Runs against M02's generated classes
+ *
+ * Written in M01 against hand-written stand-ins, repointed in M02 at
+ * `Models\{version}\Operation\CodeSystemLookup\` with **no assertion changed** — only the class
+ * resolution below. That is the milestone's strongest single result: the mapper and the classes it
+ * maps were built a milestone apart and met without adjustment. The stand-ins survive as the oracle
+ * {@see GeneratedMatchesHandWrittenTest} diffs against.
+ *
+ * The nested part classes are flat and `use`-prefixed here (`CodeSystemLookupOutProperty`, not
+ * `CodeSystemLookupOutput\Property`), which is what makes N3's `property` in/out collision
+ * impossible by construction rather than by luck.
  */
 final class OperationParameterMapperTest extends TestCase
 {
+    /** Generated `$lookup` payloads live one namespace per version; `%s` takes R4 or R5. */
+    private const string LOOKUP_NS = 'Ardenexal\FHIRTools\Component\Models\%s\Operation\CodeSystemLookup';
+
     /**
      * Every emitted parameter satisfies `inv-1`: exactly one of value, resource, part.
      *
@@ -181,11 +196,8 @@ final class OperationParameterMapperTest extends TestCase
     #[DataProvider('versionProvider')]
     public function testBareStringOnAPolymorphicParameterIsRefused(string $version, FhirVersion $fhirVersion): void
     {
-        $propertyClass = sprintf(
-            'Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s\CodeSystemLookupOutput\Property',
-            $version,
-        );
-        $outputClass = self::outputClass($version);
+        $propertyClass = sprintf(self::LOOKUP_NS . '\CodeSystemLookupOutProperty', $version);
+        $outputClass   = self::outputClass($version);
 
         $output = new $outputClass(
             name: 'x',
@@ -226,15 +238,9 @@ final class OperationParameterMapperTest extends TestCase
     #[DataProvider('versionProvider')]
     public function testFalsyValuesAreNotTreatedAsAbsent(string $version, FhirVersion $fhirVersion): void
     {
-        $subpropertyClass = sprintf(
-            'Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s\CodeSystemLookupOutput\PropertySubproperty',
-            $version,
-        );
-        $propertyClass = sprintf(
-            'Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s\CodeSystemLookupOutput\Property',
-            $version,
-        );
-        $outputClass = self::outputClass($version);
+        $subpropertyClass = sprintf(self::LOOKUP_NS . '\CodeSystemLookupOutPropertySubproperty', $version);
+        $propertyClass    = sprintf(self::LOOKUP_NS . '\CodeSystemLookupOutProperty', $version);
+        $outputClass      = self::outputClass($version);
 
         $output = new $outputClass(
             name: 'n',
@@ -472,10 +478,10 @@ final class OperationParameterMapperTest extends TestCase
     {
         $codePrimitive = sprintf('Ardenexal\FHIRTools\Component\Models\%s\Primitive\CodePrimitive', $version);
         $coding        = sprintf('Ardenexal\FHIRTools\Component\Models\%s\DataType\Coding', $version);
-        $base          = sprintf('Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s', $version);
+        $base          = sprintf(self::LOOKUP_NS, $version);
 
-        $subpropertyClass = $base . '\CodeSystemLookupOutput\PropertySubproperty';
-        $propertyClass    = $base . '\CodeSystemLookupOutput\Property';
+        $subpropertyClass = $base . '\CodeSystemLookupOutPropertySubproperty';
+        $propertyClass    = $base . '\CodeSystemLookupOutProperty';
         $outputClass      = $base . '\CodeSystemLookupOutput';
 
         return new $outputClass(
@@ -507,10 +513,7 @@ final class OperationParameterMapperTest extends TestCase
     private static function inputClass(string $version): string
     {
         /** @var class-string<R4Input|R5Input> */
-        return sprintf(
-            'Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s\CodeSystemLookupInput',
-            $version,
-        );
+        return sprintf(self::LOOKUP_NS . '\CodeSystemLookupInput', $version);
     }
 
     /**
@@ -519,10 +522,7 @@ final class OperationParameterMapperTest extends TestCase
     private static function outputClass(string $version): string
     {
         /** @var class-string<R4Output|R5Output> */
-        return sprintf(
-            'Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s\CodeSystemLookupOutput',
-            $version,
-        );
+        return sprintf(self::LOOKUP_NS . '\CodeSystemLookupOutput', $version);
     }
 
     /**

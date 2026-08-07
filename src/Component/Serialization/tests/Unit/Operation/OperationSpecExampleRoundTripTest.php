@@ -36,6 +36,21 @@ use PHPUnit\Framework\TestCase;
  * That surfaces a real design question the mapper currently answers by omission: an undeclared
  * parameter is **silently dropped**. Asserted below so the behaviour is deliberate and visible
  * rather than accidental.
+ *
+ * ## Runs against M02's generated classes, with no assertion changed
+ *
+ * Repointing this file was blocked, and the block was a real bug rather than a naming detail. The
+ * generator applied its reserved-word guard to *parameter* identifiers as well as class names, so
+ * `designation.use` became `$useParameter`. `assertNull($restored->designation[0]->use)` would then
+ * have read a property that does not exist, got `null`, and **passed vacuously** — green for exactly
+ * the reason N28 names as the weakest proof shape, since it passes both when the value is null and
+ * when nothing was read at all.
+ *
+ * The one-character fix (`->useParameter`) was deliberately not made: an assertion edit would have
+ * papered over the divergence. The guard was narrowed to class names instead — PHP reserves neither
+ * property nor parameter names, which M01's hand-written `Designation` had already demonstrated by
+ * declaring `public readonly ?Coding $use` and round-tripping. `…\Designation\Use` really would be
+ * a fatal parse error, so the class-name half of the guard stays.
  */
 final class OperationSpecExampleRoundTripTest extends TestCase
 {
@@ -468,7 +483,7 @@ final class OperationSpecExampleRoundTripTest extends TestCase
     {
         /** @var class-string */
         return sprintf(
-            'Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s\CodeSystemLookupOutput',
+            'Ardenexal\FHIRTools\Component\Models\%s\Operation\CodeSystemLookup\CodeSystemLookupOutput',
             $version,
         );
     }

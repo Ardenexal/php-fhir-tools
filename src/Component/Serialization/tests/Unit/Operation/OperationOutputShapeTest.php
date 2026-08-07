@@ -11,14 +11,14 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Operation\OperationMappingException;
 use Ardenexal\FHIRTools\Component\Serialization\Operation\OperationParameterMapper;
+use Ardenexal\FHIRTools\Component\Models\R4\Operation\CodeSystemLookup\CodeSystemLookupOperation as R4Lookup;
+use Ardenexal\FHIRTools\Component\Models\R4\Operation\MeasureSubmitData\MeasureSubmitDataInput;
+use Ardenexal\FHIRTools\Component\Models\R4\Operation\MeasureSubmitData\MeasureSubmitDataOperation as R4SubmitData;
+use Ardenexal\FHIRTools\Component\Models\R4\Operation\ResourceGraph\ResourceGraphOperation as R4Graph;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\MeasureReportResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\ValueSetResource;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R4\CodeSystemLookupOperation as R4Lookup;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R4\MeasureSubmitDataInput;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R4\MeasureSubmitDataOperation as R4SubmitData;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R4\ResourceGraphOperation as R4Graph;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R5\CodeSystemLookupOperation as R5Lookup;
+use Ardenexal\FHIRTools\Component\Models\R5\Operation\CodeSystemLookup\CodeSystemLookupOperation as R5Lookup;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -41,9 +41,20 @@ use PHPUnit\Framework\TestCase;
  * its `valueSet` IN parameter is **resource-typed**, exercising the `resource` slot that previously
  * shipped with zero coverage; and four of its parameters carry hyphens on the wire, so the wire
  * name and the PHP identifier genuinely diverge.
+ *
+ * ## Runs against M02's generated classes
+ *
+ * Repointed from M01's hand-written stand-ins with **no assertion changed**. Two tests gain from the
+ * move rather than merely surviving it: `testExpandInputMatchesTheDefinition` and
+ * `testHolderDeclaresTheShapeTheDefinitionImplies` diff against the committed OperationDefinition,
+ * so pointed at generated output they become per-operation fidelity checks on the generator itself
+ * (N23) instead of on a transcription.
  */
 final class OperationOutputShapeTest extends TestCase
 {
+    /** Generated operation payloads nest one namespace per operation; `%s` takes R4 or R5. */
+    private const string OPERATION_NS = 'Ardenexal\FHIRTools\Component\Models\%s\Operation';
+
     /**
      * A class-B response is the resource itself — returned as-is, never run through the mapper.
      */
@@ -92,10 +103,7 @@ final class OperationOutputShapeTest extends TestCase
     public function testParametersShapedOperationStillMapsThroughParameters(string $version, FhirVersion $fhirVersion): void
     {
         $mapper      = OperationParameterMapper::createDefault($fhirVersion);
-        $outputClass = sprintf(
-            'Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s\CodeSystemLookupOutput',
-            $version,
-        );
+        $outputClass = sprintf(self::OPERATION_NS . '\CodeSystemLookup\CodeSystemLookupOutput', $version);
 
         $original = new $outputClass(name: 'ACME Codes', display: 'Left displacement');
         $body     = $mapper->toParameters($original);
@@ -118,11 +126,8 @@ final class OperationOutputShapeTest extends TestCase
 
         self::assertSame($expanded, $mapper->toResponse($expanded, self::expandOperation($version)));
 
-        $outputClass = sprintf(
-            'Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s\CodeSystemLookupOutput',
-            $version,
-        );
-        $parameters = $mapper->toResponse(
+        $outputClass = sprintf(self::OPERATION_NS . '\CodeSystemLookup\CodeSystemLookupOutput', $version);
+        $parameters  = $mapper->toResponse(
             new $outputClass(name: 'n', display: 'd'),
             $version === 'R4' ? R4Lookup::class : R5Lookup::class,
         );
@@ -470,10 +475,7 @@ final class OperationOutputShapeTest extends TestCase
     private static function expandOperation(string $version): string
     {
         /** @var class-string */
-        return sprintf(
-            'Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s\ValueSetExpandOperation',
-            $version,
-        );
+        return sprintf(self::OPERATION_NS . '\ValueSetExpand\ValueSetExpandOperation', $version);
     }
 
     /**
@@ -482,10 +484,7 @@ final class OperationOutputShapeTest extends TestCase
     private static function expandInputClass(string $version): string
     {
         /** @var class-string */
-        return sprintf(
-            'Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\%s\ValueSetExpandInput',
-            $version,
-        );
+        return sprintf(self::OPERATION_NS . '\ValueSetExpand\ValueSetExpandInput', $version);
     }
 
     /**

@@ -127,6 +127,10 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
 
             $v                     = strtolower($fhirVersion);
             $expectedNormalizerIds = [
+                // Operation payloads lead the chain: nothing else claims those classes, and a
+                // generic normalizer reaching one yields an object with every property null.
+                "fhir.normalizer.operation_payload.json.{$v}",
+                "fhir.normalizer.operation_payload.xml.{$v}",
                 "fhir.normalizer.resource.json.{$v}",
                 "fhir.normalizer.resource.xml.{$v}",
                 "fhir.normalizer.complex_type.json.{$v}",
@@ -144,11 +148,24 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
                 );
             }
 
+            // Derived from the list above rather than hardcoded: the point of the assertion is that
+            // every registered normalizer is actually wired in and none is left dangling, which a
+            // magic number states only indirectly — and silently drifts when one is added.
             $normalizerRefs = $container->getDefinition("fhir.serializer.{$v}")->getArgument(0);
             self::assertCount(
-                8,
+                count($expectedNormalizerIds),
                 $normalizerRefs,
-                "fhir.serializer.{$v} should reference exactly 8 normalizers",
+                sprintf(
+                    'fhir.serializer.%s should reference all %d registered normalizers',
+                    $v,
+                    count($expectedNormalizerIds),
+                ),
+            );
+
+            self::assertSame(
+                $expectedNormalizerIds,
+                array_map(static fn (object $ref): string => (string) $ref, $normalizerRefs),
+                "fhir.serializer.{$v} normalizer order changed — order decides which one claims a class first",
             );
         });
     }

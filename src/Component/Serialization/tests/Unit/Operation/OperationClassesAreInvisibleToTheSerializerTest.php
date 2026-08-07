@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit\Operation;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Operation\CodeSystemLookup\CodeSystemLookupInput;
+use Ardenexal\FHIRTools\Component\Models\R4\Operation\CodeSystemLookup\CodeSystemLookupOutput;
+use Ardenexal\FHIRTools\Component\Models\R4\Operation\ValueSetExpand\ValueSetExpandInput;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R4\CodeSystemLookupInput;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R4\CodeSystemLookupOutput;
-use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R4\ValueSetExpandInput;
+use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\Operations\R4\CodeSystemLookupInput as UnclaimedPayload;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -35,7 +36,22 @@ use PHPUnit\Framework\TestCase;
  * location-based argument would have expired at that point.
  *
  * What remains load-bearing is the *negative* half: the classes must carry no resource metadata. That
- * is what this file asserts, because it is the half a generator can silently break.
+ * is what this file asserts, because it is the half a generator can silently break. It is asserted
+ * against M02's **generated** classes, which is where it now has to hold.
+ *
+ * ## D2's other half was deliberately narrowed after M01, and this file records where
+ *
+ * M01 read "invisible to the serializer" as *unclaimed by every normalizer*, and proved it by
+ * showing `serializeToJson()` refuses a payload outright. M02's M12/M13 changed that on purpose:
+ * generated payloads carry `#[FhirOperationPayload]` and are claimed by
+ * `FHIROperationPayloadJsonNormalizer`, registered first in the chain, which emits a conformant
+ * `Parameters` body. That is the *stronger* D2 outcome — the classes are still off the
+ * property-walking path, and now they are usable from API Platform instead of merely refused.
+ *
+ * So {@see self::testSerializingAPayloadDirectlyIsRefused} deliberately keeps using the M01
+ * hand-written class. Repointing it would not be a rename; it would assert the opposite behaviour.
+ * On a class *without* `#[FhirOperationPayload]` the refusal is still the truth, and it is the only
+ * remaining witness that nothing else in the chain claims an operation payload by accident.
  */
 final class OperationClassesAreInvisibleToTheSerializerTest extends TestCase
 {
@@ -64,7 +80,12 @@ final class OperationClassesAreInvisibleToTheSerializerTest extends TestCase
     }
 
     /**
-     * Handing a payload class straight to the serializer is refused outright.
+     * Handing an *unclaimed* payload class straight to the serializer is refused outright.
+     *
+     * Runs against M01's hand-written class on purpose — see the class docblock. A generated payload
+     * carries `#[FhirOperationPayload]` and now serializes to a `Parameters` body instead
+     * (`OperationPayloadNormalizerTest`), so this test would assert the opposite behaviour if it
+     * were repointed.
      *
      * This is the failure D2 exists to prevent, stated as a behaviour instead of a rule. The danger
      * D2 names was never an exception — it was flat, well-formed-looking JSON
@@ -80,7 +101,7 @@ final class OperationClassesAreInvisibleToTheSerializerTest extends TestCase
     public function testSerializingAPayloadDirectlyIsRefused(): void
     {
         $service = FHIRSerializationService::createDefault(FhirVersion::R4);
-        $payload = new CodeSystemLookupInput(code: 'A', system: 'http://loinc.org');
+        $payload = new UnclaimedPayload(code: 'A', system: 'http://loinc.org');
 
         $this->expectException(FHIRSerializationException::class);
 

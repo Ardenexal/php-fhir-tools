@@ -184,8 +184,11 @@ final class OperationClassNamerTest extends TestCase
         yield 'plain'                => ['code', 'code'];
         yield 'hyphenated'           => ['check-system-version', 'checkSystemVersion'];
         yield 'leading underscore'   => ['_count', 'count'];
-        yield 'reserved word'        => ['use', 'useParameter'];
-        yield 'reserved word return' => ['return', 'returnParameter'];
+        // PHP reserves neither property nor parameter names, so these pass through untouched.
+        // Escaping them was a real bug: the generated class declared `$useParameter`, and an M01
+        // assertion reading `->use` then returned null and passed *vacuously* (N28).
+        yield 'reserved word'        => ['use', 'use'];
+        yield 'reserved word return' => ['return', 'return'];
         yield 'dotted'               => ['targetIdentifier.period', 'targetIdentifierPeriod'];
         yield 'published typo kept'  => ['targetIdentifer.preferred', 'targetIdentiferPreferred'];
         yield 'numeric leading'      => ['2fa', 'p2fa'];
@@ -216,6 +219,69 @@ final class OperationClassNamerTest extends TestCase
         $this->expectExceptionMessageMatches('/empty identifier/');
 
         (new OperationClassNamer())->classStem(['url' => 'http://example.org/op', 'resource' => []]);
+    }
+
+    /**
+     * A reserved word is legal as a property name and is emitted verbatim.
+     *
+     * Proven by construction rather than asserted: PHP only reserves these as *class* names.
+     */
+    public function testReservedWordIsLegalAsAPropertyName(): void
+    {
+        $probe = new class ('yes') {
+            public function __construct(public readonly ?string $use = null)
+            {
+            }
+        };
+
+        self::assertTrue(property_exists($probe, 'use'));
+        self::assertSame('use', (new OperationClassNamer())->propertyName('use'));
+    }
+
+    /**
+     * A parameter named for a reserved word yields a legal, non-reserved class name.
+     *
+     * `…\Designation\Use` would be a fatal parse error, which is why the class-name guard exists.
+     * In practice it never fires on real data: part class names are `{Use}{Segments}`, so
+     * `designation.use` becomes `OutUse` — already unreserved by construction. Asserted as the
+     * *property* (the name is legal and unreserved) rather than as the mechanism, so the test stays
+     * true whether the guard fires or the composition happens to make it unnecessary.
+     */
+    #[DataProvider('versionProvider')]
+    public function testNoDerivedClassNameIsAReservedWord(string $version): void
+    {
+        $namer   = new OperationClassNamer();
+        $checked = 0;
+
+        foreach (self::operations($version) as $operation) {
+            $stem = $namer->classStem($operation);
+            self::assertFalse(self::isReserved($stem), sprintf('Class stem "%s" is a reserved word.', $stem));
+
+            foreach ($operation['parameter'] as $parameter) {
+                if (!is_array($parameter['part'] ?? null) || $parameter['part'] === []) {
+                    continue;
+                }
+
+                $name = $namer->partClassName($parameter['use'], [$parameter['name']]);
+
+                self::assertFalse(self::isReserved($name), sprintf('Part class "%s" is a reserved word.', $name));
+                ++$checked;
+            }
+        }
+
+        self::assertGreaterThan(2, $checked, 'No part classes were reached.');
+
+        // `designation.use` is the case D3 named. It composes to `OutUse`, legal without the guard.
+        self::assertSame('OutUse', $namer->partClassName('out', ['use']));
+    }
+
+    private static function isReserved(string $name): bool
+    {
+        // A reserved word is unusable as a class name; eval-free check via a reflection-safe list.
+        return in_array(strtolower($name), [
+            'use', 'return', 'class', 'function', 'list', 'print', 'echo', 'default', 'match',
+            'abstract', 'final', 'static', 'new', 'enum', 'interface', 'trait',
+        ], true);
     }
 
     /**

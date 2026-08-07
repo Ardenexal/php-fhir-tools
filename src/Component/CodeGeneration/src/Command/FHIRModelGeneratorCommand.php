@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIROperationGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRValueSetGenerator;
@@ -453,8 +454,63 @@ class FHIRModelGeneratorCommand extends Command
         // These are written to Models/src/{version}/Profile/ and serve the same purpose.
         $this->buildProfiles($output, $fhirVersion);
 
-        // Phase 5: Write all generated classes and enums to disk
+        // Phase 5: Generate typed operation payloads and holders from OperationDefinitions.
+        // Written to Models/src/{version}/Operation/. Runs after the type phases because the
+        // generator reads StructureDefinition `kind` and `baseDefinition` out of the same context
+        // to classify output shapes and order value[x] variants.
+        $this->buildOperations($output, $fhirVersion);
+
+        // Phase 6: Write all generated classes and enums to disk
         $this->outputGeneratedFiles($output, $fhirVersion);
+    }
+
+    /**
+     * Generate typed IN/OUT payload classes and an invocation holder per OperationDefinition.
+     *
+     * Definitions reach the context via `PackageLoader`, which admits `OperationDefinition`
+     * alongside ValueSet and CodeSystem. Unlike the type phases this iterates `getDefinitions()`
+     * directly, because operations are not StructureDefinitions.
+     *
+     * `kind = 'query'` is filtered **here**, at the call site, as well as inside the generator's
+     * `canGenerate()`. That duplication is deliberate: nothing in this pipeline dispatches on
+     * `canGenerate()` — every generator is invoked explicitly — so a filter living only there would
+     * silently do nothing.
+     */
+    private function buildOperations(OutputInterface $output, string $version): void
+    {
+        $generator = new FHIROperationGenerator();
+        $generated = 0;
+        $skipped   = 0;
+
+        foreach ($this->context[$version]->getDefinitions() as $url => $definition) {
+            if (($definition['resourceType'] ?? null) !== 'OperationDefinition') {
+                continue;
+            }
+
+            if (!$generator->canGenerate($definition)) {
+                ++$skipped;
+                $output->writeln("<comment>Skipping {$url} (kind=" . ($definition['kind'] ?? '?') . ')</comment>');
+
+                continue;
+            }
+
+            $holder = $generator->generate($definition, $version, $this->context[$version]);
+
+            // The namespace comes off the class the generator built, not from one assembled here:
+            // it nests per operation (`…\Operation\CodeSystemLookup`) to match the file layout, and
+            // rebuilding it here would silently disagree with the generator and break PSR-4.
+            $this->context[$version]->addType(
+                $url . '#operation',
+                $holder->getNamespace()?->getName() ?? "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Operation",
+                $holder,
+            );
+
+            ++$generated;
+        }
+
+        // Reported rather than silent: "0 operations generated" and "47 operations generated" look
+        // identical in a passing build otherwise, and the count is an M02 exit criterion.
+        $output->writeln("<info>Generated {$generated} operation holders for {$version} ({$skipped} skipped).</info>");
     }
 
     /**
@@ -920,6 +976,14 @@ class FHIRModelGeneratorCommand extends Command
             if (str_contains($attributeName, 'FHIRProfile')) {
                 return new PhpNamespace("{$baseNamespace}\\Profile");
             }
+
+            // Operation holders and payloads. Payload classes deliberately carry no FhirResource or
+            // FhirProperty — that is what keeps them off the normalizers' supports*() path — so
+            // without this branch they would fall through to the DataType default below and be
+            // written to the wrong directory.
+            if (str_contains($attributeName, 'FhirOperation')) {
+                return new PhpNamespace("{$baseNamespace}\\Operation");
+            }
         }
 
         // Default to DataType for any class without a recognized attribute
@@ -948,8 +1012,20 @@ class FHIRModelGeneratorCommand extends Command
         $namespaceParts = explode('\\', $namespace->getName());
         $typeCategory   = end($namespaceParts);
 
-        // If this is a backbone element in the Resource category, nest it under its parent resource
         $typeName = $type->getName();
+
+        // Operation classes nest under their operation, the way backbone elements nest under their
+        // parent resource: CodeSystemLookupOutProperty goes to Operation/CodeSystemLookup/. One
+        // operation emits up to six classes, so a flat directory would be unreadable at 154 of them.
+        if ($typeName !== null && $type instanceof ClassType && $typeCategory === 'Operation') {
+            $stem = $this->getOperationStem($type);
+
+            if ($stem !== null) {
+                return Path::canonicalize("{$basePath}/{$version}/Operation/{$stem}/{$typeName}.php");
+            }
+        }
+
+        // If this is a backbone element in the Resource category, nest it under its parent resource
         if ($typeName !== null && $type instanceof ClassType && $typeCategory === 'Resource') {
             $parentResource = $this->getBackboneParentResource($type);
             if ($parentResource !== null) {
@@ -968,6 +1044,36 @@ class FHIRModelGeneratorCommand extends Command
      *
      * @return string|null The parent resource name (e.g. "Patient"), or null if not a backbone element
      */
+    /**
+     * The operation class stem a generated operation class belongs to, e.g. `CodeSystemLookup`.
+     *
+     * Payloads carry it on `FhirOperationPayload::$operation`; holders are named `{Stem}Operation`,
+     * so the stem is recoverable from the class name. Reading it from the attribute where one exists
+     * rather than parsing every name keeps payload placement independent of the naming convention.
+     */
+    private function getOperationStem(ClassType $type): ?string
+    {
+        foreach ($type->getAttributes() as $attribute) {
+            $name = $attribute->getName();
+
+            if (str_contains($name, 'FhirOperationPayload')) {
+                $operation = $attribute->getArguments()['operation'] ?? null;
+
+                return is_string($operation) && $operation !== '' ? $operation : null;
+            }
+
+            if (str_contains($name, 'FhirOperation') && !str_contains($name, 'Parameter')) {
+                $className = $type->getName() ?? '';
+
+                return str_ends_with($className, 'Operation')
+                    ? substr($className, 0, -strlen('Operation'))
+                    : null;
+            }
+        }
+
+        return null;
+    }
+
     private function getBackboneParentResource(ClassType $type): ?string
     {
         foreach ($type->getAttributes() as $attribute) {

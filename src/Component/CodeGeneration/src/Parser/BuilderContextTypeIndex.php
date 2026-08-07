@@ -30,4 +30,11 @@ final class BuilderContextTypeIndex implements TypeIndexInterface
 
         return is_string($kind) ? $kind : null;
     }
+
+    public function isAbstract(string $typeCode): bool
+    {
+        $definition = $this->context->getDefinition(self::STRUCTURE_DEFINITION_URL . $typeCode);
+
+        return ($definition['abstract'] ?? false) === true;
+    }
 }

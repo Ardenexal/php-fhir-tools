@@ -613,11 +613,15 @@ final class OperationParameterMapper
     /**
      * The concrete `Parameters` class for this mapper's version and registry.
      *
+     * Public because a serializer integration needs it: to read an operation request body it must
+     * first denormalize the raw payload into *this* mapper's `Parameters` class, which may be an
+     * IG profile rather than the base one. Asking the mapper keeps that single source of truth.
+     *
      * @return class-string
      *
      * @throws OperationMappingException
      */
-    private function parametersResourceClass(): string
+    public function parametersResourceClass(): string
     {
         $fqcn = $this->typeResolver->resolveResourceType(['resourceType' => 'Parameters']);
 
