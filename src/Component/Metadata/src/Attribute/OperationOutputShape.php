@@ -40,10 +40,20 @@ enum OperationOutputShape: string
     case BareResource = 'bare-resource';
 
     /**
-     * A sole resource-typed OUT parameter under some name other than `return`.
+     * A sole resource-typed OUT parameter under some name other than `return` — **wrapped**.
      *
-     * Distinguished from BareResource because round-tripping a server that does wrap the response
-     * needs the parameter name, and `return` cannot be assumed.
+     * The specification's un-wrap rule is conditioned on the *name*: "If there is only one out
+     * parameter, which is a Resource with the parameter name **"return"** then the parameter format
+     * is not used". A sole resource OUT under any other name fails that condition, so the parameter
+     * format *is* used and the resource arrives inside a one-parameter `Parameters`.
+     *
+     * `Resource/$graph` is this shape — a `Bundle` named `result`. Only 3 operations per version
+     * qualify, but collapsing them into BareResource is wrong in both directions: it reads a wrapped
+     * body as bare, and emits a bare body a server would have to guess at. The name is carried on
+     * {@see FhirOperation::$outputParameterName} because it cannot be assumed.
+     *
+     * (Despite the case name, this shape is NOT bare. It is named for the *parameter*, which is a
+     * bare resource sitting in the wrapper's `resource` slot.)
      */
     case NamedBareResource = 'named-bare-resource';
 

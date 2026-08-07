@@ -56,6 +56,35 @@ final class OperationMappingException extends FHIRToolsException
         ));
     }
 
+    public static function notAnOperationHolder(string $class): self
+    {
+        return new self(sprintf(
+            '%s carries no #[FhirOperation] attribute, so the response shape is unknown. Pass the '
+            . 'generated operation holder class, not the payload class.',
+            $class,
+        ));
+    }
+
+    public static function unexpectedResponseType(string $expected, string $given, string $shape): self
+    {
+        return new self(sprintf(
+            'This operation declares output shape "%s", so the response body must be a %s — got %s. '
+            . 'A server that wrapped the resource in Parameters is not conformant here.',
+            $shape,
+            $expected,
+            $given,
+        ));
+    }
+
+    public static function missingNamedOutputParameter(string $wireName): self
+    {
+        return new self(sprintf(
+            'The response carries no parameter named "%s", which this operation declares as its sole '
+            . 'resource-typed output.',
+            $wireName,
+        ));
+    }
+
     public static function unresolvableType(string $fhirType): self
     {
         return new self(sprintf(

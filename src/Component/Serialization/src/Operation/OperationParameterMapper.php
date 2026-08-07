@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Operation;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirOperation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirOperationParameter;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\OperationOutputShape;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistryFactory;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
@@ -140,6 +142,185 @@ final class OperationParameterMapper
         $entries = $parameters->parameter ?? [];
 
         return $this->buildPayload($entries, $class);
+    }
+
+    /**
+     * Read an operation's response body into its typed output, honouring the declared output shape.
+     *
+     * Only about a quarter of operations answer with a `Parameters` resource. For the majority the
+     * response IS the resource, so calling {@see fromParameters()} on it would be wrong — which is
+     * why the shape is a generation-time decision carried on the holder rather than something this
+     * method guesses from the body it was handed.
+     *
+     * @param object|null $body           The deserialized response resource; null for an empty body
+     * @param string      $operationClass The generated holder carrying #[FhirOperation]
+     *
+     * @return object|null The typed Output for Parameters-shaped operations, the resource itself for
+     *                     the bare-resource shapes, and null for NoOutput
+     *
+     * @throws OperationMappingException when the body does not match the declared shape
+     */
+    public function fromResponse(?object $body, string $operationClass): ?object
+    {
+        $operation = $this->operationOf($operationClass);
+
+        return match ($operation->outputShape) {
+            // Modelled explicitly so "succeeded, no body" stays distinguishable from "failed to
+            // parse". A body arriving here is a contract violation worth surfacing, not ignoring.
+            OperationOutputShape::NoOutput => $body === null
+                ? null
+                : throw OperationMappingException::unexpectedResponseType('empty body', $body::class, $operation->outputShape->value),
+            OperationOutputShape::Parameters => $this->parametersOutput($body, $operation),
+            // The spec is literal about this: "If there is only one out parameter, which is a
+            // Resource with the parameter name 'return' then the parameter format is not used, and
+            // the response is simply the resource itself." No unwrapping step exists.
+            OperationOutputShape::BareResource => $this->assertResponseResource(
+                $body,
+                $operation->outputClass,
+                $operation->outputShape,
+            ),
+            // ...and the un-wrap rule is conditioned on the name `return`. A sole resource-typed OUT
+            // parameter under any *other* name does not qualify, so the parameter format IS used and
+            // the resource arrives inside a `Parameters` under that name. Collapsing this into the
+            // bare case would be wrong in both directions: reading a wrapped body as bare, and
+            // emitting a bare body a server would have to guess at.
+            OperationOutputShape::NamedBareResource => $this->namedResourceOutput($body, $operation),
+        };
+    }
+
+    /**
+     * Extract the sole resource-typed OUT parameter from the `Parameters` a class-C response wraps it in.
+     *
+     * @throws OperationMappingException
+     */
+    private function namedResourceOutput(?object $body, FhirOperation $operation): object
+    {
+        $wireName = $operation->outputParameterName;
+
+        if ($wireName === null) {
+            throw OperationMappingException::unresolvableType($operation->outputShape->value . ' outputParameterName');
+        }
+
+        /** @var list<object> $entries */
+        $entries = $body->parameter ?? [];
+
+        foreach ($entries as $entry) {
+            if ($this->wireName($entry) !== $wireName) {
+                continue;
+            }
+
+            return $this->assertResponseResource(
+                $entry->resource ?? null,
+                $operation->outputClass,
+                $operation->outputShape,
+            );
+        }
+
+        throw OperationMappingException::missingNamedOutputParameter($wireName);
+    }
+
+    /**
+     * @throws OperationMappingException
+     */
+    private function parametersOutput(?object $body, FhirOperation $operation): object
+    {
+        $outputClass = $operation->outputClass;
+
+        if ($body === null || $outputClass === null || !class_exists($outputClass)) {
+            throw OperationMappingException::unexpectedResponseType($outputClass ?? 'Parameters', get_debug_type($body), $operation->outputShape->value);
+        }
+
+        return $this->fromParameters($body, $outputClass);
+    }
+
+    /**
+     * Build the response body an operation would send for a typed output — the inverse of
+     * {@see fromResponse()}.
+     *
+     * @param string $operationClass The generated holder carrying #[FhirOperation]
+     *
+     * @throws OperationMappingException when the output does not match the declared shape
+     */
+    public function toResponse(?object $output, string $operationClass): ?object
+    {
+        $operation = $this->operationOf($operationClass);
+
+        return match ($operation->outputShape) {
+            OperationOutputShape::NoOutput    => null,
+            OperationOutputShape::Parameters  => $output === null
+                ? null
+                : $this->toParameters($output),
+            // Class C is wrapped: the un-wrap rule needs the name `return`, which this shape by
+            // definition does not have. Emitted as a one-parameter `Parameters` under the declared
+            // name, which is exactly what fromResponse() reads back.
+            OperationOutputShape::NamedBareResource => $this->wrapNamedResource($output, $operation),
+            // The resource is already the body. Nothing to map: this is the whole point of the shape.
+            OperationOutputShape::BareResource => $this->assertResponseResource(
+                $output,
+                $operation->outputClass,
+                $operation->outputShape,
+            ),
+        };
+    }
+
+    /**
+     * Wrap a class-C output back into the single-parameter `Parameters` its response uses.
+     *
+     * @throws OperationMappingException
+     */
+    private function wrapNamedResource(?object $output, FhirOperation $operation): object
+    {
+        $wireName = $operation->outputParameterName;
+
+        if ($wireName === null) {
+            throw OperationMappingException::unresolvableType($operation->outputShape->value . ' outputParameterName');
+        }
+
+        $resource = $this->assertResponseResource($output, $operation->outputClass, $operation->outputShape);
+
+        $parametersClass = $this->parametersResourceClass();
+        $parameterClass  = $this->parametersParameterClass();
+
+        return new $parametersClass(parameter: [
+            new $parameterClass(name: $wireName, resource: $resource),
+        ]);
+    }
+
+    /**
+     * @throws OperationMappingException
+     */
+    private function assertResponseResource(
+        ?object $body,
+        ?string $expectedClass,
+        OperationOutputShape $shape,
+    ): object {
+        if ($expectedClass === null) {
+            throw OperationMappingException::unresolvableType($shape->value . ' outputClass');
+        }
+
+        if (!$body instanceof $expectedClass) {
+            throw OperationMappingException::unexpectedResponseType($expectedClass, get_debug_type($body), $shape->value);
+        }
+
+        return $body;
+    }
+
+    /**
+     * @throws OperationMappingException
+     */
+    private function operationOf(string $operationClass): FhirOperation
+    {
+        if (!class_exists($operationClass)) {
+            throw OperationMappingException::notAnOperationHolder($operationClass);
+        }
+
+        $attributes = (new \ReflectionClass($operationClass))->getAttributes(FhirOperation::class);
+
+        if ($attributes === []) {
+            throw OperationMappingException::notAnOperationHolder($operationClass);
+        }
+
+        return $attributes[0]->newInstance();
     }
 
     /**
