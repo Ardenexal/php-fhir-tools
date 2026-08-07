@@ -7,7 +7,12 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Operation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirOperation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirOperationParameter;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\OperationOutputShape;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistryFactory;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
@@ -68,6 +73,21 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvide
  */
 final class OperationParameterMapper
 {
+    /**
+     * FHIR temporal types whose primitive wrapper takes a value object rather than a string.
+     *
+     * Every other primitive wrapper declares `$value` as `?string`. These four declare an
+     * `FHIRTemporalValue`, because FHIR temporals carry variable precision that a string cannot encode.
+     *
+     * @var array<string, class-string<FHIRTemporalValue>>
+     */
+    private const array TEMPORAL_VALUE_CLASSES = [
+        'date'     => FHIRDate::class,
+        'dateTime' => FHIRDateTime::class,
+        'instant'  => FHIRInstant::class,
+        'time'     => FHIRTime::class,
+    ];
+
     public function __construct(
         /**
          * Resolves `Parameters` and resource-typed parameters to concrete classes.
@@ -433,7 +453,46 @@ final class OperationParameterMapper
 
         $wrapper = $variant['phpType'];
 
-        return new $wrapper(value: $item);
+        return new $wrapper(value: $this->toWrapperValue($fhirType, $descriptor, $item));
+    }
+
+    /**
+     * Convert a payload's bare PHP value into whatever the primitive wrapper's `$value` accepts.
+     *
+     * Most wrappers take `?string`, so the value passes through. The four temporal primitives do not:
+     * `DateTimePrimitive::$value` is `?FHIRDateTime`, not `?string`, because FHIR temporal precision is
+     * variable (`2026`, `2026-08`, `2026-08-07T12:00:00Z` are all valid `dateTime`s) and a plain string
+     * cannot carry which precision was meant.
+     *
+     * Generated operation payload properties are bare `?string`, so without this every `date`,
+     * `dateTime`, `instant` or `time` parameter raised a `TypeError` on the wrapper constructor rather
+     * than mapping. That is **72 parameters across R4/R4B/R5** — including `CodeSystem/$lookup.date` and
+     * every `$everything` operation's `_since` — none of which were reachable through the mapper.
+     *
+     * Parsing mirrors `AbstractFHIRNormalizer::parseTemporalValue()` deliberately: same `::parse()`
+     * entry point, so a value that survives serialization also survives this path.
+     */
+    private function toWrapperValue(string $fhirType, FhirOperationParameter $descriptor, mixed $item): mixed
+    {
+        $valueClass = self::TEMPORAL_VALUE_CLASSES[$fhirType] ?? null;
+
+        if ($valueClass === null) {
+            return $item;
+        }
+
+        if ($item instanceof $valueClass) {
+            return $item;
+        }
+
+        if (!is_string($item)) {
+            throw OperationMappingException::unmappableValue($descriptor->name, $fhirType, get_debug_type($item));
+        }
+
+        try {
+            return $valueClass::parse($item);
+        } catch (\Throwable) {
+            throw OperationMappingException::unmappableValue($descriptor->name, $fhirType, $item);
+        }
     }
 
     /**
@@ -518,6 +577,14 @@ final class OperationParameterMapper
         if (is_object($value) && property_exists($value, 'value')) {
             /** @var mixed $inner */
             $inner = $value->value;
+
+            // The temporal wrappers hold an FHIRTemporalValue rather than a string, so the raw `->value`
+            // would be handed to a payload property declared `?string`. Rendering it back through
+            // __toString is lossless: FHIRDateTime round-trips the precision it parsed, so `2026-08`
+            // comes back as `2026-08` and not as a widened `2026-08-01T00:00:00Z`.
+            if ($inner instanceof FHIRTemporalValue) {
+                return (string) $inner;
+            }
 
             return $inner;
         }

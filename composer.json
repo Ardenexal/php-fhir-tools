@@ -90,6 +90,7 @@
         "psr-4": {
             "Ardenexal\\FHIRTools\\Tests\\": "tests/",
             "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\Tests\\": "src/Bundle/FHIRBundle/tests/",
+            "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Tests\\": "src/Component/CodeGeneration/tests/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
             "Ardenexal\\FHIRTools\\Component\\Metadata\\Tests\\": "src/Component/Metadata/tests/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/",
