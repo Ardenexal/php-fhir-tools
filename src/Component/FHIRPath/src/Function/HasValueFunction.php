@@ -34,10 +34,14 @@ class HasValueFunction extends AbstractFunction
 
         $items = [];
         foreach ($input as $item) {
-            // Check if object has a value property (FHIR primitive pattern)
+            // Check if object has a value property (FHIR primitive pattern).
+            // isset(), not property_exists() + a read: on a generated model `value` is a typed
+            // property with no default, so an instance carrying no value leaves it *uninitialized*.
+            // property_exists() is true for it, and reading it then raises
+            // "must not be accessed before initialization" rather than returning null. isset() is
+            // exactly the question being asked — declared, initialized, and not null.
             if (is_object($item)) {
-                $hasValue = property_exists($item, 'value') && $item->value !== null;
-                $items[]  = $hasValue;
+                $items[] = isset($item->value);
             } else {
                 // For non-objects, any non-null value is considered having value
                 $items[] = $item !== null;

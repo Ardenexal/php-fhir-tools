@@ -206,15 +206,32 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         return false;
     }
 
-    /** @return class-string<\BackedEnum>|null */
+    /**
+     * Resolve a generated enum for this value set, or null when membership cannot be decided here.
+     *
+     * The backed check is load-bearing, not defensive. `enum_exists()` is also true for a *pure*
+     * enum, and some value sets cannot be enumerated at all — `AllLanguages` covers the whole of
+     * BCP-47, so the generator emits `enum AllLanguages {}` with no cases and no backing type.
+     * Calling `tryFrom()` on that is a fatal `Error: Call to undefined method`, which took out four
+     * R5 cases mid-validation. Returning null instead routes to the existing "no generated enum
+     * class" warning — the honest answer for a binding we cannot check offline.
+     *
+     * @return class-string<\BackedEnum>|null
+     */
     private function resolveEnumFqcn(string $className): ?string
     {
         foreach ($this->enumNamespaceRoots as $root) {
             $fqcn = $root . '\\' . $className;
-            if (class_exists($fqcn) && enum_exists($fqcn)) {
-                /** @var class-string<\BackedEnum> $fqcn */
-                return $fqcn;
+            if (!class_exists($fqcn) || !enum_exists($fqcn)) {
+                continue;
             }
+
+            if (!(new \ReflectionEnum($fqcn))->isBacked()) {
+                continue;
+            }
+
+            /** @var class-string<\BackedEnum> $fqcn */
+            return $fqcn;
         }
 
         return null;

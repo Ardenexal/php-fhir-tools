@@ -1,47 +1,23 @@
 {
     "version": "R5",
-    "above": 13,
-    "equal": 48,
-    "below": 37,
-    "compared": 98,
-    "skipped": 58,
+    "above": 15,
+    "equal": 61,
+    "below": 44,
+    "compared": 120,
+    "skipped": 36,
     "skipsByReason": {
         "no-oracle": 2,
         "unreadable": 0,
         "deserialize-threw": 34,
-        "validate-crashed": 22
+        "validate-crashed": 0
     },
-    "crashedCases": [
-        "patient-lang1",
-        "patient-lang2",
-        "patient-lang3",
-        "bp",
-        "reference-good",
-        "reference-bad",
-        "reference-good-contained",
-        "reference-good-typed",
-        "reference-good-logical",
-        "reference-bad-logical",
-        "reference-bad-typed",
-        "slice-profile-and-local-patient",
-        "observation-bp-validationfails",
-        "observation-bp",
-        "observation-bp-bad-onlydiastolic",
-        "observation-bp-localcode",
-        "observation-maxvs-base",
-        "observation-maxvs-ex",
-        "observation-maxvs-text",
-        "observation-maxvs-wrong",
-        "specimendefinition-example-serum-plasma",
-        "dr-bad-att-hash"
-    ],
-    "wallClockSeconds": 0.15,
+    "crashedCases": [],
+    "wallClockSeconds": 0.17,
     "aboveFamilies": {
+        "invariant:ele-1": 5,
         "invariant:sdf-8a": 5,
         "constraint:FHIRValueSetBinding": 5,
         "constraint:NotBlank": 3,
-        "invariant:per-1": 2,
-        "invariant:ctm-1": 1,
         "invariant:tsk-1": 1
     },
     "cases": [
@@ -218,46 +194,76 @@
             "skewedByFilter": false
         },
         {
-            "name": "patient-au-5",
-            "class": "ABOVE",
-            "ours": 1,
-            "oursUnfiltered": 1,
+            "name": "patient-lang1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 0,
-            "families": [
-                "invariant:per-1"
-            ],
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-lang2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-lang3",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-au-5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
             "skewedByFilter": false
         },
         {
             "name": "fhirpath-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "fhirpath-bad",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "fhirpath-null",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bp",
             "class": "ABOVE",
             "ours": 1,
             "oursUnfiltered": 1,
             "java": 0,
             "families": [
-                "invariant:ctm-1"
-            ],
-            "skewedByFilter": false
-        },
-        {
-            "name": "fhirpath-bad",
-            "class": "EQUAL",
-            "ours": 1,
-            "oursUnfiltered": 1,
-            "java": 1,
-            "families": [
-                "invariant:ctm-1"
-            ],
-            "skewedByFilter": false
-        },
-        {
-            "name": "fhirpath-null",
-            "class": "EQUAL",
-            "ours": 1,
-            "oursUnfiltered": 1,
-            "java": 1,
-            "families": [
-                "invariant:ctm-1"
+                "invariant:ele-1"
             ],
             "skewedByFilter": false
         },
@@ -283,6 +289,71 @@
         },
         {
             "name": "entry-resource-bad1",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-bad",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-good-contained",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-good-typed",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-good-logical",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-bad-logical",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-bad-typed",
             "class": "BELOW",
             "ours": 0,
             "oursUnfiltered": 0,
@@ -387,12 +458,65 @@
             "skewedByFilter": false
         },
         {
+            "name": "slice-profile-and-local-patient",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
             "name": "extension-slice",
             "class": "BELOW",
             "ours": 0,
             "oursUnfiltered": 0,
             "java": 1,
             "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-bp-validationfails",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-bp",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-bp-bad-onlydiastolic",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 1,
+            "families": [
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-bp-localcode",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [
+                "invariant:ele-1"
+            ],
             "skewedByFilter": false
         },
         {
@@ -515,6 +639,42 @@
             "skewedByFilter": false
         },
         {
+            "name": "observation-maxvs-base",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-maxvs-ex",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-maxvs-text",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-maxvs-wrong",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 4,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
             "name": "bundle-local-refs",
             "class": "EQUAL",
             "ours": 0,
@@ -574,13 +734,11 @@
         },
         {
             "name": "patient-animal-5",
-            "class": "ABOVE",
-            "ours": 1,
-            "oursUnfiltered": 1,
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 0,
-            "families": [
-                "invariant:per-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -680,6 +838,17 @@
             "oursUnfiltered": 0,
             "java": 0,
             "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "specimendefinition-example-serum-plasma",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 1,
+            "families": [
+                "invariant:ele-1"
+            ],
             "skewedByFilter": false
         },
         {
@@ -972,6 +1141,17 @@
             "oursUnfiltered": 0,
             "java": 0,
             "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "dr-bad-att-hash",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 2,
+            "families": [
+                "invariant:ele-1"
+            ],
             "skewedByFilter": false
         },
         {

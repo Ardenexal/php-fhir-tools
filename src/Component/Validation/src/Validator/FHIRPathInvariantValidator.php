@@ -91,6 +91,21 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
             return;
         }
 
+        // An empty collection is not a failure. FHIRPath is three-valued: empty means "unknown", and
+        // it arises constantly from legitimate data rather than from non-conformance. `ref-1` is
+        // `reference.startsWith('#').not() or (reference.substring(1) in %rootResource.contained.id)`,
+        // so a Reference carrying only `display` yields empty on every term, and a bare `#`
+        // self-reference yields `false or {}` — which is `{}`, not `false`. Both are valid FHIR that
+        // the HL7 Java validator passes with zero issues.
+        //
+        // Only an explicit single `false` is non-conformance. Verified on the discriminating pair:
+        // `containedToContainer` evaluates empty on both its References (Java: 0 issues) while
+        // `hakan-se` still evaluates to a hard `false` on its unresolvable local reference (Java:
+        // reports ref-1). Collapsing empty into failure could not tell those apart.
+        if ($result->isEmpty()) {
+            return;
+        }
+
         $passed = $result->count() === 1 && $result->first() === true;
 
         if ($passed) {

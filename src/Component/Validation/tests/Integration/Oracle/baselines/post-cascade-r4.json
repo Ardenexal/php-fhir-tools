@@ -1,8 +1,8 @@
 {
     "version": "R4",
-    "above": 26,
-    "equal": 118,
-    "below": 98,
+    "above": 16,
+    "equal": 124,
+    "below": 102,
     "compared": 242,
     "skipped": 23,
     "skipsByReason": {
@@ -12,13 +12,12 @@
         "validate-crashed": 0
     },
     "crashedCases": [],
-    "wallClockSeconds": 0.47,
+    "wallClockSeconds": 0.5,
     "aboveFamilies": {
-        "invariant:ref-1": 38,
-        "invariant:ele-1": 13,
         "constraint:NotBlank": 11,
+        "invariant:ele-1": 11,
         "invariant:sdf-8a": 6,
-        "invariant:per-1": 4,
+        "invariant:ref-1": 4,
         "invariant:eld-13": 1,
         "constraint:FHIRValueSetBinding": 1,
         "invariant:sdf-8": 1,
@@ -138,27 +137,20 @@
         },
         {
             "name": "demo-example-1",
-            "class": "ABOVE",
-            "ours": 3,
-            "oursUnfiltered": 3,
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 0,
-            "families": [
-                "invariant:ref-1",
-                "invariant:ref-1",
-                "invariant:ref-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
             "name": "message",
             "class": "BELOW",
-            "ours": 4,
-            "oursUnfiltered": 4,
+            "ours": 1,
+            "oursUnfiltered": 1,
             "java": 9,
             "families": [
-                "invariant:ref-1",
-                "invariant:per-1",
-                "invariant:ref-1",
                 "invariant:ref-1"
             ],
             "skewedByFilter": false
@@ -166,11 +158,10 @@
         {
             "name": "message-empty-entry",
             "class": "BELOW",
-            "ours": 3,
-            "oursUnfiltered": 3,
+            "ours": 2,
+            "oursUnfiltered": 2,
             "java": 9,
             "families": [
-                "invariant:ref-1",
                 "invariant:bdl-5",
                 "invariant:ref-1"
             ],
@@ -232,41 +223,29 @@
         },
         {
             "name": "patient-animal",
-            "class": "ABOVE",
-            "ours": 3,
-            "oursUnfiltered": 3,
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 0,
-            "families": [
-                "invariant:per-1",
-                "invariant:ref-1",
-                "invariant:ref-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
             "name": "patient-xver",
-            "class": "ABOVE",
-            "ours": 3,
-            "oursUnfiltered": 3,
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 1,
-            "families": [
-                "invariant:per-1",
-                "invariant:ref-1",
-                "invariant:ref-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
             "name": "patient-xver-bad",
-            "class": "ABOVE",
-            "ours": 3,
-            "oursUnfiltered": 3,
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 2,
-            "families": [
-                "invariant:per-1",
-                "invariant:ref-1",
-                "invariant:ref-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -544,11 +523,10 @@
         {
             "name": "questionnaire-enableWhen-dw",
             "class": "ABOVE",
-            "ours": 5,
-            "oursUnfiltered": 5,
+            "ours": 4,
+            "oursUnfiltered": 4,
             "java": 1,
             "families": [
-                "invariant:per-1",
                 "constraint:NotBlank",
                 "constraint:NotBlank",
                 "constraint:NotBlank",
@@ -570,13 +548,11 @@
         },
         {
             "name": "care-plan",
-            "class": "ABOVE",
-            "ours": 1,
-            "oursUnfiltered": 1,
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 0,
-            "families": [
-                "invariant:ref-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -767,23 +743,21 @@
         {
             "name": "obs-temp",
             "class": "ABOVE",
-            "ours": 2,
-            "oursUnfiltered": 2,
+            "ours": 1,
+            "oursUnfiltered": 1,
             "java": 0,
             "families": [
-                "invariant:ref-1",
                 "invariant:ele-1"
             ],
             "skewedByFilter": false
         },
         {
             "name": "obs-temp-bad",
-            "class": "ABOVE",
-            "ours": 2,
-            "oursUnfiltered": 2,
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 1,
             "java": 1,
             "families": [
-                "invariant:ref-1",
                 "invariant:ele-1"
             ],
             "skewedByFilter": false
@@ -845,11 +819,10 @@
         {
             "name": "parameters-reference",
             "class": "ABOVE",
-            "ours": 3,
-            "oursUnfiltered": 3,
+            "ours": 2,
+            "oursUnfiltered": 2,
             "java": 0,
             "families": [
-                "invariant:ref-1",
                 "invariant:ref-1",
                 "invariant:ref-1"
             ],
@@ -858,11 +831,10 @@
         {
             "name": "parameters-reference-bad",
             "class": "ABOVE",
-            "ours": 3,
-            "oursUnfiltered": 3,
+            "ours": 2,
+            "oursUnfiltered": 2,
             "java": 1,
             "families": [
-                "invariant:ref-1",
                 "invariant:ref-1",
                 "invariant:ref-1"
             ],
@@ -980,14 +952,11 @@
         },
         {
             "name": "containedToContainer",
-            "class": "ABOVE",
-            "ours": 2,
-            "oursUnfiltered": 2,
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 0,
-            "families": [
-                "invariant:ref-1",
-                "invariant:ref-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -1279,27 +1248,18 @@
         {
             "name": "uk-msg",
             "class": "ABOVE",
-            "ours": 19,
-            "oursUnfiltered": 19,
+            "ours": 10,
+            "oursUnfiltered": 10,
             "java": 4,
             "families": [
-                "invariant:ref-1",
                 "invariant:ele-1",
-                "invariant:ref-1",
                 "invariant:ele-1",
-                "invariant:ref-1",
-                "invariant:ref-1",
-                "invariant:ref-1",
-                "invariant:ref-1",
                 "invariant:ele-1",
                 "constraint:NotBlank",
-                "invariant:ref-1",
                 "invariant:ele-1",
                 "constraint:NotBlank",
-                "invariant:ref-1",
                 "invariant:ele-1",
                 "constraint:NotBlank",
-                "invariant:ref-1",
                 "invariant:ele-1",
                 "constraint:NotBlank"
             ],
@@ -1370,13 +1330,11 @@
         },
         {
             "name": "encounter-period",
-            "class": "EQUAL",
-            "ours": 1,
-            "oursUnfiltered": 1,
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 1,
-            "families": [
-                "invariant:per-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -1571,13 +1529,10 @@
         {
             "name": "bundle-ea-testcase",
             "class": "BELOW",
-            "ours": 2,
-            "oursUnfiltered": 2,
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 13,
-            "families": [
-                "invariant:bdl-8",
-                "invariant:bdl-8"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -1592,12 +1547,10 @@
         {
             "name": "document-css",
             "class": "BELOW",
-            "ours": 1,
-            "oursUnfiltered": 1,
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 3,
-            "families": [
-                "invariant:ref-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -1870,12 +1823,11 @@
         {
             "name": "bundle-dual-target",
             "class": "BELOW",
-            "ours": 6,
-            "oursUnfiltered": 6,
+            "ours": 5,
+            "oursUnfiltered": 5,
             "java": 10,
             "families": [
                 "invariant:bdl-9",
-                "invariant:bdl-10",
                 "constraint:NotBlank",
                 "constraint:NotBlank",
                 "constraint:NotBlank",
@@ -1898,12 +1850,10 @@
         {
             "name": "ips-nz-pj",
             "class": "BELOW",
-            "ours": 1,
-            "oursUnfiltered": 1,
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 4,
-            "families": [
-                "invariant:per-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -1935,13 +1885,11 @@
         },
         {
             "name": "obs-fio2",
-            "class": "ABOVE",
-            "ours": 1,
-            "oursUnfiltered": 1,
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 0,
-            "families": [
-                "invariant:ref-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -2004,13 +1952,11 @@
         },
         {
             "name": "binary-ref-internal",
-            "class": "ABOVE",
-            "ours": 1,
-            "oursUnfiltered": 1,
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 0,
-            "families": [
-                "invariant:ref-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -2034,23 +1980,19 @@
         {
             "name": "ips-link",
             "class": "BELOW",
-            "ours": 1,
-            "oursUnfiltered": 1,
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 4,
-            "families": [
-                "invariant:per-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
             "name": "ips-link-xml",
             "class": "BELOW",
-            "ours": 1,
-            "oursUnfiltered": 1,
+            "ours": 0,
+            "oursUnfiltered": 0,
             "java": 3,
-            "families": [
-                "invariant:per-1"
-            ],
+            "families": [],
             "skewedByFilter": false
         },
         {
@@ -2299,11 +2241,10 @@
         {
             "name": "bundle-signed-good",
             "class": "ABOVE",
-            "ours": 2,
-            "oursUnfiltered": 2,
+            "ours": 1,
+            "oursUnfiltered": 1,
             "java": 0,
             "families": [
-                "invariant:ref-1",
                 "invariant:ele-1"
             ],
             "skewedByFilter": false
@@ -2311,11 +2252,10 @@
         {
             "name": "bundle-signed-good-xml",
             "class": "ABOVE",
-            "ours": 2,
-            "oursUnfiltered": 2,
+            "ours": 1,
+            "oursUnfiltered": 1,
             "java": 0,
             "families": [
-                "invariant:ref-1",
                 "invariant:ele-1"
             ],
             "skewedByFilter": false
@@ -2332,11 +2272,10 @@
         {
             "name": "bundle-sign-xml",
             "class": "ABOVE",
-            "ours": 2,
-            "oursUnfiltered": 2,
+            "ours": 1,
+            "oursUnfiltered": 1,
             "java": 0,
             "families": [
-                "invariant:ref-1",
                 "invariant:ele-1"
             ],
             "skewedByFilter": false
@@ -2344,25 +2283,21 @@
         {
             "name": "signatures-example-1",
             "class": "ABOVE",
-            "ours": 3,
-            "oursUnfiltered": 3,
+            "ours": 1,
+            "oursUnfiltered": 1,
             "java": 0,
             "families": [
-                "invariant:ref-1",
-                "invariant:ref-1",
                 "invariant:ele-1"
             ],
             "skewedByFilter": false
         },
         {
             "name": "signatures-example-2",
-            "class": "ABOVE",
-            "ours": 3,
-            "oursUnfiltered": 3,
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
             "java": 2,
             "families": [
-                "invariant:ref-1",
-                "invariant:ref-1",
                 "invariant:ele-1"
             ],
             "skewedByFilter": false
