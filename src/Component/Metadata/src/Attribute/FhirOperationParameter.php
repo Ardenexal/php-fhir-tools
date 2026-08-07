@@ -29,10 +29,12 @@ final class FhirOperationParameter
 {
     /**
      * @param list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}>|null $variants
-     *                                                                                                             Concrete types for a polymorphic parameter. Same shape as FhirProperty::$variants
-     *                                                                                                             and PropertyVariantMetadata, deliberately — the choice machinery is shared.
+     *                                                                                                              Concrete types for a polymorphic parameter. Same shape as FhirProperty::$variants
+     *                                                                                                              and PropertyVariantMetadata, deliberately — the choice machinery is shared.
      * @param list<string>                                                                               $scope
-     *                                                                                                             R5-only `parameter.scope` codes ('instance', 'type', 'system').
+     *                                                                                                              R5-only `parameter.scope` codes ('instance', 'type', 'system').
+     * @param class-string|null                                                                          $partClass
+     *                                                                                                              FQCN of the nested payload class; the mapper instantiates it directly
      */
     public function __construct(
         /**
