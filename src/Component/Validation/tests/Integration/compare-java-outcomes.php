@@ -1,0 +1,171 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Compare our validator against the HL7 Java reference validator, per case.
+ *
+ * Run from the repository root:
+ *   php src/Component/Validation/tests/Integration/compare-java-outcomes.php          # R4
+ *   php src/Component/Validation/tests/Integration/compare-java-outcomes.php r5
+ *   php src/Component/Validation/tests/Integration/compare-java-outcomes.php r4 --above
+ *   php src/Component/Validation/tests/Integration/compare-java-outcomes.php r4 --json > before.json
+ *
+ * Options:
+ *   --above   List only cases where we report MORE errors than Java (the false positives).
+ *   --below   List only cases where we report FEWER errors than Java (pre-existing gaps).
+ *   --all     List every compared case.
+ *   --json    Emit machine-readable JSON instead of a table, for before/after diffing.
+ *
+ * Why this exists: FHIRValidatorSpecificationTest asserts against outcomes/ardenexal/, which
+ * seed-outcomes.php generates from our own validator's output. That is a regression lock — it tells
+ * you behaviour changed, never that behaviour is correct. This script is the conformance oracle.
+ * Do not run seed-outcomes.php to make the suite green while any ABOVE case remains.
+ */
+
+require_once __DIR__ . '/../../../../../vendor/autoload.php';
+
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\CaseComparison;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\Classification;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\ComparisonHarness;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\OracleValidationServiceFactory;
+
+$args    = array_slice($argv, 1);
+$flags   = array_values(array_filter($args, static fn (string $a): bool => str_starts_with($a, '--')));
+$posArgs = array_values(array_filter($args, static fn (string $a): bool => !str_starts_with($a, '--')));
+
+$version = match (strtolower($posArgs[0] ?? 'r4')) {
+    'r4b'   => FhirVersion::R4B,
+    'r5'    => FhirVersion::R5,
+    default => FhirVersion::R4,
+};
+
+$asJson  = in_array('--json', $flags, true);
+$showAll = in_array('--all', $flags, true);
+$only    = match (true) {
+    in_array('--above', $flags, true) => Classification::Above,
+    in_array('--below', $flags, true) => Classification::Below,
+    default                           => null,
+};
+
+$harness = new ComparisonHarness(
+    vendorDir: __DIR__ . '/../../../../../vendor',
+    validation: OracleValidationServiceFactory::create($version),
+    serialization: FHIRSerializationService::createDefault($version),
+    version: $version,
+);
+
+if (!$asJson) {
+    fwrite(STDERR, "Comparing {$version->value} against Java reference outcomes…\n");
+}
+
+$report = $harness->run();
+
+if ($asJson) {
+    echo json_encode([
+        'version'          => $version->value,
+        'above'            => $report->aboveCount(),
+        'equal'            => $report->equalCount(),
+        'below'            => $report->belowCount(),
+        'compared'         => count($report->comparisons),
+        'skipped'          => $report->skippedCount(),
+        'skipsByReason'    => $report->skipHistogram(),
+        'crashedCases'     => $report->crashedCases(),
+        'wallClockSeconds' => round($report->wallClockSeconds, 2),
+        'aboveFamilies'    => $report->aboveFamilyHistogram(),
+        'cases'            => array_map(static fn (CaseComparison $c): array => [
+            'name'            => $c->name,
+            'class'           => $c->classification()->value,
+            'ours'            => $c->ourErrorCount,
+            'oursUnfiltered'  => $c->ourErrorCountUnfiltered,
+            'java'            => $c->javaErrorCount,
+            'families'        => $c->families,
+            'skewedByFilter'  => $c->isSkewedByKnownGapFilter(),
+        ], $report->comparisons),
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+
+    exit($report->aboveCount() === 0 && $report->crashedCases() === [] ? 0 : 1);
+}
+
+$listed = match (true) {
+    $showAll       => $report->comparisons,
+    $only !== null => $report->byClassification($only),
+    default        => $report->byClassification(Classification::Above),
+};
+
+if ($listed !== []) {
+    printf("%-52s %-6s %6s %6s  %s\n", 'CASE', 'CLASS', 'OURS', 'JAVA', 'FAMILIES');
+    echo str_repeat('-', 110) . "\n";
+
+    foreach ($listed as $c) {
+        printf(
+            "%-52s %-6s %6d %6d  %s\n",
+            substr($c->name, 0, 52),
+            $c->classification()->value,
+            $c->ourErrorCount,
+            $c->javaErrorCount,
+            implode(', ', array_unique($c->families)),
+        );
+    }
+    echo "\n";
+}
+
+printf(
+    "ABOVE %d  ·  EQUAL %d  ·  BELOW %d   (compared %d, skipped %d, %.2fs)\n",
+    $report->aboveCount(),
+    $report->equalCount(),
+    $report->belowCount(),
+    count($report->comparisons),
+    $report->skippedCount(),
+    $report->wallClockSeconds,
+);
+
+echo 'skips: ';
+foreach ($report->skipHistogram() as $reason => $count) {
+    printf('%s=%d  ', $reason, $count);
+}
+echo "\n";
+
+// A case that crashes leaves the comparison set, which lowers ABOVE and reads as an improvement.
+// Never let that pass quietly.
+$crashed = $report->crashedCases();
+if ($crashed !== []) {
+    printf(
+        "\nCRASHED: %d case(s) threw during validation and were NOT compared.\n"
+        . "This lowers the ABOVE count without fixing anything — treat as a regression:\n  %s\n",
+        count($crashed),
+        implode("\n  ", $crashed),
+    );
+}
+
+$exitCode = $report->aboveCount() === 0 && $crashed === [] ? 0 : 1;
+
+$families = $report->aboveFamilyHistogram();
+if ($families !== []) {
+    echo "\nABOVE families (error violations, largest first):\n";
+    foreach ($families as $family => $count) {
+        printf("  %-40s %d\n", $family, $count);
+    }
+}
+
+$skewed = $report->skewedCases();
+if ($skewed !== []) {
+    printf(
+        "\nWARNING: %d case(s) change class depending on isKnownGap() suppression.\n"
+        . "Java counts are never filtered, so those comparisons are not apples-to-apples:\n",
+        count($skewed),
+    );
+    foreach ($skewed as $c) {
+        printf(
+            "  %-52s filtered=%s unfiltered=%s (suppressed %d)\n",
+            substr($c->name, 0, 52),
+            $c->classification()->value,
+            $c->unfilteredClassification()->value,
+            $c->suppressedByKnownGap(),
+        );
+    }
+}
+
+exit($exitCode);
