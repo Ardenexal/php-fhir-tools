@@ -1,0 +1,2407 @@
+{
+    "version": "R4",
+    "above": 26,
+    "equal": 118,
+    "below": 98,
+    "compared": 242,
+    "skipped": 23,
+    "skipsByReason": {
+        "no-oracle": 2,
+        "unreadable": 1,
+        "deserialize-threw": 20,
+        "validate-crashed": 0
+    },
+    "crashedCases": [],
+    "wallClockSeconds": 0.47,
+    "aboveFamilies": {
+        "invariant:ref-1": 38,
+        "invariant:ele-1": 13,
+        "constraint:NotBlank": 11,
+        "invariant:sdf-8a": 6,
+        "invariant:per-1": 4,
+        "invariant:eld-13": 1,
+        "constraint:FHIRValueSetBinding": 1,
+        "invariant:sdf-8": 1,
+        "invariant:sdf-21": 1
+    },
+    "cases": [
+        {
+            "name": "attachment-with-invalid-binary",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "attachment-with-wrong-size",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-document-versioned-references-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-document-versioned-references-bad",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 3,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "contained",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "slice-by-polymorphic-type",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "slicing-types-by-string",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "questionnaire-enableWhen-test-invalid",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "questionnaire-enableWhen-test-order",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-translated-codes",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bad-bundle-reference-type-4",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "q-bp",
+            "class": "BELOW",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 17,
+            "families": [
+                "invariant:bdl-3",
+                "invariant:bdl-4"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "demo-example-1",
+            "class": "ABOVE",
+            "ours": 3,
+            "oursUnfiltered": 3,
+            "java": 0,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ref-1",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "message",
+            "class": "BELOW",
+            "ours": 4,
+            "oursUnfiltered": 4,
+            "java": 9,
+            "families": [
+                "invariant:ref-1",
+                "invariant:per-1",
+                "invariant:ref-1",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "message-empty-entry",
+            "class": "BELOW",
+            "ours": 3,
+            "oursUnfiltered": 3,
+            "java": 9,
+            "families": [
+                "invariant:ref-1",
+                "invariant:bdl-5",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-choice-1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-choice-2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-choice-3",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "no/Person-test",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "no/Person-test-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ch/mixed-valueset-dr",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-animal",
+            "class": "ABOVE",
+            "ours": 3,
+            "oursUnfiltered": 3,
+            "java": 0,
+            "families": [
+                "invariant:per-1",
+                "invariant:ref-1",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-xver",
+            "class": "ABOVE",
+            "ours": 3,
+            "oursUnfiltered": 3,
+            "java": 1,
+            "families": [
+                "invariant:per-1",
+                "invariant:ref-1",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-xver-bad",
+            "class": "ABOVE",
+            "ours": 3,
+            "oursUnfiltered": 3,
+            "java": 2,
+            "families": [
+                "invariant:per-1",
+                "invariant:ref-1",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-extension-simple",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-extension-complex",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-extension-complex-bad2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-extension-bad",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-extension-bad2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 3,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-extension-bad3",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-example-ra4",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-ihe-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-ihe-good",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 1,
+            "families": [
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-circle1-good-alone",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-circle1-good-linked",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-circle1-bad-linked1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-circle1-bad-linked2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-circle1-good-source",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-circle1-bad-source1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-circle1-bad-source2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-validation-location-1.xml",
+            "class": "BELOW",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 4,
+            "families": [
+                "constraint:FHIRValueSetBinding",
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-validation-location-2.xml",
+            "class": "BELOW",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 4,
+            "families": [
+                "constraint:FHIRValueSetBinding",
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "dr-example-org",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "dr-example-org-2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-lang-inv",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-lang-inv-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-unit-profile",
+            "class": "BELOW",
+            "ours": 2,
+            "oursUnfiltered": 3,
+            "java": 3,
+            "families": [
+                "constraint:NotBlank",
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": true
+        },
+        {
+            "name": "medstmt-ips",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "type-ref-unchecked",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "type-ref-checked",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "mycommunication.invalid",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "mycommunication.valid.example",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "capstmt",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "questionnaire-enableWhen-dw",
+            "class": "ABOVE",
+            "ours": 5,
+            "oursUnfiltered": 5,
+            "java": 1,
+            "families": [
+                "invariant:per-1",
+                "constraint:NotBlank",
+                "constraint:NotBlank",
+                "constraint:NotBlank",
+                "constraint:NotBlank"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-repeated-type",
+            "class": "ABOVE",
+            "ours": 2,
+            "oursUnfiltered": 3,
+            "java": 1,
+            "families": [
+                "invariant:sdf-8a",
+                "invariant:eld-13"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "care-plan",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "mr-m-simple-nossystem",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "mr-covid-m",
+            "class": "BELOW",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 3,
+            "families": [
+                "invariant:exp-1",
+                "constraint:NotBlank"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "mr-covid-m3",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 1,
+            "families": [
+                "constraint:NotBlank"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "mr-covid-bnd1",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 26,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "q-enablewhen-me-wrong",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-slicing-type-example-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "pat-security-good1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "pat-security-good2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "pat-security-good3",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "pat-security-bad-xhtml",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "pat-security-bad-string",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "pat-security-bad-string1",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "pat-security-bad-string2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "sp-diff-expression",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "sp-diff-type",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "sp-diff-base",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "dr-eh",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bb-obs-value-is-not-quantity",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bb-obs-value-is-not-in-valueset",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bb-obs-value-is-not-quantity-or-string",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-temp",
+            "class": "ABOVE",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 0,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-temp-bad",
+            "class": "ABOVE",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 1,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-min-none",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-min-none1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-min-fixed",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-min-fixed1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-min-pattern",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-min-pattern1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "parameters-reference",
+            "class": "ABOVE",
+            "ours": 3,
+            "oursUnfiltered": 3,
+            "java": 0,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ref-1",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "parameters-reference-bad",
+            "class": "ABOVE",
+            "ours": 3,
+            "oursUnfiltered": 3,
+            "java": 1,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ref-1",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "parameters-profiled-resource-invalid",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-duplicate-id",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "mni-patientOverview-bundle-example1",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 4,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "mni-patientOverview-bundle-example1b",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 10,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ad-practitioner-resource",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "list-bad-reference",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-duplicate-ids-not",
+            "class": "BELOW",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 49,
+            "families": [
+                "constraint:FHIRValueSetBinding",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "test-input-params-example1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-bad-profile",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 2,
+            "java": 1,
+            "families": [
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": true
+        },
+        {
+            "name": "bundle-good-profile",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 2,
+            "java": 0,
+            "families": [
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-parameters-complex",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "containedToContainer",
+            "class": "ABOVE",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 0,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "empty-array",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 1,
+            "families": [
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "sdoh-type-slice",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "hakan-se",
+            "class": "BELOW",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 4,
+            "families": [
+                "constraint:NotBlank",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "hakan-se-nofetch",
+            "class": "BELOW",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 4,
+            "families": [
+                "constraint:NotBlank",
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "hakan-se-2",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 2,
+            "families": [
+                "constraint:NotBlank"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "qr-bad-ref1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "qr-bad-ref2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "qr-bad-ref3",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "pat-dob-ext",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "target-ref-profile-empty",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 8,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "us-docref.json",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-id-1",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-id-2",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 2,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-id-3",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 3,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-id-4",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 4,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-id-5",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "us-cond",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "condition-with-extensions-on-pattern",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 3,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "pat-example-extensions",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "resource-invalid-id-0",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "resource-invalid-id-1",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "resource-invalid-id-2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "resource-invalid-id-3",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "resource-invalid-eid-0",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "resource-invalid-eid-1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "resource-invalid-eid-2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "document-manifest",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "params-empty-r4",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-with-contained",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 5,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "risk-assessment-probability-range",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "uk-msg",
+            "class": "ABOVE",
+            "ours": 19,
+            "oursUnfiltered": 19,
+            "java": 4,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ele-1",
+                "invariant:ref-1",
+                "invariant:ele-1",
+                "invariant:ref-1",
+                "invariant:ref-1",
+                "invariant:ref-1",
+                "invariant:ref-1",
+                "invariant:ele-1",
+                "constraint:NotBlank",
+                "invariant:ref-1",
+                "invariant:ele-1",
+                "constraint:NotBlank",
+                "invariant:ref-1",
+                "invariant:ele-1",
+                "constraint:NotBlank",
+                "invariant:ref-1",
+                "invariant:ele-1",
+                "constraint:NotBlank"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "contained-resource-bad-id",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "contained-resource-bad-id-ignore",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "type-subtype-slicing1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "type-subtype-slicing2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "type-subtype-slicing3",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "no.gastronet",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 18,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "nested-questionnaire-nested-valueset",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "encounter-period",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 1,
+            "families": [
+                "invariant:per-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-value-min",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-value-min-g",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-value-max-g",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "structureDefinition-11179-objectClass-R4",
+            "class": "ABOVE",
+            "ours": 2,
+            "oursUnfiltered": 3,
+            "java": 0,
+            "families": [
+                "invariant:sdf-8",
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "mimic",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-value-xver-extension",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xver-extensions-vs",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "pat-xver-extension-expected",
+            "class": "BELOW",
+            "ours": 3,
+            "oursUnfiltered": 4,
+            "java": 4,
+            "families": [
+                "invariant:sdf-8",
+                "invariant:eld-18",
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": true
+        },
+        {
+            "name": "valueset-import-legacy-test",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "library-fhir-model-definition",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bnd-ambiguous-refs",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-id-bad-1 / R4",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-id-bad-3 / R4",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-id-bad-2 / R4",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-id-only",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "capabilitystatement-measure-processor",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 3,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bad-markdown",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bad-markdown-no-html",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "slicing-kn-example",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "PulseOxBundle_25Oct2022",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 5,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-ea-testcase",
+            "class": "BELOW",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 13,
+            "families": [
+                "invariant:bdl-8",
+                "invariant:bdl-8"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "json-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "document-css",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 3,
+            "families": [
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "comments-4",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "versioned-extension",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 4,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-profiles",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-urn",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 11,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ext-ccuk",
+            "class": "BELOW",
+            "ours": 2,
+            "oursUnfiltered": 3,
+            "java": 3,
+            "families": [
+                "invariant:sdf-20",
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": true
+        },
+        {
+            "name": "maiden-name-extension",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-mz",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 2,
+            "java": 1,
+            "families": [
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": true
+        },
+        {
+            "name": "ai1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ai2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ai3",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ai7",
+            "class": "ABOVE",
+            "ours": 4,
+            "oursUnfiltered": 4,
+            "java": 3,
+            "families": [
+                "constraint:NotBlank",
+                "constraint:NotBlank",
+                "constraint:NotBlank",
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ai8",
+            "class": "BELOW",
+            "ours": 4,
+            "oursUnfiltered": 4,
+            "java": 6,
+            "families": [
+                "constraint:NotBlank",
+                "constraint:NotBlank",
+                "constraint:NotBlank",
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-missing-elements",
+            "class": "BELOW",
+            "ours": 4,
+            "oursUnfiltered": 5,
+            "java": 5,
+            "families": [
+                "invariant:sdf-8a",
+                "constraint:FHIRValueSetBinding",
+                "constraint:NotBlank",
+                "constraint:NotBlank"
+            ],
+            "skewedByFilter": true
+        },
+        {
+            "name": "obs-de",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-de-notx",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "attachment-tx",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-value-present-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-value-present-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-value-alternative-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-value-alternative-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-quantity-us",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 10,
+            "families": [
+                "constraint:NotBlank"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "sd-device",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 2,
+            "java": 0,
+            "families": [
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "med-example",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "relative_reference_to_fullUrl.id_in_Composition",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "relative_reference_to_fullUrl.id_in_target_resource",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 3,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "relative_reference_to_fullUrl.no_ids.PROBLEM",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 4,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "relative_reference_to_TYPE_ID.all_fullUrl_UUID",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-dual-target",
+            "class": "BELOW",
+            "ours": 6,
+            "oursUnfiltered": 6,
+            "java": 10,
+            "families": [
+                "invariant:bdl-9",
+                "invariant:bdl-10",
+                "constraint:NotBlank",
+                "constraint:NotBlank",
+                "constraint:NotBlank",
+                "constraint:NotBlank"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-default-value",
+            "class": "ABOVE",
+            "ours": 2,
+            "oursUnfiltered": 3,
+            "java": 1,
+            "families": [
+                "invariant:sdf-21",
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ips-nz-pj",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 4,
+            "families": [
+                "invariant:per-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "sp-composite",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ips-htmlrefs-backwards",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 4,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ips-htmlrefs-forwards",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 4,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-fio2",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "de-address-example",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "qr-internal-refs",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "Observation-ex-pain.json",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 2,
+            "families": [
+                "constraint:NotBlank"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "Observation-ex-pain.xml",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 5,
+            "families": [
+                "constraint:NotBlank"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "additional-bindings-observation-2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-vital-signs-mdc",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "binary-ref-internal",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [
+                "invariant:ref-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-percent",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "dr-xml-space",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ips-link",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 4,
+            "families": [
+                "invariant:per-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ips-link-xml",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 3,
+            "families": [
+                "invariant:per-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "q_val_fail",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-min-length",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "type-slicing-multiple",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "type-slicing-multipleb",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-slicing-multiple",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-slicing-multipleb",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "cs-narrative-status",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "extension-version-restriction-range-r4",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "extension-version-restriction-range-ctxt-r4",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "vs-params-1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "vs-params-2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "vs-params-3",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "vs-params-4",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-explicit-version-4",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ref-policy-default-r4",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ref-policy-default-apply-r5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "questionnaire-not-resolved-qr",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xhtml-ctrl-source1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xhtml-ctrl-mixed-lang",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xhtml-ctrl-no-lang-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xhtml-ctrl-no-lang-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xhtml-ctrl-two-lang-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xhtml-ctrl-two-lang-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xhtml-ctrl-two-lang-good2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xhtml-ctrl-twob-lang-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xhtml-ctrl-twob-lang-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xhtml-ctrl-twob-lang-good2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-signed-good",
+            "class": "ABOVE",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 0,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-signed-good-xml",
+            "class": "ABOVE",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 0,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-signed-nob64",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-sign-xml",
+            "class": "ABOVE",
+            "ours": 2,
+            "oursUnfiltered": 2,
+            "java": 0,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "signatures-example-1",
+            "class": "ABOVE",
+            "ours": 3,
+            "oursUnfiltered": 3,
+            "java": 0,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ref-1",
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "signatures-example-2",
+            "class": "ABOVE",
+            "ours": 3,
+            "oursUnfiltered": 3,
+            "java": 2,
+            "families": [
+                "invariant:ref-1",
+                "invariant:ref-1",
+                "invariant:ele-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "filter-display-error-with-path",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "standards-status-r4",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "filter-invalid-display",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bnd-slicing-cgm",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        }
+    ]
+}
