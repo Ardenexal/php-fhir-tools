@@ -18,6 +18,10 @@ final class CaseComparison
     /**
      * @param list<string> $ourErrorMessages filtered error messages, for family labelling
      * @param list<string> $families         family labels derived from those messages
+     * @param list<string> $javaErrorTexts   Java's error-severity issue texts, so a reviewer can tell
+     *                                       "we report something Java does not" from "we report the
+     *                                       same finding differently". Counts alone cannot separate
+     *                                       those, and M02 must not "fix" a family Java agrees with.
      */
     public function __construct(
         public readonly string $name,
@@ -28,6 +32,7 @@ final class CaseComparison
         public readonly int $javaWarningCount,
         public readonly array $ourErrorMessages = [],
         public readonly array $families = [],
+        public readonly array $javaErrorTexts = [],
     ) {
     }
 

@@ -16,6 +16,11 @@ declare(strict_types=1);
  *   --below   List only cases where we report FEWER errors than Java (pre-existing gaps).
  *   --all     List every compared case.
  *   --json    Emit machine-readable JSON instead of a table, for before/after diffing.
+ *   --family=<label>
+ *             Deep-dive one family across every ABOVE case, printing our error messages beside
+ *             Java's. Counts alone cannot tell "we report something Java does not" from "we report
+ *             the same finding differently", and M02 must not "fix" a family Java agrees with.
+ *             Example: --family=constraint:NotBlank
  *
  * Why this exists: FHIRValidatorSpecificationTest asserts against outcomes/ardenexal/, which
  * seed-outcomes.php generates from our own validator's output. That is a regression lock — it tells
@@ -62,6 +67,45 @@ if (!$asJson) {
 }
 
 $report = $harness->run();
+
+// --family=<label>: side-by-side review of one family. Prints every ABOVE case carrying the label,
+// our messages against Java's, so a reviewer can judge false positive vs genuine agreement.
+$familyFlag = null;
+foreach ($flags as $flag) {
+    if (str_starts_with($flag, '--family=')) {
+        $familyFlag = substr($flag, strlen('--family='));
+        break;
+    }
+}
+
+if ($familyFlag !== null) {
+    $matching = array_values(array_filter(
+        $report->byClassification(Classification::Above),
+        static fn (CaseComparison $c): bool => in_array($familyFlag, $c->families, true),
+    ));
+
+    printf("Family '%s' across %d ABOVE case(s):\n\n", $familyFlag, count($matching));
+
+    foreach ($matching as $c) {
+        printf("── %s  (ours %d, java %d)\n", $c->name, $c->ourErrorCount, $c->javaErrorCount);
+
+        echo "   OURS:\n";
+        foreach ($c->ourErrorMessages as $i => $m) {
+            printf("     [%s] %s\n", $c->families[$i] ?? '?', $m);
+        }
+
+        echo "   JAVA:\n";
+        if ($c->javaErrorTexts === []) {
+            echo "     (no error-severity issues)\n";
+        }
+        foreach ($c->javaErrorTexts as $t) {
+            printf("     %s\n", $t);
+        }
+        echo "\n";
+    }
+
+    exit(0);
+}
 
 if ($asJson) {
     echo json_encode([

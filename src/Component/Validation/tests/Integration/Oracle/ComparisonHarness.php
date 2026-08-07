@@ -158,6 +158,7 @@ final class ComparisonHarness
                 $filteredErrors,
             ),
             families: $this->familyClassifier->classifyAll($filteredErrors),
+            javaErrorTexts: $javaOutcome->errorTexts,
         );
     }
 

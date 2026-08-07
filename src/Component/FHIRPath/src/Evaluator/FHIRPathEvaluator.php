@@ -1190,6 +1190,23 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     /**
      * Navigate a property on a node
      */
+    /**
+     * Whether a declared property actually holds a value on this instance.
+     *
+     * Generated model properties are typed and default-less, so "declared" and "readable" are not the
+     * same thing — reading an unassigned one raises an Error rather than returning null. Untyped and
+     * dynamic properties are always considered initialized.
+     */
+    private static function isPropertyInitialized(object $node, string $propertyName): bool
+    {
+        try {
+            return (new \ReflectionProperty($node, $propertyName))->isInitialized($node);
+        } catch (\ReflectionException) {
+            // Dynamic property: property_exists() found it, so it holds something.
+            return true;
+        }
+    }
+
     private function navigateProperty(mixed $node, string $propertyName): Collection
     {
         // FHIRTypedCollection wraps a raw data array with FHIR type context.
@@ -1253,8 +1270,17 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 }
             }
 
-            // Try direct property access
+            // Try direct property access.
+            // The initialisation check is load-bearing: generated models declare typed properties
+            // with no default, so a Reference that carries no `id` has `Element::$id` declared but
+            // uninitialized. Reading it throws, and the old code let that Error fall through to the
+            // choice-variant fallback below — where `id` then matched `identifier`. An uninitialized
+            // property holds nothing, so the honest answer is an empty collection, not a fall-through.
             if (property_exists($node, $propertyName)) {
+                if (!self::isPropertyInitialized($node, $propertyName)) {
+                    return Collection::empty();
+                }
+
                 try {
                     $value = $node->$propertyName;
 
@@ -1302,8 +1328,21 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
             // Handle polymorphic properties (value[x])
             // Look for properties like valueString, valueInteger, etc.
+            //
+            // The suffix MUST start with an uppercase letter, exactly as the raw-array branch above
+            // requires. FHIR names choice variants by appending a capitalised type — `valueString`,
+            // `valueQuantity` — so a lowercase continuation is a different element, not a variant.
+            // Without this guard, navigating `id` matched `identifier` and returned the wrong node,
+            // which broke `ele-1` (`children().count() > id.count()`) on every Reference carrying an
+            // identifier: `id.count()` came back as 1 instead of 0, so the comparison went false and
+            // valid resources were reported invalid.
             foreach (get_object_vars($node) as $prop => $value) {
                 if (str_starts_with($prop, $propertyName) && $prop !== $propertyName) {
+                    $suffix = substr($prop, strlen($propertyName));
+                    if ($suffix === '' || !ctype_upper($suffix[0])) {
+                        continue;
+                    }
+
                     // Look up FHIR type for the resolved variant property
                     $fhirType = $this->resolveFhirPropertyType($node, $prop);
                     if ($fhirType !== null && is_scalar($value)) {
