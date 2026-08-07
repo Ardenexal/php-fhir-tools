@@ -1,0 +1,623 @@
+{
+  "http://h7.org/fhir/OperationDefinition/example": {
+    "code": "populate",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "QuestionnaireResponse",
+        "use": "out"
+      }
+    ],
+    "url": "http://h7.org/fhir/OperationDefinition/example"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ActivityDefinition-apply": {
+    "code": "apply",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Any",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/ActivityDefinition-apply"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ActivityDefinition-data-requirements": {
+    "code": "data-requirements",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Library",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/ActivityDefinition-data-requirements"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-conforms": {
+    "code": "conforms",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "issues",
+        "type": "OperationOutcome",
+        "use": "out"
+      },
+      {
+        "name": "union",
+        "type": "CapabilityStatement",
+        "use": "out"
+      },
+      {
+        "name": "intersection",
+        "type": "CapabilityStatement",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-conforms"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-implements": {
+    "code": "implements",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "OperationOutcome",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-implements"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-subset": {
+    "code": "subset",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "CapabilityStatement",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-subset"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-versions": {
+    "code": "versions",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "version",
+        "type": "code",
+        "use": "out"
+      },
+      {
+        "name": "default",
+        "type": "code",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-versions"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ChargeItemDefinition-apply": {
+    "code": "apply",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Any",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/ChargeItemDefinition-apply"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Claim-submit": {
+    "code": "submit",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Claim-submit"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CodeSystem-find-matches": {
+    "code": "find-matches",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "match",
+        "type": null,
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/CodeSystem-find-matches"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CodeSystem-lookup": {
+    "code": "lookup",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "name",
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "name": "version",
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "name": "display",
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "name": "designation",
+        "type": null,
+        "use": "out"
+      },
+      {
+        "name": "property",
+        "type": null,
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/CodeSystem-lookup"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CodeSystem-subsumes": {
+    "code": "subsumes",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "outcome",
+        "type": "code",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/CodeSystem-subsumes"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CodeSystem-validate-code": {
+    "code": "validate-code",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "result",
+        "type": "boolean",
+        "use": "out"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "name": "display",
+        "type": "string",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/CodeSystem-validate-code"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Composition-document": {
+    "code": "document",
+    "kind": "operation",
+    "parameter": [],
+    "url": "http://hl7.org/fhir/OperationDefinition/Composition-document"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ConceptMap-closure": {
+    "code": "closure",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "ConceptMap",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/ConceptMap-closure"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ConceptMap-translate": {
+    "code": "translate",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "result",
+        "type": "boolean",
+        "use": "out"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "name": "match",
+        "type": null,
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/ConceptMap-translate"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CoverageEligibilityRequest-submit": {
+    "code": "submit",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/CoverageEligibilityRequest-submit"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Encounter-everything": {
+    "code": "everything",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Encounter-everything"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Group-everything": {
+    "code": "everything",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Group-everything"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Library-data-requirements": {
+    "code": "data-requirements",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Library",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Library-data-requirements"
+  },
+  "http://hl7.org/fhir/OperationDefinition/List-find": {
+    "code": "find",
+    "kind": "operation",
+    "parameter": [],
+    "url": "http://hl7.org/fhir/OperationDefinition/List-find"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Measure-care-gaps": {
+    "code": "care-gaps",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Measure-care-gaps"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Measure-collect-data": {
+    "code": "collect-data",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "measureReport",
+        "type": "MeasureReport",
+        "use": "out"
+      },
+      {
+        "name": "resource",
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Measure-collect-data"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Measure-data-requirements": {
+    "code": "data-requirements",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Library",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Measure-data-requirements"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Measure-evaluate-measure": {
+    "code": "evaluate-measure",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "MeasureReport",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Measure-evaluate-measure"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Measure-submit-data": {
+    "code": "submit-data",
+    "kind": "operation",
+    "parameter": [],
+    "url": "http://hl7.org/fhir/OperationDefinition/Measure-submit-data"
+  },
+  "http://hl7.org/fhir/OperationDefinition/MedicinalProductDefinition-everything": {
+    "code": "everything",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/MedicinalProductDefinition-everything"
+  },
+  "http://hl7.org/fhir/OperationDefinition/MessageHeader-process-message": {
+    "code": "process-message",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/MessageHeader-process-message"
+  },
+  "http://hl7.org/fhir/OperationDefinition/NamingSystem-preferred-id": {
+    "code": "preferred-id",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "result",
+        "type": "string",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/NamingSystem-preferred-id"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Observation-lastn": {
+    "code": "lastn",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Observation-lastn"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Observation-stats": {
+    "code": "stats",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "statistics",
+        "type": "Observation",
+        "use": "out"
+      },
+      {
+        "name": "source",
+        "type": "Observation",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Observation-stats"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Patient-everything": {
+    "code": "everything",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Patient-everything"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Patient-match": {
+    "code": "match",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Patient-match"
+  },
+  "http://hl7.org/fhir/OperationDefinition/PlanDefinition-apply": {
+    "code": "apply",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "CarePlan",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/PlanDefinition-apply"
+  },
+  "http://hl7.org/fhir/OperationDefinition/PlanDefinition-data-requirements": {
+    "code": "data-requirements",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Library",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/PlanDefinition-data-requirements"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-convert": {
+    "code": "convert",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "output",
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-convert"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-graph": {
+    "code": "graph",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "result",
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-graph"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-graphql": {
+    "code": "graphql",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "result",
+        "type": "Binary",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-graphql"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-meta": {
+    "code": "meta",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Meta",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-meta"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-meta-add": {
+    "code": "meta-add",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Meta",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-meta-add"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-meta-delete": {
+    "code": "meta-delete",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Meta",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-meta-delete"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-validate": {
+    "code": "validate",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "OperationOutcome",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-validate"
+  },
+  "http://hl7.org/fhir/OperationDefinition/StructureDefinition-questionnaire": {
+    "code": "questionnaire",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Questionnaire",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/StructureDefinition-questionnaire"
+  },
+  "http://hl7.org/fhir/OperationDefinition/StructureDefinition-snapshot": {
+    "code": "snapshot",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "StructureDefinition",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/StructureDefinition-snapshot"
+  },
+  "http://hl7.org/fhir/OperationDefinition/StructureMap-transform": {
+    "code": "transform",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/StructureMap-transform"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ValueSet-expand": {
+    "code": "expand",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "return",
+        "type": "ValueSet",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/ValueSet-expand"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ValueSet-validate-code": {
+    "code": "validate-code",
+    "kind": "operation",
+    "parameter": [
+      {
+        "name": "result",
+        "type": "boolean",
+        "use": "out"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "name": "display",
+        "type": "string",
+        "use": "out"
+      }
+    ],
+    "url": "http://hl7.org/fhir/OperationDefinition/ValueSet-validate-code"
+  }
+}
