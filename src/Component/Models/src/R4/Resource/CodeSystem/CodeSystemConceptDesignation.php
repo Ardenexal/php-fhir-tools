@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Additional representations for the concept - other languages, aliases, specialized purposes, used for particular purposes, etc.
@@ -39,7 +40,7 @@ class CodeSystemConceptDesignation extends BackboneElement
         )]
         public ?string $language = null,
         /** @var Coding|null use Details how this designation would be used */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/designation-use', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/designation-use', strength: 'extensible')]
         public ?Coding $use = null,
         /** @var StringPrimitive|string|null value The text value for this designation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

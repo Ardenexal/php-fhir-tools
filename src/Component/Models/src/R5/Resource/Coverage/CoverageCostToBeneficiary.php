@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Money;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A suite of codes indicating the cost category and associated amount which have been detailed in the policy and may have been  included on the health card.
@@ -31,19 +32,19 @@ class CoverageCostToBeneficiary extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Cost category */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/coverage-copay-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/coverage-copay-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null category Benefit classification */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $category = null,
         /** @var CodeableConcept|null network In or out of network */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $network = null,
         /** @var CodeableConcept|null unit Individual or family */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $unit = null,
         /** @var CodeableConcept|null term Annual or lifetime */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $term = null,
         /** @var Quantity|Money|null value The amount or percentage due from the beneficiary */
         #[FhirProperty(
@@ -73,6 +74,7 @@ class CoverageCostToBeneficiary extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Coverage\CoverageCostToBeneficiaryException',
         )]
+        #[Valid]
         public array $exception = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

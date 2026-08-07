@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The assignment to an organizing scheme.
@@ -31,7 +32,7 @@ class CitationCitedArtifactClassification extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type The kind of classifier (e.g. publication type, keyword) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-artifact-classification-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-artifact-classification-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> classifier The specific classification value */
         #[FhirProperty(
@@ -40,6 +41,7 @@ class CitationCitedArtifactClassification extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $classifier = [],
         /** @var array<Reference> artifactAssessment Complex or externally created classification */
         #[FhirProperty(
@@ -48,6 +50,7 @@ class CitationCitedArtifactClassification extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ArtifactAssessment'])]
         public array $artifactAssessment = [],
     ) {

@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A description or definition of which activities are allowed to be done on the data.
@@ -37,6 +38,7 @@ class PermissionRuleActivity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Device',
             'http://hl7.org/fhir/StructureDefinition/Group',
@@ -55,6 +57,7 @@ class PermissionRuleActivity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $action = [],
         /** @var array<CodeableConcept> purpose The purpose for which the permission is given */
         #[FhirProperty(
@@ -63,6 +66,7 @@ class PermissionRuleActivity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-PurposeOfUse', strength: 'preferred')]
         public array $purpose = [],
     ) {

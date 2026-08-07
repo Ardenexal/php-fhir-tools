@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Each interaction or action.
@@ -54,10 +55,10 @@ class ExampleScenarioProcessStepOperation extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $receiverActive = null,
         /** @var ExampleScenarioInstanceContainedInstance|null request Each resource instance used by the initiator */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?ExampleScenarioInstanceContainedInstance $request = null,
         /** @var ExampleScenarioInstanceContainedInstance|null response Each resource instance used by the responder */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?ExampleScenarioInstanceContainedInstance $response = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

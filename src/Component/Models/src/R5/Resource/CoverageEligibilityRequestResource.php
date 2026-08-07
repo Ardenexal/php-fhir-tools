@@ -28,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CoverageEligibilityRequest\
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\CoverageEligibilityRequest\CoverageEligibilityRequestSupportingInfo;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Financial Management)
@@ -49,7 +50,7 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -58,10 +59,10 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -76,12 +77,13 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var FinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fm-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?FinancialResourceStatusCodesType $status = null,
         /** @var CodeableConcept|null priority Desired processing priority */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $priority = null,
         /** @var array<EligibilityRequestPurposeType> purpose auth-requirements | benefits | discovery | validation */
         #[FhirProperty(
@@ -95,7 +97,7 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/eligibilityrequest-purpose|5.0.0', strength: 'required')]
         public array $purpose = [],
         /** @var Reference|null patient Intended recipient of products and services */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
         public ?Reference $patient = null,
         /** @var array<CoverageEligibilityRequestEvent> event Event information */
         #[FhirProperty(
@@ -104,6 +106,7 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CoverageEligibilityRequest\CoverageEligibilityRequestEvent',
         )]
+        #[Valid]
         public array $event = [],
         /** @var DatePrimitive|Period|null serviced Estimated date or dates of service */
         #[FhirProperty(
@@ -131,6 +134,7 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
         public ?DateTimePrimitive $created = null,
         /** @var Reference|null enterer Author */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -138,6 +142,7 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
         public ?Reference $enterer = null,
         /** @var Reference|null provider Party responsible for the request */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -145,10 +150,10 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
         ])]
         public ?Reference $provider = null,
         /** @var Reference|null insurer Coverage issuer */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $insurer = null,
         /** @var Reference|null facility Servicing facility */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $facility = null,
         /** @var array<CoverageEligibilityRequestSupportingInfo> supportingInfo Supporting information */
         #[FhirProperty(
@@ -157,6 +162,7 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CoverageEligibilityRequest\CoverageEligibilityRequestSupportingInfo',
         )]
+        #[Valid]
         public array $supportingInfo = [],
         /** @var array<CoverageEligibilityRequestInsurance> insurance Patient insurance information */
         #[FhirProperty(
@@ -165,6 +171,7 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CoverageEligibilityRequest\CoverageEligibilityRequestInsurance',
         )]
+        #[Valid]
         public array $insurance = [],
         /** @var array<CoverageEligibilityRequestItem> item Item to be evaluated for eligibiity */
         #[FhirProperty(
@@ -173,6 +180,7 @@ class CoverageEligibilityRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CoverageEligibilityRequest\CoverageEligibilityRequestItem',
         )]
+        #[Valid]
         public array $item = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

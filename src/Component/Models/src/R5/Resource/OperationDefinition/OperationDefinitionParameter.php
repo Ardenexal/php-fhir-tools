@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The parameters for the operation/query.
@@ -111,7 +112,7 @@ class OperationDefinitionParameter extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-param-type|5.0.0', strength: 'required')]
         public ?SearchParamTypeType $searchType = null,
         /** @var OperationDefinitionParameterBinding|null binding ValueSet details if this is coded */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?OperationDefinitionParameterBinding $binding = null,
         /** @var array<OperationDefinitionParameterReferencedFrom> referencedFrom References to this parameter */
         #[FhirProperty(
@@ -120,6 +121,7 @@ class OperationDefinitionParameter extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\OperationDefinition\OperationDefinitionParameterReferencedFrom',
         )]
+        #[Valid]
         public array $referencedFrom = [],
         /** @var array<OperationDefinitionParameter> part Parts of a nested Parameter */
         #[FhirProperty(
@@ -128,6 +130,7 @@ class OperationDefinitionParameter extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\OperationDefinition\OperationDefinitionParameter',
         )]
+        #[Valid]
         public array $part = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

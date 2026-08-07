@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ResponseTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about the message that this message is a response to.  Only present if this message is a response.
@@ -39,7 +40,7 @@ class MessageHeaderResponse extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/response-code|4.3.0', strength: 'required')]
         public ?ResponseTypeType $code = null,
         /** @var Reference|null details Specific list of hints/warnings/errors */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/OperationOutcome'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/OperationOutcome'])]
         public ?Reference $details = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -28,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The actions, if any, produced by the evaluation of the artifact.
@@ -73,6 +74,7 @@ class RequestGroupAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $code = [],
         /** @var array<RelatedArtifact> documentation Supporting documentation for the intended performer of the action */
         #[FhirProperty(
@@ -81,6 +83,7 @@ class RequestGroupAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $documentation = [],
         /** @var array<RequestGroupActionCondition> condition Whether or not the action is applicable */
         #[FhirProperty(
@@ -89,6 +92,7 @@ class RequestGroupAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\RequestGroup\RequestGroupActionCondition',
         )]
+        #[Valid]
         public array $condition = [],
         /** @var array<RequestGroupActionRelatedAction> relatedAction Relationship to another action */
         #[FhirProperty(
@@ -97,6 +101,7 @@ class RequestGroupAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\RequestGroup\RequestGroupActionRelatedAction',
         )]
+        #[Valid]
         public array $relatedAction = [],
         /** @var DateTimePrimitive|Age|Period|Duration|Range|Timing|null timing When the action should take place */
         #[FhirProperty(
@@ -150,6 +155,7 @@ class RequestGroupAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -159,7 +165,7 @@ class RequestGroupAction extends BackboneElement
         ])]
         public array $participant = [],
         /** @var CodeableConcept|null type create | update | remove | fire-event */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var ActionGroupingBehaviorType|null groupingBehavior visual-group | logical-group | sentence-group */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-grouping-behavior|4.3.0', strength: 'required')]
@@ -177,7 +183,7 @@ class RequestGroupAction extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-cardinality-behavior|4.3.0', strength: 'required')]
         public ?ActionCardinalityBehaviorType $cardinalityBehavior = null,
         /** @var Reference|null resource The target of the action */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $resource = null,
         /** @var array<RequestGroupAction> action Sub action */
         #[FhirProperty(
@@ -186,6 +192,7 @@ class RequestGroupAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\RequestGroup\RequestGroupAction',
         )]
+        #[Valid]
         public array $action = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

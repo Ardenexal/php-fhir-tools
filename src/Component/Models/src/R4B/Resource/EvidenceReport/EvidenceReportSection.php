@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The root of the sections that make up the composition.
@@ -38,10 +39,10 @@ class EvidenceReportSection extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var CodeableConcept|null focus Classification of section (recommended) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-report-section', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-report-section', strength: 'extensible')]
         public ?CodeableConcept $focus = null,
         /** @var Reference|null focusReference Classification of section by Resource */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $focusReference = null,
         /** @var array<Reference> author Who and/or what authored the section */
         #[FhirProperty(
@@ -50,6 +51,7 @@ class EvidenceReportSection extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Person',
             'http://hl7.org/fhir/StructureDefinition/Device',
@@ -58,13 +60,13 @@ class EvidenceReportSection extends BackboneElement
         ])]
         public array $author = [],
         /** @var Narrative|null text Text summary of the section, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var ListModeType|null mode working | snapshot | changes */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-mode|4.3.0', strength: 'required')]
         public ?ListModeType $mode = null,
         /** @var CodeableConcept|null orderedBy Order of section entries */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-order', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-order', strength: 'preferred')]
         public ?CodeableConcept $orderedBy = null,
         /** @var array<CodeableConcept> entryClassifier Extensible classifiers as content */
         #[FhirProperty(
@@ -73,6 +75,7 @@ class EvidenceReportSection extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-classifier-code', strength: 'extensible')]
         public array $entryClassifier = [],
         /** @var array<Reference> entryReference Reference to resources as content */
@@ -82,6 +85,7 @@ class EvidenceReportSection extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $entryReference = [],
         /** @var array<Quantity> entryQuantity Quantity as content */
@@ -91,9 +95,10 @@ class EvidenceReportSection extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity',
         )]
+        #[Valid]
         public array $entryQuantity = [],
         /** @var CodeableConcept|null emptyReason Why the section is empty */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-empty-reason', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-empty-reason', strength: 'preferred')]
         public ?CodeableConcept $emptyReason = null,
         /** @var array<EvidenceReportSection> section Nested Section */
         #[FhirProperty(
@@ -102,6 +107,7 @@ class EvidenceReportSection extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\EvidenceReport\EvidenceReportSection',
         )]
+        #[Valid]
         public array $section = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

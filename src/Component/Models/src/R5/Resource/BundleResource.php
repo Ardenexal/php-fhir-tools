@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Bundle\BundleEntry;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Bundle\BundleLink;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -138,7 +139,7 @@ class BundleResource extends AbstractResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -147,7 +148,7 @@ class BundleResource extends AbstractResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Identifier|null identifier Persistent identifier for the bundle */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var BundleTypeType|null type document | message | transaction | transaction-response | batch | batch-response | history | searchset | collection | subscription-notification */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/bundle-type|5.0.0', strength: 'required')]
@@ -165,6 +166,7 @@ class BundleResource extends AbstractResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Bundle\BundleLink',
         )]
+        #[Valid]
         public array $link = [],
         /** @var array<BundleEntry> entry Entry in the bundle - will have a resource or information */
         #[FhirProperty(
@@ -173,12 +175,13 @@ class BundleResource extends AbstractResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Bundle\BundleEntry',
         )]
+        #[Valid]
         public array $entry = [],
         /** @var Signature|null signature Digital Signature */
-        #[FhirProperty(fhirType: 'Signature', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Signature', propertyKind: 'complex'), Valid]
         public ?Signature $signature = null,
         /** @var AbstractResource|null issues Issues with the Bundle */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource')]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource'), Valid]
         public ?AbstractResource $issues = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language);

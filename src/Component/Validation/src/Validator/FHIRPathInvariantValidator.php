@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
@@ -30,6 +31,33 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
     ) {
     }
 
+    /**
+     * Bind `%resource` / `%rootResource` / `%context` to the resource validation actually started at.
+     *
+     * The FHIRPath engine resolves all three from `EvaluationContext::getRootResource()` and returns
+     * an empty collection when it is unset. Passing no context therefore leaves them unbound, and an
+     * invariant like `Reference.ref-1` —
+     * `reference.startsWith('#').not() or (reference.substring(1) in %rootResource.contained.id)` —
+     * evaluates its right-hand side against nothing and reports a violation for every legitimate
+     * local reference.
+     *
+     * This was latent rather than harmless: 32 R4 invariant declarations use one of these variables,
+     * and they were simply never reached, because nested elements were not traversed at all. Emitting
+     * `#[Assert\Valid]` from the model generator made them reachable and turned a dead check into a
+     * false-positive one — `containedToContainer`, which the Java reference validator passes with zero
+     * issues, reported two `ref-1` errors.
+     *
+     * `ConstraintValidator::$context->getRoot()` is the object originally handed to
+     * `Validator::validate()`, which is the FHIR resource — precisely what these variables mean.
+     * On a nested node it stays the root rather than the node, which is the whole point.
+     */
+    private function rootResourceContext(): EvaluationContext
+    {
+        $root = $this->context->getRoot();
+
+        return new EvaluationContext(is_object($root) ? $root : null);
+    }
+
     public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof FHIRPathInvariant) {
@@ -41,7 +69,11 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
         }
 
         try {
-            $result = $this->pathService->evaluate($constraint->expression, $value);
+            $result = $this->pathService->evaluate(
+                $constraint->expression,
+                $value,
+                $this->rootResourceContext(),
+            );
         } catch (FHIRPathException) {
             // The engine could not evaluate the expression (e.g. an unsupported function).
             // Per the FHIR conformance spec this is a tooling limitation, not instance

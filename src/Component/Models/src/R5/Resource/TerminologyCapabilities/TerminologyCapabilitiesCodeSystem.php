@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeSystemContentModeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Identifies a code system that is supported by the server. If there is a no code system URL, then this declares the general assumptions a client can make about support for any CodeSystem resource.
@@ -60,6 +61,7 @@ class TerminologyCapabilitiesCodeSystem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TerminologyCapabilities\TerminologyCapabilitiesCodeSystemVersion',
         )]
+        #[Valid]
         public array $version = [],
         /** @var CodeSystemContentModeType|null content not-present | example | fragment | complete | supplement */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/codesystem-content-mode|5.0.0', strength: 'required')]

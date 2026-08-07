@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -41,6 +42,7 @@ class RelatedArtifact extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $classifier = [],
         /** @var StringPrimitive|string|null label Short label */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -52,13 +54,13 @@ class RelatedArtifact extends DataType
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $citation = null,
         /** @var Attachment|null document What document is being referenced */
-        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex'), Valid]
         public ?Attachment $document = null,
         /** @var CanonicalPrimitive|null resource What artifact is being referenced */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?CanonicalPrimitive $resource = null,
         /** @var Reference|null resourceReference What artifact, if not a conformance resource */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $resourceReference = null,
         /** @var PublicationStatusType|null publicationStatus draft | active | retired | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0', strength: 'required')]

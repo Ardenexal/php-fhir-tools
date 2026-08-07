@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Money;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The calculated account balances - these are calculated and processed by the finance system.
@@ -33,16 +34,16 @@ class AccountBalance extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null aggregate Who is expected to pay this part of the balance */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/account-aggregate', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/account-aggregate', strength: 'extensible')]
         public ?CodeableConcept $aggregate = null,
         /** @var CodeableConcept|null term current | 30 | 60 | 90 | 120 */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/account-balance-term', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/account-balance-term', strength: 'extensible')]
         public ?CodeableConcept $term = null,
         /** @var bool|null estimate Estimated balance */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $estimate = null,
         /** @var Money|null amount Calculated amount */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Money $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

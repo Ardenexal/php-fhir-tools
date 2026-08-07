@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A concept from the target value set that this concept maps to.
@@ -68,6 +69,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElementTargetProperty',
         )]
+        #[Valid]
         public array $property = [],
         /** @var array<ConceptMapGroupElementTargetDependsOn> dependsOn Other properties required for this mapping */
         #[FhirProperty(
@@ -76,6 +78,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElementTargetDependsOn',
         )]
+        #[Valid]
         public array $dependsOn = [],
         /** @var array<ConceptMapGroupElementTargetDependsOn> product Other data elements that this mapping also produces */
         #[FhirProperty(
@@ -84,6 +87,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElementTargetDependsOn',
         )]
+        #[Valid]
         public array $product = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

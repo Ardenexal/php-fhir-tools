@@ -29,6 +29,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide\Implem
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide\ImplementationGuideManifest;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -62,7 +63,7 @@ class ImplementationGuideResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -76,10 +77,10 @@ class ImplementationGuideResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -118,6 +119,7 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var MarkdownPrimitive|null description Natural language description of the implementation guide */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -129,6 +131,7 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for implementation guide (if applicable) */
         #[FhirProperty(
@@ -137,6 +140,7 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null copyright Use and/or publishing restrictions */
@@ -166,6 +170,7 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide\ImplementationGuideDependsOn',
         )]
+        #[Valid]
         public array $dependsOn = [],
         /** @var array<ImplementationGuideGlobal> global Profiles that apply globally */
         #[FhirProperty(
@@ -174,12 +179,13 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide\ImplementationGuideGlobal',
         )]
+        #[Valid]
         public array $global = [],
         /** @var ImplementationGuideDefinition|null definition Information needed to build the IG */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ImplementationGuideDefinition $definition = null,
         /** @var ImplementationGuideManifest|null manifest Information about an assembled IG */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ImplementationGuideManifest $manifest = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

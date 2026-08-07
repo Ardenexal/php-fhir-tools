@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A link between this substance and another, with details of the relationship.
@@ -56,7 +57,7 @@ class SubstanceSpecificationRelationship extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceSpecification'])]
         public Reference|CodeableConcept|null $substance = null,
         /** @var CodeableConcept|null relationship For example "salt to parent", "active moiety", "starting material" */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $relationship = null,
         /** @var bool|null isDefining For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible substance relationships */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -95,10 +96,10 @@ class SubstanceSpecificationRelationship extends BackboneElement
         )]
         public Quantity|Range|Ratio|StringPrimitive|string|null $amount = null,
         /** @var Ratio|null amountRatioLowLimit For use when the numeric */
-        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex'), Valid]
         public ?Ratio $amountRatioLowLimit = null,
         /** @var CodeableConcept|null amountType An operator for the amount, for example "average", "approximately", "less than" */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $amountType = null,
         /** @var array<Reference> source Supporting literature */
         #[FhirProperty(
@@ -107,6 +108,7 @@ class SubstanceSpecificationRelationship extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DocumentReference'])]
         public array $source = [],
     ) {

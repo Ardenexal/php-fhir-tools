@@ -30,6 +30,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Subscription\SubscriptionFilterBy;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Subscription\SubscriptionParameter;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -46,7 +47,7 @@ class SubscriptionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -55,10 +56,10 @@ class SubscriptionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -73,6 +74,7 @@ class SubscriptionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null name Human readable name for this subscription */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -90,12 +92,14 @@ class SubscriptionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactPoint',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var InstantPrimitive|null end When to automatically delete the subscription */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
         public ?InstantPrimitive $end = null,
         /** @var Reference|null managingEntity Entity responsible for Subscription changes */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/CareTeam',
             'http://hl7.org/fhir/StructureDefinition/HealthcareService',
@@ -116,9 +120,10 @@ class SubscriptionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Subscription\SubscriptionFilterBy',
         )]
+        #[Valid]
         public array $filterBy = [],
         /** @var Coding|null channelType Channel type for notifications */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-channel-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-channel-type', strength: 'extensible')]
         public ?Coding $channelType = null,
         /** @var UrlPrimitive|null endpoint Where the channel points to */
         #[FhirProperty(fhirType: 'url', propertyKind: 'primitive')]
@@ -130,6 +135,7 @@ class SubscriptionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Subscription\SubscriptionParameter',
         )]
+        #[Valid]
         public array $parameter = [],
         /** @var UnsignedIntPrimitive|null heartbeatPeriod Interval in seconds to send 'heartbeat' notification */
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]

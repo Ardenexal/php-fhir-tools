@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The class history permits the tracking of the encounters transitions without needing to go  through the resource history.  This would be used for a case where an admission starts of as an emergency encounter, then transitions into an inpatient scenario. Doing this and not restarting a new encounter ensures that any lab/diagnostic results can more easily follow the patient and not require re-processing and not get lost or cancelled during a kind of discharge from emergency to inpatient.
@@ -31,10 +32,10 @@ class EncounterClassHistory extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Coding|null class inpatient | outpatient | ambulatory | emergency + */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActEncounterCode', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActEncounterCode', strength: 'extensible')]
         public ?Coding $class = null,
         /** @var Period|null period The time that the episode was in the specified class */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Period $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\ConditionPreconditionTypeTy
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An observation that suggests that this condition applies.
@@ -35,7 +36,7 @@ class ConditionDefinitionPrecondition extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-precondition-type|5.0.0', strength: 'required')]
         public ?ConditionPreconditionTypeType $type = null,
         /** @var CodeableConcept|null code Code for relevant Observation */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
         /** @var CodeableConcept|Quantity|null value Value of Observation */
         #[FhirProperty(

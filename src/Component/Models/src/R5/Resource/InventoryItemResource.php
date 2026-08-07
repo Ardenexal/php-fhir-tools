@@ -26,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\InventoryItem\InventoryItem
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\InventoryItem\InventoryItemName;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\InventoryItem\InventoryItemResponsibleOrganization;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -42,7 +43,7 @@ class InventoryItemResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -51,10 +52,10 @@ class InventoryItemResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -69,6 +70,7 @@ class InventoryItemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var InventoryItemStatusCodesType|null status active | inactive | entered-in-error | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/inventoryitem-status|5.0.0', strength: 'required')]
@@ -80,6 +82,7 @@ class InventoryItemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $category = [],
         /** @var array<CodeableConcept> code Code designating the specific type of item */
         #[FhirProperty(
@@ -88,6 +91,7 @@ class InventoryItemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $code = [],
         /** @var array<InventoryItemName> name The item name(s) - the brand name, or common name, functional name, generic name or others */
         #[FhirProperty(
@@ -96,6 +100,7 @@ class InventoryItemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\InventoryItem\InventoryItemName',
         )]
+        #[Valid]
         public array $name = [],
         /** @var array<InventoryItemResponsibleOrganization> responsibleOrganization Organization(s) responsible for the product */
         #[FhirProperty(
@@ -104,9 +109,10 @@ class InventoryItemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\InventoryItem\InventoryItemResponsibleOrganization',
         )]
+        #[Valid]
         public array $responsibleOrganization = [],
         /** @var InventoryItemDescription|null description Descriptive characteristics of the item */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?InventoryItemDescription $description = null,
         /** @var array<CodeableConcept> inventoryStatus The usage status like recalled, in use, discarded */
         #[FhirProperty(
@@ -115,12 +121,13 @@ class InventoryItemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $inventoryStatus = [],
         /** @var CodeableConcept|null baseUnit The base unit of measure - the unit in which the product is used or counted */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $baseUnit = null,
         /** @var Quantity|null netContent Net content or amount present in the item */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $netContent = null,
         /** @var array<InventoryItemAssociation> association Association with other items or products */
         #[FhirProperty(
@@ -129,6 +136,7 @@ class InventoryItemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\InventoryItem\InventoryItemAssociation',
         )]
+        #[Valid]
         public array $association = [],
         /** @var array<InventoryItemCharacteristic> characteristic Characteristic of the item */
         #[FhirProperty(
@@ -137,12 +145,14 @@ class InventoryItemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\InventoryItem\InventoryItemCharacteristic',
         )]
+        #[Valid]
         public array $characteristic = [],
         /** @var InventoryItemInstance|null instance Instances or occurrences of the product */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?InventoryItemInstance $instance = null,
         /** @var Reference|null productReference Link to a product resource used in clinical workflows */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Medication',
             'http://hl7.org/fhir/StructureDefinition/Device',

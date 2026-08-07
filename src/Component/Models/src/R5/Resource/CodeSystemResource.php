@@ -35,6 +35,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CodeSystem\CodeSystemConcep
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\CodeSystem\CodeSystemFilter;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\CodeSystem\CodeSystemProperty;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Terminology Infrastructure)
@@ -81,7 +82,7 @@ class CodeSystemResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -90,10 +91,10 @@ class CodeSystemResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -111,6 +112,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version Business version of the code system (Coding.version) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -162,6 +164,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var MarkdownPrimitive|null description Natural language description of the code system */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -173,6 +176,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for code system (if applicable) */
         #[FhirProperty(
@@ -181,6 +185,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this code system is defined */
@@ -199,7 +204,7 @@ class CodeSystemResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $lastReviewDate = null,
         /** @var Period|null effectivePeriod When the CodeSystem is expected to be used */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $effectivePeriod = null,
         /** @var array<CodeableConcept> topic E.g. Education, Treatment, Assessment, etc */
         #[FhirProperty(
@@ -208,6 +213,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $topic = [],
         /** @var array<ContactDetail> author Who authored the CodeSystem */
         #[FhirProperty(
@@ -216,6 +222,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $author = [],
         /** @var array<ContactDetail> editor Who edited the CodeSystem */
         #[FhirProperty(
@@ -224,6 +231,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $editor = [],
         /** @var array<ContactDetail> reviewer Who reviewed the CodeSystem */
         #[FhirProperty(
@@ -232,6 +240,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $reviewer = [],
         /** @var array<ContactDetail> endorser Who endorsed the CodeSystem */
         #[FhirProperty(
@@ -240,6 +249,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $endorser = [],
         /** @var array<RelatedArtifact> relatedArtifact Additional documentation, citations, etc */
         #[FhirProperty(
@@ -248,6 +258,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $relatedArtifact = [],
         /** @var bool|null caseSensitive If code comparison is case sensitive */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -280,6 +291,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CodeSystem\CodeSystemFilter',
         )]
+        #[Valid]
         public array $filter = [],
         /** @var array<CodeSystemProperty> property Additional information supplied about each concept */
         #[FhirProperty(
@@ -288,6 +300,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CodeSystem\CodeSystemProperty',
         )]
+        #[Valid]
         public array $property = [],
         /** @var array<CodeSystemConcept> concept Concepts in the code system */
         #[FhirProperty(
@@ -296,6 +309,7 @@ class CodeSystemResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CodeSystem\CodeSystemConcept',
         )]
+        #[Valid]
         public array $concept = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

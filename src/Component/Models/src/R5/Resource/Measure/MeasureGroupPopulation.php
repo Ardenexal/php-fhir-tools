@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A population criteria for the measure.
@@ -37,22 +38,22 @@ class MeasureGroupPopulation extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $linkId = null,
         /** @var CodeableConcept|null code initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-population', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-population', strength: 'extensible')]
         public ?CodeableConcept $code = null,
         /** @var MarkdownPrimitive|null description The human readable description of this population criteria */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var Expression|null criteria The criteria that defines this population */
-        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex'), Valid]
         public ?Expression $criteria = null,
         /** @var Reference|null groupDefinition A group resource that defines this population */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
         public ?Reference $groupDefinition = null,
         /** @var StringPrimitive|string|null inputPopulationId Which population */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $inputPopulationId = null,
         /** @var CodeableConcept|null aggregateMethod Aggregation method for a measure score (e.g. sum, average, median, minimum, maximum, count) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-aggregate-method', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-aggregate-method', strength: 'extensible')]
         public ?CodeableConcept $aggregateMethod = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RatioRange;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Strength expressed in terms of a reference substance. For when the ingredient strength is additionally expressed as equivalent to the strength of some other closely related substance (e.g. salt vs. base). Reference strength represents the strength (quantitative composition) of the active moiety of the active substance. There are situations when the active substance and active moiety are different, therefore both a strength and a reference strength are needed.
@@ -34,7 +35,7 @@ class IngredientSubstanceStrengthReferenceStrength extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableReference|null substance Relevant reference substance */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceDefinition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceDefinition'])]
         public ?CodeableReference $substance = null,
         /** @var Ratio|RatioRange|null strength Strength expressed in terms of a reference substance */
         #[FhirProperty(
@@ -69,6 +70,7 @@ class IngredientSubstanceStrengthReferenceStrength extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $country = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

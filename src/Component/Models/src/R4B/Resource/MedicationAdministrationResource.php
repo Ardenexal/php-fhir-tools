@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationAdministration\MedicationAdministrationDosage;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationAdministration\MedicationAdministrationPerformer;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Pharmacy)
@@ -44,7 +45,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -58,10 +59,10 @@ class MedicationAdministrationResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -76,6 +77,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var array<UriPrimitive> instantiates Instantiates protocol or definition */
         #[FhirProperty(
@@ -92,6 +94,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/MedicationAdministration',
             'http://hl7.org/fhir/StructureDefinition/Procedure',
@@ -107,9 +110,10 @@ class MedicationAdministrationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $statusReason = [],
         /** @var CodeableConcept|null category Type of medication usage */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-admin-category', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-admin-category', strength: 'preferred')]
         public ?CodeableConcept $category = null,
         /** @var CodeableConcept|Reference|null medication What was administered */
         #[FhirProperty(
@@ -136,10 +140,11 @@ class MedicationAdministrationResource extends AbstractDomainResource
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Medication'])]
         public CodeableConcept|Reference|null $medication = null,
         /** @var Reference|null subject Who received medication */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient', 'http://hl7.org/fhir/StructureDefinition/Group'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient', 'http://hl7.org/fhir/StructureDefinition/Group'])]
         public ?Reference $subject = null,
         /** @var Reference|null context Encounter or Episode of Care administered as part of */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Encounter',
             'http://hl7.org/fhir/StructureDefinition/EpisodeOfCare',
@@ -152,6 +157,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $supportingInformation = [],
         /** @var DateTimePrimitive|Period|null effective Start and end time of administration */
@@ -184,6 +190,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationAdministration\MedicationAdministrationPerformer',
         )]
+        #[Valid]
         public array $performer = [],
         /** @var array<CodeableConcept> reasonCode Reason administration performed */
         #[FhirProperty(
@@ -192,6 +199,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $reasonCode = [],
         /** @var array<Reference> reasonReference Condition or observation that supports why the medication was administered */
         #[FhirProperty(
@@ -200,6 +208,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Condition',
             'http://hl7.org/fhir/StructureDefinition/Observation',
@@ -207,7 +216,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
         ])]
         public array $reasonReference = [],
         /** @var Reference|null request Request administration performed against */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicationRequest'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicationRequest'])]
         public ?Reference $request = null,
         /** @var array<Reference> device Device used to administer */
         #[FhirProperty(
@@ -216,6 +225,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Device'])]
         public array $device = [],
         /** @var array<Annotation> note Information about the administration */
@@ -225,9 +235,10 @@ class MedicationAdministrationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var MedicationAdministrationDosage|null dosage Details of how medication was taken */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?MedicationAdministrationDosage $dosage = null,
         /** @var array<Reference> eventHistory A list of events of interest in the lifecycle */
         #[FhirProperty(
@@ -236,6 +247,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Provenance'])]
         public array $eventHistory = [],
     ) {

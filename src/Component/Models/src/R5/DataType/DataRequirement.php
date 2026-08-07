@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -80,6 +81,7 @@ class DataRequirement extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\DataRequirementCodeFilter',
         )]
+        #[Valid]
         public array $codeFilter = [],
         /** @var array<DataRequirementDateFilter> dateFilter What dates/date ranges are expected */
         #[FhirProperty(
@@ -88,6 +90,7 @@ class DataRequirement extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\DataRequirementDateFilter',
         )]
+        #[Valid]
         public array $dateFilter = [],
         /** @var array<DataRequirementValueFilter> valueFilter What values are expected */
         #[FhirProperty(
@@ -96,6 +99,7 @@ class DataRequirement extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\DataRequirementValueFilter',
         )]
+        #[Valid]
         public array $valueFilter = [],
         /** @var PositiveIntPrimitive|null limit Number of results */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
@@ -107,6 +111,7 @@ class DataRequirement extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\DataRequirementSort',
         )]
+        #[Valid]
         public array $sort = [],
     ) {
         parent::__construct($id, $extension);

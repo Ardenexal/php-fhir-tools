@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The supplemental data criteria for the measure report, specified as either the name of a valid CQL expression within a referenced library, or a valid FHIR Resource Path.
@@ -36,7 +37,7 @@ class MeasureSupplementalData extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $linkId = null,
         /** @var CodeableConcept|null code Meaning of the supplemental data */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var array<CodeableConcept> usage supplemental-data | risk-adjustment-factor */
         #[FhirProperty(
@@ -45,13 +46,14 @@ class MeasureSupplementalData extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-data-usage', strength: 'extensible')]
         public array $usage = [],
         /** @var MarkdownPrimitive|null description The human readable description of this supplemental data */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var Expression|null criteria Expression describing additional data to be reported */
-        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Expression $criteria = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -28,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DeviceDefinition\DeviceDefi
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\DeviceDefinition\DeviceDefinitionProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\DeviceDefinition\DeviceDefinitionSpecialization;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\DeviceDefinition\DeviceDefinitionUdiDeviceIdentifier;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -49,7 +50,7 @@ class DeviceDefinitionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -63,10 +64,10 @@ class DeviceDefinitionResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -81,6 +82,7 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var array<DeviceDefinitionUdiDeviceIdentifier> udiDeviceIdentifier Unique Device Identifier (UDI) Barcode string */
         #[FhirProperty(
@@ -89,6 +91,7 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\DeviceDefinition\DeviceDefinitionUdiDeviceIdentifier',
         )]
+        #[Valid]
         public array $udiDeviceIdentifier = [],
         /** @var StringPrimitive|string|Reference|null manufacturer Name of device manufacturer */
         #[FhirProperty(
@@ -119,12 +122,13 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\DeviceDefinition\DeviceDefinitionDeviceName',
         )]
+        #[Valid]
         public array $deviceName = [],
         /** @var StringPrimitive|string|null modelNumber The model number for the device */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $modelNumber = null,
         /** @var CodeableConcept|null type What kind of device or device system this is */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var array<DeviceDefinitionSpecialization> specialization The capabilities supported on a  device, the standards to which the device conforms for a particular purpose, and used for the communication */
         #[FhirProperty(
@@ -133,6 +137,7 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\DeviceDefinition\DeviceDefinitionSpecialization',
         )]
+        #[Valid]
         public array $specialization = [],
         /** @var array<StringPrimitive|string> version Available versions */
         #[FhirProperty(
@@ -149,6 +154,7 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $safety = [],
         /** @var array<ProductShelfLife> shelfLifeStorage Shelf Life and storage information */
         #[FhirProperty(
@@ -157,9 +163,10 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ProductShelfLife',
         )]
+        #[Valid]
         public array $shelfLifeStorage = [],
         /** @var ProdCharacteristic|null physicalCharacteristics Dimensions, color etc. */
-        #[FhirProperty(fhirType: 'ProdCharacteristic', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'ProdCharacteristic', propertyKind: 'complex'), Valid]
         public ?ProdCharacteristic $physicalCharacteristics = null,
         /** @var array<CodeableConcept> languageCode Language code for the human-readable text strings produced by the device (all supported) */
         #[FhirProperty(
@@ -168,6 +175,7 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $languageCode = [],
         /** @var array<DeviceDefinitionCapability> capability Device capabilities */
         #[FhirProperty(
@@ -176,6 +184,7 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\DeviceDefinition\DeviceDefinitionCapability',
         )]
+        #[Valid]
         public array $capability = [],
         /** @var array<DeviceDefinitionProperty> property The actual configuration settings of a device as it actually operates, e.g., regulation status, time properties */
         #[FhirProperty(
@@ -184,9 +193,10 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\DeviceDefinition\DeviceDefinitionProperty',
         )]
+        #[Valid]
         public array $property = [],
         /** @var Reference|null owner Organization responsible for device */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $owner = null,
         /** @var array<ContactPoint> contact Details for human/organization for support */
         #[FhirProperty(
@@ -195,6 +205,7 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactPoint',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var UriPrimitive|null url Network address to contact device */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -209,12 +220,13 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var Quantity|null quantity The quantity of the device present in the packaging (e.g. the number of devices present in a pack, or the number of devices in the same package of the medicinal product) */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Reference|null parentDevice The parent device it can be part of */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DeviceDefinition'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DeviceDefinition'])]
         public ?Reference $parentDevice = null,
         /** @var array<DeviceDefinitionMaterial> material A substance used to create the material(s) of which the device is made */
         #[FhirProperty(
@@ -223,6 +235,7 @@ class DeviceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\DeviceDefinition\DeviceDefinitionMaterial',
         )]
+        #[Valid]
         public array $material = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

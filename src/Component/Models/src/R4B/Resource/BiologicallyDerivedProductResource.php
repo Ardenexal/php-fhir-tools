@@ -22,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedProduct
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedProduct\BiologicallyDerivedProductManipulation;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedProduct\BiologicallyDerivedProductProcessing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedProduct\BiologicallyDerivedProductStorage;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -44,7 +45,7 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -58,10 +59,10 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -76,12 +77,13 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var BiologicallyDerivedProductCategoryType|null productCategory organ | tissue | fluid | cells | biologicalAgent */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-category|4.3.0', strength: 'required')]
         public ?BiologicallyDerivedProductCategoryType $productCategory = null,
         /** @var CodeableConcept|null productCode What this biologically derived product is */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $productCode = null,
         /** @var BiologicallyDerivedProductStatusType|null status available | unavailable */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-status|4.3.0', strength: 'required')]
@@ -93,6 +95,7 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ServiceRequest'])]
         public array $request = [],
         /** @var int|null quantity The amount of this biologically derived product */
@@ -105,10 +108,11 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProduct'])]
         public array $parent = [],
         /** @var BiologicallyDerivedProductCollection|null collection How this product was collected */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?BiologicallyDerivedProductCollection $collection = null,
         /** @var array<BiologicallyDerivedProductProcessing> processing Any processing of the product during collection */
         #[FhirProperty(
@@ -117,9 +121,10 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedProduct\BiologicallyDerivedProductProcessing',
         )]
+        #[Valid]
         public array $processing = [],
         /** @var BiologicallyDerivedProductManipulation|null manipulation Any manipulation of product post-collection */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?BiologicallyDerivedProductManipulation $manipulation = null,
         /** @var array<BiologicallyDerivedProductStorage> storage Product storage */
         #[FhirProperty(
@@ -128,6 +133,7 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedProduct\BiologicallyDerivedProductStorage',
         )]
+        #[Valid]
         public array $storage = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

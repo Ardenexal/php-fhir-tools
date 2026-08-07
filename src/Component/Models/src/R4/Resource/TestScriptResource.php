@@ -32,6 +32,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptTeardo
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptTest;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptVariable;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -54,7 +55,7 @@ class TestScriptResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -68,10 +69,10 @@ class TestScriptResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -83,7 +84,7 @@ class TestScriptResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?UriPrimitive $url = null,
         /** @var Identifier|null identifier Additional identifier for the test script */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var StringPrimitive|string|null version Business version of the test script */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -113,6 +114,7 @@ class TestScriptResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var MarkdownPrimitive|null description Natural language description of the test script */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -124,6 +126,7 @@ class TestScriptResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for test script (if applicable) */
         #[FhirProperty(
@@ -132,6 +135,7 @@ class TestScriptResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this test script is defined */
@@ -147,6 +151,7 @@ class TestScriptResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptOrigin',
         )]
+        #[Valid]
         public array $origin = [],
         /** @var array<TestScriptDestination> destination An abstract server representing a destination or receiver in a message exchange */
         #[FhirProperty(
@@ -155,9 +160,10 @@ class TestScriptResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptDestination',
         )]
+        #[Valid]
         public array $destination = [],
         /** @var TestScriptMetadata|null metadata Required capability that is assumed to function correctly on the FHIR server being tested */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?TestScriptMetadata $metadata = null,
         /** @var array<TestScriptFixture> fixture Fixture in the test script - by reference (uri) */
         #[FhirProperty(
@@ -166,6 +172,7 @@ class TestScriptResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptFixture',
         )]
+        #[Valid]
         public array $fixture = [],
         /** @var array<Reference> profile Reference of the validation profile */
         #[FhirProperty(
@@ -174,6 +181,7 @@ class TestScriptResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $profile = [],
         /** @var array<TestScriptVariable> variable Placeholder for evaluated elements */
@@ -183,9 +191,10 @@ class TestScriptResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptVariable',
         )]
+        #[Valid]
         public array $variable = [],
         /** @var TestScriptSetup|null setup A series of required setup operations before tests are executed */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?TestScriptSetup $setup = null,
         /** @var array<TestScriptTest> test A test in this script */
         #[FhirProperty(
@@ -194,9 +203,10 @@ class TestScriptResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptTest',
         )]
+        #[Valid]
         public array $test = [],
         /** @var TestScriptTeardown|null teardown A series of required clean up steps */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?TestScriptTeardown $teardown = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

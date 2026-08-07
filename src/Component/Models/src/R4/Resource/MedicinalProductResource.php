@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProduct\MedicinalP
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProduct\MedicinalProductName;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProduct\MedicinalProductSpecialDesignation;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
@@ -44,7 +45,7 @@ class MedicinalProductResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -58,10 +59,10 @@ class MedicinalProductResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -76,21 +77,22 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null type Regulatory type, e.g. Investigational or Authorized */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var Coding|null domain If this medicine applies to human or veterinary uses */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid]
         public ?Coding $domain = null,
         /** @var CodeableConcept|null combinedPharmaceuticalDoseForm The dose form for a single part product, or combined form of a multiple part product */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $combinedPharmaceuticalDoseForm = null,
         /** @var CodeableConcept|null legalStatusOfSupply The legal status of supply of the medicinal product as classified by the regulator */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $legalStatusOfSupply = null,
         /** @var CodeableConcept|null additionalMonitoringIndicator Whether the Medicinal Product is subject to additional monitoring for regulatory reasons */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $additionalMonitoringIndicator = null,
         /** @var array<StringPrimitive|string> specialMeasures Whether the Medicinal Product is subject to special measures for regulatory reasons */
         #[FhirProperty(
@@ -101,7 +103,7 @@ class MedicinalProductResource extends AbstractDomainResource
         )]
         public array $specialMeasures = [],
         /** @var CodeableConcept|null paediatricUseIndicator If authorised for use in children */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $paediatricUseIndicator = null,
         /** @var array<CodeableConcept> productClassification Allows the product to be classified by various systems */
         #[FhirProperty(
@@ -110,6 +112,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $productClassification = [],
         /** @var array<MarketingStatus> marketingStatus Marketing status of the medicinal product, in contrast to marketing authorizaton */
         #[FhirProperty(
@@ -118,6 +121,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\MarketingStatus',
         )]
+        #[Valid]
         public array $marketingStatus = [],
         /** @var array<Reference> pharmaceuticalProduct Pharmaceutical aspects of product */
         #[FhirProperty(
@@ -126,6 +130,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicinalProductPharmaceutical'])]
         public array $pharmaceuticalProduct = [],
         /** @var array<Reference> packagedMedicinalProduct Package representation for the product */
@@ -135,6 +140,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicinalProductPackaged'])]
         public array $packagedMedicinalProduct = [],
         /** @var array<Reference> attachedDocument Supporting documentation, typically for regulatory submission */
@@ -144,6 +150,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DocumentReference'])]
         public array $attachedDocument = [],
         /** @var array<Reference> masterFile A master file for to the medicinal product (e.g. Pharmacovigilance System Master File) */
@@ -153,6 +160,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DocumentReference'])]
         public array $masterFile = [],
         /** @var array<Reference> contact A product specific contact, person (in a role), or an organization */
@@ -162,6 +170,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -174,6 +183,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ResearchStudy'])]
         public array $clinicalTrial = [],
         /** @var array<MedicinalProductName> name The product's name, including full name and possibly coded parts */
@@ -184,6 +194,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProduct\MedicinalProductName',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $name = [],
         /** @var array<Identifier> crossReference Reference to another product, e.g. for linking authorised to investigational product */
@@ -193,6 +204,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $crossReference = [],
         /** @var array<MedicinalProductManufacturingBusinessOperation> manufacturingBusinessOperation An operation applied to the product, for manufacturing or adminsitrative purpose */
         #[FhirProperty(
@@ -201,6 +213,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProduct\MedicinalProductManufacturingBusinessOperation',
         )]
+        #[Valid]
         public array $manufacturingBusinessOperation = [],
         /** @var array<MedicinalProductSpecialDesignation> specialDesignation Indicates if the medicinal product has an orphan designation for the treatment of a rare disease */
         #[FhirProperty(
@@ -209,6 +222,7 @@ class MedicinalProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProduct\MedicinalProductSpecialDesignation',
         )]
+        #[Valid]
         public array $specialDesignation = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

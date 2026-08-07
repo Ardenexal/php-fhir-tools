@@ -26,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -47,7 +48,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -56,10 +57,10 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -77,6 +78,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version Business version of the {{title}} */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -128,6 +130,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var MarkdownPrimitive|null description Natural language description of the {{title}} */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -139,6 +142,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for {{title}} (if applicable) */
         #[FhirProperty(
@@ -147,6 +151,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this {{title}} is defined */
@@ -165,7 +170,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $lastReviewDate = null,
         /** @var Period|null effectivePeriod When the {{title}} is expected to be used */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $effectivePeriod = null,
         /** @var array<CodeableConcept> topic E.g. Education, Treatment, Assessment, etc */
         #[FhirProperty(
@@ -174,6 +179,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $topic = [],
         /** @var array<ContactDetail> author Who authored the {{title}} */
         #[FhirProperty(
@@ -182,6 +188,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $author = [],
         /** @var array<ContactDetail> editor Who edited the {{title}} */
         #[FhirProperty(
@@ -190,6 +197,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $editor = [],
         /** @var array<ContactDetail> reviewer Who reviewed the {{title}} */
         #[FhirProperty(
@@ -198,6 +206,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $reviewer = [],
         /** @var array<ContactDetail> endorser Who endorsed the {{title}} */
         #[FhirProperty(
@@ -206,6 +215,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $endorser = [],
         /** @var array<RelatedArtifact> relatedArtifact Additional documentation, citations, etc */
         #[FhirProperty(
@@ -214,6 +224,7 @@ abstract class AbstractMetadataResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $relatedArtifact = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

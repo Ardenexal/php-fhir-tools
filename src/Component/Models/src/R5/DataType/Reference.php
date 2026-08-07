@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -47,7 +48,7 @@ class Reference extends DataType
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-types', strength: 'extensible')]
         public ?UriPrimitive $type = null,
         /** @var Identifier|null identifier Logical reference, when literal reference is not known */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var StringPrimitive|string|null display Text alternative for the resource */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

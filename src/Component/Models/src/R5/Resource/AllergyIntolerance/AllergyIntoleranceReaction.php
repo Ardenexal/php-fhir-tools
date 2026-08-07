@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Details about each adverse reaction event linked to exposure to the identified substance.
@@ -36,7 +37,7 @@ class AllergyIntoleranceReaction extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null substance Specific substance or pharmaceutical product considered to be responsible for event */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $substance = null,
         /** @var array<CodeableReference> manifestation Clinical symptoms/signs associated with the Event */
         #[FhirProperty(
@@ -46,6 +47,7 @@ class AllergyIntoleranceReaction extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[Count(min: 1)]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Observation'])]
         public array $manifestation = [],
@@ -59,7 +61,7 @@ class AllergyIntoleranceReaction extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/reaction-event-severity|5.0.0', strength: 'required')]
         public ?AllergyIntoleranceSeverityType $severity = null,
         /** @var CodeableConcept|null exposureRoute How the subject was exposed to the substance */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $exposureRoute = null,
         /** @var array<Annotation> note Text about event not captured in other fields */
         #[FhirProperty(
@@ -68,6 +70,7 @@ class AllergyIntoleranceReaction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

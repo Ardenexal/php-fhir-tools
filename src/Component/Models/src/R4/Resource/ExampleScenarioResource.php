@@ -27,6 +27,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScen
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioInstance;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioProcess;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -54,7 +55,7 @@ class ExampleScenarioResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -68,10 +69,10 @@ class ExampleScenarioResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -89,6 +90,7 @@ class ExampleScenarioResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version Business version of the example scenario */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -115,6 +117,7 @@ class ExampleScenarioResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var array<UsageContext> useContext The context that the content is intended to support */
         #[FhirProperty(
@@ -123,6 +126,7 @@ class ExampleScenarioResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for example scenario (if applicable) */
         #[FhirProperty(
@@ -131,6 +135,7 @@ class ExampleScenarioResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null copyright Use and/or publishing restrictions */
@@ -146,6 +151,7 @@ class ExampleScenarioResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioActor',
         )]
+        #[Valid]
         public array $actor = [],
         /** @var array<ExampleScenarioInstance> instance Each resource and each version that is present in the workflow */
         #[FhirProperty(
@@ -154,6 +160,7 @@ class ExampleScenarioResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioInstance',
         )]
+        #[Valid]
         public array $instance = [],
         /** @var array<ExampleScenarioProcess> process Each major process - a group of operations */
         #[FhirProperty(
@@ -162,6 +169,7 @@ class ExampleScenarioResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioProcess',
         )]
+        #[Valid]
         public array $process = [],
         /** @var array<CanonicalPrimitive> workflow Another nested workflow */
         #[FhirProperty(

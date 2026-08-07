@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\DataRequirement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Defines the outputs of the action, if any.
@@ -39,7 +40,7 @@ class RequestOrchestrationActionOutput extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var DataRequirement|null requirement What data is provided */
-        #[FhirProperty(fhirType: 'DataRequirement', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'DataRequirement', propertyKind: 'complex'), Valid]
         public ?DataRequirement $requirement = null,
         /** @var StringPrimitive|string|null relatedData What data is provided */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

@@ -29,6 +29,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\Substan
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionRelationship;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionSourceMaterial;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionStructure;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
@@ -50,7 +51,7 @@ class SubstanceDefinitionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -59,10 +60,10 @@ class SubstanceDefinitionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -77,12 +78,13 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version A business level version identifier of the substance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $version = null,
         /** @var CodeableConcept|null status Status of substance within the catalogue e.g. active, retired */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'preferred')]
         public ?CodeableConcept $status = null,
         /** @var array<CodeableConcept> classification A categorization, high level e.g. polymer or nucleic acid, or food, chemical, biological, or lower e.g. polymer linear or branch chain, or type of impurity */
         #[FhirProperty(
@@ -91,9 +93,10 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $classification = [],
         /** @var CodeableConcept|null domain If the substance applies to human or veterinary use */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $domain = null,
         /** @var array<CodeableConcept> grade The quality standard, established benchmark, to which substance complies (e.g. USP/NF, BP) */
         #[FhirProperty(
@@ -102,6 +105,7 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $grade = [],
         /** @var MarkdownPrimitive|null description Textual description of the substance */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -113,6 +117,7 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Citation'])]
         public array $informationSource = [],
         /** @var array<Annotation> note Textual comment about the substance's catalogue or registry record */
@@ -122,6 +127,7 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var array<Reference> manufacturer The entity that creates, makes, produces or fabricates the substance */
         #[FhirProperty(
@@ -130,6 +136,7 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $manufacturer = [],
         /** @var array<Reference> supplier An entity that is the source for the substance. It may be different from the manufacturer */
@@ -139,6 +146,7 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $supplier = [],
         /** @var array<SubstanceDefinitionMoiety> moiety Moiety, for structural modifications */
@@ -148,6 +156,7 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionMoiety',
         )]
+        #[Valid]
         public array $moiety = [],
         /** @var array<SubstanceDefinitionCharacterization> characterization General specifications for this substance */
         #[FhirProperty(
@@ -156,6 +165,7 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionCharacterization',
         )]
+        #[Valid]
         public array $characterization = [],
         /** @var array<SubstanceDefinitionProperty> property General specifications for this substance */
         #[FhirProperty(
@@ -164,9 +174,10 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionProperty',
         )]
+        #[Valid]
         public array $property = [],
         /** @var Reference|null referenceInformation General information detailing this substance */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceReferenceInformation'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceReferenceInformation'])]
         public ?Reference $referenceInformation = null,
         /** @var array<SubstanceDefinitionMolecularWeight> molecularWeight The average mass of a molecule of a compound */
         #[FhirProperty(
@@ -175,9 +186,10 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionMolecularWeight',
         )]
+        #[Valid]
         public array $molecularWeight = [],
         /** @var SubstanceDefinitionStructure|null structure Structural information */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?SubstanceDefinitionStructure $structure = null,
         /** @var array<SubstanceDefinitionCode> code Codes associated with the substance */
         #[FhirProperty(
@@ -186,6 +198,7 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionCode',
         )]
+        #[Valid]
         public array $code = [],
         /** @var array<SubstanceDefinitionName> name Names applicable to this substance */
         #[FhirProperty(
@@ -194,6 +207,7 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionName',
         )]
+        #[Valid]
         public array $name = [],
         /** @var array<SubstanceDefinitionRelationship> relationship A link between this substance and another */
         #[FhirProperty(
@@ -202,18 +216,19 @@ class SubstanceDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionRelationship',
         )]
+        #[Valid]
         public array $relationship = [],
         /** @var Reference|null nucleicAcid Data items specific to nucleic acids */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceNucleicAcid'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceNucleicAcid'])]
         public ?Reference $nucleicAcid = null,
         /** @var Reference|null polymer Data items specific to polymers */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstancePolymer'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstancePolymer'])]
         public ?Reference $polymer = null,
         /** @var Reference|null protein Data items specific to proteins */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceProtein'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceProtein'])]
         public ?Reference $protein = null,
         /** @var SubstanceDefinitionSourceMaterial|null sourceMaterial Material or taxonomic/anatomical source */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?SubstanceDefinitionSourceMaterial $sourceMaterial = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

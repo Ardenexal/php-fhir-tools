@@ -280,7 +280,16 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     public function evaluate(ExpressionNode $expression, mixed $resource, ?EvaluationContext $context = null): Collection
     {
         $this->context = $context ?? new EvaluationContext();
-        $this->context->setRootResource($resource);
+
+        // Only default the root to the evaluated node. A caller that supplied one means it:
+        // `%resource` / `%rootResource` / `%context` all resolve from here, and when an invariant is
+        // evaluated on a *nested* element the root is still the enclosing resource, not the element.
+        // Overwriting unconditionally made `Reference.ref-1` — which looks up
+        // `%rootResource.contained.id` — resolve against the Reference itself and fail for every
+        // legitimate local reference.
+        if ($this->context->getRootResource() === null) {
+            $this->context->setRootResource($resource);
+        }
         $this->context->setVariable('this', $resource);
         $this->context->setEvaluator($this);
 

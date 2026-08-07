@@ -27,6 +27,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\EvidenceVariable\EvidenceVariableCategory;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\EvidenceVariable\EvidenceVariableCharacteristic;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Clinical Decision Support)
@@ -54,7 +55,7 @@ class EvidenceVariableResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -68,10 +69,10 @@ class EvidenceVariableResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -89,6 +90,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version Business version of the evidence variable */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -121,6 +123,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var array<UsageContext> useContext The context that the content is intended to support */
         #[FhirProperty(
@@ -129,6 +132,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var StringPrimitive|string|null publisher Name of the publisher (organization or individual) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -140,6 +144,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var array<ContactDetail> author Who authored the content */
         #[FhirProperty(
@@ -148,6 +153,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $author = [],
         /** @var array<ContactDetail> editor Who edited the content */
         #[FhirProperty(
@@ -156,6 +162,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $editor = [],
         /** @var array<ContactDetail> reviewer Who reviewed the content */
         #[FhirProperty(
@@ -164,6 +171,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $reviewer = [],
         /** @var array<ContactDetail> endorser Who endorsed the content */
         #[FhirProperty(
@@ -172,6 +180,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $endorser = [],
         /** @var array<RelatedArtifact> relatedArtifact Additional documentation, citations, etc. */
         #[FhirProperty(
@@ -180,6 +189,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $relatedArtifact = [],
         /** @var bool|null actual Actual or conceptual */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -194,6 +204,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\EvidenceVariable\EvidenceVariableCharacteristic',
         )]
+        #[Valid]
         public array $characteristic = [],
         /** @var EvidenceVariableHandlingType|null handling continuous | dichotomous | ordinal | polychotomous */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/variable-handling|4.3.0', strength: 'required')]
@@ -205,6 +216,7 @@ class EvidenceVariableResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\EvidenceVariable\EvidenceVariableCategory',
         )]
+        #[Valid]
         public array $category = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

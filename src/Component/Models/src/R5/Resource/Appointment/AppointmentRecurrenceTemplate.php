@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The details of the recurrence pattern or template that is used to generate recurring appointments.
@@ -32,10 +33,10 @@ class AppointmentRecurrenceTemplate extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null timezone The timezone of the occurrences */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/timezones|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/timezones|5.0.0', strength: 'required')]
         public ?CodeableConcept $timezone = null,
         /** @var CodeableConcept|null recurrenceType The frequency of the recurrence */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/appointment-recurrrence-type', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/appointment-recurrrence-type', strength: 'preferred')]
         public ?CodeableConcept $recurrenceType = null,
         /** @var DatePrimitive|null lastOccurrenceDate The date when the recurrence should end */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
@@ -52,13 +53,13 @@ class AppointmentRecurrenceTemplate extends BackboneElement
         )]
         public array $occurrenceDate = [],
         /** @var AppointmentRecurrenceTemplateWeeklyTemplate|null weeklyTemplate Information about weekly recurring appointments */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?AppointmentRecurrenceTemplateWeeklyTemplate $weeklyTemplate = null,
         /** @var AppointmentRecurrenceTemplateMonthlyTemplate|null monthlyTemplate Information about monthly recurring appointments */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?AppointmentRecurrenceTemplateMonthlyTemplate $monthlyTemplate = null,
         /** @var AppointmentRecurrenceTemplateYearlyTemplate|null yearlyTemplate Information about yearly recurring appointments */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?AppointmentRecurrenceTemplateYearlyTemplate $yearlyTemplate = null,
         /** @var array<DatePrimitive> excludingDate Any dates that should be excluded from the series */
         #[FhirProperty(

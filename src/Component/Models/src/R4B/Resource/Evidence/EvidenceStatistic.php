@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Values and parameters for a single statistic.
@@ -42,15 +43,16 @@ class EvidenceStatistic extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var CodeableConcept|null statisticType Type of statistic, eg relative risk */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/statistic-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/statistic-type', strength: 'extensible')]
         public ?CodeableConcept $statisticType = null,
         /** @var CodeableConcept|null category Associated category for categorical variable */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $category = null,
         /** @var Quantity|null quantity Statistic value */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var UnsignedIntPrimitive|null numberOfEvents The number of events associated with the statistic */
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
@@ -59,7 +61,7 @@ class EvidenceStatistic extends BackboneElement
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
         public ?UnsignedIntPrimitive $numberAffected = null,
         /** @var EvidenceStatisticSampleSize|null sampleSize Number of samples in the statistic */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?EvidenceStatisticSampleSize $sampleSize = null,
         /** @var array<EvidenceStatisticAttributeEstimate> attributeEstimate An attribute of the Statistic */
         #[FhirProperty(
@@ -68,6 +70,7 @@ class EvidenceStatistic extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Evidence\EvidenceStatisticAttributeEstimate',
         )]
+        #[Valid]
         public array $attributeEstimate = [],
         /** @var array<EvidenceStatisticModelCharacteristic> modelCharacteristic An aspect of the statistical model */
         #[FhirProperty(
@@ -76,6 +79,7 @@ class EvidenceStatistic extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Evidence\EvidenceStatisticModelCharacteristic',
         )]
+        #[Valid]
         public array $modelCharacteristic = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

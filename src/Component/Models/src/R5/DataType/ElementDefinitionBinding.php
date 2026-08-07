@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Binds to a value set if this element is coded (code, Coding, CodeableConcept, Quantity), or the data types (string, uri).
@@ -54,6 +55,7 @@ class ElementDefinitionBinding extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinitionBindingAdditional',
         )]
+        #[Valid]
         public array $additional = [],
     ) {
         parent::__construct($id, $extension);

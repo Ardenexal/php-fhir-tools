@@ -27,6 +27,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Immunization\ImmunizationP
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Immunization\ImmunizationProtocolApplied;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Immunization\ImmunizationReaction;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Public Health and Emergency Response)
@@ -43,7 +44,7 @@ class ImmunizationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -57,10 +58,10 @@ class ImmunizationResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -75,21 +76,22 @@ class ImmunizationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var ImmunizationStatusCodesType|null status completed | entered-in-error | not-done */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/immunization-status|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains statuses entered-in-error and not-done which means that the resource should not be treated as valid')]
         public ?ImmunizationStatusCodesType $status = null,
         /** @var CodeableConcept|null statusReason Reason not done */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $statusReason = null,
         /** @var CodeableConcept|null vaccineCode Vaccine product administered */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $vaccineCode = null,
         /** @var Reference|null patient Who was immunized */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
         public ?Reference $patient = null,
         /** @var Reference|null encounter Encounter immunization was part of */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public ?Reference $encounter = null,
         /** @var DateTimePrimitive|StringPrimitive|string|null occurrence Vaccine administration date */
         #[FhirProperty(
@@ -121,13 +123,13 @@ class ImmunizationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $primarySource = null,
         /** @var CodeableConcept|null reportOrigin Indicates the source of a secondarily reported record */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $reportOrigin = null,
         /** @var Reference|null location Where immunization occurred */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $location = null,
         /** @var Reference|null manufacturer Vaccine manufacturer */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $manufacturer = null,
         /** @var StringPrimitive|string|null lotNumber Vaccine lot number */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -136,13 +138,13 @@ class ImmunizationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $expirationDate = null,
         /** @var CodeableConcept|null site Body site vaccine  was administered */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $site = null,
         /** @var CodeableConcept|null route How vaccine entered body */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $route = null,
         /** @var Quantity|null doseQuantity Amount of vaccine administered */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $doseQuantity = null,
         /** @var array<ImmunizationPerformer> performer Who performed event */
         #[FhirProperty(
@@ -151,6 +153,7 @@ class ImmunizationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Immunization\ImmunizationPerformer',
         )]
+        #[Valid]
         public array $performer = [],
         /** @var array<Annotation> note Additional immunization notes */
         #[FhirProperty(
@@ -159,6 +162,7 @@ class ImmunizationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var array<CodeableConcept> reasonCode Why immunization occurred */
         #[FhirProperty(
@@ -167,6 +171,7 @@ class ImmunizationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $reasonCode = [],
         /** @var array<Reference> reasonReference Why immunization occurred */
         #[FhirProperty(
@@ -175,6 +180,7 @@ class ImmunizationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Condition',
             'http://hl7.org/fhir/StructureDefinition/Observation',
@@ -191,6 +197,7 @@ class ImmunizationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $subpotentReason = [],
         /** @var array<ImmunizationEducation> education Educational material presented to patient */
         #[FhirProperty(
@@ -199,6 +206,7 @@ class ImmunizationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Immunization\ImmunizationEducation',
         )]
+        #[Valid]
         public array $education = [],
         /** @var array<CodeableConcept> programEligibility Patient eligibility for a vaccination program */
         #[FhirProperty(
@@ -207,9 +215,10 @@ class ImmunizationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $programEligibility = [],
         /** @var CodeableConcept|null fundingSource Funding source for the vaccine */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $fundingSource = null,
         /** @var array<ImmunizationReaction> reaction Details of a reaction that follows immunization */
         #[FhirProperty(
@@ -218,6 +227,7 @@ class ImmunizationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Immunization\ImmunizationReaction',
         )]
+        #[Valid]
         public array $reaction = [],
         /** @var array<ImmunizationProtocolApplied> protocolApplied Protocol followed by the provider */
         #[FhirProperty(
@@ -226,6 +236,7 @@ class ImmunizationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Immunization\ImmunizationProtocolApplied',
         )]
+        #[Valid]
         public array $protocolApplied = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

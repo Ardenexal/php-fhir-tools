@@ -27,6 +27,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Patient\PatientCommunication;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Patient\PatientContact;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Patient\PatientLink;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Patient Administration)
@@ -43,7 +44,7 @@ class PatientResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -52,10 +53,10 @@ class PatientResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -70,6 +71,7 @@ class PatientResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var bool|null active Whether this patient's record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
@@ -81,6 +83,7 @@ class PatientResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\HumanName',
         )]
+        #[Valid]
         public array $name = [],
         /** @var array<ContactPoint> telecom A contact detail for the individual */
         #[FhirProperty(
@@ -89,6 +92,7 @@ class PatientResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactPoint',
         )]
+        #[Valid]
         public array $telecom = [],
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|5.0.0', strength: 'required')]
@@ -120,9 +124,10 @@ class PatientResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Address',
         )]
+        #[Valid]
         public array $address = [],
         /** @var CodeableConcept|null maritalStatus Marital (civil) status of a patient */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/marital-status', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/marital-status', strength: 'extensible')]
         public ?CodeableConcept $maritalStatus = null,
         /** @var bool|int|null multipleBirth Whether patient is part of a multiple birth */
         #[FhirProperty(
@@ -142,6 +147,7 @@ class PatientResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Attachment',
         )]
+        #[Valid]
         public array $photo = [],
         /** @var array<PatientContact> contact A contact party (e.g. guardian, partner, friend) for the patient */
         #[FhirProperty(
@@ -150,6 +156,7 @@ class PatientResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Patient\PatientContact',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var array<PatientCommunication> communication A language which may be used to communicate with the patient about his or her health */
         #[FhirProperty(
@@ -158,6 +165,7 @@ class PatientResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Patient\PatientCommunication',
         )]
+        #[Valid]
         public array $communication = [],
         /** @var array<Reference> generalPractitioner Patient's nominated primary care provider */
         #[FhirProperty(
@@ -166,6 +174,7 @@ class PatientResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -173,7 +182,7 @@ class PatientResource extends AbstractDomainResource
         ])]
         public array $generalPractitioner = [],
         /** @var Reference|null managingOrganization Organization that is the custodian of the patient record */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $managingOrganization = null,
         /** @var array<PatientLink> link Link to a Patient or RelatedPerson resource that concerns the same actual individual */
         #[FhirProperty(
@@ -182,6 +191,7 @@ class PatientResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Patient\PatientLink',
         )]
+        #[Valid]
         #[FHIRIsModifier(reason: 'This element is labeled as a modifier because it might not be the main Patient resource, and the referenced patient should be used instead of this Patient record. This is when the link.type value is \'replaced-by\'')]
         public array $link = [],
     ) {

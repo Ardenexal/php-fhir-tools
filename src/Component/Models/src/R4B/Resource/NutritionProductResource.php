@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\NutritionProduct\Nutrition
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\NutritionProduct\NutritionProductNutrient;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\NutritionProduct\NutritionProductProductCharacteristic;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -44,7 +45,7 @@ class NutritionProductResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -58,10 +59,10 @@ class NutritionProductResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -79,9 +80,10 @@ class NutritionProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $category = [],
         /** @var CodeableConcept|null code A code designating a specific type of nutritional product */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var array<Reference> manufacturer Manufacturer, representative or officially responsible for the product */
         #[FhirProperty(
@@ -90,6 +92,7 @@ class NutritionProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $manufacturer = [],
         /** @var array<NutritionProductNutrient> nutrient The product's nutritional information expressed by the nutrients */
@@ -99,6 +102,7 @@ class NutritionProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\NutritionProduct\NutritionProductNutrient',
         )]
+        #[Valid]
         public array $nutrient = [],
         /** @var array<NutritionProductIngredient> ingredient Ingredients contained in this product */
         #[FhirProperty(
@@ -107,6 +111,7 @@ class NutritionProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\NutritionProduct\NutritionProductIngredient',
         )]
+        #[Valid]
         public array $ingredient = [],
         /** @var array<CodeableReference> knownAllergen Known or suspected allergens that are a part of this product */
         #[FhirProperty(
@@ -115,6 +120,7 @@ class NutritionProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Substance'])]
         public array $knownAllergen = [],
         /** @var array<NutritionProductProductCharacteristic> productCharacteristic Specifies descriptive properties of the nutrition product */
@@ -124,9 +130,10 @@ class NutritionProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\NutritionProduct\NutritionProductProductCharacteristic',
         )]
+        #[Valid]
         public array $productCharacteristic = [],
         /** @var NutritionProductInstance|null instance One or several physical instances or occurrences of the nutrition product */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?NutritionProductInstance $instance = null,
         /** @var array<Annotation> note Comments made about the product */
         #[FhirProperty(
@@ -135,6 +142,7 @@ class NutritionProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

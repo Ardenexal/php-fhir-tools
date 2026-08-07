@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Organizes the mapping into manageable chunks for human review/ease of maintenance.
@@ -52,6 +53,7 @@ class StructureMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureMap\StructureMapGroupInput',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $input = [],
         /** @var array<StructureMapGroupRule> rule Transform Rule from source to target */
@@ -62,6 +64,7 @@ class StructureMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureMap\StructureMapGroupRule',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $rule = [],
     ) {

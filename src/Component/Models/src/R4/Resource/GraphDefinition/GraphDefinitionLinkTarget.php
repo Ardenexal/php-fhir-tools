@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\ResourceTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Potential target for the link.
@@ -48,6 +49,7 @@ class GraphDefinitionLinkTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\GraphDefinition\GraphDefinitionLinkTargetCompartment',
         )]
+        #[Valid]
         public array $compartment = [],
         /** @var array<GraphDefinitionLink> link Additional links from target resource */
         #[FhirProperty(
@@ -56,6 +58,7 @@ class GraphDefinitionLinkTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\GraphDefinition\GraphDefinitionLink',
         )]
+        #[Valid]
         public array $link = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

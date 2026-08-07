@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description When using an account for billing a specific Encounter the set of diagnoses that are relevant for billing are stored here on the account where they are able to be sequenced appropriately prior to processing to produce claim(s).
@@ -44,7 +45,7 @@ class AccountDiagnosis extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $sequence = null,
         /** @var CodeableReference|null condition The diagnosis relevant to the account */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Condition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Condition'])]
         public ?CodeableReference $condition = null,
         /** @var DateTimePrimitive|null dateOfDiagnosis Date of the diagnosis (when coded diagnosis) */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -56,6 +57,7 @@ class AccountDiagnosis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-diagnosis-use', strength: 'preferred')]
         public array $type = [],
         /** @var bool|null onAdmission Diagnosis present on Admission */
@@ -68,6 +70,7 @@ class AccountDiagnosis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $packageCode = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

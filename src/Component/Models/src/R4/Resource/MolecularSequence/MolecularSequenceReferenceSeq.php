@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\OrientationTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\StrandTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A sequence that is used as a reference to describe variants that are present in a sequence analyzed.
@@ -47,7 +48,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null chromosome Chromosome containing genetic finding */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $chromosome = null,
         /** @var StringPrimitive|string|null genomeBuild The Genome Build used for reference, following GRCh build versions e.g. 'GRCh 37' */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -56,10 +57,10 @@ class MolecularSequenceReferenceSeq extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/orientation-type|4.0.1', strength: 'required')]
         public ?OrientationTypeType $orientation = null,
         /** @var CodeableConcept|null referenceSeqId Reference identifier */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $referenceSeqId = null,
         /** @var Reference|null referenceSeqPointer A pointer to another MolecularSequence entity as reference sequence */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MolecularSequence'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MolecularSequence'])]
         public ?Reference $referenceSeqPointer = null,
         /** @var StringPrimitive|string|null referenceSeqString A string to represent reference sequence */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

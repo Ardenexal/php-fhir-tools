@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Represents the instance as it was at a specific time-point.
@@ -40,7 +41,7 @@ class ExampleScenarioInstanceVersion extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var Reference|null content Example instance version data */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid]
         public ?Reference $content = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

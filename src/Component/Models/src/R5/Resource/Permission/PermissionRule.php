@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ConsentProvisionTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A set of rules.
@@ -39,6 +40,7 @@ class PermissionRule extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Permission\PermissionRuleData',
         )]
+        #[Valid]
         public array $data = [],
         /** @var array<PermissionRuleActivity> activity A description or definition of which activities are allowed to be done on the data */
         #[FhirProperty(
@@ -47,6 +49,7 @@ class PermissionRule extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Permission\PermissionRuleActivity',
         )]
+        #[Valid]
         public array $activity = [],
         /** @var array<CodeableConcept> limit What limits apply to the use of the data */
         #[FhirProperty(
@@ -55,6 +58,7 @@ class PermissionRule extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $limit = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

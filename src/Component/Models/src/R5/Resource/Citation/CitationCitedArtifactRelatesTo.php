@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The artifact related to the cited artifact.
@@ -45,6 +46,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/citation-artifact-classifier', strength: 'extensible')]
         public array $classifier = [],
         /** @var StringPrimitive|string|null label Short label */
@@ -57,13 +59,13 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $citation = null,
         /** @var Attachment|null document What document is being referenced */
-        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex'), Valid]
         public ?Attachment $document = null,
         /** @var CanonicalPrimitive|null resource What artifact is being referenced */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
         public ?CanonicalPrimitive $resource = null,
         /** @var Reference|null resourceReference What artifact, if not a conformance resource */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid]
         public ?Reference $resourceReference = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

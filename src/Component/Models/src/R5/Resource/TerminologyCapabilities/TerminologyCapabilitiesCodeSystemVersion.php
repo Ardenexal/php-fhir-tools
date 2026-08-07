@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CommonLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description For the code system, a list of versions that are supported by the server.
@@ -55,6 +56,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TerminologyCapabilities\TerminologyCapabilitiesCodeSystemVersionFilter',
         )]
+        #[Valid]
         public array $filter = [],
         /** @var array<CodePrimitive> property Properties supported for $lookup */
         #[FhirProperty(

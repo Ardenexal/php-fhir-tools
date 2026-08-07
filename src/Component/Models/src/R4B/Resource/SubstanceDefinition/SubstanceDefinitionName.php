@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Names applicable to this substance.
@@ -36,10 +37,10 @@ class SubstanceDefinitionName extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $name = null,
         /** @var CodeableConcept|null type Name type e.g. 'systematic',  'scientific, 'brand' */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null status The status of the name e.g. 'current', 'proposed' */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'preferred')]
         public ?CodeableConcept $status = null,
         /** @var bool|null preferred If this is the preferred name for this substance */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -51,6 +52,7 @@ class SubstanceDefinitionName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
@@ -64,6 +66,7 @@ class SubstanceDefinitionName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $domain = [],
         /** @var array<CodeableConcept> jurisdiction The jurisdiction where this name applies */
         #[FhirProperty(
@@ -72,6 +75,7 @@ class SubstanceDefinitionName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $jurisdiction = [],
         /** @var array<SubstanceDefinitionName> synonym A synonym of this particular name, by which the substance is also known */
         #[FhirProperty(
@@ -80,6 +84,7 @@ class SubstanceDefinitionName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionName',
         )]
+        #[Valid]
         public array $synonym = [],
         /** @var array<SubstanceDefinitionName> translation A translation for this name into another human language */
         #[FhirProperty(
@@ -88,6 +93,7 @@ class SubstanceDefinitionName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionName',
         )]
+        #[Valid]
         public array $translation = [],
         /** @var array<SubstanceDefinitionNameOfficial> official Details of the official nature of this name */
         #[FhirProperty(
@@ -96,6 +102,7 @@ class SubstanceDefinitionName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionNameOfficial',
         )]
+        #[Valid]
         public array $official = [],
         /** @var array<Reference> source Supporting literature */
         #[FhirProperty(
@@ -104,6 +111,7 @@ class SubstanceDefinitionName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DocumentReference'])]
         public array $source = [],
     ) {

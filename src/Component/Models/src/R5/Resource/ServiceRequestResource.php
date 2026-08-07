@@ -33,6 +33,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\ServiceRequest\ServiceRequestOrderDetail;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\ServiceRequest\ServiceRequestPatientInstruction;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -66,7 +67,7 @@ class ServiceRequestResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -75,10 +76,10 @@ class ServiceRequestResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -93,6 +94,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var array<CanonicalPrimitive> instantiatesCanonical Instantiates FHIR protocol or definition */
         #[FhirProperty(
@@ -121,6 +123,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/CarePlan',
             'http://hl7.org/fhir/StructureDefinition/ServiceRequest',
@@ -134,10 +137,11 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ServiceRequest'])]
         public array $replaces = [],
         /** @var Identifier|null requisition Composite Request ID */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $requisition = null,
         /** @var RequestStatusType|null status draft | active | on-hold | revoked | completed | entered-in-error | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
@@ -152,6 +156,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $category = [],
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0', strength: 'required')]
@@ -161,6 +166,7 @@ class ServiceRequestResource extends AbstractDomainResource
         public ?bool $doNotPerform = null,
         /** @var CodeableReference|null code What is being requested/ordered */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
             'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
@@ -173,6 +179,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ServiceRequest\ServiceRequestOrderDetail',
         )]
+        #[Valid]
         public array $orderDetail = [],
         /** @var Quantity|Ratio|Range|null quantity Service amount */
         #[FhirProperty(
@@ -203,6 +210,7 @@ class ServiceRequestResource extends AbstractDomainResource
         public Quantity|Ratio|Range|null $quantity = null,
         /** @var Reference|null subject Individual or Entity the service is ordered for */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
@@ -218,10 +226,11 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $focus = [],
         /** @var Reference|null encounter Encounter in which the request was created */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public ?Reference $encounter = null,
         /** @var DateTimePrimitive|Period|Timing|null occurrence When service should occur */
         #[FhirProperty(
@@ -271,6 +280,7 @@ class ServiceRequestResource extends AbstractDomainResource
         public ?DateTimePrimitive $authoredOn = null,
         /** @var Reference|null requester Who/what is requesting service */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -281,7 +291,7 @@ class ServiceRequestResource extends AbstractDomainResource
         ])]
         public ?Reference $requester = null,
         /** @var CodeableConcept|null performerType Performer role */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $performerType = null,
         /** @var array<Reference> performer Requested performer */
         #[FhirProperty(
@@ -290,6 +300,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -308,6 +319,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public array $location = [],
         /** @var array<CodeableReference> reason Explanation/Justification for procedure or service */
@@ -317,6 +329,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Condition',
             'http://hl7.org/fhir/StructureDefinition/Observation',
@@ -332,6 +345,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Coverage',
             'http://hl7.org/fhir/StructureDefinition/ClaimResponse',
@@ -344,6 +358,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $supportingInfo = [],
         /** @var array<Reference> specimen Procedure Samples */
@@ -353,6 +368,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Specimen'])]
         public array $specimen = [],
         /** @var array<CodeableConcept> bodySite Coded location on Body */
@@ -362,9 +378,10 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $bodySite = [],
         /** @var Reference|null bodyStructure BodyStructure-based location on the body */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BodyStructure'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BodyStructure'])]
         public ?Reference $bodyStructure = null,
         /** @var array<Annotation> note Comments */
         #[FhirProperty(
@@ -373,6 +390,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var array<ServiceRequestPatientInstruction> patientInstruction Patient or consumer-oriented instructions */
         #[FhirProperty(
@@ -381,6 +399,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ServiceRequest\ServiceRequestPatientInstruction',
         )]
+        #[Valid]
         public array $patientInstruction = [],
         /** @var array<Reference> relevantHistory Request provenance */
         #[FhirProperty(
@@ -389,6 +408,7 @@ class ServiceRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Provenance'])]
         public array $relevantHistory = [],
     ) {

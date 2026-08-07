@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Details about the stay during which a healthcare service is provided.
@@ -34,30 +35,32 @@ class EncounterAdmission extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Identifier|null preAdmissionIdentifier Pre-admission identifier */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $preAdmissionIdentifier = null,
         /** @var Reference|null origin The location/organization from which the patient came before admission */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Location',
             'http://hl7.org/fhir/StructureDefinition/Organization',
         ])]
         public ?Reference $origin = null,
         /** @var CodeableConcept|null admitSource From where patient was admitted (physician referral, transfer) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-admit-source', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-admit-source', strength: 'preferred')]
         public ?CodeableConcept $admitSource = null,
         /** @var CodeableConcept|null reAdmission Indicates that the patient is being re-admitted */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $reAdmission = null,
         /** @var Reference|null destination Location/organization to which the patient is discharged */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Location',
             'http://hl7.org/fhir/StructureDefinition/Organization',
         ])]
         public ?Reference $destination = null,
         /** @var CodeableConcept|null dischargeDisposition Category or kind of location after discharge */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $dischargeDisposition = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

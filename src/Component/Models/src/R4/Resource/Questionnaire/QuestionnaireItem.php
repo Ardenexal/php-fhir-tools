@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A particular question, question grouping or display text that is part of the questionnaire.
@@ -115,6 +116,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding',
         )]
+        #[Valid]
         public array $code = [],
         /** @var StringPrimitive|string|null prefix E.g. "1(a)", "2.5.3" */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -132,6 +134,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItemEnableWhen',
         )]
+        #[Valid]
         #[FHIRIsModifier(reason: 'If enableWhen is present and the condition evaluates to false, then the Questionnaire behaves as though the elements weren\'t actually present')]
         public array $enableWhen = [],
         /** @var EnableWhenBehaviorType|null enableBehavior all | any */
@@ -159,6 +162,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItemAnswerOption',
         )]
+        #[Valid]
         public array $answerOption = [],
         /** @var array<QuestionnaireItemInitial> initial Initial value(s) when item is first rendered */
         #[FhirProperty(
@@ -167,6 +171,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItemInitial',
         )]
+        #[Valid]
         public array $initial = [],
         /** @var array<QuestionnaireItem> item Nested questionnaire items */
         #[FhirProperty(
@@ -175,6 +180,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItem',
         )]
+        #[Valid]
         public array $item = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ResponseTypeType;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about the message that this message is a response to.  Only present if this message is a response.
@@ -33,13 +34,13 @@ class MessageHeaderResponse extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Identifier|null identifier Bundle.identifier of original message */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Identifier $identifier = null,
         /** @var ResponseTypeType|null code ok | transient-error | fatal-error */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/response-code|5.0.0', strength: 'required')]
         public ?ResponseTypeType $code = null,
         /** @var Reference|null details Specific list of hints/warnings/errors */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/OperationOutcome'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/OperationOutcome'])]
         public ?Reference $details = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

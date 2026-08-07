@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\EncounterStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The status history permits the encounter resource to contain the status history without needing to read through the historical versions of the resource, or even have the server store them.
@@ -34,7 +35,7 @@ class EncounterStatusHistory extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-status|4.0.1', strength: 'required')]
         public ?EncounterStatusType $status = null,
         /** @var Period|null period The time that the episode was in the specified status */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Period $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -26,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\MeasureReport\MeasureReportGroup;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Clinical Quality Information)
@@ -54,7 +55,7 @@ class MeasureReportResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -63,10 +64,10 @@ class MeasureReportResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -81,6 +82,7 @@ class MeasureReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var MeasureReportStatusType|null status complete | pending | error */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-report-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
@@ -96,6 +98,7 @@ class MeasureReportResource extends AbstractDomainResource
         public ?CanonicalPrimitive $measure = null,
         /** @var Reference|null subject What individual(s) the report is for */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/CareTeam',
             'http://hl7.org/fhir/StructureDefinition/Device',
@@ -114,6 +117,7 @@ class MeasureReportResource extends AbstractDomainResource
         public ?DateTimePrimitive $date = null,
         /** @var Reference|null reporter Who is reporting the data */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -122,22 +126,22 @@ class MeasureReportResource extends AbstractDomainResource
         ])]
         public ?Reference $reporter = null,
         /** @var Reference|null reportingVendor What vendor prepared the data */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $reportingVendor = null,
         /** @var Reference|null location Where the reported data is from */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $location = null,
         /** @var Period|null period What period the report covers */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Period $period = null,
         /** @var Reference|null inputParameters What parameters were provided to the report */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Parameters'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Parameters'])]
         public ?Reference $inputParameters = null,
         /** @var CodeableConcept|null scoring What scoring method (e.g. proportion, ratio, continuous-variable) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/measure-scoring', strength: 'extensible'), FHIRIsModifier(reason: 'Scoring determines what method was used to calculate the measure score and is required for correct interpretation of the score')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/measure-scoring', strength: 'extensible'), FHIRIsModifier(reason: 'Scoring determines what method was used to calculate the measure score and is required for correct interpretation of the score')]
         public ?CodeableConcept $scoring = null,
         /** @var CodeableConcept|null improvementNotation increase | decrease */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-improvement-notation|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'Improvement notation determines how to interpret the measure score (i.e. whether an increase is an improvement)')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-improvement-notation|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'Improvement notation determines how to interpret the measure score (i.e. whether an increase is an improvement)')]
         public ?CodeableConcept $improvementNotation = null,
         /** @var array<MeasureReportGroup> group Measure results for each group */
         #[FhirProperty(
@@ -146,6 +150,7 @@ class MeasureReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MeasureReport\MeasureReportGroup',
         )]
+        #[Valid]
         public array $group = [],
         /** @var array<Reference> supplementalData Additional information collected for the report */
         #[FhirProperty(
@@ -154,6 +159,7 @@ class MeasureReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $supplementalData = [],
         /** @var array<Reference> evaluatedResource What data was used to calculate the measure score */
@@ -163,6 +169,7 @@ class MeasureReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $evaluatedResource = [],
     ) {

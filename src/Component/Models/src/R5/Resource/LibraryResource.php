@@ -32,6 +32,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Clinical Decision Support)
@@ -54,7 +55,7 @@ class LibraryResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -63,10 +64,10 @@ class LibraryResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -84,6 +85,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version Business version of the library */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -126,7 +128,7 @@ class LibraryResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $experimental = null,
         /** @var CodeableConcept|null type logic-library | model-definition | asset-collection | module-definition */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/library-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/library-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|Reference|null subject Type of individual the library content is focused on */
         #[FhirProperty(
@@ -164,6 +166,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var MarkdownPrimitive|null description Natural language description of the library */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -175,6 +178,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for library (if applicable) */
         #[FhirProperty(
@@ -183,6 +187,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this library is defined */
@@ -204,7 +209,7 @@ class LibraryResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $lastReviewDate = null,
         /** @var Period|null effectivePeriod When the library is expected to be used */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $effectivePeriod = null,
         /** @var array<CodeableConcept> topic E.g. Education, Treatment, Assessment, etc */
         #[FhirProperty(
@@ -213,6 +218,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $topic = [],
         /** @var array<ContactDetail> author Who authored the content */
         #[FhirProperty(
@@ -221,6 +227,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $author = [],
         /** @var array<ContactDetail> editor Who edited the content */
         #[FhirProperty(
@@ -229,6 +236,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $editor = [],
         /** @var array<ContactDetail> reviewer Who reviewed the content */
         #[FhirProperty(
@@ -237,6 +245,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $reviewer = [],
         /** @var array<ContactDetail> endorser Who endorsed the content */
         #[FhirProperty(
@@ -245,6 +254,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $endorser = [],
         /** @var array<RelatedArtifact> relatedArtifact Additional documentation, citations, etc */
         #[FhirProperty(
@@ -253,6 +263,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $relatedArtifact = [],
         /** @var array<ParameterDefinition> parameter Parameters defined by the library */
         #[FhirProperty(
@@ -261,6 +272,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ParameterDefinition',
         )]
+        #[Valid]
         public array $parameter = [],
         /** @var array<DataRequirement> dataRequirement What data is referenced by this library */
         #[FhirProperty(
@@ -269,6 +281,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\DataRequirement',
         )]
+        #[Valid]
         public array $dataRequirement = [],
         /** @var array<Attachment> content Contents of the library, either embedded or referenced */
         #[FhirProperty(
@@ -277,6 +290,7 @@ class LibraryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Attachment',
         )]
+        #[Valid]
         public array $content = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

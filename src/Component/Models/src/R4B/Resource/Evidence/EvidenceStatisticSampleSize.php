@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Number of samples in the statistic.
@@ -39,6 +40,7 @@ class EvidenceStatisticSampleSize extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var UnsignedIntPrimitive|null numberOfStudies Number of contributing studies */
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]

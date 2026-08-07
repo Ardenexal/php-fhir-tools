@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\StructureMapTargetListMode
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\StructureMapTransformType;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Content to create because of this mapping rule.
@@ -79,6 +80,7 @@ class StructureMapGroupRuleTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\StructureMap\StructureMapGroupRuleTargetParameter',
         )]
+        #[Valid]
         public array $parameter = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

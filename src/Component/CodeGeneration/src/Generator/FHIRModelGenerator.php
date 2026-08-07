@@ -11,11 +11,13 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
+use Nette\PhpGenerator\PromotedParameter;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\Valid;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Parser\ObligationExtensionParser;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
@@ -811,11 +813,13 @@ class FHIRModelGenerator implements GeneratorInterface
                     ->setType('array')
                     ->addComment('@var  array<' . $typeHint . '> ' . $parameterName . ' ' . $shortDescription);
                 $param->addAttribute(FhirProperty::class, $attributeArgs);
+                $this->addCascadeIfNested($param, $propertyKind);
             } else {
                 $param = $method->addPromotedParameter($parameterName, null)
                     ->setType(implode('|', $types))
                     ->addComment('@var null|' . implode('|', array_unique($docblockTypes)) . ' ' . $parameterName . ' ' . $shortDescription);
                 $param->addAttribute(FhirProperty::class, $attributeArgs);
+                $this->addCascadeIfNested($param, $propertyKind);
                 if ($isNullable === false) {
                     $param->addAttribute(NotBlank::class);
                 }
@@ -1057,6 +1061,45 @@ class FHIRModelGenerator implements GeneratorInterface
         }
 
         return $this->resolvePropertyKindFromCode($types[0]['code'] ?? '');
+    }
+
+    /**
+     * Emit `#[Assert\Valid]` on properties holding nested FHIR objects, so their constraints run.
+     *
+     * Symfony's validator descends into a nested object **only** where the referring property carries
+     * this attribute. Without it, every constraint declared on a backbone element or datatype is
+     * unreachable when a resource is validated as a whole: measured before this was added, a
+     * `Parameters.parameter` violating `inv-1` reported zero errors nested inside its
+     * `ParametersResource` and one error when passed as the validation root. 117 / 123 / 179 invariant
+     * declarations in R4 / R4B / R5 were dead for that reason, against 110 / 114 / 147 resource-level
+     * ones that worked.
+     *
+     * The set is deliberately narrow, and each exclusion is load-bearing rather than cautious:
+     *
+     *  - **`choice`** — excluded because it is the one kind that can hold a raw scalar. A `value[x]`
+     *    legitimately carries `bool`, `int` or `string`, and `Assert\Valid` on a non-object throws
+     *    `NoSuchMetadataException` ("Cannot create metadata for non-objects"), verified directly. This
+     *    would be a fatal error at validation time, not a missed check.
+     *  - **`extension`** — excluded because `FHIRValidationService` already walks extensions itself
+     *    (`validateExtensionContexts`, `validateModifierExtensions`). Cascading as well would report
+     *    the same violation twice.
+     *  - **`primitive`** — excluded because the primitive wrapper classes carry no constraints of their
+     *    own (measured: 0 across `Primitive/` in R4), so cascading into them is pure traversal cost.
+     *  - **`scalar`** — never an object.
+     *
+     * Verified before emitting: of 2560 `complex`/`backbone`/`resource` properties in the R4 tree,
+     * **zero** declare a scalar in their PHP type, so this cannot hit the non-object throw.
+     *
+     * If a future FHIR version gives primitives or extensions real constraints, revisit — but revisit
+     * `choice` only with a guard, because that exclusion is about a runtime exception, not coverage.
+     */
+    private function addCascadeIfNested(PromotedParameter $param, string $propertyKind): void
+    {
+        if (!in_array($propertyKind, ['backbone', 'complex', 'resource'], true)) {
+            return;
+        }
+
+        $param->addAttribute(Valid::class);
     }
 
     /**

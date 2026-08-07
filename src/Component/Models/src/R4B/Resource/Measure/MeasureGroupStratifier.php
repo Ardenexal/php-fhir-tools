@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The stratifier criteria for the measure report, specified as either the name of a valid CQL expression defined within a referenced library or a valid FHIR Resource Path.
@@ -30,13 +31,13 @@ class MeasureGroupStratifier extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null code Meaning of the stratifier */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var StringPrimitive|string|null description The human readable description of this stratifier */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var Expression|null criteria How the measure should be stratified */
-        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex'), Valid]
         public ?Expression $criteria = null,
         /** @var array<MeasureGroupStratifierComponent> component Stratifier criteria component for the measure */
         #[FhirProperty(
@@ -45,6 +46,7 @@ class MeasureGroupStratifier extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Measure\MeasureGroupStratifierComponent',
         )]
+        #[Valid]
         public array $component = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

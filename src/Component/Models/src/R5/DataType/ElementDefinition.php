@@ -28,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UuidPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -180,9 +181,10 @@ class ElementDefinition extends BackboneType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
+        #[Valid]
         public array $code = [],
         /** @var ElementDefinitionSlicing|null slicing This element is sliced - slices follow */
-        #[FhirProperty(fhirType: 'Element', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Element', propertyKind: 'complex'), Valid]
         public ?ElementDefinitionSlicing $slicing = null,
         /** @var StringPrimitive|string|null short Concise definition for space-constrained presentation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -211,7 +213,7 @@ class ElementDefinition extends BackboneType
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $max = null,
         /** @var ElementDefinitionBase|null base Base definition information for tools */
-        #[FhirProperty(fhirType: 'Element', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Element', propertyKind: 'complex'), Valid]
         public ?ElementDefinitionBase $base = null,
         /** @var UriPrimitive|null contentReference Reference to definition of content for the element */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -223,6 +225,7 @@ class ElementDefinition extends BackboneType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinitionType',
         )]
+        #[Valid]
         public array $type = [],
         /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|Integer64Primitive|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Availability|ExtendedContactDetail|Dosage|Meta|null defaultValue Specified value if missing from instance */
         #[FhirProperty(
@@ -1191,6 +1194,7 @@ class ElementDefinition extends BackboneType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinitionExample',
         )]
+        #[Valid]
         public array $example = [],
         /** @var DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|string|int|Integer64Primitive|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null minValue Minimum Allowed Value (for some types) */
         #[FhirProperty(
@@ -1328,6 +1332,7 @@ class ElementDefinition extends BackboneType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinitionConstraint',
         )]
+        #[Valid]
         public array $constraint = [],
         /** @var bool|null mustHaveValue For primitives, that a value must be present - not replaced by an extension */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -1354,7 +1359,7 @@ class ElementDefinition extends BackboneType
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $isSummary = null,
         /** @var ElementDefinitionBinding|null binding ValueSet details if this is coded */
-        #[FhirProperty(fhirType: 'Element', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Element', propertyKind: 'complex'), Valid]
         public ?ElementDefinitionBinding $binding = null,
         /** @var array<ElementDefinitionMapping> mapping Map element to another set of definitions */
         #[FhirProperty(
@@ -1363,6 +1368,7 @@ class ElementDefinition extends BackboneType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinitionMapping',
         )]
+        #[Valid]
         public array $mapping = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

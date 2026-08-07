@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Practitioner\PractitionerQualification;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Patient Administration)
@@ -37,7 +38,7 @@ class PractitionerResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -51,10 +52,10 @@ class PractitionerResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -69,6 +70,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var bool|null active Whether this practitioner's record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -80,6 +82,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName',
         )]
+        #[Valid]
         public array $name = [],
         /** @var array<ContactPoint> telecom A contact detail for the practitioner (that apply to all roles) */
         #[FhirProperty(
@@ -88,6 +91,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactPoint',
         )]
+        #[Valid]
         public array $telecom = [],
         /** @var array<Address> address Address(es) of the practitioner that are not role specific (typically home address) */
         #[FhirProperty(
@@ -96,6 +100,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Address',
         )]
+        #[Valid]
         public array $address = [],
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1', strength: 'required')]
@@ -110,6 +115,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment',
         )]
+        #[Valid]
         public array $photo = [],
         /** @var array<PractitionerQualification> qualification Certification, licenses, or training pertaining to the provision of care */
         #[FhirProperty(
@@ -118,6 +124,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Practitioner\PractitionerQualification',
         )]
+        #[Valid]
         public array $qualification = [],
         /** @var array<CodeableConcept> communication A language the practitioner can use in patient communication */
         #[FhirProperty(
@@ -126,6 +133,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',

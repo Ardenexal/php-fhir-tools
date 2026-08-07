@@ -27,6 +27,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\PaymentReconciliation\PaymentReconciliationAllocation;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\PaymentReconciliation\PaymentReconciliationProcessNote;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Financial Management)
@@ -48,7 +49,7 @@ class PaymentReconciliationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -57,10 +58,10 @@ class PaymentReconciliationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -75,24 +76,26 @@ class PaymentReconciliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null type Category of payment */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var FinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fm-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?FinancialResourceStatusCodesType $status = null,
         /** @var CodeableConcept|null kind Workflow originating payment */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-kind', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-kind', strength: 'extensible')]
         public ?CodeableConcept $kind = null,
         /** @var Period|null period Period covered */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,
         /** @var DateTimePrimitive|null created Creation date */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?DateTimePrimitive $created = null,
         /** @var Reference|null enterer Who entered the payment */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -100,10 +103,11 @@ class PaymentReconciliationResource extends AbstractDomainResource
         ])]
         public ?Reference $enterer = null,
         /** @var CodeableConcept|null issuerType Nature of the source */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-issuertype', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-issuertype', strength: 'extensible')]
         public ?CodeableConcept $issuerType = null,
         /** @var Reference|null paymentIssuer Party generating payment */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/Patient',
@@ -111,10 +115,11 @@ class PaymentReconciliationResource extends AbstractDomainResource
         ])]
         public ?Reference $paymentIssuer = null,
         /** @var Reference|null request Reference to requesting resource */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Task'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Task'])]
         public ?Reference $request = null,
         /** @var Reference|null requestor Responsible practitioner */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -131,10 +136,10 @@ class PaymentReconciliationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?DatePrimitive $date = null,
         /** @var Reference|null location Where payment collected */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $location = null,
         /** @var CodeableConcept|null method Payment instrument */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0570', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0570', strength: 'extensible')]
         public ?CodeableConcept $method = null,
         /** @var StringPrimitive|string|null cardBrand Type of card */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -155,16 +160,16 @@ class PaymentReconciliationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $authorization = null,
         /** @var Money|null tenderedAmount Amount offered by the issuer */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $tenderedAmount = null,
         /** @var Money|null returnedAmount Amount returned by the receiver */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $returnedAmount = null,
         /** @var Money|null amount Total amount of Payment */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Money $amount = null,
         /** @var Identifier|null paymentIdentifier Business identifier for the payment */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $paymentIdentifier = null,
         /** @var array<PaymentReconciliationAllocation> allocation Settlement particulars */
         #[FhirProperty(
@@ -173,9 +178,10 @@ class PaymentReconciliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PaymentReconciliation\PaymentReconciliationAllocation',
         )]
+        #[Valid]
         public array $allocation = [],
         /** @var CodeableConcept|null formCode Printed form identifier */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $formCode = null,
         /** @var array<PaymentReconciliationProcessNote> processNote Note concerning processing */
         #[FhirProperty(
@@ -184,6 +190,7 @@ class PaymentReconciliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PaymentReconciliation\PaymentReconciliationProcessNote',
         )]
+        #[Valid]
         public array $processNote = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

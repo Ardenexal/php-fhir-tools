@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -96,9 +97,10 @@ class TriggerDefinition extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\DataRequirement',
         )]
+        #[Valid]
         public array $data = [],
         /** @var Expression|null condition Whether the event triggers (boolean expression) */
-        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex'), Valid]
         public ?Expression $condition = null,
     ) {
         parent::__construct($id, $extension);

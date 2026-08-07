@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -57,13 +58,13 @@ class SubstanceAmount extends BackboneElement
         )]
         public Quantity|Range|StringPrimitive|string|null $amount = null,
         /** @var CodeableConcept|null amountType Most elements that require a quantitative value will also have a field called amount type. Amount type should always be specified because the actual value of the amount is often dependent on it. EXAMPLE: In capturing the actual relative amounts of substances or molecular fragments it is essential to indicate whether the amount refers to a mole ratio or weight ratio. For any given element an effort should be made to use same the amount type for all related definitional elements */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $amountType = null,
         /** @var StringPrimitive|string|null amountText A textual comment on a numeric value */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $amountText = null,
         /** @var SubstanceAmountReferenceRange|null referenceRange Reference range of possible or expected values */
-        #[FhirProperty(fhirType: 'Element', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Element', propertyKind: 'complex'), Valid]
         public ?SubstanceAmountReferenceRange $referenceRange = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

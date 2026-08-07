@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information aimed at providing directions for the usage of this model of device.
@@ -38,6 +39,7 @@ class DeviceDefinitionGuideline extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var MarkdownPrimitive|null usageInstruction Detailed written and visual directions for the user on how to use the device */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -49,6 +51,7 @@ class DeviceDefinitionGuideline extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $relatedArtifact = [],
         /** @var array<CodeableConcept> indication A clinical condition for which the device was designed to be used */
         #[FhirProperty(
@@ -57,6 +60,7 @@ class DeviceDefinitionGuideline extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $indication = [],
         /** @var array<CodeableConcept> contraindication A specific situation when a device should not be used because it may cause harm */
         #[FhirProperty(
@@ -65,6 +69,7 @@ class DeviceDefinitionGuideline extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $contraindication = [],
         /** @var array<CodeableConcept> warning Specific hazard alert information that a user needs to know before using the device */
         #[FhirProperty(
@@ -73,6 +78,7 @@ class DeviceDefinitionGuideline extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $warning = [],
         /** @var StringPrimitive|string|null intendedUse A description of the general purpose or medical use of the device or its function */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

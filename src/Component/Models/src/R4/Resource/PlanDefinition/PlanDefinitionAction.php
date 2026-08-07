@@ -32,6 +32,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An action or group of actions to be taken as part of the plan.
@@ -71,6 +72,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $code = [],
         /** @var array<CodeableConcept> reason Why the action should be performed */
         #[FhirProperty(
@@ -79,6 +81,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $reason = [],
         /** @var array<RelatedArtifact> documentation Supporting documentation for the intended performer of the action */
         #[FhirProperty(
@@ -87,6 +90,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $documentation = [],
         /** @var array<IdPrimitive> goalId What goals this action supports */
         #[FhirProperty(
@@ -126,6 +130,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\TriggerDefinition',
         )]
+        #[Valid]
         public array $trigger = [],
         /** @var array<PlanDefinitionActionCondition> condition Whether or not the action is applicable */
         #[FhirProperty(
@@ -134,6 +139,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\PlanDefinition\PlanDefinitionActionCondition',
         )]
+        #[Valid]
         public array $condition = [],
         /** @var array<DataRequirement> input Input data requirements */
         #[FhirProperty(
@@ -142,6 +148,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\DataRequirement',
         )]
+        #[Valid]
         public array $input = [],
         /** @var array<DataRequirement> output Output data definition */
         #[FhirProperty(
@@ -150,6 +157,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\DataRequirement',
         )]
+        #[Valid]
         public array $output = [],
         /** @var array<PlanDefinitionActionRelatedAction> relatedAction Relationship to another action */
         #[FhirProperty(
@@ -158,6 +166,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\PlanDefinition\PlanDefinitionActionRelatedAction',
         )]
+        #[Valid]
         public array $relatedAction = [],
         /** @var DateTimePrimitive|Age|Period|Duration|Range|Timing|null timing When the action should take place */
         #[FhirProperty(
@@ -211,9 +220,10 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\PlanDefinition\PlanDefinitionActionParticipant',
         )]
+        #[Valid]
         public array $participant = [],
         /** @var CodeableConcept|null type create | update | remove | fire-event */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var ActionGroupingBehaviorType|null groupingBehavior visual-group | logical-group | sentence-group */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-grouping-behavior|4.0.1', strength: 'required')]
@@ -266,6 +276,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\PlanDefinition\PlanDefinitionActionDynamicValue',
         )]
+        #[Valid]
         public array $dynamicValue = [],
         /** @var array<PlanDefinitionAction> action A sub-action */
         #[FhirProperty(
@@ -274,6 +285,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\PlanDefinition\PlanDefinitionAction',
         )]
+        #[Valid]
         public array $action = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

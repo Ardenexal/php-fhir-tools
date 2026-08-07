@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\BiologicallyDerivedProduct\BiologicallyDerivedProductCollection;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\BiologicallyDerivedProduct\BiologicallyDerivedProductProperty;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -45,7 +46,7 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -54,10 +55,10 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -66,10 +67,10 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var Coding|null productCategory organ | tissue | fluid | cells | biologicalAgent */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid]
         public ?Coding $productCategory = null,
         /** @var CodeableConcept|null productCode A code that identifies the kind of this biologically derived product */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $productCode = null,
         /** @var array<Reference> parent The parent biologically-derived product */
         #[FhirProperty(
@@ -78,6 +79,7 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProduct'])]
         public array $parent = [],
         /** @var array<Reference> request Request to obtain and/or infuse this product */
@@ -87,6 +89,7 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ServiceRequest'])]
         public array $request = [],
         /** @var array<Identifier> identifier Instance identifier */
@@ -96,9 +99,10 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var Identifier|null biologicalSourceEvent An identifier that supports traceability to the event during which material in this product from one or more biological entities was obtained or pooled */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $biologicalSourceEvent = null,
         /** @var array<Reference> processingFacility Processing facilities responsible for the labeling and distribution of this biologically derived product */
         #[FhirProperty(
@@ -107,22 +111,23 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $processingFacility = [],
         /** @var StringPrimitive|string|null division A unique identifier for an aliquot of a product */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $division = null,
         /** @var Coding|null productStatus available | unavailable */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid]
         public ?Coding $productStatus = null,
         /** @var DateTimePrimitive|null expirationDate Date, and where relevant time, of expiration */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $expirationDate = null,
         /** @var BiologicallyDerivedProductCollection|null collection How this product was collected */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?BiologicallyDerivedProductCollection $collection = null,
         /** @var Range|null storageTempRequirements Product storage temperature requirements */
-        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $storageTempRequirements = null,
         /** @var array<BiologicallyDerivedProductProperty> property A property that is specific to this BiologicallyDerviedProduct instance */
         #[FhirProperty(
@@ -131,6 +136,7 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\BiologicallyDerivedProduct\BiologicallyDerivedProductProperty',
         )]
+        #[Valid]
         public array $property = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

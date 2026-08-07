@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\HumanName;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A contact party (e.g. guardian, partner, friend) for the patient.
@@ -49,10 +50,11 @@ class PatientContact extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/patient-contactrelationship', strength: 'extensible')]
         public array $relationship = [],
         /** @var HumanName|null name A name associated with the contact person */
-        #[FhirProperty(fhirType: 'HumanName', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'HumanName', propertyKind: 'complex'), Valid]
         public ?HumanName $name = null,
         /** @var array<ContactPoint> telecom A contact detail for the person */
         #[FhirProperty(
@@ -61,18 +63,19 @@ class PatientContact extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactPoint',
         )]
+        #[Valid]
         public array $telecom = [],
         /** @var Address|null address Address for the contact person */
-        #[FhirProperty(fhirType: 'Address', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Address', propertyKind: 'complex'), Valid]
         public ?Address $address = null,
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|4.3.0', strength: 'required')]
         public ?AdministrativeGenderType $gender = null,
         /** @var Reference|null organization Organization that is associated with the contact */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $organization = null,
         /** @var Period|null period The period during which this contact person or organization is valid to be contacted relating to this patient */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

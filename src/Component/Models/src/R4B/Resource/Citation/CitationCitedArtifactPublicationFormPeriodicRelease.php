@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The specific issue in which the cited article resides.
@@ -30,7 +31,7 @@ class CitationCitedArtifactPublicationFormPeriodicRelease extends BackboneElemen
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null citedMedium Internet or Print */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-medium', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-medium', strength: 'extensible')]
         public ?CodeableConcept $citedMedium = null,
         /** @var StringPrimitive|string|null volume Volume number of journal in which the article is published */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -39,7 +40,7 @@ class CitationCitedArtifactPublicationFormPeriodicRelease extends BackboneElemen
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $issue = null,
         /** @var CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication|null dateOfPublication Defining the date on which the issue of the journal was published */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication $dateOfPublication = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

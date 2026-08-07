@@ -63,6 +63,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UuidPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\AbstractResource;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A parameter passed to or received from the operation.
@@ -408,7 +409,7 @@ class ParametersParameter extends BackboneElement
         )]
         public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|Integer64Primitive|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Availability|ExtendedContactDetail|Dosage|Meta|null $value = null,
         /** @var AbstractResource|null resource If parameter is a whole resource */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource')]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource'), Valid]
         public ?AbstractResource $resource = null,
         /** @var array<ParametersParameter> part Named part of a multi-part parameter */
         #[FhirProperty(
@@ -417,6 +418,7 @@ class ParametersParameter extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Parameters\ParametersParameter',
         )]
+        #[Valid]
         public array $part = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A definition of a resource-based event that triggers a notification based on the SubscriptionTopic. The criteria may be just a human readable description and/or a full FHIR search string or FHIRPath expression. Multiple triggers are considered OR joined (e.g., a resource update matching ANY of the definitions will trigger a notification).
@@ -48,7 +49,7 @@ class SubscriptionTopicResourceTrigger extends BackboneElement
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/interaction-trigger|4.3.0', strength: 'required')]
         public array $supportedInteraction = [],
         /** @var SubscriptionTopicResourceTriggerQueryCriteria|null queryCriteria Query based trigger rule */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?SubscriptionTopicResourceTriggerQueryCriteria $queryCriteria = null,
         /** @var StringPrimitive|string|null fhirPathCriteria FHIRPath based trigger rule */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

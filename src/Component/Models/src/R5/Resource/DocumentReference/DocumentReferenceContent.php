@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Attachment;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The document and format referenced.  If there are multiple content element repetitions, these must all represent the same document in different format, or attachment metadata.
@@ -29,7 +30,7 @@ class DocumentReferenceContent extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Attachment|null attachment Where to access the document */
-        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Attachment $attachment = null,
         /** @var array<DocumentReferenceContentProfile> profile Content profile rules for the document */
         #[FhirProperty(
@@ -38,6 +39,7 @@ class DocumentReferenceContent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\DocumentReference\DocumentReferenceContentProfile',
         )]
+        #[Valid]
         public array $profile = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Details of an accident which resulted in injuries which required the products and services listed in the claim.
@@ -37,7 +38,7 @@ class ClaimAccident extends BackboneElement
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?DatePrimitive $date = null,
         /** @var CodeableConcept|null type The nature of the accident */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActIncidentCode', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActIncidentCode', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var Address|Reference|null location Where the event occurred */
         #[FhirProperty(

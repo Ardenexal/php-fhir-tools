@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Evaluates the results of previous operations to determine if the server under test behaves appropriately.
@@ -135,6 +136,7 @@ class TestScriptSetupActionAssert extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestScript\TestScriptSetupActionAssertRequirement',
         )]
+        #[Valid]
         public array $requirement = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

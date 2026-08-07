@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ProvenanceEntityRoleType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An entity used in this activity.
@@ -35,7 +36,7 @@ class ProvenanceEntity extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/provenance-entity-role|4.0.1', strength: 'required')]
         public ?ProvenanceEntityRoleType $role = null,
         /** @var Reference|null what Identity of entity */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $what = null,
         /** @var array<ProvenanceAgent> agent Entity is attributed to this agent */
         #[FhirProperty(
@@ -44,6 +45,7 @@ class ProvenanceEntity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Provenance\ProvenanceAgent',
         )]
+        #[Valid]
         public array $agent = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

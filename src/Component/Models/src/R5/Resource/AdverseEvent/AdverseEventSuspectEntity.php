@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Describes the entity that is suspected to have caused the adverse event.
@@ -65,7 +66,7 @@ class AdverseEventSuspectEntity extends BackboneElement
         ])]
         public CodeableConcept|Reference|null $instance = null,
         /** @var AdverseEventSuspectEntityCausality|null causality Information on the possible cause of the event */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?AdverseEventSuspectEntityCausality $causality = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

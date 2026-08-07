@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Performer for the analysis event.
@@ -31,6 +32,7 @@ class GenomicStudyAnalysisPerformer extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null actor The organization, healthcare professional, or others who participated in performing this analysis */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -39,7 +41,7 @@ class GenomicStudyAnalysisPerformer extends BackboneElement
         ])]
         public ?Reference $actor = null,
         /** @var CodeableConcept|null role Role of the actor for this analysis */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $role = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

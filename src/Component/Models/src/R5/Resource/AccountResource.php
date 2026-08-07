@@ -29,6 +29,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\Account\AccountGuarantor;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Account\AccountProcedure;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Account\AccountRelatedAccount;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Patient Administration)
@@ -45,7 +46,7 @@ class AccountResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -54,10 +55,10 @@ class AccountResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -72,15 +73,16 @@ class AccountResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var AccountStatusType|null status active | inactive | entered-in-error | on-hold | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/account-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?AccountStatusType $status = null,
         /** @var CodeableConcept|null billingStatus Tracks the lifecycle of the account through the billing process */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $billingStatus = null,
         /** @var CodeableConcept|null type E.g. patient, expense, depreciation */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var StringPrimitive|string|null name Human-readable label */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -92,6 +94,7 @@ class AccountResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
             'http://hl7.org/fhir/StructureDefinition/Device',
@@ -103,7 +106,7 @@ class AccountResource extends AbstractDomainResource
         ])]
         public array $subject = [],
         /** @var Period|null servicePeriod Transaction window */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $servicePeriod = null,
         /** @var array<AccountCoverage> coverage The party(s) that are responsible for covering the payment of this account, and what order should they be applied to the account */
         #[FhirProperty(
@@ -112,9 +115,10 @@ class AccountResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Account\AccountCoverage',
         )]
+        #[Valid]
         public array $coverage = [],
         /** @var Reference|null owner Entity managing the Account */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $owner = null,
         /** @var MarkdownPrimitive|null description Explanation of purpose/use */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -126,6 +130,7 @@ class AccountResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Account\AccountGuarantor',
         )]
+        #[Valid]
         public array $guarantor = [],
         /** @var array<AccountDiagnosis> diagnosis The list of diagnoses relevant to this account */
         #[FhirProperty(
@@ -134,6 +139,7 @@ class AccountResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Account\AccountDiagnosis',
         )]
+        #[Valid]
         public array $diagnosis = [],
         /** @var array<AccountProcedure> procedure The list of procedures relevant to this account */
         #[FhirProperty(
@@ -142,6 +148,7 @@ class AccountResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Account\AccountProcedure',
         )]
+        #[Valid]
         public array $procedure = [],
         /** @var array<AccountRelatedAccount> relatedAccount Other associated accounts related to this account */
         #[FhirProperty(
@@ -150,9 +157,10 @@ class AccountResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Account\AccountRelatedAccount',
         )]
+        #[Valid]
         public array $relatedAccount = [],
         /** @var CodeableConcept|null currency The base or default currency */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/currencies|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/currencies|5.0.0', strength: 'required')]
         public ?CodeableConcept $currency = null,
         /** @var array<AccountBalance> balance Calculated account balance(s) */
         #[FhirProperty(
@@ -161,6 +169,7 @@ class AccountResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Account\AccountBalance',
         )]
+        #[Valid]
         public array $balance = [],
         /** @var InstantPrimitive|null calculatedAt Time the balance amount was calculated */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Physical parts of the manufactured item, that it is intrisically made from. This is distinct from the ingredients that are part of its chemical makeup.
@@ -30,7 +31,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Defining type of the component e.g. shell, layer, ink */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> function The function of this component within the item e.g. delivers active ingredient, masks taste */
         #[FhirProperty(
@@ -39,6 +40,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $function = [],
         /** @var array<Quantity> amount The measurable amount of total quantity of all substances in the component, expressable in different ways (e.g. by mass or volume) */
         #[FhirProperty(
@@ -47,6 +49,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity',
         )]
+        #[Valid]
         public array $amount = [],
         /** @var array<ManufacturedItemDefinitionComponentConstituent> constituent A reference to a constituent of the manufactured item as a whole, linked here so that its component location within the item can be indicated. This not where the item's ingredient are primarily stated (for which see Ingredient.for or ManufacturedItemDefinition.ingredient) */
         #[FhirProperty(
@@ -55,6 +58,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ManufacturedItemDefinition\ManufacturedItemDefinitionComponentConstituent',
         )]
+        #[Valid]
         public array $constituent = [],
         /** @var array<ManufacturedItemDefinitionProperty> property General characteristics of this component */
         #[FhirProperty(
@@ -63,6 +67,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ManufacturedItemDefinition\ManufacturedItemDefinitionProperty',
         )]
+        #[Valid]
         public array $property = [],
         /** @var array<ManufacturedItemDefinitionComponent> component A component that this component contains or is made from */
         #[FhirProperty(
@@ -71,6 +76,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ManufacturedItemDefinition\ManufacturedItemDefinitionComponent',
         )]
+        #[Valid]
         public array $component = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

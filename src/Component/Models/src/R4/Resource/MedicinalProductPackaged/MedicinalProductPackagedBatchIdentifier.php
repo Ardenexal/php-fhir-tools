@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Batch numbering.
@@ -29,10 +30,10 @@ class MedicinalProductPackagedBatchIdentifier extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Identifier|null outerPackaging A number appearing on the outer packaging of a specific batch */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Identifier $outerPackaging = null,
         /** @var Identifier|null immediatePackaging A number appearing on the immediate packaging (and not the outer packaging) */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $immediatePackaging = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

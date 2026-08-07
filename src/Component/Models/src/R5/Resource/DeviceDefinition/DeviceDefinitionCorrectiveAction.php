@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\DeviceCorrectiveActionScope
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Tracking of latest field safety corrective action.
@@ -37,7 +38,7 @@ class DeviceDefinitionCorrectiveAction extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-correctiveactionscope|5.0.0', strength: 'required')]
         public ?DeviceCorrectiveActionScopeType $scope = null,
         /** @var Period|null period Start and end dates of the  corrective action */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Period $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

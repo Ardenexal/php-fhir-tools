@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A component of the method to generate the statistic.
@@ -31,10 +32,10 @@ class EvidenceStatisticModelCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null code Model specification */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/statistic-model-code', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/statistic-model-code', strength: 'extensible')]
         public ?CodeableConcept $code = null,
         /** @var Quantity|null value Numerical value to complete model specification */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $value = null,
         /** @var array<EvidenceStatisticModelCharacteristicVariable> variable A variable adjusted for in the adjusted analysis */
         #[FhirProperty(
@@ -43,6 +44,7 @@ class EvidenceStatisticModelCharacteristic extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Evidence\EvidenceStatisticModelCharacteristicVariable',
         )]
+        #[Valid]
         public array $variable = [],
         /** @var array<EvidenceStatisticAttributeEstimate> attributeEstimate An attribute of the statistic used as a model characteristic */
         #[FhirProperty(
@@ -51,6 +53,7 @@ class EvidenceStatisticModelCharacteristic extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Evidence\EvidenceStatisticAttributeEstimate',
         )]
+        #[Valid]
         public array $attributeEstimate = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

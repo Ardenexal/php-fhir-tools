@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A specification of the restful capabilities of the solution for a specific resource type.
@@ -69,6 +70,7 @@ class CapabilityStatementRestResource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CapabilityStatement\CapabilityStatementRestResourceInteraction',
         )]
+        #[Valid]
         public array $interaction = [],
         /** @var ResourceVersionPolicyType|null versioning no-version | versioned | versioned-update */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/versioning-policy|5.0.0', strength: 'required')]
@@ -126,6 +128,7 @@ class CapabilityStatementRestResource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CapabilityStatement\CapabilityStatementRestResourceSearchParam',
         )]
+        #[Valid]
         public array $searchParam = [],
         /** @var array<CapabilityStatementRestResourceOperation> operation Definition of a resource operation */
         #[FhirProperty(
@@ -134,6 +137,7 @@ class CapabilityStatementRestResource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CapabilityStatement\CapabilityStatementRestResourceOperation',
         )]
+        #[Valid]
         public array $operation = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A page / section in the implementation guide. The root page is the implementation guide home page.
@@ -82,6 +83,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImplementationGuide\ImplementationGuideDefinitionPage',
         )]
+        #[Valid]
         public array $page = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

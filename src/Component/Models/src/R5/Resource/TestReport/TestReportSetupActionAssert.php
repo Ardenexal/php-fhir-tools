@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\TestReportActionResultType;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The results of the assertion performed on the previous operations.
@@ -47,6 +48,7 @@ class TestReportSetupActionAssert extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestReport\TestReportSetupActionAssertRequirement',
         )]
+        #[Valid]
         public array $requirement = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\IssueSeverityType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\IssueTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An error, warning, or information message that results from a system action.
@@ -39,7 +40,7 @@ class OperationOutcomeIssue extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/issue-type|4.0.1', strength: 'required')]
         public ?IssueTypeType $code = null,
         /** @var CodeableConcept|null details Additional details about the error */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $details = null,
         /** @var StringPrimitive|string|null diagnostics Additional diagnostic information about the issue */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

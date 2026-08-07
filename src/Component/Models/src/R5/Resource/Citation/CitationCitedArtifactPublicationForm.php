@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description If multiple, used to represent alternative forms of the article that are not separate citations.
@@ -32,10 +33,10 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CitationCitedArtifactPublicationFormPublishedIn|null publishedIn The collection the cited article or artifact is published in */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?CitationCitedArtifactPublicationFormPublishedIn $publishedIn = null,
         /** @var CodeableConcept|null citedMedium Internet or Print */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-medium', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-medium', strength: 'extensible')]
         public ?CodeableConcept $citedMedium = null,
         /** @var StringPrimitive|string|null volume Volume number of journal or other collection in which the article is published */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -62,6 +63,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
         public array $language = [],
         /** @var StringPrimitive|string|null accessionNumber Entry number or identifier for inclusion in a database */

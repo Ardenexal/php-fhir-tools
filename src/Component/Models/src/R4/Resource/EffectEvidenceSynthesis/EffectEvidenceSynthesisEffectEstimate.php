@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The estimated effect of the exposure variant.
@@ -33,16 +34,16 @@ class EffectEvidenceSynthesisEffectEstimate extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var CodeableConcept|null type Type of efffect estimate */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/effect-estimate-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/effect-estimate-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null variantState Variant exposure states */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-variant-state', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-variant-state', strength: 'extensible')]
         public ?CodeableConcept $variantState = null,
         /** @var numeric-string|null value Point estimate */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $value = null,
         /** @var CodeableConcept|null unitOfMeasure What unit is the outcome described in? */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|4.0.1', strength: 'required')]
         public ?CodeableConcept $unitOfMeasure = null,
         /** @var array<EffectEvidenceSynthesisEffectEstimatePrecisionEstimate> precisionEstimate How precise the estimate is */
         #[FhirProperty(
@@ -51,6 +52,7 @@ class EffectEvidenceSynthesisEffectEstimate extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\EffectEvidenceSynthesis\EffectEvidenceSynthesisEffectEstimatePrecisionEstimate',
         )]
+        #[Valid]
         public array $precisionEstimate = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

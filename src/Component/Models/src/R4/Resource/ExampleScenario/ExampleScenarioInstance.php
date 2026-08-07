@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\ResourceTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Each resource and each version that is present in the workflow.
@@ -50,6 +51,7 @@ class ExampleScenarioInstance extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioInstanceVersion',
         )]
+        #[Valid]
         public array $version = [],
         /** @var array<ExampleScenarioInstanceContainedInstance> containedInstance Resources contained in the instance */
         #[FhirProperty(
@@ -58,6 +60,7 @@ class ExampleScenarioInstance extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioInstanceContainedInstance',
         )]
+        #[Valid]
         public array $containedInstance = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

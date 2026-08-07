@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The item(s) within the packaging.
@@ -36,6 +37,7 @@ class PackagedProductDefinitionPackageContainedItem extends BackboneElement
         public array $modifierExtension = [],
         /** @var CodeableReference|null item The actual item(s) of medication, as manufactured, or a device, or other medically related item (food, biologicals, raw materials, medical fluids, gases etc.), as contained in the package */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition',
@@ -46,7 +48,7 @@ class PackagedProductDefinitionPackageContainedItem extends BackboneElement
         ])]
         public ?CodeableReference $item = null,
         /** @var Quantity|null amount The number of this type of item within this packaging */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

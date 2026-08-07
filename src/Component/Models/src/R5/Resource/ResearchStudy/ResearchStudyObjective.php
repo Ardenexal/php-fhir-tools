@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A goal that the study is aiming to achieve in terms of a scientific question to be answered by the analysis of data collected during the study.
@@ -34,7 +35,7 @@ class ResearchStudyObjective extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
         /** @var CodeableConcept|null type primary | secondary | exploratory */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/research-study-objective-type', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/research-study-objective-type', strength: 'preferred')]
         public ?CodeableConcept $type = null,
         /** @var MarkdownPrimitive|null description Description of the objective */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

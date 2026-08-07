@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Additional representations for the concept - other languages, aliases, specialized purposes, used for particular purposes, etc.
@@ -42,7 +43,7 @@ class CodeSystemConceptDesignation extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Coding|null use Details how this designation would be used */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/designation-use', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/designation-use', strength: 'extensible')]
         public ?Coding $use = null,
         /** @var array<Coding> additionalUse Additional ways how this designation would be used */
         #[FhirProperty(
@@ -51,6 +52,7 @@ class CodeSystemConceptDesignation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/designation-use', strength: 'extensible')]
         public array $additionalUse = [],
         /** @var StringPrimitive|string|null value The text value for this designation */

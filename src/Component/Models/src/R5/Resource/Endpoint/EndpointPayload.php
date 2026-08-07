@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\MimeTypesType;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The set of payloads that are provided/available at this endpoint.
@@ -36,6 +37,7 @@ class EndpointPayload extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $type = [],
         /** @var array<MimeTypesType> mimeType Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this) */
         #[FhirProperty(

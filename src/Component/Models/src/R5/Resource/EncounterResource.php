@@ -29,6 +29,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\Encounter\EncounterLocation
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Encounter\EncounterParticipant;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Encounter\EncounterReason;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Patient Administration)
@@ -45,7 +46,7 @@ class EncounterResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -54,10 +55,10 @@ class EncounterResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -72,6 +73,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var EncounterStatusType|null status planned | in-progress | on-hold | discharged | completed | cancelled | discontinued | entered-in-error | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
@@ -83,10 +85,11 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/encounter-class', strength: 'preferred')]
         public array $class = [],
         /** @var CodeableConcept|null priority Indicates the urgency of the encounter */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $priority = null,
         /** @var array<CodeableConcept> type Specific type of encounter (e.g. e-mail consultation, surgical day-care, ...) */
         #[FhirProperty(
@@ -95,6 +98,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $type = [],
         /** @var array<CodeableReference> serviceType Specific type of service */
         #[FhirProperty(
@@ -103,13 +107,14 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/HealthcareService'])]
         public array $serviceType = [],
         /** @var Reference|null subject The patient or group related to this encounter */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient', 'http://hl7.org/fhir/StructureDefinition/Group'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient', 'http://hl7.org/fhir/StructureDefinition/Group'])]
         public ?Reference $subject = null,
         /** @var CodeableConcept|null subjectStatus The current status of the subject in relation to the Encounter */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $subjectStatus = null,
         /** @var array<Reference> episodeOfCare Episode(s) of care that this encounter should be recorded against */
         #[FhirProperty(
@@ -118,6 +123,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/EpisodeOfCare'])]
         public array $episodeOfCare = [],
         /** @var array<Reference> basedOn The request that initiated this encounter */
@@ -127,6 +133,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/CarePlan',
             'http://hl7.org/fhir/StructureDefinition/DeviceRequest',
@@ -141,13 +148,14 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CareTeam'])]
         public array $careTeam = [],
         /** @var Reference|null partOf Another Encounter this encounter is part of */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public ?Reference $partOf = null,
         /** @var Reference|null serviceProvider The organization (facility) responsible for this encounter */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $serviceProvider = null,
         /** @var array<EncounterParticipant> participant List of participants involved in the encounter */
         #[FhirProperty(
@@ -156,6 +164,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Encounter\EncounterParticipant',
         )]
+        #[Valid]
         public array $participant = [],
         /** @var array<Reference> appointment The appointment that scheduled this encounter */
         #[FhirProperty(
@@ -164,6 +173,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Appointment'])]
         public array $appointment = [],
         /** @var array<VirtualServiceDetail> virtualService Connection details of a virtual service (e.g. conference call) */
@@ -173,9 +183,10 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\VirtualServiceDetail',
         )]
+        #[Valid]
         public array $virtualService = [],
         /** @var Period|null actualPeriod The actual start and end time of the encounter */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $actualPeriod = null,
         /** @var DateTimePrimitive|null plannedStartDate The planned start date/time (or admission date) of the encounter */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -184,7 +195,7 @@ class EncounterResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $plannedEndDate = null,
         /** @var Duration|null length Actual quantity of time the encounter lasted (less time absent) */
-        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $length = null,
         /** @var array<EncounterReason> reason The list of medical reasons that are expected to be addressed during the episode of care */
         #[FhirProperty(
@@ -193,6 +204,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Encounter\EncounterReason',
         )]
+        #[Valid]
         public array $reason = [],
         /** @var array<EncounterDiagnosis> diagnosis The list of diagnosis relevant to this encounter */
         #[FhirProperty(
@@ -201,6 +213,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Encounter\EncounterDiagnosis',
         )]
+        #[Valid]
         public array $diagnosis = [],
         /** @var array<Reference> account The set of accounts that may be used for billing for this Encounter */
         #[FhirProperty(
@@ -209,6 +222,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Account'])]
         public array $account = [],
         /** @var array<CodeableConcept> dietPreference Diet preferences reported by the patient */
@@ -218,6 +232,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $dietPreference = [],
         /** @var array<CodeableConcept> specialArrangement Wheelchair, translator, stretcher, etc */
         #[FhirProperty(
@@ -226,6 +241,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-special-arrangements', strength: 'preferred')]
         public array $specialArrangement = [],
         /** @var array<CodeableConcept> specialCourtesy Special courtesies (VIP, board member) */
@@ -235,10 +251,11 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-special-courtesy', strength: 'preferred')]
         public array $specialCourtesy = [],
         /** @var EncounterAdmission|null admission Details about the admission to a healthcare service */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?EncounterAdmission $admission = null,
         /** @var array<EncounterLocation> location List of locations where the patient has been */
         #[FhirProperty(
@@ -247,6 +264,7 @@ class EncounterResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Encounter\EncounterLocation',
         )]
+        #[Valid]
         public array $location = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

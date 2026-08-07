@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Diet given orally in contrast to enteral (tube) feeding.
@@ -36,6 +37,7 @@ class NutritionOrderOralDiet extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $type = [],
         /** @var array<Timing> schedule Scheduled frequency of diet */
         #[FhirProperty(
@@ -44,6 +46,7 @@ class NutritionOrderOralDiet extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
         )]
+        #[Valid]
         public array $schedule = [],
         /** @var array<NutritionOrderOralDietNutrient> nutrient Required  nutrient modifications */
         #[FhirProperty(
@@ -52,6 +55,7 @@ class NutritionOrderOralDiet extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\NutritionOrder\NutritionOrderOralDietNutrient',
         )]
+        #[Valid]
         public array $nutrient = [],
         /** @var array<NutritionOrderOralDietTexture> texture Required  texture modifications */
         #[FhirProperty(
@@ -60,6 +64,7 @@ class NutritionOrderOralDiet extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\NutritionOrder\NutritionOrderOralDietTexture',
         )]
+        #[Valid]
         public array $texture = [],
         /** @var array<CodeableConcept> fluidConsistencyType The required consistency of fluids and liquids provided to the patient */
         #[FhirProperty(
@@ -68,6 +73,7 @@ class NutritionOrderOralDiet extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $fluidConsistencyType = [],
         /** @var StringPrimitive|string|null instruction Instructions or additional information about the oral diet */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

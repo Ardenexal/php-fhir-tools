@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The list of diagnosis relevant to this encounter.
@@ -34,6 +35,7 @@ class EncounterDiagnosis extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null condition The diagnosis or procedure relevant to the encounter */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Condition',
@@ -41,7 +43,7 @@ class EncounterDiagnosis extends BackboneElement
         ])]
         public ?Reference $condition = null,
         /** @var CodeableConcept|null use Role that this diagnosis has within the encounter (e.g. admission, billing, discharge …) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/diagnosis-role', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/diagnosis-role', strength: 'preferred')]
         public ?CodeableConcept $use = null,
         /** @var PositiveIntPrimitive|null rank Ranking of the diagnosis (for each role type) */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

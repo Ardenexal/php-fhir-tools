@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\InstantPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -38,6 +39,7 @@ class Signature extends Element
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
+        #[Valid]
         #[Count(min: 1)]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/signature-type', strength: 'preferred')]
         public array $type = [],
@@ -46,6 +48,7 @@ class Signature extends Element
         public ?InstantPrimitive $when = null,
         /** @var Reference|null who Who signed */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -58,6 +61,7 @@ class Signature extends Element
         public ?Reference $who = null,
         /** @var Reference|null onBehalfOf The party represented */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',

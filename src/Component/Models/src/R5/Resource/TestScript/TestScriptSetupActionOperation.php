@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The operation to perform.
@@ -42,7 +43,7 @@ class TestScriptSetupActionOperation extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Coding|null type The operation code type that will be executed */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-operation-codes', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-operation-codes', strength: 'extensible')]
         public ?Coding $type = null,
         /** @var UriPrimitive|null resource Resource type */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concrete-fhir-types', strength: 'extensible')]
@@ -81,6 +82,7 @@ class TestScriptSetupActionOperation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestScript\TestScriptSetupActionOperationRequestHeader',
         )]
+        #[Valid]
         public array $requestHeader = [],
         /** @var IdPrimitive|null requestId Fixture Id of mapped request */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]

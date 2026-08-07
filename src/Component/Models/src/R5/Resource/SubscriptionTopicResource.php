@@ -31,6 +31,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\SubscriptionTopic\Subscript
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\SubscriptionTopic\SubscriptionTopicNotificationShape;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\SubscriptionTopic\SubscriptionTopicResourceTrigger;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -52,7 +53,7 @@ class SubscriptionTopicResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
@@ -61,10 +62,10 @@ class SubscriptionTopicResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -82,6 +83,7 @@ class SubscriptionTopicResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version Business version of the subscription topic */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -142,6 +144,7 @@ class SubscriptionTopicResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var MarkdownPrimitive|null description Natural language description of the SubscriptionTopic */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -153,6 +156,7 @@ class SubscriptionTopicResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction of the SubscriptionTopic (if applicable) */
         #[FhirProperty(
@@ -161,6 +165,7 @@ class SubscriptionTopicResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this SubscriptionTopic is defined */
@@ -179,7 +184,7 @@ class SubscriptionTopicResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $lastReviewDate = null,
         /** @var Period|null effectivePeriod The effective date range for the SubscriptionTopic */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $effectivePeriod = null,
         /** @var array<SubscriptionTopicResourceTrigger> resourceTrigger Definition of a resource-based trigger for the subscription topic */
         #[FhirProperty(
@@ -188,6 +193,7 @@ class SubscriptionTopicResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubscriptionTopic\SubscriptionTopicResourceTrigger',
         )]
+        #[Valid]
         public array $resourceTrigger = [],
         /** @var array<SubscriptionTopicEventTrigger> eventTrigger Event definitions the SubscriptionTopic */
         #[FhirProperty(
@@ -196,6 +202,7 @@ class SubscriptionTopicResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubscriptionTopic\SubscriptionTopicEventTrigger',
         )]
+        #[Valid]
         public array $eventTrigger = [],
         /** @var array<SubscriptionTopicCanFilterBy> canFilterBy Properties by which a Subscription can filter notifications from the SubscriptionTopic */
         #[FhirProperty(
@@ -204,6 +211,7 @@ class SubscriptionTopicResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubscriptionTopic\SubscriptionTopicCanFilterBy',
         )]
+        #[Valid]
         public array $canFilterBy = [],
         /** @var array<SubscriptionTopicNotificationShape> notificationShape Properties for describing the shape of notifications generated by this topic */
         #[FhirProperty(
@@ -212,6 +220,7 @@ class SubscriptionTopicResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubscriptionTopic\SubscriptionTopicNotificationShape',
         )]
+        #[Valid]
         public array $notificationShape = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

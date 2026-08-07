@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The test assertions - the expectations of test results from the execution of the test case.
@@ -35,6 +36,7 @@ class TestPlanTestCaseAssertion extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $type = [],
         /** @var array<CodeableReference> object The focus or object of the assertion */
         #[FhirProperty(
@@ -43,6 +45,7 @@ class TestPlanTestCaseAssertion extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         public array $object = [],
         /** @var array<CodeableReference> result The actual result assertion */
         #[FhirProperty(
@@ -51,6 +54,7 @@ class TestPlanTestCaseAssertion extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         public array $result = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

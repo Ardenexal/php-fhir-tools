@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Feeding provided through the gastrointestinal tract via a tube, catheter, or stoma that delivers nutrition distal to the oral cavity.
@@ -31,22 +32,22 @@ class NutritionOrderEnteralFormula extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null baseFormulaType Type of enteral or infant formula */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $baseFormulaType = null,
         /** @var StringPrimitive|string|null baseFormulaProductName Product or brand name of the enteral or infant formula */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $baseFormulaProductName = null,
         /** @var CodeableConcept|null additiveType Type of modular component to add to the feeding */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $additiveType = null,
         /** @var StringPrimitive|string|null additiveProductName Product or brand name of the modular additive */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $additiveProductName = null,
         /** @var Quantity|null caloricDensity Amount of energy per specified volume that is required */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $caloricDensity = null,
         /** @var CodeableConcept|null routeofAdministration How the formula should enter the patient's gastrointestinal tract */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/enteral-route', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/enteral-route', strength: 'extensible')]
         public ?CodeableConcept $routeofAdministration = null,
         /** @var array<NutritionOrderEnteralFormulaAdministration> administration Formula feeding instruction as structured data */
         #[FhirProperty(
@@ -55,9 +56,10 @@ class NutritionOrderEnteralFormula extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\NutritionOrder\NutritionOrderEnteralFormulaAdministration',
         )]
+        #[Valid]
         public array $administration = [],
         /** @var Quantity|null maxVolumeToDeliver Upper limit on formula volume per unit of time */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $maxVolumeToDeliver = null,
         /** @var StringPrimitive|string|null administrationInstruction Formula feeding instructions expressed as text */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

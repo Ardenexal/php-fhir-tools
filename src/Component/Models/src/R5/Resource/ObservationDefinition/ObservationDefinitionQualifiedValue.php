@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\ObservationRangeCategoryTyp
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A set of qualified values associated with a context and a set of conditions -  provides a range for quantitative and ordinal observations and a collection of value sets for qualitative observations.
@@ -35,7 +36,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null context Context qualifier for the set of qualified values */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/referencerange-meaning', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/referencerange-meaning', strength: 'extensible')]
         public ?CodeableConcept $context = null,
         /** @var array<CodeableConcept> appliesTo Targetted population for the set of qualified values */
         #[FhirProperty(
@@ -44,15 +45,16 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $appliesTo = [],
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|5.0.0', strength: 'required')]
         public ?AdministrativeGenderType $gender = null,
         /** @var Range|null age Applicable age range for the set of qualified values */
-        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $age = null,
         /** @var Range|null gestationalAge Applicable gestational age range for the set of qualified values */
-        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $gestationalAge = null,
         /** @var StringPrimitive|string|null condition Condition associated with the set of qualified values */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -61,7 +63,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-range-category|5.0.0', strength: 'required')]
         public ?ObservationRangeCategoryType $rangeCategory = null,
         /** @var Range|null range The range for continuous or ordinal observations */
-        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $range = null,
         /** @var CanonicalPrimitive|null validCodedValueSet Value set of valid coded values as part of this set of qualified values */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]

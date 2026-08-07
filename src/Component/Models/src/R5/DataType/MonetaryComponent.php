@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -30,13 +31,13 @@ class MonetaryComponent extends DataType
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/price-component-type|5.0.0', strength: 'required')]
         public ?PriceComponentTypeType $type = null,
         /** @var CodeableConcept|null code Codes may be used to differentiate between kinds of taxes, surcharges, discounts etc. */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var numeric-string|null factor Factor used for calculating this component */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $factor = null,
         /** @var Money|null amount Explicit value amount to be used */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $amount = null,
     ) {
         parent::__construct($id, $extension);

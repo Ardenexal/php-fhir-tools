@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Characteristics e.g. a product's onset of action.
@@ -37,7 +38,7 @@ class AdministrableProductDefinitionProperty extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type A code expressing the type of characteristic */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null value A value for the characteristic */
         #[FhirProperty(
@@ -74,7 +75,7 @@ class AdministrableProductDefinitionProperty extends BackboneElement
         )]
         public CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null $value = null,
         /** @var CodeableConcept|null status The status of characteristic e.g. assigned or pending */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required')]
         public ?CodeableConcept $status = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

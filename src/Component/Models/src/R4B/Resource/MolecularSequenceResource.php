@@ -25,6 +25,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\Molecula
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\MolecularSequenceStructureVariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\MolecularSequenceVariant;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Clinical Genomics)
@@ -52,7 +53,7 @@ class MolecularSequenceResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -66,10 +67,10 @@ class MolecularSequenceResource extends AbstractDomainResource
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -84,6 +85,7 @@ class MolecularSequenceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var SequenceTypeType|null type aa | dna | rna */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/sequence-type|4.3.0', strength: 'required')]
@@ -92,22 +94,22 @@ class MolecularSequenceResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotBlank]
         public ?int $coordinateSystem = null,
         /** @var Reference|null patient Who and/or what this is about */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
         public ?Reference $patient = null,
         /** @var Reference|null specimen Specimen used for sequencing */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Specimen'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Specimen'])]
         public ?Reference $specimen = null,
         /** @var Reference|null device The method for sequencing */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Device'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Device'])]
         public ?Reference $device = null,
         /** @var Reference|null performer Who should be responsible for test result */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $performer = null,
         /** @var Quantity|null quantity The number of copies of the sequence of interest.  (RNASeq) */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var MolecularSequenceReferenceSeq|null referenceSeq A sequence used as reference */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?MolecularSequenceReferenceSeq $referenceSeq = null,
         /** @var array<MolecularSequenceVariant> variant Variant in sequence */
         #[FhirProperty(
@@ -116,6 +118,7 @@ class MolecularSequenceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\MolecularSequenceVariant',
         )]
+        #[Valid]
         public array $variant = [],
         /** @var StringPrimitive|string|null observedSeq Sequence that was observed */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -127,6 +130,7 @@ class MolecularSequenceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\MolecularSequenceQuality',
         )]
+        #[Valid]
         public array $quality = [],
         /** @var int|null readCoverage Average number of reads representing a given nucleotide in the reconstructed sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
@@ -138,6 +142,7 @@ class MolecularSequenceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\MolecularSequenceRepository',
         )]
+        #[Valid]
         public array $repository = [],
         /** @var array<Reference> pointer Pointer to next atomic sequence */
         #[FhirProperty(
@@ -146,6 +151,7 @@ class MolecularSequenceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MolecularSequence'])]
         public array $pointer = [],
         /** @var array<MolecularSequenceStructureVariant> structureVariant Structural variant */
@@ -155,6 +161,7 @@ class MolecularSequenceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence\MolecularSequenceStructureVariant',
         )]
+        #[Valid]
         public array $structureVariant = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

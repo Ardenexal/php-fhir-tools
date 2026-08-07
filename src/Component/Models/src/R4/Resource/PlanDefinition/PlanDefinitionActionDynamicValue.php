@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Customizations that should be applied to the statically defined resource. For example, if the dosage of a medication must be computed based on the patient's weight, a customization would be used to specify an expression that calculated the weight, and the path on the resource that would contain the result.
@@ -32,7 +33,7 @@ class PlanDefinitionActionDynamicValue extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $path = null,
         /** @var Expression|null expression An expression that provides the dynamic value for the customization */
-        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex'), Valid]
         public ?Expression $expression = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

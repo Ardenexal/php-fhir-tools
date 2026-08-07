@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\NoteTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A note that describes or explains adjudication results in a human readable form.
@@ -43,6 +44,7 @@ class ClaimResponseProcessNote extends BackboneElement
         public StringPrimitive|string|null $text = null,
         /** @var CodeableConcept|null language Language of the text */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRValueSetBinding(
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ReportRelationshipTypeType;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Relationships that this composition has with other compositions or documents that already exist.
@@ -33,7 +34,7 @@ class EvidenceReportRelatesTo extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/report-relation-type|5.0.0', strength: 'required')]
         public ?ReportRelationshipTypeType $code = null,
         /** @var EvidenceReportRelatesToTarget|null target Target of the relationship */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isRequired: true), Valid, NotBlank]
         public ?EvidenceReportRelatesToTarget $target = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

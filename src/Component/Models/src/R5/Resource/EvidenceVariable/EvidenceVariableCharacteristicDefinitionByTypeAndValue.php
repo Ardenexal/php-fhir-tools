@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Defines the characteristic using both a type and value[x] elements.
@@ -38,7 +39,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Expresses the type of characteristic */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> method Method for how the characteristic value was determined */
         #[FhirProperty(
@@ -47,9 +48,11 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $method = [],
         /** @var Reference|null device Device used for determining characteristic */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Device',
             'http://hl7.org/fhir/StructureDefinition/DeviceMetric',
@@ -98,7 +101,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
         #[NotBlank]
         public CodeableConcept|bool|Quantity|Range|Reference|IdPrimitive|null $value = null,
         /** @var CodeableConcept|null offset Reference point for valueQuantity or valueRange */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $offset = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

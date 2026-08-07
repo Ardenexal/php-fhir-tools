@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Additional bindings that help applications implementing this element. Additional bindings do not replace the main binding but provide more information and/or context.
@@ -45,6 +46,7 @@ class ElementDefinitionBindingAdditional extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $usage = [],
         /** @var bool|null any Whether binding can applies to all repeats, or just one */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

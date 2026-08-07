@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A significant action that occurs as part of the process.
@@ -46,13 +47,13 @@ class ExampleScenarioProcessStep extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $number = null,
         /** @var ExampleScenarioProcess|null process Step is nested process */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?ExampleScenarioProcess $process = null,
         /** @var CanonicalPrimitive|null workflow Step is nested workflow */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ExampleScenario'])]
         public ?CanonicalPrimitive $workflow = null,
         /** @var ExampleScenarioProcessStepOperation|null operation Step is simple action */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ExampleScenarioProcessStepOperation $operation = null,
         /** @var array<ExampleScenarioProcessStepAlternative> alternative Alternate non-typical step action */
         #[FhirProperty(
@@ -61,6 +62,7 @@ class ExampleScenarioProcessStep extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario\ExampleScenarioProcessStepAlternative',
         )]
+        #[Valid]
         public array $alternative = [],
         /** @var bool|null pause Pause in the flow? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

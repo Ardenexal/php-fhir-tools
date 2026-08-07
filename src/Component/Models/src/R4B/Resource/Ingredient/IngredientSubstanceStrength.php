@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RatioRange;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The quantity of substance in the unit of presentation, or in the volume (or mass) of the single pharmaceutical product or manufactured item. The allowed repetitions do not represent different strengths, but are different representations - mathematically equivalent - of a single strength.
@@ -88,6 +89,7 @@ class IngredientSubstanceStrength extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $country = [],
         /** @var array<IngredientSubstanceStrengthReferenceStrength> referenceStrength Strength expressed in terms of a reference substance */
         #[FhirProperty(
@@ -96,6 +98,7 @@ class IngredientSubstanceStrength extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Ingredient\IngredientSubstanceStrengthReferenceStrength',
         )]
+        #[Valid]
         public array $referenceStrength = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);
