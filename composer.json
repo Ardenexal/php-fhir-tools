@@ -32,6 +32,7 @@
         "nette/php-generator": "^4.2.1",
         "psr/cache": "^3.0",
         "psr/http-client": "^1.0",
+        "seld/jsonlint": "^1.12",
         "symfony/config": "^6.4|^7.4",
         "symfony/console": "^6.4|^7.4",
         "symfony/dependency-injection": "^6.4|^7.4",

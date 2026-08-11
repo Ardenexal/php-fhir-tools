@@ -15,7 +15,7 @@
     "outcome": {
         "errors": {
             "deserialization": [
-                "(root) — Unable to detect target class from data"
+                "(root) — Unable to parse XML: xmlParseCharRef: invalid xmlChar value 19 at line 4 column 42"
             ]
         },
         "suppressedErrors": {},

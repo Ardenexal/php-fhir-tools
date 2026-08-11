@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRComplexTypeXm
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRPrimitiveTypeXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRResourceXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Xml\XmlNamespacePrefixResolver;
+use Seld\JsonLint\JsonParser;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Serializer;
@@ -297,7 +298,14 @@ class FHIRSerializationService
             return 'xml';
         }
 
-        throw new FHIRSerializationException('Unable to detect data format');
+        // Neither shape matched. Show what it actually started with — "Unable to detect data format"
+        // alone is unactionable, and the common real causes (a leading JSON comment, an HTML error
+        // page returned by a server, a stray log line) are all obvious the moment the bytes are shown.
+        if ($trimmed === '') {
+            throw new FHIRSerializationException('Unable to detect data format: input is empty');
+        }
+
+        throw new FHIRSerializationException(sprintf('Unable to detect data format: expected JSON (starting "{" or "[") or XML (starting "<"), got %s', var_export(mb_strimwidth($trimmed, 0, 40, '…'), true)));
     }
 
     /**
@@ -324,6 +332,61 @@ class FHIRSerializationService
     }
 
     /**
+     * Describe why a JSON payload failed to parse, with a position.
+     *
+     * `json_last_error_msg()` returns a bare "Syntax error" carrying no line, no column and no
+     * context, which is not enough to locate the problem in a large Bundle or to attach a validation
+     * violation to an element. seld/jsonlint reports the line, a caret column and the expected tokens.
+     * It is a hard dependency of this package, but the lint result is still treated as best-effort:
+     * a linter that finds nothing must not turn a real parse failure into an empty message.
+     */
+    private function describeJsonParseFailure(string $data): string
+    {
+        $fallback = json_last_error_msg();
+
+        try {
+            $lintError = (new JsonParser())->lint($data);
+        } catch (\Throwable) {
+            // The linter is a diagnostic aid; never let it replace the failure it was asked to explain.
+            return $fallback;
+        }
+
+        $message = $lintError?->getMessage();
+
+        return $message === null || trim($message) === '' ? $fallback : $message;
+    }
+
+    /**
+     * Describe why an XML payload failed to parse, with a position.
+     *
+     * Deliberately no extra dependency: libxml already produces messages and line/column pairs that
+     * match the HL7 Java reference validator's own output closely (e.g. "Entity 'reg' not defined"
+     * at line 6 column 916, against Java's "The entity "reg" was referenced, but not declared."
+     * at [6,916]). The errors were simply being discarded rather than reported.
+     */
+    private function describeXmlParseFailure(string $data): string
+    {
+        $previousErrorState = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
+        try {
+            $document = new \DOMDocument();
+            $document->loadXML($data, \LIBXML_NONET);
+            $errors = libxml_get_errors();
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousErrorState);
+        }
+
+        $first = $errors[0] ?? null;
+        if ($first === null) {
+            return 'malformed XML';
+        }
+
+        return sprintf('%s at line %d column %d', trim($first->message), $first->line, $first->column);
+    }
+
+    /**
      * Detect the target class from the data content.
      *
      * Delegates to FHIRTypeResolver so that profile-based resolution (via meta.profile) and
@@ -337,15 +400,26 @@ class FHIRSerializationService
 
         if ($format === 'json') {
             $decoded = json_decode($data, true);
+
+            // A parse failure here is not "we could not identify the resource" — it is "this is not
+            // JSON", and reporting the former discards the only diagnostic the caller can act on.
+            // The encoder's detailed errors never reach this path, because deserialize() resolves the
+            // target class before handing anything to the serializer.
+            if (json_last_error() !== \JSON_ERROR_NONE) {
+                throw new FHIRSerializationException(sprintf('Unable to parse JSON: %s', $this->describeJsonParseFailure($data)));
+            }
+
             if (!is_array($decoded)) {
                 $decoded = null;
             }
         } elseif ($format === 'xml') {
             // Strip DOCTYPE to prevent XXE, then extract the root element name
             $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NOERROR);
-            if ($xml !== false) {
-                $decoded = ['resourceType' => $xml->getName()];
+            if ($xml === false) {
+                throw new FHIRSerializationException(sprintf('Unable to parse XML: %s', $this->describeXmlParseFailure($data)));
             }
+
+            $decoded = ['resourceType' => $xml->getName()];
         }
 
         if ($decoded !== null) {

@@ -15,7 +15,7 @@
     "outcome": {
         "errors": {
             "deserialization": [
-                "(root) — Unable to detect target class from data"
+                "(root) — Unable to parse JSON: Parse error on line 1:\n{\r  resourceType : \"Pati\n---^\nExpected one of: 'STRING', '}'"
             ]
         },
         "suppressedErrors": {},

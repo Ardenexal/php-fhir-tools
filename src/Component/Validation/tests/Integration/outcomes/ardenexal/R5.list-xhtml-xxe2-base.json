@@ -15,7 +15,7 @@
     "outcome": {
         "errors": {
             "deserialization": [
-                "(root) — Unable to detect target class from data"
+                "(root) — Unable to parse XML: StartTag: invalid element name at line 6 column 9"
             ]
         },
         "suppressedErrors": {},

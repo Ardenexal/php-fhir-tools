@@ -15,7 +15,7 @@
     "outcome": {
         "errors": {
             "deserialization": [
-                "(root) — Unable to detect target class from data"
+                "(root) — Unable to parse XML: Input is not proper UTF-8, indicate encoding !\nBytes: 0x81 0x79 0x93 0xFC at line 15 column 16"
             ]
         },
         "suppressedErrors": {},
