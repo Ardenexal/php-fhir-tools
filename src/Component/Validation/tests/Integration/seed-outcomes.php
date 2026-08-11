@@ -32,6 +32,25 @@ declare(strict_types=1);
  *     }
  *   }
  *
+ * A case the deserializer rejected carries an extra `unread` block and `errorCount: 0`:
+ *
+ *   {
+ *     "errorCount": 0, "warningCount": 0, "infoCount": 0,
+ *     "unread": { "javaErrorCount": 108, "javaWarningCount": 0, "failure": "Unable to parse XML: …" },
+ *     "java": { …, "classification": "BELOW" },
+ *     "outcome": { "errors": { "deserialization": ["(root) — …"] }, … }
+ *   }
+ *
+ * The count is 0 because we produced no validation report at all — the document was never read. It was
+ * `1` until 2026-08-11, which is the F8 trap in miniature: 1 coincidentally equals Java's count on the
+ * many fixtures with exactly one error, so the file recorded `classification: EQUAL` and a capability
+ * gap read as agreement. At 0, an unread case can record EQUAL only when Java is also 0.
+ *
+ * FHIRValidatorSpecificationTest asserts on the *presence* of `unread`, in both directions: a case that
+ * starts parsing fails until re-seeded, and a case that stops parsing fails as a regression. Neither
+ * was detectable before — the R4 path asserted `errorCount >= 1` against the seed file itself (which
+ * cannot observe our behaviour at all) and R4B/R5 called markTestSkipped.
+ *
  * The `suppressed*` keys are the point of the `outcome` block: isKnownGap() removes those violations
  * from the counts entirely, so without listing them a reviewer cannot tell a genuinely clean case from
  * one whose findings were filtered away. A count that reads right for the wrong reason is the failure
@@ -74,6 +93,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConst
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
@@ -164,30 +184,81 @@ foreach ($cases as $name => $case) {
 
     try {
         $resource = $serial->deserialize($data);
-    } catch (Throwable $e) {
-        // Deserializer threw (bad format, bad XML, bad JSON, etc.).
-        // If Java also expects errors, seed errorCount=1 so the spec test asserts
-        // rather than staying Incomplete. If Java expects 0 errors (e.g. allow-comments
-        // JSON5 that we can't parse), leave unseeded so the test stays Incomplete.
-        $javaOutcome    = $javaReader->read($case);
-        $javaErrorCount = $javaOutcome?->errorCount;
-        if ($javaErrorCount === null || $javaErrorCount === 0) {
-            echo "  SKIP (deserialize, java-clean) {$name}: {$e->getMessage()}\n";
-            ++$skipped;
-            continue;
-        }
+    } catch (FHIRConformanceViolationException $e) {
+        // Read, understood, rejected on a stated FHIR rule. This IS a finding — `bundle-dual-subject`
+        // emits `Composition.subject: max allowed = 1, but found 2`, which is the reference validator's
+        // error verbatim — so it is seeded as one error and compared normally. It is deliberately NOT
+        // marked `unread`: filing a correct, Java-matching result under "we could not read this" made it
+        // count 0 and read as a BELOW gap.
+        $javaOutcome = $javaReader->read($case);
 
-        // Same shape as the validated cases, so every file can be read the same way. There is no
-        // validation report here — the payload never became a resource — so the single error is the
-        // parse failure itself, and recording its message is what makes the file reviewable.
         $outcome = json_encode([
             'errorCount'   => 1,
             'warningCount' => 0,
             'infoCount'    => 0,
-            // Java's counts for the same case. On a parse failure this is the most valuable place for
-            // them: our single error is "we could not read the document", so a Java errorCount above 1
-            // says the document is readable and we are missing checks, not that the fixture is invalid.
             'java'         => javaBlock($javaOutcome, ourErrorCount: 1, ourWarningCount: 0),
+            'outcome'      => [
+                // Keyed as the finding it is, not as `deserialization`, which would perpetuate exactly
+                // the confusion this split removes.
+                'errors'             => (object) ['conformance:deserialization' => ['(root) — ' . $e->finding]],
+                'suppressedErrors'   => (object) [],
+                'warnings'           => (object) [],
+                'suppressedWarnings' => (object) [],
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+
+        $outFile = OUTCOMES_DIR . '/' . $outcomePrefix . '.' . sanitizeName($name) . '-base.json';
+        if (file_put_contents($outFile, $outcome) !== false) {
+            ++$written;
+        } else {
+            echo "  ERROR writing {$name}\n";
+            ++$errors;
+        }
+
+        continue;
+    } catch (Throwable $e) {
+        // Deserializer threw (bad format, bad XML, bad JSON, etc.). The payload never became a
+        // resource, so there is no validation report and no count of ours to compare.
+        //
+        // Every parse failure is seeded, including ones Java considers clean. Leaving those unseeded
+        // (the previous rule) made them markTestIncomplete, invisible to a grep for '"deserialization"',
+        // and reconcilable only against the harness — three ways for the same class to hide.
+        $javaOutcome = $javaReader->read($case);
+
+        // No resolvable oracle means FHIRValidatorSpecificationTest's data provider drops the case
+        // entirely (search: `resolveJavaErrorCount`), so a seed file here would be read by nothing.
+        // This is NOT the old "java-clean" skip being reinstated: an oracle reporting zero errors is a
+        // real result and is seeded. This is "no oracle exists at all", which the docblock above warns
+        // must never be collapsed with it. `ex-pat` is the live example — its manifest declares
+        // `java/R4.ex-pat-base.json` while the file on disk is `R5.ex-pat-base.json`, so all three
+        // instruments drop it for different reasons (harness: NoOracle; provider: excluded; here: this).
+        if ($javaOutcome === null) {
+            echo "  SKIP (deserialize, no oracle — case is not in the spec suite) {$name}: {$e->getMessage()}\n";
+            ++$skipped;
+            continue;
+        }
+
+        // errorCount is 0, NOT 1. We did not find one error; we found none, because we never read the
+        // document. The old `errorCount: 1` was the F8 trap in its purest form: it coincidentally equals
+        // Java's count on the many fixtures with exactly one error, so the file recorded
+        // `classification: EQUAL` and a real capability gap read as agreement. With 0, an unread case
+        // can only ever record EQUAL when Java is also 0 — the coincidence is structurally impossible.
+        //
+        // The `unread` block is what the spec test asserts on. It states plainly that this file
+        // describes a document we could not read, so the counts above are not a comparison.
+        $outcome = json_encode([
+            'errorCount'   => 0,
+            'warningCount' => 0,
+            'infoCount'    => 0,
+            'unread'       => [
+                'javaErrorCount'   => $javaOutcome?->errorCount   ?? 0,
+                'javaWarningCount' => $javaOutcome?->warningCount ?? 0,
+                // Recorded for review, deliberately NOT asserted: the test re-deserializes at run time
+                // and compares presence, not wording. Parse-error messages are upstream text (jsonlint,
+                // libxml) and must be free to improve without turning the suite red.
+                'failure'          => $e->getMessage(),
+            ],
+            'java'         => javaBlock($javaOutcome, ourErrorCount: 0, ourWarningCount: 0),
             'outcome'      => [
                 'errors'             => (object) ['deserialization' => ['(root) — ' . $e->getMessage()]],
                 'suppressedErrors'   => (object) [],

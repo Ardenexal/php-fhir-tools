@@ -1,12 +1,17 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 1,
+        "javaWarningCount": 0,
+        "failure": "Unable to parse XML: StartTag: invalid element name at line 6 column 9"
+    },
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "EQUAL",
+        "classification": "BELOW",
         "warningClassification": "EQUAL",
         "errors": [
             "org.xml.sax.SAXException: Scanner State 24 not Recognized "

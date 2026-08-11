@@ -1,7 +1,12 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 3,
+        "javaWarningCount": 0,
+        "failure": "Unable to parse JSON: Parse error on line 8:\n...    \"Sarah\",\r      ]\r    }\r  ],\r  \"g\n---------------------^\nExpected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '[' - It appears you have an extra trailing comma"
+    },
     "java": {
         "errorCount": 3,
         "warningCount": 0,

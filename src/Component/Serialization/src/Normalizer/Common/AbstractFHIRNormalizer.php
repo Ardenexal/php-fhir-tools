@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
@@ -906,7 +907,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return;
         }
 
-        throw FHIRSerializationException::formatError('xml', sprintf('%s.%s: max allowed = 1, but found %d', self::shortTypeName($ownerType), $elementName, count($value)));
+        throw FHIRConformanceViolationException::inFormat('xml', sprintf('%s.%s: max allowed = 1, but found %d', self::shortTypeName($ownerType), $elementName, count($value)));
     }
 
     /**
@@ -936,7 +937,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return;
         }
 
-        throw FHIRSerializationException::formatError('json', sprintf('The property %s must be a JSON Array, not an Object (at %s)', $elementName, self::shortTypeName($ownerType)));
+        throw FHIRConformanceViolationException::inFormat('json', sprintf('The property %s must be a JSON Array, not an Object (at %s)', $elementName, self::shortTypeName($ownerType)));
     }
 
     private static function shortTypeName(string $fqcn): string

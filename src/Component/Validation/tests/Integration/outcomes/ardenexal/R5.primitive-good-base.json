@@ -1,7 +1,12 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 3,
+        "javaWarningCount": 2,
+        "failure": "Failed to deserialize XML to FHIR object: Expected Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRDateTime string, got invalid value: 2013-01-01T12:59:60+10:00"
+    },
     "java": {
         "errorCount": 3,
         "warningCount": 2,

@@ -16,8 +16,8 @@
     },
     "outcome": {
         "errors": {
-            "deserialization": [
-                "(root) — Failed to deserialize JSON to FHIR object: Format error (json): The property reasonCode must be a JSON Array, not an Object (at Encounter)"
+            "conformance:deserialization": [
+                "(root) — The property reasonCode must be a JSON Array, not an Object (at Encounter)"
             ]
         },
         "suppressedErrors": {},

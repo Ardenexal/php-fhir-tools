@@ -1,12 +1,17 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 1,
+        "javaWarningCount": 0,
+        "failure": "Unable to parse JSON: Parse error on line 14:\n...stopher\"]          ]         ]      }\n---------------------^\nExpected one of: '}', ','"
+    },
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "EQUAL",
+        "classification": "BELOW",
         "warningClassification": "EQUAL",
         "errors": [
             "Error parsing JSON: Error parsing JSON source: Unexpected close marker ']'. Expected '}' at Line 15 (path=[//entry[]/entry/resource/name[]/name/given[]Christopher])"

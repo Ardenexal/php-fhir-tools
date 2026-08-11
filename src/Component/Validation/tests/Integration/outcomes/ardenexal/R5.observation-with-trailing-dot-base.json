@@ -1,12 +1,17 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 1,
+        "javaWarningCount": 1,
+        "failure": "Unable to parse JSON: Parse error on line 22:\n...        \"value\": 925.,        \"unit\": \"\n----------------------^\nExpected one of: 'EOF', '}', ',', ']'"
+    },
     "java": {
         "errorCount": 1,
         "warningCount": 1,
         "infoCount": 0,
-        "classification": "EQUAL",
+        "classification": "BELOW",
         "warningClassification": "BELOW",
         "errors": [
             "The value '925.' is not a valid decimal"

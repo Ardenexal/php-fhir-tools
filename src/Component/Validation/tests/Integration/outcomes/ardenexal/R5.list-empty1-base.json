@@ -1,7 +1,12 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 2,
+        "javaWarningCount": 0,
+        "failure": "Failed to deserialize XML to FHIR object: Could not denormalize object of type \"Ardenexal\\FHIRTools\\Component\\Models\\R5\\Resource\\List\\ListEntry\", no supporting normalizer found."
+    },
     "java": {
         "errorCount": 2,
         "warningCount": 0,

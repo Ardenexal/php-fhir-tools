@@ -1,21 +1,24 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 0,
+        "javaWarningCount": 0,
+        "failure": "Unable to detect target class from data"
+    },
     "java": {
-        "errorCount": 1,
+        "errorCount": 0,
         "warningCount": 0,
         "infoCount": 0,
         "classification": "EQUAL",
         "warningClassification": "EQUAL",
-        "errors": [
-            "Composition.subject: max allowed = 1, but found 2 (from http://hl7.org/fhir/StructureDefinition/Composition|4.0.1)"
-        ]
+        "errors": []
     },
     "outcome": {
         "errors": {
-            "conformance:deserialization": [
-                "(root) — Composition.subject: max allowed = 1, but found 2"
+            "deserialization": [
+                "(root) — Unable to detect target class from data"
             ]
         },
         "suppressedErrors": {},

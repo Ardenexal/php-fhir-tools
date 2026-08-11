@@ -1,12 +1,17 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 1,
+        "javaWarningCount": 0,
+        "failure": "Unable to detect data format: expected JSON (starting \"{\" or \"[\") or XML (starting \"<\"), got '// example with comments\r\n{\r\n  \"resourc…'"
+    },
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "EQUAL",
+        "classification": "BELOW",
         "warningClassification": "EQUAL",
         "errors": [
             "Comments are not allowed in JSON"

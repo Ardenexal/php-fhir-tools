@@ -1,12 +1,17 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 1,
+        "javaWarningCount": 0,
+        "failure": "Unable to detect target class from data"
+    },
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "EQUAL",
+        "classification": "BELOW",
         "warningClassification": "EQUAL",
         "errors": []
     },

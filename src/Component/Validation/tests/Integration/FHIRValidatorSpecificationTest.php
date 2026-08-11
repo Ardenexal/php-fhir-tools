@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
@@ -192,20 +193,17 @@ final class FHIRValidatorSpecificationTest extends TestCase
 
         try {
             $resource = $this->serialization->deserialize($data);
-        } catch (\Throwable) {
-            // Deserializer threw (bad format, bad XML, bad JSON, etc.).
-            // Our seeded outcome has errorCount=1; assert it is ≥ 1 and stop — no
-            // resource to validate. Cases without a seeded outcome are already
-            // markTestIncomplete above. json-comments-yes cases are not seeded because
-            // Java considers them valid (allow-comments=true); they remain Incomplete.
-            self::assertGreaterThanOrEqual(
-                1,
-                $expected['errorCount'],
-                "Seeded outcome for parse-failing case '{$name}' must have errorCount ≥ 1",
-            );
+        } catch (FHIRConformanceViolationException $e) {
+            self::assertConformanceViolationIsSeededAsAFinding($expected, $name, $e);
+
+            return;
+        } catch (\Throwable $e) {
+            self::assertCaseIsSeededAsUnread($expected, $name, $e);
 
             return;
         }
+
+        self::assertCaseIsNotSeededAsUnread($expected, $name);
 
         try {
             $report = $this->service->validate($resource);
@@ -317,9 +315,17 @@ final class FHIRValidatorSpecificationTest extends TestCase
 
         try {
             $resource = $this->serializationR4B->deserialize($data);
+        } catch (FHIRConformanceViolationException $e) {
+            self::assertConformanceViolationIsSeededAsAFinding($expected, "R4B {$name}", $e);
+
+            return;
         } catch (\Throwable $e) {
-            $this->markTestSkipped("Deserialization failed for R4B {$name}: {$e->getMessage()}");
+            self::assertCaseIsSeededAsUnread($expected, "R4B {$name}", $e);
+
+            return;
         }
+
+        self::assertCaseIsNotSeededAsUnread($expected, "R4B {$name}");
 
         try {
             $report = $this->service->validate($resource);
@@ -433,9 +439,17 @@ final class FHIRValidatorSpecificationTest extends TestCase
 
         try {
             $resource = $this->serializationR5->deserialize($data);
+        } catch (FHIRConformanceViolationException $e) {
+            self::assertConformanceViolationIsSeededAsAFinding($expected, "R5 {$name}", $e);
+
+            return;
         } catch (\Throwable $e) {
-            $this->markTestSkipped("Deserialization failed for R5 {$name}: {$e->getMessage()}");
+            self::assertCaseIsSeededAsUnread($expected, "R5 {$name}", $e);
+
+            return;
         }
+
+        self::assertCaseIsNotSeededAsUnread($expected, "R5 {$name}");
 
         try {
             $report = $this->serviceR5->validate($resource);
@@ -456,6 +470,96 @@ final class FHIRValidatorSpecificationTest extends TestCase
             $expected['warningCount'],
             count($realWarnings),
             "Unexpected warning count for R5 '{$name}'",
+        );
+    }
+
+    /**
+     * A conformance rejection is a finding, so it is asserted like one — never as an unread document.
+     *
+     * The deserializer raises these when the document is readable but breaks a stated FHIR rule that
+     * the generated model physically cannot hold (a `0..1` element supplied twice, a `0..*` element
+     * supplied as a JSON object). `bundle-dual-subject` produces
+     * `Composition.subject: max allowed = 1, but found 2` — the reference validator's error verbatim.
+     *
+     * Treating that as unread counted it 0 and recorded `classification: BELOW`, so a correct result
+     * that agrees with Java exactly was scored as a gap. It counts 1, and it is compared.
+     *
+     * @param array<string, mixed> $expected the seeded outcome file
+     */
+    private static function assertConformanceViolationIsSeededAsAFinding(
+        array $expected,
+        string $name,
+        FHIRConformanceViolationException $violation,
+    ): void {
+        self::assertArrayNotHasKey(
+            'unread',
+            $expected,
+            sprintf(
+                "'%s' is seeded as unread, but the deserializer rejected it on a stated FHIR rule (%s). "
+                . 'That is a finding, not an unreadable document — re-run seed-outcomes.php.',
+                $name,
+                $violation->finding,
+            ),
+        );
+
+        self::assertSame(
+            1,
+            $expected['errorCount'] ?? null,
+            sprintf("Conformance rejection '%s' must be seeded as exactly one error", $name),
+        );
+    }
+
+    /**
+     * A case we could not read must be seeded as unread — and one seeded as unread must still be unread.
+     *
+     * These two assertions replaced three different non-assertions for the same situation, one per
+     * version. R4 asserted `errorCount >= 1` against the seeded file, comparing two values that both
+     * came from the seed and therefore observing our behaviour not at all — the only way to fail it was
+     * to edit the fixture. R4B and R5 called `markTestSkipped`. So a case that regressed from readable
+     * to unreadable passed silently in every version: the deserializer breaking on a document it used
+     * to handle was invisible to the suite that exists to catch exactly that.
+     *
+     * Presence is asserted, never the message. The seeder records the failure text for review, but the
+     * test re-deserializes at run time and parse-error wording comes from upstream (jsonlint, libxml);
+     * pinning it would turn every diagnostic improvement into a red suite.
+     *
+     * @param array<string, mixed> $expected the seeded outcome file
+     */
+    private static function assertCaseIsSeededAsUnread(array $expected, string $name, \Throwable $failure): void
+    {
+        self::assertArrayHasKey(
+            'unread',
+            $expected,
+            sprintf(
+                "REGRESSION: '%s' is seeded as readable (errorCount %s) but the deserializer now rejects it: %s. "
+                . 'Losing the ability to read a document is a defect, not something to re-seed away.',
+                $name,
+                var_export($expected['errorCount'] ?? null, true),
+                $failure->getMessage(),
+            ),
+        );
+    }
+
+    /**
+     * A case seeded as unread that now parses is progress — but the seed is stale until re-run.
+     *
+     * This is the direction that already worked in practice: when the XML-comment fix made ~19 cases
+     * parse for the first time, their seeded counts stopped matching and the suite went red, which is
+     * what prompted the re-seed. Asserting it explicitly means the signal no longer depends on the new
+     * count happening to differ from the old one.
+     *
+     * @param array<string, mixed> $expected the seeded outcome file
+     */
+    private static function assertCaseIsNotSeededAsUnread(array $expected, string $name): void
+    {
+        self::assertArrayNotHasKey(
+            'unread',
+            $expected,
+            sprintf(
+                "'%s' is seeded as unread but now deserializes successfully. This is an improvement — "
+                . 're-run seed-outcomes.php and review the diff.',
+                $name,
+            ),
         );
     }
 

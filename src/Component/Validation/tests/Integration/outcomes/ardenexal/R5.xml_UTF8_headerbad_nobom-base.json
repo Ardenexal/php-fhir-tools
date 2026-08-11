@@ -1,7 +1,12 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 2,
+        "javaWarningCount": 0,
+        "failure": "Unable to parse XML: Document labelled UTF-16 but has UTF-8 content at line 1 column 38"
+    },
     "java": {
         "errorCount": 2,
         "warningCount": 0,

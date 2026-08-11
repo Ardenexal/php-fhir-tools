@@ -1,12 +1,17 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 1,
+        "javaWarningCount": 0,
+        "failure": "Unable to parse XML: Input is not proper UTF-8, indicate encoding !\nBytes: 0x81 0x79 0x93 0xFC at line 15 column 16"
+    },
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "EQUAL",
+        "classification": "BELOW",
         "warningClassification": "EQUAL",
         "errors": [
             "An invalid XML character (Unicode: 0xb) was found in the element content of the document."

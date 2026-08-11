@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
 
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
@@ -120,6 +121,22 @@ final class ComparisonHarness
     ): ?CaseComparison {
         try {
             $resource = $this->serialization->deserialize($data);
+        } catch (FHIRConformanceViolationException $e) {
+            // Read, understood, and rejected on a stated FHIR rule — a finding, not an unread document.
+            // Counting it 0 and filing it under UNREAD made a correct, Java-matching result read as a
+            // BELOW gap: `bundle-dual-subject` emits `Composition.subject: max allowed = 1, but found 2`,
+            // which is Java's error verbatim. It belongs in the comparison set with exactly one error.
+            return new CaseComparison(
+                name: $name,
+                ourErrorCount: 1,
+                ourErrorCountUnfiltered: 1,
+                ourWarningCount: 0,
+                javaErrorCount: $javaOutcome->errorCount,
+                javaWarningCount: $javaOutcome->warningCount,
+                ourErrorMessages: [$e->finding],
+                families: ['conformance:deserialization'],
+                javaErrorTexts: $javaOutcome->errorTexts,
+            );
         } catch (\Throwable $e) {
             $this->recordUnread($name, $javaOutcome, $e->getMessage(), $skips, $unread);
 

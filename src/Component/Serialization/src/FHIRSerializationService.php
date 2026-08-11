@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistryFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
@@ -177,6 +178,13 @@ class FHIRSerializationService
 
             /** @var T $result */
             return $result;
+        } catch (FHIRConformanceViolationException $e) {
+            // Pass through unwrapped. This already states the FHIR rule that was broken, in the
+            // reference validator's own wording, and wrapping it would both bury that behind a generic
+            // prefix and replace the exception type — leaving nothing able to tell "this document
+            // breaks a FHIR rule" from "this document is unreadable". The conformance oracle counts the
+            // first as a finding and the second as UNREAD, so the distinction has to survive.
+            throw $e;
         } catch (\Exception $e) {
             throw new FHIRSerializationException(sprintf('Failed to deserialize JSON to FHIR object: %s', $e->getMessage()), 0, $e);
         }
@@ -233,6 +241,9 @@ class FHIRSerializationService
 
             /** @var T $result */
             return $result;
+        } catch (FHIRConformanceViolationException $e) {
+            // See deserializeFromJson(): a conformance violation must keep its type and its message.
+            throw $e;
         } catch (\Exception $e) {
             throw new FHIRSerializationException(sprintf('Failed to deserialize XML to FHIR object: %s', $e->getMessage()), 0, $e);
         }

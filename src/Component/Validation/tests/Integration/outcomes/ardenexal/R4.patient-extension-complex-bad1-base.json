@@ -1,7 +1,12 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 2,
+        "javaWarningCount": 0,
+        "failure": "Failed to deserialize XML to FHIR object: Format error (xml): Required sub-extension \"species\" not found or type mismatch in Ardenexal\\FHIRTools\\Component\\Models\\R4\\Extension\\PatAnimalExtension::fromSubExtensions()"
+    },
     "java": {
         "errorCount": 2,
         "warningCount": 0,

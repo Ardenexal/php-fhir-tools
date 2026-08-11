@@ -17,8 +17,8 @@
     },
     "outcome": {
         "errors": {
-            "deserialization": [
-                "(root) — Failed to deserialize JSON to FHIR object: Format error (json): The property subject must be a JSON Array, not an Object (at List)"
+            "conformance:deserialization": [
+                "(root) — The property subject must be a JSON Array, not an Object (at List)"
             ]
         },
         "suppressedErrors": {},
