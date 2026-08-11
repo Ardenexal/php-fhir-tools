@@ -1,5 +1,40 @@
 {
     "errorCount": 3,
     "warningCount": 2,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 5,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "ABOVE",
+        "errors": [
+            "ElementDefinition.slicing.discriminator.path: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/ElementDefinition|4.0.1)",
+            "ElementDefinition.slicing.discriminator.path: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/ElementDefinition|4.0.1)",
+            "Error generating Snapshot: Unknown DiscriminatorType code 'expression' (this usually arises from a problem in the differential)",
+            "The System URI could not be determined for the code 'expression' in the ValueSet 'http://hl7.org/fhir/ValueSet/discriminator-type|4.0.1'",
+            "The value provided ('expression') was not found in the value set 'DiscriminatorType' (http://hl7.org/fhir/ValueSet/discriminator-type|4.0.1), and a code is required from this value set  (error message = The System URI could not be determined for the code 'expression' in the ValueSet 'http://hl7.org/fhir/ValueSet/discriminator-type|4.0.1'; The provided code '#expression' was not found in the value set 'http://hl7.org/fhir/ValueSet/discriminator-type|4.0.1')"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:FHIRValueSetBinding": [
+                "differential.element[0].slicing.discriminator[0].type — The value expression is not a valid case of value set http://hl7.org/fhir/ValueSet/discriminator-type|4.0.1."
+            ],
+            "constraint:NotBlank": [
+                "differential.element[0].slicing.discriminator[0].path — This value should not be blank.",
+                "differential.element[0].slicing.discriminator[1].path — This value should not be blank."
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "differential.element[0].slicing.rules — Required binding for value set http://hl7.org/fhir/ValueSet/resource-slicing-rules|4.0.1 could not be validated: no enum class generated."
+            ],
+            "invariant:sdf-0": [
+                "(root) — Name should be usable as an identifier for the module by machine processing applications such as code generation"
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

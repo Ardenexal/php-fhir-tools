@@ -1,5 +1,26 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 6,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "The element code is present in the instance but not allowed in the applicable fixed value specified in profile",
+            "The element system is present in the instance but not allowed in the applicable fixed value specified in profile",
+            "The element text is present in the instance but not allowed in the applicable fixed value specified in profile",
+            "The element unit is present in the instance but not allowed in the applicable fixed value specified in profile",
+            "Value is '13457-7' but is fixed to '35200-5' in the profile http://hl7.org/fhir/StructureDefinition/cholesterol|5.0.0#Observation",
+            "Value is 'Cholesterol in LDL [Mass/volume] in Serum or Plasma by calculation' but is fixed to 'Cholesterol [Moles/​volume] in Serum or Plasma' in the profile http://hl7.org/fhir/StructureDefinition/cholesterol|5.0.0#Observation"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

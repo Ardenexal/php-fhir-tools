@@ -1,5 +1,25 @@
 {
     "errorCount": 0,
     "warningCount": 1,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "ABOVE",
+        "errors": [
+            "When the SearchParameter has a type of 'composite', then the SearchParameter must define two or more components"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "base — Required binding for value set http://hl7.org/fhir/ValueSet/resource-types|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

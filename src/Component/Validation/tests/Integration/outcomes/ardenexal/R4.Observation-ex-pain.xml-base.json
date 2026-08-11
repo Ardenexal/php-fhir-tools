@@ -1,5 +1,29 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 5,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: ele-1: 'All FHIR elements must have a @value or children' (defined in http://hl7.org/fhir/StructureDefinition/Element)",
+            "Observation.code: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/Observation|4.0.1)",
+            "Primitive types must have a value or must have child extensions",
+            "Undefined attribute '@something' on status for type code",
+            "Undefined element 'value' at /f:Observation/f:valueInteger"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotBlank": [
+                "code — This value should not be blank."
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

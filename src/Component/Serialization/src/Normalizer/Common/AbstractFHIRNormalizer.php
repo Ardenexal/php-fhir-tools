@@ -879,6 +879,83 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /**
      * Unwrap a FHIR XML value encoded as ['@value' => '...', '#' => ''] by Symfony's XmlEncoder.
      */
+    /**
+     * Reject a repeated XML element landing on a single-valued property.
+     *
+     * XML has no array syntax: repetition is expressed by repeating the element, so
+     * `<subject/><subject/>` decodes to a *list* while one `<subject/>` decodes to a map. A property
+     * the model declares as `0..1` therefore receives a list only when the document exceeds its
+     * maximum cardinality — `Composition.subject` is `0..1`, and `bundle-dual-subject.xml` supplies
+     * two.
+     *
+     * Without this guard the list reached the complex-type normalizer, whose element loop assumes
+     * string keys, and `str_starts_with(0, '@')` raised a `TypeError`. That surfaced as an opaque
+     * "Format error (xml)" naming neither the element nor the real problem — and because a failed
+     * deserialization is seeded as one error, it coincidentally matched the Java reference validator's
+     * single cardinality error and looked correct.
+     *
+     * The model cannot hold both values, so this is fatal for the document rather than something
+     * validation can report later. The message says which element and how many, mirroring Java's
+     * "max allowed = 1, but found 2".
+     *
+     * @throws FHIRSerializationException when $value repeats and the property cannot hold a list
+     */
+    protected static function assertSingleValuedElement(string $elementName, mixed $value, string $ownerType): void
+    {
+        if (!is_array($value) || !array_is_list($value) || count($value) < 2) {
+            return;
+        }
+
+        throw FHIRSerializationException::formatError('xml', sprintf('%s.%s: max allowed = 1, but found %d', self::shortTypeName($ownerType), $elementName, count($value)));
+    }
+
+    /**
+     * The FHIR type name for a generated class, for messages a reader can match against the spec.
+     *
+     * Prefers `#[FhirResource(type: …)]` / `#[FHIRDataType(type: …)]` over the PHP class name, so the
+     * message says `Composition.subject` rather than `CompositionResource.subject` and lines up with
+     * the reference validator's wording. Falls back to the short class name.
+     */
+    /**
+     * Reject a repeating element supplied as a JSON object instead of an array.
+     *
+     * FHIR JSON represents a `0..*` element as an array, always — even for a single occurrence. An
+     * object there is malformed, and the HL7 Java reference validator reports it as an error ("The
+     * property reasonCode must be a JSON Array, not an Object"), so accepting it leniently would make
+     * us pass documents the oracle rejects.
+     *
+     * The alternative is worse than a wrong answer: iterating the object walks its *fields* into the
+     * item normalizer, where an integer key reaches `str_starts_with()` and raises a `TypeError`
+     * reported only as an opaque "Format error (json)".
+     *
+     * @throws FHIRSerializationException when $value is an object rather than a list
+     */
+    protected static function assertRepeatingElementIsArray(string $elementName, mixed $value, string $ownerType): void
+    {
+        if (!is_array($value) || array_is_list($value)) {
+            return;
+        }
+
+        throw FHIRSerializationException::formatError('json', sprintf('The property %s must be a JSON Array, not an Object (at %s)', $elementName, self::shortTypeName($ownerType)));
+    }
+
+    private static function shortTypeName(string $fqcn): string
+    {
+        if (class_exists($fqcn)) {
+            $reflection = new \ReflectionClass($fqcn);
+            foreach ($reflection->getAttributes() as $attribute) {
+                $type = $attribute->getArguments()['type'] ?? null;
+                if (is_string($type) && $type !== '') {
+                    return $type;
+                }
+            }
+        }
+
+        $tail = strrchr($fqcn, '\\');
+
+        return $tail === false ? $fqcn : substr($tail, 1);
+    }
+
     protected function unwrapXmlValue(mixed $value, ?string $propertyType = null): mixed
     {
         if (is_array($value) && array_key_exists('@value', $value)) {

@@ -1,5 +1,27 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "The System URI could not be determined for the code 'completed' in the ValueSet 'http://hl7.org/fhir/ValueSet/encounter-status|4.0.1'",
+            "The property reasonCode must be a JSON Array, not an Object (at Encounter)",
+            "The value provided ('completed') was not found in the value set 'EncounterStatus' (http://hl7.org/fhir/ValueSet/encounter-status|4.0.1), and a code is required from this value set  (error message = The System URI could not be determined for the code 'completed' in the ValueSet 'http://hl7.org/fhir/ValueSet/encounter-status|4.0.1'; The provided code '#completed' was not found in the value set 'http://hl7.org/fhir/ValueSet/encounter-status|4.0.1')"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Failed to deserialize JSON to FHIR object: Format error (json): The property reasonCode must be a JSON Array, not an Object (at Encounter)"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

@@ -1,5 +1,25 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 8
+    "infoCount": 8,
+    "java": {
+        "errorCount": 5,
+        "warningCount": 8,
+        "infoCount": 4,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Constraint failed: vs-3: 'If there is no a value a data absent reason must be present'",
+            "Wrong Display Name 'Flow Rate' for http://loinc.org#3151-8. Valid display is one of 3 choices: 'Inhaled oxygen flow rate' (en-US), 'Inhaled oxygen flow rate' (en-US) or 'Inhaled O2 flow rate' (en-US) (for the language(s) 'en-US')",
+            "Wrong Display Name 'Flow Rate' for http://loinc.org#3151-8. Valid display is one of 3 choices: 'Inhaled oxygen flow rate' (en-US), 'Inhaled oxygen flow rate' (en-US) or 'Inhaled O2 flow rate' (en-US) (for the language(s) 'en-US')",
+            "Wrong Display Name 'O2 % BldC Oximetry' for http://loinc.org#59408-5. Valid display is one of 3 choices: 'Oxygen saturation in Arterial blood by Pulse oximetry' (en-US), 'Oxygen saturation in Arterial blood by Pulse oximetry' (en-US) or 'SaO2 % BldA PulseOx' (en-US) (for the language(s) 'en-US')",
+            "Wrong Display Name 'O2 % BldC Oximetry' for http://loinc.org#59408-5. Valid display is one of 3 choices: 'Oxygen saturation in Arterial blood by Pulse oximetry' (en-US), 'Oxygen saturation in Arterial blood by Pulse oximetry' (en-US) or 'SaO2 % BldA PulseOx' (en-US) (for the language(s) 'en-US')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

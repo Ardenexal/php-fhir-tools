@@ -1,5 +1,22 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 0,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "No code provided, and a code is required from the value set",
+            "No code provided, and a code is required from the value set"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

@@ -220,7 +220,11 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     } else {
                         $propertyType = $this->getPropertyType($property);
                         if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                            $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
+                            // Captured before the cardinality guard: that call is impure to PHPStan,
+                            // which would otherwise widen $this->denormalizer back to nullable.
+                            $denormalizer = $this->denormalizer;
+                            self::assertSingleValuedElement($elementName, $value, $resolvedType);
+                            $denormalizedValue = $denormalizer->denormalize($value, $propertyType, 'xml', $context);
                         } else {
                             $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
                             if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {

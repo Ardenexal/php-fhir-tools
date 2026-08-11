@@ -1,5 +1,34 @@
 {
     "errorCount": 3,
     "warningCount": 0,
-    "infoCount": 4
+    "infoCount": 4,
+    "java": {
+        "errorCount": 6,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "No match found for Patient.birthDate in the generated snapshot: check that the path and definitions are legal in the differential (including order)",
+            "StructureDefinition.abstract: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/StructureDefinition|4.0.1)",
+            "StructureDefinition.name: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/StructureDefinition|4.0.1)",
+            "StructureDefinition.status: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/StructureDefinition|4.0.1)",
+            "The profile http://example.org/other-patient-profile has 1 element in the differential (id: Patient.birthDate) that don't have a matching element in the snapshot: check that the path and definitions are legal in the differential (including order)",
+            "This element has a Binding but the types [date] do not make this kind of constraint relevant"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotBlank": [
+                "name — This value should not be blank.",
+                "status — This value should not be blank."
+            ],
+            "constraint:NotNull": [
+                "abstract — This value should not be null."
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

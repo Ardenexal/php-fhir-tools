@@ -1,5 +1,30 @@
 {
     "errorCount": 1,
     "warningCount": 1,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 1,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "If a date has a time, it must have a timezone",
+            "MedicationRequest.medication[x]: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/MedicationRequest|4.0.1)"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotBlank": [
+                "medication — This value should not be blank."
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "intent — Required binding for value set http://hl7.org/fhir/ValueSet/medicationrequest-intent|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

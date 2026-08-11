@@ -1,5 +1,24 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 4,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: ext-1: 'Must have either extensions or value[x], not both' (defined in http://hl7.org/fhir/StructureDefinition/Extension)",
+            "Unrecognized property 'fhir_comments'",
+            "Unrecognized property 'fhir_comments'",
+            "Unrecognized property 'valueCodeX'"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

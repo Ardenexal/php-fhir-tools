@@ -1,5 +1,21 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 6,
+        "infoCount": 3,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Duplicate Security Label http://test.org#x"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

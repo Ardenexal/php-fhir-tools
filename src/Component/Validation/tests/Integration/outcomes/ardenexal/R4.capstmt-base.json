@@ -1,5 +1,26 @@
 {
     "errorCount": 0,
     "warningCount": 2,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "ABOVE",
+        "errors": [
+            "Type mismatch - SearchParameter 'http://hl7.org/fhir/SearchParameter/AllergyIntolerance-clinical-status|4.0.1' type is token, but type here is date"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "format — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated.",
+                "rest[0].resource[0].type — Required binding for value set http://hl7.org/fhir/ValueSet/resource-types|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

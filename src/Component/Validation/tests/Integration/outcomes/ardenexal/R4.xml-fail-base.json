@@ -1,5 +1,33 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 9,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Invalid Resource id: Invalid Characters ('[%count%]')",
+            "Text should not be present ('[%endloop%]')",
+            "Text should not be present ('[%loop count=70%]')",
+            "The System URI could not be determined for the code '[%payloadFormat%]' in the ValueSet 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1'",
+            "The System URI could not be determined for the code '[%status%]' in the ValueSet 'http://hl7.org/fhir/ValueSet/endpoint-status|4.0.1'",
+            "The value provided ('[%payloadFormat%]') was not found in the value set 'MimeType' (http://hl7.org/fhir/ValueSet/mimetypes|4.0.1), and a code is required from this value set  (error message = The System URI could not be determined for the code '[%payloadFormat%]' in the ValueSet 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1'; The provided code '#[%payloadFormat%]' was not found in the value set 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1')",
+            "The value provided ('[%status%]') was not found in the value set 'EndpointStatus' (http://hl7.org/fhir/ValueSet/endpoint-status|4.0.1), and a code is required from this value set  (error message = The System URI could not be determined for the code '[%status%]' in the ValueSet 'http://hl7.org/fhir/ValueSet/endpoint-status|4.0.1'; The provided code '#[%status%]' was not found in the value set 'http://hl7.org/fhir/ValueSet/endpoint-status|4.0.1')",
+            "Undefined attribute '@xsi:schemaLocation' on Bundle for type Bundle",
+            "Undefined element 'coding' at Endpoint/f:connectionType"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Unable to detect data format"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

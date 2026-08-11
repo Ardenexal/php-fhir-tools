@@ -1,5 +1,27 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "A Comma is missing in the JSON",
+            "There is an extra comma at the end of the Array in the JSON",
+            "There is an extra comma at the end of the Object in the JSON"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Unable to detect target class from data"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

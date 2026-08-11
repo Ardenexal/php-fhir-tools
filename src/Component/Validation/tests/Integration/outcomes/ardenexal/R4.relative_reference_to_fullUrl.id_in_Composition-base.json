@@ -1,5 +1,21 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "The fullUrl 'http://zrbj.eu/x/Organization/666' looks like a RESTful server URL, but the resource has no id"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

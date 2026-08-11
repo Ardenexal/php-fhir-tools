@@ -1,5 +1,21 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 3,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The Extension 'http://hl7.org/fhir/1.0/StructureDefinition/extension-Patient.animal' must not be used as an extension (it's a modifierExtension)"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

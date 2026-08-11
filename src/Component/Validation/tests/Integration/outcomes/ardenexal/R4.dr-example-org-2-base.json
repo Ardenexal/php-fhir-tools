@@ -1,5 +1,23 @@
 {
     "errorCount": 0,
     "warningCount": 1,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "ABOVE",
+        "errors": []
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "content[0].attachment.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

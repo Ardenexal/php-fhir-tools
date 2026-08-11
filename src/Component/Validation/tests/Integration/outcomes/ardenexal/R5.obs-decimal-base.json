@@ -1,5 +1,23 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 7
+    "infoCount": 7,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 3,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Element value '-1.000000000000000000E+245' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'",
+            "Element value '1.000000000000000000E-24' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'",
+            "Element value '1000000000000000000' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

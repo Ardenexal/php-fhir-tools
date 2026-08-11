@@ -1,5 +1,22 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 3,
+        "infoCount": 2,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Sub-extension url 'x-breed' is not defined by the Extension http://hl7.org/fhir/1.0/StructureDefinition/extension-Patient.animal|4.0.1",
+            "The Extension 'http://hl7.org/fhir/1.0/StructureDefinition/extension-Patient.animal' must not be used as an extension (it's a modifierExtension)"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

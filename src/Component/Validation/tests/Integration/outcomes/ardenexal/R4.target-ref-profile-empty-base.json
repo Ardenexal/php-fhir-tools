@@ -1,5 +1,32 @@
 {
     "errorCount": 0,
     "warningCount": 1,
-    "infoCount": 5
+    "infoCount": 5,
+    "java": {
+        "errorCount": 8,
+        "warningCount": 8,
+        "infoCount": 6,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The extension http://fkcfhir.org/fhir/StructureDefinition/MedRequestPriorAuth could not be found so is not allowed here",
+            "The extension http://fkcfhir.org/fhir/StructureDefinition/MedRequestPriorAuthStart could not be found so is not allowed here",
+            "The extension http://fkcfhir.org/fhir/StructureDefinition/eCCOrderStatus could not be found so is not allowed here",
+            "The extension http://fkcfhir.org/fhir/StructureDefinition/eccStatusDate could not be found so is not allowed here",
+            "The extension http://fkcfhir.org/fhir/StructureDefinition/medEpisodeOfCare could not be found so is not allowed here",
+            "The extension http://fkcfhir.org/fhir/StructureDefinition/orderSource could not be found so is not allowed here",
+            "The extension http://fkcfhir.org/fhir/StructureDefinition/supplyBy could not be found so is not allowed here",
+            "Wrong Display Name 'Malignant neoplasm of pyriform sinus' for http://hl7.org/fhir/sid/icd-10#C12. Valid display is 'Malignant neoplasm of piriform sinus' (for the language(s) 'en-US')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "intent — Required binding for value set http://hl7.org/fhir/ValueSet/medicationrequest-intent|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

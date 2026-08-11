@@ -1,5 +1,30 @@
 {
     "errorCount": 2,
     "warningCount": 0,
-    "infoCount": 6
+    "infoCount": 6,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 4,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Constraint failed: exp-1: 'An expression or a reference must be provided'",
+            "Expression.language: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/Expression|4.0.1)",
+            "Wrong Display Name 'COVID-19' for http://snomed.info/sct#840535000. Valid display is one of 11 choices: 'Antibody to Wuhan coronavirus' (en), 'Antibody to 2019 novel coronavirus' (en), 'Antibody to 2019 novel coronavirus (substance)' (en), 'Antibody to 2019-nCoV' (en), 'Antibody to severe acute respiratory syndrome coronavirus 2 (substance)' (en), 'Antibody to severe acute respiratory syndrome coronavirus 2' (en), 'Antibody to SARS-CoV-2' (en), 'Antibody to Severe acute respiratory syndrome coronavirus 2 (substance)' (en), 'Severe acute respiratory syndrome coronavirus 2 Ab' (en), 'Antibody to Severe acute respiratory syndrome coronavirus 2' (en) or 'Severe acute respiratory syndrome coronavirus 2 antibody' (en) (for the language(s) 'en-US')"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotBlank": [
+                "group[0].population[0].criteria.language — This value should not be blank."
+            ],
+            "invariant:exp-1": [
+                "group[0].population[0].criteria — An expression or a reference must be provided"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

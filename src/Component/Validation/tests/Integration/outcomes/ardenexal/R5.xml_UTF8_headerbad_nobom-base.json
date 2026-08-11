@@ -1,5 +1,26 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Content is not allowed in prolog.",
+            "The XML encoding is invalid (must be UTF-8, not 'UTF-1')"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Unable to detect target class from data"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

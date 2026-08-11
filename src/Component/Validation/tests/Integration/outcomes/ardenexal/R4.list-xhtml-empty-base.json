@@ -1,5 +1,25 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: txt-2: 'The narrative SHALL have some non-whitespace content'"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Failed to deserialize XML to FHIR object: Could not denormalize object of type \"Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource\\ListResource\", no supporting normalizer found."
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

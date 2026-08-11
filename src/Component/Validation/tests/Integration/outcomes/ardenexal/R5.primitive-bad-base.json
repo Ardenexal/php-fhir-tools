@@ -1,5 +1,64 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 40,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Boolean values must be 'true' or 'false'",
+            "Boolean values must be 'true' or 'false'",
+            "Boolean values must be 'true' or 'false'",
+            "Constraint failed: ele-1: 'All FHIR elements must have a @value or children' (defined in http://hl7.org/fhir/StructureDefinition/Element)",
+            "Constraint failed: ele-1: 'All FHIR elements must have a @value or children' (defined in http://hl7.org/fhir/StructureDefinition/Element)",
+            "Element value '0000-01-01T12:32:45Z' does not meet instant regex '([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]{1,9})?(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))'",
+            "Not a valid date format: '1900-13-01'",
+            "Not a valid date format: 'Invalid date/time format: \"1900-02-29\"'",
+            "Not a valid date format: 'Invalid date/time format: \"2013-04-31\"'",
+            "Not a valid date/time format: '-0001-01-01'",
+            "Not a valid date/time format: '2013-01-01T12:32:45+13:33.00'",
+            "Not a valid instant format: '1983-00-01T12:32:45Z'",
+            "Not a valid instant format: '1983-01-00T12:32:45Z'",
+            "Not a valid instant format: '1983-01-01T12:32'",
+            "Not a valid instant format: '1983-01-01T12:32:45'",
+            "Not a valid instant format: '1983-01-01T12:32:45-15:00'",
+            "Not a valid time (null)",
+            "Not a valid time (null)",
+            "OIDs must be valid ( 0.1.2.3)",
+            "OIDs must be valid (a0.1.2.3)",
+            "OIDs must start with urn:oid:",
+            "OIDs must start with urn:oid:",
+            "The code ' asdasd' is not valid (whitespace rules)",
+            "The code 'asd  asd' is not valid (whitespace rules)",
+            "The code 'asdasd ' is not valid (whitespace rules)",
+            "The value '$0' is not a valid integer",
+            "The value '00.1' is not a valid decimal",
+            "The value '1e4' is not a valid integer",
+            "The value '34534536346345345345' is not a valid integer",
+            "The value 'YXNhcs2Rhc2Q=' is not a valid Base64 value",
+            "URI values cannot have whitespace('not a valid uri')",
+            "URI values cannot have whitespace('urn:oid: 0.1.2.3')",
+            "URI values cannot start with oid:",
+            "id value '12123/23' is not valid",
+            "id value ':12123-23' is not valid",
+            "id value 'asdasdasdasdasddgjhasdkjfgasdfasdfgsadfgsdfaskdfjhasdfjgsdfjhgsdfjhgsadfskadjfhg' is not valid",
+            "value cannot be empty",
+            "value cannot be empty",
+            "value is less than permitted minimum value of 0",
+            "value is less than permitted minimum value of 1"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Failed to deserialize XML to FHIR object: Expected Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRInstant string, got invalid value: 1983-00-01T12:32:45Z"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

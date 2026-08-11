@@ -1,5 +1,24 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 4,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Can't find 'Organization/666' in the bundle (Composition.author)",
+            "Entry 'http://zrbj.eu/x/Organization/666' isn't reachable by traversing links (forward or backward) from the Composition",
+            "The fullUrl 'http://zrbj.eu/x/Composition/666' looks like a RESTful server URL, but the resource has no id",
+            "The fullUrl 'http://zrbj.eu/x/Organization/666' looks like a RESTful server URL, but the resource has no id"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

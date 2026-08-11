@@ -1,5 +1,23 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 5
+    "infoCount": 5,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "The constraint key 'dom-3' already exists at the location 'http://hl7.org/fhir/StructureDefinition/Patient|5.0.0' with a different expression ('contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()')",
+            "The constraint key 'e-1' already exists at the location 'Patient.name' with a different expression ('family.exists() and family.hasValue()')",
+            "The constraint key 'ident-1' already exists at the location 'http://hl7.org/fhir/StructureDefinition/Identifier|5.0.0' with a different expression ('value.exists()')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

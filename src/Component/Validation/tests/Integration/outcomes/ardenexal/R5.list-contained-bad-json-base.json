@@ -1,5 +1,28 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 4,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: ref-1: 'SHALL have a contained resource if a local reference is provided' (defined in http://hl7.org/fhir/StructureDefinition/Reference) (url: pat; ids: pat2) (log:  (url: pat; ids: pat2))",
+            "The contained resource 'pat2' is not referenced to from elsewhere in the containing resource nor does it refer to the containing resource (dom-3)",
+            "The property subject must be a JSON Array, not an Object (at List)",
+            "Unable to resolve resource with reference '#pat'"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Failed to deserialize JSON to FHIR object: Format error (json): The property subject must be a JSON Array, not an Object (at List)"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

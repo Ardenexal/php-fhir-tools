@@ -1,5 +1,27 @@
 {
     "errorCount": 0,
     "warningCount": 1,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "ABOVE",
+        "errors": []
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {
+            "invariant:dom-3": [
+                "(root) — If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource"
+            ]
+        },
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "contained[0].contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|5.0.0 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

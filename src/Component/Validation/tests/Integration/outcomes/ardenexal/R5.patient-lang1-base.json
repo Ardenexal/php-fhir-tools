@@ -1,5 +1,25 @@
 {
     "errorCount": 0,
     "warningCount": 3,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 0,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "ABOVE",
+        "errors": []
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "language — Required binding for value set http://hl7.org/fhir/ValueSet/all-languages|5.0.0 could not be validated: no enum class generated.",
+                "language — Required binding for value set http://hl7.org/fhir/ValueSet/all-languages|5.0.0 could not be validated: no enum class generated.",
+                "language — Required binding for value set http://hl7.org/fhir/ValueSet/all-languages|5.0.0 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

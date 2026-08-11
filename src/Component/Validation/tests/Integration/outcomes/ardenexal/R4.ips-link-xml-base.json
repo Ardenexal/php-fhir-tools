@@ -1,5 +1,31 @@
 {
     "errorCount": 0,
     "warningCount": 5,
-    "infoCount": 10
+    "infoCount": 10,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "ABOVE",
+        "errors": [
+            "Multiple matching targets for the textLink data reference 'Patient/AAA1234#AAA1234' were found in the resource",
+            "The textLink selector 'Practitioner.name.given' is invalid: Error evaluating FHIRPath expression: The name 'Practitioner' is not valid for any of the possible types: [http://hl7.org/fhir/StructureDefinition/Patient] (@char 1)",
+            "Wrong Display Name 'History of Immunization Narrative' for http://loinc.org#11369-6. Valid display is one of 3 choices: 'History of Immunization note' (en-US), 'History of Immunization note' (en-US) or 'Hx of Immunization note' (en-US) (for the language(s) 'en-NZ')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "entry[6].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/allergyintolerance-clinical|4.0.1 could not be validated: no enum class generated.",
+                "entry[7].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-clinical|4.0.1 could not be validated: no enum class generated.",
+                "entry[8].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
+                "entry[9].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/immunization-status|4.0.1 could not be validated: no enum class generated.",
+                "entry[10].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/immunization-status|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

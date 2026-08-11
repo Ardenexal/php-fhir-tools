@@ -1,5 +1,27 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Constraint failed: eld-19: 'Element names cannot include some special characters'",
+            "Error generating Snapshot: Invalid path 'Observation...unit' in differential in http://hl7.org.au/fhir/tools/StructureDefinition/-unit-profile: name portion missing ('..') (this usually arises from a problem in the differential)",
+            "StructureDefinition.name: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/StructureDefinition|4.0.1)"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotBlank": [
+                "name — This value should not be blank."
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

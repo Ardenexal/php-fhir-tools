@@ -1,5 +1,28 @@
 {
     "errorCount": 0,
     "warningCount": 2,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 2,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Entry 'http://hl7.org/fhir/test/Binary/css1' isn't reachable by traversing links (forward or backward) from the Composition",
+            "The fullUrl 'http://hl7.org/fhir/test/Composition/test-css-document' looks like a RESTful server URL, so it must end with the correct type and id (/Composition/test-document-good)",
+            "The stylesheet reference could not be resolved in this bundle"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "entry[1].resource.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated.",
+                "entry[2].resource.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

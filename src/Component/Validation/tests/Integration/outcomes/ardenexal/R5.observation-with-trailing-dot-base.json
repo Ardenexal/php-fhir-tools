@@ -1,5 +1,25 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The value '925.' is not a valid decimal"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Unable to detect target class from data"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

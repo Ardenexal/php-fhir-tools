@@ -1,5 +1,25 @@
 {
     "errorCount": 0,
     "warningCount": 1,
-    "infoCount": 2
+    "infoCount": 2,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "The element definition for Patient.identifier has a property meaningWhenMissing which is not allowed in a profile"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "invariant:cnl-0": [
+                "(root) — Name should be usable as an identifier for the module by machine processing applications such as code generation"
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

@@ -1,5 +1,26 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 0,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Group.characteristic.value[x]: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/Group|5.0.0)",
+            "Unrecognized property 'valueInteger'"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotNull": [
+                "characteristic[0].value — This value should not be null."
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

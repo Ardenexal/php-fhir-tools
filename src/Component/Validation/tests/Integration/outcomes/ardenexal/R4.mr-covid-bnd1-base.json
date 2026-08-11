@@ -1,5 +1,50 @@
 {
     "errorCount": 0,
     "warningCount": 1,
-    "infoCount": 91
+    "infoCount": 91,
+    "java": {
+        "errorCount": 26,
+        "warningCount": 52,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "Coding.system must be an absolute reference, not a local reference",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+            "The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "invariant:mea-0": [
+                "entry[1].resource — Name should be usable as an identifier for the module by machine processing applications such as code generation"
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

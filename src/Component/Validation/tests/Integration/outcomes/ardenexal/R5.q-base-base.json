@@ -1,5 +1,29 @@
 {
     "errorCount": 0,
     "warningCount": 7,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "ABOVE",
+        "errors": []
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "item[0].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|5.0.0 could not be validated: no enum class generated.",
+                "item[1].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|5.0.0 could not be validated: no enum class generated.",
+                "item[2].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|5.0.0 could not be validated: no enum class generated.",
+                "item[2].item[0].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|5.0.0 could not be validated: no enum class generated.",
+                "item[2].item[1].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|5.0.0 could not be validated: no enum class generated.",
+                "item[2].item[2].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|5.0.0 could not be validated: no enum class generated.",
+                "item[3].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|5.0.0 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

@@ -1,5 +1,39 @@
 {
     "errorCount": 1,
     "warningCount": 3,
-    "infoCount": 6
+    "infoCount": 6,
+    "java": {
+        "errorCount": 9,
+        "warningCount": 3,
+        "infoCount": 4,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: bdl-5: 'must be a resource unless there's a request or response'",
+            "Hyperlink scheme 'urn' in 'urn:uuid:7221aa91-d9e1-44fa-8b90-c5a8c7caeade' at 'div/p/a' for 'Saint Luke W Endpoint' is not a valid hyperlinkable scheme",
+            "Hyperlink scheme 'urn' in 'urn:uuid:75ea28b5-74b8-4d9c-9eb5-cfdc10b48fa' at 'div/table/tr/td/a' for 'Health Level Seven International - Amherst' is not a valid hyperlinkable scheme",
+            "Hyperlink scheme 'urn' in 'urn:uuid:a33d1eed-c4ad-4def-8087-042b7ac0f2b7' at 'div/p/a' for 'Inpatient Encounter' is not a valid hyperlinkable scheme",
+            "Hyperlink scheme 'urn' in 'urn:uuid:a33d1eed-c4ad-4def-8087-042b7ac0f2b7' at 'div/p/a' for 'urn:uuid:a33d1eed-c4ad-4def-8087-042b7ac0f2b7' is not a valid hyperlinkable scheme",
+            "Hyperlink scheme 'urn' in 'urn:uuid:e442c924-df77-47fa-838f-24a8253bbdd4' at 'div/p/a' for 'Amy V. Shaw' is not a valid hyperlinkable scheme",
+            "Hyperlink scheme 'urn' in 'urn:uuid:e442c924-df77-47fa-838f-24a8253bbdd4' at 'div/p/a' for 'Amy V. Shaw' is not a valid hyperlinkable scheme",
+            "Hyperlink scheme 'urn' in 'urn:uuid:e4b71aed-1c54-4f85-bea0-48444aa31f59' at 'div/p/a' for 'Ronald Bone' is not a valid hyperlinkable scheme",
+            "Hyperlink scheme 'urn' in 'urn:uuid:e4b71aed-1c54-4f85-bea0-48444aa31f59' at 'div/table/tr/td/a' for 'Ronald Bone' is not a valid hyperlinkable scheme"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "invariant:bdl-5": [
+                "entry[5] — must be a resource unless there's a request or response"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "entry[6].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-clinical|4.0.1 could not be validated: no enum class generated.",
+                "entry[6].resource.verificationStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-ver-status|4.0.1 could not be validated: no enum class generated.",
+                "entry[7].resource.contained[0].payloadMimeType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

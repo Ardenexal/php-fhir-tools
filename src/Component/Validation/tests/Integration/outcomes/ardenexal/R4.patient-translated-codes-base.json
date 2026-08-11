@@ -1,5 +1,22 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 2,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Wrong Display Name 'alt-designation' for http://terminology.hl7.org/CodeSystem/v2-0131#N. Valid display is one of 2 choices: 'Next-of-Kin' or 'Kontaktperson' (de) (for the language(s) 'en, de')",
+            "Wrong Display Name 'alt-display' for http://terminology.hl7.org/CodeSystem/v2-0131#C. Valid display is one of 2 choices: 'Emergency Contact' or 'Ansprechpartner in Notfällen' (de) (for the language(s) 'en, de')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

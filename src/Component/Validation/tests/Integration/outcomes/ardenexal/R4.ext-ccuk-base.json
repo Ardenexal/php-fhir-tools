@@ -1,5 +1,31 @@
 {
     "errorCount": 1,
     "warningCount": 1,
-    "infoCount": 5
+    "infoCount": 5,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: sdf-20: 'No slicing on the root element'",
+            "Error generating Snapshot: Error: The profile has slicing at the root ('Extension'), which is illegal (this usually arises from a problem in the differential)",
+            "Slicing is not allowed at the root of a profile"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "invariant:sdf-20": [
+                "differential — No slicing on the root element"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "differential.element[0].slicing.rules — Required binding for value set http://hl7.org/fhir/ValueSet/resource-slicing-rules|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

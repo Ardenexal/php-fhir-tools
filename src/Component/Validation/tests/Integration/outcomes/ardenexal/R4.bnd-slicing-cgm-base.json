@@ -1,5 +1,32 @@
 {
     "errorCount": 0,
     "warningCount": 10,
-    "infoCount": 14
+    "infoCount": 14,
+    "java": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "ABOVE",
+        "errors": []
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "entry[0].resource.presentedForm[0].contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated.",
+                "entry[0].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated.",
+                "entry[1].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated.",
+                "entry[2].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated.",
+                "entry[3].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated.",
+                "entry[4].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated.",
+                "entry[5].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated.",
+                "entry[6].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated.",
+                "entry[7].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated.",
+                "entry[8].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

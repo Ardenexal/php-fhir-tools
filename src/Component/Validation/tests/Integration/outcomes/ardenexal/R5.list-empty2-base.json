@@ -1,5 +1,26 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Element must have some content",
+            "List.entry.item: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/List|5.0.0)"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Failed to deserialize XML to FHIR object: Could not denormalize object of type \"Ardenexal\\FHIRTools\\Component\\Models\\R5\\Resource\\ListResource\", no supporting normalizer found."
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

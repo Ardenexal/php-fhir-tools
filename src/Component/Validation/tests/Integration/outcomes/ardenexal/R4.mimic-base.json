@@ -1,5 +1,22 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 4
+    "infoCount": 4,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 6,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "None of the codings provided are in the value set 'Admission Type' (http://mimic.fhir.mit.edu/ValueSet/admission-type|0.1.2), and a coding from this value set is required) (codes = http://fhir.mimic.mit.edu/CodeSystem/admission-type#URGENT)",
+            "The code provided (http://fhir.mimic.mit.edu/CodeSystem/admission-class#URGENT) was not found in the value set 'Admission Class' (http://mimic.fhir.mit.edu/ValueSet/admission-class|0.1.2), and a code from this value set is required: A definition for CodeSystem 'http://fhir.mimic.mit.edu/CodeSystem/admission-class' could not be found, so the code cannot be validated; The provided code 'http://fhir.mimic.mit.edu/CodeSystem/admission-class#URGENT' was not found in the value set 'http://mimic.fhir.mit.edu/ValueSet/admission-class|0.1.2'"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

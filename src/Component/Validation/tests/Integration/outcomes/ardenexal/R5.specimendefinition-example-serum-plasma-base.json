@@ -1,5 +1,29 @@
 {
     "errorCount": 1,
     "warningCount": 1,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 3,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Undefined attribute '@value' on identifier for type Identifier"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "invariant:ele-1": [
+                "identifier — All FHIR elements must have a @value or children"
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {
+            "invariant:ident-1": [
+                "identifier — Identifier with no value has limited utility.  If communicating that an identifier value has been suppressed or missing, the value element SHOULD be present with an extension indicating the missing semantic - e.g. data-absent-reason"
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

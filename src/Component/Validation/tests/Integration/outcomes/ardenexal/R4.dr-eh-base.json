@@ -1,5 +1,25 @@
 {
     "errorCount": 0,
     "warningCount": 1,
-    "infoCount": 2
+    "infoCount": 2,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 2,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The type 'Device' implied by the reference URL Device/foo is not a valid Target for this element (must be one of [Patient])"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "content[0].attachment.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

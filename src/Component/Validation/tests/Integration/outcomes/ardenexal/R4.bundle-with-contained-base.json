@@ -1,5 +1,25 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 5,
+        "warningCount": 3,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Can't find 'Organization/SampleLabelerOrganization' in the bundle (MessageHeader Data). Note that there is a resource in the bundle with the same type and id, but it does not match because of the fullUrl based rules around matching relative references. Found 'http://example.org/Organization/SampleLabelerOrganization', but it doesn't match because of the source fullUrl 'http://example.org/MessageHeader/LabelerCodeRequestMessage'",
+            "Hyperlink '#Organization_SampleLabelerOrganization' at 'div/p/a' for 'See above (Organization/SampleLabelerOrganization)' does not resolve",
+            "The fullUrl 'http://example.org/MessageHeader/LabelerCodeRequestMessage' looks like a RESTful server URL, so it must end with the correct type and id (/MessageHeader/SampleLabelerCodeRequestMessage)",
+            "Wrong Display Name 'Foreign Facility's United States Agent' for http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C73330. Valid display is 'UNITED STATES AGENT' (for the language(s) 'en-US')",
+            "Wrong Display Name 'NDC labeler code request' for http://loinc.org#51726-8. Valid display is one of 3 choices: 'FDA product label NDC labeler code request' (en-US), 'FDA product label NDC labeler code request' (en-US) or 'FDA label NDC labeler code request' (en-US) (for the language(s) 'en-US')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }

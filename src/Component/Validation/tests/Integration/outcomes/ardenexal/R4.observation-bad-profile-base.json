@@ -1,5 +1,25 @@
 {
     "errorCount": 0,
     "warningCount": 1,
-    "infoCount": 3
+    "infoCount": 3,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Profile http://hl7.org/fhir/StructureDefinition/Count is for type StructureDefinition[http://hl7.org/fhir/StructureDefinition/Count|4.0.1], but the Observation.valueQuantity element has type Quantity"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "invariant:sdf-0": [
+                "(root) — Name should be usable as an identifier for the module by machine processing applications such as code generation"
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

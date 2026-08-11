@@ -402,7 +402,11 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                             $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $context);
                         }
                     } elseif ($this->denormalizer !== null && $propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                        $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
+                        // Captured before the cardinality guard: that call is impure to PHPStan, which
+                        // would otherwise widen $this->denormalizer back to nullable.
+                        $denormalizer = $this->denormalizer;
+                        self::assertSingleValuedElement($elementName, $value, $resolvedType);
+                        $denormalizedValue = $denormalizer->denormalize($value, $propertyType, 'xml', $context);
                     } else {
                         $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
 

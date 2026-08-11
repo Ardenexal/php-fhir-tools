@@ -1,5 +1,27 @@
 {
     "errorCount": 0,
     "warningCount": 1,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "ABOVE",
+        "errors": [
+            "Search results must have ids",
+            "This is not a matching resource type for the specified search (Immunization expecting [Patient])",
+            "Wrong Display Name 'SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 100 mcg/0.5mL dose' for http://hl7.org/fhir/sid/cvx#207. Valid display is 'COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5mL dose or 50 mcg/0.25mL dose' (for the language(s) 'en-US')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "suppressedErrors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "entry[0].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/immunization-status|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
+        "suppressedWarnings": {}
+    }
 }

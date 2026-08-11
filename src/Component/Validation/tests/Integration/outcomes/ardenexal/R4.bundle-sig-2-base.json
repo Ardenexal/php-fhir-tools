@@ -1,5 +1,27 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 1,
+        "infoCount": 9,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The property meta must be an Object, not a Null (at Bundle.meta)",
+            "The signature cannot be valid because the content to sign (3,521 bytes} is not the same as the signed content (3,553 bytes)",
+            "The signature did not verify against the provided certificate"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Failed to deserialize JSON to FHIR object: Could not denormalize object of type \"Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Meta\", no supporting normalizer found."
+            ]
+        },
+        "suppressedErrors": {},
+        "warnings": {},
+        "suppressedWarnings": {}
+    }
 }
