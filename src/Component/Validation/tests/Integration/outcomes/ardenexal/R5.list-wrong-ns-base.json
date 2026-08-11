@@ -1,23 +1,19 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "EQUAL",
+        "classification": "BELOW",
         "warningClassification": "EQUAL",
         "errors": [
             "This content cannot be parsed (unknown or unrecognized XML Root element namespace/name 'http://hl7.org/fhir1::List')"
         ]
     },
     "outcome": {
-        "errors": {
-            "deserialization": [
-                "(root) — Failed to deserialize XML to FHIR object: Could not denormalize object of type \"Ardenexal\\FHIRTools\\Component\\Models\\R5\\Resource\\ListResource\", no supporting normalizer found."
-            ]
-        },
+        "errors": {},
         "suppressedErrors": {},
         "warnings": {},
         "suppressedWarnings": {}

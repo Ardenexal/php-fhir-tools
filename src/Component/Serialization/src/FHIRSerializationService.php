@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRBackboneEleme
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRComplexTypeXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRPrimitiveTypeXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRResourceXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Xml\XmlNamespacePrefixResolver;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Serializer;
@@ -39,6 +40,7 @@ class FHIRSerializationService
         private readonly FHIRSerializationDebugInfo $debugInfo,
         private readonly FHIRMetadataExtractorInterface $metadataExtractor = new FHIRMetadataExtractor(),
         private readonly FHIRTypeResolverInterface $typeResolver = new FHIRTypeResolver(),
+        private readonly XmlNamespacePrefixResolver $namespacePrefixResolver = new XmlNamespacePrefixResolver(),
     ) {
     }
 
@@ -190,13 +192,32 @@ class FHIRSerializationService
         try {
             $xmlContext = $this->contextFactory->createXmlContext($context);
 
-            // Strip DOCTYPE declarations to prevent XXE entity definitions from being processed
-            $xmlContext[XmlEncoder::DECODER_IGNORED_NODE_TYPES] = [\XML_DOCUMENT_TYPE_NODE];
+            // Strip DOCTYPE declarations to prevent XXE entity definitions from being processed.
+            // This must ADD to the ignored-node list, never replace it: XmlEncoder reads the key with
+            // `$context[...] ?? $this->defaultContext[...]`, so assigning outright discards Symfony's
+            // default of [XML_PI_NODE, XML_COMMENT_NODE]. Comment nodes then stop being ignored, and a
+            // document with a leading comment decodes to that comment's text as a bare string, which no
+            // normalizer claims — surfacing as the misleading "no supporting normalizer found".
+            // A caller may extend the list (or opt back into decoding comments/PIs) via $context, but
+            // XML_DOCUMENT_TYPE_NODE is a security floor and is always re-added.
+            $callerIgnored = $context[XmlEncoder::DECODER_IGNORED_NODE_TYPES] ?? [\XML_PI_NODE, \XML_COMMENT_NODE];
+
+            $xmlContext[XmlEncoder::DECODER_IGNORED_NODE_TYPES] = array_values(array_unique(
+                [...(is_array($callerIgnored) ? $callerIgnored : []), \XML_DOCUMENT_TYPE_NODE],
+            ));
             // Preserve all attribute values as strings so numeric-looking values (e.g. "1.0",
             // "2002") are not cast to float/int, which would lose precision on round-trip.
             $xmlContext[XmlEncoder::TYPE_CAST_ATTRIBUTES] = false;
 
-            $result = $this->serializer->deserialize($xmlData, $targetClass, 'xml', $xmlContext);
+            // Resolve prefixed element names to local names while the DOM's namespace scoping still
+            // exists — XmlEncoder::decode() destroys child-declared prefix bindings, after which
+            // `<f:status>` can no longer be told apart from an element in a foreign namespace.
+            $result = $this->serializer->deserialize(
+                $this->namespacePrefixResolver->resolve($xmlData),
+                $targetClass,
+                'xml',
+                $xmlContext,
+            );
 
             if (!is_object($result)) {
                 throw new FHIRSerializationException('Deserialization did not produce an object');

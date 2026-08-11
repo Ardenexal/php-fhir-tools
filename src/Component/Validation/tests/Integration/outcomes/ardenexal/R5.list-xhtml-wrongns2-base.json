@@ -1,23 +1,19 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "EQUAL",
+        "classification": "BELOW",
         "warningClassification": "EQUAL",
         "errors": [
             "Wrong namespace on the XHTML ('http://www.w3.org/1999/xhtmlx', should be 'http://www.w3.org/1999/xhtml')"
         ]
     },
     "outcome": {
-        "errors": {
-            "deserialization": [
-                "(root) — Failed to deserialize XML to FHIR object: Could not denormalize object of type \"Ardenexal\\FHIRTools\\Component\\Models\\R5\\Resource\\ListResource\", no supporting normalizer found."
-            ]
-        },
+        "errors": {},
         "suppressedErrors": {},
         "warnings": {},
         "suppressedWarnings": {}

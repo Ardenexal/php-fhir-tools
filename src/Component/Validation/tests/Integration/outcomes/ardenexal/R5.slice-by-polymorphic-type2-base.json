@@ -3,14 +3,12 @@
     "warningCount": 0,
     "infoCount": 0,
     "java": {
-        "errorCount": 1,
+        "errorCount": 0,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
-        "errors": [
-            "Wrong namespace on the XHTML ('http://hl7.org/fhir', should be 'http://www.w3.org/1999/xhtml')"
-        ]
+        "errors": []
     },
     "outcome": {
         "errors": {},
