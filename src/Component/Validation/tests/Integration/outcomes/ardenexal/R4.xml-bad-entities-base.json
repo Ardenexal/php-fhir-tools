@@ -15,7 +15,7 @@
     "outcome": {
         "errors": {
             "deserialization": [
-                "(root) — Unable to detect data format"
+                "(root) — Unable to detect target class from data"
             ]
         },
         "suppressedErrors": {},

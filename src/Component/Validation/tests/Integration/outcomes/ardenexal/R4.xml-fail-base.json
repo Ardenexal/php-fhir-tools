@@ -1,13 +1,13 @@
 {
-    "errorCount": 1,
-    "warningCount": 0,
-    "infoCount": 0,
+    "errorCount": 2,
+    "warningCount": 1,
+    "infoCount": 1,
     "java": {
         "errorCount": 9,
         "warningCount": 1,
         "infoCount": 0,
         "classification": "BELOW",
-        "warningClassification": "BELOW",
+        "warningClassification": "EQUAL",
         "errors": [
             "Invalid Resource id: Invalid Characters ('[%count%]')",
             "Text should not be present ('[%endloop%]')",
@@ -22,12 +22,19 @@
     },
     "outcome": {
         "errors": {
-            "deserialization": [
-                "(root) — Unable to detect data format"
+            "constraint:FHIRValueSetBinding": [
+                "entry[0].resource.status — The value [%status%] is not a valid case of value set http://hl7.org/fhir/ValueSet/endpoint-status|4.0.1."
+            ],
+            "invariant:ele-1": [
+                "entry[0].resource.connectionType — All FHIR elements must have a @value or children"
             ]
         },
         "suppressedErrors": {},
-        "warnings": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "entry[0].resource.payloadMimeType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
+            ]
+        },
         "suppressedWarnings": {}
     }
 }

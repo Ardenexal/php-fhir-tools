@@ -161,7 +161,14 @@ class FHIRSerializationService
         try {
             $jsonContext = $this->contextFactory->createJsonContext($context);
 
-            $result = $this->serializer->deserialize($jsonData, $targetClass, 'json', $jsonContext);
+            // json_decode() rejects a leading BOM with a bare "Syntax error", so it is stripped here
+            // rather than only in detectFormat() — this method is a public entry point in its own right.
+            $result = $this->serializer->deserialize(
+                $this->stripByteOrderMark($jsonData),
+                $targetClass,
+                'json',
+                $jsonContext,
+            );
 
             if (!is_object($result)) {
                 throw new FHIRSerializationException('Deserialization did not produce an object');
@@ -213,7 +220,7 @@ class FHIRSerializationService
             // exists — XmlEncoder::decode() destroys child-declared prefix bindings, after which
             // `<f:status>` can no longer be told apart from an element in a foreign namespace.
             $result = $this->serializer->deserialize(
-                $this->namespacePrefixResolver->resolve($xmlData),
+                $this->namespacePrefixResolver->resolve($this->stripByteOrderMark($xmlData)),
                 $targetClass,
                 'xml',
                 $xmlContext,
@@ -241,6 +248,13 @@ class FHIRSerializationService
      */
     public function deserialize(string $data, ?string $targetClass = null, array $context = []): object
     {
+        // Strip once, up front: detectFormat(), detectTargetClass() and the delegated deserialize call
+        // must all see the same bytes. detectTargetClass() json_decode()s the payload, which returns
+        // null on a BOM and surfaces as "Unable to detect target class from data" — a second, distinct
+        // failure from the detectFormat() one, and the reason a fix confined to detectFormat() is not
+        // enough.
+        $data = $this->stripByteOrderMark($data);
+
         // Auto-detect format
         $format = $this->detectFormat($data);
 
@@ -273,7 +287,7 @@ class FHIRSerializationService
      */
     private function detectFormat(string $data): string
     {
-        $trimmed = trim($data);
+        $trimmed = trim($this->stripByteOrderMark($data));
 
         if (str_starts_with($trimmed, '{') || str_starts_with($trimmed, '[')) {
             return 'json';
@@ -284,6 +298,29 @@ class FHIRSerializationService
         }
 
         throw new FHIRSerializationException('Unable to detect data format');
+    }
+
+    /**
+     * Remove a leading UTF-8 byte order mark.
+     *
+     * A BOM is legal at the start of a UTF-8 document and real-world FHIR payloads carry one — 15 files
+     * in the vendored test corpus do. It broke two separate layers here:
+     *
+     *  - `trim()`'s default charlist is " \t\n\r\0\x0B", which does NOT include `EF BB BF`, so
+     *    `detectFormat()` saw neither `{`, `[` nor `<` and threw "Unable to detect data format".
+     *  - `json_decode()` rejects a leading BOM outright with a syntax error, so stripping it for
+     *    detection alone would simply move the failure one layer down.
+     *
+     * XML is unaffected either way — libxml consumes the BOM itself — but the strip is applied
+     * uniformly so every entry point sees the same bytes.
+     *
+     * Only the UTF-8 BOM is handled. FHIR mandates UTF-8, so a UTF-16/32 BOM signals a payload that is
+     * not decodable as FHIR at all, and silently discarding those bytes would turn a clear encoding
+     * error into a confusing parse error further in.
+     */
+    private function stripByteOrderMark(string $data): string
+    {
+        return str_starts_with($data, "\xEF\xBB\xBF") ? substr($data, 3) : $data;
     }
 
     /**
