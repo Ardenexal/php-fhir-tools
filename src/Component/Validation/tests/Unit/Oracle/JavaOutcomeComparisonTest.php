@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\Classifica
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\ComparisonReport;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\JavaOutcomeReader;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\SkipReason;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\UnreadCase;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\ViolationFamilyClassifier;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -30,6 +31,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[CoversClass(ComparisonReport::class)]
 #[CoversClass(ViolationFamilyClassifier::class)]
 #[CoversClass(SkipReason::class)]
+#[CoversClass(UnreadCase::class)]
 final class JavaOutcomeComparisonTest extends TestCase
 {
     #[DataProvider('provideClassifications')]
@@ -248,6 +250,68 @@ final class JavaOutcomeComparisonTest extends TestCase
             javaErrorCount: $java,
             javaWarningCount: 0,
             families: $families,
+        );
+    }
+
+    public function testUnreadCasesCarryJavasCountAndAreInNoClassification(): void
+    {
+        $report = new ComparisonReport(
+            comparisons: [self::comparison('readable', ours: 1, java: 1, families: [])],
+            skips: [
+                'unreadable-a' => SkipReason::DeserializeThrew,
+                'unreadable-b' => SkipReason::DeserializeThrew,
+            ],
+            unread: [
+                new UnreadCase('unreadable-a', javaErrorCount: 108, javaWarningCount: 0, failureMessage: 'not UTF-8'),
+                new UnreadCase('unreadable-b', javaErrorCount: 3, javaWarningCount: 1, failureMessage: 'syntax error'),
+            ],
+        );
+
+        self::assertSame(2, $report->unreadCount());
+
+        // The point of the class: a skip tally says "two cases missing", this says how much reference
+        // behaviour that actually hides.
+        self::assertSame(111, $report->unreadJavaErrorCount());
+
+        // Unread cases must stay out of every classification roll-up — they have no count of ours to
+        // compare, so counting them anywhere would corrupt the numbers the milestones report against.
+        self::assertSame(0, $report->aboveCount());
+        self::assertSame(1, $report->equalCount());
+        self::assertSame(0, $report->belowCount());
+        self::assertCount(1, $report->comparisons);
+    }
+
+    public function testUnreadIsAdditiveToTheSkipHistogramRatherThanAReplacement(): void
+    {
+        // M02's exit criterion and every re-baselining run compare skipsByReason against a committed
+        // baseline; that arithmetic is the only thing detecting a case silently leaving the comparison
+        // set. If UNREAD ever relocated cases out of skips, those baselines would quietly stop matching.
+        $report = new ComparisonReport(
+            comparisons: [],
+            skips: ['a' => SkipReason::DeserializeThrew, 'b' => SkipReason::NoOracle],
+            unread: [new UnreadCase('a', javaErrorCount: 5, javaWarningCount: 0, failureMessage: 'boom')],
+        );
+
+        self::assertSame(1, $report->skipHistogram()[SkipReason::DeserializeThrew->value]);
+        self::assertSame(2, $report->skippedCount());
+        self::assertSame(1, $report->unreadCount());
+    }
+
+    public function testUnreadIsOrderedByHowMuchEachCaseHides(): void
+    {
+        $report = new ComparisonReport(
+            comparisons: [],
+            unread: [
+                new UnreadCase('small', javaErrorCount: 1, javaWarningCount: 0, failureMessage: 'x'),
+                new UnreadCase('large', javaErrorCount: 108, javaWarningCount: 0, failureMessage: 'x'),
+                new UnreadCase('medium', javaErrorCount: 9, javaWarningCount: 0, failureMessage: 'x'),
+            ],
+        );
+
+        self::assertSame(
+            ['large', 'medium', 'small'],
+            array_map(static fn (UnreadCase $c): string => $c->name, $report->unreadByImpact()),
+            'Largest first, so the case worth fixing next is the one you read first',
         );
     }
 

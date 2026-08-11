@@ -15,12 +15,45 @@ final class ComparisonReport
     /**
      * @param list<CaseComparison>      $comparisons
      * @param array<string, SkipReason> $skips       case name => why it was not compared
+     * @param list<UnreadCase>          $unread      cases the deserializer rejected, carrying the Java
+     *                                               outcome they were never compared against
      */
     public function __construct(
         public readonly array $comparisons,
         public readonly float $wallClockSeconds = 0.0,
         public readonly array $skips = [],
+        public readonly array $unread = [],
     ) {
+    }
+
+    public function unreadCount(): int
+    {
+        return count($this->unread);
+    }
+
+    /**
+     * How many Java error reports these unread cases are hiding.
+     *
+     * This is the number the skip histogram cannot express. "deserialize-threw=17" says seventeen
+     * cases are missing; it does not say whether that is seventeen trivial parse rejections or a
+     * hundred-plus reference findings going unmeasured. Deciding what to fix next needs the latter.
+     */
+    public function unreadJavaErrorCount(): int
+    {
+        return array_sum(array_map(static fn (UnreadCase $c): int => $c->javaErrorCount, $this->unread));
+    }
+
+    /**
+     * Unread cases ordered by how much reference behaviour each one hides, largest first.
+     *
+     * @return list<UnreadCase>
+     */
+    public function unreadByImpact(): array
+    {
+        $sorted = $this->unread;
+        usort($sorted, static fn (UnreadCase $a, UnreadCase $b): int => $b->javaErrorCount <=> $a->javaErrorCount);
+
+        return $sorted;
     }
 
     public function skippedCount(): int

@@ -59,6 +59,7 @@ final class ComparisonHarness
         $reader      = new JavaOutcomeReader($validatorDir);
         $comparisons = [];
         $skips       = [];
+        $unread      = [];
 
         $start = microtime(true);
 
@@ -83,7 +84,7 @@ final class ComparisonHarness
                 continue;
             }
 
-            $comparison = $this->compareCase($name, $data, $javaOutcome, $skips);
+            $comparison = $this->compareCase($name, $data, $javaOutcome, $skips, $unread);
             if ($comparison === null) {
                 continue;
             }
@@ -95,6 +96,7 @@ final class ComparisonHarness
             comparisons: $comparisons,
             wallClockSeconds: microtime(true) - $start,
             skips: $skips,
+            unread: $unread,
         );
     }
 
@@ -105,24 +107,33 @@ final class ComparisonHarness
      * cannot run is not a case we agree on — and because dropping one silently *lowers* the ABOVE
      * count, every drop has to be attributable.
      *
-     * @param array<string, SkipReason> $skips written by reference so the caller can account for drops
+     * @param array<string, SkipReason> $skips  written by reference so the caller can account for drops
+     * @param list<UnreadCase>          $unread written by reference; deserialization failures paired
+     *                                          with the Java outcome they were never compared against
      */
     private function compareCase(
         string $name,
         string $data,
         JavaOutcome $javaOutcome,
         array &$skips,
+        array &$unread,
     ): ?CaseComparison {
         try {
             $resource = $this->serialization->deserialize($data);
-        } catch (\Throwable) {
-            $skips[$name] = SkipReason::DeserializeThrew;
+        } catch (\Throwable $e) {
+            $this->recordUnread($name, $javaOutcome, $e->getMessage(), $skips, $unread);
 
             return null;
         }
 
         if (!is_object($resource)) {
-            $skips[$name] = SkipReason::DeserializeThrew;
+            $this->recordUnread(
+                $name,
+                $javaOutcome,
+                sprintf('deserialize() returned %s rather than an object', get_debug_type($resource)),
+                $skips,
+                $unread,
+            );
 
             return null;
         }
@@ -205,6 +216,35 @@ final class ComparisonHarness
         unset($selected['']);
 
         return $selected;
+    }
+
+    /**
+     * Record a case we could not read, in both places it has to appear.
+     *
+     * The skip entry is kept as well as the UnreadCase, deliberately and non-negotiably: M02's exit
+     * criterion and every re-baselining run compare `skipsByReason` against a committed baseline
+     * (`R4 2/1/20/0`, `R5 2/0/34/0`). That arithmetic is the only thing that detects a case silently
+     * leaving the comparison set — which lowers ABOVE and reads as an improvement. UNREAD is additive
+     * enrichment on top of it, never a relocation of it.
+     *
+     * @param array<string, SkipReason> $skips
+     * @param list<UnreadCase>          $unread
+     */
+    private function recordUnread(
+        string $name,
+        JavaOutcome $javaOutcome,
+        string $failureMessage,
+        array &$skips,
+        array &$unread,
+    ): void {
+        $skips[$name] = SkipReason::DeserializeThrew;
+
+        $unread[] = new UnreadCase(
+            name: $name,
+            javaErrorCount: $javaOutcome->errorCount,
+            javaWarningCount: $javaOutcome->warningCount,
+            failureMessage: $failureMessage,
+        );
     }
 
     /** @param array<string, mixed> $case */

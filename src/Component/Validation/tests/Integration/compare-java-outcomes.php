@@ -36,6 +36,7 @@ use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\CaseCompar
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\Classification;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\ComparisonHarness;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\OracleValidationServiceFactory;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\UnreadCase;
 
 $args    = array_slice($argv, 1);
 $flags   = array_values(array_filter($args, static fn (string $a): bool => str_starts_with($a, '--')));
@@ -116,6 +117,17 @@ if ($asJson) {
         'compared'         => count($report->comparisons),
         'skipped'          => $report->skippedCount(),
         'skipsByReason'    => $report->skipHistogram(),
+        // UNREAD belongs in the JSON as well as the table: --json is what the re-baselining workflow
+        // diffs (`--json > before.json`), so a section that existed only in the human printer would be
+        // invisible to the exact process it was added to serve.
+        'unread'           => $report->unreadCount(),
+        'unreadJavaErrors' => $report->unreadJavaErrorCount(),
+        'unreadCases'      => array_map(static fn (UnreadCase $c): array => [
+            'name'         => $c->name,
+            'java'         => $c->javaErrorCount,
+            'javaWarnings' => $c->javaWarningCount,
+            'failure'      => $c->failureMessage,
+        ], $report->unreadByImpact()),
         'crashedCases'     => $report->crashedCases(),
         'warningMismatch'  => count($report->warningMismatches()),
         'wallClockSeconds' => round($report->wallClockSeconds, 2),
@@ -161,10 +173,11 @@ if ($listed !== []) {
 }
 
 printf(
-    "ABOVE %d  ·  EQUAL %d  ·  BELOW %d   (compared %d, skipped %d, %.2fs)\n",
+    "ABOVE %d  ·  EQUAL %d  ·  BELOW %d  ·  UNREAD %d   (compared %d, skipped %d, %.2fs)\n",
     $report->aboveCount(),
     $report->equalCount(),
     $report->belowCount(),
+    $report->unreadCount(),
     count($report->comparisons),
     $report->skippedCount(),
     $report->wallClockSeconds,
@@ -175,6 +188,32 @@ foreach ($report->skipHistogram() as $reason => $count) {
     printf('%s=%d  ', $reason, $count);
 }
 echo "\n";
+
+// UNREAD is a standing quantity, not a delta. ABOVE/EQUAL/BELOW describe the cases we could read;
+// these are the ones we could not, and until now they were visible only as a skip tally that moves.
+// The Java error total is the point: it converts "17 cases missing" into "how much reference
+// behaviour is going unmeasured", which is what decides whether this is worth working on next.
+if ($report->unreadCount() > 0) {
+    printf(
+        "\nUNREAD: %d case(s) the deserializer rejected, hiding %d Java error report(s).\n"
+        . "These are in NO class — not ABOVE, not BELOW — so they cannot show up as a regression.\n",
+        $report->unreadCount(),
+        $report->unreadJavaErrorCount(),
+    );
+
+    foreach (array_slice($report->unreadByImpact(), 0, 10) as $unreadCase) {
+        printf(
+            "  %-44s java=%-4d %s\n",
+            substr($unreadCase->name, 0, 44),
+            $unreadCase->javaErrorCount,
+            substr(str_replace("\n", ' ', $unreadCase->failureMessage), 0, 70),
+        );
+    }
+
+    if ($report->unreadCount() > 10) {
+        printf("  … and %d more (use --json for the full list)\n", $report->unreadCount() - 10);
+    }
+}
 
 // A case that crashes leaves the comparison set, which lowers ABOVE and reads as an improvement.
 // Never let that pass quietly.
