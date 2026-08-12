@@ -1173,6 +1173,38 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Render a JSON-decoded number as the FHIR `decimal` lexical form it was written in.
+     *
+     * Generated models store `decimal` as a string precisely to keep the author's precision, but
+     * `json_decode()` has already turned `101.0` into PHP float `101.0`, and `(string)` on that float
+     * loses two things:
+     *
+     *  - the decimal point — `(string) 101.0` is `"101"`, which reads as an integer. FHIRPath type
+     *    detection for choice elements sniffs for a `.` to tell `decimal` from `integer`
+     *    (`FHIRPathEvaluator::resolveChoiceVariantType()`), so `probability is decimal` came out false
+     *    and `ras-2` (`probability is decimal implies (probability as decimal) <= 100`) short-circuited
+     *    to a silent pass on a probability of 101;
+     *  - significant digits — the cast honours `precision` (14), so `1.23456789012345678` became
+     *    `"1.2345678901235"`.
+     *
+     * `JSON_PRESERVE_ZERO_FRACTION` keeps the `.0` that both the cast and a plain `json_encode()` drop,
+     * and `serialize_precision = -1` makes it the shortest representation that round-trips exactly.
+     * Integers are left as written: JSON `101` for a decimal element is lexically `"101"`, and inventing
+     * a fraction there would change serialized output.
+     */
+    protected static function decimalToLexicalString(mixed $value): string
+    {
+        if (is_float($value)) {
+            $encoded = json_encode($value, JSON_PRESERVE_ZERO_FRACTION);
+            if (is_string($encoded)) {
+                return $encoded;
+            }
+        }
+
+        return is_scalar($value) ? (string) $value : '';
+    }
+
+    /**
      * Instantiate a class the way `newInstanceWithoutConstructor()` cannot: with its repeating
      * elements already empty rather than uninitialized.
      *

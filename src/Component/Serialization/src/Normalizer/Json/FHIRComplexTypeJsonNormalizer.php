@@ -138,7 +138,7 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'json', $context);
                         } else {
                             $denormalizedValue = ($fhirType === 'decimal' || $fhirType === 'http://hl7.org/fhirpath/System.Decimal') && is_numeric($value)
-                                ? (string) $value
+                                ? self::decimalToLexicalString($value)
                                 : $value;
                         }
 
