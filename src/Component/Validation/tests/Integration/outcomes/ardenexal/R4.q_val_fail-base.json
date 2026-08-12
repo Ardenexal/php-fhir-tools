@@ -1,6 +1,6 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
+    "warningCount": 0,
     "infoCount": 2,
     "java": {
         "errorCount": 0,
@@ -13,11 +13,7 @@
     "outcome": {
         "errors": {},
         "suppressedErrors": {},
-        "warnings": {
-            "constraint:FHIRValueSetBinding": [
-                "status — Required binding for value set http://hl7.org/fhir/ValueSet/questionnaire-answers-status|4.0.1 could not be validated: no enum class generated."
-            ]
-        },
+        "warnings": {},
         "suppressedWarnings": {}
     }
 }

@@ -1,13 +1,13 @@
 {
     "errorCount": 0,
-    "warningCount": 3,
+    "warningCount": 1,
     "infoCount": 1,
     "java": {
         "errorCount": 11,
         "warningCount": 1,
         "infoCount": 2,
         "classification": "BELOW",
-        "warningClassification": "ABOVE",
+        "warningClassification": "EQUAL",
         "errors": [
             "Can't find 'AllergyIntolerance/e198be1e-9861-46af-9d97-841ef9f7c707' in the bundle (Section Entry). Note that there is a resource in the bundle with the same type and id, but it does not match because of the fullUrl based rules around matching relative references. Found 'urn:uuid:e198be1e-9861-46af-9d97-841ef9f7c707', but it doesn't match because of the source fullUrl 'urn:uuid:a6a8a8e6-415c-42e1-abf7-f8d876e5908b'",
             "Can't find 'Condition/da138a5d-633f-493f-9485-e5af1320db5b' in the bundle (Section Entry). Note that there is a resource in the bundle with the same type and id, but it does not match because of the fullUrl based rules around matching relative references. Found 'urn:uuid:da138a5d-633f-493f-9485-e5af1320db5b', but it doesn't match because of the source fullUrl 'urn:uuid:a6a8a8e6-415c-42e1-abf7-f8d876e5908b'",
@@ -27,9 +27,7 @@
         "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
-                "entry[2].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
-                "entry[3].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/allergyintolerance-clinical|4.0.1 could not be validated: no enum class generated.",
-                "entry[4].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-clinical|4.0.1 could not be validated: no enum class generated."
+                "entry[2].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated."
             ]
         },
         "suppressedWarnings": {}

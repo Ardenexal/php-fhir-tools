@@ -1,19 +1,23 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Constraint failed: ras-2: 'Must be <= 100'"
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "invariant:ras-2": [
+                "prediction[0] — Must be <= 100"
+            ]
+        },
         "suppressedErrors": {},
         "warnings": {},
         "suppressedWarnings": {}

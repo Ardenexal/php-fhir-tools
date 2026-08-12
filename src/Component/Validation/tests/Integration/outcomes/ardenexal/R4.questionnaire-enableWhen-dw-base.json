@@ -1,13 +1,13 @@
 {
     "errorCount": 0,
-    "warningCount": 13,
+    "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
         "classification": "BELOW",
-        "warningClassification": "ABOVE",
+        "warningClassification": "EQUAL",
         "errors": [
             "Constraint failed: que-12: 'If there are more than one enableWhen, enableBehavior must be specified'"
         ]
@@ -15,23 +15,7 @@
     "outcome": {
         "errors": {},
         "suppressedErrors": {},
-        "warnings": {
-            "constraint:FHIRValueSetBinding": [
-                "subjectType — Required binding for value set http://hl7.org/fhir/ValueSet/resource-types|4.0.1 could not be validated: no enum class generated.",
-                "item[0].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|4.0.1 could not be validated: no enum class generated.",
-                "item[1].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|4.0.1 could not be validated: no enum class generated.",
-                "item[1].enableWhen[0].operator — Required binding for value set http://hl7.org/fhir/ValueSet/questionnaire-enable-operator|4.0.1 could not be validated: no enum class generated.",
-                "item[2].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|4.0.1 could not be validated: no enum class generated.",
-                "item[2].enableWhen[0].operator — Required binding for value set http://hl7.org/fhir/ValueSet/questionnaire-enable-operator|4.0.1 could not be validated: no enum class generated.",
-                "item[3].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|4.0.1 could not be validated: no enum class generated.",
-                "item[3].enableWhen[0].operator — Required binding for value set http://hl7.org/fhir/ValueSet/questionnaire-enable-operator|4.0.1 could not be validated: no enum class generated.",
-                "item[3].enableWhen[1].operator — Required binding for value set http://hl7.org/fhir/ValueSet/questionnaire-enable-operator|4.0.1 could not be validated: no enum class generated.",
-                "item[4].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|4.0.1 could not be validated: no enum class generated.",
-                "item[4].enableWhen[0].operator — Required binding for value set http://hl7.org/fhir/ValueSet/questionnaire-enable-operator|4.0.1 could not be validated: no enum class generated.",
-                "item[5].type — Required binding for value set http://hl7.org/fhir/ValueSet/item-type|4.0.1 could not be validated: no enum class generated.",
-                "item[5].enableWhen[0].operator — Required binding for value set http://hl7.org/fhir/ValueSet/questionnaire-enable-operator|4.0.1 could not be validated: no enum class generated."
-            ]
-        },
+        "warnings": {},
         "suppressedWarnings": {}
     }
 }

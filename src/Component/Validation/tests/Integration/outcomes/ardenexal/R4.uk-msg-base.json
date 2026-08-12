@@ -1,13 +1,13 @@
 {
     "errorCount": 0,
-    "warningCount": 4,
+    "warningCount": 0,
     "infoCount": 10,
     "java": {
         "errorCount": 4,
         "warningCount": 2,
         "infoCount": 14,
         "classification": "BELOW",
-        "warningClassification": "ABOVE",
+        "warningClassification": "BELOW",
         "errors": [
             "Unknown code '35901911000001104' in the CodeSystem 'http://snomed.info/sct' version 'http://snomed.info/sct/900000000000207008/version/20250201' (International Edition)",
             "Unknown code '39695211000001102' in the CodeSystem 'http://snomed.info/sct' version 'http://snomed.info/sct/900000000000207008/version/20250201' (International Edition)",
@@ -18,14 +18,7 @@
     "outcome": {
         "errors": {},
         "suppressedErrors": {},
-        "warnings": {
-            "constraint:FHIRValueSetBinding": [
-                "entry[4].resource.intent — Required binding for value set http://hl7.org/fhir/ValueSet/medicationrequest-intent|4.0.1 could not be validated: no enum class generated.",
-                "entry[5].resource.intent — Required binding for value set http://hl7.org/fhir/ValueSet/medicationrequest-intent|4.0.1 could not be validated: no enum class generated.",
-                "entry[6].resource.intent — Required binding for value set http://hl7.org/fhir/ValueSet/medicationrequest-intent|4.0.1 could not be validated: no enum class generated.",
-                "entry[7].resource.intent — Required binding for value set http://hl7.org/fhir/ValueSet/medicationrequest-intent|4.0.1 could not be validated: no enum class generated."
-            ]
-        },
+        "warnings": {},
         "suppressedWarnings": {}
     }
 }

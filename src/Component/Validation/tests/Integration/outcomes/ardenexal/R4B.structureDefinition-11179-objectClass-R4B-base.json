@@ -1,6 +1,6 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
+    "warningCount": 0,
     "infoCount": 9,
     "java": {
         "errorCount": 0,
@@ -13,11 +13,7 @@
     "outcome": {
         "errors": {},
         "suppressedErrors": {},
-        "warnings": {
-            "constraint:FHIRValueSetBinding": [
-                "snapshot.element[2].slicing.rules — Required binding for value set http://hl7.org/fhir/ValueSet/resource-slicing-rules|4.3.0 could not be validated: no enum class generated."
-            ]
-        },
+        "warnings": {},
         "suppressedWarnings": {}
     }
 }

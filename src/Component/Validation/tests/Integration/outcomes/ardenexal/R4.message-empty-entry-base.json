@@ -1,13 +1,13 @@
 {
     "errorCount": 1,
-    "warningCount": 3,
+    "warningCount": 1,
     "infoCount": 6,
     "java": {
         "errorCount": 9,
         "warningCount": 3,
         "infoCount": 4,
         "classification": "BELOW",
-        "warningClassification": "EQUAL",
+        "warningClassification": "BELOW",
         "errors": [
             "Constraint failed: bdl-5: 'must be a resource unless there's a request or response'",
             "Hyperlink scheme 'urn' in 'urn:uuid:7221aa91-d9e1-44fa-8b90-c5a8c7caeade' at 'div/p/a' for 'Saint Luke W Endpoint' is not a valid hyperlinkable scheme",
@@ -29,8 +29,6 @@
         "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
-                "entry[6].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-clinical|4.0.1 could not be validated: no enum class generated.",
-                "entry[6].resource.verificationStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-ver-status|4.0.1 could not be validated: no enum class generated.",
                 "entry[7].resource.contained[0].payloadMimeType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
             ]
         },

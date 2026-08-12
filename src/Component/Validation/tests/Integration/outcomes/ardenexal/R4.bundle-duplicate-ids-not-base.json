@@ -1,7 +1,7 @@
 {
     "errorCount": 0,
-    "warningCount": 14,
-    "infoCount": 33,
+    "warningCount": 6,
+    "infoCount": 31,
     "java": {
         "errorCount": 49,
         "warningCount": 55,
@@ -65,17 +65,9 @@
         "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
-                "entry[6].resource.deviceName[0].type — Required binding for value set http://hl7.org/fhir/ValueSet/device-nametype|4.0.1 could not be validated: no enum class generated.",
-                "entry[7].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/fm-status|4.0.1 could not be validated: no enum class generated.",
                 "entry[10].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
                 "entry[12].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
                 "entry[13].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
-                "entry[14].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/allergyintolerance-clinical|4.0.1 could not be validated: no enum class generated.",
-                "entry[15].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/allergyintolerance-clinical|4.0.1 could not be validated: no enum class generated.",
-                "entry[16].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-clinical|4.0.1 could not be validated: no enum class generated.",
-                "entry[17].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-clinical|4.0.1 could not be validated: no enum class generated.",
-                "entry[30].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/history-status|4.0.1 could not be validated: no enum class generated.",
-                "entry[31].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/history-status|4.0.1 could not be validated: no enum class generated.",
                 "entry[36].resource.content[0].attachment.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated.",
                 "entry[37].resource.content[0].attachment.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated.",
                 "entry[38].resource.content[0].attachment.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."

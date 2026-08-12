@@ -1,23 +1,19 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
+    "warningCount": 0,
     "infoCount": 10,
     "java": {
         "errorCount": 0,
         "warningCount": 0,
         "infoCount": 0,
         "classification": "EQUAL",
-        "warningClassification": "ABOVE",
+        "warningClassification": "EQUAL",
         "errors": []
     },
     "outcome": {
         "errors": {},
         "suppressedErrors": {},
-        "warnings": {
-            "constraint:FHIRValueSetBinding": [
-                "differential.element[5].slicing.rules — Required binding for value set http://hl7.org/fhir/ValueSet/resource-slicing-rules|5.0.0 could not be validated: no enum class generated."
-            ]
-        },
+        "warnings": {},
         "suppressedWarnings": {}
     }
 }

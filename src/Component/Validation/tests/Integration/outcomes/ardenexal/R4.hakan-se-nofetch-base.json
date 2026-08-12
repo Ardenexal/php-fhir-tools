@@ -1,13 +1,13 @@
 {
     "errorCount": 2,
-    "warningCount": 1,
+    "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 4,
         "warningCount": 1,
         "infoCount": 0,
         "classification": "BELOW",
-        "warningClassification": "EQUAL",
+        "warningClassification": "BELOW",
         "errors": [
             "Constraint failed: ref-1: 'SHALL have a contained resource if a local reference is provided' (url: 1505724e-2d13-4790-ab25-e9ae2fa8d272; ids: ) (log:  (url: 1505724e-2d13-4790-ab25-e9ae2fa8d272; ids: ))",
             "If a date has a time, it must have a timezone",
@@ -25,11 +25,7 @@
             ]
         },
         "suppressedErrors": {},
-        "warnings": {
-            "constraint:FHIRValueSetBinding": [
-                "intent — Required binding for value set http://hl7.org/fhir/ValueSet/medicationrequest-intent|4.0.1 could not be validated: no enum class generated."
-            ]
-        },
+        "warnings": {},
         "suppressedWarnings": {}
     }
 }

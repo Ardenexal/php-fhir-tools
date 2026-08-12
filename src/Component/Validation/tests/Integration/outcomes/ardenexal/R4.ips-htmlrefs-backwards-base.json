@@ -1,13 +1,13 @@
 {
     "errorCount": 0,
-    "warningCount": 2,
+    "warningCount": 0,
     "infoCount": 1,
     "java": {
         "errorCount": 4,
         "warningCount": 0,
         "infoCount": 3,
         "classification": "BELOW",
-        "warningClassification": "ABOVE",
+        "warningClassification": "EQUAL",
         "errors": [
             "Can't find 'urn:uuid:8ce7db7b-9b9b-41ae-b1d7-3f2d1c728a13' in the bundle (AllergyIntolerance-urn:uuid:edf25255-bfcd-4e29-a797-e89ea4ef000cXX)",
             "Found 2 matches for fragment AllergyIntolerance-urn:uuid:01ea6a58-df5f-4455-b6b2-7a31492be6b1 in resource 'urn:uuid:8ce7db7b-9b9b-41ae-b1d7-3f2d1c728a13' in the bundle (Bundle.entry[3].resource.extension[0].value[x])",
@@ -18,12 +18,7 @@
     "outcome": {
         "errors": {},
         "suppressedErrors": {},
-        "warnings": {
-            "constraint:FHIRValueSetBinding": [
-                "entry[2].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/allergyintolerance-clinical|4.0.1 could not be validated: no enum class generated.",
-                "entry[3].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/allergyintolerance-clinical|4.0.1 could not be validated: no enum class generated."
-            ]
-        },
+        "warnings": {},
         "suppressedWarnings": {}
     }
 }

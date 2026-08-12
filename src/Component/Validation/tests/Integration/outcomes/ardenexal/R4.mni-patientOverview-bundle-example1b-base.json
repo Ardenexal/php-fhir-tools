@@ -1,13 +1,13 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
+    "warningCount": 0,
     "infoCount": 6,
     "java": {
         "errorCount": 10,
         "warningCount": 0,
         "infoCount": 1,
         "classification": "BELOW",
-        "warningClassification": "ABOVE",
+        "warningClassification": "EQUAL",
         "errors": [
             "Can't find 'Device/1' in the bundle (Composition.author). Note that there is a resource in the bundle with the same type and id, but it does not match because of the fullUrl based rules around matching relative references. Found 'Device/1', but it doesn't match because of the source fullUrl 'Composition/1'",
             "Can't find 'Patient/1' in the bundle (Composition.subject). Note that there is a resource in the bundle with the same type and id, but it does not match because of the fullUrl based rules around matching relative references. Found 'Patient/1', but it doesn't match because of the source fullUrl 'Composition/1'",
@@ -24,11 +24,7 @@
     "outcome": {
         "errors": {},
         "suppressedErrors": {},
-        "warnings": {
-            "constraint:FHIRValueSetBinding": [
-                "entry[2].resource.deviceName[0].type — Required binding for value set http://hl7.org/fhir/ValueSet/device-nametype|4.0.1 could not be validated: no enum class generated."
-            ]
-        },
+        "warnings": {},
         "suppressedWarnings": {}
     }
 }

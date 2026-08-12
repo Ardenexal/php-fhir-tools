@@ -1,5 +1,5 @@
 {
-    "errorCount": 5,
+    "errorCount": 7,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -23,11 +23,17 @@
     },
     "outcome": {
         "errors": {
+            "constraint:Count": [
+                "entry[0].resource.author — This collection should contain 1 element or more."
+            ],
             "constraint:NotBlank": [
                 "entry[0].resource.status — This value should not be blank.",
                 "entry[0].resource.type — This value should not be blank.",
                 "entry[0].resource.date — This value should not be blank.",
                 "entry[0].resource.title — This value should not be blank."
+            ],
+            "invariant:bdl-10": [
+                "(root) — A document must have a date"
             ],
             "invariant:bdl-9": [
                 "(root) — A document must have an identifier with a system and a value"

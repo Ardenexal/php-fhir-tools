@@ -1,6 +1,6 @@
 {
     "errorCount": 0,
-    "warningCount": 5,
+    "warningCount": 1,
     "infoCount": 10,
     "java": {
         "errorCount": 4,
@@ -20,11 +20,7 @@
         "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
-                "entry[6].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/allergyintolerance-clinical|4.0.1 could not be validated: no enum class generated.",
-                "entry[7].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-clinical|4.0.1 could not be validated: no enum class generated.",
-                "entry[8].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
-                "entry[9].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/immunization-status|4.0.1 could not be validated: no enum class generated.",
-                "entry[10].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/immunization-status|4.0.1 could not be validated: no enum class generated."
+                "entry[8].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated."
             ]
         },
         "suppressedWarnings": {}

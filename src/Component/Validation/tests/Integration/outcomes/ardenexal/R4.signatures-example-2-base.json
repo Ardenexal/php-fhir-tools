@@ -1,13 +1,13 @@
 {
     "errorCount": 0,
-    "warningCount": 3,
-    "infoCount": 7,
+    "warningCount": 2,
+    "infoCount": 6,
     "java": {
         "errorCount": 2,
         "warningCount": 3,
         "infoCount": 7,
         "classification": "BELOW",
-        "warningClassification": "EQUAL",
+        "warningClassification": "BELOW",
         "errors": [
             "The signature cannot be valid because the content to sign (13,051 bytes} is not the same as the signed content (14,173 bytes)",
             "The signature did not verify against the provided certificate"
@@ -18,7 +18,6 @@
         "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
-                "entry[3].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-clinical|4.0.1 could not be validated: no enum class generated.",
                 "signature.targetFormat — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated.",
                 "signature.sigFormat — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
             ]

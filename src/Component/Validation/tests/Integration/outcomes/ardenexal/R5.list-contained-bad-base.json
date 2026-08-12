@@ -1,5 +1,5 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -16,15 +16,14 @@
     },
     "outcome": {
         "errors": {
+            "invariant:dom-3": [
+                "(root) — If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource"
+            ],
             "invariant:ref-1": [
                 "subject[0] — SHALL have a contained resource if a local reference is provided"
             ]
         },
-        "suppressedErrors": {
-            "invariant:dom-3": [
-                "(root) — If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource"
-            ]
-        },
+        "suppressedErrors": {},
         "warnings": {},
         "suppressedWarnings": {}
     }

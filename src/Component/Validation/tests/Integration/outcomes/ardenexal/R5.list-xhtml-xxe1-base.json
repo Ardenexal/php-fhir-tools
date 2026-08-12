@@ -5,7 +5,7 @@
     "unread": {
         "javaErrorCount": 1,
         "javaWarningCount": 0,
-        "failure": "Failed to deserialize XML to FHIR object: Invalid URI: file://c:\\temp\\xxe.txt\n"
+        "failure": "XML DOCTYPE declarations are not accepted: they permit external entity references (XXE). Remove the DOCTYPE and resubmit the document."
     },
     "java": {
         "errorCount": 1,
@@ -20,7 +20,7 @@
     "outcome": {
         "errors": {
             "deserialization": [
-                "(root) — Failed to deserialize XML to FHIR object: Invalid URI: file://c:\\temp\\xxe.txt\n"
+                "(root) — XML DOCTYPE declarations are not accepted: they permit external entity references (XXE). Remove the DOCTYPE and resubmit the document."
             ]
         },
         "suppressedErrors": {},

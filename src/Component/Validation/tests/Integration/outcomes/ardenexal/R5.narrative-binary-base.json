@@ -12,11 +12,7 @@
     },
     "outcome": {
         "errors": {},
-        "suppressedErrors": {
-            "invariant:dom-3": [
-                "(root) — If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource"
-            ]
-        },
+        "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
                 "contained[0].contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|5.0.0 could not be validated: no enum class generated."

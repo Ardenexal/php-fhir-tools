@@ -1,13 +1,13 @@
 {
     "errorCount": 0,
-    "warningCount": 4,
+    "warningCount": 2,
     "infoCount": 3,
     "java": {
         "errorCount": 0,
         "warningCount": 2,
         "infoCount": 7,
         "classification": "EQUAL",
-        "warningClassification": "ABOVE",
+        "warningClassification": "EQUAL",
         "errors": []
     },
     "outcome": {
@@ -15,8 +15,6 @@
         "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
-                "entry[0].resource.clinicalStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-clinical|4.0.1 could not be validated: no enum class generated.",
-                "entry[0].resource.verificationStatus — Required binding for value set http://hl7.org/fhir/ValueSet/condition-ver-status|4.0.1 could not be validated: no enum class generated.",
                 "signature.targetFormat — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated.",
                 "signature.sigFormat — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
             ]

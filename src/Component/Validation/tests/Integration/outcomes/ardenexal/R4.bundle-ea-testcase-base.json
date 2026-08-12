@@ -1,6 +1,6 @@
 {
     "errorCount": 0,
-    "warningCount": 2,
+    "warningCount": 0,
     "infoCount": 6,
     "java": {
         "errorCount": 13,
@@ -27,12 +27,7 @@
     "outcome": {
         "errors": {},
         "suppressedErrors": {},
-        "warnings": {
-            "constraint:FHIRValueSetBinding": [
-                "entry[0].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated.",
-                "entry[1].request.method — Required binding for value set http://hl7.org/fhir/ValueSet/http-verb|4.0.1 could not be validated: no enum class generated."
-            ]
-        },
+        "warnings": {},
         "suppressedWarnings": {}
     }
 }
