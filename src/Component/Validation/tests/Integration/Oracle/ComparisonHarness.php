@@ -288,7 +288,11 @@ final class ComparisonHarness
             return true;
         }
 
-        if ($v->invariantKey === 'dom-3' || $v->invariantKey === 'sdf-19') {
+        // `dom-3` was suppressed here too until the XHTML-narrative false positive was fixed in
+        // FHIRPathInvariantValidator::narrativeAccountsForContained(). It is no longer filtered, so
+        // `R5.list-contained-bad`'s genuine "contained resource 'pat1' is not referenced" error —
+        // which Java reports and we were hiding — now counts.
+        if ($v->invariantKey === 'sdf-19') {
             return true;
         }
 

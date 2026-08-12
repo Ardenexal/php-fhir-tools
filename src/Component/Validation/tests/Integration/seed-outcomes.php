@@ -54,7 +54,10 @@ declare(strict_types=1);
  * The `suppressed*` keys are the point of the `outcome` block: isKnownGap() removes those violations
  * from the counts entirely, so without listing them a reviewer cannot tell a genuinely clean case from
  * one whose findings were filtered away. A count that reads right for the wrong reason is the failure
- * mode this catches — `R5.narrative-binary` reports errorCount 0 while hiding a real dom-3.
+ * mode this catches. `R5.narrative-binary` was the worked example: it reported errorCount 0 while hiding
+ * a dom-3 — which turned out to be a false positive, whereas `R5.list-contained-bad` was hiding a real
+ * one. Both are now unfiltered, the false positive having been fixed at source in
+ * FHIRPathInvariantValidator; `invariant:sdf-19` is the remaining suppression of this shape.
  *
  * The `java` block exists so divergence from the oracle is readable in the file itself, without
  * running compare-java-outcomes.php. **It is deliberately named `java`, not `expected`.** The
@@ -445,9 +448,6 @@ function matchesVersion(array $case, FhirVersion $version): bool
 function isKnownGap(FHIRValidationViolation $v, object $resource): bool
 {
     if (str_contains($v->message, 'has no generated enum class')) {
-        return true;
-    }
-    if ($v->invariantKey === 'dom-3') {
         return true;
     }
     if ($v->invariantKey === 'sdf-19') {

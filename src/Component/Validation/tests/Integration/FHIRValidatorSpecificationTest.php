@@ -575,12 +575,6 @@ final class FHIRValidatorSpecificationTest extends TestCase
             return true;
         }
 
-        // dom-3: contained-resource back-reference check. Our FHIRPath evaluator does not
-        // yet resolve %resource context variables, causing false positives.
-        if ($v->invariantKey === 'dom-3') {
-            return true;
-        }
-
         // sdf-19: StructureDefinition URL-based type-code check. Our FHIRPath evaluator
         // produces false positives on the startsWith/implies combination — cases Java
         // considers valid still fire this invariant for us.
