@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRBackboneEleme
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRComplexTypeXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRPrimitiveTypeXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRResourceXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Xml\XmlDoctypeGuard;
 use Ardenexal\FHIRTools\Component\Serialization\Xml\XmlNamespacePrefixResolver;
 use Seld\JsonLint\JsonParser;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -206,9 +207,14 @@ class FHIRSerializationService
     public function deserializeFromXml(string $xmlData, string $targetClass, array $context = []): object
     {
         try {
+            // A DOCTYPE is refused before any parser sees the document. This is a public entry point
+            // in its own right, so it cannot rely on detectTargetClass() having already checked.
+            XmlDoctypeGuard::assertNoDoctype($xmlData);
+
             $xmlContext = $this->contextFactory->createXmlContext($context);
 
-            // Strip DOCTYPE declarations to prevent XXE entity definitions from being processed.
+            // Ignore the DOCTYPE node type as well, for defence in depth on any path that reaches
+            // the decoder without passing the guard above.
             // This must ADD to the ignored-node list, never replace it: XmlEncoder reads the key with
             // `$context[...] ?? $this->defaultContext[...]`, so assigning outright discards Symfony's
             // default of [XML_PI_NODE, XML_COMMENT_NODE]. Comment nodes then stop being ignored, and a
@@ -424,7 +430,10 @@ class FHIRSerializationService
                 $decoded = null;
             }
         } elseif ($format === 'xml') {
-            // Strip DOCTYPE to prevent XXE, then extract the root element name
+            // Reject a DOCTYPE before libxml sees it. LIBXML_NONET alone does not prevent an
+            // external entity's system identifier from being resolved — see XmlDoctypeGuard.
+            XmlDoctypeGuard::assertNoDoctype($data);
+
             $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NOERROR);
             if ($xml === false) {
                 throw new FHIRSerializationException(sprintf('Unable to parse XML: %s', $this->describeXmlParseFailure($data)));
