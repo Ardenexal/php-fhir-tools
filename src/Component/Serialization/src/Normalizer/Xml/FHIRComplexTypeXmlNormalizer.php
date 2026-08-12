@@ -115,7 +115,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             $isBackboneElement = !empty($reflection->getAttributes(FHIRBackboneElement::class));
             $object            = $isBackboneElement
                 ? $this->instantiateWithConstructorDefaults($reflection)
-                : $reflection->newInstanceWithoutConstructor();
+                : $this->instantiateWithEmptyArrays($reflection);
 
             $metaMap = $this->getPropertyMetadataMap($object);
 

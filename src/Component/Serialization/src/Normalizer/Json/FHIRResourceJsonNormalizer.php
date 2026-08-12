@@ -291,7 +291,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
 
         try {
             $reflection            = self::reflClass($resolvedType);
-            $object                = $reflection->newInstanceWithoutConstructor();
+            $object                = $this->instantiateWithEmptyArrays($reflection);
             $metaMap               = $this->getPropertyMetadataMap($object);
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
 

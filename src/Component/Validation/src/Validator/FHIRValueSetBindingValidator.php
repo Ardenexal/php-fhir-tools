@@ -54,6 +54,15 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
             return;
         }
 
+        // An empty repeating element carries no codes, so there is no membership question to answer.
+        // Only `null` was treated as absent before, which was enough while the deserializer left
+        // repeating properties uninitialized (Symfony reads those as null). Once they are initialised
+        // to `[]`, every unpopulated coded array — `ElementDefinition.type.aggregation` is the loudest —
+        // reached validateRequired() and produced a "no enum class generated" warning about nothing.
+        if ($value === []) {
+            return;
+        }
+
         // FHIR primitives that carry only extensions (e.g. `_status`) have no
         // underlying value. Cast-to-string yields "" — treat as absent so that
         // NotBlank handles the required-field check rather than this validator.

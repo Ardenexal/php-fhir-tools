@@ -1173,6 +1173,42 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Instantiate a class the way `newInstanceWithoutConstructor()` cannot: with its repeating
+     * elements already empty rather than uninitialized.
+     *
+     * Generated models declare every repeating element as a promoted `public array $x = []`, so an
+     * instance produced by PHP's own constructor never has an uninitialized array property. The
+     * denormalizers bypass the constructor, which leaves that state reachable — and it is not
+     * equivalent to `[]`:
+     *
+     *  - reading `$resource->item` raises "must not be accessed before initialization" for consumers;
+     *  - Symfony's `PropertyMetadata::getPropertyValue()` maps the uninitialized slot to `null`, and
+     *    `CountValidator` returns early on null, so every generated `#[Count(min: 1)]` was dead.
+     *
+     * Only properties declared exactly `array` are filled. A nullable `?array` is left alone: there
+     * null is a value the model chose to allow, not an artefact of skipping the constructor.
+     *
+     * @param \ReflectionClass<object> $reflection
+     */
+    protected function instantiateWithEmptyArrays(\ReflectionClass $reflection): object
+    {
+        $object = $reflection->newInstanceWithoutConstructor();
+
+        foreach (self::reflPublicProps($reflection->getName()) as $property) {
+            if ($property->isStatic() || $property->isInitialized($object)) {
+                continue;
+            }
+
+            $type = $property->getType();
+            if ($type instanceof \ReflectionNamedType && !$type->allowsNull() && $type->getName() === 'array') {
+                $property->setValue($object, []);
+            }
+        }
+
+        return $object;
+    }
+
+    /**
      * Instantiate an object of the given class, providing constructor default values if a constructor exists.
      *
      * @param \ReflectionClass<object> $reflection
