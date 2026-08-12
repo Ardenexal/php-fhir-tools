@@ -961,7 +961,32 @@ class FHIRModelGenerator implements GeneratorInterface
             // Regex pattern from primitive type extension.
             $regexPattern = $this->extractPrimitiveRegexPattern($element);
             if ($regexPattern !== null) {
-                $param->addAttribute(Regex::class, ['pattern' => $regexPattern]);
+                $param->addAttribute(Regex::class, ['pattern' => self::toDelimitedAnchoredPattern($regexPattern)]);
+            } elseif (($element['path'] ?? null) === 'Resource.id') {
+                // `Resource.id` is the one element whose lexical rule lives nowhere in its own
+                // definition: its type is `http://hl7.org/fhirpath/System.String` with no `regex`
+                // extension, so nothing above emits anything and every resource id was unconstrained.
+                //
+                // Constraining `IdPrimitive` instead does not work — the property is generated as a
+                // bare `?string`, so the primitive wrapper class is never consulted.
+                //
+                // Matched on `path`, not `base.path`: `base.path` is `Resource.id` on *every* concrete
+                // resource's `id` too (Patient.id, Observation.id, …), and Symfony merges a parent's
+                // property constraints into a child that redeclares the property, so emitting on both
+                // AbstractResource::$id and PatientResource::$id yields two violations where the
+                // reference validator reports one. Matching `path` emits exactly once, on the
+                // `Resource` StructureDefinition, and all 146 generated resource classes inherit it.
+                //
+                // Not to be confused with `Element.id` (Narrative.id, Coding.id, …), which has the
+                // identical `System.String` shape but carries no such rule and must stay unconstrained.
+                //
+                // One constraint, not Regex + Length: the length limit is inside the quantifier, so an
+                // over-long id fails exactly once, matching the reference validator's single issue.
+                $param->addAttribute(Regex::class, [
+                    'pattern' => self::toDelimitedAnchoredPattern(self::RESOURCE_ID_PATTERN),
+                    // `{{ value }}` is already rendered quoted by Symfony — no quotes around it here.
+                    'message' => 'Invalid Resource id: {{ value }} must be 1-64 characters of A-Z, a-z, 0-9, "-" or ".".',
+                ]);
             }
 
             // FHIRValueSetBinding for required/extensible/preferred-strength bindings.
@@ -1090,6 +1115,70 @@ class FHIRModelGenerator implements GeneratorInterface
         }
 
         return null;
+    }
+
+    /**
+     * Delimiters tried, in order, when wrapping a FHIR regex for PCRE.
+     *
+     * None of these is a PCRE metacharacter, so an unescaped occurrence inside the pattern is always
+     * a literal and the "first candidate absent from the pattern" rule is safe. `/` is deliberately
+     * absent: two core patterns (`base64Binary`, and R5's `base64Binary`) contain it literally.
+     *
+     * @var list<string>
+     */
+    private const REGEX_DELIMITER_CANDIDATES = ['~', '#', '%', '!', '@'];
+
+    /**
+     * The lexical rule for `Resource.id`, identical in R4, R4B and R5.
+     *
+     * Sourced from the `id` primitive's own `regex` extension rather than invented here; the
+     * `Resource.id` element itself carries no `regex` extension to read it from.
+     */
+    private const RESOURCE_ID_PATTERN = '[A-Za-z0-9\-\.]{1,64}';
+
+    /**
+     * Wrap a raw FHIR regex as a delimited, whole-value-anchored PCRE pattern.
+     *
+     * StructureDefinitions carry regexes in an undelimited dialect (`true|false`,
+     * `(\s*([0-9a-zA-Z\+/=]){4}\s*)+`). Handing those straight to `Symfony\...\Regex` is a silent
+     * inversion of the constraint: `preg_match()` raises ("Delimiter must not be alphanumeric…",
+     * "Unknown modifier '+'") and returns `false`, which `RegexValidator` reads as "did not match",
+     * so the constraint rejects *every* value including the valid ones.
+     *
+     * Anchored with `\A`/`\z` rather than `^`/`$`: FHIR regexes constrain the entire lexical value,
+     * and `$` also matches immediately before a trailing newline, so `^…$` would accept `"abc\n"`
+     * for `code`, `id`, `oid` and friends. The body is wrapped in a non-capturing group so a
+     * top-level alternation (`true|false`) cannot escape the anchors.
+     */
+    private static function toDelimitedAnchoredPattern(string $fhirRegex): string
+    {
+        foreach (self::REGEX_DELIMITER_CANDIDATES as $candidate) {
+            if (! str_contains($fhirRegex, $candidate)) {
+                return $candidate . '\A(?:' . $fhirRegex . ')\z' . $candidate;
+            }
+        }
+
+        // Every candidate occurs literally in the pattern. Escape the occurrences of the first one
+        // rather than assuming this cannot happen — a future FHIR version only has to ship one regex
+        // containing all five characters to turn an unchecked assumption into a silent inversion.
+        $delimiter = self::REGEX_DELIMITER_CANDIDATES[0];
+        $escaped   = '';
+        $length    = strlen($fhirRegex);
+        for ($i = 0; $i < $length; ++$i) {
+            $char = $fhirRegex[$i];
+            // Preserve existing escape sequences verbatim so `\~` is not turned into `\\~`.
+            if ($char === '\\' && $i + 1 < $length) {
+                $escaped .= $char . $fhirRegex[$i + 1];
+                ++$i;
+                continue;
+            }
+            if ($char === $delimiter) {
+                $escaped .= '\\';
+            }
+            $escaped .= $char;
+        }
+
+        return $delimiter . '\A(?:' . $escaped . ')\z' . $delimiter;
     }
 
     /**

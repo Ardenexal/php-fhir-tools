@@ -290,7 +290,51 @@ class FHIRModelGeneratorConstraintEmissionTest extends TestCase
         $fqcn  = $this->evalClass($class, self::TEST_NS . '\\Primitive');
         $attrs = (new \ReflectionClass($fqcn))->getProperty('value')->getAttributes(Regex::class);
         self::assertNotEmpty($attrs, '#[Regex] must be emitted when type has regex extension');
-        self::assertSame('^[A-Z]+$', $attrs[0]->newInstance()->pattern, 'Regex::$pattern must match valueString');
+
+        // The valueString is an *undelimited* FHIR regex and must not be emitted verbatim: an
+        // undelimited pattern makes preg_match() raise and return false, which RegexValidator reads
+        // as "did not match", inverting the constraint so it rejects every value.
+        $pattern = $attrs[0]->newInstance()->pattern;
+        self::assertSame('~\A(?:^[A-Z]+$)\z~', $pattern, 'Regex::$pattern must be delimited and whole-value anchored');
+        self::assertNotSame(false, @preg_match($pattern, 'ABC'), 'emitted pattern must be a compilable PCRE');
+        self::assertSame(1, preg_match($pattern, 'ABC'));
+        self::assertSame(0, preg_match($pattern, 'xABCx'), 'pattern must be anchored to the whole value');
+    }
+
+    /**
+     * The delimiter must not be a character the pattern itself contains — `base64Binary`'s
+     * `[0-9a-zA-Z\+/=]` is exactly why `/` cannot be used.
+     */
+    public function testRegexDelimiterAvoidsCharactersPresentInThePattern(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('SlashRegexType', 'primitive-type', [
+                [
+                    'path' => 'SlashRegexType.value',
+                    'min'  => 0,
+                    'max'  => '1',
+                    'type' => [[
+                        'code'      => 'http://hl7.org/fhirpath/System.String',
+                        'extension' => [
+                            ['url' => 'http://hl7.org/fhir/StructureDefinition/regex', 'valueString' => '(\s*([0-9a-zA-Z\+/=]){4}\s*)+'],
+                        ],
+                    ]],
+                    'base'           => ['path' => 'SlashRegexType.value'],
+                    'representation' => ['xmlAttr'],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn    = $this->evalClass($class, self::TEST_NS . '\\Primitive');
+        $attrs   = (new \ReflectionClass($fqcn))->getProperty('value')->getAttributes(Regex::class);
+        $pattern = $attrs[0]->newInstance()->pattern;
+
+        self::assertNotSame(false, @preg_match($pattern, 'aGVsbG8='), 'emitted pattern must be a compilable PCRE');
+        self::assertSame(1, preg_match($pattern, 'aGVsbG8='), 'a valid base64 value must pass');
+        self::assertSame(0, preg_match($pattern, '!!!!'), 'an invalid value must fail');
+        self::assertSame(0, preg_match($pattern, 'aGVsbG8=!!!'), 'merely containing a valid value must fail');
     }
 
     public function testRegexNotEmittedWhenExtensionAbsent(): void

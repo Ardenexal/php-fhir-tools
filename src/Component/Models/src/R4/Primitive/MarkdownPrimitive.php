@@ -32,7 +32,7 @@ class MarkdownPrimitive extends StringPrimitive implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var string|null value Primitive value for markdown */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '[ \r\n\t\S]+')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '~\A(?:[ \r\n\t\S]+)\z~')]
         public ?string $value = null,
     ) {
         parent::__construct($id, $extension, $value);

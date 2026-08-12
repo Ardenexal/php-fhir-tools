@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Base;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -27,6 +28,10 @@ abstract class AbstractResource extends Base
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[Regex(
+            pattern: '~\A(?:[A-Za-z0-9\-\.]{1,64})\z~',
+            message: 'Invalid Resource id: {{ value }} must be 1-64 characters of A-Z, a-z, 0-9, "-" or ".".',
+        )]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]

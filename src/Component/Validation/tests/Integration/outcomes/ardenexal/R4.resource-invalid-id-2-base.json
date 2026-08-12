@@ -1,19 +1,23 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Invalid Resource id: Too long (90 chars)"
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:Regex": [
+                "id — Invalid Resource id: \"foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar\" must be 1-64 characters of A-Z, a-z, 0-9, \"-\" or \".\"."
+            ]
+        },
         "suppressedErrors": {},
         "warnings": {},
         "suppressedWarnings": {}
