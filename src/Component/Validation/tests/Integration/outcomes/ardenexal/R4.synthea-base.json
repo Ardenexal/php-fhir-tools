@@ -20,8 +20,6 @@
                 "(root) — The property reasonCode must be a JSON Array, not an Object (at Encounter)"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

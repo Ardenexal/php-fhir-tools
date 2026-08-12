@@ -20,8 +20,6 @@
                 "differential — No slicing on the root element"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

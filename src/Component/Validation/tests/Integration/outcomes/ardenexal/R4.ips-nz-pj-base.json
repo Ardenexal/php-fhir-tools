@@ -17,7 +17,6 @@
     },
     "outcome": {
         "errors": {},
-        "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
                 "entry[20].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
@@ -28,7 +27,6 @@
                 "entry[25].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
                 "entry[26].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated."
             ]
-        },
-        "suppressedWarnings": {}
+        }
     }
 }

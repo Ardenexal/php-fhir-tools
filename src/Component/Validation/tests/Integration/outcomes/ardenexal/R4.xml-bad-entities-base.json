@@ -23,8 +23,6 @@
                 "(root) — Unable to parse XML: Entity 'reg' not defined at line 6 column 916"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

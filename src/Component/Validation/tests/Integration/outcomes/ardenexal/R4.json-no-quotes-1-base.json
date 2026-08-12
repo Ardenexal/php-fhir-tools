@@ -23,8 +23,6 @@
                 "(root) — Unable to parse JSON: Parse error on line 1:\n{\r  resourceType : \"Pati\n---^\nExpected one of: 'STRING', '}'"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

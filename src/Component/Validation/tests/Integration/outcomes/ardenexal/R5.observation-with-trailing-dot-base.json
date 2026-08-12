@@ -23,8 +23,6 @@
                 "(root) — Unable to parse JSON: Parse error on line 22:\n...        \"value\": 925.,        \"unit\": \"\n----------------------^\nExpected one of: 'EOF', '}', ',', ']'"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

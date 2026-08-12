@@ -211,8 +211,8 @@ final class FHIRValidatorSpecificationTest extends TestCase
             $this->markTestSkipped("Validation threw Error for '{$name}': {$e->getMessage()}");
         }
 
-        $realErrors   = array_values(array_filter($report->errors(), fn ($v) => !$this->isKnownGap($v, $resource)));
-        $realWarnings = array_values(array_filter($report->warnings(), fn ($v) => !$this->isKnownGap($v, $resource)));
+        $realErrors   = $report->errors();
+        $realWarnings = $report->warnings();
 
         self::assertSame(
             $expected['errorCount'],
@@ -333,8 +333,8 @@ final class FHIRValidatorSpecificationTest extends TestCase
             $this->markTestSkipped("Validation threw Error for R4B '{$name}': {$e->getMessage()}");
         }
 
-        $realErrors   = array_values(array_filter($report->errors(), fn ($v) => !$this->isKnownGap($v, $resource)));
-        $realWarnings = array_values(array_filter($report->warnings(), fn ($v) => !$this->isKnownGap($v, $resource)));
+        $realErrors   = $report->errors();
+        $realWarnings = $report->warnings();
 
         self::assertSame(
             $expected['errorCount'],
@@ -457,8 +457,8 @@ final class FHIRValidatorSpecificationTest extends TestCase
             $this->markTestSkipped("Validation threw Error for R5 '{$name}': {$e->getMessage()}");
         }
 
-        $realErrors   = array_values(array_filter($report->errors(), fn ($v) => !$this->isKnownGap($v, $resource)));
-        $realWarnings = array_values(array_filter($report->warnings(), fn ($v) => !$this->isKnownGap($v, $resource)));
+        $realErrors   = $report->errors();
+        $realWarnings = $report->warnings();
 
         self::assertSame(
             $expected['errorCount'],
@@ -568,33 +568,10 @@ final class FHIRValidatorSpecificationTest extends TestCase
         return str_replace(['/', ' '], '-', $name);
     }
 
-    private function isKnownGap(FHIRValidationViolation $v, object $resource): bool
-    {
-        // Required binding cannot be evaluated — no generated enum for this value set.
-        if (str_contains($v->message, 'has no generated enum class')) {
-            return true;
-        }
-
-        // sdf-19: StructureDefinition URL-based type-code check. Our FHIRPath evaluator
-        // produces false positives on the startsWith/implies combination — cases Java
-        // considers valid still fire this invariant for us.
-        if ($v->invariantKey === 'sdf-19') {
-            return true;
-        }
-
-        // NotBlank on a boolean false: generated models emit #[NotBlank] on required ?bool
-        // properties, but Symfony's NotBlank treats false as blank. The constraint should
-        // be #[NotNull] for booleans. This is a code-generator bug.
-        if ($v->constraintClass === \Symfony\Component\Validator\Constraints\NotBlank::class
-            && $v->path !== ''
-            && property_exists($resource, $v->path)
-            && isset($resource->{$v->path})
-            && $resource->{$v->path} === false) {
-            return true;
-        }
-
-        return false;
-    }
+    // This suite asserts every violation the validator reports; nothing is filtered before the
+    // counts are asserted. Limitations we cannot close offline are declared per case in
+    // Oracle\DeclaredLimitations, and ComparisonHarness's docblock explains why no suppression
+    // filter belongs here.
 
     private static function createValidationService(FhirVersion $version = FhirVersion::R4): FHIRValidationService
     {

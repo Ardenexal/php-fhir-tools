@@ -23,8 +23,6 @@
                 "(root) — Unable to parse XML: StartTag: invalid element name at line 6 column 9"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

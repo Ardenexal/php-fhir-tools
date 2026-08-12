@@ -138,21 +138,6 @@ final class ComparisonReport
     }
 
     /**
-     * Cases whose class changes depending on whether isKnownGap() suppression is applied.
-     *
-     * A non-empty result means the filtered comparison is not apples-to-apples with Java, because
-     * Java's counts are never filtered. This is the evidence for M00's severity-mapping task.
-     *
-     * @return list<CaseComparison>
-     */
-    public function skewedCases(): array
-    {
-        return array_values(
-            array_filter($this->comparisons, static fn (CaseComparison $c): bool => $c->isSkewedByKnownGapFilter()),
-        );
-    }
-
-    /**
      * Family label => number of error violations carrying it, across every ABOVE case.
      *
      * Restricted to ABOVE because those are the false positives worth fixing; counting families

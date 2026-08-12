@@ -23,8 +23,6 @@
                 "subject[0] — SHALL have a contained resource if a local reference is provided"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

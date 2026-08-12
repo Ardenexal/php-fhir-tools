@@ -21,8 +21,6 @@
                 "(root) — Unable to detect target class from data"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

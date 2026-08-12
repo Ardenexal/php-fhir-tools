@@ -19,8 +19,6 @@
                 "characteristic[0].value — This value should not be null."
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

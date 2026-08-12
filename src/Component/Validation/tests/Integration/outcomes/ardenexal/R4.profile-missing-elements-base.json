@@ -26,12 +26,10 @@
                 "differential.element[0].slicing.discriminator[1].path — This value should not be blank."
             ]
         },
-        "suppressedErrors": {},
         "warnings": {
             "invariant:sdf-0": [
                 "(root) — Name should be usable as an identifier for the module by machine processing applications such as code generation"
             ]
-        },
-        "suppressedWarnings": {}
+        }
     }
 }

@@ -24,8 +24,6 @@
                 "abstract — This value should not be null."
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

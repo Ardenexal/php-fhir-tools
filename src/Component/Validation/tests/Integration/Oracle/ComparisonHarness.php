@@ -9,7 +9,6 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationViolation;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Runs every applicable fhir-test-cases validator case and compares our counts against Java's.
@@ -20,6 +19,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * Case selection mirrors FHIRValidatorSpecificationTest so the two stay comparable. Cases with no
  * Java outcome are excluded rather than counted as zero-error: absent oracle is not agreement.
+ *
+ * ## No suppression filter
+ *
+ * Our violations are compared exactly as the validator reports them. Java's counts are never
+ * filtered, so filtering ours would break the comparison in the direction that matters most: a
+ * suppressed violation reads as agreement.
+ *
+ * **Do not add a message- or invariant-keyed filter.** That shape hides findings the reference
+ * validator agrees with, and rots invisibly — nothing tells you whether such a rule still matches
+ * anything. Limitations we cannot close offline are declared per case, with both sides' counts
+ * pinned, in {@see DeclaredLimitations}, where one that stops being a limitation fails its pin
+ * rather than lingering.
  */
 final class ComparisonHarness
 {
@@ -129,7 +140,6 @@ final class ComparisonHarness
             return new CaseComparison(
                 name: $name,
                 ourErrorCount: 1,
-                ourErrorCountUnfiltered: 1,
                 ourWarningCount: 0,
                 javaErrorCount: $javaOutcome->errorCount,
                 javaWarningCount: $javaOutcome->warningCount,
@@ -166,26 +176,19 @@ final class ComparisonHarness
             return null;
         }
 
-        $allErrors      = $report->errors();
-        $filteredErrors = array_values(
-            array_filter($allErrors, fn (FHIRValidationViolation $v): bool => !self::isKnownGap($v, $resource)),
-        );
-        $filteredWarnings = array_values(
-            array_filter($report->warnings(), fn (FHIRValidationViolation $v): bool => !self::isKnownGap($v, $resource)),
-        );
+        $errors = $report->errors();
 
         return new CaseComparison(
             name: $name,
-            ourErrorCount: count($filteredErrors),
-            ourErrorCountUnfiltered: count($allErrors),
-            ourWarningCount: count($filteredWarnings),
+            ourErrorCount: count($errors),
+            ourWarningCount: count($report->warnings()),
             javaErrorCount: $javaOutcome->errorCount,
             javaWarningCount: $javaOutcome->warningCount,
             ourErrorMessages: array_map(
                 static fn (FHIRValidationViolation $v): string => $v->message,
-                $filteredErrors,
+                $errors,
             ),
-            families: $this->familyClassifier->classifyAll($filteredErrors),
+            families: $this->familyClassifier->classifyAll($errors),
             javaErrorTexts: $javaOutcome->errorTexts,
         );
     }
@@ -274,32 +277,5 @@ final class ComparisonHarness
             FhirVersion::R4B => $declared === '4.3',
             FhirVersion::R5  => $declared === null || in_array($declared, ['5.0', '5.0.0'], true),
         };
-    }
-
-    /**
-     * Mirrors FHIRValidatorSpecificationTest::isKnownGap().
-     *
-     * Kept in sync deliberately rather than shared: the harness must be able to report what the
-     * suite suppresses, which means reproducing the suite's rule rather than inheriting it.
-     */
-    public static function isKnownGap(FHIRValidationViolation $v, object $resource): bool
-    {
-        if (str_contains($v->message, 'has no generated enum class')) {
-            return true;
-        }
-
-        // `dom-3` was suppressed here too until the XHTML-narrative false positive was fixed in
-        // FHIRPathInvariantValidator::narrativeAccountsForContained(). It is no longer filtered, so
-        // `R5.list-contained-bad`'s genuine "contained resource 'pat1' is not referenced" error —
-        // which Java reports and we were hiding — now counts.
-        if ($v->invariantKey === 'sdf-19') {
-            return true;
-        }
-
-        return $v->constraintClass === NotBlank::class
-            && $v->path !== ''
-            && property_exists($resource, $v->path)
-            && isset($resource->{$v->path})
-            && $resource->{$v->path} === false;
     }
 }

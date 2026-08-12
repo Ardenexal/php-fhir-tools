@@ -32,12 +32,10 @@
                 "entry[0].resource.connectionType — All FHIR elements must have a @value or children"
             ]
         },
-        "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
                 "entry[0].resource.payloadMimeType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
             ]
-        },
-        "suppressedWarnings": {}
+        }
     }
 }

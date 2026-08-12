@@ -23,8 +23,6 @@
                 "(root) — Unable to detect data format: expected JSON (starting \"{\" or \"[\") or XML (starting \"<\"), got '// example with comments\r\n{\r\n  \"resourc…'"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

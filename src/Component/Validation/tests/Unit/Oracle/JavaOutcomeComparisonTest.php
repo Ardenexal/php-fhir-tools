@@ -120,25 +120,6 @@ final class JavaOutcomeComparisonTest extends TestCase
         self::assertNull($reader->read(['java' => 'missing-file.json']));
     }
 
-    public function testKnownGapSuppressionIsReportedAsSkew(): void
-    {
-        // Unfiltered we report 2 errors and Java reports 1, but isKnownGap() hides one of ours,
-        // making the filtered comparison look like agreement. That divergence must be visible.
-        $comparison = new CaseComparison(
-            name: 'skewed-case',
-            ourErrorCount: 1,
-            ourErrorCountUnfiltered: 2,
-            ourWarningCount: 0,
-            javaErrorCount: 1,
-            javaWarningCount: 0,
-        );
-
-        self::assertSame(Classification::Equal, $comparison->classification());
-        self::assertSame(Classification::Above, $comparison->unfilteredClassification());
-        self::assertTrue($comparison->isSkewedByKnownGapFilter());
-        self::assertSame(1, $comparison->suppressedByKnownGap());
-    }
-
     public function testReportRollsUpCountsAndAboveFamilies(): void
     {
         $report = new ComparisonReport([
@@ -206,7 +187,6 @@ final class JavaOutcomeComparisonTest extends TestCase
         $agreesOnErrorsNotWarnings = new CaseComparison(
             name: 'noisy',
             ourErrorCount: 1,
-            ourErrorCountUnfiltered: 1,
             ourWarningCount: 16,
             javaErrorCount: 1,
             javaWarningCount: 0,
@@ -245,7 +225,6 @@ final class JavaOutcomeComparisonTest extends TestCase
         return new CaseComparison(
             name: $name,
             ourErrorCount: $ours,
-            ourErrorCountUnfiltered: $ours,
             ourWarningCount: 0,
             javaErrorCount: $java,
             javaWarningCount: 0,

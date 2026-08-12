@@ -23,8 +23,6 @@
                 "(root) — Unable to parse XML: Opening and ending tag mismatch: id line 4 and List at line 7 column 8"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

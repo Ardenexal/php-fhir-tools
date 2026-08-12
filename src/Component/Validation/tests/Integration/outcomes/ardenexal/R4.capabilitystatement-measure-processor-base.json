@@ -20,12 +20,10 @@
                 "fhirVersion — The value 5.0.0 is not a valid case of value set http://hl7.org/fhir/ValueSet/FHIR-version|4.0.1."
             ]
         },
-        "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
                 "format — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
             ]
-        },
-        "suppressedWarnings": {}
+        }
     }
 }

@@ -21,8 +21,6 @@
     },
     "outcome": {
         "errors": {},
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

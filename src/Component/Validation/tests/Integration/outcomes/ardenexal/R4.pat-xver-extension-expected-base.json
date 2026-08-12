@@ -21,8 +21,6 @@
                 "snapshot.element[8] — Must have a modifier reason if isModifier = true"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

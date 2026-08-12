@@ -62,8 +62,6 @@
                 "(root) — Failed to deserialize XML to FHIR object: Expected Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRInstant string, got invalid value: 1983-00-01T12:32:45Z"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

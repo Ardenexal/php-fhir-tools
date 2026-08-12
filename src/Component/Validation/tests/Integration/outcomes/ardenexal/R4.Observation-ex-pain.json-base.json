@@ -19,8 +19,6 @@
                 "code — This value should not be blank."
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

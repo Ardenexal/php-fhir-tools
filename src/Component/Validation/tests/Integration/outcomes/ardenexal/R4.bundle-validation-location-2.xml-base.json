@@ -22,8 +22,6 @@
                 "entry[1].resource.gender — The value invalid is not a valid case of value set http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1."
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

@@ -23,8 +23,6 @@
                 "(root) — Failed to deserialize XML to FHIR object: Could not denormalize object of type \"Ardenexal\\FHIRTools\\Component\\Models\\R5\\DataType\\CodeableConcept\", no supporting normalizer found."
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

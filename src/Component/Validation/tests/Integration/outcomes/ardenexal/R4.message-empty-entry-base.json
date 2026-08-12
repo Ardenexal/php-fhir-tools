@@ -26,12 +26,10 @@
                 "entry[5] — must be a resource unless there's a request or response"
             ]
         },
-        "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
                 "entry[7].resource.contained[0].payloadMimeType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
             ]
-        },
-        "suppressedWarnings": {}
+        }
     }
 }

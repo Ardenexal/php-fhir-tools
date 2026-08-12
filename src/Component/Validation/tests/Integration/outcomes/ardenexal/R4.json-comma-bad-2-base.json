@@ -25,8 +25,6 @@
                 "(root) — Unable to parse JSON: Parse error on line 8:\n...    \"Sarah\",\r      ]\r    }\r  ],\r  \"g\n---------------------^\nExpected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '[' - It appears you have an extra trailing comma"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

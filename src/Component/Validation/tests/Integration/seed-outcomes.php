@@ -11,8 +11,8 @@ declare(strict_types=1);
  *   php src/Component/Validation/tests/Integration/seed-outcomes.php r4b   # seeds R4B
  *
  * Writes one JSON file per qualifying test case to outcomes/ardenexal/.
- * Existing files are overwritten. Known-gap violations are excluded from counts,
- * matching the logic in FHIRValidatorSpecificationTest::isKnownGap().
+ * Existing files are overwritten. Every violation the validator reports is counted — nothing is
+ * filtered out; see ComparisonHarness for why no suppression filter belongs in this comparison.
  *
  * Each file carries the three asserted counts, a `java` block holding the reference validator's
  * counts for the same case, and an `outcome` block holding the messages behind ours:
@@ -25,10 +25,8 @@ declare(strict_types=1);
  *       "errors": ["Not a valid date format: 'not a date'"]
  *     },
  *     "outcome": {
- *       "errors":             { "invariant:ref-1": ["Coverage.payor[0] — SHALL have a contained …"] },
- *       "suppressedErrors":   { "invariant:dom-3": ["(root) — …"] },
- *       "warnings":           {},
- *       "suppressedWarnings": {}
+ *       "errors":   { "invariant:ref-1": ["Coverage.payor[0] — SHALL have a contained …"] },
+ *       "warnings": {}
  *     }
  *   }
  *
@@ -51,13 +49,10 @@ declare(strict_types=1);
  * was detectable before — the R4 path asserted `errorCount >= 1` against the seed file itself (which
  * cannot observe our behaviour at all) and R4B/R5 called markTestSkipped.
  *
- * The `suppressed*` keys are the point of the `outcome` block: isKnownGap() removes those violations
- * from the counts entirely, so without listing them a reviewer cannot tell a genuinely clean case from
- * one whose findings were filtered away. A count that reads right for the wrong reason is the failure
- * mode this catches. `R5.narrative-binary` was the worked example: it reported errorCount 0 while hiding
- * a dom-3 — which turned out to be a false positive, whereas `R5.list-contained-bad` was hiding a real
- * one. Both are now unfiltered, the false positive having been fixed at source in
- * FHIRPathInvariantValidator; `invariant:sdf-19` is the remaining suppression of this shape.
+ * The `outcome` block is what makes a count reviewable: `errorCount: 0` on its own cannot be told
+ * apart from a case whose findings were quietly dropped, and a count that reads right for the wrong
+ * reason is the failure mode this guards against. `errors` and `warnings` are the whole story:
+ * nothing is filtered, so every violation behind a count is listed.
  *
  * The `java` block exists so divergence from the oracle is readable in the file itself, without
  * running compare-java-outcomes.php. **It is deliberately named `java`, not `expected`.** The
@@ -122,7 +117,6 @@ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 // matchetype: FHIRPath pattern-matching syntax tests using $instant$ placeholders — not real dateTime values.
 const SKIP_MODULES = ['tx', 'cda', 'cdshooks', 'shc', 'matchetype'];
@@ -203,10 +197,8 @@ foreach ($cases as $name => $case) {
             'outcome'      => [
                 // Keyed as the finding it is, not as `deserialization`, which would perpetuate exactly
                 // the confusion this split removes.
-                'errors'             => (object) ['conformance:deserialization' => ['(root) — ' . $e->finding]],
-                'suppressedErrors'   => (object) [],
-                'warnings'           => (object) [],
-                'suppressedWarnings' => (object) [],
+                'errors'   => (object) ['conformance:deserialization' => ['(root) — ' . $e->finding]],
+                'warnings' => (object) [],
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
 
@@ -263,10 +255,8 @@ foreach ($cases as $name => $case) {
             ],
             'java'         => javaBlock($javaOutcome, ourErrorCount: 0, ourWarningCount: 0),
             'outcome'      => [
-                'errors'             => (object) ['deserialization' => ['(root) — ' . $e->getMessage()]],
-                'suppressedErrors'   => (object) [],
-                'warnings'           => (object) [],
-                'suppressedWarnings' => (object) [],
+                'errors'   => (object) ['deserialization' => ['(root) — ' . $e->getMessage()]],
+                'warnings' => (object) [],
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
         $outFile = OUTCOMES_DIR . '/' . $outcomePrefix . '.' . sanitizeName($name) . '-base.json';
@@ -288,10 +278,8 @@ foreach ($cases as $name => $case) {
         continue;
     }
 
-    $countedErrors      = array_values(array_filter($report->errors(), fn ($v) => !isKnownGap($v, $resource)));
-    $suppressedErrors   = array_values(array_filter($report->errors(), fn ($v) => isKnownGap($v, $resource)));
-    $countedWarnings    = array_values(array_filter($report->warnings(), fn ($v) => !isKnownGap($v, $resource)));
-    $suppressedWarnings = array_values(array_filter($report->warnings(), fn ($v) => isKnownGap($v, $resource)));
+    $countedErrors   = $report->errors();
+    $countedWarnings = $report->warnings();
 
     $javaOutcome = $javaReader->read($case);
 
@@ -304,15 +292,13 @@ foreach ($cases as $name => $case) {
         // on why this is `java` and not `expected`.
         'java'         => javaBlock($javaOutcome, count($countedErrors), count($countedWarnings)),
         // The counts alone cannot be reviewed. This is the evidence behind them: every message that
-        // produced a count, grouped by invariant key or constraint, plus the errors isKnownGap()
-        // removed — those are invisible in errorCount and are exactly where a real defect can hide.
-        // Cast to object so an empty group encodes as `{}` rather than `[]` — the three keys keep one
+        // produced a count, grouped by invariant key or constraint. Nothing is held back — every
+        // violation we reported is both counted above and listed here.
+        // Cast to object so an empty group encodes as `{}` rather than `[]` — the keys keep one
         // shape whether or not they hold anything, which matters for anything reading these files.
         'outcome'      => [
-            'errors'             => (object) groupViolations($countedErrors),
-            'suppressedErrors'   => (object) groupViolations($suppressedErrors),
-            'warnings'           => (object) groupViolations($countedWarnings),
-            'suppressedWarnings' => (object) groupViolations($suppressedWarnings),
+            'errors'   => (object) groupViolations($countedErrors),
+            'warnings' => (object) groupViolations($countedWarnings),
         ],
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
 
@@ -443,25 +429,6 @@ function matchesVersion(array $case, FhirVersion $version): bool
         FhirVersion::R4B => $v === '4.3',
         FhirVersion::R5  => $v === null || in_array($v, ['5.0', '5.0.0'], true),
     };
-}
-
-function isKnownGap(FHIRValidationViolation $v, object $resource): bool
-{
-    if (str_contains($v->message, 'has no generated enum class')) {
-        return true;
-    }
-    if ($v->invariantKey === 'sdf-19') {
-        return true;
-    }
-    if ($v->constraintClass === NotBlank::class
-        && $v->path !== ''
-        && property_exists($resource, $v->path)
-        && isset($resource->{$v->path})
-        && $resource->{$v->path} === false) {
-        return true;
-    }
-
-    return false;
 }
 
 function createValidationService(FhirVersion $version = FhirVersion::R4): FHIRValidationService

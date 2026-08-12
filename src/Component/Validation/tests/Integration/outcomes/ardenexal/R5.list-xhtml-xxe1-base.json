@@ -23,8 +23,6 @@
                 "(root) — XML DOCTYPE declarations are not accepted: they permit external entity references (XXE). Remove the DOCTYPE and resubmit the document."
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

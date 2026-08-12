@@ -15,13 +15,11 @@
     },
     "outcome": {
         "errors": {},
-        "suppressedErrors": {},
         "warnings": {
             "constraint:FHIRValueSetBinding": [
                 "content[0].attachment.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|5.0.0 could not be validated: no enum class generated.",
                 "content[0].attachment.language — Required binding for value set http://hl7.org/fhir/ValueSet/all-languages|5.0.0 could not be validated: no enum class generated."
             ]
-        },
-        "suppressedWarnings": {}
+        }
     }
 }

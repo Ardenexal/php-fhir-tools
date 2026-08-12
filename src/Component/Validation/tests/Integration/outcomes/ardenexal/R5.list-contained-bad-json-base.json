@@ -21,8 +21,6 @@
                 "(root) — The property subject must be a JSON Array, not an Object (at List)"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

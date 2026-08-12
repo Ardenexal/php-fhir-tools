@@ -23,8 +23,6 @@
                 "(root) — Failed to deserialize JSON to FHIR object: Expected Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRDate string, got invalid value: not a date"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

@@ -7,16 +7,14 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
 /**
  * One case's result: our counts beside Java's, classified.
  *
- * Both a filtered and a raw error count are carried deliberately. FHIRValidatorSpecificationTest
- * asserts against counts with isKnownGap() applied, but the Java side is never filtered, so
- * comparing filtered-ours against unfiltered-Java understates us wherever a known gap is
- * suppressed. Keeping both makes that skew measurable instead of invisible — see
- * ComparisonReport::skewedCases().
+ * `ourErrorCount` is every error we reported — nothing is filtered out before comparison, which is
+ * what makes it apples-to-apples with Java's count. See ComparisonHarness for why no suppression
+ * filter belongs anywhere in this comparison.
  */
 final class CaseComparison
 {
     /**
-     * @param list<string> $ourErrorMessages filtered error messages, for family labelling
+     * @param list<string> $ourErrorMessages our error messages, for family labelling
      * @param list<string> $families         family labels derived from those messages
      * @param list<string> $javaErrorTexts   Java's error-severity issue texts, so a reviewer can tell
      *                                       "we report something Java does not" from "we report the
@@ -26,7 +24,6 @@ final class CaseComparison
     public function __construct(
         public readonly string $name,
         public readonly int $ourErrorCount,
-        public readonly int $ourErrorCountUnfiltered,
         public readonly int $ourWarningCount,
         public readonly int $javaErrorCount,
         public readonly int $javaWarningCount,
@@ -36,27 +33,13 @@ final class CaseComparison
     ) {
     }
 
-    /** Classification on the same basis the specification suite asserts (known gaps suppressed). */
+    /**
+     * How our error count compares with Java's — on the same basis the specification suite asserts,
+     * and on the same basis a caller of the library sees, those now being one and the same thing.
+     */
     public function classification(): Classification
     {
         return Classification::compare($this->ourErrorCount, $this->javaErrorCount);
-    }
-
-    /** Classification with nothing suppressed — what a caller of the library actually sees. */
-    public function unfilteredClassification(): Classification
-    {
-        return Classification::compare($this->ourErrorCountUnfiltered, $this->javaErrorCount);
-    }
-
-    /** True when isKnownGap() suppression is what moves this case between classes. */
-    public function isSkewedByKnownGapFilter(): bool
-    {
-        return $this->classification() !== $this->unfilteredClassification();
-    }
-
-    public function suppressedByKnownGap(): int
-    {
-        return $this->ourErrorCountUnfiltered - $this->ourErrorCount;
     }
 
     /**

@@ -39,12 +39,10 @@
     },
     "outcome": {
         "errors": {},
-        "suppressedErrors": {},
         "warnings": {
             "invariant:mea-0": [
                 "entry[1].resource — Name should be usable as an identifier for the module by machine processing applications such as code generation"
             ]
-        },
-        "suppressedWarnings": {}
+        }
     }
 }

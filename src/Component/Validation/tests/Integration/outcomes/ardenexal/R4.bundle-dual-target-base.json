@@ -39,8 +39,6 @@
                 "(root) — A document must have an identifier with a system and a value"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

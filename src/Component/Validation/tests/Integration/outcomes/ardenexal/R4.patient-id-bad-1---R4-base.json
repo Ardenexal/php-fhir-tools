@@ -18,8 +18,6 @@
                 "id — Invalid Resource id: \"bad-id_1\" must be 1-64 characters of A-Z, a-z, 0-9, \"-\" or \".\"."
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

@@ -24,8 +24,6 @@
                 "(root) — Unable to parse XML: Document labelled UTF-16 but has UTF-8 content at line 1 column 38"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

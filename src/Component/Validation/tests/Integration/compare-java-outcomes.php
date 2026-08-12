@@ -136,10 +136,8 @@ if ($asJson) {
             'name'            => $c->name,
             'class'           => $c->classification()->value,
             'ours'            => $c->ourErrorCount,
-            'oursUnfiltered'  => $c->ourErrorCountUnfiltered,
             'java'            => $c->javaErrorCount,
             'families'        => $c->families,
-            'skewedByFilter'  => $c->isSkewedByKnownGapFilter(),
             'oursWarnings'    => $c->ourWarningCount,
             'javaWarnings'    => $c->javaWarningCount,
             'warningClass'    => $c->warningClassification()->value,
@@ -251,24 +249,6 @@ if ($families !== []) {
     echo "\nABOVE families (error violations, largest first):\n";
     foreach ($families as $family => $count) {
         printf("  %-40s %d\n", $family, $count);
-    }
-}
-
-$skewed = $report->skewedCases();
-if ($skewed !== []) {
-    printf(
-        "\nWARNING: %d case(s) change class depending on isKnownGap() suppression.\n"
-        . "Java counts are never filtered, so those comparisons are not apples-to-apples:\n",
-        count($skewed),
-    );
-    foreach ($skewed as $c) {
-        printf(
-            "  %-52s filtered=%s unfiltered=%s (suppressed %d)\n",
-            substr($c->name, 0, 52),
-            $c->classification()->value,
-            $c->unfilteredClassification()->value,
-            $c->suppressedByKnownGap(),
-        );
     }
 }
 

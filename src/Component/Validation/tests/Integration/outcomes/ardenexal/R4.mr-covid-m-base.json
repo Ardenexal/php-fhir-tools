@@ -23,8 +23,6 @@
                 "group[0].population[0].criteria — An expression or a reference must be provided"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

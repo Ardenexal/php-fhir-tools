@@ -18,8 +18,6 @@
                 "group[0].population[0].criteria — This value should not be blank."
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

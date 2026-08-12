@@ -18,8 +18,6 @@
                 "(root) — Default values can only be specified on specializations"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

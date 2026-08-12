@@ -23,8 +23,6 @@
                 "(root) — Unable to parse XML: xmlParseCharRef: invalid xmlChar value 29 at line 23 column 81"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

@@ -24,8 +24,6 @@
                 "(root) — Unable to parse JSON: Lexical error on line 3. Comments are not allowed.\n...pe\" : \"Patient\",\r  // example with comm\n---------------------^"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }

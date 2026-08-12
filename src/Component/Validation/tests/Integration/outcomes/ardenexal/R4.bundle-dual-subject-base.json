@@ -18,8 +18,6 @@
                 "(root) — Composition.subject: max allowed = 1, but found 2"
             ]
         },
-        "suppressedErrors": {},
-        "warnings": {},
-        "suppressedWarnings": {}
+        "warnings": {}
     }
 }
