@@ -57,7 +57,11 @@ class Meta extends Element
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AllSecurityLabels',
+        )]
         public array $security = [],
         /** @var array<Coding> tag Tags applied to this resource */
         #[FhirProperty(

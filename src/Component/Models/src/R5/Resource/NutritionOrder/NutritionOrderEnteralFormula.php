@@ -63,7 +63,13 @@ class NutritionOrderEnteralFormula extends BackboneElement
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $caloricDensity = null,
         /** @var CodeableConcept|null routeOfAdministration How the formula should enter the patient's gastrointestinal tract */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/enteral-route', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/enteral-route',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\EnteralRouteCodes',
+        )]
         public ?CodeableConcept $routeOfAdministration = null,
         /** @var array<NutritionOrderEnteralFormulaAdministration> administration Formula feeding instruction as structured data */
         #[FhirProperty(

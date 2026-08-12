@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Request Resource Types
  * URL: http://hl7.org/fhir/ValueSet/request-resource-types
  * Version: 5.0.0
  * Description: All Resource Types that represent request resources
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/request-resource-types', version: '5.0.0')]
 enum RequestResourceTypes: string
 {
     /** Base */

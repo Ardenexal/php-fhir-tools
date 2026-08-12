@@ -55,7 +55,12 @@ class AllergyIntoleranceReaction extends BackboneElement
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $onset = null,
         /** @var AllergyIntoleranceSeverityType|null severity mild | moderate | severe (of event as a whole) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/reaction-event-severity|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/reaction-event-severity|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AllergyIntoleranceSeverity',
+        )]
         public ?AllergyIntoleranceSeverityType $severity = null,
         /** @var CodeableConcept|null exposureRoute How the subject was exposed to the substance */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]

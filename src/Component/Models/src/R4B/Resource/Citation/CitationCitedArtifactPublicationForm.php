@@ -52,7 +52,11 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
+        )]
         public array $language = [],
         /** @var StringPrimitive|string|null accessionNumber Entry number or identifier for inclusion in a database */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

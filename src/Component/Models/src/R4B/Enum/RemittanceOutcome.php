@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: RemittanceOutcome
  * URL: http://hl7.org/fhir/ValueSet/remittance-outcome
  * Version: 4.3.0
  * Description: The outcome of the processing.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/remittance-outcome', version: '4.3.0')]
 enum RemittanceOutcome: string
 {
     /** Queued */

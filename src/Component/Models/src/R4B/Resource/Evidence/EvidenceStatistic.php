@@ -46,7 +46,13 @@ class EvidenceStatistic extends BackboneElement
         #[Valid]
         public array $note = [],
         /** @var CodeableConcept|null statisticType Type of statistic, eg relative risk */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/statistic-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/statistic-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\StatisticType',
+        )]
         public ?CodeableConcept $statisticType = null,
         /** @var CodeableConcept|null category Associated category for categorical variable */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]

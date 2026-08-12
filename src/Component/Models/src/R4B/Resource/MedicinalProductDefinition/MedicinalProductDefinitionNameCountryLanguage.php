@@ -48,6 +48,7 @@ class MedicinalProductDefinitionNameCountryLanguage extends BackboneElement
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?CodeableConcept $language = null,
     ) {

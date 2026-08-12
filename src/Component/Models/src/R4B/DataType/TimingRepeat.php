@@ -119,7 +119,12 @@ class TimingRepeat extends Element
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $durationMax = null,
         /** @var UnitsOfTimeType|null durationUnit s | min | h | d | wk | mo | a - unit of time (UCUM) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/units-of-time|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/units-of-time|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\UnitsOfTime',
+        )]
         public ?UnitsOfTimeType $durationUnit = null,
         /** @var PositiveIntPrimitive|null frequency Event occurs frequency times per period */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
@@ -134,7 +139,12 @@ class TimingRepeat extends Element
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $periodMax = null,
         /** @var UnitsOfTimeType|null periodUnit s | min | h | d | wk | mo | a - unit of time (UCUM) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/units-of-time|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/units-of-time|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\UnitsOfTime',
+        )]
         public ?UnitsOfTimeType $periodUnit = null,
         /** @var array<DaysOfWeekType> dayOfWeek mon | tue | wed | thu | fri | sat | sun */
         #[FhirProperty(
@@ -143,7 +153,11 @@ class TimingRepeat extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DaysOfWeekType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.3.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\DaysOfWeek',
+        )]
         public array $dayOfWeek = [],
         /** @var array<TimePrimitive> timeOfDay Time of day for action */
         #[FhirProperty(
@@ -160,7 +174,11 @@ class TimingRepeat extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\EventTimingType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/event-timing|4.3.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/event-timing|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\EventTiming',
+        )]
         public array $when = [],
         /** @var UnsignedIntPrimitive|null offset Minutes from event (before or after) */
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]

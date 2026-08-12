@@ -57,6 +57,7 @@ class DiagnosticReportResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
@@ -97,7 +98,14 @@ class DiagnosticReportResource extends AbstractDomainResource
         ])]
         public array $basedOn = [],
         /** @var DiagnosticReportStatusType|null status registered | partial | preliminary | final + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/diagnostic-report-status|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/diagnostic-report-status|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\DiagnosticReportStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?DiagnosticReportStatusType $status = null,
         /** @var array<CodeableConcept> category Service category */
         #[FhirProperty(
@@ -109,7 +117,14 @@ class DiagnosticReportResource extends AbstractDomainResource
         #[Valid]
         public array $category = [],
         /** @var CodeableConcept|null code Name/Code for this diagnostic report */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/report-codes', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/report-codes',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\LOINCDiagnosticReportCodes',
+        )]
         public ?CodeableConcept $code = null,
         /** @var Reference|null subject The subject of the report - usually, but not always, the patient */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

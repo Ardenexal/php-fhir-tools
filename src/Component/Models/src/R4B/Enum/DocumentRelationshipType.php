@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: DocumentRelationshipType
  * URL: http://hl7.org/fhir/ValueSet/document-relationship-type
  * Version: 4.3.0
  * Description: The type of relationship between documents.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/document-relationship-type', version: '4.3.0')]
 enum DocumentRelationshipType: string
 {
     /** Replaces */

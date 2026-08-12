@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: EventTiming
  * URL: http://hl7.org/fhir/ValueSet/event-timing
  * Version: 5.0.0
  * Description: Real-world event relating to the schedule.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/event-timing', version: '5.0.0')]
 enum EventTiming: string
 {
     /** Morning */

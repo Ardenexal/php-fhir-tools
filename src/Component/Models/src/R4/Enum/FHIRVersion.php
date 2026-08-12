@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: FHIRVersion
  * URL: http://hl7.org/fhir/ValueSet/FHIR-version
  * Version: 4.0.1
  * Description: All published FHIR Versions.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/FHIR-version', version: '4.0.1')]
 enum FHIRVersion: string
 {
     /** 0.01 */

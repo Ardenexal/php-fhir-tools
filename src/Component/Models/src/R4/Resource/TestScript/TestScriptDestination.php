@@ -35,7 +35,14 @@ class TestScriptDestination extends BackboneElement
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?int $index = null,
         /** @var Coding|null profile FHIR-Server | FHIR-SDC-FormManager | FHIR-SDC-FormReceiver | FHIR-SDC-FormProcessor */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-profile-destination-types', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-profile-destination-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\TestScriptProfileDestinationType',
+        )]
         public ?Coding $profile = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

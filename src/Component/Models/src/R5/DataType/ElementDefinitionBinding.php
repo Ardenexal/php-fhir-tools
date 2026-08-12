@@ -40,7 +40,13 @@ class ElementDefinitionBinding extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var BindingStrengthType|null strength required | extensible | preferred | example */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/binding-strength|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/binding-strength|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\BindingStrength',
+        )]
         public ?BindingStrengthType $strength = null,
         /** @var MarkdownPrimitive|null description Intended use of codes in the bound value set */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

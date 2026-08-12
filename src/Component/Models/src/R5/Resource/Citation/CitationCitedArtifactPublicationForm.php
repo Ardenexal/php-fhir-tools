@@ -36,7 +36,13 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?CitationCitedArtifactPublicationFormPublishedIn $publishedIn = null,
         /** @var CodeableConcept|null citedMedium Internet or Print */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-medium', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-medium',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CitedMedium',
+        )]
         public ?CodeableConcept $citedMedium = null,
         /** @var StringPrimitive|string|null volume Volume number of journal or other collection in which the article is published */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -64,7 +70,11 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CommonLanguages',
+        )]
         public array $language = [],
         /** @var StringPrimitive|string|null accessionNumber Entry number or identifier for inclusion in a database */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

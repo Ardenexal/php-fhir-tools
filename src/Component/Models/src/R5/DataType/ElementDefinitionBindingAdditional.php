@@ -28,7 +28,13 @@ class ElementDefinitionBindingAdditional extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var AdditionalBindingPurposeVSType|null purpose maximum | minimum | required | extensible | candidate | current | preferred | ui | starter | component */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/additional-binding-purpose|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/additional-binding-purpose|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AdditionalBindingPurposeVS',
+        )]
         public ?AdditionalBindingPurposeVSType $purpose = null,
         /** @var CanonicalPrimitive|null valueSet The value set for the additional binding */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]

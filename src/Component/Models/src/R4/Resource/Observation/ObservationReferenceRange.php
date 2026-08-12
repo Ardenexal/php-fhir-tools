@@ -46,7 +46,13 @@ class ObservationReferenceRange extends BackboneElement
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $high = null,
         /** @var CodeableConcept|null type Reference range qualifier */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/referencerange-meaning', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/referencerange-meaning',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ObservationReferenceRangeMeaningCodes',
+        )]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> appliesTo Reference range population */
         #[FhirProperty(

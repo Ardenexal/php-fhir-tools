@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ConceptMapRelationship
  * URL: http://hl7.org/fhir/ValueSet/concept-map-relationship
  * Version: 5.0.0
  * Description: The relationship between concepts.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/concept-map-relationship', version: '5.0.0')]
 enum ConceptMapRelationship: string
 {
     /** Related To */

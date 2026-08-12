@@ -38,7 +38,12 @@ class BiologicallyDerivedProductStorage extends BackboneElement
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $temperature = null,
         /** @var BiologicallyDerivedProductStorageScaleType|null scale farenheit | celsius | kelvin */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-storage-scale|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-storage-scale|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\BiologicallyDerivedProductStorageScale',
+        )]
         public ?BiologicallyDerivedProductStorageScaleType $scale = null,
         /** @var Period|null duration Storage timeperiod */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]

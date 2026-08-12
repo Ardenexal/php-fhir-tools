@@ -35,7 +35,13 @@ class DocumentReferenceContent extends BackboneElement
         #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Attachment $attachment = null,
         /** @var Coding|null format Format/content rules for the document */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/formatcodes', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/formatcodes',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\DocumentReferenceFormatCodeSet',
+        )]
         public ?Coding $format = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

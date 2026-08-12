@@ -55,13 +55,22 @@ class StructureMapGroupRuleTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\StructureMapTargetListModeType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-target-list-mode|5.0.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-target-list-mode|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\StructureMapTargetListMode',
+        )]
         public array $listMode = [],
         /** @var IdPrimitive|null listRuleId Internal rule reference for shared list items */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $listRuleId = null,
         /** @var StructureMapTransformType|null transform create | copy + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-transform|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-transform|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\StructureMapTransform',
+        )]
         public ?StructureMapTransformType $transform = null,
         /** @var array<StructureMapGroupRuleTargetParameter> parameter Parameters to the transform */
         #[FhirProperty(

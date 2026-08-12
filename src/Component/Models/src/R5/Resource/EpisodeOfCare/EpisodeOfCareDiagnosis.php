@@ -42,7 +42,13 @@ class EpisodeOfCareDiagnosis extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Condition'])]
         public array $condition = [],
         /** @var CodeableConcept|null use Role that this diagnosis has within the episode of care (e.g. admission, billing, discharge …) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-diagnosis-use', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-diagnosis-use',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\EncounterDiagnosisUse',
+        )]
         public ?CodeableConcept $use = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

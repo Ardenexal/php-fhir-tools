@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Status
  * URL: http://hl7.org/fhir/ValueSet/verificationresult-status
  * Version: 4.0.1
  * Description: The validation status of the target
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/verificationresult-status', version: '4.0.1')]
 enum Status: string
 {
     /** Attested */

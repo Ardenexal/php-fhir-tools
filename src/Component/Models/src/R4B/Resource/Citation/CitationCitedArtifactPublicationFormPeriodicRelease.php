@@ -31,7 +31,13 @@ class CitationCitedArtifactPublicationFormPeriodicRelease extends BackboneElemen
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null citedMedium Internet or Print */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-medium', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-medium',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CitedMedium',
+        )]
         public ?CodeableConcept $citedMedium = null,
         /** @var StringPrimitive|string|null volume Volume number of journal in which the article is published */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

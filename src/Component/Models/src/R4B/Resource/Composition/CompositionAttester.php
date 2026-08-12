@@ -34,7 +34,13 @@ class CompositionAttester extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CompositionAttestationModeType|null mode personal | professional | legal | official */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/composition-attestation-mode|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/composition-attestation-mode|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CompositionAttestationMode',
+        )]
         public ?CompositionAttestationModeType $mode = null,
         /** @var DateTimePrimitive|null time When the composition was attested */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]

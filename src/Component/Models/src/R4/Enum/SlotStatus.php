@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: SlotStatus
  * URL: http://hl7.org/fhir/ValueSet/slotstatus
  * Version: 4.0.1
  * Description: The free/busy status of the slot.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/slotstatus', version: '4.0.1')]
 enum SlotStatus: string
 {
     /** Busy */

@@ -40,7 +40,13 @@ class SpecimenDefinitionTypeTested extends BackboneElement
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var SpecimenContainedPreferenceType|null preference preferred | alternate */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/specimen-contained-preference|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/specimen-contained-preference|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SpecimenContainedPreference',
+        )]
         public ?SpecimenContainedPreferenceType $preference = null,
         /** @var SpecimenDefinitionTypeTestedContainer|null container The specimen's container */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]

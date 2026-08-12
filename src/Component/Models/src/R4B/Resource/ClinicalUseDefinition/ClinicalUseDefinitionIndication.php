@@ -50,7 +50,14 @@ class ClinicalUseDefinitionIndication extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public array $comorbidity = [],
         /** @var CodeableReference|null intendedEffect The intended effect, aim or strategy to be achieved */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-intended-use', strength: 'preferred'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-intended-use',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ProductIntendedUse',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public ?CodeableReference $intendedEffect = null,
         /** @var Range|StringPrimitive|string|null duration Timing or duration information */
         #[FhirProperty(

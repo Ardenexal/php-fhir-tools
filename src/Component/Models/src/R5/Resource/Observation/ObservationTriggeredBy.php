@@ -37,7 +37,13 @@ class ObservationTriggeredBy extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Observation'])]
         public ?Reference $observation = null,
         /** @var TriggeredBytypeType|null type reflex | repeat | re-run */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-triggeredbytype|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-triggeredbytype|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\TriggeredBytype',
+        )]
         public ?TriggeredBytypeType $type = null,
         /** @var StringPrimitive|string|null reason Reason that the observation was triggered */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

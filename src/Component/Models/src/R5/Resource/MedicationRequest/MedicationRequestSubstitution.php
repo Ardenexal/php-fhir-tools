@@ -47,7 +47,11 @@ class MedicationRequestSubstitution extends BackboneElement
             ],
         )]
         #[NotNull]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActSubstanceAdminSubstitutionCode', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActSubstanceAdminSubstitutionCode',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActSubstanceAdminSubstitutionCode',
+        )]
         public bool|CodeableConcept|null $allowed = null,
         /** @var CodeableConcept|null reason Why should (not) substitution be made */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]

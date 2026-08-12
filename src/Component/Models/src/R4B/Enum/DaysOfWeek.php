@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: DaysOfWeek
  * URL: http://hl7.org/fhir/ValueSet/days-of-week
  * Version: 4.3.0
  * Description: The days of the week.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/days-of-week', version: '4.3.0')]
 enum DaysOfWeek: string
 {
     /** Monday */

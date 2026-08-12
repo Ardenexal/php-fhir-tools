@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CarePlanActivityStatus
  * URL: http://hl7.org/fhir/ValueSet/care-plan-activity-status
  * Version: 4.3.0
  * Description: Codes that reflect the current state of a care plan activity within its overall life cycle.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/care-plan-activity-status', version: '4.3.0')]
 enum CarePlanActivityStatus: string
 {
     /** Not Started */

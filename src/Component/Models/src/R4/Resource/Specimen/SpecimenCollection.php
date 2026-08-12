@@ -96,7 +96,11 @@ class SpecimenCollection extends BackboneElement
                 ],
             ],
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0916', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0916',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\V20916',
+        )]
         public CodeableConcept|Duration|null $fastingStatus = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

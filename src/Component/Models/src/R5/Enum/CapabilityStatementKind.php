@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Capability Statement Kind
  * URL: http://hl7.org/fhir/ValueSet/capability-statement-kind
  * Version: 5.0.0
  * Description: How a capability statement is intended to be used.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/capability-statement-kind', version: '5.0.0')]
 enum CapabilityStatementKind: string
 {
     /** Instance */

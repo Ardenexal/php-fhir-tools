@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: TriggerType
  * URL: http://hl7.org/fhir/ValueSet/trigger-type
  * Version: 5.0.0
  * Description: The type of trigger.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/trigger-type', version: '5.0.0')]
 enum TriggerType: string
 {
     /** Named Event */

@@ -38,7 +38,11 @@ class CitationCitedArtifactWebLocation extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/artifact-url-classifier', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/artifact-url-classifier',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ArtifactUrlClassifier',
+        )]
         public array $classifier = [],
         /** @var UriPrimitive|null url The specific URL */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]

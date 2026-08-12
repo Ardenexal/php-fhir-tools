@@ -35,7 +35,14 @@ class TestScriptOrigin extends BackboneElement
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?int $index = null,
         /** @var Coding|null profile FHIR-Client | FHIR-SDC-FormFiller */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-profile-origin-types', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-profile-origin-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\TestScriptProfileOriginType',
+        )]
         public ?Coding $profile = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

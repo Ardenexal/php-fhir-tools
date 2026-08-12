@@ -72,7 +72,11 @@ class MedicationIngredient extends BackboneElement
                 ],
             ],
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-ingredientstrength', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-ingredientstrength',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\MedicationIngredientStrengthCodes',
+        )]
         public Ratio|CodeableConcept|Quantity|null $strength = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

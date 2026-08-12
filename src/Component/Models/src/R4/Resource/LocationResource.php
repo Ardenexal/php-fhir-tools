@@ -52,6 +52,7 @@ class LocationResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
@@ -76,10 +77,22 @@ class LocationResource extends AbstractDomainResource
         #[Valid]
         public array $identifier = [],
         /** @var LocationStatusType|null status active | suspended | inactive */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/location-status|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/location-status|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\LocationStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid')]
         public ?LocationStatusType $status = null,
         /** @var Coding|null operationalStatus The operational status of the location (typically only for a bed/room) */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0116', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0116',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\V20116',
+        )]
         public ?Coding $operationalStatus = null,
         /** @var StringPrimitive|string|null name Name of the location as used by humans */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -96,7 +109,12 @@ class LocationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var LocationModeType|null mode instance | kind */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/location-mode|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/location-mode|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\LocationMode',
+        )]
         public ?LocationModeType $mode = null,
         /** @var array<CodeableConcept> type Type of function performed */
         #[FhirProperty(
@@ -106,7 +124,11 @@ class LocationResource extends AbstractDomainResource
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ServiceDeliveryLocationRoleType', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ServiceDeliveryLocationRoleType',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\V3ServiceDeliveryLocationRoleType',
+        )]
         public array $type = [],
         /** @var array<ContactPoint> telecom Contact details of the location */
         #[FhirProperty(

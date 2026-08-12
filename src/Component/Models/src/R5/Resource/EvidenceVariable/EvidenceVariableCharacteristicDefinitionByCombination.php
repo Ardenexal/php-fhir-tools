@@ -36,7 +36,13 @@ class EvidenceVariableCharacteristicDefinitionByCombination extends BackboneElem
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CharacteristicCombinationType|null code all-of | any-of | at-least | at-most | statistical | net-effect | dataset */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/characteristic-combination|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/characteristic-combination|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CharacteristicCombination',
+        )]
         public ?CharacteristicCombinationType $code = null,
         /** @var PositiveIntPrimitive|null threshold Provides the value of "n" when "at-least" or "at-most" codes are used */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: GuideParameterCode
  * URL: http://hl7.org/fhir/ValueSet/guide-parameter-code
  * Version: 4.3.0
  * Description: Code of parameter that is input to the guide.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/guide-parameter-code', version: '4.3.0')]
 enum GuideParameterCode: string
 {
     /** Apply Metadata Value */

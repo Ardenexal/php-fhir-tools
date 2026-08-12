@@ -42,7 +42,13 @@ class PatientLink extends BackboneElement
         ])]
         public ?Reference $other = null,
         /** @var LinkTypeType|null type replaced-by | replaces | refer | seealso */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/link-type|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/link-type|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\LinkType',
+        )]
         public ?LinkTypeType $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

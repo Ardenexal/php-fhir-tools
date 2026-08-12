@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Composition Status
  * URL: http://hl7.org/fhir/ValueSet/composition-status
  * Version: 5.0.0
  * Description: The workflow/clinical status of the composition.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/composition-status', version: '5.0.0')]
 enum CompositionStatus: string
 {
     /** Registered */

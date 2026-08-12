@@ -164,7 +164,11 @@ class ElementDefinition extends BackboneType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\PropertyRepresentationType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/property-representation|5.0.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/property-representation|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PropertyRepresentation',
+        )]
         public array $representation = [],
         /** @var StringPrimitive|string|null sliceName Name for this particular element (in a set of slices) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

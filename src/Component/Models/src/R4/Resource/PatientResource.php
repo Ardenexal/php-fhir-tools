@@ -54,6 +54,7 @@ class PatientResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
@@ -99,7 +100,12 @@ class PatientResource extends AbstractDomainResource
         #[Valid]
         public array $telecom = [],
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AdministrativeGender',
+        )]
         public ?AdministrativeGenderType $gender = null,
         /** @var DatePrimitive|null birthDate The date of birth for the individual */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
@@ -131,7 +137,13 @@ class PatientResource extends AbstractDomainResource
         #[Valid]
         public array $address = [],
         /** @var CodeableConcept|null maritalStatus Marital (civil) status of a patient */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/marital-status', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/marital-status',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\MaritalStatusCodes',
+        )]
         public ?CodeableConcept $maritalStatus = null,
         /** @var bool|int|null multipleBirth Whether patient is part of a multiple birth */
         #[FhirProperty(

@@ -43,7 +43,13 @@ class EncounterDiagnosis extends BackboneElement
         ])]
         public ?Reference $condition = null,
         /** @var CodeableConcept|null use Role that this diagnosis has within the encounter (e.g. admission, billing, discharge …) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/diagnosis-role', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/diagnosis-role',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\DiagnosisRole',
+        )]
         public ?CodeableConcept $use = null,
         /** @var PositiveIntPrimitive|null rank Ranking of the diagnosis (for each role type) */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

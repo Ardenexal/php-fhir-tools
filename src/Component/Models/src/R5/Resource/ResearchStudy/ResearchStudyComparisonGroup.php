@@ -42,7 +42,13 @@ class ResearchStudyComparisonGroup extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $name = null,
         /** @var CodeableConcept|null type Categorization of study comparisonGroup */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/research-study-arm-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/research-study-arm-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ResearchStudyArmType',
+        )]
         public ?CodeableConcept $type = null,
         /** @var MarkdownPrimitive|null description Short explanation of study path */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

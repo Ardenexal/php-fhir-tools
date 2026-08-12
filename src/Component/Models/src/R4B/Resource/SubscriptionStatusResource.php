@@ -61,6 +61,7 @@ class SubscriptionStatusResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
@@ -76,10 +77,22 @@ class SubscriptionStatusResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var SubscriptionStatusCodesType|null status requested | active | error | off | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-status|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-status|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SubscriptionStatusCodes',
+        )]
         public ?SubscriptionStatusCodesType $status = null,
         /** @var SubscriptionNotificationTypeType|null type handshake | heartbeat | event-notification | query-status | query-event */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-notification-type|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'Not known why this is labelled a modifier')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-notification-type|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SubscriptionNotificationType',
+        )]
+        #[FHIRIsModifier(reason: 'Not known why this is labelled a modifier')]
         public ?SubscriptionNotificationTypeType $type = null,
         /** @var StringPrimitive|string|null eventsSinceSubscriptionStart Events since the Subscription was created */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

@@ -62,7 +62,13 @@ class ImplementationGuideDefinitionPage extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $title = null,
         /** @var GuidePageGenerationType|null generation html | markdown | xml | generated */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/guide-page-generation|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/guide-page-generation|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\GuidePageGeneration',
+        )]
         public ?GuidePageGenerationType $generation = null,
         /** @var array<ImplementationGuideDefinitionPage> page Nested Pages / Sections */
         #[FhirProperty(

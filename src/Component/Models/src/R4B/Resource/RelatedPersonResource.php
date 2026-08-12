@@ -58,6 +58,7 @@ class RelatedPersonResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
@@ -95,7 +96,11 @@ class RelatedPersonResource extends AbstractDomainResource
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\PatientRelationshipType',
+        )]
         public array $relationship = [],
         /** @var array<HumanName> name A name associated with the person */
         #[FhirProperty(
@@ -116,7 +121,12 @@ class RelatedPersonResource extends AbstractDomainResource
         #[Valid]
         public array $telecom = [],
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AdministrativeGender',
+        )]
         public ?AdministrativeGenderType $gender = null,
         /** @var DatePrimitive|null birthDate The date on which the related person was born */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]

@@ -63,7 +63,12 @@ class ConditionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
@@ -87,10 +92,25 @@ class ConditionResource extends AbstractDomainResource
         #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null clinicalStatus active | recurrence | relapse | inactive | remission | resolved | unknown */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-clinical|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains codes that mark the condition as no longer active.')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-clinical|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConditionClinicalStatusCodes',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains codes that mark the condition as no longer active.')]
         public ?CodeableConcept $clinicalStatus = null,
         /** @var CodeableConcept|null verificationStatus unconfirmed | provisional | differential | confirmed | refuted | entered-in-error */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-ver-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains the code refuted and entered-in-error that mark the Condition as not currently valid.')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-ver-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConditionVerificationStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains the code refuted and entered-in-error that mark the Condition as not currently valid.')]
         public ?CodeableConcept $verificationStatus = null,
         /** @var array<CodeableConcept> category problem-list-item | encounter-diagnosis */
         #[FhirProperty(
@@ -100,10 +120,20 @@ class ConditionResource extends AbstractDomainResource
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-category', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-category',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConditionCategoryCodes',
+        )]
         public array $category = [],
         /** @var CodeableConcept|null severity Subjective severity of condition */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-severity', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-severity',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConditionDiagnosisSeverity',
+        )]
         public ?CodeableConcept $severity = null,
         /** @var CodeableConcept|null code Identification of the condition, problem or diagnosis */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]

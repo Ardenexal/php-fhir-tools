@@ -48,6 +48,7 @@ class AdverseEventResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
@@ -66,7 +67,14 @@ class AdverseEventResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var AdverseEventActualityType|null actuality actual | potential */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/adverse-event-actuality|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because it has a potential code that indicates the adverse event did not actually happen.')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/adverse-event-actuality|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AdverseEventActuality',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labeled as a modifier because it has a potential code that indicates the adverse event did not actually happen.')]
         public ?AdverseEventActualityType $actuality = null,
         /** @var array<CodeableConcept> category product-problem | product-quality | product-use-error | wrong-dose | incorrect-prescribing-information | wrong-technique | wrong-route-of-administration | wrong-rate | wrong-duration | wrong-time | expired-drug | medical-device-use-error | problem-different-manufacturer | unsafe-physical-environment */
         #[FhirProperty(
@@ -76,7 +84,11 @@ class AdverseEventResource extends AbstractDomainResource
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/adverse-event-category', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/adverse-event-category',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AdverseEventCategory',
+        )]
         public array $category = [],
         /** @var CodeableConcept|null event Type of the event itself in relation to the subject */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
@@ -121,10 +133,22 @@ class AdverseEventResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $seriousness = null,
         /** @var CodeableConcept|null severity mild | moderate | severe */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/adverse-event-severity|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/adverse-event-severity|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AdverseEventSeverity',
+        )]
         public ?CodeableConcept $severity = null,
         /** @var CodeableConcept|null outcome resolved | recovering | ongoing | resolvedWithSequelae | fatal | unknown */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/adverse-event-outcome|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/adverse-event-outcome|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AdverseEventOutcome',
+        )]
         public ?CodeableConcept $outcome = null,
         /** @var Reference|null recorder Who recorded the adverse event */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

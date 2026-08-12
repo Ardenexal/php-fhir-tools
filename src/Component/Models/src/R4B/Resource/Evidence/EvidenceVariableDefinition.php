@@ -47,7 +47,14 @@ class EvidenceVariableDefinition extends BackboneElement
         #[Valid]
         public array $note = [],
         /** @var CodeableConcept|null variableRole population | subpopulation | exposure | referenceExposure | measuredVariable | confounder */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/variable-role', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/variable-role',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\EvidenceVariableRole',
+        )]
         public ?CodeableConcept $variableRole = null,
         /** @var Reference|null observed Definition of the actual variable related to the statistic(s) */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
@@ -66,7 +73,13 @@ class EvidenceVariableDefinition extends BackboneElement
         ])]
         public ?Reference $intended = null,
         /** @var CodeableConcept|null directnessMatch low | moderate | high | exact */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/directness', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/directness',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\EvidenceDirectness',
+        )]
         public ?CodeableConcept $directnessMatch = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

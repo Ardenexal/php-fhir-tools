@@ -73,6 +73,7 @@ class AllergyIntoleranceResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
@@ -97,13 +98,32 @@ class AllergyIntoleranceResource extends AbstractDomainResource
         #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null clinicalStatus active | inactive | resolved */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergyintolerance-clinical|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains the codes inactive and resolved that mark the AllergyIntolerance as no longer active.')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergyintolerance-clinical|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AllergyIntoleranceClinicalStatusCodes',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains the codes inactive and resolved that mark the AllergyIntolerance as no longer active.')]
         public ?CodeableConcept $clinicalStatus = null,
         /** @var CodeableConcept|null verificationStatus unconfirmed | confirmed | refuted | entered-in-error */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergyintolerance-verification|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains the codes refuted and entered-in-error that mark the AllergyIntolerance as not currently valid.')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergyintolerance-verification|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AllergyIntoleranceVerificationStatusCodes',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains the codes refuted and entered-in-error that mark the AllergyIntolerance as not currently valid.')]
         public ?CodeableConcept $verificationStatus = null,
         /** @var AllergyIntoleranceTypeType|null type allergy | intolerance - Underlying mechanism (if known) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-type|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-type|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AllergyIntoleranceType',
+        )]
         public ?AllergyIntoleranceTypeType $type = null,
         /** @var array<AllergyIntoleranceCategoryType> category food | medication | environment | biologic */
         #[FhirProperty(
@@ -112,10 +132,19 @@ class AllergyIntoleranceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\AllergyIntoleranceCategoryType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-category|4.0.1', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-category|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AllergyIntoleranceCategory',
+        )]
         public array $category = [],
         /** @var AllergyIntoleranceCriticalityType|null criticality low | high | unable-to-assess */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-criticality|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-criticality|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AllergyIntoleranceCriticality',
+        )]
         public ?AllergyIntoleranceCriticalityType $criticality = null,
         /** @var CodeableConcept|null code Code that identifies the allergy or intolerance */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]

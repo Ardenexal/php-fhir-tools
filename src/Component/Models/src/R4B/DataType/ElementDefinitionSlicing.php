@@ -47,7 +47,13 @@ class ElementDefinitionSlicing extends Element
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $ordered = null,
         /** @var SlicingRulesType|null rules closed | open | openAtEnd */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-slicing-rules|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-slicing-rules|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SlicingRules',
+        )]
         public ?SlicingRulesType $rules = null,
     ) {
         parent::__construct($id, $extension);

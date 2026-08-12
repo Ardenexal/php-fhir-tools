@@ -35,7 +35,13 @@ class RiskEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElemen
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Type of subcomponent of certainty rating */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/certainty-subcomponent-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/certainty-subcomponent-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CertaintySubcomponentType',
+        )]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> rating Subcomponent certainty rating */
         #[FhirProperty(
@@ -45,7 +51,11 @@ class RiskEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElemen
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/certainty-subcomponent-rating', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/certainty-subcomponent-rating',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CertaintySubcomponentRating',
+        )]
         public array $rating = [],
         /** @var array<Annotation> note Used for footnotes or explanatory notes */
         #[FhirProperty(

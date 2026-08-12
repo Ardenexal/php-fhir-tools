@@ -64,7 +64,11 @@ class CitationCitedArtifact extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-artifact-status-type', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/cited-artifact-status-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CitedArtifactStatusType',
+        )]
         public array $currentState = [],
         /** @var array<CitationCitedArtifactStatusDate> statusDate An effective date or period for a status of the cited artifact */
         #[FhirProperty(

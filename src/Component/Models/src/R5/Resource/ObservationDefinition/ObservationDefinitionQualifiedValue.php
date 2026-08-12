@@ -36,7 +36,13 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null context Context qualifier for the set of qualified values */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/referencerange-meaning', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/referencerange-meaning',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ObservationReferenceRangeMeaningCodes',
+        )]
         public ?CodeableConcept $context = null,
         /** @var array<CodeableConcept> appliesTo Targetted population for the set of qualified values */
         #[FhirProperty(
@@ -48,7 +54,12 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
         #[Valid]
         public array $appliesTo = [],
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AdministrativeGender',
+        )]
         public ?AdministrativeGenderType $gender = null,
         /** @var Range|null age Applicable age range for the set of qualified values */
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
@@ -60,7 +71,12 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $condition = null,
         /** @var ObservationRangeCategoryType|null rangeCategory reference | critical | absolute */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-range-category|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-range-category|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ObservationRangeCategory',
+        )]
         public ?ObservationRangeCategoryType $rangeCategory = null,
         /** @var Range|null range The range for continuous or ordinal observations */
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]

@@ -41,7 +41,13 @@ class CapabilityStatementRest extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var RestfulCapabilityModeType|null mode client | server */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/restful-capability-mode|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/restful-capability-mode|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\RestfulCapabilityMode',
+        )]
         public ?RestfulCapabilityModeType $mode = null,
         /** @var MarkdownPrimitive|null documentation General description of implementation */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

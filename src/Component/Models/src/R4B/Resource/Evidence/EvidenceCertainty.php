@@ -44,10 +44,22 @@ class EvidenceCertainty extends BackboneElement
         #[Valid]
         public array $note = [],
         /** @var CodeableConcept|null type Aspect of certainty being rated */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/certainty-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/certainty-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\EvidenceCertaintyType',
+        )]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null rating Assessment or judgement of the aspect */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/certainty-rating', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/certainty-rating',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\EvidenceCertaintyRating',
+        )]
         public ?CodeableConcept $rating = null,
         /** @var StringPrimitive|string|null rater Individual or group who did the rating */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

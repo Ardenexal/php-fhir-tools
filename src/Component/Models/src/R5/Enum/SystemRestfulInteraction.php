@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: System Restful Interaction
  * URL: http://hl7.org/fhir/ValueSet/system-restful-interaction
  * Version: 5.0.0
  * Description: Operations supported by REST at the system level.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/system-restful-interaction', version: '5.0.0')]
 enum SystemRestfulInteraction: string
 {
     /** read */

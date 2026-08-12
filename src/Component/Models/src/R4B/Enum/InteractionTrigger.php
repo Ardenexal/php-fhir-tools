@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Interaction Trigger
  * URL: http://hl7.org/fhir/ValueSet/interaction-trigger
  * Version: 4.3.0
  * Description: FHIR RESTful interaction codes used for SubscriptionTopic trigger.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/interaction-trigger', version: '4.3.0')]
 enum InteractionTrigger: string
 {
     /** read */

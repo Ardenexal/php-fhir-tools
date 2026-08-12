@@ -68,7 +68,11 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/bodystructure-relative-location', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/bodystructure-relative-location',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\BodystructureLocationQualifier',
+        )]
         public array $surfaceOrientation = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

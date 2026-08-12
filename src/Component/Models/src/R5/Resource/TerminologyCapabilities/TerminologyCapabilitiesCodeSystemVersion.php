@@ -47,7 +47,11 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CommonLanguagesType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages|5.0.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CommonLanguages',
+        )]
         public array $language = [],
         /** @var array<TerminologyCapabilitiesCodeSystemVersionFilter> filter Filter Properties supported */
         #[FhirProperty(

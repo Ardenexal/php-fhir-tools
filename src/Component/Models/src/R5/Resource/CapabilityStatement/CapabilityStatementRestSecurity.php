@@ -41,7 +41,11 @@ class CapabilityStatementRestSecurity extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/restful-security-service', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/restful-security-service',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\RestfulSecurityService',
+        )]
         public array $service = [],
         /** @var MarkdownPrimitive|null description General description of how security works */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

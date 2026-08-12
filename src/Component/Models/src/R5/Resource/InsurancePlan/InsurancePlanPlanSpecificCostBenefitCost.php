@@ -35,7 +35,13 @@ class InsurancePlanPlanSpecificCostBenefitCost extends BackboneElement
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null applicability in-network | out-of-network | other */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/insuranceplan-applicability|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/insuranceplan-applicability|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\BenefitCostApplicability',
+        )]
         public ?CodeableConcept $applicability = null,
         /** @var array<CodeableConcept> qualifiers Additional information about the cost */
         #[FhirProperty(

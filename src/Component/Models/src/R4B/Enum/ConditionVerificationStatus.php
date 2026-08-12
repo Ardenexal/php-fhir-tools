@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ConditionVerificationStatus
  * URL: http://hl7.org/fhir/ValueSet/condition-ver-status
  * Version: 4.3.0
  * Description: The verification status to support or decline the clinical status of the condition or diagnosis.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/condition-ver-status', version: '4.3.0')]
 enum ConditionVerificationStatus: string
 {
     /** Unconfirmed */

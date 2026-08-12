@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: FHIRAllTypes
  * URL: http://hl7.org/fhir/ValueSet/all-types
  * Version: 4.3.0
  * Description: A list of all the concrete types defined in this version of the FHIR specification - Abstract Types, Data Types and Resource Types.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/all-types', version: '4.3.0')]
 enum FHIRAllTypes: string
 {
     /** Address */

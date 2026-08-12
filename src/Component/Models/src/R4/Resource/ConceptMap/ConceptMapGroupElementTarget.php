@@ -46,7 +46,14 @@ class ConceptMapGroupElementTarget extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $display = null,
         /** @var ConceptMapEquivalenceType|null equivalence relatedto | equivalent | equal | wider | subsumes | narrower | specializes | inexact | unmatched | disjoint */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-equivalence|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'Some of the values mean that there is no mapping from the source to the target, particularly \'disjoint\', and the mapping cannot be interpreted without knowing this value as it could mean the elements are equivalent, totally mismatched or anything in between')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-equivalence|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ConceptMapEquivalence',
+        )]
+        #[FHIRIsModifier(reason: 'Some of the values mean that there is no mapping from the source to the target, particularly \'disjoint\', and the mapping cannot be interpreted without knowing this value as it could mean the elements are equivalent, totally mismatched or anything in between')]
         public ?ConceptMapEquivalenceType $equivalence = null,
         /** @var StringPrimitive|string|null comment Description of status/issues in mapping */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

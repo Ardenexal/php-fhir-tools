@@ -46,7 +46,13 @@ class EncounterAdmission extends BackboneElement
         ])]
         public ?Reference $origin = null,
         /** @var CodeableConcept|null admitSource From where patient was admitted (physician referral, transfer) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-admit-source', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-admit-source',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AdmitSource',
+        )]
         public ?CodeableConcept $admitSource = null,
         /** @var CodeableConcept|null reAdmission Indicates that the patient is being re-admitted */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]

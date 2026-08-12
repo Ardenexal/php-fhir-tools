@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: AssertionOperatorType
  * URL: http://hl7.org/fhir/ValueSet/assert-operator-codes
  * Version: 4.0.1
  * Description: The type of operator to use for assertion.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/assert-operator-codes', version: '4.0.1')]
 enum AssertionOperatorType: string
 {
     /** equals */

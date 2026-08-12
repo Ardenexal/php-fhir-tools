@@ -75,7 +75,13 @@ class AdministrableProductDefinitionProperty extends BackboneElement
         )]
         public CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null $value = null,
         /** @var CodeableConcept|null status The status of characteristic e.g. assigned or pending */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\PublicationStatus',
+        )]
         public ?CodeableConcept $status = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

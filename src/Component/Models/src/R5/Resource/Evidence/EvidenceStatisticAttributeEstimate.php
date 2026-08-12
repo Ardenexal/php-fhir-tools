@@ -46,7 +46,13 @@ class EvidenceStatisticAttributeEstimate extends BackboneElement
         #[Valid]
         public array $note = [],
         /** @var CodeableConcept|null type The type of attribute estimate, e.g., confidence interval or p value */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/attribute-estimate-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/attribute-estimate-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AttributeEstimateType',
+        )]
         public ?CodeableConcept $type = null,
         /** @var Quantity|null quantity The singular quantity of the attribute estimate, for attribute estimates represented as single values; also used to report unit of measure */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]

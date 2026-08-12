@@ -45,7 +45,13 @@ class SampledData extends DataType
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $interval = null,
         /** @var UCUMCodesType|null intervalUnit The measurement unit of the interval between samples */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\UCUMCodes',
+        )]
         public ?UCUMCodesType $intervalUnit = null,
         /** @var numeric-string|null factor Multiply data by this before adding to origin */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]

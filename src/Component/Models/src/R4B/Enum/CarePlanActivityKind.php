@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Care Plan Activity Kind
  * URL: http://hl7.org/fhir/ValueSet/care-plan-activity-kind
  * Version: 4.3.0
  * Description: Resource types defined as part of FHIR that can be represented as in-line definitions of a care plan activity.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/care-plan-activity-kind', version: '4.3.0')]
 enum CarePlanActivityKind: string
 {
     /** Resource */

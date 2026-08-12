@@ -53,7 +53,11 @@ class EncounterParticipant extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-participant-type', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-participant-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ParticipantType',
+        )]
         public array $type = [],
         /** @var Period|null period Period of time during the encounter that the participant participated */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]

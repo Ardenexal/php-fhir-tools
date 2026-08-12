@@ -37,7 +37,13 @@ class ExplanationOfBenefitAccident extends BackboneElement
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $date = null,
         /** @var CodeableConcept|null type The nature of the accident */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActIncidentCode', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActIncidentCode',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActIncidentCode',
+        )]
         public ?CodeableConcept $type = null,
         /** @var Address|Reference|null location Where the event occurred */
         #[FhirProperty(

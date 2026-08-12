@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Detected Issue Status
  * URL: http://hl7.org/fhir/ValueSet/detectedissue-status
  * Version: 5.0.0
  * Description: Indicates the status of a detected issue
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/detectedissue-status', version: '5.0.0')]
 enum DetectedIssueStatus: string
 {
     /** Registered */

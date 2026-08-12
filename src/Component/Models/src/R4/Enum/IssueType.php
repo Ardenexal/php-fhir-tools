@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: IssueType
  * URL: http://hl7.org/fhir/ValueSet/issue-type
  * Version: 4.0.1
  * Description: A code that describes the type of issue.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/issue-type', version: '4.0.1')]
 enum IssueType: string
 {
     /** Invalid Content */

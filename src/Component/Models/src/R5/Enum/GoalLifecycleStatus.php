@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Goal Lifecycle Status
  * URL: http://hl7.org/fhir/ValueSet/goal-status
  * Version: 5.0.0
  * Description: Codes that reflect the current state of a goal and whether the goal is still being targeted.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/goal-status', version: '5.0.0')]
 enum GoalLifecycleStatus: string
 {
     /** Proposed */

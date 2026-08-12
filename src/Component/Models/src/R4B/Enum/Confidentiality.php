@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Confidentiality
  * URL: http://terminology.hl7.org/ValueSet/v3-Confidentiality
  * Version: 3.0.0
  * Description: Set of codes used to value Act.Confidentiality and Role.Confidentiality attribute in accordance with the definition for concept domain "Confidentiality".
  */
+#[FHIRValueSetSource(url: 'http://terminology.hl7.org/ValueSet/v3-Confidentiality', version: '3.0.0')]
 enum Confidentiality: string
 {
     /** Confidentiality */

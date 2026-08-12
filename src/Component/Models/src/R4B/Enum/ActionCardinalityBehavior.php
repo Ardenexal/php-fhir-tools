@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ActionCardinalityBehavior
  * URL: http://hl7.org/fhir/ValueSet/action-cardinality-behavior
  * Version: 4.3.0
  * Description: Defines behavior for an action or a group for how many times that item may be repeated.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/action-cardinality-behavior', version: '4.3.0')]
 enum ActionCardinalityBehavior: string
 {
     /** Single */

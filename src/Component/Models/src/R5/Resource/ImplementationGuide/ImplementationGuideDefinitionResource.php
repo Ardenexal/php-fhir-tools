@@ -46,7 +46,11 @@ class ImplementationGuideDefinitionResource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRVersionType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/FHIR-version|5.0.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/FHIR-version|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRVersion',
+        )]
         public array $fhirVersion = [],
         /** @var StringPrimitive|string|null name Human readable name for the resource */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

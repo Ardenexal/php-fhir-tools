@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Value Filter Comparator
  * URL: http://hl7.org/fhir/ValueSet/value-filter-comparator
  * Version: 5.3.0
  * Description: The type of comparator operator to use
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/value-filter-comparator', version: '5.3.0')]
 enum ValueFilterComparator: string
 {
     /** Equals */

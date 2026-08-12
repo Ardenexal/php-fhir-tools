@@ -57,7 +57,11 @@ class AuditEventSource extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-source-type', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-source-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AuditEventSourceType',
+        )]
         public array $type = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

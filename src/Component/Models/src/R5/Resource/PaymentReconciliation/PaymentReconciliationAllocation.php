@@ -88,7 +88,13 @@ class PaymentReconciliationAllocation extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Account'])]
         public ?Reference $account = null,
         /** @var CodeableConcept|null type Category of payment */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PaymentTypeCodes',
+        )]
         public ?CodeableConcept $type = null,
         /** @var Reference|null submitter Submitter of the request */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

@@ -37,13 +37,24 @@ class ContactPoint extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var ContactPointSystemType|null system phone | fax | email | pager | url | sms | other */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contact-point-system|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/contact-point-system|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ContactPointSystem',
+        )]
         public ?ContactPointSystemType $system = null,
         /** @var StringPrimitive|string|null value The actual contact point details */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $value = null,
         /** @var ContactPointUseType|null use home | work | temp | old | mobile - purpose of this contact point */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contact-point-use|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not mistake a temporary or old contact etc.for a current/permanent one')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/contact-point-use|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ContactPointUse',
+        )]
+        #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not mistake a temporary or old contact etc.for a current/permanent one')]
         public ?ContactPointUseType $use = null,
         /** @var PositiveIntPrimitive|null rank Specify preferred order of use (1 = highest) */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

@@ -38,7 +38,11 @@ class RiskEvidenceSynthesisCertainty extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-quality', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-quality',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\QualityOfEvidenceRating',
+        )]
         public array $rating = [],
         /** @var array<Annotation> note Used for footnotes or explanatory notes */
         #[FhirProperty(

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Code System Content Mode
  * URL: http://hl7.org/fhir/ValueSet/codesystem-content-mode
  * Version: 5.0.0
  * Description: The extent of the content of the code system (the concepts and codes it defines) are represented in a code system resource.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/codesystem-content-mode', version: '5.0.0')]
 enum CodeSystemContentMode: string
 {
     /** Not Present */

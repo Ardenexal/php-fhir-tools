@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Care Plan Intent
  * URL: http://hl7.org/fhir/ValueSet/care-plan-intent
  * Version: 4.0.1
  * Description: Codes indicating the degree of authority/intentionality associated with a care plan.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/care-plan-intent', version: '4.0.1')]
 enum CarePlanIntent: string
 {
     /** Proposal */

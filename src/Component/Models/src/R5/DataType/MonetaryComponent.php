@@ -28,7 +28,13 @@ class MonetaryComponent extends DataType
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var PriceComponentTypeType|null type base | surcharge | deduction | discount | tax | informational */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/price-component-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/price-component-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PriceComponentType',
+        )]
         public ?PriceComponentTypeType $type = null,
         /** @var CodeableConcept|null code Codes may be used to differentiate between kinds of taxes, surcharges, discounts etc. */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]

@@ -39,7 +39,12 @@ class Reference extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $reference = null,
         /** @var UriPrimitive|null type Type the reference refers to (e.g. "Patient") */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-types', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ResourceType',
+        )]
         public ?UriPrimitive $type = null,
         /** @var Identifier|null identifier Logical reference, when literal reference is not known */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]

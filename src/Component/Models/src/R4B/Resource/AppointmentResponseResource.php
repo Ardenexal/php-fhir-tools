@@ -60,6 +60,7 @@ class AppointmentResponseResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
@@ -100,7 +101,11 @@ class AppointmentResponseResource extends AbstractDomainResource
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-participant-type', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-participant-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ParticipantType',
+        )]
         public array $participantType = [],
         /** @var Reference|null actor Person, Location, HealthcareService, or Device */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
@@ -116,7 +121,14 @@ class AppointmentResponseResource extends AbstractDomainResource
         ])]
         public ?Reference $actor = null,
         /** @var ParticipationStatusType|null participantStatus accepted | declined | tentative | needs-action */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participationstatus|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'Not known why this is labelled a modifier')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/participationstatus|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ParticipationStatus',
+        )]
+        #[FHIRIsModifier(reason: 'Not known why this is labelled a modifier')]
         public ?ParticipationStatusType $participantStatus = null,
         /** @var StringPrimitive|string|null comment Additional comments */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

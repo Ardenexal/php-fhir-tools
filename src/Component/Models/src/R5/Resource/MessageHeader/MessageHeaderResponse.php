@@ -37,7 +37,13 @@ class MessageHeaderResponse extends BackboneElement
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Identifier $identifier = null,
         /** @var ResponseTypeType|null code ok | transient-error | fatal-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/response-code|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/response-code|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ResponseType',
+        )]
         public ?ResponseTypeType $code = null,
         /** @var Reference|null details Specific list of hints/warnings/errors */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/OperationOutcome'])]

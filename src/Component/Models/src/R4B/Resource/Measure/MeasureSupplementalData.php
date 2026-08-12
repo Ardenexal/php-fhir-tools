@@ -43,7 +43,11 @@ class MeasureSupplementalData extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-data-usage', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-data-usage',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\MeasureDataUsage',
+        )]
         public array $usage = [],
         /** @var StringPrimitive|string|null description The human readable description of this supplemental data */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

@@ -54,7 +54,12 @@ class MolecularSequenceReferenceSeq extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $genomeBuild = null,
         /** @var OrientationTypeType|null orientation sense | antisense */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/orientation-type|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/orientation-type|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\OrientationType',
+        )]
         public ?OrientationTypeType $orientation = null,
         /** @var CodeableConcept|null referenceSeqId Reference identifier */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
@@ -66,7 +71,12 @@ class MolecularSequenceReferenceSeq extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $referenceSeqString = null,
         /** @var StrandTypeType|null strand watson | crick */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/strand-type|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/strand-type|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\StrandType',
+        )]
         public ?StrandTypeType $strand = null,
         /** @var int|null windowStart Start position of the window on the  reference sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]

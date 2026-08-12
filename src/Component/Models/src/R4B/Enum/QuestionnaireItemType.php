@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: QuestionnaireItemType
  * URL: http://hl7.org/fhir/ValueSet/item-type
  * Version: 4.3.0
  * Description: Distinguishes groups from questions and display text and indicates data type for questions.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/item-type', version: '4.3.0')]
 enum QuestionnaireItemType: string
 {
     /** Group */

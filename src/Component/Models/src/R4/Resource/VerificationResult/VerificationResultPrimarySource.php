@@ -60,13 +60,25 @@ class VerificationResultPrimarySource extends BackboneElement
         #[Valid]
         public array $communicationMethod = [],
         /** @var CodeableConcept|null validationStatus successful | failed | unknown */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-validation-status', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-validation-status',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ValidationStatus',
+        )]
         public ?CodeableConcept $validationStatus = null,
         /** @var DateTimePrimitive|null validationDate When the target was validated against the primary source */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $validationDate = null,
         /** @var CodeableConcept|null canPushUpdates yes | no | undetermined */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-can-push-updates', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-can-push-updates',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CanPushUpdates',
+        )]
         public ?CodeableConcept $canPushUpdates = null,
         /** @var array<CodeableConcept> pushTypeAvailable specific | any | source */
         #[FhirProperty(
@@ -76,7 +88,11 @@ class VerificationResultPrimarySource extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-push-type-available', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-push-type-available',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\PushTypeAvailable',
+        )]
         public array $pushTypeAvailable = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

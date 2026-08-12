@@ -38,7 +38,13 @@ class VisionPrescriptionLensSpecification extends BackboneElement
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $product = null,
         /** @var VisionEyesType|null eye right | left */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/vision-eye-codes|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/vision-eye-codes|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\VisionEyes',
+        )]
         public ?VisionEyesType $eye = null,
         /** @var numeric-string|null sphere Power of the lens */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]

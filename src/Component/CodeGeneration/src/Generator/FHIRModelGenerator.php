@@ -591,6 +591,57 @@ class FHIRModelGenerator implements GeneratorInterface
      *
      * @return void
      */
+    /**
+     * The generated enum class name backing a value set, or null when there is not one.
+     *
+     * Bindings carry a version-suffixed URL (`.../ValueSet/item-type|4.0.1`) while the context is
+     * keyed by the bare URL, so the suffix is stripped before lookup.
+     *
+     * Only materialised enums count, and deliberately so. The pending register (`getPendingEnums()`)
+     * is keyed by URL but holds a name derived through `ClassNameResolver`, and two different value
+     * sets can resolve to the *same* name: `.../ValueSet/medication-statement-status` and
+     * `.../ValueSet/medication-status` both yield `MedicationStatusCodes`, whose generated enum holds
+     * only the latter's three codes. Trusting the pending name bound `MedicationStatement.status` to
+     * the wrong enum and rejected the legal code `unknown` — a false positive that `ABOVE` could not
+     * catch, because both affected cases were already `BELOW`.
+     *
+     * Resolution goes through the ValueSet *definition*, not the generated-enum register, because
+     * `getEnum()` is still empty while models are being written — value sets are registered in the
+     * command's own later loop. Definitions are loaded up front, so this is order-independent.
+     *
+     * The name this produces is **not** trusted on its own. `ClassNameResolver` can map two value sets
+     * to one name (`medication-statement-status` and `medication-status` both give
+     * `MedicationStatusCodes`), and `resolveValueSetDefinition()` may itself fall back to an
+     * alternative URL. Both are caught at validation time by comparing the enum's own
+     * `#[FHIRValueSetSource]` URL against the binding's, so a mismatch degrades to the existing
+     * "no enum class generated" warning rather than rejecting legal codes.
+     */
+    private function resolveBoundEnumName(
+        string $valueSetUrl,
+        string $version,
+        BuilderContextInterface $builderContext,
+    ): ?string {
+        $bareUrl    = $this->extractBaseValueSetUrl($valueSetUrl);
+        $definition = $this->resolveValueSetDefinition($bareUrl, $builderContext);
+
+        if ($definition === null || !isset($definition['name']) || !is_string($definition['name'])) {
+            return null;
+        }
+
+        $className = ClassNameResolver::resolveClassName($bareUrl, $definition['name']);
+
+        // Fully qualified, not a bare name. The validator is wired with every version's enum
+        // namespace at once (services.yaml lists R4, R4B and R5), and probing them in order returns
+        // whichever matches first — always R4. An R5 binding therefore resolved to R4's enum, where
+        // the code sets genuinely differ: `coding` is legal in R5 and absent from R4 (so it was
+        // rejected), while `choice` was removed in R5 and present in R4 (so it was accepted). The
+        // corpus harness cannot see this, because its factory wires a single namespace per version.
+        return $builderContext->getEnumNamespace($version)->getName() . '\\' . $className;
+    }
+
+    /**
+     * @param array<string, mixed> $element
+     */
     private function trackValueSetDependencies(array $element, BuilderContextInterface $builderContext): void
     {
         // Process direct bindings on the element
@@ -925,6 +976,16 @@ class FHIRModelGenerator implements GeneratorInterface
                     $maxValueSetUrl = $this->extractMaxValueSetUrl($element['binding']['extension'] ?? []);
                     if ($maxValueSetUrl !== null) {
                         $args['maxValueSetUrl'] = $maxValueSetUrl;
+                    }
+
+                    // Record which generated enum backs this value set. The validator cannot work it
+                    // out from the URL: class names come from the ValueSet's `name` via
+                    // ClassNameResolver, so `.../ValueSet/item-type` is `QuestionnaireItemType` and
+                    // `http-verb` is `HTTPVerb`. Guessing from the slug missed 27 of 28 value sets and
+                    // silently downgraded 19 core required bindings to an unenforced warning.
+                    $enumClass = $this->resolveBoundEnumName($valueSetUrl, $version, $builderContext);
+                    if ($enumClass !== null) {
+                        $args['enumClass'] = $enumClass;
                     }
 
                     $param->addAttribute(FHIRValueSetBinding::class, $args);

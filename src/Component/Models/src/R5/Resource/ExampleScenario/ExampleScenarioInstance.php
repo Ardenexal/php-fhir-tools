@@ -76,7 +76,14 @@ class ExampleScenarioInstance extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $key = null,
         /** @var Coding|null structureType Data structure for example */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/examplescenario-instance-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/examplescenario-instance-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ExampleScenarioResourceType',
+        )]
         public ?Coding $structureType = null,
         /** @var StringPrimitive|string|null structureVersion E.g. 4.0.1 */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

@@ -137,7 +137,13 @@ class QuestionnaireItem extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
         /** @var QuestionnaireItemTypeType|null type group | display | boolean | decimal | integer | date | dateTime + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/item-type|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/item-type|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\QuestionnaireItemType',
+        )]
         public ?QuestionnaireItemTypeType $type = null,
         /** @var array<QuestionnaireItemEnableWhen> enableWhen Only allow data when */
         #[FhirProperty(
@@ -150,7 +156,12 @@ class QuestionnaireItem extends BackboneElement
         #[FHIRIsModifier(reason: 'If enableWhen is present and the condition evaluates to false, then the Questionnaire behaves as though the elements weren\'t actually present')]
         public array $enableWhen = [],
         /** @var EnableWhenBehaviorType|null enableBehavior all | any */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-enable-behavior|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-enable-behavior|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\EnableWhenBehavior',
+        )]
         public ?EnableWhenBehaviorType $enableBehavior = null,
         /** @var bool|null required Whether the item must be included in data results */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

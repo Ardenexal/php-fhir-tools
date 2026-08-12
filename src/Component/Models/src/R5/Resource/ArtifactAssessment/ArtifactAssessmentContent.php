@@ -37,7 +37,12 @@ class ArtifactAssessmentContent extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var ArtifactAssessmentInformationTypeType|null informationType comment | classifier | rating | container | response | change-request */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/artifactassessment-information-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/artifactassessment-information-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ArtifactAssessmentInformationType',
+        )]
         public ?ArtifactAssessmentInformationTypeType $informationType = null,
         /** @var MarkdownPrimitive|null summary Brief summary of the content */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

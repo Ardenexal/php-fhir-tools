@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Additional Binding Purpose ValueSet
  * URL: http://hl7.org/fhir/ValueSet/additional-binding-purpose
  * Version: 5.0.0
  * Description: Additional Binding Purpose
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/additional-binding-purpose', version: '5.0.0')]
 enum AdditionalBindingPurposeVS: string
 {
     /** Maximum Binding */

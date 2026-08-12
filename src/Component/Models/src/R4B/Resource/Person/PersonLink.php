@@ -44,7 +44,12 @@ class PersonLink extends BackboneElement
         ])]
         public ?Reference $target = null,
         /** @var IdentityAssuranceLevelType|null assurance level1 | level2 | level3 | level4 */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/identity-assuranceLevel|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/identity-assuranceLevel|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\IdentityAssuranceLevel',
+        )]
         public ?IdentityAssuranceLevelType $assurance = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

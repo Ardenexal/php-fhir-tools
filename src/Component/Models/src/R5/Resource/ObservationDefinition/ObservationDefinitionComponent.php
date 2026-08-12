@@ -49,7 +49,11 @@ class ObservationDefinitionComponent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ObservationDataTypeType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/permitted-data-type|5.0.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/permitted-data-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ObservationDataType',
+        )]
         public array $permittedDataType = [],
         /** @var array<Coding> permittedUnit Unit for quantitative results */
         #[FhirProperty(
@@ -59,7 +63,11 @@ class ObservationDefinitionComponent extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\UCUMCodes',
+        )]
         public array $permittedUnit = [],
         /** @var array<ObservationDefinitionQualifiedValue> qualifiedValue Set of qualified values for observation results */
         #[FhirProperty(

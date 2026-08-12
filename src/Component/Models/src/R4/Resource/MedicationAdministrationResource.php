@@ -56,6 +56,7 @@ class MedicationAdministrationResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
@@ -101,7 +102,14 @@ class MedicationAdministrationResource extends AbstractDomainResource
         ])]
         public array $partOf = [],
         /** @var MedicationAdministrationStatusCodesType|null status in-progress | not-done | on-hold | completed | entered-in-error | stopped | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-admin-status|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-admin-status|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\MedicationAdministrationStatusCodes',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?MedicationAdministrationStatusCodesType $status = null,
         /** @var array<CodeableConcept> statusReason Reason administration not performed */
         #[FhirProperty(
@@ -113,7 +121,13 @@ class MedicationAdministrationResource extends AbstractDomainResource
         #[Valid]
         public array $statusReason = [],
         /** @var CodeableConcept|null category Type of medication usage */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-admin-category', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-admin-category',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\MedicationAdministrationCategoryCodes',
+        )]
         public ?CodeableConcept $category = null,
         /** @var CodeableConcept|Reference|null medication What was administered */
         #[FhirProperty(

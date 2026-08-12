@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ClinicalUseDefinitionType
  * URL: http://hl7.org/fhir/ValueSet/clinical-use-definition-type
  * Version: 4.3.0
  * Description: Overall defining type of this clinical use definition.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/clinical-use-definition-type', version: '4.3.0')]
 enum ClinicalUseDefinitionType: string
 {
     /** Indication */

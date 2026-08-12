@@ -49,7 +49,11 @@ class SubstanceDefinitionSourceMaterial extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/country|4.3.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/country|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CountryValueSet',
+        )]
         public array $countryOfOrigin = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

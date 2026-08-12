@@ -64,7 +64,13 @@ class TerminologyCapabilitiesCodeSystem extends BackboneElement
         #[Valid]
         public array $version = [],
         /** @var CodeSystemContentModeType|null content not-present | example | fragment | complete | supplement */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/codesystem-content-mode|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/codesystem-content-mode|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CodeSystemContentMode',
+        )]
         public ?CodeSystemContentModeType $content = null,
         /** @var bool|null subsumption Whether subsumption is supported */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

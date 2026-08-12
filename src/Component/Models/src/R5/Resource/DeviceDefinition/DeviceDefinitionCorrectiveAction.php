@@ -36,7 +36,12 @@ class DeviceDefinitionCorrectiveAction extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $recall = null,
         /** @var DeviceCorrectiveActionScopeType|null scope model | lot-numbers | serial-numbers */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-correctiveactionscope|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-correctiveactionscope|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\DeviceCorrectiveActionScope',
+        )]
         public ?DeviceCorrectiveActionScopeType $scope = null,
         /** @var Period|null period Start and end dates of the  corrective action */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), Valid, NotBlank]

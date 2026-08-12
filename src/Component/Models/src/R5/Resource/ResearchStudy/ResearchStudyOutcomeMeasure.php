@@ -44,7 +44,11 @@ class ResearchStudyOutcomeMeasure extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/research-study-objective-type', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/research-study-objective-type',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ResearchStudyObjectiveType',
+        )]
         public array $type = [],
         /** @var MarkdownPrimitive|null description Description of the outcome */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

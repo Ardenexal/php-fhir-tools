@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContextInterface;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Intl\Currencies;
@@ -114,6 +115,17 @@ class FHIRValueSetGenerator implements GeneratorInterface
         $enumType->addComment('URL: ' . ($valueSet['url'] ?? 'unknown'));
         $enumType->addComment('Version: ' . ($valueSet['version'] ?? 'unknown'));
         $enumType->addComment('Description: ' . ($valueSet['description'] ?? 'No description provided.'));
+
+        // Record the source value set so a binding can verify it resolved to the right enum rather
+        // than to one whose ClassNameResolver name merely collides. See FHIRValueSetSource.
+        if (isset($valueSet['url']) && is_string($valueSet['url'])) {
+            $sourceArgs = ['url' => $valueSet['url']];
+            if (isset($valueSet['version']) && is_string($valueSet['version'])) {
+                $sourceArgs['version'] = $valueSet['version'];
+            }
+
+            $enumType->addAttribute(FHIRValueSetSource::class, $sourceArgs);
+        }
 
         foreach ($valueSet['compose']['include'] as $include) {
             if (isset($include['system'])) {

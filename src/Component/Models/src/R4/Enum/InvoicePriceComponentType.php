@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: InvoicePriceComponentType
  * URL: http://hl7.org/fhir/ValueSet/invoice-priceComponentType
  * Version: 4.0.1
  * Description: Codes indicating the kind of the price component.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/invoice-priceComponentType', version: '4.0.1')]
 enum InvoicePriceComponentType: string
 {
     /** base price */

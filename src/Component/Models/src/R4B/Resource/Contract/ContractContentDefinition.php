@@ -54,7 +54,13 @@ class ContractContentDefinition extends BackboneElement
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $publicationDate = null,
         /** @var ContractResourcePublicationStatusCodesType|null publicationStatus amended | appended | cancelled | disputed | entered-in-error | executable | executed | negotiable | offered | policy | rejected | renewed | revoked | resolved | terminated */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contract-publicationstatus|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/contract-publicationstatus|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ContractResourcePublicationStatusCodes',
+        )]
         public ?ContractResourcePublicationStatusCodesType $publicationStatus = null,
         /** @var MarkdownPrimitive|null copyright Publication Ownership */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

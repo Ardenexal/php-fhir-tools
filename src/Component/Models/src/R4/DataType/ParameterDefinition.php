@@ -34,7 +34,13 @@ class ParameterDefinition extends Element
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?CodePrimitive $name = null,
         /** @var OperationParameterUseType|null use in | out */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-parameter-use|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-parameter-use|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\OperationParameterUse',
+        )]
         public ?OperationParameterUseType $use = null,
         /** @var int|null min Minimum cardinality */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
@@ -46,7 +52,13 @@ class ParameterDefinition extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $documentation = null,
         /** @var FHIRAllTypesType|null type What type of value */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-types|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-types|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRAllTypes',
+        )]
         public ?FHIRAllTypesType $type = null,
         /** @var CanonicalPrimitive|null profile What profile the value is expected to be */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]

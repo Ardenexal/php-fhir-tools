@@ -58,7 +58,11 @@ class AccountDiagnosis extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
         #[Valid]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-diagnosis-use', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-diagnosis-use',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\EncounterDiagnosisUse',
+        )]
         public array $type = [],
         /** @var bool|null onAdmission Diagnosis present on Admission */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

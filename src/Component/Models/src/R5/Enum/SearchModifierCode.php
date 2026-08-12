@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Search Modifier Code
  * URL: http://hl7.org/fhir/ValueSet/search-modifier-code
  * Version: 5.0.0
  * Description: A supported modifier for a search parameter.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/search-modifier-code', version: '5.0.0')]
 enum SearchModifierCode: string
 {
     /** Missing */

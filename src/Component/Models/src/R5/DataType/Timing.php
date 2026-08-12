@@ -43,7 +43,13 @@ class Timing extends BackboneType
         #[FhirProperty(fhirType: 'Element', propertyKind: 'complex'), Valid]
         public ?TimingRepeat $repeat = null,
         /** @var CodeableConcept|null code C | BID | TID | QID | AM | PM | QD | QOD | + */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/timing-abbreviation', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/timing-abbreviation',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\TimingAbbreviation',
+        )]
         public ?CodeableConcept $code = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

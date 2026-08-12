@@ -67,7 +67,13 @@ class ContractTermAsset extends BackboneElement
         #[Valid]
         public array $subtype = [],
         /** @var Coding|null relationship Kinship of the asset */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-content-class', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-content-class',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ConsentContentClass',
+        )]
         public ?Coding $relationship = null,
         /** @var array<ContractTermAssetContext> context Circumstance of the asset */
         #[FhirProperty(

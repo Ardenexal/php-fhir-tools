@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: RequestIntent
  * URL: http://hl7.org/fhir/ValueSet/request-intent
  * Version: 4.0.1
  * Description: Codes indicating the degree of authority/intentionality associated with a request.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/request-intent', version: '4.0.1')]
 enum RequestIntent: string
 {
     /** Proposal */
