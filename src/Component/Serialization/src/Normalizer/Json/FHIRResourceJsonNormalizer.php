@@ -362,6 +362,11 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                             // string keys, and str_starts_with() raised a TypeError reported only as an
                             // opaque "Format error (json)".
                             self::assertSingleValuedElement($elementName, $value, $resolvedType);
+                            // A null on a complex element is malformed FHIR JSON, and without this it
+                            // reached the complex normalizer, which claimed nothing and surfaced as
+                            // "no supporting normalizer found" — losing the rest of the document.
+                            // Complex branch only: the primitive path above relies on null placeholders.
+                            self::assertComplexPropertyIsNotNull($elementName, $value, $resolvedType);
                             $denormalizedValue = $denormalizer->denormalize($value, $propertyType, 'json', $context);
                         } else {
                             $denormalizedValue = $value;

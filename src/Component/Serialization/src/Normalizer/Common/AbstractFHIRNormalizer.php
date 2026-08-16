@@ -825,6 +825,16 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Read a temporal lexeme, retaining it rather than aborting the document when it will not parse.
+     *
+     * Malformed primitive syntax is a FHIR *validation* finding, not a reason to refuse the
+     * document: the reference validator reads `primitive-bad.xml` end to end and reports forty
+     * located errors, one per bad primitive. Throwing here surfaced only the first bad temporal and
+     * lost the other thirty-nine — the document never reached the validator at all.
+     *
+     * The lexeme is therefore kept on the value object ({@see FHIRTemporalValue::unparsed()}), where
+     * validation locates it and reports it, and serialization writes it back exactly as supplied.
+     *
      * @param class-string<FHIRTemporalValue> $class
      */
     protected function parseTemporalValue(mixed $value, string $class): ?FHIRTemporalValue
@@ -845,7 +855,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             try {
                 return $class::parse($value);
             } catch (\Throwable $e) {
-                throw new NotNormalizableValueException(sprintf('Expected %s string, got invalid value: %s', $class, $value), 0, $e);
+                return $class::unparsed($value, $e->getMessage());
             }
         }
 
@@ -938,6 +948,44 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         throw FHIRConformanceViolationException::inFormat('json', sprintf('The property %s must be a JSON Array, not an Object (at %s)', $elementName, self::shortTypeName($ownerType)));
+    }
+
+    /**
+     * Was this XML element present in the document but carrying nothing an element can hold?
+     *
+     * Symfony's XmlEncoder decodes `<entry/>` and `<code>\n</code>` to the empty or whitespace-only
+     * string, and `<entry><!-- c --></entry>` to the empty array — three spellings of the same fact.
+     *
+     * That is a *validation* finding, not a reason to refuse the document: the reference validator
+     * reads `list-empty1.xml` end to end and reports ele-1 ("Element must have some content") at the
+     * offending path. Refusing it lost the whole file. Callers therefore substitute `[]` — an element
+     * that is present with no children — and let `ele-1` on {@see Element} report it.
+     */
+    protected static function isEmptyXmlElement(mixed $value): bool
+    {
+        return $value === [] || (is_string($value) && trim($value) === '');
+    }
+
+    /**
+     * Reject a complex-valued JSON property supplied as `null`.
+     *
+     * FHIR JSON has no null for a complex element: an element is either present as an object or
+     * absent. The HL7 Java reference validator reports the null as an error ("The property meta must
+     * be an Object, not a Null (at Bundle.meta)") rather than reading it, so accepting it leniently
+     * would make us pass documents the oracle rejects.
+     *
+     * This is deliberately *not* applied on the primitive path: FHIR legitimately uses `null`
+     * placeholders inside a primitive array to align it with its `_x` extension array.
+     *
+     * @throws FHIRSerializationException when $value is null
+     */
+    protected static function assertComplexPropertyIsNotNull(string $elementName, mixed $value, string $ownerType): void
+    {
+        if ($value !== null) {
+            return;
+        }
+
+        throw FHIRConformanceViolationException::inFormat('json', sprintf('The property %s must be an Object, not a Null (at %s.%s)', $elementName, self::shortTypeName($ownerType), $elementName));
     }
 
     private static function shortTypeName(string $fqcn): string

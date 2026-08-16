@@ -71,6 +71,12 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        // A present-but-empty element (`<entry/>`) is a backbone with no children, not a missing one.
+        // Reading it as such keeps the rest of the document available; ele-1 reports it.
+        if (self::isEmptyXmlElement($data)) {
+            $data = [];
+        }
+
         if (!is_array($data)) {
             throw new NotNormalizableValueException('Expected array, got ' . gettype($data));
         }
@@ -98,8 +104,20 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
                         } else {
-                            $rawValue          = $this->unwrapXmlValue($value, $phpType);
-                            $denormalizedValue = match ($phpType) {
+                            $rawValue = $this->unwrapXmlValue($value, $phpType);
+
+                            // A choice variant the generator maps to a PHP scalar (boolean, integer,
+                            // decimal) has nowhere to put child elements, so an extension-only
+                            // occurrence — `<valueDecimal><extension url="…data-absent-reason"/></valueDecimal>`
+                            // — arrives here as the decoded array and raised "Cannot assign array to
+                            // property", aborting the document. See the twin guard in
+                            // FHIRComplexTypeXmlNormalizer for why the placeholder is not null.
+                            $denormalizedValue = is_array($rawValue) ? match ($phpType) {
+                                'int'   => 0,
+                                'float' => 0.0,
+                                'bool'  => false,
+                                default => '',
+                            } : match ($phpType) {
                                 'int'   => (int) $rawValue,
                                 'float' => (float) $rawValue,
                                 'bool'  => filter_var($rawValue, FILTER_VALIDATE_BOOLEAN),
@@ -136,6 +154,11 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                     $items        = $this->unwrapXmlValue($value, 'array');
                     if (is_array($items) && !array_is_list($items)) {
                         $items = [$items];
+                    }
+                    // Present yet strips to nothing: one occurrence that was empty, not zero.
+                    // See self::isEmptyXmlElement().
+                    if ($items === []) {
+                        $items = [''];
                     }
                     $denormalizedValue = [];
                     foreach ((array) $items as $item) {
@@ -180,7 +203,9 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
             return false;
         }
 
-        if (!is_array($data)) {
+        // An empty element still claims its backbone type: refusing it here left Symfony with no
+        // normalizer at all and aborted the whole document. See self::isEmptyXmlElement().
+        if (!is_array($data) && !self::isEmptyXmlElement($data)) {
             return false;
         }
 

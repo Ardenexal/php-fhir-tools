@@ -1,17 +1,12 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
-    "unread": {
-        "javaErrorCount": 1,
-        "javaWarningCount": 0,
-        "failure": "Failed to deserialize JSON to FHIR object: Expected Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRDate string, got invalid value: not a date"
-    },
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Not a valid date format: 'not a date'"
@@ -19,8 +14,8 @@
     },
     "outcome": {
         "errors": {
-            "deserialization": [
-                "(root) — Failed to deserialize JSON to FHIR object: Expected Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRDate string, got invalid value: not a date"
+            "constraint:PrimitiveFormatChecker": [
+                "birthDate — Not a valid date format: 'not a date'"
             ]
         },
         "warnings": {}

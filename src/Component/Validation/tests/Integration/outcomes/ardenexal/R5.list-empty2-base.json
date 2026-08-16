@@ -1,12 +1,12 @@
 {
-    "errorCount": 0,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 2,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Element must have some content",
@@ -14,7 +14,14 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:NotBlank": [
+                "entry[0].item — This value should not be blank."
+            ],
+            "invariant:ele-1": [
+                "entry[0] — All FHIR elements must have a @value or children"
+            ]
+        },
         "warnings": {}
     }
 }

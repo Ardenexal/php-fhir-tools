@@ -1,12 +1,12 @@
 {
-    "errorCount": 0,
+    "errorCount": 26,
     "warningCount": 1,
     "infoCount": 91,
     "java": {
         "errorCount": 26,
         "warningCount": 52,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "BELOW",
         "errors": [
             "Coding.system must be an absolute reference, not a local reference",
@@ -38,7 +38,36 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:CodingSystemChecker": [
+                "entry[0].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[0].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[1].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[1].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[2].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[2].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[3].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[3].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[4].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[4].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[5].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[5].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[6].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[6].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[7].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[7].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[8].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[8].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[9].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[9].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[10].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[10].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[11].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[11].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')",
+                "entry[12].resource.subject.coding[0].system — Coding.system must be an absolute reference, not a local reference",
+                "entry[12].resource.type[0].coding[0].system — The Coding references a value set, not a code system ('http://hl7.org/fhir/ValueSet/measure-type')"
+            ]
+        },
         "warnings": {
             "invariant:mea-0": [
                 "entry[1].resource — Name should be usable as an identifier for the module by machine processing applications such as code generation"

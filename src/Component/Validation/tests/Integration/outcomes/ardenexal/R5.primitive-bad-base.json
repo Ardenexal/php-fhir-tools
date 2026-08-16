@@ -1,12 +1,7 @@
 {
-    "errorCount": 0,
+    "errorCount": 12,
     "warningCount": 0,
     "infoCount": 0,
-    "unread": {
-        "javaErrorCount": 40,
-        "javaWarningCount": 1,
-        "failure": "Failed to deserialize XML to FHIR object: Expected Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRInstant string, got invalid value: 1983-00-01T12:32:45Z"
-    },
     "java": {
         "errorCount": 40,
         "warningCount": 1,
@@ -58,8 +53,19 @@
     },
     "outcome": {
         "errors": {
-            "deserialization": [
-                "(root) — Failed to deserialize XML to FHIR object: Expected Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRInstant string, got invalid value: 1983-00-01T12:32:45Z"
+            "constraint:PrimitiveFormatChecker": [
+                "parameter[6].value — Element value '00.1' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'",
+                "parameter[9].value — Not a valid instant format: '1983-00-01T12:32:45Z'",
+                "parameter[10].value — Not a valid instant format: '1983-01-00T12:32:45Z'",
+                "parameter[11].value — Not a valid instant format: '1983-01-01T12:32'",
+                "parameter[12].value — Not a valid instant format: '1983-01-01T12:32:45'",
+                "parameter[16].value — Not a valid date format: '1900-02-29'",
+                "parameter[17].value — Not a valid date format: '1900-13-01'",
+                "parameter[18].value — Not a valid date format: '2013-04-31'",
+                "parameter[19].value — Not a valid date/time format: '2013-01-01T12:32:45+13:33.00'",
+                "parameter[20].value — Not a valid date/time format: '-0001-01-01'",
+                "parameter[21].value — Not a valid time format: '11:60:59'",
+                "parameter[22].value — Not a valid time format: '24:00:00'"
             ]
         },
         "warnings": {}

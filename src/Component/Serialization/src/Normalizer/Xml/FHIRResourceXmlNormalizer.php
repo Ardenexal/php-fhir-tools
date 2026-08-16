@@ -397,6 +397,13 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                         if (is_array($items) && !array_is_list($items)) {
                             $items = [$items];
                         }
+                        // The element was present yet strips to nothing — `<entry><!-- c --></entry>`
+                        // decodes to `[]` once comment nodes are dropped. That is one occurrence that
+                        // was present and empty, not zero occurrences; iterating `[]` recorded no
+                        // entry at all and lost the finding. See self::isEmptyXmlElement().
+                        if ($items === []) {
+                            $items = [''];
+                        }
                         $denormalizedValue = [];
                         foreach ((array) $items as $item) {
                             $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $context);
