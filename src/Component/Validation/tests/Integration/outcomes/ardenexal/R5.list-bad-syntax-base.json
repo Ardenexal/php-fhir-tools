@@ -1,17 +1,12 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
-    "unread": {
-        "javaErrorCount": 1,
-        "javaWarningCount": 0,
-        "failure": "Unable to parse XML: Opening and ending tag mismatch: id line 4 and List at line 7 column 8"
-    },
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "The element type \"id\" must be terminated by the matching end-tag \"</id>\"."
@@ -19,7 +14,7 @@
     },
     "outcome": {
         "errors": {
-            "deserialization": [
+            "unreadable:deserialization": [
                 "(root) — Unable to parse XML: Opening and ending tag mismatch: id line 4 and List at line 7 column 8"
             ]
         },

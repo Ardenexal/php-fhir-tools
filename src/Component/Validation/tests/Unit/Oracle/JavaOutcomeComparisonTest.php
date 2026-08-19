@@ -12,7 +12,7 @@ use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\JavaOutcom
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\SkipReason;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\UnreadCase;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\ViolationFamilyClassifier;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -25,13 +25,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * shapes below are lifted from the vendored corpus (containedToContainer and hakan-se), which are the
  * plan's discriminating pair.
  */
-#[CoversClass(Classification::class)]
-#[CoversClass(JavaOutcomeReader::class)]
-#[CoversClass(CaseComparison::class)]
-#[CoversClass(ComparisonReport::class)]
-#[CoversClass(ViolationFamilyClassifier::class)]
-#[CoversClass(SkipReason::class)]
-#[CoversClass(UnreadCase::class)]
+// CoversNothing, not CoversClass: every class under test here lives in
+// `src/Component/Validation/tests/Integration/Oracle/`, which phpunit.dist.xml excludes from coverage
+// (`<exclude><directory>src/Component/*/tests</directory></exclude>`). Naming an excluded class as a
+// coverage target makes PHPUnit warn `… is not a valid target for code coverage`, once per test
+// method — and with `failOnWarning="true"` that fails the build. It only fails where a coverage driver
+// is installed, so a local run with no xdebug/pcov reports `OK` while CI reports 17 warnings and
+// exits 1. The harness is test infrastructure; there is no production coverage to attribute to it.
+#[CoversNothing]
 final class JavaOutcomeComparisonTest extends TestCase
 {
     #[DataProvider('provideClassifications')]

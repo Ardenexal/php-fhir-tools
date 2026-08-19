@@ -1,12 +1,7 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
-    "unread": {
-        "javaErrorCount": 2,
-        "javaWarningCount": 0,
-        "failure": "Unable to detect data format: expected JSON (starting \"{\" or \"[\") or XML (starting \"<\"), got '??' . \"\\0\" . '<' . \"\\0\" . 'C' . \"\\0\" . 'o' . \"\\0\" . 'd' . \"\\0\" . 'e' . \"\\0\" . 'S' . \"\\0\" . 'y' . \"\\0\" . 's' . \"\\0\" . 't' . \"\\0\" . 'e' . \"\\0\" . 'm' . \"\\0\" . ' ' . \"\\0\" . 'x' . \"\\0\" . 'm' . \"\\0\" . 'l' . \"\\0\" . 'n' . \"\\0\" . 's' . \"\\0\" . '=' . \"\\0\" . '…'"
-    },
     "java": {
         "errorCount": 2,
         "warningCount": 0,
@@ -20,7 +15,7 @@
     },
     "outcome": {
         "errors": {
-            "deserialization": [
+            "unreadable:deserialization": [
                 "(root) — Unable to detect data format: expected JSON (starting \"{\" or \"[\") or XML (starting \"<\"), got '??' . \"\\0\" . '<' . \"\\0\" . 'C' . \"\\0\" . 'o' . \"\\0\" . 'd' . \"\\0\" . 'e' . \"\\0\" . 'S' . \"\\0\" . 'y' . \"\\0\" . 's' . \"\\0\" . 't' . \"\\0\" . 'e' . \"\\0\" . 'm' . \"\\0\" . ' ' . \"\\0\" . 'x' . \"\\0\" . 'm' . \"\\0\" . 'l' . \"\\0\" . 'n' . \"\\0\" . 's' . \"\\0\" . '=' . \"\\0\" . '…'"
             ]
         },

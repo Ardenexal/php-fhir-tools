@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRUnreadableDocumentException;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRBackboneElementJsonNormalizer;
@@ -179,12 +180,13 @@ class FHIRSerializationService
 
             /** @var T $result */
             return $result;
-        } catch (FHIRConformanceViolationException $e) {
-            // Pass through unwrapped. This already states the FHIR rule that was broken, in the
-            // reference validator's own wording, and wrapping it would both bury that behind a generic
-            // prefix and replace the exception type — leaving nothing able to tell "this document
-            // breaks a FHIR rule" from "this document is unreadable". The conformance oracle counts the
-            // first as a finding and the second as UNREAD, so the distinction has to survive.
+        } catch (FHIRConformanceViolationException|FHIRUnreadableDocumentException $e) {
+            // Pass both through unwrapped. Each already states its own reason in the reference
+            // validator's wording, and wrapping would bury that behind a generic prefix *and* replace
+            // the exception type — leaving nothing able to tell "this document breaks a FHIR rule"
+            // from "these bytes are not a document" from "we could not map it to a model". The
+            // conformance oracle reports the first two as findings and only the third as UNREAD, so
+            // both distinctions have to survive the catch.
             throw $e;
         } catch (\Exception $e) {
             throw new FHIRSerializationException(sprintf('Failed to deserialize JSON to FHIR object: %s', $e->getMessage()), 0, $e);
@@ -251,8 +253,8 @@ class FHIRSerializationService
 
             /** @var T $result */
             return $result;
-        } catch (FHIRConformanceViolationException $e) {
-            // See deserializeFromJson(): a conformance violation must keep its type and its message.
+        } catch (FHIRConformanceViolationException|FHIRUnreadableDocumentException $e) {
+            // See deserializeFromJson(): both must keep their type and their message.
             throw $e;
         } catch (\Exception $e) {
             throw new FHIRSerializationException(sprintf('Failed to deserialize XML to FHIR object: %s', $e->getMessage()), 0, $e);
@@ -323,10 +325,10 @@ class FHIRSerializationService
         // alone is unactionable, and the common real causes (a leading JSON comment, an HTML error
         // page returned by a server, a stray log line) are all obvious the moment the bytes are shown.
         if ($trimmed === '') {
-            throw new FHIRSerializationException('Unable to detect data format: input is empty');
+            throw FHIRUnreadableDocumentException::because('Unable to detect data format: input is empty');
         }
 
-        throw new FHIRSerializationException(sprintf('Unable to detect data format: expected JSON (starting "{" or "[") or XML (starting "<"), got %s', var_export(mb_strimwidth($trimmed, 0, 40, '…'), true)));
+        throw FHIRUnreadableDocumentException::because(sprintf('Unable to detect data format: expected JSON (starting "{" or "[") or XML (starting "<"), got %s', var_export(mb_strimwidth($trimmed, 0, 40, '…'), true)));
     }
 
     /**
@@ -427,7 +429,7 @@ class FHIRSerializationService
             // The encoder's detailed errors never reach this path, because deserialize() resolves the
             // target class before handing anything to the serializer.
             if (json_last_error() !== \JSON_ERROR_NONE) {
-                throw new FHIRSerializationException(sprintf('Unable to parse JSON: %s', $this->describeJsonParseFailure($data)));
+                throw FHIRUnreadableDocumentException::because(sprintf('Unable to parse JSON: %s', $this->describeJsonParseFailure($data)));
             }
 
             if (!is_array($decoded)) {
@@ -440,7 +442,7 @@ class FHIRSerializationService
 
             $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NOERROR);
             if ($xml === false) {
-                throw new FHIRSerializationException(sprintf('Unable to parse XML: %s', $this->describeXmlParseFailure($data)));
+                throw FHIRUnreadableDocumentException::because(sprintf('Unable to parse XML: %s', $this->describeXmlParseFailure($data)));
             }
 
             $decoded = ['resourceType' => $xml->getName()];

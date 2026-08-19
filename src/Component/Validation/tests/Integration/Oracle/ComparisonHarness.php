@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
 
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRUnreadableDocumentException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
@@ -145,6 +146,25 @@ final class ComparisonHarness
                 javaWarningCount: $javaOutcome->warningCount,
                 ourErrorMessages: [$e->finding],
                 families: ['conformance:deserialization'],
+                javaErrorTexts: $javaOutcome->errorTexts,
+            );
+        } catch (FHIRUnreadableDocumentException $e) {
+            // The bytes are not a document, and that is a finding rather than a silence. Java answers
+            // every case in this class with an OperationOutcome error — `Unable to parse JSON`,
+            // `Content is not allowed in prolog` — so counting ours 0 and filing it under UNREAD put
+            // the case in no class at all: not ABOVE, not BELOW, invisible to any regression check.
+            //
+            // Only genuine parse/format failures reach here. "Unable to detect target class" keeps the
+            // plain type and stays unread, because `R5.logicalxml-nonamespace` parses fine and Java
+            // reports zero on it — reporting one would manufacture the project's first ABOVE case.
+            return new CaseComparison(
+                name: $name,
+                ourErrorCount: 1,
+                ourWarningCount: 0,
+                javaErrorCount: $javaOutcome->errorCount,
+                javaWarningCount: $javaOutcome->warningCount,
+                ourErrorMessages: [$e->finding],
+                families: ['unreadable:deserialization'],
                 javaErrorTexts: $javaOutcome->errorTexts,
             );
         } catch (\Throwable $e) {

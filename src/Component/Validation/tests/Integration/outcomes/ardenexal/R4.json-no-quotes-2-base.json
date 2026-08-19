@@ -1,12 +1,7 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
-    "unread": {
-        "javaErrorCount": 3,
-        "javaWarningCount": 0,
-        "failure": "Unable to parse JSON: Parse error on line 7:\n...given\" : [\r        Sarah\r      ]\r    \n---------------------^\nExpected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '[', ']'"
-    },
     "java": {
         "errorCount": 3,
         "warningCount": 0,
@@ -21,7 +16,7 @@
     },
     "outcome": {
         "errors": {
-            "deserialization": [
+            "unreadable:deserialization": [
                 "(root) — Unable to parse JSON: Parse error on line 7:\n...given\" : [\r        Sarah\r      ]\r    \n---------------------^\nExpected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '[', ']'"
             ]
         },

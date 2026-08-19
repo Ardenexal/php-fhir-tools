@@ -92,6 +92,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRUnreadableDocumentException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
@@ -211,8 +212,54 @@ foreach ($cases as $name => $case) {
         }
 
         continue;
+    } catch (FHIRUnreadableDocumentException $e) {
+        // The bytes are not a document at all. That is still a finding: Java answers every case in
+        // this class with an OperationOutcome error rather than declining to answer, so seeding 0 and
+        // marking it `unread` kept the case out of the comparison set entirely — in no class, visible
+        // to no regression check.
+        //
+        // The F8 coincidence the `unread` rule below guards against does not apply here. There it was
+        // real: a seeded 1 on a document we never read matched Java's 1 by accident. Here the 1 is a
+        // finding we actually made and can quote, so agreement is agreement.
+        $javaOutcome = $javaReader->read($case);
+
+        // Same no-oracle rule as the unread branch below, and it is not hypothetical here: `ex-pat`
+        // reaches this branch (`Unable to parse XML: Attribute class redefined`) while its manifest
+        // declares an oracle path that does not exist on disk. Without this guard the seeder writes a
+        // file with `"java": null` — an orphan the spec suite's provider drops outright, so it is read
+        // by nothing and merely accumulates. Absent oracle is not a comparison.
+        if ($javaOutcome === null) {
+            echo "  SKIP (unreadable, no oracle — case is not in the spec suite) {$name}: {$e->getMessage()}\n";
+            ++$skipped;
+            continue;
+        }
+
+        $outcome = json_encode([
+            'errorCount'   => 1,
+            'warningCount' => 0,
+            'infoCount'    => 0,
+            'java'         => javaBlock($javaOutcome, ourErrorCount: 1, ourWarningCount: 0),
+            'outcome'      => [
+                // Distinct from both `conformance:deserialization` (a stated FHIR rule we enforced) and
+                // `deserialization` (the residual unread class), so the three stay tellable apart in the
+                // seeded corpus rather than collapsing back into one bucket.
+                'errors'   => (object) ['unreadable:deserialization' => ['(root) — ' . $e->finding]],
+                'warnings' => (object) [],
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+
+        $outFile = OUTCOMES_DIR . '/' . $outcomePrefix . '.' . sanitizeName($name) . '-base.json';
+        if (file_put_contents($outFile, $outcome) !== false) {
+            ++$written;
+        } else {
+            echo "  ERROR writing {$name}\n";
+            ++$errors;
+        }
+
+        continue;
     } catch (Throwable $e) {
-        // Deserializer threw (bad format, bad XML, bad JSON, etc.). The payload never became a
+        // Deserializer threw and we could not attribute the failure to the document: we read it but
+        // cannot map it to a model, or a normalizer refused it. The payload never became a
         // resource, so there is no validation report and no count of ours to compare.
         //
         // Every parse failure is seeded, including ones Java considers clean. Leaving those unseeded

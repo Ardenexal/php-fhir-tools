@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRUnreadableDocumentException;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
@@ -197,6 +198,10 @@ final class FHIRValidatorSpecificationTest extends TestCase
             self::assertConformanceViolationIsSeededAsAFinding($expected, $name, $e);
 
             return;
+        } catch (FHIRUnreadableDocumentException $e) {
+            self::assertUnreadableDocumentIsSeededAsAFinding($expected, $name, $e);
+
+            return;
         } catch (\Throwable $e) {
             self::assertCaseIsSeededAsUnread($expected, $name, $e);
 
@@ -317,6 +322,10 @@ final class FHIRValidatorSpecificationTest extends TestCase
             $resource = $this->serializationR4B->deserialize($data);
         } catch (FHIRConformanceViolationException $e) {
             self::assertConformanceViolationIsSeededAsAFinding($expected, "R4B {$name}", $e);
+
+            return;
+        } catch (FHIRUnreadableDocumentException $e) {
+            self::assertUnreadableDocumentIsSeededAsAFinding($expected, "R4B {$name}", $e);
 
             return;
         } catch (\Throwable $e) {
@@ -443,6 +452,10 @@ final class FHIRValidatorSpecificationTest extends TestCase
             self::assertConformanceViolationIsSeededAsAFinding($expected, "R5 {$name}", $e);
 
             return;
+        } catch (FHIRUnreadableDocumentException $e) {
+            self::assertUnreadableDocumentIsSeededAsAFinding($expected, "R5 {$name}", $e);
+
+            return;
         } catch (\Throwable $e) {
             self::assertCaseIsSeededAsUnread($expected, "R5 {$name}", $e);
 
@@ -506,6 +519,48 @@ final class FHIRValidatorSpecificationTest extends TestCase
             1,
             $expected['errorCount'] ?? null,
             sprintf("Conformance rejection '%s' must be seeded as exactly one error", $name),
+        );
+    }
+
+    /**
+     * An unreadable document is also a finding — "these bytes are not a document" is our answer, not
+     * our silence.
+     *
+     * Distinct from a conformance rejection: there the document was read and broke a stated rule; here
+     * nothing was ever recovered. Both nonetheless produce exactly one violation, because the HL7 Java
+     * reference validator answers every case in this class with an `OperationOutcome` error rather than
+     * declining to answer.
+     *
+     * What must NOT reach here is the residual class the plain exception still covers — a document that
+     * parsed but could not be mapped to a model. `R5.logicalxml-nonamespace` is why: Java reads it and
+     * reports zero, so seeding one would put us `ABOVE` the reference validator, which the conformance
+     * gate forbids outright.
+     *
+     * The wording is deliberately not asserted. Parse-error text comes from upstream (jsonlint, libxml)
+     * and must stay free to improve without turning the suite red; only the classification is pinned.
+     *
+     * @param array<string, mixed> $expected the seeded outcome file
+     */
+    private static function assertUnreadableDocumentIsSeededAsAFinding(
+        array $expected,
+        string $name,
+        FHIRUnreadableDocumentException $failure,
+    ): void {
+        self::assertArrayNotHasKey(
+            'unread',
+            $expected,
+            sprintf(
+                "'%s' is seeded as unread, but the deserializer identified the document itself as "
+                . 'unreadable (%s). That is a finding Java also reports — re-run seed-outcomes.php.',
+                $name,
+                $failure->finding,
+            ),
+        );
+
+        self::assertSame(
+            1,
+            $expected['errorCount'] ?? null,
+            sprintf("Unreadable document '%s' must be seeded as exactly one error", $name),
         );
     }
 
