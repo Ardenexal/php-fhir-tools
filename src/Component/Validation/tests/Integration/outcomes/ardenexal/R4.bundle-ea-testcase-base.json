@@ -1,7 +1,7 @@
 {
-    "errorCount": 0,
+    "errorCount": 4,
     "warningCount": 0,
-    "infoCount": 6,
+    "infoCount": 7,
     "java": {
         "errorCount": 13,
         "warningCount": 7,
@@ -25,7 +25,16 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:BundleEntryFullUrlChecker": [
+                "entry[1].resource.contained[0].entry[0].fullUrl — The fullUrl must be an absolute URL (not '1a19a371-91b8-4a1d-9bb0-e8a997baa655')",
+                "entry[1].resource.contained[0].entry[1].fullUrl — The fullUrl must be an absolute URL (not 'Patient/denom-EXM104')"
+            ],
+            "constraint:NotBlank": [
+                "entry[1].resource.contained[0].entry[0].resource.status — This value should not be blank.",
+                "entry[1].resource.contained[0].entry[0].resource.mode — This value should not be blank."
+            ]
+        },
         "warnings": {}
     }
 }

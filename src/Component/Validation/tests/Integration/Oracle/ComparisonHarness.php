@@ -83,6 +83,20 @@ final class ComparisonHarness
                 continue;
             }
 
+            // `validateContains` selects the reference validator's contained-resource validation
+            // policy. `IGNORE` means it did not validate contained resources at all, so its zero-error
+            // outcome describes a configuration we have no way to reproduce — every constraint on a
+            // contained resource is reachable for us the moment the resource is typed. Comparing our
+            // run against it measures the option, not our correctness.
+            //
+            // Recorded as a skip rather than dropped in selectCases(), so the case stays visible in
+            // the skip arithmetic instead of silently lowering the compared set. Its twin
+            // (`CHECK_VALID`, same fixture) stays in the comparison and measures the same behaviour.
+            if (($case['validateContains'] ?? null) === 'IGNORE') {
+                $skips[$name] = SkipReason::UnmodelledOption;
+                continue;
+            }
+
             $file     = (string) ($case['file'] ?? '');
             $filePath = $validatorDir . '/' . $file;
 
