@@ -207,8 +207,12 @@ class FHIRSerializationService
     public function deserializeFromXml(string $xmlData, string $targetClass, array $context = []): object
     {
         try {
-            // A DOCTYPE is refused before any parser sees the document. This is a public entry point
-            // in its own right, so it cannot rely on detectTargetClass() having already checked.
+            // Two preconditions, in this order. The DOCTYPE scan is a byte comparison, so it reads a
+            // UTF-16 document as having no DOCTYPE at all and waves an XXE payload straight through to
+            // libxml; the encoding must therefore be settled before the scan can be trusted.
+            // deserialize() gets the encoding check for free from detectFormat(), which cannot make
+            // sense of byte pairs — this is a public entry point in its own right and skips that.
+            XmlDoctypeGuard::assertUtf8($xmlData);
             XmlDoctypeGuard::assertNoDoctype($xmlData);
 
             $xmlContext = $this->contextFactory->createXmlContext($context);

@@ -9,7 +9,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DecimalPrimitive as R5DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
+use Ardenexal\FHIRTools\Component\Validation\PrimitiveFormatChecker;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPathInvariantValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -153,6 +155,67 @@ final class GeneratedPrimitiveRegexTest extends TestCase
         self::assertSame(0, preg_match($pattern, 'xtruex'));
         self::assertSame(0, preg_match($pattern, 'truely'));
         self::assertSame(0, preg_match($pattern, 'notfalse'));
+    }
+
+    /**
+     * R5's published `decimal` regex is defective, and a compilable pattern is not a correct one.
+     *
+     * `hl7.fhir.r5.core#5.0.0` ships `([eE][+-]?[0-9]{1,9}})?` — a stray closing brace, which PCRE
+     * reads as a literal `}` rather than a typo. It compiles, so
+     * {@see testEveryEmittedPrimitivePatternCompiles} cannot see it; it simply rejects every legal
+     * exponent and accepts a malformed one. The generator corrects it against the HL7 Java reference
+     * validator's own pattern — see `FHIRModelGenerator::REGEX_CORRECTIONS`.
+     *
+     * The values below are the exact set measured against the broken pattern.
+     *
+     * @return iterable<string, array{string, int}>
+     */
+    public static function r5DecimalValues(): iterable
+    {
+        // Rejected by the upstream pattern's stray brace; all four are legal FHIR decimals.
+        yield 'bare exponent'              => ['1e1', 1];
+        yield 'negative exponent'          => ['1.0e-1', 1];
+        yield 'two-digit exponent'         => ['0.1e11', 1];
+        yield 'fraction with exponent'     => ['0.12e3', 1];
+        yield 'plain decimal'              => ['1.5', 1];
+        yield 'zero'                       => ['0', 1];
+
+        // Accepted by the upstream pattern, because the stray brace is a literal.
+        yield 'trailing brace is not legal' => ['1e1}', 0];
+
+        // Java flags this on R5.primitive-good, so the correction follows the reference validator
+        // rather than upstream-minus-the-brace, which would have accepted it.
+        yield 'leading zero in exponent'    => ['1e09', 0];
+
+        // The digit ceilings are upstream's and are preserved by the correction.
+        yield 'fraction over 17 digits'     => ['0.000000000000000000000001', 0];
+    }
+
+    #[DataProvider('r5DecimalValues')]
+    public function testR5DecimalPatternMatchesTheReferenceValidator(string $value, int $expectedMatch): void
+    {
+        $pattern = self::emittedPattern(R5DecimalPrimitive::class, 'value');
+
+        self::assertSame(
+            $expectedMatch,
+            preg_match($pattern, $value),
+            sprintf('R5 decimal pattern disagrees on %s', var_export($value, true)),
+        );
+    }
+
+    /**
+     * The generated constraint and `PrimitiveFormatChecker` must not drift apart.
+     *
+     * The checker walks the tree itself and quotes its pattern in the violation message for parity
+     * with Java's wording; the generated `Regex` is what fires once anything cascades `Assert\Valid`
+     * into a primitive. Two decimal rules that disagree would mean a value accepted by one layer and
+     * rejected by the other, which is precisely the split the upstream typo already caused.
+     */
+    public function testGeneratedDecimalPatternAgreesWithPrimitiveFormatChecker(): void
+    {
+        $emitted = self::emittedPattern(R5DecimalPrimitive::class, 'value');
+
+        self::assertSame('~\A(?:' . PrimitiveFormatChecker::DECIMAL_SOURCE . ')\z~', $emitted);
     }
 
     /** Every emitted pattern must be a compilable PCRE — an uncompilable one silently rejects all. */

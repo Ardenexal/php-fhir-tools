@@ -1099,10 +1099,40 @@ class FHIRModelGenerator implements GeneratorInterface
     }
 
     /**
+     * Corrections for `regex` extensions that ship defective in the published StructureDefinitions.
+     *
+     * Keyed on the **exact** upstream string, so a correction stops applying the moment HL7 ships a
+     * package that no longer contains the defect. That is deliberate: a correction keyed on type name
+     * would silently keep overriding a pattern that had since been fixed — or worse, revised — upstream.
+     *
+     * Every entry needs the defect named and the replacement sourced from something other than our own
+     * judgement. Do not add one for a pattern that is merely stricter or looser than we would like.
+     *
+     * @var array<string, string>
+     */
+    private const REGEX_CORRECTIONS = [
+        // R5 `decimal`. `hl7.fhir.r5.core#5.0.0`'s StructureDefinition-decimal.json carries a stray
+        // closing brace in the exponent group — `[0-9]{1,9}}` — which is a literal `}` to PCRE, not a
+        // typo it can see through. The emitted constraint therefore rejects the legal `1e1`, `1.0e-1`,
+        // `0.1e11` and `0.12e3`, and accepts the malformed `1e1}`.
+        //
+        // The replacement is the HL7 Java reference validator's own decimal pattern, quoted verbatim
+        // from its output in `outcomes/java` (search: `does not meet decimal regex`) rather than
+        // hand-repaired here. It differs from upstream-minus-the-brace in one further respect: the
+        // exponent may not carry a leading zero. That is not our embellishment — Java flags `1e09` on
+        // `R5.primitive-good`, so spec-minus-the-brace would put the generated constraint in direct
+        // conflict with both the reference validator and `PrimitiveFormatChecker`, which already
+        // reports against this exact pattern.
+        '-?(0|[1-9][0-9]{0,17})(\.[0-9]{1,17})?([eE][+-]?[0-9]{1,9}})?' => '-?(0|[1-9][0-9]{0,17})(\.[0-9]{1,17})?([eE](0|[+\-]?[1-9][0-9]{0,9}))?',
+    ];
+
+    /**
      * Extract a regex pattern from a primitive element's type extension.
      *
      * Looks for the `http://hl7.org/fhir/StructureDefinition/regex` extension on element.type[0].
      * Returns null when the extension is absent.
+     *
+     * A published pattern is not automatically a correct one — see {@see self::REGEX_CORRECTIONS}.
      *
      * @param array<string, mixed> $element The FHIR element definition
      */
@@ -1110,7 +1140,13 @@ class FHIRModelGenerator implements GeneratorInterface
     {
         foreach ($element['type'][0]['extension'] ?? [] as $ext) {
             if (($ext['url'] ?? '') === 'http://hl7.org/fhir/StructureDefinition/regex') {
-                return $ext['valueString'] ?? null;
+                $pattern = $ext['valueString'] ?? null;
+
+                if (!is_string($pattern)) {
+                    return null;
+                }
+
+                return self::REGEX_CORRECTIONS[$pattern] ?? $pattern;
             }
         }
 

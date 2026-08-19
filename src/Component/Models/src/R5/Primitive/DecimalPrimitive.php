@@ -33,7 +33,7 @@ class DecimalPrimitive extends PrimitiveType implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var numeric-string|null value Primitive value for decimal */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Decimal', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '~\A(?:-?(0|[1-9][0-9]{0,17})(\.[0-9]{1,17})?([eE][+-]?[0-9]{1,9}})?)\z~')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Decimal', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '~\A(?:-?(0|[1-9][0-9]{0,17})(\.[0-9]{1,17})?([eE](0|[+\-]?[1-9][0-9]{0,9}))?)\z~')]
         public ?string $value = null,
     ) {
         parent::__construct($id, $extension);

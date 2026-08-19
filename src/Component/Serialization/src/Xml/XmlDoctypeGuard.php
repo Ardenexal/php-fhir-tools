@@ -25,10 +25,37 @@ use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationExcep
  * Detection is confined to the prolog, where a DOCTYPE is the only place one may legally appear.
  * Scanning the whole document would reject any instance whose narrative text merely contains the
  * literal `<!DOCTYPE` — valid FHIR that we must keep accepting.
+ *
+ * **The prolog walk is a byte comparison, so it only sees a UTF-8 document.** In UTF-16 every ASCII
+ * character is a byte pair, so `<!DOCTYPE` never matches and the walk reports "no DOCTYPE" on a
+ * document that plainly has one — libxml then parses it, declaration and all. `assertUtf8()` closes
+ * that hole by refusing the encodings this scan cannot read, and callers must run both.
  */
 final class XmlDoctypeGuard
 {
     private const BOM = "\xEF\xBB\xBF";
+
+    /**
+     * Byte order marks for the encodings the prolog walk cannot read.
+     *
+     * A UTF-32 BOM shares its first two bytes with a UTF-16 one, so this list is only ever used to
+     * answer "is this one of them", never to name which.
+     */
+    private const NON_UTF8_BOMS = [
+        "\x00\x00\xFE\xFF", // UTF-32BE
+        "\xFF\xFE\x00\x00", // UTF-32LE
+        "\xFE\xFF",         // UTF-16BE
+        "\xFF\xFE",         // UTF-16LE
+    ];
+
+    /**
+     * How far in to look for the NUL byte that betrays a BOM-less UTF-16/32 payload.
+     *
+     * A UTF-16 document pairs its very first character with a NUL, so the byte always lands within
+     * the first few bytes; the window is generous only so the check reads as "the start of the
+     * document" rather than a magic pair of bytes.
+     */
+    private const ENCODING_SNIFF_BYTES = 4096;
 
     /**
      * @throws FHIRSerializationException if the document declares a DOCTYPE
@@ -40,6 +67,50 @@ final class XmlDoctypeGuard
         }
 
         throw new FHIRSerializationException('XML DOCTYPE declarations are not accepted: they permit external entity references (XXE). Remove the DOCTYPE and resubmit the document.');
+    }
+
+    /**
+     * Refuse a payload that is not UTF-8, before anything tries to read it as text.
+     *
+     * FHIR mandates UTF-8, and the auto-detecting `deserialize()` path already refuses anything else
+     * — `detectFormat()` sees byte pairs rather than `<` and reports "Unable to detect data format".
+     * `deserializeFromXml()` skips that detection, so without this the two public entry points
+     * disagree about which encodings they accept, and the stricter one is not the one handed a raw
+     * XML string.
+     *
+     * The payload is rejected rather than transcoded. Re-encoding here would make the direct XML
+     * entry point *more* permissive than the auto-detecting one, and would hand the rest of the
+     * pipeline — the UTF-8-only BOM strip, the namespace resolver's byte-wise fast path — bytes none
+     * of it was written for.
+     *
+     * @throws FHIRSerializationException if the document is not UTF-8
+     */
+    public static function assertUtf8(string $xmlData): void
+    {
+        if (self::isUtf8($xmlData)) {
+            return;
+        }
+
+        throw new FHIRSerializationException('XML payloads must be UTF-8 encoded: this document is UTF-16 or UTF-32. FHIR mandates UTF-8. Re-encode the document and resubmit it.');
+    }
+
+    /**
+     * Whether the payload can be read as UTF-8 text.
+     *
+     * Two signals, because a UTF-16/32 document need not carry a BOM: the byte order marks
+     * themselves, and a NUL byte near the start. NUL is not a legal XML character in any encoding,
+     * so its presence in UTF-8-interpreted bytes means the document is not UTF-8 — there is no
+     * well-formed UTF-8 XML for this to reject.
+     */
+    private static function isUtf8(string $xmlData): bool
+    {
+        foreach (self::NON_UTF8_BOMS as $bom) {
+            if (str_starts_with($xmlData, $bom)) {
+                return false;
+            }
+        }
+
+        return !str_contains(substr($xmlData, 0, self::ENCODING_SNIFF_BYTES), "\x00");
     }
 
     /**

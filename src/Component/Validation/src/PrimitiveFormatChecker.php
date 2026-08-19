@@ -17,10 +17,14 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
  * ## Why this is not a Symfony constraint
  *
  * The generated primitive classes carry `Regex` constraints, but nothing reaches them: no
- * `Assert\Valid` cascades into primitive-typed properties, and adding one is barred while
- * `DecimalPrimitive`'s emitted pattern is wrong (`([eE][+-]?[0-9]{1,9}})?` — the stray brace rejects
- * the legal `1e1`, `1.0e-1`, `0.1e11`, `0.12e3`). This pass walks the tree itself, so the rule is
- * independent of what the generator emits.
+ * `Assert\Valid` cascades into primitive-typed properties. That cascade is still absent for the
+ * reasons set out in the nested-cascade work — `boolean`, `integer` and `decimal` choice variants are
+ * generated as bare PHP scalars, so no primitive object exists on those properties to descend into —
+ * not because any emitted pattern is defective. R5 `decimal`'s stray-brace defect, which this
+ * docblock previously cited as the blocker, is corrected at the generator
+ * (`FHIRModelGenerator::REGEX_CORRECTIONS`).
+ *
+ * This pass walks the tree itself, so the rule holds whether or not the cascade is ever switched on.
  *
  * ## Why the deserializer no longer aborts
  *
@@ -66,14 +70,23 @@ final class PrimitiveFormatChecker
     private const string LEAP_SECOND = '/(?:^|T)\d{2}:\d{2}:60(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})?$/';
 
     /**
-     * The canonical FHIR `decimal` pattern, quoted in the message exactly as the spec writes it.
+     * The canonical FHIR `decimal` pattern, quoted in the message exactly as the reference validator
+     * writes it — see `outcomes/java` (search: `does not meet decimal regex`).
      *
-     * Written out here rather than read from the generated `DecimalPrimitive` Regex constraint: that
-     * one emits `([eE][+-]?[0-9]{1,9}})?` — a stray closing brace — and rejects the legal `1e1`,
-     * `1.0e-1`, `0.1e11` and `0.12e3`. Fixing the generator is a separate change; this rule must not
-     * wait on it, and must not inherit its bug.
+     * Not the same artifact as the generated `DecimalPrimitive` Regex constraint, and deliberately
+     * still written out here: this string is *message text* as much as it is a rule, and reading it
+     * off a generated attribute would couple our wording to codegen. The two must nonetheless agree,
+     * which `GeneratedPrimitiveRegexTest` pins
+     * (search: `testGeneratedDecimalPatternAgreesWithPrimitiveFormatChecker`).
+     *
+     * Public for that test alone. It is the one constant here that another component has a legitimate
+     * reason to read, precisely because drift between the two decimal rules is the failure mode.
+     *
+     * Note it is stricter than R5's published regex in one respect beyond the stray brace the
+     * generator now corrects: the exponent may not carry a leading zero. That follows Java, which
+     * flags `1e09` on `R5.primitive-good`.
      */
-    private const string DECIMAL_SOURCE = '-?(0|[1-9][0-9]{0,17})(\.[0-9]{1,17})?([eE](0|[+\-]?[1-9][0-9]{0,9}))?';
+    public const string DECIMAL_SOURCE = '-?(0|[1-9][0-9]{0,17})(\.[0-9]{1,17})?([eE](0|[+\-]?[1-9][0-9]{0,9}))?';
 
     private const string DECIMAL = '/\A(?:' . self::DECIMAL_SOURCE . ')\z/';
 

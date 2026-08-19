@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\Xml\XmlDoctypeGuard;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * A DOCTYPE declaration must be refused before any parser sees the document.
@@ -119,5 +120,72 @@ final class XmlDoctypeRejectionTest extends TestCase
         XmlDoctypeGuard::assertNoDoctype($xml);
 
         self::assertTrue(true, 'A document with no DOCTYPE is accepted.');
+    }
+
+    /**
+     * The prolog walk compares bytes, so in UTF-16 `<!DOCTYPE` never matches and the scan reports a
+     * clean document. Measured before `assertUtf8()` existed: the same payload that UTF-8 refuses
+     * reached libxml, which got as far as `Attribute references external entity`. The encoding is
+     * therefore settled first, and these payloads are refused rather than transcoded — re-encoding
+     * would leave `deserializeFromXml()` accepting documents `deserialize()` rejects.
+     *
+     * BOM-less UTF-16 is included deliberately: the byte order marks are not the only signal, since
+     * a NUL byte lands within the first few bytes either way.
+     *
+     * @return iterable<string, array{string}>
+     */
+    public static function nonUtf8Encodings(): iterable
+    {
+        yield 'UTF-16LE with BOM'    => ["\xFF\xFE" . mb_convert_encoding(self::XXE, 'UTF-16LE', 'UTF-8')];
+        yield 'UTF-16BE with BOM'    => ["\xFE\xFF" . mb_convert_encoding(self::XXE, 'UTF-16BE', 'UTF-8')];
+        yield 'UTF-16LE without BOM' => [mb_convert_encoding(self::XXE, 'UTF-16LE', 'UTF-8')];
+        yield 'UTF-32LE with BOM'    => ["\xFF\xFE\x00\x00" . mb_convert_encoding(self::XXE, 'UTF-32LE', 'UTF-8')];
+    }
+
+    #[DataProvider('nonUtf8Encodings')]
+    public function testNonUtf8DoctypePayloadIsRefusedBeforeAnyParser(string $xml): void
+    {
+        $service = FHIRSerializationService::createDefault(FhirVersion::R4);
+
+        $this->expectException(FHIRSerializationException::class);
+        $this->expectExceptionMessageMatches('/must be UTF-8 encoded/');
+
+        $service->deserializeFromXml($xml, PatientResource::class);
+    }
+
+    /**
+     * Mirrors {@see testRejectionMessageDoesNotNameTheSystemIdentifier} for the encoding branch: if
+     * the message ever names the entity, libxml reached for it and the refusal came too late.
+     */
+    #[DataProvider('nonUtf8Encodings')]
+    public function testNonUtf8RejectionDoesNotNameTheSystemIdentifier(string $xml): void
+    {
+        $service = FHIRSerializationService::createDefault(FhirVersion::R4);
+
+        try {
+            $service->deserializeFromXml($xml, PatientResource::class);
+            self::fail('Expected a non-UTF-8 rejection.');
+        } catch (FHIRSerializationException $e) {
+            self::assertStringNotContainsString('/etc/passwd', $e->getMessage());
+            self::assertStringNotContainsString('external entity', $e->getMessage());
+        }
+    }
+
+    /**
+     * The encoding check must not cost us ordinary documents. A UTF-8 BOM is legal and 15 corpus
+     * files carry one, so it has to survive a rule aimed at UTF-16/32 byte order marks.
+     */
+    public function testUtf8DocumentsAreNotMistakenForUtf16(): void
+    {
+        $xml     = '<?xml version="1.0" encoding="UTF-8"?><Patient xmlns="http://hl7.org/fhir"><id value="x"/></Patient>';
+        $service = FHIRSerializationService::createDefault(FhirVersion::R4);
+
+        XmlDoctypeGuard::assertUtf8($xml);
+        XmlDoctypeGuard::assertUtf8("\xEF\xBB\xBF" . $xml);
+
+        self::assertInstanceOf(
+            PatientResource::class,
+            $service->deserializeFromXml("\xEF\xBB\xBF" . $xml, PatientResource::class),
+        );
     }
 }
