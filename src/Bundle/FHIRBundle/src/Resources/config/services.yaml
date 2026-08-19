@@ -187,6 +187,9 @@ services:
     # Coding.system URI checker — absolute-reference and value-set-as-code-system rules.
     Ardenexal\FHIRTools\Component\Validation\CodingSystemChecker: ~
 
+    # Bundle.entry.fullUrl checker — the spec requires an absolute URL; nothing else enforces it.
+    Ardenexal\FHIRTools\Component\Validation\BundleEntryFullUrlChecker: ~
+
     # Validation Service
     Ardenexal\FHIRTools\Component\Validation\FHIRValidationService:
         public: true

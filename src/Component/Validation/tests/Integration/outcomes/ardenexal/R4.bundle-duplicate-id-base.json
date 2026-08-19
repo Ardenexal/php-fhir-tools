@@ -1,12 +1,12 @@
 {
-    "errorCount": 0,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 2,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "The fullUrl must be an absolute URL (not 'Patient/1')",
@@ -14,7 +14,12 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:BundleEntryFullUrlChecker": [
+                "entry[0].fullUrl — The fullUrl must be an absolute URL (not 'Patient/1')",
+                "entry[1].fullUrl — The fullUrl must be an absolute URL (not 'RelatedPerson/1')"
+            ]
+        },
         "warnings": {}
     }
 }
