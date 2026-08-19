@@ -1,5 +1,19 @@
 {
-    "errorCount": 1,
-    "warningCount": 1,
-    "infoCount": 1
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Wrong Display Name 'Allergies and adverse reactions' for http://loinc.org#48765-2. Valid display is one of 3 choices: 'Allergies and adverse reactions Document' (en-US), 'Allergies and adverse reactions Document' (en-US) or 'Allergies &or adverse reactions Doc' (en-US) (for the language(s) 'en-US')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\HealthcareService\HealthcareServiceEligibility;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Patient Administration)
@@ -44,19 +45,24 @@ class HealthcareServiceResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -71,12 +77,13 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var bool|null active Whether this HealthcareService record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
         public ?bool $active = null,
         /** @var Reference|null providedBy Organization that provides this service */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $providedBy = null,
         /** @var array<Reference> offeredIn The service within which this service is offered */
         #[FhirProperty(
@@ -85,6 +92,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/HealthcareService'])]
         public array $offeredIn = [],
         /** @var array<CodeableConcept> category Broad category of service being performed or delivered */
@@ -94,6 +102,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $category = [],
         /** @var array<CodeableConcept> type Type of service that may be delivered or performed */
         #[FhirProperty(
@@ -102,6 +111,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $type = [],
         /** @var array<CodeableConcept> specialty Specialties handled by the HealthcareService */
         #[FhirProperty(
@@ -110,7 +120,12 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/c80-practice-codes', strength: 'preferred')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/c80-practice-codes',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PracticeSettingCodeValueSet',
+        )]
         public array $specialty = [],
         /** @var array<Reference> location Location(s) where service may be provided */
         #[FhirProperty(
@@ -119,6 +134,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public array $location = [],
         /** @var StringPrimitive|string|null name Description of service as presented to a consumer while searching */
@@ -131,7 +147,7 @@ class HealthcareServiceResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $extraDetails = null,
         /** @var Attachment|null photo Facilitates quick identification of the service */
-        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex'), Valid]
         public ?Attachment $photo = null,
         /** @var array<ExtendedContactDetail> contact Official contact details for the HealthcareService */
         #[FhirProperty(
@@ -140,6 +156,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ExtendedContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var array<Reference> coverageArea Location(s) service is intended for/available to */
         #[FhirProperty(
@@ -148,6 +165,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public array $coverageArea = [],
         /** @var array<CodeableConcept> serviceProvisionCode Conditions under which service is available/offered */
@@ -157,6 +175,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $serviceProvisionCode = [],
         /** @var array<HealthcareServiceEligibility> eligibility Specific eligibility requirements required to use the service */
         #[FhirProperty(
@@ -165,6 +184,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\HealthcareService\HealthcareServiceEligibility',
         )]
+        #[Valid]
         public array $eligibility = [],
         /** @var array<CodeableConcept> program Programs that this service is applicable to */
         #[FhirProperty(
@@ -173,6 +193,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $program = [],
         /** @var array<CodeableConcept> characteristic Collection of characteristics (attributes) */
         #[FhirProperty(
@@ -181,6 +202,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $characteristic = [],
         /** @var array<CodeableConcept> communication The language that this service is offered in */
         #[FhirProperty(
@@ -189,7 +211,12 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public array $communication = [],
         /** @var array<CodeableConcept> referralMethod Ways that the service accepts referrals */
         #[FhirProperty(
@@ -198,6 +225,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $referralMethod = [],
         /** @var bool|null appointmentRequired If an appointment is required for access to this service */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -209,6 +237,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Availability',
         )]
+        #[Valid]
         public array $availability = [],
         /** @var array<Reference> endpoint Technical endpoints providing access to electronic services operated for the healthcare service */
         #[FhirProperty(
@@ -217,6 +246,7 @@ class HealthcareServiceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Endpoint'])]
         public array $endpoint = [],
     ) {

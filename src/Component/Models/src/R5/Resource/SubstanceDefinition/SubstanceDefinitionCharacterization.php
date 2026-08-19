@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description General specifications for this substance.
@@ -30,10 +31,10 @@ class SubstanceDefinitionCharacterization extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null technique The method used to find the characterization e.g. HPLC */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $technique = null,
         /** @var CodeableConcept|null form Describes the nature of the chemical entity and explains, for instance, whether this is a base or a salt form */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $form = null,
         /** @var MarkdownPrimitive|null description The description or justification in support of the interpretation of the data file */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -45,6 +46,7 @@ class SubstanceDefinitionCharacterization extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Attachment',
         )]
+        #[Valid]
         public array $file = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

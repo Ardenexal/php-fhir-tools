@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The state or status of the citation record paired with an effective date or period for that state.
@@ -30,13 +31,13 @@ class CitationStatusDate extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null activity Classification of the status */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $activity = null,
         /** @var bool|null actual Either occurred or expected */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $actual = null,
         /** @var Period|null period When the status started and/or ended */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Period $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

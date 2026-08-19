@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CurrencyCode
  * URL: http://hl7.org/fhir/ValueSet/currencies
  * Version: 4.0.1
  * Description: Currency codes from ISO 4217 (see https://www.iso.org/iso-4217-currency-codes.html)
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/currencies', version: '4.0.1')]
 enum Currencies: string
 {
     /** Andorran Peseta */

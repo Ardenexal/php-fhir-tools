@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Money;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A suite of codes indicating the cost category and associated amount which have been detailed in the policy and may have been  included on the health card.
@@ -32,7 +33,13 @@ class CoverageCostToBeneficiary extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Cost category */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/coverage-copay-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/coverage-copay-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CoverageCopayTypeCodes',
+        )]
         public ?CodeableConcept $type = null,
         /** @var Quantity|Money|null value The amount or percentage due from the beneficiary */
         #[FhirProperty(
@@ -64,6 +71,7 @@ class CoverageCostToBeneficiary extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Coverage\CoverageCostToBeneficiaryException',
         )]
+        #[Valid]
         public array $exception = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

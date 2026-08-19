@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A packaging item, as a container for medically related items, possibly with other packaging items within, or a packaging component, such as bottle cap (which is not a device or a medication manufactured item).
@@ -37,9 +38,10 @@ class PackagedProductDefinitionPackage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null type The physical type of the container of the items */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var int|null quantity The quantity of this level of packaging in the package that contains it (with the outermost level being 1) */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
@@ -51,6 +53,7 @@ class PackagedProductDefinitionPackage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $material = [],
         /** @var array<CodeableConcept> alternateMaterial A possible alternate material for this part of the packaging, that is allowed to be used instead of the usual material */
         #[FhirProperty(
@@ -59,6 +62,7 @@ class PackagedProductDefinitionPackage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $alternateMaterial = [],
         /** @var array<PackagedProductDefinitionPackageShelfLifeStorage> shelfLifeStorage Shelf Life and storage information */
         #[FhirProperty(
@@ -67,6 +71,7 @@ class PackagedProductDefinitionPackage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\PackagedProductDefinition\PackagedProductDefinitionPackageShelfLifeStorage',
         )]
+        #[Valid]
         public array $shelfLifeStorage = [],
         /** @var array<Reference> manufacturer Manufacturer of this package Item (multiple means these are all possible manufacturers) */
         #[FhirProperty(
@@ -75,6 +80,7 @@ class PackagedProductDefinitionPackage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $manufacturer = [],
         /** @var array<PackagedProductDefinitionPackageProperty> property General characteristics of this item */
@@ -84,6 +90,7 @@ class PackagedProductDefinitionPackage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\PackagedProductDefinition\PackagedProductDefinitionPackageProperty',
         )]
+        #[Valid]
         public array $property = [],
         /** @var array<PackagedProductDefinitionPackageContainedItem> containedItem The item(s) within the packaging */
         #[FhirProperty(
@@ -92,6 +99,7 @@ class PackagedProductDefinitionPackage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\PackagedProductDefinition\PackagedProductDefinitionPackageContainedItem',
         )]
+        #[Valid]
         public array $containedItem = [],
         /** @var array<PackagedProductDefinitionPackage> package Allows containers (and parts of containers) within containers, still a single packaged product */
         #[FhirProperty(
@@ -100,6 +108,7 @@ class PackagedProductDefinitionPackage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\PackagedProductDefinition\PackagedProductDefinitionPackage',
         )]
+        #[Valid]
         public array $package = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -36,7 +36,11 @@ class LocationHoursOfOperation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DaysOfWeekType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.3.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\DaysOfWeek',
+        )]
         public array $daysOfWeek = [],
         /** @var bool|null allDay The Location is open all day */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: DeviceNameType
  * URL: http://hl7.org/fhir/ValueSet/device-nametype
  * Version: 4.0.1
  * Description: The type of name the device is referred by.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/device-nametype', version: '4.0.1')]
 enum DeviceNameType: string
 {
     /** UDI Label name */

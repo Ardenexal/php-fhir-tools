@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ResponseType
  * URL: http://hl7.org/fhir/ValueSet/response-code
  * Version: 4.0.1
  * Description: The kind of response to a message.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/response-code', version: '4.0.1')]
 enum ResponseType: string
 {
     /** OK */

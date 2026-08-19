@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Financial instruments for reimbursement for the health care products and services.
@@ -31,13 +32,13 @@ class CoverageEligibilityResponseInsurance extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Reference|null coverage Insurance information */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Coverage'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Coverage'])]
         public ?Reference $coverage = null,
         /** @var bool|null inforce Coverage inforce indicator */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $inforce = null,
         /** @var Period|null benefitPeriod When the benefits are applicable */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $benefitPeriod = null,
         /** @var array<CoverageEligibilityResponseInsuranceItem> item Benefits and authorization details */
         #[FhirProperty(
@@ -46,6 +47,7 @@ class CoverageEligibilityResponseInsurance extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CoverageEligibilityResponse\CoverageEligibilityResponseInsuranceItem',
         )]
+        #[Valid]
         public array $item = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

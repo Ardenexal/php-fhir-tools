@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: AddressUse
  * URL: http://hl7.org/fhir/ValueSet/address-use
  * Version: 5.0.0
  * Description: The use of an address.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/address-use', version: '5.0.0')]
 enum AddressUse: string
 {
     /** Home */

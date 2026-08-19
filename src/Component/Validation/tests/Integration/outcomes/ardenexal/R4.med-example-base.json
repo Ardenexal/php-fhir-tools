@@ -1,5 +1,19 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 7,
+        "infoCount": 6,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The fullUrl must be an absolute URL (not 'Medication/12345')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

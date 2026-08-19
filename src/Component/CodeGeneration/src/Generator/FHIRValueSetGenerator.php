@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContextInterface;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Intl\Currencies;
@@ -115,6 +116,17 @@ class FHIRValueSetGenerator implements GeneratorInterface
         $enumType->addComment('Version: ' . ($valueSet['version'] ?? 'unknown'));
         $enumType->addComment('Description: ' . ($valueSet['description'] ?? 'No description provided.'));
 
+        // Record the source value set so a binding can verify it resolved to the right enum rather
+        // than to one whose ClassNameResolver name merely collides. See FHIRValueSetSource.
+        if (isset($valueSet['url']) && is_string($valueSet['url'])) {
+            $sourceArgs = ['url' => $valueSet['url']];
+            if (isset($valueSet['version']) && is_string($valueSet['version'])) {
+                $sourceArgs['version'] = $valueSet['version'];
+            }
+
+            $enumType->addAttribute(FHIRValueSetSource::class, $sourceArgs);
+        }
+
         foreach ($valueSet['compose']['include'] as $include) {
             if (isset($include['system'])) {
                 if ($include['system'] === 'urn:iso:std:iso:4217') {
@@ -147,29 +159,66 @@ class FHIRValueSetGenerator implements GeneratorInterface
      *
      * @return void
      */
+    /**
+     * Add every concept in a CodeSystem subtree as an enum case, depth-first.
+     *
+     * Child concepts are full members of the value set, not annotations on their parent — `invalid`
+     * has `structure`, `required`, `value` and `invariant` beneath it, and all five are valid codes.
+     * Duplicate names are skipped rather than overwritten, matching the previous behaviour, so a code
+     * reachable by more than one path is emitted once.
+     *
+     * @param array<int|string, mixed> $concepts
+     */
+    private function addConceptsRecursively(array $concepts, EnumType $enum): void
+    {
+        foreach ($concepts as $concept) {
+            if (!is_array($concept) || !isset($concept['code']) || !is_string($concept['code'])) {
+                continue;
+            }
+
+            $code     = $concept['code'];
+            $enumName = $this->getEnumName($concept);
+            if (empty($enumName)) {
+                throw GenerationException::enumGenerationFailed($code, 'Could not generate valid enum name from concept data');
+            }
+            if (is_numeric($enumName[0])) {
+                $enumName = 'CODE_' . $enumName;
+            }
+
+            // Deduplicate on BOTH name and backing value. A concept hierarchy can reach the same code
+            // by more than one path, and the generated name is derived from `display`, so the same
+            // code can arrive under two different names. A backed enum requires unique values, and a
+            // collision is a fatal `Error: Duplicate value in enum` at class-load time — which takes
+            // down validation of any resource touching that binding.
+            $duplicate = array_any(
+                $enum->getCases(),
+                fn ($case) => $case->getName() === $enumName || $case->getValue() === $code,
+            );
+
+            if (!$duplicate) {
+                $enum->addCase($enumName, $code)
+                     ->addComment($concept['display'] ?? '');
+            }
+
+            if (isset($concept['concept']) && is_array($concept['concept'])) {
+                $this->addConceptsRecursively($concept['concept'], $enum);
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $include A single ValueSet `compose.include` entry
+     */
     private function addConceptsFromCodeSystem(array $include, EnumType $enum, BuilderContextInterface $builderContext): void
     {
         $codeSystem = $builderContext->getDefinition($include['system']);
         if ($codeSystem !== null && isset($codeSystem['concept']) && is_array($codeSystem['concept'])) {
-            foreach ($codeSystem['concept'] as $concept) {
-                if (!is_array($concept) || !isset($concept['code']) || !is_string($concept['code'])) {
-                    continue;
-                }
-                $code     = $concept['code'];
-                $enumName = $this->getEnumName($concept);
-                if (empty($enumName)) {
-                    throw GenerationException::enumGenerationFailed($code, 'Could not generate valid enum name from concept data');
-                }
-                if (is_numeric($enumName[0])) {
-                    $enumName = 'CODE_' . $enumName;
-                }
-                // Skip if already exists
-                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName)) {
-                    continue;
-                }
-                $enum->addCase($enumName, $code)
-                     ->addComment($concept['display'] ?? '');
-            }
+            // Recurse: CodeSystem concepts nest via `concept.concept`, and a ValueSet that includes a
+            // system without a filter includes every descendant, not just the top level. `issue-type`
+            // declares 5 top-level codes with children beneath each — walking only the top level
+            // generated a 5-case enum and made valid codes like `code-invalid` fail required-binding
+            // validation.
+            $this->addConceptsRecursively($codeSystem['concept'], $enum);
         }
 
         if (isset($include['concept']) && is_array($include['concept'])) {
@@ -179,8 +228,19 @@ class FHIRValueSetGenerator implements GeneratorInterface
                 }
                 $display  = $concept['display'] ?? $concept['code'];
                 $enumName = u($display)->upper()->snake()->toString();
-                // Skip if already exists
-                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName)) {
+
+                // Skip if the name OR the backing value is already present. The two are separate
+                // checks because this branch and the CodeSystem walk above name the same code
+                // differently: the CodeSystem supplies a display ("Unrestricted" → `unrestricted`)
+                // while an inline concept without one falls back to the code itself ("U" → `u`).
+                // Both carry value 'U', and a backed enum with a duplicate value is a fatal at
+                // class-load time, which took out nine R4 cases mid-validation.
+                $duplicate = array_any(
+                    $enum->getCases(),
+                    fn ($case) => $case->getName() === $enumName || $case->getValue() === $concept['code'],
+                );
+
+                if ($duplicate) {
                     continue;
                 }
 

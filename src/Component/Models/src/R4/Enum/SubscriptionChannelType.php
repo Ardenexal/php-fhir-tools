@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: SubscriptionChannelType
  * URL: http://hl7.org/fhir/ValueSet/subscription-channel-type
  * Version: 4.0.1
  * Description: The type of method used to execute a subscription.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/subscription-channel-type', version: '4.0.1')]
 enum SubscriptionChannelType: string
 {
     /** Rest Hook */

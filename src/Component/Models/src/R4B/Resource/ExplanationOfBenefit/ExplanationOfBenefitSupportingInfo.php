@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
@@ -41,10 +42,10 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $sequence = null,
         /** @var CodeableConcept|null category Classification of the supplied information */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $category = null,
         /** @var CodeableConcept|null code Type of information */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var DatePrimitive|Period|null timing When it occurred */
         #[FhirProperty(
@@ -103,7 +104,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public bool|StringPrimitive|string|Quantity|Attachment|Reference|null $value = null,
         /** @var Coding|null reason Explanation for the information */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid]
         public ?Coding $reason = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

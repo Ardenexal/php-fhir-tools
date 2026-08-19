@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Detected Issue Severity
  * URL: http://hl7.org/fhir/ValueSet/detectedissue-severity
  * Version: 5.0.0
  * Description: Indicates the potential degree of impact of the identified issue on the patient.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/detectedissue-severity', version: '5.0.0')]
 enum DetectedIssueSeverity: string
 {
     /** High */

@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Errors encountered during the processing of the adjudication.
@@ -40,7 +41,7 @@ class ClaimResponseError extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $subDetailSequence = null,
         /** @var CodeableConcept|null code Error code detailing processing issues */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
         /** @var array<StringPrimitive|string> expression FHIRPath of element(s) related to issue */
         #[FhirProperty(

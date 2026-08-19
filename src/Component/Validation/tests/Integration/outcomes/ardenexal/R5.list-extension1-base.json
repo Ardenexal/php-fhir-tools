@@ -1,5 +1,20 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 0
+    "warningCount": 0,
+    "infoCount": 0,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Unrecognized property 'fhir_comments'",
+            "Unrecognized property 'fhir_comments'"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

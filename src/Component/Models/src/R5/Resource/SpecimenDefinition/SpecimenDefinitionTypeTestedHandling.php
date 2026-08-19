@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Set of instructions for preservation/transport of the specimen at a defined temperature interval, prior the testing process.
@@ -31,13 +32,13 @@ class SpecimenDefinitionTypeTestedHandling extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null temperatureQualifier Qualifies the interval of temperature */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $temperatureQualifier = null,
         /** @var Range|null temperatureRange Temperature range for these handling instructions */
-        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $temperatureRange = null,
         /** @var Duration|null maxDuration Maximum preservation time */
-        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $maxDuration = null,
         /** @var MarkdownPrimitive|null instruction Preservation instruction */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

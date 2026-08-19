@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\AbstractResource;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Indicates the results of processing the corresponding 'request' entry in the batch or transaction being responded to or what the results of an operation where when returning history.
@@ -44,7 +45,7 @@ class BundleEntryResponse extends BackboneElement
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
         public ?InstantPrimitive $lastModified = null,
         /** @var AbstractResource|null outcome OperationOutcome with hints and warnings (for batch/transaction) */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource')]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource'), Valid]
         public ?AbstractResource $outcome = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

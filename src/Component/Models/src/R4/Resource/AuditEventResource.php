@@ -24,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\AuditEvent\AuditEventEntity
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\AuditEvent\AuditEventSource;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Security)
@@ -40,7 +41,7 @@ class AuditEventResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -51,13 +52,14 @@ class AuditEventResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -66,7 +68,14 @@ class AuditEventResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var Coding|null type Type/identifier of event */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-event-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-event-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AuditEventID',
+        )]
         public ?Coding $type = null,
         /** @var array<Coding> subtype More specific type/id for the event */
         #[FhirProperty(
@@ -75,19 +84,34 @@ class AuditEventResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-event-sub-type', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-event-sub-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AuditEventSubType',
+        )]
         public array $subtype = [],
         /** @var AuditEventActionType|null action Type of action performed during the event */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-event-action|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-event-action|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AuditEventAction',
+        )]
         public ?AuditEventActionType $action = null,
         /** @var Period|null period When the activity occurred */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,
         /** @var InstantPrimitive|null recorded Time when the event was recorded */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?InstantPrimitive $recorded = null,
         /** @var AuditEventOutcomeType|null outcome Whether the event succeeded or failed */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-event-outcome|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-event-outcome|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AuditEventOutcome',
+        )]
         public ?AuditEventOutcomeType $outcome = null,
         /** @var StringPrimitive|string|null outcomeDesc Description of the event outcome */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -99,7 +123,12 @@ class AuditEventResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-PurposeOfUse', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-PurposeOfUse',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\V3PurposeOfUse',
+        )]
         public array $purposeOfEvent = [],
         /** @var array<AuditEventAgent> agent Actor involved in the event */
         #[FhirProperty(
@@ -109,10 +138,11 @@ class AuditEventResource extends AbstractDomainResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\AuditEvent\AuditEventAgent',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $agent = [],
         /** @var AuditEventSource|null source Audit Event Reporter */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isRequired: true), Valid, NotBlank]
         public ?AuditEventSource $source = null,
         /** @var array<AuditEventEntity> entity Data or objects used */
         #[FhirProperty(
@@ -121,6 +151,7 @@ class AuditEventResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\AuditEvent\AuditEventEntity',
         )]
+        #[Valid]
         public array $entity = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

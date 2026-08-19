@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Error parsing JSON: Error parsing JSON source: Unexpected content '#' in json format at Line 15 (path=[//entry[]/entry/resource/name[]/name/given[]Christopher])"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to parse JSON: Parse error on line 14:\n...stopher\"]          #        ]      }\n---------------------^\nExpected one of: 'EOF', '}', ',', ']'"
+            ]
+        },
+        "warnings": {}
+    }
 }

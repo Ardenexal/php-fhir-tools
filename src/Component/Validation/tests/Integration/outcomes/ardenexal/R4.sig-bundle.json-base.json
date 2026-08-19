@@ -1,5 +1,15 @@
 {
     "errorCount": 0,
-    "warningCount": 0,
-    "infoCount": 0
+    "warningCount": 2,
+    "infoCount": 10,
+    "java": null,
+    "outcome": {
+        "errors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "signature.targetFormat — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated.",
+                "signature.sigFormat — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
+            ]
+        }
+    }
 }

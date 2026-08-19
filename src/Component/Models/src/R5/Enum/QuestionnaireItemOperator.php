@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Questionnaire Item Operator
  * URL: http://hl7.org/fhir/ValueSet/questionnaire-enable-operator
  * Version: 5.0.0
  * Description: The criteria by which a question is enabled.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/questionnaire-enable-operator', version: '5.0.0')]
 enum QuestionnaireItemOperator: string
 {
     /** Exists */

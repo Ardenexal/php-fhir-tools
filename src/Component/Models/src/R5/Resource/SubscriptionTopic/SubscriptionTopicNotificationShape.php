@@ -31,7 +31,13 @@ class SubscriptionTopicNotificationShape extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var UriPrimitive|null resource URL of the Resource that is the focus (main) resource in a notification shape */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-types', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\SubscriptionTypes',
+        )]
         public ?UriPrimitive $resource = null,
         /** @var array<StringPrimitive|string> include Include directives, rooted in the resource for this shape */
         #[FhirProperty(

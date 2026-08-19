@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Coding words or phrases of the name.
@@ -33,7 +34,7 @@ class MedicinalProductNameNamePart extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $part = null,
         /** @var Coding|null type Idenifying type for this part of the name (e.g. strength part) */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Coding $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

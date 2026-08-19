@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Each step of the process.
@@ -33,12 +34,13 @@ class ExampleScenarioProcessStep extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioProcess',
         )]
+        #[Valid]
         public array $process = [],
         /** @var bool|null pause If there is a pause in the flow */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $pause = null,
         /** @var ExampleScenarioProcessStepOperation|null operation Each interaction or action */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ExampleScenarioProcessStepOperation $operation = null,
         /** @var array<ExampleScenarioProcessStepAlternative> alternative Alternate non-typical step action */
         #[FhirProperty(
@@ -47,6 +49,7 @@ class ExampleScenarioProcessStep extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioProcessStepAlternative',
         )]
+        #[Valid]
         public array $alternative = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

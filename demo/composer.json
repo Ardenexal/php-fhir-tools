@@ -11,6 +11,7 @@
         "nette/php-generator": "^4.2.2",
         "phpdocumentor/reflection-docblock": "^5.6.7",
         "phpstan/phpdoc-parser": "^2.3.2",
+        "seld/jsonlint": "^1.12.1",
         "symfony/asset": "7.4.*",
         "symfony/asset-mapper": "7.4.*",
         "symfony/console": "7.4.*",

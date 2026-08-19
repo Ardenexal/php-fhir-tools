@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The product's name, including full name and possibly coded parts.
@@ -33,7 +34,7 @@ class MedicinalProductDefinitionName extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $productName = null,
         /** @var CodeableConcept|null type Type of product name, such as rINN, BAN, Proprietary, Non-Proprietary */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var array<MedicinalProductDefinitionNameNamePart> namePart Coding words or phrases of the name */
         #[FhirProperty(
@@ -42,6 +43,7 @@ class MedicinalProductDefinitionName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicinalProductDefinition\MedicinalProductDefinitionNameNamePart',
         )]
+        #[Valid]
         public array $namePart = [],
         /** @var array<MedicinalProductDefinitionNameCountryLanguage> countryLanguage Country and jurisdiction where the name applies */
         #[FhirProperty(
@@ -50,6 +52,7 @@ class MedicinalProductDefinitionName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicinalProductDefinition\MedicinalProductDefinitionNameCountryLanguage',
         )]
+        #[Valid]
         public array $countryLanguage = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

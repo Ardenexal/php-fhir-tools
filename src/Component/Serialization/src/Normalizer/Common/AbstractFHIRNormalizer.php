@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
@@ -824,6 +825,16 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Read a temporal lexeme, retaining it rather than aborting the document when it will not parse.
+     *
+     * Malformed primitive syntax is a FHIR *validation* finding, not a reason to refuse the
+     * document: the reference validator reads `primitive-bad.xml` end to end and reports forty
+     * located errors, one per bad primitive. Throwing here surfaced only the first bad temporal and
+     * lost the other thirty-nine — the document never reached the validator at all.
+     *
+     * The lexeme is therefore kept on the value object ({@see FHIRTemporalValue::unparsed()}), where
+     * validation locates it and reports it, and serialization writes it back exactly as supplied.
+     *
      * @param class-string<FHIRTemporalValue> $class
      */
     protected function parseTemporalValue(mixed $value, string $class): ?FHIRTemporalValue
@@ -844,7 +855,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             try {
                 return $class::parse($value);
             } catch (\Throwable $e) {
-                throw new NotNormalizableValueException(sprintf('Expected %s string, got invalid value: %s', $class, $value), 0, $e);
+                return $class::unparsed($value, $e->getMessage());
             }
         }
 
@@ -879,6 +890,121 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /**
      * Unwrap a FHIR XML value encoded as ['@value' => '...', '#' => ''] by Symfony's XmlEncoder.
      */
+    /**
+     * Reject a repeated XML element landing on a single-valued property.
+     *
+     * XML has no array syntax: repetition is expressed by repeating the element, so
+     * `<subject/><subject/>` decodes to a *list* while one `<subject/>` decodes to a map. A property
+     * the model declares as `0..1` therefore receives a list only when the document exceeds its
+     * maximum cardinality — `Composition.subject` is `0..1`, and `bundle-dual-subject.xml` supplies
+     * two.
+     *
+     * Without this guard the list reached the complex-type normalizer, whose element loop assumes
+     * string keys, and `str_starts_with(0, '@')` raised a `TypeError`. That surfaced as an opaque
+     * "Format error (xml)" naming neither the element nor the real problem — and because a failed
+     * deserialization is seeded as one error, it coincidentally matched the Java reference validator's
+     * single cardinality error and looked correct.
+     *
+     * The model cannot hold both values, so this is fatal for the document rather than something
+     * validation can report later. The message says which element and how many, mirroring Java's
+     * "max allowed = 1, but found 2".
+     *
+     * @throws FHIRSerializationException when $value repeats and the property cannot hold a list
+     */
+    protected static function assertSingleValuedElement(string $elementName, mixed $value, string $ownerType): void
+    {
+        if (!is_array($value) || !array_is_list($value) || count($value) < 2) {
+            return;
+        }
+
+        throw FHIRConformanceViolationException::inFormat('xml', sprintf('%s.%s: max allowed = 1, but found %d', self::shortTypeName($ownerType), $elementName, count($value)));
+    }
+
+    /**
+     * The FHIR type name for a generated class, for messages a reader can match against the spec.
+     *
+     * Prefers `#[FhirResource(type: …)]` / `#[FHIRDataType(type: …)]` over the PHP class name, so the
+     * message says `Composition.subject` rather than `CompositionResource.subject` and lines up with
+     * the reference validator's wording. Falls back to the short class name.
+     */
+    /**
+     * Reject a repeating element supplied as a JSON object instead of an array.
+     *
+     * FHIR JSON represents a `0..*` element as an array, always — even for a single occurrence. An
+     * object there is malformed, and the HL7 Java reference validator reports it as an error ("The
+     * property reasonCode must be a JSON Array, not an Object"), so accepting it leniently would make
+     * us pass documents the oracle rejects.
+     *
+     * The alternative is worse than a wrong answer: iterating the object walks its *fields* into the
+     * item normalizer, where an integer key reaches `str_starts_with()` and raises a `TypeError`
+     * reported only as an opaque "Format error (json)".
+     *
+     * @throws FHIRSerializationException when $value is an object rather than a list
+     */
+    protected static function assertRepeatingElementIsArray(string $elementName, mixed $value, string $ownerType): void
+    {
+        if (!is_array($value) || array_is_list($value)) {
+            return;
+        }
+
+        throw FHIRConformanceViolationException::inFormat('json', sprintf('The property %s must be a JSON Array, not an Object (at %s)', $elementName, self::shortTypeName($ownerType)));
+    }
+
+    /**
+     * Was this XML element present in the document but carrying nothing an element can hold?
+     *
+     * Symfony's XmlEncoder decodes `<entry/>` and `<code>\n</code>` to the empty or whitespace-only
+     * string, and `<entry><!-- c --></entry>` to the empty array — three spellings of the same fact.
+     *
+     * That is a *validation* finding, not a reason to refuse the document: the reference validator
+     * reads `list-empty1.xml` end to end and reports ele-1 ("Element must have some content") at the
+     * offending path. Refusing it lost the whole file. Callers therefore substitute `[]` — an element
+     * that is present with no children — and let `ele-1` on {@see Element} report it.
+     */
+    protected static function isEmptyXmlElement(mixed $value): bool
+    {
+        return $value === [] || (is_string($value) && trim($value) === '');
+    }
+
+    /**
+     * Reject a complex-valued JSON property supplied as `null`.
+     *
+     * FHIR JSON has no null for a complex element: an element is either present as an object or
+     * absent. The HL7 Java reference validator reports the null as an error ("The property meta must
+     * be an Object, not a Null (at Bundle.meta)") rather than reading it, so accepting it leniently
+     * would make us pass documents the oracle rejects.
+     *
+     * This is deliberately *not* applied on the primitive path: FHIR legitimately uses `null`
+     * placeholders inside a primitive array to align it with its `_x` extension array.
+     *
+     * @throws FHIRSerializationException when $value is null
+     */
+    protected static function assertComplexPropertyIsNotNull(string $elementName, mixed $value, string $ownerType): void
+    {
+        if ($value !== null) {
+            return;
+        }
+
+        throw FHIRConformanceViolationException::inFormat('json', sprintf('The property %s must be an Object, not a Null (at %s.%s)', $elementName, self::shortTypeName($ownerType), $elementName));
+    }
+
+    private static function shortTypeName(string $fqcn): string
+    {
+        if (class_exists($fqcn)) {
+            $reflection = new \ReflectionClass($fqcn);
+            foreach ($reflection->getAttributes() as $attribute) {
+                $type = $attribute->getArguments()['type'] ?? null;
+                if (is_string($type) && $type !== '') {
+                    return $type;
+                }
+            }
+        }
+
+        $tail = strrchr($fqcn, '\\');
+
+        return $tail === false ? $fqcn : substr($tail, 1);
+    }
+
     protected function unwrapXmlValue(mixed $value, ?string $propertyType = null): mixed
     {
         if (is_array($value) && array_key_exists('@value', $value)) {
@@ -1092,6 +1218,74 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         return null;
+    }
+
+    /**
+     * Render a JSON-decoded number as the FHIR `decimal` lexical form it was written in.
+     *
+     * Generated models store `decimal` as a string precisely to keep the author's precision, but
+     * `json_decode()` has already turned `101.0` into PHP float `101.0`, and `(string)` on that float
+     * loses two things:
+     *
+     *  - the decimal point — `(string) 101.0` is `"101"`, which reads as an integer. FHIRPath type
+     *    detection for choice elements sniffs for a `.` to tell `decimal` from `integer`
+     *    (`FHIRPathEvaluator::resolveChoiceVariantType()`), so `probability is decimal` came out false
+     *    and `ras-2` (`probability is decimal implies (probability as decimal) <= 100`) short-circuited
+     *    to a silent pass on a probability of 101;
+     *  - significant digits — the cast honours `precision` (14), so `1.23456789012345678` became
+     *    `"1.2345678901235"`.
+     *
+     * `JSON_PRESERVE_ZERO_FRACTION` keeps the `.0` that both the cast and a plain `json_encode()` drop,
+     * and `serialize_precision = -1` makes it the shortest representation that round-trips exactly.
+     * Integers are left as written: JSON `101` for a decimal element is lexically `"101"`, and inventing
+     * a fraction there would change serialized output.
+     */
+    protected static function decimalToLexicalString(mixed $value): string
+    {
+        if (is_float($value)) {
+            $encoded = json_encode($value, JSON_PRESERVE_ZERO_FRACTION);
+            if (is_string($encoded)) {
+                return $encoded;
+            }
+        }
+
+        return is_scalar($value) ? (string) $value : '';
+    }
+
+    /**
+     * Instantiate a class the way `newInstanceWithoutConstructor()` cannot: with its repeating
+     * elements already empty rather than uninitialized.
+     *
+     * Generated models declare every repeating element as a promoted `public array $x = []`, so an
+     * instance produced by PHP's own constructor never has an uninitialized array property. The
+     * denormalizers bypass the constructor, which leaves that state reachable — and it is not
+     * equivalent to `[]`:
+     *
+     *  - reading `$resource->item` raises "must not be accessed before initialization" for consumers;
+     *  - Symfony's `PropertyMetadata::getPropertyValue()` maps the uninitialized slot to `null`, and
+     *    `CountValidator` returns early on null, so every generated `#[Count(min: 1)]` was dead.
+     *
+     * Only properties declared exactly `array` are filled. A nullable `?array` is left alone: there
+     * null is a value the model chose to allow, not an artefact of skipping the constructor.
+     *
+     * @param \ReflectionClass<object> $reflection
+     */
+    protected function instantiateWithEmptyArrays(\ReflectionClass $reflection): object
+    {
+        $object = $reflection->newInstanceWithoutConstructor();
+
+        foreach (self::reflPublicProps($reflection->getName()) as $property) {
+            if ($property->isStatic() || $property->isInitialized($object)) {
+                continue;
+            }
+
+            $type = $property->getType();
+            if ($type instanceof \ReflectionNamedType && !$type->allowsNull() && $type->getName() === 'array') {
+                $property->setValue($object, []);
+            }
+        }
+
+        return $object;
     }
 
     /**

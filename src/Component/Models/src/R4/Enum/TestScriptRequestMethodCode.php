@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: TestScriptRequestMethodCode
  * URL: http://hl7.org/fhir/ValueSet/http-operations
  * Version: 4.0.1
  * Description: The allowable request method or HTTP operation codes.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/http-operations', version: '4.0.1')]
 enum TestScriptRequestMethodCode: string
 {
     /** DELETE */

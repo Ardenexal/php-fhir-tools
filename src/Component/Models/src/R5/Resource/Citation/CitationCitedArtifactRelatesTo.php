@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The artifact related to the cited artifact.
@@ -36,7 +37,13 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var RelatedArtifactTypeExpandedType|null type documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of | part-of | amends | amended-with | appends | appended-with | cites | cited-by | comments-on | comment-in | contains | contained-in | corrects | correction-in | replaces | replaced-with | retracts | retracted-by | signs | similar-to | supports | supported-with | transforms | transformed-into | transformed-with | documents | specification-of | created-with | cite-as | reprint | reprint-of */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/related-artifact-type-all|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/related-artifact-type-all|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\RelatedArtifactTypeExpanded',
+        )]
         public ?RelatedArtifactTypeExpandedType $type = null,
         /** @var array<CodeableConcept> classifier Additional classifiers */
         #[FhirProperty(
@@ -45,7 +52,12 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/citation-artifact-classifier', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/citation-artifact-classifier',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CitationArtifactClassifier',
+        )]
         public array $classifier = [],
         /** @var StringPrimitive|string|null label Short label */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -57,13 +69,13 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $citation = null,
         /** @var Attachment|null document What document is being referenced */
-        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex'), Valid]
         public ?Attachment $document = null,
         /** @var CanonicalPrimitive|null resource What artifact is being referenced */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
         public ?CanonicalPrimitive $resource = null,
         /** @var Reference|null resourceReference What artifact, if not a conformance resource */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid]
         public ?Reference $resourceReference = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

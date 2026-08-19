@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Signature;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about the entity validating information.
@@ -32,13 +33,13 @@ class VerificationResultValidator extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Reference|null organization Reference to the organization validating information */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $organization = null,
         /** @var StringPrimitive|string|null identityCertificate A digital identity certificate associated with the validator */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $identityCertificate = null,
         /** @var Signature|null attestationSignature Validator signature (digital or image) */
-        #[FhirProperty(fhirType: 'Signature', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Signature', propertyKind: 'complex'), Valid]
         public ?Signature $attestationSignature = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

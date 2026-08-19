@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Structure Definition Kind
  * URL: http://hl7.org/fhir/ValueSet/structure-definition-kind
  * Version: 5.0.0
  * Description: Defines the type of structure that a definition is describing.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/structure-definition-kind', version: '5.0.0')]
 enum StructureDefinitionKind: string
 {
     /** Primitive Data Type */

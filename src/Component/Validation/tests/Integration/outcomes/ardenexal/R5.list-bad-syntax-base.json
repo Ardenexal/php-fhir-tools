@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "The element type \"id\" must be terminated by the matching end-tag \"</id>\"."
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to parse XML: Opening and ending tag mismatch: id line 4 and List at line 7 column 8"
+            ]
+        },
+        "warnings": {}
+    }
 }

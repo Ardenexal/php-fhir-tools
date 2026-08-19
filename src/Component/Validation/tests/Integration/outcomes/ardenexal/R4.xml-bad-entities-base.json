@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "The entity \"reg\" was referenced, but not declared."
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to parse XML: Entity 'reg' not defined at line 6 column 916"
+            ]
+        },
+        "warnings": {}
+    }
 }

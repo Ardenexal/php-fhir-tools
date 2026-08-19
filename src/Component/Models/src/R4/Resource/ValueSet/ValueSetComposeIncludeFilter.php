@@ -35,7 +35,13 @@ class ValueSetComposeIncludeFilter extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $property = null,
         /** @var FilterOperatorType|null op = | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | exists */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/filter-operator|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/filter-operator|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\FilterOperator',
+        )]
         public ?FilterOperatorType $op = null,
         /** @var StringPrimitive|string|null value Code from the system, or regex criteria, or boolean value for exists */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Binds to a value set if this element is coded (code, Coding, CodeableConcept, Quantity), or the data types (string, uri).
@@ -39,7 +40,13 @@ class ElementDefinitionBinding extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var BindingStrengthType|null strength required | extensible | preferred | example */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/binding-strength|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/binding-strength|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\BindingStrength',
+        )]
         public ?BindingStrengthType $strength = null,
         /** @var MarkdownPrimitive|null description Intended use of codes in the bound value set */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -54,6 +61,7 @@ class ElementDefinitionBinding extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinitionBindingAdditional',
         )]
+        #[Valid]
         public array $additional = [],
     ) {
         parent::__construct($id, $extension);

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: BiologicallyDerivedProductStatus
  * URL: http://hl7.org/fhir/ValueSet/product-status
  * Version: 4.0.1
  * Description: Biologically Derived Product Status.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/product-status', version: '4.0.1')]
 enum BiologicallyDerivedProductStatus: string
 {
     /** Available */

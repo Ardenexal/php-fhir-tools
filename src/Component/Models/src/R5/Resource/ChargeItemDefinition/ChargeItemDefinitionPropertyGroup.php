@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\MonetaryComponent;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Group of properties which are applicable under the same conditions. If no applicability rules are established for the group, then all properties always apply.
@@ -34,6 +35,7 @@ class ChargeItemDefinitionPropertyGroup extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ChargeItemDefinition\ChargeItemDefinitionApplicability',
         )]
+        #[Valid]
         public array $applicability = [],
         /** @var array<MonetaryComponent> priceComponent Components of total line item price */
         #[FhirProperty(
@@ -42,6 +44,7 @@ class ChargeItemDefinitionPropertyGroup extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\MonetaryComponent',
         )]
+        #[Valid]
         public array $priceComponent = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

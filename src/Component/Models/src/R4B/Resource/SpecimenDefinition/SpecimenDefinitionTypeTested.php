@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\SpecimenContainedPreferenceType;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specimen conditioned in a container as expected by the testing laboratory.
@@ -36,19 +37,25 @@ class SpecimenDefinitionTypeTested extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $isDerived = null,
         /** @var CodeableConcept|null type Type of intended specimen */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var SpecimenContainedPreferenceType|null preference preferred | alternate */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/specimen-contained-preference|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/specimen-contained-preference|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SpecimenContainedPreference',
+        )]
         public ?SpecimenContainedPreferenceType $preference = null,
         /** @var SpecimenDefinitionTypeTestedContainer|null container The specimen's container */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?SpecimenDefinitionTypeTestedContainer $container = null,
         /** @var StringPrimitive|string|null requirement Specimen requirements */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $requirement = null,
         /** @var Duration|null retentionTime Specimen retention time */
-        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $retentionTime = null,
         /** @var array<CodeableConcept> rejectionCriterion Rejection criterion */
         #[FhirProperty(
@@ -57,6 +64,7 @@ class SpecimenDefinitionTypeTested extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $rejectionCriterion = [],
         /** @var array<SpecimenDefinitionTypeTestedHandling> handling Specimen handling before testing */
         #[FhirProperty(
@@ -65,6 +73,7 @@ class SpecimenDefinitionTypeTested extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SpecimenDefinition\SpecimenDefinitionTypeTestedHandling',
         )]
+        #[Valid]
         public array $handling = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Transport Intent
  * URL: http://hl7.org/fhir/ValueSet/transport-intent
  * Version: 5.0.0
  * Description: Distinguishes whether the transport is a proposal, plan or full order.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/transport-intent', version: '5.0.0')]
 enum TransportIntent: string
 {
     /** Unknown */
@@ -27,18 +30,18 @@ enum TransportIntent: string
     /** Order */
     case order = 'order';
 
-    /** Option */
-    case option = 'option';
-
-    /** original-order */
+    /** Original Order */
     case originalorder = 'original-order';
 
-    /** reflex-order */
+    /** Reflex Order */
     case reflexorder = 'reflex-order';
 
-    /** filler-order */
+    /** Filler Order */
     case fillerorder = 'filler-order';
 
-    /** instance-order */
+    /** Instance Order */
     case instanceorder = 'instance-order';
+
+    /** Option */
+    case option = 'option';
 }

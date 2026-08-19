@@ -36,10 +36,21 @@ class RequestOrchestrationActionRelatedAction extends BackboneElement
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?IdPrimitive $targetId = null,
         /** @var ActionRelationshipTypeType|null relationship before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-relationship-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-relationship-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionRelationshipType',
+        )]
         public ?ActionRelationshipTypeType $relationship = null,
         /** @var ActionRelationshipTypeType|null endRelationship before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-relationship-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-relationship-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionRelationshipType',
+        )]
         public ?ActionRelationshipTypeType $endRelationship = null,
         /** @var Duration|Range|null offset Time offset for the relationship */
         #[FhirProperty(

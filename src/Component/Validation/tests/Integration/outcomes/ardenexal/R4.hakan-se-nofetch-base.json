@@ -1,5 +1,29 @@
 {
-    "errorCount": 1,
-    "warningCount": 2,
-    "infoCount": 0
+    "errorCount": 2,
+    "warningCount": 0,
+    "infoCount": 0,
+    "java": {
+        "errorCount": 4,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Constraint failed: ref-1: 'SHALL have a contained resource if a local reference is provided' (url: 1505724e-2d13-4790-ab25-e9ae2fa8d272; ids: ) (log:  (url: 1505724e-2d13-4790-ab25-e9ae2fa8d272; ids: ))",
+            "If a date has a time, it must have a timezone",
+            "MedicationRequest.medication[x]: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/MedicationRequest|4.0.1)",
+            "Unable to resolve resource with reference '#1505724e-2d13-4790-ab25-e9ae2fa8d272'"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotBlank": [
+                "medication — This value should not be blank."
+            ],
+            "invariant:ref-1": [
+                "requester — SHALL have a contained resource if a local reference is provided"
+            ]
+        },
+        "warnings": {}
+    }
 }

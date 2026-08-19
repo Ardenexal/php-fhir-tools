@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\Integer64Primitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Detailed information about events relevant to this subscription notification.
@@ -38,7 +39,7 @@ class SubscriptionStatusNotificationEvent extends BackboneElement
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
         public ?InstantPrimitive $timestamp = null,
         /** @var Reference|null focus Reference to the primary resource or information of this event */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $focus = null,
         /** @var array<Reference> additionalContext References related to the focus resource and/or context of this event */
         #[FhirProperty(
@@ -47,6 +48,7 @@ class SubscriptionStatusNotificationEvent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $additionalContext = [],
     ) {

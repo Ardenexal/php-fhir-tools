@@ -1,5 +1,23 @@
 {
-    "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 2
+    "errorCount": 1,
+    "warningCount": 0,
+    "infoCount": 6,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Measure.group.population.criteria: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/Measure|4.0.1)"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotBlank": [
+                "group[0].population[0].criteria — This value should not be blank."
+            ]
+        },
+        "warnings": {}
+    }
 }

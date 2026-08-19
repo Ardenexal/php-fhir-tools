@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Imaging Selection Status
  * URL: http://hl7.org/fhir/ValueSet/imagingselection-status
  * Version: 5.0.0
  * Description: The status of the ImagingSelection.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/imagingselection-status', version: '5.0.0')]
 enum ImagingSelectionStatus: string
 {
     /** Available */

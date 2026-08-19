@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: TaskStatus
  * URL: http://hl7.org/fhir/ValueSet/task-status
  * Version: 4.0.1
  * Description: The current status of the task.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/task-status', version: '4.0.1')]
 enum TaskStatus: string
 {
     /** Draft */

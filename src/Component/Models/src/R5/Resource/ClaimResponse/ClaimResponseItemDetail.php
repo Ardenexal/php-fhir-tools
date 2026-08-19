@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A claim detail. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
@@ -39,6 +40,7 @@ class ClaimResponseItemDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $traceNumber = [],
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
         #[FhirProperty(
@@ -49,7 +51,7 @@ class ClaimResponseItemDetail extends BackboneElement
         )]
         public array $noteNumber = [],
         /** @var ClaimResponseItemReviewOutcome|null reviewOutcome Detail level adjudication results */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?ClaimResponseItemReviewOutcome $reviewOutcome = null,
         /** @var array<ClaimResponseItemAdjudication> adjudication Detail level adjudication details */
         #[FhirProperty(
@@ -58,6 +60,7 @@ class ClaimResponseItemDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ClaimResponse\ClaimResponseItemAdjudication',
         )]
+        #[Valid]
         public array $adjudication = [],
         /** @var array<ClaimResponseItemDetailSubDetail> subDetail Adjudication for claim sub-details */
         #[FhirProperty(
@@ -66,6 +69,7 @@ class ClaimResponseItemDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ClaimResponse\ClaimResponseItemDetailSubDetail',
         )]
+        #[Valid]
         public array $subDetail = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

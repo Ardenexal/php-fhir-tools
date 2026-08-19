@@ -1,5 +1,19 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 2
+    "infoCount": 4,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 2,
+        "infoCount": 2,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Slice 'Observation.component:SystolicBP': a matching slice is required, but not found (from http://hl7.org/fhir/StructureDefinition/bp|5.0.0). Note that other slices are allowed in addition to this required slice"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Artifact Assessment Workflow Status
  * URL: http://hl7.org/fhir/ValueSet/artifactassessment-workflow-status
  * Version: 5.0.0
  * Description: Possible values for the workflow status of the comment or assessment, typically used to coordinate workflow around the process of accepting and rejecting changes and comments on the artifact.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/artifactassessment-workflow-status', version: '5.0.0')]
 enum ArtifactAssessmentWorkflowStatus: string
 {
     /** Submitted */

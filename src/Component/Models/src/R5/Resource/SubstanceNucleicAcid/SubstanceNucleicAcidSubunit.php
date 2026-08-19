@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Subunits are listed in order of decreasing length; sequences of the same length will be ordered by molecular weight; subunits that have identical sequences will be repeated multiple times.
@@ -39,13 +40,13 @@ class SubstanceNucleicAcidSubunit extends BackboneElement
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $length = null,
         /** @var Attachment|null sequenceAttachment (TBC) */
-        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex'), Valid]
         public ?Attachment $sequenceAttachment = null,
         /** @var CodeableConcept|null fivePrime The nucleotide present at the 5’ terminal shall be specified based on a controlled vocabulary. Since the sequence is represented from the 5' to the 3' end, the 5’ prime nucleotide is the letter at the first position in the sequence. A separate representation would be redundant */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $fivePrime = null,
         /** @var CodeableConcept|null threePrime The nucleotide present at the 3’ terminal shall be specified based on a controlled vocabulary. Since the sequence is represented from the 5' to the 3' end, the 5’ prime nucleotide is the letter at the last position in the sequence. A separate representation would be redundant */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $threePrime = null,
         /** @var array<SubstanceNucleicAcidSubunitLinkage> linkage The linkages between sugar residues will also be captured */
         #[FhirProperty(
@@ -54,6 +55,7 @@ class SubstanceNucleicAcidSubunit extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceNucleicAcid\SubstanceNucleicAcidSubunitLinkage',
         )]
+        #[Valid]
         public array $linkage = [],
         /** @var array<SubstanceNucleicAcidSubunitSugar> sugar 5.3.6.8.1 Sugar ID (Mandatory) */
         #[FhirProperty(
@@ -62,6 +64,7 @@ class SubstanceNucleicAcidSubunit extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceNucleicAcid\SubstanceNucleicAcidSubunitSugar',
         )]
+        #[Valid]
         public array $sugar = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

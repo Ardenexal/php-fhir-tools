@@ -123,7 +123,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                 throw $e;
             }
 
-            throw FHIRSerializationException::formatError('json', $e->getMessage(), ['target_type' => $type, 'data_keys' => array_keys($data)]);
+            throw FHIRSerializationException::formatError('json', $e->getMessage(), ['target_type' => $type, 'data_keys' => array_keys($data)], $e);
         }
     }
 
@@ -291,7 +291,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
 
         try {
             $reflection            = self::reflClass($resolvedType);
-            $object                = $reflection->newInstanceWithoutConstructor();
+            $object                = $this->instantiateWithEmptyArrays($reflection);
             $metaMap               = $this->getPropertyMetadataMap($object);
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
 
@@ -314,7 +314,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'json', $context);
                         } else {
                             $denormalizedValue = ($fhirType === 'decimal' || $fhirType === 'http://hl7.org/fhirpath/System.Decimal') && is_numeric($value)
-                                ? (string) $value
+                                ? self::decimalToLexicalString($value)
                                 : $value;
                         }
 
@@ -335,16 +335,39 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                     ) {
                         $denormalizedValue = $this->denormalizeExtensionArray($value, 'json', $context);
                     } elseif (is_array($value) && $phpItemClass !== null && $this->denormalizer !== null) {
+                        // A repeating element MUST be a JSON array. Do not be lenient here: the HL7
+                        // Java reference validator reports "The property reasonCode must be a JSON
+                        // Array, not an Object" as an error, so silently wrapping a lone object would
+                        // accept malformed FHIR that the oracle rejects.
+                        //
+                        // Rejecting explicitly also replaces a TypeError: iterating the object walked
+                        // its *fields* into the item normalizer, where str_starts_with() received an
+                        // integer key and surfaced only as an opaque "Format error (json)".
+                        // Captured before the guard, which PHPStan treats as impure.
+                        $denormalizer = $this->denormalizer;
+                        self::assertRepeatingElementIsArray($elementName, $value, $resolvedType);
                         $denormalizedValue = [];
                         foreach ($value as $item) {
-                            $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'json', $context);
+                            $denormalizedValue[] = $denormalizer->denormalize($item, $phpItemClass, 'json', $context);
                         }
                     } elseif ($this->denormalizer !== null && $meta !== null && $meta->propertyKind === 'primitive') {
                         $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'json', $context, $metaMap);
                     } elseif ($this->denormalizer !== null) {
                         $propertyType = $this->getPropertyType($property);
                         if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                            $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
+                            // Captured before the cardinality guard, which PHPStan treats as impure.
+                            $denormalizer = $this->denormalizer;
+                            // A JSON array on a 0..1 element exceeds its maximum cardinality. Without
+                            // this the array reached the complex normalizer, whose element loop assumes
+                            // string keys, and str_starts_with() raised a TypeError reported only as an
+                            // opaque "Format error (json)".
+                            self::assertSingleValuedElement($elementName, $value, $resolvedType);
+                            // A null on a complex element is malformed FHIR JSON, and without this it
+                            // reached the complex normalizer, which claimed nothing and surfaced as
+                            // "no supporting normalizer found" — losing the rest of the document.
+                            // Complex branch only: the primitive path above relies on null placeholders.
+                            self::assertComplexPropertyIsNotNull($elementName, $value, $resolvedType);
+                            $denormalizedValue = $denormalizer->denormalize($value, $propertyType, 'json', $context);
                         } else {
                             $denormalizedValue = $value;
                         }

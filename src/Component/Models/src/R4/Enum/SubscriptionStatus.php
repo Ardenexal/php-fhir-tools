@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: SubscriptionStatus
  * URL: http://hl7.org/fhir/ValueSet/subscription-status
  * Version: 4.0.1
  * Description: The status of a subscription.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/subscription-status', version: '4.0.1')]
 enum SubscriptionStatus: string
 {
     /** Requested */

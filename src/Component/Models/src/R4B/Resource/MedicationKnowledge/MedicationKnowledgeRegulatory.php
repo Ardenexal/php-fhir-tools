@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Regulatory information about a medication.
@@ -30,7 +31,7 @@ class MedicationKnowledgeRegulatory extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Reference|null regulatoryAuthority Specifies the authority of the regulation */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $regulatoryAuthority = null,
         /** @var array<MedicationKnowledgeRegulatorySubstitution> substitution Specifies if changes are allowed when dispensing a medication from a regulatory perspective */
         #[FhirProperty(
@@ -39,6 +40,7 @@ class MedicationKnowledgeRegulatory extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeRegulatorySubstitution',
         )]
+        #[Valid]
         public array $substitution = [],
         /** @var array<MedicationKnowledgeRegulatorySchedule> schedule Specifies the schedule of a medication in jurisdiction */
         #[FhirProperty(
@@ -47,9 +49,10 @@ class MedicationKnowledgeRegulatory extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeRegulatorySchedule',
         )]
+        #[Valid]
         public array $schedule = [],
         /** @var MedicationKnowledgeRegulatoryMaxDispense|null maxDispense The maximum number of units of the medication that can be dispensed in a period */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?MedicationKnowledgeRegulatoryMaxDispense $maxDispense = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

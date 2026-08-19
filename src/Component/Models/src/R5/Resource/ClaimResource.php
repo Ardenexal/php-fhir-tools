@@ -33,6 +33,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimProcedure;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimRelated;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimSupportingInfo;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Financial Management)
@@ -49,19 +50,24 @@ class ClaimResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -76,6 +82,7 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var array<Identifier> traceNumber Number for tracking */
         #[FhirProperty(
@@ -84,30 +91,52 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $traceNumber = [],
         /** @var FinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fm-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/fm-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\FinancialResourceStatusCodes',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?FinancialResourceStatusCodesType $status = null,
         /** @var CodeableConcept|null type Category or discipline */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/claim-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/claim-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ClaimTypeCodes',
+        )]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null subType More granular claim type */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $subType = null,
         /** @var ClaimUseType|null use claim | preauthorization | predetermination */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/claim-use|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/claim-use|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ClaimUse',
+        )]
         public ?ClaimUseType $use = null,
         /** @var Reference|null patient The recipient of the products and services */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
         public ?Reference $patient = null,
         /** @var Period|null billablePeriod Relevant time frame for the claim */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $billablePeriod = null,
         /** @var DateTimePrimitive|null created Resource creation date */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?DateTimePrimitive $created = null,
         /** @var Reference|null enterer Author of the claim */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -116,10 +145,11 @@ class ClaimResource extends AbstractDomainResource
         ])]
         public ?Reference $enterer = null,
         /** @var Reference|null insurer Target */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $insurer = null,
         /** @var Reference|null provider Party responsible for the claim */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -127,10 +157,10 @@ class ClaimResource extends AbstractDomainResource
         ])]
         public ?Reference $provider = null,
         /** @var CodeableConcept|null priority Desired processing urgency */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $priority = null,
         /** @var CodeableConcept|null fundsReserve For whom to reserve funds */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $fundsReserve = null,
         /** @var array<ClaimRelated> related Prior or corollary claims */
         #[FhirProperty(
@@ -139,9 +169,11 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimRelated',
         )]
+        #[Valid]
         public array $related = [],
         /** @var Reference|null prescription Prescription authorizing services and products */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/DeviceRequest',
             'http://hl7.org/fhir/StructureDefinition/MedicationRequest',
@@ -150,6 +182,7 @@ class ClaimResource extends AbstractDomainResource
         public ?Reference $prescription = null,
         /** @var Reference|null originalPrescription Original prescription if superseded by fulfiller */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/DeviceRequest',
             'http://hl7.org/fhir/StructureDefinition/MedicationRequest',
@@ -157,10 +190,10 @@ class ClaimResource extends AbstractDomainResource
         ])]
         public ?Reference $originalPrescription = null,
         /** @var ClaimPayee|null payee Recipient of benefits payable */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ClaimPayee $payee = null,
         /** @var Reference|null referral Treatment referral */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ServiceRequest'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ServiceRequest'])]
         public ?Reference $referral = null,
         /** @var array<Reference> encounter Encounters associated with the listed treatments */
         #[FhirProperty(
@@ -169,17 +202,19 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public array $encounter = [],
         /** @var Reference|null facility Servicing facility */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Location',
             'http://hl7.org/fhir/StructureDefinition/Organization',
         ])]
         public ?Reference $facility = null,
         /** @var CodeableConcept|null diagnosisRelatedGroup Package billing code */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $diagnosisRelatedGroup = null,
         /** @var array<ClaimEvent> event Event information */
         #[FhirProperty(
@@ -188,6 +223,7 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimEvent',
         )]
+        #[Valid]
         public array $event = [],
         /** @var array<ClaimCareTeam> careTeam Members of the care team */
         #[FhirProperty(
@@ -196,6 +232,7 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimCareTeam',
         )]
+        #[Valid]
         public array $careTeam = [],
         /** @var array<ClaimSupportingInfo> supportingInfo Supporting information */
         #[FhirProperty(
@@ -204,6 +241,7 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimSupportingInfo',
         )]
+        #[Valid]
         public array $supportingInfo = [],
         /** @var array<ClaimDiagnosis> diagnosis Pertinent diagnosis information */
         #[FhirProperty(
@@ -212,6 +250,7 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimDiagnosis',
         )]
+        #[Valid]
         public array $diagnosis = [],
         /** @var array<ClaimProcedure> procedure Clinical procedures performed */
         #[FhirProperty(
@@ -220,6 +259,7 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimProcedure',
         )]
+        #[Valid]
         public array $procedure = [],
         /** @var array<ClaimInsurance> insurance Patient insurance information */
         #[FhirProperty(
@@ -228,12 +268,13 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimInsurance',
         )]
+        #[Valid]
         public array $insurance = [],
         /** @var ClaimAccident|null accident Details of the event */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ClaimAccident $accident = null,
         /** @var Money|null patientPaid Paid by the patient */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $patientPaid = null,
         /** @var array<ClaimItem> item Product or service provided */
         #[FhirProperty(
@@ -242,9 +283,10 @@ class ClaimResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimItem',
         )]
+        #[Valid]
         public array $item = [],
         /** @var Money|null total Total claim cost */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $total = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

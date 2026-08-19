@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Action would contain either an operation or an assertion.
@@ -34,10 +35,10 @@ class TestScriptTestAction extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var TestScriptSetupActionOperation|null operation The setup operation to perform */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?TestScriptSetupActionOperation $operation = null,
         /** @var TestScriptSetupActionAssert|null assert The setup assertion to perform */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?TestScriptSetupActionAssert $assert = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Strength expressed in terms of a reference substance.
@@ -35,13 +36,13 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength exte
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null substance Relevant reference substance */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $substance = null,
         /** @var Ratio|null strength Strength expressed in terms of a reference substance */
-        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Ratio $strength = null,
         /** @var Ratio|null strengthLowLimit Strength expressed in terms of a reference substance */
-        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex'), Valid]
         public ?Ratio $strengthLowLimit = null,
         /** @var StringPrimitive|string|null measurementPoint For when strength is measured at a particular point or distance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -53,6 +54,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength exte
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $country = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

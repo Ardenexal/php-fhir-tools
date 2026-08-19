@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ResearchSubjectStatus
  * URL: http://hl7.org/fhir/ValueSet/research-subject-status
  * Version: 4.3.0
  * Description: Indicates the progression of a study subject through a study.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/research-subject-status', version: '4.3.0')]
 enum ResearchSubjectStatus: string
 {
     /** Candidate */

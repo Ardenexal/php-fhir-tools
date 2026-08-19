@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\MimeTypesType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestScriptRequestMethodCodeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description Evaluates the results of previous operations to determine if the server under test behaves appropriately.
@@ -62,7 +62,12 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var AssertionDirectionTypeType|null direction response | request */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/assert-direction-codes|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/assert-direction-codes|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AssertionDirectionType',
+        )]
         public ?AssertionDirectionTypeType $direction = null,
         /** @var StringPrimitive|string|null compareToSourceId Id of the source fixture to be evaluated */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -74,7 +79,12 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $compareToSourcePath = null,
         /** @var MimeTypesType|null contentType Mime type to compare against the 'Content-Type' header */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\MimeTypes',
+        )]
         public ?MimeTypesType $contentType = null,
         /** @var StringPrimitive|string|null expression The FHIRPath expression to be evaluated */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -89,22 +99,42 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $navigationLinks = null,
         /** @var AssertionOperatorTypeType|null operator equals | notEquals | in | notIn | greaterThan | lessThan | empty | notEmpty | contains | notContains | eval */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/assert-operator-codes|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/assert-operator-codes|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AssertionOperatorType',
+        )]
         public ?AssertionOperatorTypeType $operator = null,
         /** @var StringPrimitive|string|null path XPath or JSONPath expression */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $path = null,
         /** @var TestScriptRequestMethodCodeType|null requestMethod delete | get | options | patch | post | put | head */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/http-operations|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/http-operations|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\TestScriptRequestMethodCode',
+        )]
         public ?TestScriptRequestMethodCodeType $requestMethod = null,
         /** @var StringPrimitive|string|null requestURL Request URL comparison value */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $requestURL = null,
         /** @var FHIRDefinedTypeType|null resource Resource type */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/defined-types|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/defined-types|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRDefinedType',
+        )]
         public ?FHIRDefinedTypeType $resource = null,
         /** @var AssertionResponseTypesType|null response okay | created | noContent | notModified | bad | forbidden | notFound | methodNotAllowed | conflict | gone | preconditionFailed | unprocessable */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/assert-response-code-types|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/assert-response-code-types|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AssertionResponseTypes',
+        )]
         public ?AssertionResponseTypesType $response = null,
         /** @var StringPrimitive|string|null responseCode HTTP response code to test */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -119,7 +149,7 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $value = null,
         /** @var bool|null warningOnly Will this assert produce a warning only on error? */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $warningOnly = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -29,7 +29,12 @@ class Money extends Element
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $value = null,
         /** @var CurrenciesType|null currency ISO 4217 Currency Code */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/currencies|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/currencies|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\Currencies',
+        )]
         public ?CurrenciesType $currency = null,
     ) {
         parent::__construct($id, $extension);

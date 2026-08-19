@@ -1,5 +1,21 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 0
+    "warningCount": 0,
+    "infoCount": 0,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Duplicate ID for contained resource: pat1",
+            "Resource requires an id, but none is present",
+            "The contained resource 'null' is not referenced to from elsewhere in the containing resource nor does it refer to the containing resource (dom-3)"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about the primary source(s) involved in validation.
@@ -33,6 +34,7 @@ class VerificationResultPrimarySource extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null who Reference to the primary source */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -46,6 +48,7 @@ class VerificationResultPrimarySource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $type = [],
         /** @var array<CodeableConcept> communicationMethod Method for exchanging information with the primary source */
         #[FhirProperty(
@@ -54,15 +57,28 @@ class VerificationResultPrimarySource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $communicationMethod = [],
         /** @var CodeableConcept|null validationStatus successful | failed | unknown */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-validation-status', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-validation-status',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ValidationStatus',
+        )]
         public ?CodeableConcept $validationStatus = null,
         /** @var DateTimePrimitive|null validationDate When the target was validated against the primary source */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $validationDate = null,
         /** @var CodeableConcept|null canPushUpdates yes | no | undetermined */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-can-push-updates', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-can-push-updates',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CanPushUpdates',
+        )]
         public ?CodeableConcept $canPushUpdates = null,
         /** @var array<CodeableConcept> pushTypeAvailable specific | any | source */
         #[FhirProperty(
@@ -71,7 +87,12 @@ class VerificationResultPrimarySource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-push-type-available', strength: 'preferred')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-push-type-available',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PushTypeAvailable',
+        )]
         public array $pushTypeAvailable = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

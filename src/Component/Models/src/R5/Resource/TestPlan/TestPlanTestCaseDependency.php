@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The required criteria to execute the test case - e.g. preconditions, previous tests.
@@ -32,7 +33,7 @@ class TestPlanTestCaseDependency extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var Reference|null predecessor Link to predecessor test plans */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid]
         public ?Reference $predecessor = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Timing in which the characteristic is determined.
@@ -44,6 +45,7 @@ class EvidenceVariableCharacteristicTimeFromEvent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var CodeableConcept|Reference|DateTimePrimitive|IdPrimitive|null event The event used as a base point (reference point) in time */
         #[FhirProperty(
@@ -79,10 +81,10 @@ class EvidenceVariableCharacteristicTimeFromEvent extends BackboneElement
         )]
         public CodeableConcept|Reference|DateTimePrimitive|IdPrimitive|null $event = null,
         /** @var Quantity|null quantity Used to express the observation at a defined amount of time before or after the event */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Range|null range Used to express the observation within a period before and/or after the event */
-        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $range = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

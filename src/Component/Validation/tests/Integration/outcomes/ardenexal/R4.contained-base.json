@@ -1,5 +1,17 @@
 {
     "errorCount": 0,
-    "warningCount": 2,
-    "infoCount": 1
+    "warningCount": 0,
+    "infoCount": 1,
+    "java": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": []
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

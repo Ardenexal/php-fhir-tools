@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -50,13 +51,13 @@ class Population extends BackboneElement
         )]
         public Range|CodeableConcept|null $age = null,
         /** @var CodeableConcept|null gender The gender of the specific population */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $gender = null,
         /** @var CodeableConcept|null race Race of the specific population */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $race = null,
         /** @var CodeableConcept|null physiologicalCondition The existing physiological conditions of the specific population to which this applies */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $physiologicalCondition = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The individual test cases that are part of this plan, when they they are made explicit.
@@ -37,6 +38,7 @@ class TestPlanTestCase extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         public array $scope = [],
         /** @var array<TestPlanTestCaseDependency> dependency Required criteria to execute the test case */
         #[FhirProperty(
@@ -45,6 +47,7 @@ class TestPlanTestCase extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestPlan\TestPlanTestCaseDependency',
         )]
+        #[Valid]
         public array $dependency = [],
         /** @var array<TestPlanTestCaseTestRun> testRun The actual test to be executed */
         #[FhirProperty(
@@ -53,6 +56,7 @@ class TestPlanTestCase extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestPlan\TestPlanTestCaseTestRun',
         )]
+        #[Valid]
         public array $testRun = [],
         /** @var array<TestPlanTestCaseTestData> testData The test data used in the test case */
         #[FhirProperty(
@@ -61,6 +65,7 @@ class TestPlanTestCase extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestPlan\TestPlanTestCaseTestData',
         )]
+        #[Valid]
         public array $testData = [],
         /** @var array<TestPlanTestCaseAssertion> assertion Test assertions or expectations */
         #[FhirProperty(
@@ -69,6 +74,7 @@ class TestPlanTestCase extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestPlan\TestPlanTestCaseAssertion',
         )]
+        #[Valid]
         public array $assertion = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

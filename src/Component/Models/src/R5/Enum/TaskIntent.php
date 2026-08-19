@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Task Intent
  * URL: http://hl7.org/fhir/ValueSet/task-intent
  * Version: 5.0.0
  * Description: Distinguishes whether the task is a proposal, plan or full order.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/task-intent', version: '5.0.0')]
 enum TaskIntent: string
 {
     /** Unknown */
@@ -27,18 +30,18 @@ enum TaskIntent: string
     /** Order */
     case order = 'order';
 
-    /** Option */
-    case option = 'option';
-
-    /** original-order */
+    /** Original Order */
     case originalorder = 'original-order';
 
-    /** reflex-order */
+    /** Reflex Order */
     case reflexorder = 'reflex-order';
 
-    /** filler-order */
+    /** Filler Order */
     case fillerorder = 'filler-order';
 
-    /** instance-order */
+    /** Instance Order */
     case instanceorder = 'instance-order';
+
+    /** Option */
+    case option = 'option';
 }

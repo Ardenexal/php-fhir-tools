@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about the [ValueSet/$expand](valueset-operation-expand.html) operation.
@@ -43,6 +44,7 @@ class TerminologyCapabilitiesExpansion extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\TerminologyCapabilities\TerminologyCapabilitiesExpansionParameter',
         )]
+        #[Valid]
         public array $parameter = [],
         /** @var MarkdownPrimitive|null textFilter Documentation about text searching works */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

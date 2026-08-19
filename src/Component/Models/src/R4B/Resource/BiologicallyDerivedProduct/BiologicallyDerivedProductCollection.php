@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description How this product was collected.
@@ -32,6 +33,7 @@ class BiologicallyDerivedProductCollection extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null collector Individual performing collection */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -39,6 +41,7 @@ class BiologicallyDerivedProductCollection extends BackboneElement
         public ?Reference $collector = null,
         /** @var Reference|null source Who is product from */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
             'http://hl7.org/fhir/StructureDefinition/Organization',

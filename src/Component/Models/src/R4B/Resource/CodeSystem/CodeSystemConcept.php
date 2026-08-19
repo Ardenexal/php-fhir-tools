@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Concepts that are in the code system. The concept definitions are inherently hierarchical, but the definitions must be consulted to determine what the meanings of the hierarchical relationships are.
@@ -45,6 +46,7 @@ class CodeSystemConcept extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CodeSystem\CodeSystemConceptDesignation',
         )]
+        #[Valid]
         public array $designation = [],
         /** @var array<CodeSystemConceptProperty> property Property value for the concept */
         #[FhirProperty(
@@ -53,6 +55,7 @@ class CodeSystemConcept extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CodeSystem\CodeSystemConceptProperty',
         )]
+        #[Valid]
         public array $property = [],
         /** @var array<CodeSystemConcept> concept Child Concepts (is-a/contains/categorizes) */
         #[FhirProperty(
@@ -61,6 +64,7 @@ class CodeSystemConcept extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CodeSystem\CodeSystemConcept',
         )]
+        #[Valid]
         public array $concept = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

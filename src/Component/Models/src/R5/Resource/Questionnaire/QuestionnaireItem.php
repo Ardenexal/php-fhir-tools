@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A particular question, question grouping or display text that is part of the questionnaire.
@@ -135,6 +136,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
+        #[Valid]
         public array $code = [],
         /** @var StringPrimitive|string|null prefix E.g. "1(a)", "2.5.3" */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -143,7 +145,13 @@ class QuestionnaireItem extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
         /** @var QuestionnaireItemTypeType|null type group | display | boolean | decimal | integer | date | dateTime + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/item-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/item-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\QuestionnaireItemType',
+        )]
         public ?QuestionnaireItemTypeType $type = null,
         /** @var array<QuestionnaireItemEnableWhen> enableWhen Only allow data when */
         #[FhirProperty(
@@ -152,13 +160,24 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Questionnaire\QuestionnaireItemEnableWhen',
         )]
+        #[Valid]
         #[FHIRIsModifier(reason: 'If enableWhen is present and the condition evaluates to false, then the Questionnaire behaves as though the elements weren\'t actually present')]
         public array $enableWhen = [],
         /** @var EnableWhenBehaviorType|null enableBehavior all | any */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-enable-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-enable-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\EnableWhenBehavior',
+        )]
         public ?EnableWhenBehaviorType $enableBehavior = null,
         /** @var QuestionnaireItemDisabledDisplayType|null disabledDisplay hidden | protected */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-disabled-display|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-disabled-display|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\QuestionnaireItemDisabledDisplay',
+        )]
         public ?QuestionnaireItemDisabledDisplayType $disabledDisplay = null,
         /** @var bool|null required Whether the item must be included in data results */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -173,7 +192,12 @@ class QuestionnaireItem extends BackboneElement
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $maxLength = null,
         /** @var QuestionnaireAnswerConstraintType|null answerConstraint optionsOnly | optionsOrType | optionsOrString */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-answer-constraint|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-answer-constraint|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\QuestionnaireAnswerConstraint',
+        )]
         public ?QuestionnaireAnswerConstraintType $answerConstraint = null,
         /** @var CanonicalPrimitive|null answerValueSet ValueSet containing permitted answers */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
@@ -185,6 +209,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Questionnaire\QuestionnaireItemAnswerOption',
         )]
+        #[Valid]
         public array $answerOption = [],
         /** @var array<QuestionnaireItemInitial> initial Initial value(s) when item is first rendered */
         #[FhirProperty(
@@ -193,6 +218,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Questionnaire\QuestionnaireItemInitial',
         )]
+        #[Valid]
         public array $initial = [],
         /** @var array<QuestionnaireItem> item Nested questionnaire items */
         #[FhirProperty(
@@ -201,6 +227,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Questionnaire\QuestionnaireItem',
         )]
+        #[Valid]
         public array $item = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

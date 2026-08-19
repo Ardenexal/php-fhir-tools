@@ -30,6 +30,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\Medica
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgePackaging;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeRegulatory;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeRelatedMedicationKnowledge;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Pharmacy)
@@ -51,7 +52,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -62,13 +63,14 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -77,19 +79,25 @@ class MedicationKnowledgeResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null code Code that identifies this medication */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var MedicationKnowledgeStatusCodesType|null status active | inactive | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medicationknowledge-status|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This element changes the interpretation of all descriptive attributes.')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/medicationknowledge-status|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\MedicationKnowledgeStatusCodes',
+        )]
+        #[FHIRIsModifier(reason: 'This element changes the interpretation of all descriptive attributes.')]
         public ?MedicationKnowledgeStatusCodesType $status = null,
         /** @var Reference|null manufacturer Manufacturer of the item */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $manufacturer = null,
         /** @var CodeableConcept|null doseForm powder | tablets | capsule + */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $doseForm = null,
         /** @var Quantity|null amount Amount of drug in package */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $amount = null,
         /** @var array<StringPrimitive|string> synonym Additional names for a medication */
         #[FhirProperty(
@@ -106,6 +114,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeRelatedMedicationKnowledge',
         )]
+        #[Valid]
         public array $relatedMedicationKnowledge = [],
         /** @var array<Reference> associatedMedication A medication resource that is associated with this medication */
         #[FhirProperty(
@@ -114,6 +123,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Medication'])]
         public array $associatedMedication = [],
         /** @var array<CodeableConcept> productType Category of the medication or product */
@@ -123,6 +133,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $productType = [],
         /** @var array<MedicationKnowledgeMonograph> monograph Associated documentation about the medication */
         #[FhirProperty(
@@ -131,6 +142,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeMonograph',
         )]
+        #[Valid]
         public array $monograph = [],
         /** @var array<MedicationKnowledgeIngredient> ingredient Active or inactive ingredient */
         #[FhirProperty(
@@ -139,6 +151,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeIngredient',
         )]
+        #[Valid]
         public array $ingredient = [],
         /** @var MarkdownPrimitive|null preparationInstruction The instructions for preparing the medication */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -150,6 +163,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $intendedRoute = [],
         /** @var array<MedicationKnowledgeCost> cost The pricing of the medication */
         #[FhirProperty(
@@ -158,6 +172,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeCost',
         )]
+        #[Valid]
         public array $cost = [],
         /** @var array<MedicationKnowledgeMonitoringProgram> monitoringProgram Program under which a medication is reviewed */
         #[FhirProperty(
@@ -166,6 +181,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeMonitoringProgram',
         )]
+        #[Valid]
         public array $monitoringProgram = [],
         /** @var array<MedicationKnowledgeAdministrationGuidelines> administrationGuidelines Guidelines for administration of the medication */
         #[FhirProperty(
@@ -174,6 +190,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeAdministrationGuidelines',
         )]
+        #[Valid]
         public array $administrationGuidelines = [],
         /** @var array<MedicationKnowledgeMedicineClassification> medicineClassification Categorization of the medication within a formulary or classification system */
         #[FhirProperty(
@@ -182,9 +199,10 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeMedicineClassification',
         )]
+        #[Valid]
         public array $medicineClassification = [],
         /** @var MedicationKnowledgePackaging|null packaging Details about packaged medications */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?MedicationKnowledgePackaging $packaging = null,
         /** @var array<MedicationKnowledgeDrugCharacteristic> drugCharacteristic Specifies descriptive properties of the medicine */
         #[FhirProperty(
@@ -193,6 +211,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeDrugCharacteristic',
         )]
+        #[Valid]
         public array $drugCharacteristic = [],
         /** @var array<Reference> contraindication Potential clinical issue with or between medication(s) */
         #[FhirProperty(
@@ -201,6 +220,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DetectedIssue'])]
         public array $contraindication = [],
         /** @var array<MedicationKnowledgeRegulatory> regulatory Regulatory information about a medication */
@@ -210,6 +230,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeRegulatory',
         )]
+        #[Valid]
         public array $regulatory = [],
         /** @var array<MedicationKnowledgeKinetics> kinetics The time course of drug absorption, distribution, metabolism and excretion of a medication from the body */
         #[FhirProperty(
@@ -218,6 +239,7 @@ class MedicationKnowledgeResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeKinetics',
         )]
+        #[Valid]
         public array $kinetics = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

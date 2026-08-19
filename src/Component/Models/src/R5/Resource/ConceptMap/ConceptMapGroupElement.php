@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Mappings for an individual concept in the source to one or more concepts in the target.
@@ -62,6 +63,7 @@ class ConceptMapGroupElement extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElementTarget',
         )]
+        #[Valid]
         public array $target = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

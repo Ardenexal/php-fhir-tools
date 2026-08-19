@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Ingredient Manufacturer Role
  * URL: http://hl7.org/fhir/ValueSet/ingredient-manufacturer-role
  * Version: 5.0.0
  * Description: The way in which this manufacturer is associated with the ingredient. For example whether it is a possible one (others allowed), or an exclusive authorized one for this ingredient. Note that this is not the manufacturing process role.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/ingredient-manufacturer-role', version: '5.0.0')]
 enum IngredientManufacturerRole: string
 {
     /** Manufacturer is specifically allowed for this ingredient */

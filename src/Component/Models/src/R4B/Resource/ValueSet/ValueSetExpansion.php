@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A value set can also be "expanded", where the value set is turned into a simple collection of enumerated codes. This element holds the expansion, if it has been performed.
@@ -48,6 +49,7 @@ class ValueSetExpansion extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ValueSet\ValueSetExpansionParameter',
         )]
+        #[Valid]
         public array $parameter = [],
         /** @var array<ValueSetExpansionContains> contains Codes in the value set */
         #[FhirProperty(
@@ -56,6 +58,7 @@ class ValueSetExpansion extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ValueSet\ValueSetExpansionContains',
         )]
+        #[Valid]
         public array $contains = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

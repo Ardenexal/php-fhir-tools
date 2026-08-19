@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Which other rules to apply in the context of this rule.
@@ -39,6 +40,7 @@ class StructureMapGroupRuleDependent extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap\StructureMapGroupRuleTargetParameter',
         )]
+        #[Valid]
         public array $parameter = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

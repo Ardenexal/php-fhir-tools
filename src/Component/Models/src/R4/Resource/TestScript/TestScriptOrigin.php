@@ -12,6 +12,8 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An abstract server used in operations within this test script in the origin element.
@@ -30,10 +32,17 @@ class TestScriptOrigin extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var int|null index The index of the abstract origin server starting at 1 */
-        #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?int $index = null,
         /** @var Coding|null profile FHIR-Client | FHIR-SDC-FormFiller */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-profile-origin-types', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-profile-origin-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\TestScriptProfileOriginType',
+        )]
         public ?Coding $profile = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

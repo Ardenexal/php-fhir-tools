@@ -516,11 +516,12 @@ class FHIRModelGeneratorCommand extends Command
                 $this->context[$version]->addType($structureDefinition['url'], $targetNamespace->getName(), $class);
                 $targetNamespace->add($class);
 
+                // The unsupported-kind guard above already returned every other kind to the loop,
+                // so only the three routable kinds reach here and 'primitive-type' is the default.
                 match ($kind) {
-                    'resource'       => $resourceCount++,
-                    'complex-type'   => $dataTypeCount++,
-                    'primitive-type' => $primitiveCount++,
-                    default          => null
+                    'resource'     => $resourceCount++,
+                    'complex-type' => $dataTypeCount++,
+                    default        => $primitiveCount++,
                 };
             } else {
                 $output->writeln("<error>Failed to generate class for {$name}</error>");
