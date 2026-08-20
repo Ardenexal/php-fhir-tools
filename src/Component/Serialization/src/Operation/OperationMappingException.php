@@ -37,6 +37,29 @@ final class OperationMappingException extends FHIRToolsException
         ));
     }
 
+    /**
+     * A payload constructor rejected a value the wire supplied.
+     *
+     * Raised where a `TypeError` used to escape. `TypeError` extends `Error`, not `Exception`, so it
+     * passed straight through `FHIRSerializationService`'s `catch (\Exception)` and through any
+     * consumer catching the FHIR exception hierarchy — an uncaught fatal on what is really a bad
+     * request. The original `TypeError` is kept as `$previous` because its message is the only thing
+     * that names the offending constructor argument and its declared type.
+     */
+    public static function payloadRejectedValue(string $class, \Throwable $previous): self
+    {
+        return new self(
+            sprintf(
+                'A value read from the Parameters resource does not satisfy %s. The wire supplied a '
+                . 'type the parameter does not declare: %s',
+                $class,
+                $previous->getMessage(),
+            ),
+            0,
+            $previous,
+        );
+    }
+
     public static function unmappableValue(string $wireName, string $fhirType, string $given): self
     {
         return new self(sprintf(

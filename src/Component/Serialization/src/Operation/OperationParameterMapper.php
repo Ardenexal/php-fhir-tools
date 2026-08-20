@@ -88,6 +88,29 @@ final class OperationParameterMapper
         'time'     => FHIRTime::class,
     ];
 
+    /**
+     * The FHIR `decimal` lexical form, used to tell a decimal from an arbitrary string.
+     *
+     * `decimal` is the one `value[x]` variant carried as a bare PHP string (to preserve precision),
+     * so on a polymorphic parameter it is the only string that can be typed unambiguously — but only
+     * if it actually *is* one. `'ambiguous'` on a decimal-bearing parameter remains unguessable
+     * between `valueCode` and `valueString`, and must still be refused.
+     *
+     * Copied verbatim from the `#[Regex]` on `{version}\Primitive\DecimalPrimitive::$value`, so this
+     * guard can never admit a string that the corresponding primitive wrapper would reject. Not read
+     * off that class at runtime: this is reached per value on the emit path, and resolving plus
+     * reflecting a primitive wrapper to recover a constant regex is a lot of work to avoid one
+     * literal. If the pattern changes, `DecimalPrimitive` is the other place to update.
+     *
+     * Note the exponent group places the sign inside the alternative, which makes `1e+0` and `1e-0`
+     * non-matching even though the FHIR spec pattern allows them. That is a quirk of
+     * `DecimalPrimitive`'s regex, not of this guard; being identically strict is the safe direction,
+     * because the alternative is a value this admits and the wrapper later refuses.
+     *
+     * @see https://www.hl7.org/fhir/datatypes.html#decimal
+     */
+    private const string DECIMAL_LEXICAL_FORM = '~\A(?:-?(0|[1-9][0-9]{0,17})(\.[0-9]{1,17})?([eE](0|[+\-]?[1-9][0-9]{0,9}))?)\z~';
+
     public function __construct(
         /**
          * Resolves `Parameters` and resource-typed parameters to concrete classes.
@@ -425,6 +448,29 @@ final class OperationParameterMapper
                 return $item;
             }
 
+            // One exception, and it is not a loosening: FHIR `decimal` is carried as a PHP string to
+            // preserve its lexical form (see the builtin note below), so a conformant `valueDecimal`
+            // reaches a polymorphic slot as a bare string and had no way back out — read in fine,
+            // threw on the way out. A SNOMED numeric property on `$lookup` is exactly that shape.
+            //
+            // Admitting it is unambiguous rather than a guess: of all 54 `value[x]` variants exactly
+            // one is `scalar`-kind with a `string` phpType, and it is `decimal` — `boolean` is bool
+            // and `integer` is int, and every other string-ish type (`code`, `string`, `uri`, …) is
+            // a `primitive`-kind wrapper object. So a bare string can only be the decimal variant,
+            // and only where this parameter actually declares it.
+            //
+            // Both conditions are load-bearing. Dropping the *lexical* check would re-admit the very
+            // ambiguity this arm exists to reject: `'ambiguous'` on a decimal-bearing parameter is
+            // still an unguessable `valueCode`/`valueString`, not a decimal. And a parameter whose
+            // variants exclude decimal refuses regardless of lexical form. Floats also still refuse
+            // — a float is precisely what the string carrier exists to avoid.
+            if (is_string($item)
+                && $this->hasBareStringVariant($descriptor)
+                && preg_match(self::DECIMAL_LEXICAL_FORM, $item) === 1
+            ) {
+                return $item;
+            }
+
             throw OperationMappingException::ambiguousPolymorphicValue($descriptor->name, get_debug_type($item));
         }
 
@@ -534,8 +580,22 @@ final class OperationParameterMapper
             $arguments[$descriptor->phpName] = $descriptor->isCollection() ? $values : $values[0];
         }
 
-        /** @var T */
-        return new $class(...$arguments);
+        // The descriptor says what type a parameter declares; the wire says what actually arrived.
+        // Nothing above reconciles the two, so a non-conformant body reaches the constructor and
+        // PHP raises a TypeError — which extends Error, not Exception, and so escaped every catch
+        // in this library and in its consumers. Rewrapped here so a bad request is a catchable
+        // mapping failure rather than an uncaught fatal, keeping the TypeError as $previous because
+        // its message is what names the offending argument.
+        //
+        // The catch is around this one construction, not the whole method, so a failure inside a
+        // nested `part` group is attributed to the nested class by its own recursion rather than to
+        // this one.
+        try {
+            /** @var T */
+            return new $class(...$arguments);
+        } catch (\TypeError $e) {
+            throw OperationMappingException::payloadRejectedValue($class, $e);
+        }
     }
 
     /**
@@ -562,7 +622,7 @@ final class OperationParameterMapper
             return $value;
         }
 
-        return $this->unwrapPrimitive($value);
+        return $this->unwrapPrimitive($value, $descriptor);
     }
 
     /**
@@ -571,9 +631,38 @@ final class OperationParameterMapper
      * Any primitive extensions on the wrapper are dropped here — see the class docblock. The value
      * is read off `->value` rather than cast via __toString so that a null-valued wrapper carrying
      * only extensions comes back as null rather than an empty string.
+     *
+     * ## Only `primitive`-kind types are unwrapped, and the descriptor decides
+     *
+     * The condition used to be "is an object and has a `value` property", which is structurally
+     * true of plenty of *complex* types too: `Identifier::$value` is the identifier's own value
+     * element, and `UsageContext::$value` likewise. Those were being replaced by their scalar, so
+     * every sibling element went with them — `Identifier.system` above all, which is what makes the
+     * value a namespaced identifier rather than a loose string.
+     *
+     * So the decision comes from the declared type instead of the value's shape.
+     * `valueVariantFor()` classifies each of the 54 `value[x]` variants by `propertyKind`:
+     *   - `primitive` (17: code, dateTime, uri, …) — a wrapper object; unwrap it.
+     *   - `scalar` (3: boolean, decimal, integer) — already a bare PHP value; nothing to unwrap.
+     *   - `complex` (34: Identifier, Coding, Quantity, Meta, …) — hand it back whole.
+     *
+     * Anything the table does not classify (a resource type, or `Element` with no variants) is
+     * returned untouched rather than rejected: this is the read path, and turning an unrecognised
+     * type into a hard failure here would be a behaviour change well beyond the defect. A genuine
+     * mismatch is still caught, at the payload constructor, by `buildPayload`.
+     *
+     * The descriptor is required, not optional. An optional one would let a future caller skip the
+     * guard by omission and silently restore the coercion this method exists to prevent — the whole
+     * defect was that the unwrap decision was made without consulting the declared type.
      */
-    private function unwrapPrimitive(mixed $value): mixed
+    private function unwrapPrimitive(mixed $value, FhirOperationParameter $descriptor): mixed
     {
+        $fhirType = $descriptor->type;
+
+        if ($fhirType !== null && ($this->valueVariantFor($fhirType)['kind'] ?? null) !== 'primitive') {
+            return $value;
+        }
+
         if (is_object($value) && property_exists($value, 'value')) {
             /** @var mixed $inner */
             $inner = $value->value;
@@ -725,6 +814,29 @@ final class OperationParameterMapper
     }
 
     /**
+     * Does this polymorphic parameter declare a variant that is legitimately carried as a bare string?
+     *
+     * Only `decimal` qualifies, and the check is against the parameter's *own* declared variants
+     * rather than the universal `value[x]` union — a parameter that cannot be a decimal must keep
+     * rejecting a bare string, or the fix would trade a loud failure for a silent mis-slotting.
+     *
+     * Read off the variant metadata rather than comparing `fhirType` to the literal `'decimal'`, so
+     * that if a future FHIR version adds another scalar-backed string type this admits it for the
+     * same reason instead of quietly excluding it. `scalar` + `string` is the property that makes a
+     * bare string unambiguous; `decimal` is merely today's only member.
+     */
+    private function hasBareStringVariant(FhirOperationParameter $descriptor): bool
+    {
+        foreach ($descriptor->variants ?? [] as $variant) {
+            if ($variant['propertyKind'] === 'scalar' && $variant['phpType'] === 'string') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Resolve a FHIR type code to the PHP type the `value[x]` slot expects, or null when it is a
      * PHP builtin that needs no wrapping.
      *
@@ -733,7 +845,11 @@ final class OperationParameterMapper
      * the answer from that beats a hand-maintained table: it cannot drift from the models, and it
      * follows the resolved (possibly profiled) class rather than a guessed namespace.
      *
-     * @return array{wrap: bool, phpType: string}|null null when the type is not a known value variant
+     * `kind` is the variant's `propertyKind` and is what tells a *wrapper* primitive apart from a
+     * structurally similar complex type: `primitive` unwraps to `->value`, `scalar` is already bare,
+     * and `complex` must be handed back whole. {@see unwrapPrimitive()} depends on that distinction.
+     *
+     * @return array{wrap: bool, phpType: string, kind: string}|null null when the type is not a known value variant
      */
     private function valueVariantFor(string $fhirType): ?array
     {
@@ -746,7 +862,11 @@ final class OperationParameterMapper
 
         foreach ($variants as $variant) {
             if ($variant->fhirType === $fhirType) {
-                return ['wrap' => !$variant->isBuiltin, 'phpType' => $variant->phpType];
+                return [
+                    'wrap'    => !$variant->isBuiltin,
+                    'phpType' => $variant->phpType,
+                    'kind'    => $variant->propertyKind,
+                ];
             }
         }
 

@@ -481,6 +481,7 @@ class FHIRModelGeneratorCommand extends Command
         $generator = new FHIROperationGenerator();
         $generated = 0;
         $skipped   = 0;
+        $failed    = 0;
 
         foreach ($this->context[$version]->getDefinitions() as $url => $definition) {
             if (($definition['resourceType'] ?? null) !== 'OperationDefinition') {
@@ -494,7 +495,32 @@ class FHIRModelGeneratorCommand extends Command
                 continue;
             }
 
-            $holder = $generator->generate($definition, $version, $this->context[$version]);
+            // Contained per definition, like every sibling phase. The generator is deliberately
+            // fatal on an unnamable stem, a colliding parameter name, an unresolvable polymorphic
+            // type or an unnamable part path — but an escaping throw is not survivable here: Phase 2
+            // has already deleted `Models/src/{$version}`, and Phase 6 (`outputGeneratedFiles`) is
+            // what writes it back. Aborting between the two leaves the version's whole public
+            // surface deleted until a clean regen succeeds.
+            //
+            // `addError` still trips `hasErrors()` regardless of the severity string (it appends to
+            // the same list), so `execute()` returns Command::FAILURE and a broken definition can
+            // never be silently absent from a green build. The severity is 'error' because that is
+            // what it is; it drives `getErrorsBySeverity()` and the display, not the exit code.
+            try {
+                $holder = $generator->generate($definition, $version, $this->context[$version]);
+            } catch (\Throwable $e) {
+                ++$failed;
+                $this->errorCollector->addError(
+                    sprintf('Could not generate operation "%s": %s', $definition['code'] ?? $url, $e->getMessage()),
+                    $url,
+                    'OPERATION_GENERATION_ERROR',
+                    'error',
+                    ['exception_class' => get_class($e), 'fhir_version' => $version],
+                );
+                $output->writeln("<error>Failed to generate operation from {$url}: {$e->getMessage()}</error>");
+
+                continue;
+            }
 
             // The namespace comes off the class the generator built, not from one assembled here:
             // it nests per operation (`…\Operation\CodeSystemLookup`) to match the file layout, and
@@ -509,8 +535,10 @@ class FHIRModelGeneratorCommand extends Command
         }
 
         // Reported rather than silent: "0 operations generated" and "47 operations generated" look
-        // identical in a passing build otherwise, and the count is an M02 exit criterion.
-        $output->writeln("<info>Generated {$generated} operation holders for {$version} ({$skipped} skipped).</info>");
+        // identical in a passing build otherwise, and the count is an M02 exit criterion. Failures
+        // are counted separately so a partial run is legible at a glance rather than only in the
+        // error list at the end.
+        $output->writeln("<info>Generated {$generated} operation holders for {$version} ({$skipped} skipped, {$failed} failed).</info>");
     }
 
     /**
