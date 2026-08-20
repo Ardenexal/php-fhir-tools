@@ -43,6 +43,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly NarrativeXhtmlChecker $narrativeChecker = new NarrativeXhtmlChecker(),
         private readonly PrimitiveFormatChecker $primitiveChecker = new PrimitiveFormatChecker(),
         private readonly CodingSystemChecker $codingSystemChecker = new CodingSystemChecker(),
+        private readonly BundleEntryFullUrlChecker $bundleFullUrlChecker = new BundleEntryFullUrlChecker(),
     ) {
     }
 
@@ -100,6 +101,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // needs no terminology server: both rules read the URL alone. See CodingSystemChecker.
         foreach ($this->codingSystemChecker->check($resource) as $codingViolation) {
             $violations[] = $codingViolation;
+        }
+
+        // Bundle.entry.fullUrl must be absolute. Unconditional for the same reason again, and a shape
+        // test on the URL alone — it resolves nothing, so it is independent of the reference-resolution
+        // work. See BundleEntryFullUrlChecker.
+        foreach ($this->bundleFullUrlChecker->check($resource) as $fullUrlViolation) {
+            $violations[] = $fullUrlViolation;
         }
 
         if ($this->registry !== null) {
