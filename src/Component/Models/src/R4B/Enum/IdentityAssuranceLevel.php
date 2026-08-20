@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: IdentityAssuranceLevel
  * URL: http://hl7.org/fhir/ValueSet/identity-assuranceLevel
  * Version: 4.3.0
  * Description: The level of confidence that this link represents the same actual person, based on NIST Authentication Levels.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/identity-assuranceLevel', version: '4.3.0')]
 enum IdentityAssuranceLevel: string
 {
     /** Level 1 */

@@ -1,0 +1,1099 @@
+{
+    "version": "R5",
+    "above": 4,
+    "equal": 62,
+    "below": 51,
+    "compared": 117,
+    "skipped": 39,
+    "skipsByReason": {
+        "no-oracle": 2,
+        "unreadable": 0,
+        "deserialize-threw": 34,
+        "validate-crashed": 3
+    },
+    "crashedCases": [
+        "patient-lang1",
+        "patient-lang2",
+        "patient-lang3"
+    ],
+    "wallClockSeconds": 0.11,
+    "aboveFamilies": {
+        "constraint:FHIRValueSetBinding": 3,
+        "invariant:tsk-1": 1
+    },
+    "cases": [
+        {
+            "name": "bundle-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-bad-empty",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "group-choice-bad1",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "group-choice-bad2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "group-choice-bad3",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "group-choice-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "group-minimal-tiny",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "group-minimal",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "list-contained",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "list-extension1",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "list-extension2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 4,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "list-unknown-prop",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "list-wrong-order",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "primitive-good-ws",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "list-xhtml-syntax",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 3,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "list-xhtml-xxe",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-duplicate",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-au-5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "fhirpath-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "fhirpath-bad",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "fhirpath-null",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bp",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "list-contained-bad",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 1,
+            "java": 3,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "string-extensions-and-constraints-example",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "entry-resource-bad1",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-bad",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-good-contained",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-good-typed",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-good-logical",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-bad-logical",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "reference-bad-typed",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-patternidentifier-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-patternidentifier-badmultiple",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-patternidentifier-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-patternidentifier-profile",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": true
+        },
+        {
+            "name": "patient-patternidentifierslice-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-patternidentifierslice-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-patternidentifierslice-goodmultiple",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-patternidentifierslice-profile",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": true
+        },
+        {
+            "name": "patient-conform-profile",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 1,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": true
+        },
+        {
+            "name": "patient-warning-maritalstatus",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "slice-profile-and-local-patient",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "extension-slice",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-bp-validationfails",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-bp",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-bp-bad-onlydiastolic",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-bp-localcode",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-cholesterol-good",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-cholesterol-bad-referencerangemissing",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 3,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-cholesterol-bad-referencerangehighfixedquantitywrong",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 5,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-cholesterol-bad-wrongcode",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 6,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "invariant.example",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-triglyceride-good",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-triglyceride-good2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-triglyceride-bad-wrongcode",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-contained-org",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "multi-profile-same-resource",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bad-bundle-reference-type-5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "duplicate-security-tags",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "azatadha/example-params-1",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-maxvs-base",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-maxvs-ex",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-maxvs-text",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "observation-maxvs-wrong",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 4,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-local-refs",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "demo-example-2",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 1,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "demo-example-3",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "org-home-1",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "org-home-2",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "q-bundle",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-animal-5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-url-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-url-bad",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-dupl-id-1",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-dupl-id-2",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "base64-whitespace",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-id-bad-1 / R5",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-id-bad-3 / R5",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-id-bad-2 / R5",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-url-dash",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-conditional-reference-bad",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-conditional-reference-good",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "specimendefinition-example-serum-plasma",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-decimal",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 3,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "params-ws",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-illegal-elements",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 2,
+            "java": 1,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": true
+        },
+        {
+            "name": "q-base",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "mixed-request-canonical-targets-profile",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 2,
+            "java": 0,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "unicode-control-chars-json",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ext-stds-status-normative",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 2,
+            "java": 2,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": true
+        },
+        {
+            "name": "ext-stds-status-deprecated",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 2,
+            "java": 2,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": true
+        },
+        {
+            "name": "slice-instance",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xver-immunization-r5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xver-immunization2-r5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xver-patient-r5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xver-task-r5",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [
+                "invariant:tsk-1"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "xver-parameters-r5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "narrative-binary",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": true
+        },
+        {
+            "name": "narrative-binary-bad",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 1,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": true
+        },
+        {
+            "name": "contained-canonical",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "additional-bindings-observation-1",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-vital-signs-mdc5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "profile-multiple-inv-same-key",
+            "class": "BELOW",
+            "ours": 1,
+            "oursUnfiltered": 2,
+            "java": 3,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "extension-version-restriction-range-r5",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "extension-version-restriction-range-ctxt-r5",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-duplicate-contained",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 3,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "narrative-empty",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "bundle-explicit-version-5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ref-policy-default-r5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "ref-policy-default-r4",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "sd-slices-ms",
+            "class": "ABOVE",
+            "ours": 1,
+            "oursUnfiltered": 2,
+            "java": 0,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-ig-ig",
+            "class": "EQUAL",
+            "ours": 1,
+            "oursUnfiltered": 1,
+            "java": 1,
+            "families": [
+                "constraint:FHIRValueSetBinding"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "obs-sampled-data",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "dr-bad-att-hash",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 2,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "standards-status-r5",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        }
+    ]
+}

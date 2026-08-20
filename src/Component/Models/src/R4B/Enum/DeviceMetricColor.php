@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: DeviceMetricColor
  * URL: http://hl7.org/fhir/ValueSet/metric-color
  * Version: 4.3.0
  * Description: Describes the typical color of representation.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/metric-color', version: '4.3.0')]
 enum DeviceMetricColor: string
 {
     /** Color Black */

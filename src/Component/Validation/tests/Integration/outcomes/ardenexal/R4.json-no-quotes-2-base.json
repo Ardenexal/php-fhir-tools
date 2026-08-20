@@ -1,5 +1,25 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "The JSON property 'city' has no quotes around the value of the property 'Strahan'",
+            "The JSON property 'item' has no quotes around the value of the property 'Sarah'",
+            "The JSON property 'line' has no quotes around the name of the property"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to parse JSON: Parse error on line 7:\n...given\" : [\r        Sarah\r      ]\r    \n---------------------^\nExpected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '[', ']'"
+            ]
+        },
+        "warnings": {}
+    }
 }

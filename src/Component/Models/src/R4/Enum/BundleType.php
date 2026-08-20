@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: BundleType
  * URL: http://hl7.org/fhir/ValueSet/bundle-type
  * Version: 4.0.1
  * Description: Indicates the purpose of a bundle - how it is intended to be used.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/bundle-type', version: '4.0.1')]
 enum BundleType: string
 {
     /** Document */

@@ -307,7 +307,7 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
 
         try {
             $reflection            = self::reflClass($resolvedType);
-            $object                = $reflection->newInstanceWithoutConstructor();
+            $object                = $this->instantiateWithEmptyArrays($reflection);
             $metaMap               = $this->getPropertyMetadataMap($object);
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
 
@@ -397,12 +397,23 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                         if (is_array($items) && !array_is_list($items)) {
                             $items = [$items];
                         }
+                        // The element was present yet strips to nothing — `<entry><!-- c --></entry>`
+                        // decodes to `[]` once comment nodes are dropped. That is one occurrence that
+                        // was present and empty, not zero occurrences; iterating `[]` recorded no
+                        // entry at all and lost the finding. See self::isEmptyXmlElement().
+                        if ($items === []) {
+                            $items = [''];
+                        }
                         $denormalizedValue = [];
                         foreach ((array) $items as $item) {
                             $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $context);
                         }
                     } elseif ($this->denormalizer !== null && $propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                        $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
+                        // Captured before the cardinality guard: that call is impure to PHPStan, which
+                        // would otherwise widen $this->denormalizer back to nullable.
+                        $denormalizer = $this->denormalizer;
+                        self::assertSingleValuedElement($elementName, $value, $resolvedType);
+                        $denormalizedValue = $denormalizer->denormalize($value, $propertyType, 'xml', $context);
                     } else {
                         $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
 

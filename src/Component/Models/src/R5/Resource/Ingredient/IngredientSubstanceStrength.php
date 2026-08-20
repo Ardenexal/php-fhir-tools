@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RatioRange;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The quantity of substance in the unit of presentation, or in the volume (or mass) of the single pharmaceutical product or manufactured item. The allowed repetitions do not represent different strengths, but are different representations - mathematically equivalent - of a single strength.
@@ -104,7 +105,7 @@ class IngredientSubstanceStrength extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $textConcentration = null,
         /** @var CodeableConcept|null basis A code that indicates if the strength is, for example, based on the ingredient substance as stated or on the substance base (when the ingredient is a salt) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $basis = null,
         /** @var StringPrimitive|string|null measurementPoint When strength is measured at a particular point or distance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -116,6 +117,7 @@ class IngredientSubstanceStrength extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $country = [],
         /** @var array<IngredientSubstanceStrengthReferenceStrength> referenceStrength Strength expressed in terms of a reference substance */
         #[FhirProperty(
@@ -124,6 +126,7 @@ class IngredientSubstanceStrength extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Ingredient\IngredientSubstanceStrengthReferenceStrength',
         )]
+        #[Valid]
         public array $referenceStrength = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

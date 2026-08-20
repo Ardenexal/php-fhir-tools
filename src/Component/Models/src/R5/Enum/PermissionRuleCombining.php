@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Permission Rule Combining
  * URL: http://hl7.org/fhir/ValueSet/permission-rule-combining
  * Version: 5.0.0
  * Description: Codes identifying rule combining algorithm.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/permission-rule-combining', version: '5.0.0')]
 enum PermissionRuleCombining: string
 {
     /** Deny-overrides */

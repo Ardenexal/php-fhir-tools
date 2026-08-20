@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The value '925.' is not a valid decimal"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to parse JSON: Parse error on line 22:\n...        \"value\": 925.,        \"unit\": \"\n----------------------^\nExpected one of: 'EOF', '}', ',', ']'"
+            ]
+        },
+        "warnings": {}
+    }
 }

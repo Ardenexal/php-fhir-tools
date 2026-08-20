@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Structural information.
@@ -31,10 +32,10 @@ class SubstanceDefinitionStructure extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null stereochemistry Stereochemistry type */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $stereochemistry = null,
         /** @var CodeableConcept|null opticalActivity Optical activity type */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $opticalActivity = null,
         /** @var StringPrimitive|string|null molecularFormula An expression which states the number and type of atoms present in a molecule of a substance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -43,7 +44,7 @@ class SubstanceDefinitionStructure extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $molecularFormulaByMoiety = null,
         /** @var SubstanceDefinitionMolecularWeight|null molecularWeight The molecular weight or weight range */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?SubstanceDefinitionMolecularWeight $molecularWeight = null,
         /** @var array<CodeableConcept> technique The method used to find the structure e.g. X-ray, NMR */
         #[FhirProperty(
@@ -52,6 +53,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $technique = [],
         /** @var array<Reference> sourceDocument Source of information for the structure */
         #[FhirProperty(
@@ -60,6 +62,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DocumentReference'])]
         public array $sourceDocument = [],
         /** @var array<SubstanceDefinitionStructureRepresentation> representation A depiction of the structure of the substance */
@@ -69,6 +72,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstanceDefinition\SubstanceDefinitionStructureRepresentation',
         )]
+        #[Valid]
         public array $representation = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

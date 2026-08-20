@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ActionRequiredBehavior
  * URL: http://hl7.org/fhir/ValueSet/action-required-behavior
  * Version: 4.0.1
  * Description: Defines expectations around whether an action or action group is required.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/action-required-behavior', version: '4.0.1')]
 enum ActionRequiredBehavior: string
 {
     /** Must */

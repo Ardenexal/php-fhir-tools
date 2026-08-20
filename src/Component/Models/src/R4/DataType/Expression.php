@@ -49,6 +49,7 @@ class Expression extends Element
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/expression-language',
             strength: 'extensible',
             maxValueSetUrl: 'http://www.rfc-editor.org/bcp/bcp13.txt',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ExpressionLanguage',
         )]
         public ?string $language = null,
         /** @var StringPrimitive|string|null expression Expression in specified language */

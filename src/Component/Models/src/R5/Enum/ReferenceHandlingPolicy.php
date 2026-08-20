@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Reference Handling Policy
  * URL: http://hl7.org/fhir/ValueSet/reference-handling-policy
  * Version: 5.0.0
  * Description: A set of flags that defines how references are supported.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/reference-handling-policy', version: '5.0.0')]
 enum ReferenceHandlingPolicy: string
 {
     /** Literal References */

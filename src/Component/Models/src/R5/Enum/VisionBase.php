@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Vision Base
  * URL: http://hl7.org/fhir/ValueSet/vision-base-codes
  * Version: 5.0.0
  * Description: A coded concept listing the base codes.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/vision-base-codes', version: '5.0.0')]
 enum VisionBase: string
 {
     /** Up */

@@ -36,7 +36,13 @@ class StructureMapStructure extends BackboneElement
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public ?CanonicalPrimitive $url = null,
         /** @var StructureMapModelModeType|null mode source | queried | target | produced */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-model-mode|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-model-mode|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\StructureMapModelMode',
+        )]
         public ?StructureMapModelModeType $mode = null,
         /** @var StringPrimitive|string|null alias Name for type in this map */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

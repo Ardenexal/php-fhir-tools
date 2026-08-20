@@ -1,5 +1,31 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 6,
+    "java": {
+        "errorCount": 13,
+        "warningCount": 7,
+        "infoCount": 2,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Bundle entry missing fullUrl",
+            "Canonical URLs must be absolute URLs if they are not fragment references (Library/library-EXM104-8.2.000)",
+            "Canonical URLs must be absolute URLs if they are not fragment references (Measure/measure-EXM104-8.2.000)",
+            "Experimental content is not allowed in this context",
+            "List.mode: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/List|4.0.1)",
+            "List.status: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/List|4.0.1)",
+            "Relative Reference appears inside Bundle whose entry is missing a fullUrl",
+            "Relative URLs must be of the format [ResourceName]/[id]. Encountered denom-EXM104",
+            "The contained resource '4e9ea2cf-bdfc-460f-b7a0-49f70201e177' is not referenced to from elsewhere in the containing resource nor does it refer to the containing resource (dom-3)",
+            "The extension http://hl7.org/fhir/us/core/StructureDefinition/us-core-race could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-populationBasis could not be found so is not allowed here",
+            "The fullUrl must be an absolute URL (not '1a19a371-91b8-4a1d-9bb0-e8a997baa655')",
+            "The fullUrl must be an absolute URL (not 'Patient/denom-EXM104')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

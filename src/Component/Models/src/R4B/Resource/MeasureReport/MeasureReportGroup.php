@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The results of the calculation, one for each population group in the measure.
@@ -29,7 +30,7 @@ class MeasureReportGroup extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null code Meaning of the group */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var array<MeasureReportGroupPopulation> population The populations in the group */
         #[FhirProperty(
@@ -38,9 +39,10 @@ class MeasureReportGroup extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MeasureReport\MeasureReportGroupPopulation',
         )]
+        #[Valid]
         public array $population = [],
         /** @var Quantity|null measureScore What score this group achieved */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $measureScore = null,
         /** @var array<MeasureReportGroupStratifier> stratifier Stratification results */
         #[FhirProperty(
@@ -49,6 +51,7 @@ class MeasureReportGroup extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MeasureReport\MeasureReportGroupStratifier',
         )]
+        #[Valid]
         public array $stratifier = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

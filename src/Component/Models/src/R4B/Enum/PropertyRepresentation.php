@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: PropertyRepresentation
  * URL: http://hl7.org/fhir/ValueSet/property-representation
  * Version: 4.3.0
  * Description: How a property is represented when serialized.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/property-representation', version: '4.3.0')]
 enum PropertyRepresentation: string
 {
     /** XML Attribute */

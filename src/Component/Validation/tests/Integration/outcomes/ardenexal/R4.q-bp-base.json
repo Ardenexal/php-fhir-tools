@@ -1,5 +1,35 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 1
+    "warningCount": 0,
+    "infoCount": 2,
+    "java": {
+        "errorCount": 17,
+        "warningCount": 9,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext could not be found so is not allowed here",
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-sourceQueries could not be found so is not allowed here",
+            "The extension http://standards.healthconnex.com.au/fhir/StructureDefinition/Questionnaire-hcx-css could not be found so is not allowed here",
+            "The extension http://standards.healthconnex.com.au/fhir/StructureDefinition/Questionnaire-hcx-horizontal could not be found so is not allowed here"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

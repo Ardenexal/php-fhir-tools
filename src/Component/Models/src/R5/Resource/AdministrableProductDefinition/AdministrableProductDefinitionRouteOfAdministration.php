@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The path by which the product is taken into or makes contact with the body. In some regions this is referred to as the licenced or approved route. RouteOfAdministration cannot be used when the 'formOf' product already uses MedicinalProductDefinition.route (and vice versa).
@@ -36,22 +37,22 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null code Coded expression for the route */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
         /** @var Quantity|null firstDose The first dose (dose quantity) administered can be specified for the product */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $firstDose = null,
         /** @var Quantity|null maxSingleDose The maximum single dose that can be administered */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $maxSingleDose = null,
         /** @var Quantity|null maxDosePerDay The maximum dose quantity to be administered in any one 24-h period */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $maxDosePerDay = null,
         /** @var Ratio|null maxDosePerTreatmentPeriod The maximum dose per treatment period that can be administered */
-        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex'), Valid]
         public ?Ratio $maxDosePerTreatmentPeriod = null,
         /** @var Duration|null maxTreatmentPeriod The maximum treatment period during which the product can be administered */
-        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $maxTreatmentPeriod = null,
         /** @var array<AdministrableProductDefinitionRouteOfAdministrationTargetSpecies> targetSpecies A species for which this route applies */
         #[FhirProperty(
@@ -60,6 +61,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\AdministrableProductDefinition\AdministrableProductDefinitionRouteOfAdministrationTargetSpecies',
         )]
+        #[Valid]
         public array $targetSpecies = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

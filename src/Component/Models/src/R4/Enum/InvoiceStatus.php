@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: InvoiceStatus
  * URL: http://hl7.org/fhir/ValueSet/invoice-status
  * Version: 4.0.1
  * Description: Codes identifying the lifecycle stage of an Invoice.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/invoice-status', version: '4.0.1')]
 enum InvoiceStatus: string
 {
     /** draft */

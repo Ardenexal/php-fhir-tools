@@ -11,6 +11,7 @@
         "ardenexal/fhir-models": "^0.4",
         "brick/date-time": "^0.9.0",
         "psr/cache": "^3.0",
+        "seld/jsonlint": "^1.12",
         "symfony/property-access": "^6.4|^7.4",
         "symfony/property-info": "^6.4|^7.4",
         "symfony/serializer": "^6.4|^7.4",

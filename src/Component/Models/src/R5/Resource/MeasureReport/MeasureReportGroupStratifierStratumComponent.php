@@ -15,6 +15,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A stratifier component value.
@@ -36,7 +38,7 @@ class MeasureReportGroupStratifierStratumComponent extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $linkId = null,
         /** @var CodeableConcept|null code What stratifier component of the group */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
         /** @var CodeableConcept|bool|Quantity|Range|Reference|null value The stratum component value, e.g. male */
         #[FhirProperty(
@@ -72,7 +74,7 @@ class MeasureReportGroupStratifierStratumComponent extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public CodeableConcept|bool|Quantity|Range|Reference|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

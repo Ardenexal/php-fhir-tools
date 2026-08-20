@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description Parameters to the transform.
@@ -74,7 +74,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public IdPrimitive|StringPrimitive|string|bool|int|DatePrimitive|TimePrimitive|DateTimePrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

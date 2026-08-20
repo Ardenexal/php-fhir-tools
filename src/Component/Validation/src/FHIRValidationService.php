@@ -40,6 +40,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly ?FHIRIGTypeRegistry $registry = null,
         private readonly FHIRTypeHierarchyResolverInterface $typeResolver = new FhirPropertyTypeHierarchyResolver(),
         private readonly FHIRValidationReportMapper $reportMapper = new FHIRValidationReportMapper(),
+        private readonly NarrativeXhtmlChecker $narrativeChecker = new NarrativeXhtmlChecker(),
+        private readonly PrimitiveFormatChecker $primitiveChecker = new PrimitiveFormatChecker(),
+        private readonly CodingSystemChecker $codingSystemChecker = new CodingSystemChecker(),
     ) {
     }
 
@@ -77,6 +80,26 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         $contextVisited = [];
         foreach ($this->validateExtensionContexts($resource, $this->getResourceFhirType($resource), '', [], $contextVisited, []) as $contextViolation) {
             $violations[] = $contextViolation;
+        }
+
+        // Narrative xhtml is checked here rather than by a constraint on the generated model: the
+        // txt-1/txt-2 invariants reduce to a boolean, and the reference validator reports which
+        // element or attribute is at fault alongside them. See NarrativeXhtmlChecker.
+        foreach ($this->narrativeChecker->check($resource) as $narrativeViolation) {
+            $violations[] = $narrativeViolation;
+        }
+
+        // Primitive lexemes the deserializer retained rather than aborting on. Unconditional, like
+        // the pass above: the modifier-extension walk below is gated on a registry the conformance
+        // harness never supplies, so a rule placed there would silently never run.
+        foreach ($this->primitiveChecker->check($resource) as $primitiveViolation) {
+            $violations[] = $primitiveViolation;
+        }
+
+        // Coding.system URI shape. Unconditional for the same reason as the two passes above, and
+        // needs no terminology server: both rules read the URL alone. See CodingSystemChecker.
+        foreach ($this->codingSystemChecker->check($resource) as $codingViolation) {
+            $violations[] = $codingViolation;
         }
 
         if ($this->registry !== null) {

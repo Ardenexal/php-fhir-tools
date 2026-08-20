@@ -79,6 +79,12 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        // A present-but-empty element (`<code></code>`) is an object with no children, not a missing
+        // one. Reading it as such keeps the rest of the document available; ele-1 reports it.
+        if (self::isEmptyXmlElement($data)) {
+            $data = [];
+        }
+
         if (!is_array($data)) {
             throw new NotNormalizableValueException('Expected array, got ' . gettype($data));
         }
@@ -115,7 +121,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             $isBackboneElement = !empty($reflection->getAttributes(FHIRBackboneElement::class));
             $object            = $isBackboneElement
                 ? $this->instantiateWithConstructorDefaults($reflection)
-                : $reflection->newInstanceWithoutConstructor();
+                : $this->instantiateWithEmptyArrays($reflection);
 
             $metaMap = $this->getPropertyMetadataMap($object);
 
@@ -148,8 +154,26 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
                         } else {
-                            $rawValue          = $this->unwrapXmlValue($value, $phpType);
-                            $denormalizedValue = match ($phpType) {
+                            $rawValue = $this->unwrapXmlValue($value, $phpType);
+
+                            // A choice variant the generator maps to a PHP scalar (boolean, integer,
+                            // decimal) has nowhere to put child elements, so an extension-only
+                            // occurrence — `<valueDecimal><extension url="…data-absent-reason"/></valueDecimal>`
+                            // — arrives here as the decoded array and raised "Cannot assign array to
+                            // property", aborting the document.
+                            //
+                            // The placeholder records that the element was *present*, which is the
+                            // part invariants read: `Parameters.parameter` inv-1 requires
+                            // `value.exists()`, and null would fail it on an instance the reference
+                            // validator passes. The extension itself is unrepresentable here and is
+                            // lost — closing that needs the generator to emit these three variants as
+                            // primitive wrapper classes rather than bare bool/int/string.
+                            $denormalizedValue = is_array($rawValue) ? match ($phpType) {
+                                'int'   => 0,
+                                'float' => 0.0,
+                                'bool'  => false,
+                                default => '',
+                            } : match ($phpType) {
                                 'int'   => (int) $rawValue,
                                 'float' => (float) $rawValue,
                                 'bool'  => filter_var($rawValue, FILTER_VALIDATE_BOOLEAN),
@@ -200,6 +224,11 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         if (is_array($items) && !array_is_list($items)) {
                             $items = [$items];
                         }
+                        // Present yet strips to nothing: one occurrence that was empty, not zero.
+                        // See self::isEmptyXmlElement().
+                        if ($items === []) {
+                            $items = [''];
+                        }
                         $denormalizedValue = [];
                         foreach ((array) $items as $item) {
                             /** @var class-string $phpItemClass */
@@ -220,7 +249,11 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     } else {
                         $propertyType = $this->getPropertyType($property);
                         if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                            $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
+                            // Captured before the cardinality guard: that call is impure to PHPStan,
+                            // which would otherwise widen $this->denormalizer back to nullable.
+                            $denormalizer = $this->denormalizer;
+                            self::assertSingleValuedElement($elementName, $value, $resolvedType);
+                            $denormalizedValue = $denormalizer->denormalize($value, $propertyType, 'xml', $context);
                         } else {
                             $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
                             if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {
@@ -253,7 +286,9 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             return false;
         }
 
-        if (!is_array($data)) {
+        // An empty element still claims its complex type: refusing it here left Symfony with no
+        // normalizer at all and aborted the whole document. See self::isEmptyXmlElement().
+        if (!is_array($data) && !self::isEmptyXmlElement($data)) {
             return false;
         }
 

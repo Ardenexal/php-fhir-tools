@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: RequestIntent
  * URL: http://hl7.org/fhir/ValueSet/request-intent
  * Version: 4.3.0
  * Description: Codes indicating the degree of authority/intentionality associated with a request.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/request-intent', version: '4.3.0')]
 enum RequestIntent: string
 {
     /** Proposal */
@@ -23,6 +26,18 @@ enum RequestIntent: string
 
     /** Order */
     case order = 'order';
+
+    /** Original Order */
+    case originalorder = 'original-order';
+
+    /** Reflex Order */
+    case reflexorder = 'reflex-order';
+
+    /** Filler Order */
+    case fillerorder = 'filler-order';
+
+    /** Instance Order */
+    case instanceorder = 'instance-order';
 
     /** Option */
     case option = 'option';

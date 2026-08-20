@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description This element is used to list authors and other contributors, their contact information, specific contributions, and summary statements.
@@ -36,6 +37,7 @@ class CitationCitedArtifactContributorship extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Citation\CitationCitedArtifactContributorshipEntry',
         )]
+        #[Valid]
         public array $entry = [],
         /** @var array<CitationCitedArtifactContributorshipSummary> summary Used to record a display of the author/contributor list without separate data element for each list member */
         #[FhirProperty(
@@ -44,6 +46,7 @@ class CitationCitedArtifactContributorship extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Citation\CitationCitedArtifactContributorshipSummary',
         )]
+        #[Valid]
         public array $summary = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

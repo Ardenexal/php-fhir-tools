@@ -33,7 +33,7 @@ class BooleanPrimitive extends PrimitiveType implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var bool|null value Primitive value for boolean */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Boolean', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: 'true|false')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Boolean', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '~\A(?:true|false)\z~')]
         public ?bool $value = null,
     ) {
         parent::__construct($id, $extension);

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: TestReportResult
  * URL: http://hl7.org/fhir/ValueSet/report-result-codes
  * Version: 4.0.1
  * Description: The reported execution result.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/report-result-codes', version: '4.0.1')]
 enum TestReportResult: string
 {
     /** Pass */

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Consent State
  * URL: http://hl7.org/fhir/ValueSet/consent-state-codes
  * Version: 5.0.0
  * Description: Indicates the state of the consent.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/consent-state-codes', version: '5.0.0')]
 enum ConsentState: string
 {
     /** Pending */

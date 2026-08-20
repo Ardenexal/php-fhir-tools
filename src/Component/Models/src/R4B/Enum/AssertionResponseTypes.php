@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: AssertionResponseTypes
  * URL: http://hl7.org/fhir/ValueSet/assert-response-code-types
  * Version: 4.3.0
  * Description: The type of response code to use for assertion.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/assert-response-code-types', version: '4.3.0')]
 enum AssertionResponseTypes: string
 {
     /** okay */

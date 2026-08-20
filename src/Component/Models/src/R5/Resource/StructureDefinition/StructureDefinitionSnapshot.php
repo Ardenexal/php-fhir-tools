@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinition;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A snapshot view is expressed in a standalone form that can be used and interpreted without considering the base StructureDefinition.
@@ -46,6 +47,7 @@ use Symfony\Component\Validator\Constraints\Count;
     severity: 'warning',
     expression: '$this.where(element[0].mustSupport=\'true\').exists().not()',
     human: 'The root element of a profile should not have mustSupport = true',
+    bestPractice: true,
 )]
 #[FHIRPathInvariant(
     key: 'sdf-8b',
@@ -73,6 +75,7 @@ class StructureDefinitionSnapshot extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinition',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $element = [],
     ) {

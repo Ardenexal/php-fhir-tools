@@ -1,5 +1,20 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 0
+    "warningCount": 0,
+    "infoCount": 4,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 2,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Canonical URLs must be absolute URLs if they are not fragment references (Library/library-cms146-example)",
+            "No CQL Libraries found on this Measure"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

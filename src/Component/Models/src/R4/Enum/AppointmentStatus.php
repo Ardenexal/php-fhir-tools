@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: AppointmentStatus
  * URL: http://hl7.org/fhir/ValueSet/appointmentstatus
  * Version: 4.0.1
  * Description: The free/busy status of an appointment.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/appointmentstatus', version: '4.0.1')]
 enum AppointmentStatus: string
 {
     /** Proposed */

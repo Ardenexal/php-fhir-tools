@@ -40,13 +40,24 @@ class StartsWithFunction extends AbstractFunction
         if ($evaluator === null) {
             throw new EvaluationException('Evaluator not available in context');
         }
-        $prefixResult = $evaluator->evaluate($prefixExpr, $context);
+        // Evaluate the argument against the CURRENT NODE, passing the context separately.
+        // `evaluate()` takes (expression, resource, context) — the widespread
+        // `evaluate($expr, $context)` idiom accidentally supplies the context object as the resource.
+        // That is harmless for literal arguments but breaks any argument that navigates: in sdf-8a,
+        // `path.startsWith(%resource.type)` resolved `%resource` against an EvaluationContext, got
+        // nothing, and answered false — flagging valid StructureDefinitions.
+        $prefixResult = $evaluator->evaluate($prefixExpr, $context->getCurrentNode(), $context);
 
         if ($prefixResult->isEmpty()) {
             return Collection::single(false);
         }
 
-        $prefix = $prefixResult->first();
+        // Normalize the prefix exactly as the input is normalized above. Navigating to a FHIR
+        // primitive yields a typed wrapper rather than a bare string, so an un-normalized prefix
+        // fails is_string() and the function silently answers false. That is how
+        // `element.first().path.startsWith(%resource.type)` in sdf-8a reported
+        // 'Device.identifier'.startsWith('Device') as false and flagged valid StructureDefinitions.
+        $prefix = $context->normalizeValue($prefixResult->first());
         if (!is_string($prefix)) {
             return Collection::single(false);
         }

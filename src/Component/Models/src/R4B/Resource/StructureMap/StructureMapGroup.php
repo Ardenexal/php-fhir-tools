@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Organizes the mapping into manageable chunks for human review/ease of maintenance.
@@ -39,7 +40,13 @@ class StructureMapGroup extends BackboneElement
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $extends = null,
         /** @var StructureMapGroupTypeModeType|null typeMode none | types | type-and-types */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-group-type-mode|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-group-type-mode|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\StructureMapGroupTypeMode',
+        )]
         public ?StructureMapGroupTypeModeType $typeMode = null,
         /** @var StringPrimitive|string|null documentation Additional description/explanation for group */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -52,6 +59,7 @@ class StructureMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\StructureMap\StructureMapGroupInput',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $input = [],
         /** @var array<StructureMapGroupRule> rule Transform Rule from source to target */
@@ -62,6 +70,7 @@ class StructureMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\StructureMap\StructureMapGroupRule',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $rule = [],
     ) {

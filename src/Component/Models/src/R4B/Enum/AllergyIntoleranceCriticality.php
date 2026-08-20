@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: AllergyIntoleranceCriticality
  * URL: http://hl7.org/fhir/ValueSet/allergy-intolerance-criticality
  * Version: 4.3.0
  * Description: Estimate of the potential clinical harm, or seriousness, of a reaction to an identified substance.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-criticality', version: '4.3.0')]
 enum AllergyIntoleranceCriticality: string
 {
     /** Low Risk */

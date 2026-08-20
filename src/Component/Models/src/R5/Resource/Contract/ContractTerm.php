@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description One or more Contract Provisions, which may be related and conveyed as a group, and may contain nested groups.
@@ -35,13 +36,13 @@ class ContractTerm extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Identifier|null identifier Contract Term Number */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var DateTimePrimitive|null issued Contract Term Issue Date Time */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $issued = null,
         /** @var Period|null applies Contract Term Effective Time */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $applies = null,
         /** @var CodeableConcept|Reference|null topic Term Concern */
         #[FhirProperty(
@@ -66,10 +67,10 @@ class ContractTerm extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public CodeableConcept|Reference|null $topic = null,
         /** @var CodeableConcept|null type Contract Term Type or Form */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null subType Contract Term Type specific classification */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $subType = null,
         /** @var StringPrimitive|string|null text Term Statement */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -81,9 +82,10 @@ class ContractTerm extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Contract\ContractTermSecurityLabel',
         )]
+        #[Valid]
         public array $securityLabel = [],
         /** @var ContractTermOffer|null offer Context of the Contract term */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isRequired: true), Valid, NotBlank]
         public ?ContractTermOffer $offer = null,
         /** @var array<ContractTermAsset> asset Contract Term Asset List */
         #[FhirProperty(
@@ -92,6 +94,7 @@ class ContractTerm extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Contract\ContractTermAsset',
         )]
+        #[Valid]
         public array $asset = [],
         /** @var array<ContractTermAction> action Entity being ascribed responsibility */
         #[FhirProperty(
@@ -100,6 +103,7 @@ class ContractTerm extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Contract\ContractTermAction',
         )]
+        #[Valid]
         public array $action = [],
         /** @var array<ContractTerm> group Nested Contract Term Group */
         #[FhirProperty(
@@ -108,6 +112,7 @@ class ContractTerm extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Contract\ContractTerm',
         )]
+        #[Valid]
         public array $group = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

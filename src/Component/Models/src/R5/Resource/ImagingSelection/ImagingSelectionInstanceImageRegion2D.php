@@ -32,7 +32,13 @@ class ImagingSelectionInstanceImageRegion2D extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var ImagingSelection2DGraphicTypeType|null regionType point | polyline | interpolated | circle | ellipse */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/imagingselection-2dgraphictype|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/imagingselection-2dgraphictype|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ImagingSelection2DGraphicType',
+        )]
         public ?ImagingSelection2DGraphicTypeType $regionType = null,
         /** @var array<numeric-string> coordinate Specifies the coordinates that define the image region */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true, isRequired: true), Count(min: 1)]

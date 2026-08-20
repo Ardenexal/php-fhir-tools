@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Contract Term Asset List.
@@ -35,7 +36,7 @@ class ContractTermAsset extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null scope Range of asset */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $scope = null,
         /** @var array<CodeableConcept> type Asset category */
         #[FhirProperty(
@@ -44,6 +45,7 @@ class ContractTermAsset extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $type = [],
         /** @var array<Reference> typeReference Associated entities */
         #[FhirProperty(
@@ -52,6 +54,7 @@ class ContractTermAsset extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $typeReference = [],
         /** @var array<CodeableConcept> subtype Asset sub-category */
@@ -61,9 +64,16 @@ class ContractTermAsset extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $subtype = [],
         /** @var Coding|null relationship Kinship of the asset */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-content-class', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-content-class',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConsentContentClass',
+        )]
         public ?Coding $relationship = null,
         /** @var array<ContractTermAssetContext> context Circumstance of the asset */
         #[FhirProperty(
@@ -72,6 +82,7 @@ class ContractTermAsset extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Contract\ContractTermAssetContext',
         )]
+        #[Valid]
         public array $context = [],
         /** @var StringPrimitive|string|null condition Quality desctiption of asset */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -83,6 +94,7 @@ class ContractTermAsset extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $periodType = [],
         /** @var array<Period> period Time period of the asset */
         #[FhirProperty(
@@ -91,6 +103,7 @@ class ContractTermAsset extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
         )]
+        #[Valid]
         public array $period = [],
         /** @var array<Period> usePeriod Time period */
         #[FhirProperty(
@@ -99,6 +112,7 @@ class ContractTermAsset extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
         )]
+        #[Valid]
         public array $usePeriod = [],
         /** @var StringPrimitive|string|null text Asset clause or question text */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -118,6 +132,7 @@ class ContractTermAsset extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Contract\ContractTermOfferAnswer',
         )]
+        #[Valid]
         public array $answer = [],
         /** @var array<UnsignedIntPrimitive> securityLabelNumber Asset restriction numbers */
         #[FhirProperty(
@@ -134,6 +149,7 @@ class ContractTermAsset extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Contract\ContractTermAssetValuedItem',
         )]
+        #[Valid]
         public array $valuedItem = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

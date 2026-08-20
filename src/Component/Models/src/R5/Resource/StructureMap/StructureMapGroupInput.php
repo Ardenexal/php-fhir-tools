@@ -38,7 +38,13 @@ class StructureMapGroupInput extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $type = null,
         /** @var StructureMapInputModeType|null mode source | target */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-input-mode|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-input-mode|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\StructureMapInputMode',
+        )]
         public ?StructureMapInputModeType $mode = null,
         /** @var StringPrimitive|string|null documentation Documentation for this instance of data */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

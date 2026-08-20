@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description This element contains the results for a single stratum within the stratifier. For example, when stratifying on administrative gender, there will be four strata, one for each possible gender value.
@@ -29,7 +30,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null value The stratum value, e.g. male */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $value = null,
         /** @var array<MeasureReportGroupStratifierStratumComponent> component Stratifier component values */
         #[FhirProperty(
@@ -38,6 +39,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MeasureReport\MeasureReportGroupStratifierStratumComponent',
         )]
+        #[Valid]
         public array $component = [],
         /** @var array<MeasureReportGroupStratifierStratumPopulation> population Population results in this stratum */
         #[FhirProperty(
@@ -46,9 +48,10 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MeasureReport\MeasureReportGroupStratifierStratumPopulation',
         )]
+        #[Valid]
         public array $population = [],
         /** @var Quantity|null measureScore What score this stratum achieved */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $measureScore = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

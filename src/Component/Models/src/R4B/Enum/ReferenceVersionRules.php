@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ReferenceVersionRules
  * URL: http://hl7.org/fhir/ValueSet/reference-version-rules
  * Version: 4.3.0
  * Description: Whether a reference needs to be version specific or version independent, or whether either can be used.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/reference-version-rules', version: '4.3.0')]
 enum ReferenceVersionRules: string
 {
     /** Either Specific or independent */

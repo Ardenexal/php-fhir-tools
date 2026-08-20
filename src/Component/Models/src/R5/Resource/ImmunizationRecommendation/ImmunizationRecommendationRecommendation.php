@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Vaccine administration recommendations.
@@ -50,6 +51,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $vaccineCode = [],
         /** @var array<CodeableConcept> targetDisease Disease to be immunized against */
         #[FhirProperty(
@@ -58,6 +60,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $targetDisease = [],
         /** @var array<CodeableConcept> contraindicatedVaccineCode Vaccine which is contraindicated to fulfill the recommendation */
         #[FhirProperty(
@@ -66,9 +69,10 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $contraindicatedVaccineCode = [],
         /** @var CodeableConcept|null forecastStatus Vaccine recommendation status */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRIsModifier(reason: 'This element is labeled as a modifier because the forecastStatus indicates whether a patient needs additional doses (due, overdue, etc.) or not  (contraindicated, complete, etc.).')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRIsModifier(reason: 'This element is labeled as a modifier because the forecastStatus indicates whether a patient needs additional doses (due, overdue, etc.) or not  (contraindicated, complete, etc.).')]
         public ?CodeableConcept $forecastStatus = null,
         /** @var array<CodeableConcept> forecastReason Vaccine administration status reason */
         #[FhirProperty(
@@ -77,6 +81,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $forecastReason = [],
         /** @var array<ImmunizationRecommendationRecommendationDateCriterion> dateCriterion Dates governing proposed immunization */
         #[FhirProperty(
@@ -85,6 +90,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImmunizationRecommendation\ImmunizationRecommendationRecommendationDateCriterion',
         )]
+        #[Valid]
         public array $dateCriterion = [],
         /** @var MarkdownPrimitive|null description Protocol details */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -105,6 +111,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Immunization',
             'http://hl7.org/fhir/StructureDefinition/ImmunizationEvaluation',
@@ -117,6 +124,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $supportingPatientInformation = [],
     ) {

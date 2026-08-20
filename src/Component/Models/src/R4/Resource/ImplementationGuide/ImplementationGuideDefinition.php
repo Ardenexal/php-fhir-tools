@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The information needed by an IG publisher tool to publish the whole implementation guide.
@@ -41,6 +42,7 @@ class ImplementationGuideDefinition extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ImplementationGuide\ImplementationGuideDefinitionGrouping',
         )]
+        #[Valid]
         public array $grouping = [],
         /** @var array<ImplementationGuideDefinitionResource> resource Resource in the implementation guide */
         #[FhirProperty(
@@ -50,10 +52,11 @@ class ImplementationGuideDefinition extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ImplementationGuide\ImplementationGuideDefinitionResource',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $resource = [],
         /** @var ImplementationGuideDefinitionPage|null page Page/Section in the Guide */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ImplementationGuideDefinitionPage $page = null,
         /** @var array<ImplementationGuideDefinitionParameter> parameter Defines how IG is built by tools */
         #[FhirProperty(
@@ -62,6 +65,7 @@ class ImplementationGuideDefinition extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ImplementationGuide\ImplementationGuideDefinitionParameter',
         )]
+        #[Valid]
         public array $parameter = [],
         /** @var array<ImplementationGuideDefinitionTemplate> template A template for building resources */
         #[FhirProperty(
@@ -70,6 +74,7 @@ class ImplementationGuideDefinition extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ImplementationGuide\ImplementationGuideDefinitionTemplate',
         )]
+        #[Valid]
         public array $template = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

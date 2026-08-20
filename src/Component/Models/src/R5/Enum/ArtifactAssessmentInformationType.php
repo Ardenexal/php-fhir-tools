@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Artifact Assessment Information Type
  * URL: http://hl7.org/fhir/ValueSet/artifactassessment-information-type
  * Version: 5.0.0
  * Description: The type of information contained in a component of an artifact assessment.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/artifactassessment-information-type', version: '5.0.0')]
 enum ArtifactAssessmentInformationType: string
 {
     /** Comment */

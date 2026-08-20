@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A concept from the target value set that this concept maps to.
@@ -45,7 +46,14 @@ class ConceptMapGroupElementTarget extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $display = null,
         /** @var ConceptMapEquivalenceType|null equivalence relatedto | equivalent | equal | wider | subsumes | narrower | specializes | inexact | unmatched | disjoint */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-equivalence|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'Some of the values mean that there is no mapping from the source to the target, particularly \'disjoint\', and the mapping cannot be interpreted without knowing this value as it could mean the elements are equivalent, totally mismatched or anything in between')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-equivalence|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ConceptMapEquivalence',
+        )]
+        #[FHIRIsModifier(reason: 'Some of the values mean that there is no mapping from the source to the target, particularly \'disjoint\', and the mapping cannot be interpreted without knowing this value as it could mean the elements are equivalent, totally mismatched or anything in between')]
         public ?ConceptMapEquivalenceType $equivalence = null,
         /** @var StringPrimitive|string|null comment Description of status/issues in mapping */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -57,6 +65,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ConceptMap\ConceptMapGroupElementTargetDependsOn',
         )]
+        #[Valid]
         public array $dependsOn = [],
         /** @var array<ConceptMapGroupElementTargetDependsOn> product Other concepts that this mapping also produces */
         #[FhirProperty(
@@ -65,6 +74,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ConceptMap\ConceptMapGroupElementTargetDependsOn',
         )]
+        #[Valid]
         public array $product = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

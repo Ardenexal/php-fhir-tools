@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: S P D X License
  * URL: http://hl7.org/fhir/ValueSet/spdx-license
  * Version: 5.0.0
  * Description: The license that applies to an Implementation Guide (using an SPDX license Identifiers, or 'not-open-source'). The binding is required but new SPDX license Identifiers are allowed to be used (https://spdx.org/licenses/).
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/spdx-license', version: '5.0.0')]
 enum SPDXLicense: string
 {
     /** Not open source */

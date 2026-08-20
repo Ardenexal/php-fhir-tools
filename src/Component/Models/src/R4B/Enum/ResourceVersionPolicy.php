@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ResourceVersionPolicy
  * URL: http://hl7.org/fhir/ValueSet/versioning-policy
  * Version: 4.3.0
  * Description: How the system supports versioning for a resource.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/versioning-policy', version: '4.3.0')]
 enum ResourceVersionPolicy: string
 {
     /** No VersionId Support */
