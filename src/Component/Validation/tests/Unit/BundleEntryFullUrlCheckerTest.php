@@ -17,8 +17,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The message text is copied from the Java reference outcome in
- * `outcomes/java/R4.bundle-duplicate-ids-not-base.json`, so a drift in our wording fails here rather
- * than quietly turning a matching case into a differently worded one.
+ * vendor/fhir/fhir-test-cases/validator/outcomes/java/R4.bundle-duplicate-ids-not-base.json, so a drift
+ * in our wording fails here rather than quietly turning a matching case into a differently worded one.
  */
 final class BundleEntryFullUrlCheckerTest extends TestCase
 {
