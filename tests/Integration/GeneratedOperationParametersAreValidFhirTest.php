@@ -43,27 +43,21 @@ use Symfony\Component\Validator\Validation;
  * both directions passes an identity check perfectly. Only an independent conformance judgement — the
  * validator, reading the invariants published on the model — can say the wire format is legal.
  *
- * ## This test walks the tree itself, because the validation service does not
+ * ## The service walks the tree, so this test no longer does
  *
- * `FHIRValidationService::validate()` delegates to Symfony's validator, which descends into nested
- * objects **only** where a property carries `#[Assert\Valid]`. No generated model carries it, so every
- * invariant declared on a backbone element — including `Parameters.parameter`'s `inv-1`, the one that
- * governs everything this mapper emits — is never evaluated when a resource is validated as a whole.
+ * It used to. `FHIRValidationService::validate()` delegates to Symfony's validator, which descends into
+ * nested objects **only** where a property carries `Assert\Valid`, and no generated model carried it —
+ * so every invariant declared on a backbone element, including `Parameters.parameter`'s `inv-1`, the one
+ * that governs everything this mapper emits, went unevaluated when a resource was validated as a whole
+ * (M03 note N8: 117 / 123 / 179 dead declarations in R4 / R4B / R5). This file compensated with a
+ * `parameterNodes()` walk that re-rooted each nested parameter and validated it directly.
  *
- * That was measured, not assumed (M03 note N8). The same invalid `ParametersParameter` reports **zero**
- * errors nested inside a `ParametersResource` and **one** error when passed as the validation root, and
- * the split reproduces through the production DI container as well as here. 117 / 123 / 179 invariant
- * declarations in R4 / R4B / R5 are dead for the same reason.
+ * `FHIRModelGenerator` now emits the cascade, so that workaround is deleted and `collectErrors()` hands
+ * the root resource to the service and nothing else. The guard below is what proves the deletion was
+ * safe rather than merely quiet: it constructs an `inv-1`-violating nested parameter and requires the
+ * violation to surface from a single root-level `validate()` call.
  *
- * So `validateEveryNode()` below re-roots each nested parameter and validates it directly. That is a
- * workaround, deliberately scoped to this test rather than fixed here: the real fix is either emitting
- * `#[Assert\Valid]` from `FHIRModelGenerator` or giving the service its own recursive walk, both of
- * which are `Validation` changes with blast radius far beyond operations. Backlogged under
- * "Nested-element invariants are never evaluated".
- *
- * **If that fix lands, this test should keep passing and its traversal can be deleted.**
- *
- * @see self::testTheTraversalReachesNestedParametersAndWouldFailOnAnInvalidOne — the guard that stops
+ * @see self::testTheValidatorReachesNestedParametersAndWouldFailOnAnInvalidOne — the guard that stops
  *      this whole file from silently becoming vacuous, which is exactly what it did on first write
  */
 final class GeneratedOperationParametersAreValidFhirTest extends TestCase
@@ -92,7 +86,7 @@ final class GeneratedOperationParametersAreValidFhirTest extends TestCase
     {
         $parameters = $this->mapper($version)->toParameters($this->populatedLookupOutput($version));
 
-        $this->assertEveryNodeValid($version, $parameters, 'CodeSystemLookupOutput');
+        $this->assertEmittedParametersValid($version, $parameters, 'CodeSystemLookupOutput');
     }
 
     /**
@@ -105,21 +99,24 @@ final class GeneratedOperationParametersAreValidFhirTest extends TestCase
     public function testTypedInputsEmitValidParameters(string $version): void
     {
         foreach ($this->inputCases($version) as $label => $payload) {
-            $this->assertEveryNodeValid($version, $this->mapper($version)->toParameters($payload), $label);
+            $this->assertEmittedParametersValid($version, $this->mapper($version)->toParameters($payload), $label);
         }
     }
 
     /**
-     * The guard: prove the traversal actually reaches nested parameters.
+     * The guard: prove the validator actually reaches nested parameters.
      *
      * Without this, every assertion above passes both when the emitted output is valid **and** when
      * the validator never looked at it — and the second is what actually happened on first write. This
      * is M02 note N28's weakest proof shape, caught in the act. `inv-1` ("a parameter must have one and
      * only one of value, resource, part") is violated by a parameter carrying none of the three, which
      * is unreachable through the mapper and so has to be constructed directly.
+     *
+     * Since the `Assert\Valid` cascade landed this is also the pin on that cascade reaching operation
+     * payloads: it fails if the emission is ever dropped from `Parameters.parameter`.
      */
     #[DataProvider('versions')]
-    public function testTheTraversalReachesNestedParametersAndWouldFailOnAnInvalidOne(string $version): void
+    public function testTheValidatorReachesNestedParametersAndWouldFailOnAnInvalidOne(string $version): void
     {
         $parametersClass = $this->mapper($version)->parametersResourceClass();
 
@@ -137,8 +134,9 @@ final class GeneratedOperationParametersAreValidFhirTest extends TestCase
         $violations = $this->collectErrors($version, $subject);
 
         self::assertNotSame([], $violations, sprintf(
-            'The self-traversal did not reach the nested parameter in %s. Every other assertion in this '
-            . 'file is therefore vacuous — they would pass on invalid output too.',
+            'The validator did not reach the nested parameter in %s — check that `Parameters.parameter` '
+            . 'still carries `Assert\Valid`. Every other assertion in this file is otherwise vacuous: '
+            . 'they would pass on invalid output too.',
             $version,
         ));
 
@@ -153,7 +151,7 @@ final class GeneratedOperationParametersAreValidFhirTest extends TestCase
     /**
      * Assert an emitted `Parameters` and every node beneath it is error-free.
      */
-    private function assertEveryNodeValid(string $version, object $parameters, string $label): void
+    private function assertEmittedParametersValid(string $version, object $parameters, string $label): void
     {
         $errors = $this->collectErrors($version, $parameters);
 
@@ -176,59 +174,15 @@ final class GeneratedOperationParametersAreValidFhirTest extends TestCase
     }
 
     /**
-     * Validate a resource and, separately, every `parameter` node beneath it at any depth.
+     * Validate a resource, relying on the service to descend into every nested `parameter` itself.
      *
      * @return list<object> violations at error severity
      */
     private function collectErrors(string $version, object $resource): array
     {
         $service = $this->service($version);
-        $errors  = $service->validate($resource)->errors();
 
-        foreach ($this->parameterNodes($resource) as $node) {
-            foreach ($service->validate($node)->errors() as $violation) {
-                $errors[] = $violation;
-            }
-        }
-
-        return array_values($errors);
-    }
-
-    /**
-     * Every `Parameters.parameter` node beneath a resource, at any depth, including `part[]`.
-     *
-     * @return list<object>
-     */
-    private function parameterNodes(object $resource): array
-    {
-        $nodes = [];
-
-        $walk = static function(object $node) use (&$walk, &$nodes): void {
-            foreach (['parameter', 'part'] as $property) {
-                if (!property_exists($node, $property)) {
-                    continue;
-                }
-
-                $children = $node->{$property};
-
-                if (!is_array($children)) {
-                    continue;
-                }
-
-                foreach ($children as $child) {
-                    if (!is_object($child)) {
-                        continue;
-                    }
-
-                    $nodes[] = $child;
-                    $walk($child);
-                }
-            }
-        };
-
-        $walk($resource);
-
-        return $nodes;
+        return array_values($service->validate($resource)->errors());
     }
 
     private function mapper(string $version): OperationParameterMapper
