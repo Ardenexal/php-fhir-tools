@@ -110,6 +110,23 @@ class GenerationException extends \Exception
      *
      * @return self
      */
+    /**
+     * Create exception for an OperationDefinition that cannot yield legal PHP identifiers.
+     *
+     * Deliberately fatal rather than skip-and-continue: a generator that silently drops one of two
+     * colliding names produces output that looks complete. See
+     * `.goat-flow/learning-loop/footguns/valueset-enum-case-naming.md`.
+     *
+     * @param string $reason What could not be derived, and from what
+     */
+    public static function operationNamingFailed(string $reason): self
+    {
+        return new self(
+            "Operation code generation failed: {$reason}",
+            ['reason' => $reason],
+        );
+    }
+
     public static function enumGenerationFailed(string $code, string $reason): self
     {
         return new self(

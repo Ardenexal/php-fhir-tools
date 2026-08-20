@@ -13,11 +13,14 @@ use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRUnreadableDocument
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRBackboneElementJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractOperationPayloadNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRComplexTypeJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIROperationPayloadJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRPrimitiveTypeJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRResourceJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRBackboneElementXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRComplexTypeXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIROperationPayloadXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRPrimitiveTypeXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRResourceXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Xml\XmlDoctypeGuard;
@@ -82,6 +85,12 @@ class FHIRSerializationService
         $typeResolver      = new FHIRTypeResolver(igTypeRegistry: $registry, fhirVersion: $version->value);
 
         $normalizers = [
+            // Operation payloads first. They carry no #[FhirResource], so nothing else in this chain
+            // claims them and a generic normalizer would accept one and map a `Parameters` body onto
+            // constructor arguments it has no keys for — producing an object with every property
+            // null, silently.
+            new FHIROperationPayloadJsonNormalizer($metadataExtractor, $typeResolver, version: $version->value, igTypeRegistry: $registry),
+            new FHIROperationPayloadXmlNormalizer($metadataExtractor, $typeResolver, version: $version->value, igTypeRegistry: $registry),
             new FHIRResourceJsonNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
             new FHIRResourceXmlNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
             new FHIRComplexTypeJsonNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
@@ -142,9 +151,29 @@ class FHIRSerializationService
         }
     }
 
+    /**
+     * The XML root element name for an object about to be serialized.
+     *
+     * FHIR requires the root element to be the resource type. `XmlEncoder` otherwise falls back to
+     * its own default (`<response>`), which is not valid FHIR — and silently so, because the element
+     * *contents* are correct.
+     *
+     * Operation payloads need explicit handling: they carry no `#[FhirResource]`, so the metadata
+     * extractor rightly reports no resource type for them. What actually reaches the encoder is the
+     * `Parameters` resource the payload normalizer maps them to, so that is the root name. Reading
+     * the object here rather than the emitted document is what makes this a lookup instead of a
+     * second serialization pass.
+     */
     private function extractResourceTypeFromObject(object $fhirObject): ?string
     {
-        return $this->metadataExtractor->extractResourceType($fhirObject);
+        $resourceType = $this->metadataExtractor->extractResourceType($fhirObject);
+
+        if ($resourceType !== null) {
+            return $resourceType;
+        }
+
+        // A profiled `Parameters` is still `Parameters` on the wire, so the literal is safe here.
+        return AbstractOperationPayloadNormalizer::isOperationPayload($fhirObject) ? 'Parameters' : null;
     }
 
     /**

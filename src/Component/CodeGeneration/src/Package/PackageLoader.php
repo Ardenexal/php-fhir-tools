@@ -333,6 +333,7 @@ class PackageLoader
                         break;
                     case 'ValueSet':
                     case 'CodeSystem':
+                    case 'OperationDefinition':
                         $this->contextBuilder->addDefinition($json['url'], $json);
                         $structureDefinitions[$json['url']] = $json;
                         ++$loadedCount;

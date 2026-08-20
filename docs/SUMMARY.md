@@ -13,6 +13,7 @@
 * [Overview](code-generation/overview.md)
 * [Generating Base FHIR Models](code-generation/base-models.md)
 * [Generating Implementation Guides](code-generation/implementation-guides.md)
+* [Generating Operation Classes](code-generation/operations.md)
 * [Generated Output Structure](code-generation/output-structure.md)
 
 ## Models
@@ -28,6 +29,7 @@
 * [XML Serialization](serialization/xml.md)
 * [Configuring Serialization Behavior](serialization/context.md)
 * [Serializing IG Extensions & Profiles](serialization/ig-aware.md)
+* [Operations & the Parameters Mapping](serialization/operations.md)
 
 ## Validation
 
