@@ -32,7 +32,7 @@
         "nette/php-generator": "^4.2.1",
         "psr/cache": "^3.0",
         "psr/http-client": "^1.0",
-        "seld/jsonlint": "^1.12",
+        "seld/jsonlint": "^1.12.1",
         "symfony/config": "^6.4|^7.4",
         "symfony/console": "^6.4|^7.4",
         "symfony/dependency-injection": "^6.4|^7.4",
@@ -50,6 +50,7 @@
         "symfony/yaml": "^6.4|^7.4"
     },
     "require-dev": {
+        "blundergoat/gruff-php": "^0.5.2",
         "brianium/paratest": "^7.20",
         "fhir/fhir-test-cases": "1.7.49",
         "giorgiosironi/eris": "^1.0",
