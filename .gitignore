@@ -9,8 +9,16 @@ Thumbs.db
 # Internal tool configs
 .kiro/
 .claude/
-.goat-flow/
 .gruff-cache/
+
+# goat-flow is deliberately NOT ignored here: the .goat-flow/ pointers in
+# CLAUDE.md and AGENTS.md have to resolve for anyone who clones the repo.
+# .goat-flow/.gitignore decides what is publishable and is default-deny, so
+# session logs, plan contents, the scratchpad, the audit cache, and install
+# state all stay local. Rules cannot be added here to override it: git gives a
+# deeper .gitignore precedence over its parents. .goat-flow/hooks/ is therefore
+# tracked and executable - review any pull request that touches it before
+# checking the branch out, and see .github/CODEOWNERS.
 .playwright-mcp/
 
 ###> symfony/framework-bundle ###

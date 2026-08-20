@@ -1,0 +1,14 @@
+version: "1.16.0"
+
+skills:
+  install: all
+
+# Togglable goat-flow hook state. Missing entries use registry defaults.
+# Manage with the dashboard Hooks page or `goat-flow hooks <enable|disable|sync>`.
+hooks:
+  deny-dangerous:
+    enabled: true
+  gruff-code-quality:
+    enabled: true
+  post-turn-safety:
+    enabled: true

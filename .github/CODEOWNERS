@@ -1,0 +1,15 @@
+# Code owners for this repository.
+#
+# GitHub requests a review from the owners listed below on any pull request that
+# touches the matching paths. This is advisory until branch protection for the
+# default branch enables "Require review from Code Owners".
+
+# goat-flow agent hooks are shell and Node scripts that run locally in a
+# maintainer's coding-agent session, not in CI. A change here is a change to
+# code that executes on a reviewer's machine as soon as they check the branch
+# out, so it needs the same scrutiny as a release script.
+/.goat-flow/hooks/ @Ardenexal
+
+# Decides which .goat-flow/ paths are publishable at all. Loosening it can
+# expose local session logs, plan contents, or the scratchpad.
+/.goat-flow/.gitignore @Ardenexal
