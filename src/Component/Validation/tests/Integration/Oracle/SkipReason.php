@@ -25,4 +25,15 @@ enum SkipReason: string
 
     /** Validation itself blew up. Always suspicious — this is the category that must never grow. */
     case ValidateCrashed = 'validate-crashed';
+
+    /**
+     * The manifest configures the reference validator with an option we do not model, so its recorded
+     * outcome is not a like-for-like comparison against our default run.
+     *
+     * Distinct from the exclusions in `ComparisonHarness::selectCases()`, which drop a case before it
+     * is ever selected and therefore leave no trace in the arithmetic. A case that would otherwise be
+     * compared must remain visible when it leaves the set — see this enum's own reasoning about silent
+     * departures reading as improvements.
+     */
+    case UnmodelledOption = 'unmodelled-option';
 }

@@ -164,6 +164,7 @@ final class JavaOutcomeComparisonTest extends TestCase
                 'unreadable'        => 1,
                 'deserialize-threw' => 0,
                 'validate-crashed'  => 2,
+                'unmodelled-option' => 0,
             ],
             $report->skipHistogram(),
         );

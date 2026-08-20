@@ -746,14 +746,30 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      *   - FHIR R4 FHIRPath supplement: %resource, %rootResource, %sct, %loinc,
      *     %vs-<name>, %ext-<name>
      *
-     * Note: %resource differs from %rootResource when navigating contained
-     * resources via resolve() — for now both return rootResource since contained
-     * resource navigation is not yet implemented.
+     * %resource and %rootResource differ by exactly one level inside a contained
+     * resource: FHIR defines %resource as the resource containing the node and
+     * %rootResource as *that* resource's container. The evaluation context carries
+     * the container separately and only when there is one, so %rootResource falls
+     * back to %resource everywhere else — which is the spec's own equivalence for
+     * a node that is not inside a contained resource.
+     *
+     * %context is left resolving from the enclosing resource. That is not the
+     * spec's definition (it should be the constraint's context node) but it is
+     * pre-existing behaviour reachable from every variable-using invariant, so it
+     * is deliberately not changed here.
      */
     private function resolveEnvironmentVariable(string $name): Collection|string|null
     {
         // Node references
-        if ($name === 'context' || $name === 'resource' || $name === 'rootResource') {
+        if ($name === 'rootResource') {
+            // The container, when the enclosing resource is contained; otherwise the
+            // enclosing resource itself.
+            $node = $this->context->getContainerResource() ?? $this->context->getRootResource();
+
+            return $node !== null ? Collection::single($node) : Collection::empty();
+        }
+
+        if ($name === 'context' || $name === 'resource') {
             $root = $this->context->getRootResource();
 
             return $root !== null ? Collection::single($root) : Collection::empty();

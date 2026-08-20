@@ -334,6 +334,35 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                         && ($meta->propertyKind === 'extension' || $meta->propertyKind === 'modifierExtension')
                     ) {
                         $denormalizedValue = $this->denormalizeExtensionArray($value, 'json', $context);
+                    } elseif (is_array($value)
+                        && $meta !== null
+                        && $meta->isArray
+                        && $meta->propertyKind === 'resource'
+                        && $this->denormalizer !== null
+                    ) {
+                        // A polymorphic resource array — `contained`. The generator cannot emit a
+                        // phpItemClass for it (there is no single class to name for `Resource`), so
+                        // without this branch it falls through to the generic branch, where the
+                        // declared type is the builtin `array` and every item stays a raw array.
+                        // The whole constraint cascade then walks past it, as it did for JSON
+                        // documents for the life of the project. FHIRResourceXmlNormalizer has
+                        // always resolved these; this is the JSON half of that parity.
+                        //
+                        // Resolve each item from its OWN resourceType through the type resolver —
+                        // never by interpolating a Models\{version}\… FQCN, which resolves only
+                        // base-spec classes and silently defeats profiles.
+                        $denormalizer = $this->denormalizer;
+                        self::assertRepeatingElementIsArray($elementName, $value, $resolvedType);
+                        $denormalizedValue = [];
+                        foreach ($value as $item) {
+                            $itemClass = is_array($item) ? $this->typeResolver->resolveResourceType($item) : null;
+                            // An unresolvable resourceType keeps the raw array rather than dropping
+                            // the item: losing a contained resource silently is worse than leaving
+                            // it opaque, which is exactly the behaviour that held here before.
+                            $denormalizedValue[] = $itemClass !== null
+                                ? $denormalizer->denormalize($item, $itemClass, 'json', $context)
+                                : $item;
+                        }
                     } elseif (is_array($value) && $phpItemClass !== null && $this->denormalizer !== null) {
                         // A repeating element MUST be a JSON array. Do not be lenient here: the HL7
                         // Java reference validator reports "The property reasonCode must be a JSON

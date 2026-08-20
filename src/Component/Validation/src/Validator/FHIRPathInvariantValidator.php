@@ -75,21 +75,46 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
             return new EvaluationContext(null);
         }
 
-        return new EvaluationContext($this->nearestEnclosingResource($root, (string) $this->context->getPropertyPath()));
+        [$enclosing, $container] = $this->enclosingResourceAndContainer($root, (string) $this->context->getPropertyPath());
+
+        return new EvaluationContext(rootResource: $enclosing, containerResource: $container);
     }
 
     /**
-     * Walk `$path` from `$root`, returning the deepest object that is itself a FHIR resource.
+     * Walk `$path` from `$root`, returning `[nearest enclosing resource, its container]`, where the container is non-null only when
+     * the enclosing resource was reached through a `contained` property.
+     *
+     * `%resource` is the nearest enclosing resource (M01's finding, unchanged). `%rootResource` is one
+     * level out, but *only* for contained resources: FHIR defines it as "the container resource for the
+     * resource that contains the original node", and a local `#id` reference inside a contained resource
+     * addresses a sibling of that contained resource — so it must resolve against the container's
+     * `contained`, not the contained resource's own (usually absent) one. `document-manifest` proves it:
+     * its three local references all sit inside `contained[4]`, and all three reported `ref-1` against
+     * the oracle's zero until `%rootResource` reached the DocumentManifest.
+     *
+     * The container is the **immediate** container, never the outermost root. For a node inside
+     * `Bundle.entry[0].resource.contained[0]`, `%rootResource` is the entry's resource; binding the
+     * Bundle instead would resolve `#id` against the wrong `contained` set and still pass
+     * `document-manifest`.
+     *
+     * A resource reached any other way — `Parameters.parameter.resource`, `Bundle.entry.resource` — is
+     * its own root, so the container stays null and `%rootResource` falls back to `%resource`. That is
+     * what keeps M02's F3 closure (`containedToContainer`, whose `#payer` lives in the nested Coverage's
+     * own `contained`) passing.
      *
      * Navigation is deliberately forgiving — an unreadable or absent segment simply stops the walk and
      * returns the best resource found so far, which is always at least the root. Binding a slightly
      * shallower resource degrades an invariant to its previous behaviour; throwing here would abort
      * validation of an otherwise valid document.
+     *
+     * @return array{0: object, 1: object|null}
      */
-    private function nearestEnclosingResource(object $root, string $path): object
+    private function enclosingResourceAndContainer(object $root, string $path): array
     {
-        $nearest = $root;
-        $current = $root;
+        $nearest   = $root;
+        $container = null;
+        $current   = $root;
+        $lastProp  = null;
 
         foreach (self::pathSegments($path) as $segment) {
             if (!is_object($current) && !is_array($current)) {
@@ -103,11 +128,20 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
 
             $current = $next;
             if (is_object($current) && self::isResource($current)) {
-                $nearest = $current;
+                // `contained[4]` arrives on the numeric segment, so the property navigated through is
+                // the last non-numeric one; a hypothetical single-valued `contained` arrives on the
+                // property segment itself. Both read the same way here.
+                $arrivedVia = is_numeric($segment) ? $lastProp : $segment;
+                $container  = $arrivedVia === 'contained' ? $nearest : null;
+                $nearest    = $current;
+            }
+
+            if (!is_numeric($segment)) {
+                $lastProp = $segment;
             }
         }
 
-        return $nearest;
+        return [$nearest, $container];
     }
 
     /**
