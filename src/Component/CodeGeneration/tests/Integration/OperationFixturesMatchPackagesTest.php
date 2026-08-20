@@ -99,15 +99,44 @@ final class OperationFixturesMatchPackagesTest extends TestCase
         self::assertGreaterThan(150, count($index), 'Implausibly few types extracted.');
     }
 
+    /**
+     * Skipping is acceptable on a developer machine. In CI it is the defect.
+     *
+     * These are the ONLY drift detectors for ~14,700 lines of committed manifest and type-index
+     * fixtures, and in CI all 9 cases skipped while the leg reported pass — observed on PR #104:
+     *
+     *     SSSSSSSSS...........NNNNN     25 / 25 (100%)
+     *     OK, but there were issues!
+     *     Tests: 25, Assertions: 56, PHPUnit Notices: 5, Skipped: 9.
+     *
+     * `phpunit.dist.xml` sets failOnDeprecation/failOnNotice/failOnWarning but not `failOnSkipped`,
+     * and no CI step populates `demo/var/cache/dev/.fhir/`. So the fixtures could go stale after a
+     * package bump with no signal at all, and the hand-maintained PRE_REGISTERED literals would
+     * become the only authority.
+     *
+     * Locally the skip is still right — a fresh clone has no package cache and should not fail for
+     * it. So the behaviour is split: skip where a human can read the message and act on it, fail
+     * where nobody will. The real fix is to prime the cache in the `tests` job, which is a workflow
+     * change; until that lands this at least converts a silent pass into a loud failure.
+     */
     private function extractorOrSkip(string $version): OperationFixtureExtractor
     {
         $extractor = new OperationFixtureExtractor();
 
         if (!in_array($version, $extractor->availableVersions(), true)) {
-            self::markTestSkipped(sprintf(
+            $message = sprintf(
                 'No %s package in demo/var/cache/dev/.fhir/ — run `composer run generate-models-all` to populate it.',
                 strtoupper($version),
-            ));
+            );
+
+            // `CI` and `GITHUB_ACTIONS` are both set unconditionally by GitHub Actions runners, and
+            // `CI` by essentially every other provider. Checking both so this fires on either.
+            if (getenv('CI') !== false || getenv('GITHUB_ACTIONS') !== false) {
+                self::fail($message . ' In CI this is a hard failure: skipping here would leave the '
+                    . 'committed fixtures with no drift detector at all while the job reported pass.');
+            }
+
+            self::markTestSkipped($message);
         }
 
         return $extractor;

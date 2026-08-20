@@ -60,6 +60,25 @@ final class OperationMappingException extends FHIRToolsException
         );
     }
 
+    /**
+     * More values arrived for a parameter than its cardinality allows.
+     *
+     * Previously the extras were dropped: `buildPayload` took `$values[0]` for any non-collection
+     * descriptor, so a caller could not distinguish a truncated response from a single-valued one.
+     * Unlike the undeclared-parameter drop — which is deliberate and documented — this one was
+     * neither, so it is reported rather than silently narrowed.
+     */
+    public static function tooManyValues(string $wireName, string $max, int $given): self
+    {
+        return new self(sprintf(
+            'Operation parameter "%s" is bounded at max %s but the Parameters resource carried %d '
+            . 'entries for it. Keeping only the first would silently discard the rest.',
+            $wireName,
+            $max,
+            $given,
+        ));
+    }
+
     public static function unmappableValue(string $wireName, string $fhirType, string $given): self
     {
         return new self(sprintf(

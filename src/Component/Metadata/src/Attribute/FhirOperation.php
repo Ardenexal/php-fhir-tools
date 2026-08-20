@@ -33,7 +33,22 @@ final class FhirOperation
         public readonly string $url,
         /** FHIR version this holder targets: 'R4', 'R4B' or 'R5'. */
         public readonly string $version,
-        /** FQCN of the typed IN class. */
+        /**
+         * FQCN of the typed IN class, or `''` when the operation declares no `use: in` parameters.
+         *
+         * The empty string is a deliberate sentinel, not a generation failure — 12 shipped holders
+         * carry it (`ResourceMeta`, `CapabilityStatementVersions`, `ActivityDefinitionDataRequirements`
+         * and `PlanDefinitionDataRequirements`, across R4/R4B/R5). Consumers must therefore check for
+         * `''` and not only for a missing class: `new ($op->inputClass)()` throws
+         * `Error: Class "" not found`, and `class_exists('')` is false.
+         *
+         * It is `string` rather than `?string` (unlike `$outputClass`, which is genuinely null for
+         * `NoOutput`) because changing it would mean regenerating every holder. The contract was
+         * previously recorded only in
+         * `tests/Integration/GeneratedOperationClassCountMatchesParameterPathsTest.php`
+         * (search: "an operation with no IN parameters carries") — which is a monorepo test a library
+         * consumer never reads. Stated here because this attribute *is* the public surface.
+         */
         public readonly string $inputClass,
         /** How the response is shaped — see the distribution table on the enum. */
         public readonly OperationOutputShape $outputShape,

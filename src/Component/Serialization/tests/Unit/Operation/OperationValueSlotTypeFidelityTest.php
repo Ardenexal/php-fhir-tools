@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit\Operation;
 
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Parameters\ParametersParameter;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\ParametersResource;
 use Ardenexal\FHIRTools\Component\Models\R5\Operation\CodeSystemFindMatches\CodeSystemFindMatchesInProperty;
 use Ardenexal\FHIRTools\Component\Models\R5\Operation\CodeSystemLookup\CodeSystemLookupOutProperty;
 use Ardenexal\FHIRTools\Component\Models\R5\Operation\CodeSystemLookup\CodeSystemLookupOutput;
@@ -16,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Operation\OperationMappingException;
 use Ardenexal\FHIRTools\Component\Serialization\Operation\OperationParameterMapper;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\AssertionFailedError;
 
 /**
  * The mapper must not coerce a value into a shape its declared type did not ask for.
@@ -147,6 +151,63 @@ final class OperationValueSlotTypeFidelityTest extends TestCase
     }
 
     /**
+     * Two values for a `max: 1` parameter must be reported, not truncated to the first.
+     *
+     * `buildPayload` did `$descriptor->isCollection() ? $values : $values[0]`, so an over-cardinal
+     * body silently lost everything after the first entry — no exception, no log, no context flag,
+     * and (unlike the undeclared-parameter drop) not disclosed anywhere in the docs. A caller could
+     * not tell a truncated response from a single-valued one.
+     *
+     * `isCollection()` is `max === '*' || (int) max > 1`, so this only fires where the spec really
+     * does bound the parameter at one. A `max: '2'` parameter is a collection and is unaffected —
+     * checked because rejecting two values there would refuse conformant input. The shipped corpus
+     * carries only `max: '1'` (712) and `max: '*'` (116).
+     */
+    public function testARepeatingValueForASingleValuedParameterIsReported(): void
+    {
+        // Driven through the mapper rather than the service: `deserializeFromJson` wraps mapper
+        // failures in FHIRSerializationException, and the behaviour under test belongs to the mapper.
+        //
+        // Deliberately NOT `try { … } catch (\Exception)` either: PHPUnit's own assertion failures
+        // extend Exception, so a catch that broad swallows self::fail() and the test passes while the
+        // bug is live. Asserting on the thrown type is the only structure that can actually fail.
+        $parameters = new ParametersResource(parameter: [
+            new ParametersParameter(name: 'code', value: new CodePrimitive(value: 'a')),
+            new ParametersParameter(name: 'code', value: new CodePrimitive(value: 'b')),
+        ]);
+
+        $this->expectException(OperationMappingException::class);
+        $this->expectExceptionMessageMatches('/code/');
+
+        $this->mapper()->fromParameters($parameters, ValueSetValidateCodeInput::class);
+    }
+
+    /**
+     * A genuinely repeating parameter still accepts many values.
+     *
+     * The guard above must not turn `max: '*'` into an error. `$lookup`'s `property` output group is
+     * unbounded, so two of them is conformant and must round-trip.
+     */
+    public function testAnUnboundedParameterStillAcceptsManyValues(): void
+    {
+        $body = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [
+                ['name' => 'name', 'valueString' => 'SNOMED CT'],
+                ['name' => 'display', 'valueString' => 'Body mass index'],
+                ['name' => 'property', 'part' => [['name' => 'code', 'valueCode' => 'p1']]],
+                ['name' => 'property', 'part' => [['name' => 'code', 'valueCode' => 'p2']]],
+            ],
+        ], JSON_THROW_ON_ERROR);
+
+        $typed = $this->service()->deserializeFromJson($body, CodeSystemLookupOutput::class);
+
+        self::assertCount(2, $typed->property);
+        self::assertSame('p1', $typed->property[0]->code);
+        self::assertSame('p2', $typed->property[1]->code);
+    }
+
+    /**
      * A wire value the declared type cannot accept must arrive as OperationMappingException.
      *
      * `buildPayload` never checked the value against the descriptor before calling
@@ -167,6 +228,11 @@ final class OperationValueSlotTypeFidelityTest extends TestCase
         try {
             $this->service()->deserializeFromJson($body, ValueSetValidateCodeInput::class);
             self::fail('Expected the mismatched value to be rejected.');
+        } catch (AssertionFailedError $e) {
+            // Rethrown explicitly. AssertionFailedError extends Exception, so without this arm the
+            // broad catch below would swallow both self::fail() calls and the test would pass while
+            // the defect was live.
+            throw $e;
         } catch (\TypeError $e) {
             self::fail('A TypeError escaped instead of a mapping failure: ' . $e->getMessage());
         } catch (\Exception $e) {

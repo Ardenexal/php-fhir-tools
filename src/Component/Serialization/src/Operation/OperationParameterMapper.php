@@ -289,7 +289,15 @@ final class OperationParameterMapper
         $operation = $this->operationOf($operationClass);
 
         return match ($operation->outputShape) {
-            OperationOutputShape::NoOutput    => null,
+            // Mirrors fromResponse()'s NoOutput arm rather than swallowing the value. This used to be
+            // a bare `=> null`, so an output computed for a NoOutput operation was discarded in
+            // silence — the same declared-shape-versus-object-in-hand disagreement the read
+            // direction calls "a contract violation worth surfacing, not ignoring". A handler that
+            // returns something for `List/$find` has a bug in its logic or in its shape metadata,
+            // and dropping the value hides which one.
+            OperationOutputShape::NoOutput => $output === null
+                ? null
+                : throw OperationMappingException::unexpectedResponseType('no output', $output::class, $operation->outputShape->value),
             OperationOutputShape::Parameters  => $output === null
                 ? null
                 : $this->toParameters($output),
@@ -576,6 +584,14 @@ final class OperationParameterMapper
             }
 
             $values = array_map(fn (object $entry): mixed => $this->readValueSlot($descriptor, $entry), $matching);
+
+            // Reported rather than narrowed to $values[0]. `isCollection()` is
+            // `max === '*' || (int) max > 1`, so this only fires where the spec genuinely bounds the
+            // parameter at one — a `max: '2'` parameter is a collection and is unaffected, which
+            // matters because rejecting two values there would refuse conformant input.
+            if (!$descriptor->isCollection() && count($values) > 1) {
+                throw OperationMappingException::tooManyValues($descriptor->name, $descriptor->max, count($values));
+            }
 
             $arguments[$descriptor->phpName] = $descriptor->isCollection() ? $values : $values[0];
         }

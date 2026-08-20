@@ -105,6 +105,55 @@ final class BuildOperationsErrorContainmentTest extends TestCase
     }
 
     /**
+     * Two definitions that derive the same class stem must not silently overwrite each other.
+     *
+     * `classStem` is `pascal(resource[0]) . pascal(code)`, so two OperationDefinitions with different
+     * canonical URLs but the same first resource and code produce the same namespace, the same class
+     * names and the same file paths. `BuilderContext::addType` keys on the URL so both survive in the
+     * context; `outputGeneratedFiles` then writes both to `Operation/{Stem}/{Stem}Input.php` and the
+     * second wins. The count printed at the end of the phase counted both.
+     *
+     * The result was a legal, invocable operation absent from the generated API, with exit code 0 and
+     * a plausible-looking count — exactly what `OperationClassNamer`'s own docblock promises against
+     * ("every collision here is fatal: a generator that quietly drops one of two operations produces
+     * output that looks complete"). That promise only ever covered parameter names within one class.
+     *
+     * An IG redefining `Patient/$match` is the realistic trigger; nothing in the core packages
+     * collides (R4 47 / R4B 47 / R5 60 stems, all distinct), which is why this went unnoticed.
+     */
+    public function testTwoDefinitionsDerivingTheSameStemAreReportedNotOverwritten(): void
+    {
+        $first = self::HEALTHY;
+
+        // Same resource + same code, different URL: a downstream IG redefining a core operation.
+        $second         = self::HEALTHY;
+        $second['url']  = 'http://example.test/ig/OperationDefinition/ping-redefined';
+        $second['name'] = 'PingRedefined';
+
+        [$command, $context, $errors] = $this->commandWithDefinitions([
+            $first['url']  => $first,
+            $second['url'] => $second,
+        ]);
+
+        $this->invokeBuildOperations($command);
+
+        self::assertTrue(
+            $errors->hasErrors(),
+            'A stem collision must be reported. Silently overwriting one operation with another '
+            . 'produces generated output that looks complete but is missing an invocable operation.',
+        );
+        self::assertStringContainsString(
+            $second['url'],
+            $errors->getDetailedOutput(),
+            'The error must name the losing definition so the operator can act on it.',
+        );
+
+        // The first claimant is kept, deterministically — not the last writer.
+        self::assertNotNull($context->getType($first['url'] . '#operation'));
+        self::assertNull($context->getType($second['url'] . '#operation'));
+    }
+
+    /**
      * With nothing malformed, nothing is recorded — the containment must not manufacture errors.
      */
     public function testAHealthyCorpusRecordsNoErrors(): void

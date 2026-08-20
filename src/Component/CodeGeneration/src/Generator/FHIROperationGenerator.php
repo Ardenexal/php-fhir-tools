@@ -604,6 +604,25 @@ final class FHIROperationGenerator implements GeneratorInterface
      * FQCN literals are correct here: this is generation time, and the emitted string is the
      * base-spec default that a runtime profile later overrides through the type resolver. M01's
      * note N18 forbids building these at *runtime*, which is a different thing.
+     *
+     * ## Known limitation: constraint-derived complex types would resolve to the wrong namespace
+     *
+     * This always emits `DataType\{TypeCode}`. A constraint-derived complex type has no class there
+     * — `buildProfiles` writes it to `Profile\{Name}Profile` instead (e.g. `SimpleQuantity` becomes
+     * `Profile\SimpleQuantityProfile`, not `DataType\SimpleQuantity`). So a parameter typed with one
+     * would emit an unresolvable `phpType`, and PHPStan on `Models/` would fail after the regen.
+     *
+     * Deliberately not fixed, because the path is unreachable in every shipped package and a
+     * speculative fix could not be exercised. Measured against the real package cache: of the 40
+     * distinct type codes named by any operation parameter `type` or allowed-type variant across
+     * R4/R4B/R5, all 40 resolve and **none** is constraint-derived. Fixing it properly needs a
+     * type-code -> profile-class mapping, and `FHIRProfileGenerator` names profiles from the
+     * StructureDefinition's `name` rather than from the type code, so that mapping is a context read
+     * with its own failure modes — worth writing when something actually needs it, with a test that
+     * can fail.
+     *
+     * The related *ordering* half of this problem IS fixed: see `VariantOrderer::depthOf()`, which
+     * now counts constraint derivations because they do produce a PHP subclass.
      */
     private function modelFqcn(string $fhirType, string $version): string
     {

@@ -483,6 +483,9 @@ class FHIRModelGeneratorCommand extends Command
         $skipped   = 0;
         $failed    = 0;
 
+        /** @var array<string, string> $claimedNamespaces Operation namespace => the URL that claimed it */
+        $claimedNamespaces = [];
+
         foreach ($this->context[$version]->getDefinitions() as $url => $definition) {
             if (($definition['resourceType'] ?? null) !== 'OperationDefinition') {
                 continue;
@@ -525,11 +528,45 @@ class FHIRModelGeneratorCommand extends Command
             // The namespace comes off the class the generator built, not from one assembled here:
             // it nests per operation (`…\Operation\CodeSystemLookup`) to match the file layout, and
             // rebuilding it here would silently disagree with the generator and break PSR-4.
-            $this->context[$version]->addType(
-                $url . '#operation',
-                $holder->getNamespace()?->getName() ?? "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Operation",
-                $holder,
-            );
+            $namespace = $holder->getNamespace()?->getName()
+                ?? "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Operation";
+
+            // Two definitions can derive the same class stem — `classStem` is
+            // pascal(resource[0]) . pascal(code), so an IG redefining `Patient/$match` produces the
+            // same namespace, class names and file paths as the core definition. `addType` keys on
+            // the URL so both would survive here, and `outputGeneratedFiles` would then write both to
+            // the same path: the second silently overwrites the first while the count below counts
+            // both. The result is a legal, invocable operation missing from the generated API with a
+            // successful-looking build.
+            //
+            // `OperationClassNamer::assertNoCollisions` does not cover this — it checks parameter
+            // names within one class, two levels below. Checked on the namespace rather than on a
+            // recomputed stem because the namespace is what actually determines the file path.
+            //
+            // First claimant wins, so the outcome is deterministic regardless of definition order.
+            if (isset($claimedNamespaces[$namespace])) {
+                ++$failed;
+                $this->errorCollector->addError(
+                    sprintf(
+                        'Operation "%s" derives the class namespace %s, already claimed by "%s". '
+                        . 'Emitting it would overwrite the other operation\'s files.',
+                        $url,
+                        $namespace,
+                        $claimedNamespaces[$namespace],
+                    ),
+                    $url,
+                    'OPERATION_NAMESPACE_COLLISION',
+                    'error',
+                    ['fhir_version' => $version, 'namespace' => $namespace],
+                );
+                $output->writeln("<error>Namespace collision: {$url} would overwrite {$claimedNamespaces[$namespace]}</error>");
+
+                continue;
+            }
+
+            $claimedNamespaces[$namespace] = $url;
+
+            $this->context[$version]->addType($url . '#operation', $namespace, $holder);
 
             ++$generated;
         }
