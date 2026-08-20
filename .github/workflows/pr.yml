@@ -148,6 +148,47 @@ jobs:
             -   name: Install dependencies
                 run: composer install --prefer-dist --no-progress --no-suggest
 
+            # The integration-codegen suite contains the ONLY drift detectors for the ~14,700 lines
+            # of committed fixtures under CodeGeneration/tests/Fixtures/{OperationManifests,TypeIndex}.
+            # Without the FHIR packages on disk all 9 of their cases used to skip, and because
+            # phpunit.dist.xml sets failOnDeprecation/Notice/Warning but NOT failOnSkipped, the leg
+            # reported pass with 9 skips — so the fixtures could go stale after a package bump with no
+            # signal at all. Only the three CORE packages are needed (the extractor reads exactly
+            # hl7.fhir.{r4,r4b,r5}.core); the extensions and terminology packages are not.
+            -   name: Cache FHIR core packages
+                if: matrix.suite == 'integration-codegen'
+                id: fhir-package-cache
+                uses: actions/cache@v4
+                with:
+                    path: demo/var/cache/dev/.fhir
+                    # Keyed on the extractor, which is where the pinned package versions live, so a
+                    # version bump there invalidates the cache instead of silently reusing old packages.
+                    key: ${{ runner.os }}-fhir-core-${{ hashFiles('src/Component/CodeGeneration/tests/Fixtures/OperationFixtureExtractor.php') }}
+
+            -   name: Prime the FHIR package cache
+                if: matrix.suite == 'integration-codegen' && steps.fhir-package-cache.outputs.cache-hit != 'true'
+                # Fetched straight from the registry rather than by running `fhir:generate`: the
+                # generator would also rewrite src/Component/Models, which a test job must not do.
+                # The tarballs extract to `<name>_<version>/package/`, which is the layout
+                # OperationFixtureExtractor::packageDirectory() expects.
+                run: |
+                    set -euo pipefail
+                    mkdir -p demo/var/cache/dev/.fhir
+                    for spec in \
+                        "hl7.fhir.r4.core|4.0.1" \
+                        "hl7.fhir.r4b.core|4.3.0" \
+                        "hl7.fhir.r5.core|5.0.0"; do
+                      name="${spec%%|*}"
+                      version="${spec##*|}"
+                      target="demo/var/cache/dev/.fhir/${name}_${version}"
+                      echo "Fetching ${name}#${version}"
+                      mkdir -p "$target"
+                      curl -sSfL --retry 3 --retry-delay 5 --max-time 180 \
+                        "https://packages.fhir.org/${name}/${version}" -o "${target}.tgz"
+                      tar -xzf "${target}.tgz" -C "$target"
+                    done
+                    echo "Primed: $(ls -1 demo/var/cache/dev/.fhir | grep -c '^hl7\.' || true) entries"
+
             -   name: Run ${{ matrix.suite }} tests
                 run: php ./vendor/bin/paratest --testsuite=${{ matrix.suite }} ${{ matrix.extra }} --log-junit=./results/${{ matrix.suite }}-tests.xml --coverage-clover ./results/${{ matrix.suite }}-coverage.xml
 
@@ -208,6 +249,25 @@ jobs:
             pull-requests: write
             contents: read
 
+        # Previously R4B only, which left a real gap: the operation and model generators run over all
+        # three versions, but only R4B was ever re-derived in CI. R5 has the largest and most
+        # divergent surface (60 operations vs 47, plus nested subproperty groups R4/R4B lack), so an
+        # R4- or R5-only generator regression could merge green and surface later as a surprise diff.
+        # Legs are independent (fail-fast: false) so one version's failure still reports the others.
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    -   version: R4
+                        packages: --package=hl7.fhir.r4.core --package=hl7.fhir.uv.extensions.r4
+                        script: generate-models-r4
+                    -   version: R4B
+                        packages: --package=hl7.fhir.r4b.core --package=hl7.fhir.uv.extensions.r4b
+                        script: generate-models-r4b
+                    -   version: R5
+                        packages: --package=hl7.fhir.r5.core --package=hl7.fhir.uv.extensions.r5
+                        script: generate-models-r5
+
         steps:
             -   uses: actions/checkout@v4
 
@@ -230,18 +290,17 @@ jobs:
                       echo "🧪 Testing FHIR Model Generation..."
                       echo "================================="
                       echo ""
-                      echo "📦 Regenerating R4B FHIR models (hl7.fhir.r4b.core + hl7.fhir.uv.extensions.r4b)..."
+                      echo "📦 Regenerating ${{ matrix.version }} FHIR models (${{ matrix.packages }})..."
                       echo ""
                     } >> fhir_output.txt
 
-                    # Regenerate the full R4B set so the git-drift check below is meaningful:
+                    # Regenerate the full per-version set so the git-drift check below is meaningful:
                     # generating only the core package would delete the extension models and
-                    # produce a spurious diff. Must match `composer run generate-models-r4b`.
+                    # produce a spurious diff. Must match `composer run ${{ matrix.script }}`.
                     start_time=$(date +%s)
 
-                    if timeout 540 php demo/bin/console fhir:generate \
-                        --package=hl7.fhir.r4b.core \
-                        --package=hl7.fhir.uv.extensions.r4b -v >> fhir_output.txt 2>&1; then
+                    if timeout 900 php demo/bin/console fhir:generate \
+                        ${{ matrix.packages }} -v >> fhir_output.txt 2>&1; then
                       end_time=$(date +%s)
                       execution_time=$((end_time - start_time))
 
@@ -250,8 +309,8 @@ jobs:
                         echo "✅ **FHIR Generation Successful!**"
                         echo "⏱️ Execution time: ${execution_time} seconds"
                         echo ""
-                        file_count=$(find src/Component/Models/src/R4B -name "*.php" | wc -l)
-                        echo "📁 Generated ${file_count} R4B PHP model files"
+                        file_count=$(find src/Component/Models/src/${{ matrix.version }} -name "*.php" | wc -l)
+                        echo "📁 Generated ${file_count} ${{ matrix.version }} PHP model files"
                       } >> fhir_output.txt
 
                       echo "FHIR_SUCCESS=true" >> "$GITHUB_OUTPUT"
@@ -262,7 +321,7 @@ jobs:
                       {
                         echo ""
                         echo "❌ **FHIR Generation Failed**"
-                        echo "⏱️ Execution time: ${execution_time} seconds (timed out at 540s)"
+                        echo "⏱️ Execution time: ${execution_time} seconds (timed out at 900s)"
                         echo ""
                         echo "Please check the error output above for details."
                       } >> fhir_output.txt
@@ -296,8 +355,8 @@ jobs:
                         echo ""
                         echo "❌ **Generated models are out of date**"
                         echo ""
-                        echo "Regenerating the R4B models produced changes that are not committed."
-                        echo "Run \`composer run generate-models-r4b\` locally and commit the result."
+                        echo "Regenerating the ${{ matrix.version }} models produced changes that are not committed."
+                        echo "Run \`composer run ${{ matrix.script }}\` locally and commit the result."
                         echo ""
                         echo "<details>"
                         echo "<summary>📝 git status</summary>"
@@ -336,8 +395,11 @@ jobs:
                     script: |
                         const fs = require('fs');
                         // Stable marker so we can update this PR's existing comment in place
-                        // instead of posting a fresh one on every commit.
-                        const MARKER = '<!-- fhir-model-generation-test -->';
+                        // instead of posting a fresh one on every commit. Scoped per FHIR version:
+                        // the three matrix legs run concurrently, and a shared marker would have
+                        // them race to update one comment, so the last writer would erase the other
+                        // two versions' results.
+                        const MARKER = '<!-- fhir-model-generation-test-${{ matrix.version }} -->';
 
                         let fhirOutput;
                         try {
@@ -358,7 +420,7 @@ jobs:
                           footer = '⚠️ The FHIR model generation encountered issues. Please review the output above and fix any problems before merging.';
                         } else if (drift) {
                           status = 'OUT OF DATE';
-                          footer = '⚠️ Regenerating the FHIR models produced uncommitted changes. Run `composer run generate-models-r4b` locally and commit the result before merging.';
+                          footer = '⚠️ Regenerating the FHIR models produced uncommitted changes. Run `composer run ${{ matrix.script }}` locally and commit the result before merging.';
                         } else {
                           status = 'SUCCESS';
                           footer = '🎉 The FHIR model generation completed successfully and the committed models are up to date.';
@@ -368,9 +430,9 @@ jobs:
                         // rendered markdown (leading spaces would otherwise become code blocks).
                         const commentBody = [
                           MARKER,
-                          `## ${emoji} FHIR Model Generation Test ${status}`,
+                          `## ${emoji} FHIR Model Generation Test — ${{ matrix.version }} — ${status}`,
                           '',
-                          'This automated test regenerates the R4B FHIR models and verifies that the generation functionality works correctly with the changes in this PR, then checks that the committed models are up to date.',
+                          'This automated test regenerates the ${{ matrix.version }} FHIR models and verifies that the generation functionality works correctly with the changes in this PR, then checks that the committed models are up to date.',
                           '',
                           '<details>',
                           '<summary>📋 Click to view detailed output</summary>',
@@ -418,8 +480,24 @@ jobs:
             -   name: Fail if generation failed or models are out of date
                 if: steps.fhir-test.outputs.FHIR_SUCCESS != 'true' || steps.model-drift.outputs.MODELS_DRIFT == 'true'
                 run: |
-                    echo "FHIR model generation check failed (success=${{ steps.fhir-test.outputs.FHIR_SUCCESS }}, drift=${{ steps.model-drift.outputs.MODELS_DRIFT }})."
+                    echo "FHIR model generation check failed for ${{ matrix.version }} (success=${{ steps.fhir-test.outputs.FHIR_SUCCESS }}, drift=${{ steps.model-drift.outputs.MODELS_DRIFT }})."
                     exit 1
+
+    # Fan-in gate for branch protection, mirroring `tests-passed`. Matrixing the job above renamed
+    # its checks from `fhir-generation-test` to `fhir-generation-test (R4)` and friends, so a ruleset
+    # requiring the old single name would never be satisfied again. Require this instead — it also
+    # survives future changes to the version matrix.
+    fhir-generation-passed:
+        runs-on: ubuntu-latest
+        needs: [ fhir-generation-test ]
+        if: ${{ always() }}
+        steps:
+            -   name: Check FHIR generation matrix result
+                run: |
+                    if [ "${{ needs.fhir-generation-test.result }}" != "success" ]; then
+                      echo "FHIR generation matrix result: ${{ needs.fhir-generation-test.result }}"
+                      exit 1
+                    fi
 
     benchmarks:
         runs-on: ubuntu-latest
