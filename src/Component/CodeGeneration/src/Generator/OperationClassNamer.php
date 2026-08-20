@@ -129,7 +129,9 @@ final class OperationClassNamer
      * The PHP property name for a parameter's wire name.
      *
      * Never derivable in reverse, which is why generated classes store both (M01 note N7): `_count`
-     * and `count` both yield `count`, and `use` yields `useParameter`.
+     * and `count` both yield `count`, and `targetIdentifier.period` yields `targetIdentifierPeriod`.
+     * Reserved words are **not** escaped here — `use` yields `use`, because a property named `$use`
+     * is legal PHP. See {@see self::RESERVED_WORDS}, which is class-names-only for that reason.
      *
      * @throws GenerationException when no legal identifier can be derived
      */
