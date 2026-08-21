@@ -20,6 +20,10 @@ final class CaseComparison
      *                                       "we report something Java does not" from "we report the
      *                                       same finding differently". Counts alone cannot separate
      *                                       those, and M02 must not "fix" a family Java agrees with.
+     * @param list<string> $ourErrorPaths    the FHIR path each of our messages was reported on, parallel
+     *                                       to $ourErrorMessages. Needed to review a pairing by hand:
+     *                                       two validators can word one finding differently, and the
+     *                                       element is what shows they mean the same one.
      */
     public function __construct(
         public readonly string $name,
@@ -30,6 +34,15 @@ final class CaseComparison
         public readonly array $ourErrorMessages = [],
         public readonly array $families = [],
         public readonly array $javaErrorTexts = [],
+        public readonly array $ourErrorPaths = [],
+        /**
+         * Reference findings this case leaves unexplained, labelled by capability.
+         *
+         * Not derivable from `javaErrorCount - ourErrorCount`, and the difference is the point: a case
+         * can be `EQUAL` on counts while still missing a finding, because we report a different one Java
+         * does not. Arithmetic on the two totals cannot see that; pairing can.
+         */
+        public readonly FindingDelta $delta = new FindingDelta(),
     ) {
     }
 

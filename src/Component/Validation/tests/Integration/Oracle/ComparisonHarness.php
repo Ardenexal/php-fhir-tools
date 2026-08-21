@@ -40,14 +40,72 @@ final class ComparisonHarness
 
     private readonly ViolationFamilyClassifier $familyClassifier;
 
+    /** Decides which reference findings we already report in different words. */
+    private readonly JavaFindingMatcher $matcher;
+
+    /** Names the capability each unpaired reference finding would need. */
+    private readonly MissingFindingClassifier $missingClassifier;
+
     public function __construct(
         private readonly string $vendorDir,
         private readonly FHIRValidationService $validation,
         private readonly FHIRSerializationService $serialization,
         private readonly FhirVersion $version,
         ?ViolationFamilyClassifier $familyClassifier = null,
+        ?JavaFindingMatcher $matcher = null,
+        ?MissingFindingClassifier $missingClassifier = null,
     ) {
-        $this->familyClassifier = $familyClassifier ?? new ViolationFamilyClassifier();
+        $this->familyClassifier  = $familyClassifier  ?? new ViolationFamilyClassifier();
+        $this->matcher           = $matcher           ?? new JavaFindingMatcher();
+        $this->missingClassifier = $missingClassifier ?? new MissingFindingClassifier();
+    }
+
+    /**
+     * Pair both sides' findings and label whatever is left over.
+     *
+     * Runs for every compared case, not only the `BELOW` ones: an `EQUAL` case can report one error each
+     * while the two errors are about different things, and that is a missing finding the class cannot see.
+     *
+     * @param list<string>                  $javaErrorTexts
+     * @param list<FHIRValidationViolation> $ourErrors
+     * @param list<string>                  $javaExpressions where each reference finding was found,
+     *                                                       parallel to $javaErrorTexts. Without it the
+     *                                                       cardinality rule cannot tell two instances
+     *                                                       of one type apart, and refuses to pair.
+     */
+    private function delta(array $javaErrorTexts, array $ourErrors, array $javaExpressions = []): FindingDelta
+    {
+        $missing = $this->matcher->unmatched($javaErrorTexts, $ourErrors, $javaExpressions);
+
+        return new FindingDelta(
+            $missing,
+            $this->missingClassifier->classifyAll($missing),
+            // A finding naming a code system nothing vendored can decide is a declared limitation, not work.
+            array_map(static fn (string $t): ?string => DeclaredLimitations::reasonFor($t), $missing),
+            // Kept so `audit-pairings.php` can review the pairings this count was produced from, rather
+            // than a second run of the matcher that might not agree with it.
+            $this->matcher->matchedPairs($javaErrorTexts, $ourErrors, $javaExpressions),
+        );
+    }
+
+    /**
+     * Our finding as a violation, for a rejection raised before the validator ran.
+     *
+     * The deserializer reports a finding as a bare string, but pairing compares violations. Wrapping it
+     * keeps one type through the matcher instead of giving these two cases their own pairing path — they
+     * are the cases most likely to duplicate a reference finding verbatim, so they need the real rules.
+     */
+    private function deserializationFinding(string $finding, ?string $code = null): FHIRValidationViolation
+    {
+        return new FHIRValidationViolation(
+            severity: 'error',
+            path: '',
+            message: $finding,
+            constraintClass: '',
+            profileGroup: null,
+            invariantKey: null,
+            code: $code,
+        );
     }
 
     public function run(): ComparisonReport
@@ -161,6 +219,12 @@ final class ComparisonHarness
                 ourErrorMessages: [$e->finding],
                 families: ['conformance:deserialization'],
                 javaErrorTexts: $javaOutcome->errorTexts,
+                ourErrorPaths: [''],
+                delta: $this->delta(
+                    $javaOutcome->errorTexts,
+                    [$this->deserializationFinding($e->finding)],
+                    $javaOutcome->errorExpressions,
+                ),
             );
         } catch (FHIRUnreadableDocumentException $e) {
             // The bytes are not a document, and that is a finding rather than a silence. Java answers
@@ -180,6 +244,16 @@ final class ComparisonHarness
                 ourErrorMessages: [$e->finding],
                 families: ['unreadable:deserialization'],
                 javaErrorTexts: $javaOutcome->errorTexts,
+                ourErrorPaths: [''],
+                delta: $this->delta(
+                    $javaOutcome->errorTexts,
+                    // Tagged so the matcher can recognise "we refused to read this document at all".
+                    // The reference validator splits one unreadable document into several parse
+                    // diagnostics — `json-no-quotes-2` gets three — and pairing those one-to-one would
+                    // score two of them as checks we lack when we already reject the whole file.
+                    [$this->deserializationFinding($e->finding, JavaFindingMatcher::UNREADABLE_DOCUMENT_CODE)],
+                    $javaOutcome->errorExpressions,
+                ),
             );
         } catch (\Throwable $e) {
             $this->recordUnread($name, $javaOutcome, $e->getMessage(), $skips, $unread);
@@ -224,6 +298,11 @@ final class ComparisonHarness
             ),
             families: $this->familyClassifier->classifyAll($errors),
             javaErrorTexts: $javaOutcome->errorTexts,
+            ourErrorPaths: array_map(
+                static fn (FHIRValidationViolation $v): string => $v->path,
+                $errors,
+            ),
+            delta: $this->delta($javaOutcome->errorTexts, $errors, $javaOutcome->errorExpressions),
         );
     }
 
@@ -298,6 +377,10 @@ final class ComparisonHarness
             javaErrorCount: $javaOutcome->errorCount,
             javaWarningCount: $javaOutcome->warningCount,
             failureMessage: $failureMessage,
+            // Nothing of ours to pair against, so every reference finding is missing by definition. This
+            // is what brings these cases into the missing-finding total rather than leaving them in a
+            // footnote no check reads.
+            delta: FindingDelta::allMissing($javaOutcome->errorTexts, $this->missingClassifier),
         );
     }
 

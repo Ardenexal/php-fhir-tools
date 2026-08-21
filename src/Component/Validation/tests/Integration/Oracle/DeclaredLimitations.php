@@ -72,6 +72,127 @@ final class DeclaredLimitations
         ],
     ];
 
+    /** ICD-10 in every dialect: the base classification and the German `dimdi` variant. */
+    public const REASON_ICD10 = 'ICD-10 is licence-restricted and no vendored package carries its concepts';
+
+    /** The NCI Thesaurus, reached via a Coding in `bundle-with-contained`. */
+    public const REASON_NCI = 'the NCI Thesaurus is not vendored in any form';
+
+    /**
+     * A national or project guide we have no copy of.
+     *
+     * The corpus ships a few packages of its own — `mimic`, `swiss.mednet.fhir`, `hl7.fhir.test.versions` —
+     * so "not in the package cache" is not the same as "unavailable". This reason is only for systems that
+     * are in neither place. `mimic` in particular is shipped, at
+     * `vendor/fhir/fhir-test-cases/validator/mimic/mimic-0.1.2.tgz`, and is ours to fix.
+     */
+    public const REASON_UNVENDORED_IG = 'the implementation guide defining this system is not vendored, and the corpus does not ship it';
+
+    /**
+     * Code system => why no work on this codebase can decide a finding that names it.
+     *
+     * Keyed on the **obstacle** rather than the case, because the measurement is finding-level now: one
+     * case can hold a LOINC display finding we can never decide beside a cardinality finding that is
+     * plainly ours, and `japanese-utf8-ok` holds 108 findings of which only some are terminology. Declaring
+     * whole cases cannot express that, which is why {@see MAP} above deliberately refuses cases that are
+     * only partly terminology-bound.
+     *
+     * A system-keyed rule is the same *shape* as the invariant-keyed suppression this class replaced, and
+     * that shape failed by absorbing whatever matched. What made the case map safe was not its key but its
+     * **pinned counts**, so that property is kept: see {@see DECLARED_FINDING_COUNTS}. A new LOINC finding
+     * appearing must fail a test rather than quietly joining the written-off pile.
+     *
+     * Verified 2026-08-20 against what is actually reachable at validation time. That is **not** the
+     * package cache under `~/.fhir/packages` — only `CodeGeneration` reads that. The validator resolves
+     * codes against generated enums (`FHIRValueSetBindingValidator` takes `$enumNamespaceRoots` pointing at
+     * `Models\{R4,R4B,R5}\Enum`), so a system is decidable here only if its ValueSet became an enum.
+     *
+     * @var array<string, string>
+     */
+    public const TERMINOLOGY_SYSTEMS = [
+        'http://loinc.org'                                   => self::REASON_LOINC,
+        'http://snomed.info/sct'                             => self::REASON_SNOMED,
+        'http://hl7.org/fhir/sid/cvx'                        => self::REASON_CVX,
+        'http://hl7.org/fhir/sid/icd-10'                     => self::REASON_ICD10,
+        'http://hl7.org/fhir/ValueSet/icd-10'                => self::REASON_ICD10,
+        'http://fhir.de/CodeSystem/dimdi/icd-10-gm'          => self::REASON_ICD10,
+        'http://fhir.de/ValueSet/dimdi/icd-10-gm'            => self::REASON_ICD10,
+        'http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl' => self::REASON_NCI,
+        'http://ehelse.no/fhir'                              => self::REASON_UNVENDORED_IG,
+    ];
+
+    /** Refusing a DOCTYPE is the right behaviour, so the reference finding behind it is unreachable. */
+    public const REASON_XXE_REFUSAL = 'refusing an XML DOCTYPE is deliberate: it blocks external-entity attacks, so this finding is unreachable by design';
+
+    /**
+     * Text signature => reason, for limitations that are not about a code system.
+     *
+     * Kept apart from {@see TERMINOLOGY_SYSTEMS} because the two are different claims. A terminology entry
+     * says "we have no copy of this data"; an entry here says "we decline to do this, and would decline
+     * again". `list-xhtml-xxe1` is the whole of it: the reference validator parses a document declaring a
+     * DOCTYPE, we refuse, and refusing is correct — `disallow-doctype-decl` is what stops an external-entity
+     * attack. Counting that as a gap would put pressure on a security control.
+     *
+     * @var array<string, string>
+     */
+    public const DECLARED_SIGNATURES = [
+        'doctype is disallowed'       => self::REASON_XXE_REFUSAL,
+        'found a doctype declaration' => self::REASON_XXE_REFUSAL,
+    ];
+
+    /**
+     * version => reason => how many findings it blocks, as measured 2026-08-20.
+     *
+     * The property that made the case-keyed {@see MAP} safe, kept for the system-keyed rule: a claim that
+     * cannot fail is not worth making. Pinned by `DeclaredLimitationsTest`, so a new LOINC finding has to
+     * fail a test rather than quietly join the written-off pile — which is exactly how the invariant-keyed
+     * suppression this class replaced went wrong.
+     *
+     * Update these only after reading why the number moved. Growing means more findings are being written
+     * off; shrinking means a limitation stopped being one and its entry should go.
+     *
+     * @var array<string, array<string, int>>
+     */
+    public const EXPECTED_FINDING_COUNTS = [
+        'R4' => [
+            self::REASON_LOINC  => 27,
+            self::REASON_SNOMED => 19,
+            self::REASON_ICD10  => 4,
+            self::REASON_CVX    => 3,
+            self::REASON_NCI    => 1,
+        ],
+        'R4B' => [],
+        'R5'  => [
+            self::REASON_LOINC       => 7,
+            self::REASON_XXE_REFUSAL => 1,
+        ],
+    ];
+
+    /**
+     * The reason a finding cannot be decided offline, or null when nothing here blocks it.
+     *
+     * Matched on the raw text because the system URL is the only part of a reference message that names the
+     * obstacle. Deliberately narrow: a system absent from {@see TERMINOLOGY_SYSTEMS} yields null and the
+     * finding stays counted as open, which is the direction that keeps work visible.
+     */
+    public static function reasonFor(string $javaText): ?string
+    {
+        foreach (self::TERMINOLOGY_SYSTEMS as $system => $reason) {
+            if (str_contains($javaText, $system)) {
+                return $reason;
+            }
+        }
+
+        $haystack = strtolower($javaText);
+        foreach (self::DECLARED_SIGNATURES as $signature => $reason) {
+            if (str_contains($haystack, $signature)) {
+                return $reason;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Substrings that mark a reference-validator error as needing a code system we do not hold.
      *

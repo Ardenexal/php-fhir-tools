@@ -138,6 +138,163 @@ final class ComparisonReport
     }
 
     /**
+     * How many reference findings we do not report, across every case including the unread ones.
+     *
+     * **This is the parity headline, not {@see belowCount()}.** A `BELOW` case count classifies on error
+     * totals, which distorts in both directions: it counts a case as short by two when one of the two is
+     * our own finding worded differently, and it counts a case as `EQUAL` when both sides report one
+     * error and the errors are about different things. Pairing removes both distortions.
+     *
+     * Unread cases are included because leaving them out is what let them go unmeasured — see
+     * {@see UnreadCase}.
+     */
+    public function missingFindingCount(): int
+    {
+        $total = 0;
+        foreach ($this->comparisons as $comparison) {
+            $total += $comparison->delta->count();
+        }
+        foreach ($this->unread as $unreadCase) {
+            $total += $unreadCase->delta->count();
+        }
+
+        return $total;
+    }
+
+    /**
+     * Missing findings nothing in this codebase can close, and how many of each reason.
+     *
+     * Split out of {@see missingFindingCount()} so the open figure reads as work someone could pick up.
+     * A finding lands here only when it names a code system {@see DeclaredLimitations} records as
+     * unavailable, and the counts are pinned by test — a new one appearing has to fail a check rather than
+     * quietly join the written-off pile, which is how the suppression this replaced went wrong.
+     *
+     * @return array<string, int> reason => findings blocked, descending
+     */
+    public function declaredByReason(): array
+    {
+        $histogram = [];
+
+        foreach ([...$this->comparisons, ...$this->unread] as $case) {
+            foreach ($case->delta->reasonHistogram() as $reason => $count) {
+                $histogram[$reason] = ($histogram[$reason] ?? 0) + $count;
+            }
+        }
+
+        arsort($histogram);
+
+        return $histogram;
+    }
+
+    /** Missing findings blocked by something outside this codebase. */
+    public function declaredMissingCount(): int
+    {
+        return array_sum($this->declaredByReason());
+    }
+
+    /**
+     * Missing findings someone could actually close.
+     *
+     * The figure the capability milestones are sized against. {@see missingFindingCount()} stays the
+     * arithmetic total so the two can be reconciled: open + declared is always the whole.
+     */
+    public function openMissingCount(): int
+    {
+        return $this->missingFindingCount() - $this->declaredMissingCount();
+    }
+
+    /**
+     * Case name => how many findings it is missing, largest first.
+     *
+     * The total alone is a misleading way to size work, because the distribution is extremely uneven:
+     * on R4, `japanese-utf8-ok` contributes 108 findings on its own, all downstream of one refusal to
+     * read a file whose encoding the reference validator tolerates. Fixing that reads as a hundred-plus
+     * improvement while closing one capability. Anyone choosing what to work on needs to see the
+     * concentration, not just the sum.
+     *
+     * @return array<string, int> descending by count, cases missing nothing omitted
+     */
+    public function missingByCase(): array
+    {
+        $byCase = [];
+
+        foreach ([...$this->comparisons, ...$this->unread] as $case) {
+            $count = $case->delta->count();
+            if ($count > 0) {
+                $byCase[$case->name] = $count;
+            }
+        }
+
+        arsort($byCase);
+
+        return $byCase;
+    }
+
+    /**
+     * Capability label => how many missing findings need it, across every case including unread ones.
+     *
+     * The totals sum to {@see missingFindingCount()} by construction, because
+     * {@see MissingFindingClassifier} labels every finding and falls back to `other` rather than
+     * dropping one. A partition that did not sum would mean findings were being lost in the measurement.
+     *
+     * @return array<string, int> descending by count
+     */
+    public function missingFindingHistogram(): array
+    {
+        $histogram = [];
+
+        foreach ([...$this->comparisons, ...$this->unread] as $case) {
+            foreach ($case->delta->labelHistogram() as $label => $count) {
+                $histogram[$label] = ($histogram[$label] ?? 0) + $count;
+            }
+        }
+
+        arsort($histogram);
+
+        return $histogram;
+    }
+
+    /**
+     * Compared cases missing at least one finding of this capability, largest contribution first.
+     *
+     * The review list behind a label: `--family=<label>` prints these with both sides' findings so a
+     * pairing can be judged by eye. Unread cases are excluded because there is no side of ours to show.
+     *
+     * @return list<CaseComparison>
+     */
+    public function casesNeeding(string $label): array
+    {
+        $matching = array_values(array_filter(
+            $this->comparisons,
+            static fn (CaseComparison $c): bool => $c->delta->needs($label),
+        ));
+
+        usort(
+            $matching,
+            static fn (CaseComparison $a, CaseComparison $b): int => count($b->delta->findingsFor($label)) <=> count($a->delta->findingsFor($label)),
+        );
+
+        return $matching;
+    }
+
+    /**
+     * Unread cases missing at least one finding of this capability.
+     *
+     * Kept separate from {@see casesNeeding()} rather than merged into it: these carry no findings of
+     * ours, so a caller printing a side-by-side has nothing to put in the left column and needs to know
+     * that rather than render an empty one.
+     *
+     * @return list<UnreadCase>
+     */
+    public function unreadNeeding(string $label): array
+    {
+        return array_values(array_filter(
+            $this->unread,
+            static fn (UnreadCase $c): bool => $c->delta->needs($label),
+        ));
+    }
+
+    /**
      * Family label => number of error violations carrying it, across every ABOVE case.
      *
      * Restricted to ABOVE because those are the false positives worth fixing; counting families

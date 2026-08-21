@@ -78,10 +78,11 @@ final class JavaOutcomeReader
             return new JavaOutcome(0, 0, 0);
         }
 
-        $errors     = 0;
-        $warnings   = 0;
-        $info       = 0;
-        $errorTexts = [];
+        $errors           = 0;
+        $warnings         = 0;
+        $info             = 0;
+        $errorTexts       = [];
+        $errorExpressions = [];
 
         foreach ($issues as $issue) {
             if (!is_array($issue)) {
@@ -98,13 +99,23 @@ final class JavaOutcomeReader
             };
 
             if (in_array($severity, ['error', 'fatal'], true)) {
-                $details = $issue['details'] ?? null;
-                if (is_array($details) && is_string($details['text'] ?? null)) {
-                    $errorTexts[] = $details['text'];
-                }
+                // Both lists grow exactly once per error, even when the issue carries neither field. They
+                // are read in parallel, so appending only when a value exists would silently shift every
+                // later expression onto the wrong text.
+                $details      = $issue['details'] ?? null;
+                $errorTexts[] = is_array($details) && is_string($details['text'] ?? null)
+                    ? $details['text']
+                    : JavaOutcome::TEXT_UNAVAILABLE;
+
+                // `expression` is FHIRPath into the instance; `location` is the older XPath-ish form of the
+                // same thing. Either says which element the finding is about, which the message text does
+                // not: it names the element by type (`List.status`), so two Lists in one document are
+                // indistinguishable without this.
+                $where              = $issue['expression'] ?? $issue['location'] ?? null;
+                $errorExpressions[] = is_array($where) && is_string($where[0] ?? null) ? $where[0] : '';
             }
         }
 
-        return new JavaOutcome($errors, $warnings, $info, $errorTexts);
+        return new JavaOutcome($errors, $warnings, $info, $errorTexts, $errorExpressions);
     }
 }

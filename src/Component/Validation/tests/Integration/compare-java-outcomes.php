@@ -21,11 +21,25 @@ declare(strict_types=1);
  *             Java's. Counts alone cannot tell "we report something Java does not" from "we report
  *             the same finding differently", and M02 must not "fix" a family Java agrees with.
  *             Example: --family=constraint:NotBlank
+ *   --below --family=<label>
+ *             The same review in the other direction: every case missing a finding of one
+ *             *capability*, with the reference findings we do not report beside everything we do
+ *             report on that case. This is how a pairing gets judged by eye.
+ *             Example: --below --family=terminology:display
  *
  * Why this exists: FHIRValidatorSpecificationTest asserts against outcomes/ardenexal/, which
  * seed-outcomes.php generates from our own validator's output. That is a regression lock — it tells
  * you behaviour changed, never that behaviour is correct. This script is the conformance oracle.
  * Do not run seed-outcomes.php to make the suite green while any ABOVE case remains.
+ *
+ * ## Read MISSING, not BELOW
+ *
+ * `BELOW` counts cases where Java reports more errors than we do, which is not the number of checks
+ * we lack. It overstates — `R4.Observation-ex-pain` reads two short when one of the two is our own
+ * `This value should not be blank.` worded differently — and it also hides cases that agree on the
+ * total while reporting different things. MISSING pairs the two sides finding by finding and counts
+ * only what is left over. Size work off MISSING and its capability labels; BELOW stays on the
+ * summary line because the specification suite still classifies on counts.
  */
 
 require_once __DIR__ . '/../../../../../vendor/autoload.php';
@@ -79,6 +93,60 @@ foreach ($flags as $flag) {
     }
 }
 
+// With --below, the label names a missing *capability* rather than one of our constraint families, so
+// the review is inverted: the left column is everything we report on the case and the right column is
+// only what Java reports that we do not. Judging a pairing needs both, which a MISSING count cannot show.
+if ($familyFlag !== null && $only === Classification::Below) {
+    $matching = $report->casesNeeding($familyFlag);
+    $unreadOn = $report->unreadNeeding($familyFlag);
+
+    printf(
+        "Capability '%s': %d compared case(s), %d unread case(s):\n\n",
+        $familyFlag,
+        count($matching),
+        count($unreadOn),
+    );
+
+    foreach ($matching as $c) {
+        $missingHere = $c->delta->findingsFor($familyFlag);
+
+        printf(
+            "── %s  (ours %d, java %d, missing %d of which %d here)\n",
+            $c->name,
+            $c->ourErrorCount,
+            $c->javaErrorCount,
+            $c->delta->count(),
+            count($missingHere),
+        );
+
+        echo "   WE REPORT:\n";
+        if ($c->ourErrorMessages === []) {
+            echo "     (nothing)\n";
+        }
+        foreach ($c->ourErrorMessages as $i => $m) {
+            printf("     [%s] %s — %s\n", $c->families[$i] ?? '?', $c->ourErrorPaths[$i] ?? '?', $m);
+        }
+
+        echo "   JAVA REPORTS, UNPAIRED:\n";
+        foreach ($missingHere as $t) {
+            printf("     %s\n", $t);
+        }
+        echo "\n";
+    }
+
+    foreach ($unreadOn as $u) {
+        printf("── %s  (UNREAD — nothing of ours to compare)\n", $u->name);
+        printf("   REJECTED: %s\n", str_replace("\n", ' ', $u->failureMessage));
+        echo "   JAVA REPORTS, UNPAIRED:\n";
+        foreach ($u->delta->findingsFor($familyFlag) as $t) {
+            printf("     %s\n", $t);
+        }
+        echo "\n";
+    }
+
+    exit(0);
+}
+
 if ($familyFlag !== null) {
     $matching = array_values(array_filter(
         $report->byClassification(Classification::Above),
@@ -127,7 +195,16 @@ if ($asJson) {
             'java'         => $c->javaErrorCount,
             'javaWarnings' => $c->javaWarningCount,
             'failure'      => $c->failureMessage,
+            'missing'      => $c->delta->count(),
+            'missingBy'    => $c->delta->labelHistogram(),
         ], $report->unreadByImpact()),
+        // The headline the parity work is sized against. Ahead of the case classes in the payload
+        // because reading `below` first is the mistake this measurement exists to stop.
+        'missing'          => $report->missingFindingCount(),
+        'missingOpen'      => $report->openMissingCount(),
+        'missingDeclared'  => $report->declaredMissingCount(),
+        'declaredByReason' => $report->declaredByReason(),
+        'missingBy'        => $report->missingFindingHistogram(),
         'crashedCases'     => $report->crashedCases(),
         'warningMismatch'  => count($report->warningMismatches()),
         'wallClockSeconds' => round($report->wallClockSeconds, 2),
@@ -141,6 +218,8 @@ if ($asJson) {
             'oursWarnings'    => $c->ourWarningCount,
             'javaWarnings'    => $c->javaWarningCount,
             'warningClass'    => $c->warningClassification()->value,
+            'missing'         => $c->delta->count(),
+            'missingBy'       => $c->delta->labelHistogram(),
         ], $report->comparisons),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
 
@@ -169,6 +248,19 @@ if ($listed !== []) {
     }
     echo "\n";
 }
+
+// MISSING leads because it is the number work is sized against; the case classes follow it because the
+// specification suite still asserts on counts. Reading BELOW as the gap is the error being corrected —
+// see this file's "Read MISSING, not BELOW".
+printf(
+    "MISSING %d reference finding(s) with no counterpart in ours (across %d compared + %d unread case(s))\n"
+    . "  of which OPEN %d  ·  DECLARED %d (blocked outside this codebase; see below)\n",
+    $report->missingFindingCount(),
+    count($report->comparisons),
+    $report->unreadCount(),
+    $report->openMissingCount(),
+    $report->declaredMissingCount(),
+);
 
 printf(
     "ABOVE %d  ·  EQUAL %d  ·  BELOW %d  ·  UNREAD %d   (compared %d, skipped %d, %.2fs)\n",
@@ -250,6 +342,45 @@ if ($families !== []) {
     foreach ($families as $family => $count) {
         printf("  %-40s %d\n", $family, $count);
     }
+}
+
+// The capability breakdown, which is what M02 picks its next target from. The totals sum to MISSING by
+// construction — `other` is a real label, not a discard — so a growing `other` means a signature is
+// missing from MissingFindingClassifier, never that findings were lost.
+// Named, not merely counted. A limitation whose reason is not written down is indistinguishable from a
+// gap nobody got round to, which is the confusion this section exists to remove.
+$declared = $report->declaredByReason();
+if ($declared !== []) {
+    printf("\nDECLARED LIMITATIONS (%d finding(s) — not open work):\n", $report->declaredMissingCount());
+    foreach ($declared as $reason => $count) {
+        printf("  %4d  %s\n", $count, $reason);
+    }
+}
+
+$missingBy = $report->missingFindingHistogram();
+if ($missingBy !== []) {
+    printf(
+        "\nMISSING by capability (largest first, sums to %d). Review one with:\n"
+        . "  --below --family=<label>\n",
+        $report->missingFindingCount(),
+    );
+    foreach ($missingBy as $label => $count) {
+        printf("  %-40s %d\n", $label, $count);
+    }
+
+    // The distribution is far more uneven than the total suggests, so print it. Sizing work off the sum
+    // alone would credit one encoding fix with a hundred-plus findings.
+    $byCase = $report->missingByCase();
+    echo "\nMISSING concentrated in these cases (largest first):\n";
+    foreach (array_slice($byCase, 0, 10, true) as $caseName => $count) {
+        printf("  %-46s %d\n", substr($caseName, 0, 46), $count);
+    }
+    printf(
+        "  (%d case(s) missing at least one finding; top 10 hold %d of %d)\n",
+        count($byCase),
+        array_sum(array_slice($byCase, 0, 10, true)),
+        $report->missingFindingCount(),
+    );
 }
 
 exit($exitCode);
