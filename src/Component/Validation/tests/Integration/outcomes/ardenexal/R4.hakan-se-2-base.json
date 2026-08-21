@@ -1,12 +1,12 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 1,
     "java": {
         "errorCount": 2,
         "warningCount": 1,
         "infoCount": 1,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "BELOW",
         "errors": [
             "If a date has a time, it must have a timezone",
@@ -17,6 +17,9 @@
         "errors": {
             "constraint:NotBlank": [
                 "medication — This value should not be blank."
+            ],
+            "constraint:PrimitiveFormatChecker": [
+                "authoredOn — If a date has a time, it must have a timezone"
             ]
         },
         "warnings": {}
