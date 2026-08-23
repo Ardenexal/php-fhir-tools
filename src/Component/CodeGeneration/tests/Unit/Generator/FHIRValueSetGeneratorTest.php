@@ -47,7 +47,7 @@ final class FHIRValueSetGeneratorTest extends TestCase
         // The override drops the redundant `CDA` prefix the ValueSet name carries.
         self::assertSame('NullFlavor', $enum->getName());
 
-        $values = array_map(static fn ($c) => $c->getValue(), $enum->getCases());
+        $values = array_values(array_map(static fn ($c) => $c->getValue(), $enum->getCases()));
         self::assertEqualsCanonicalizing(['NI', 'UNK', 'ASKU'], $values);
     }
 
@@ -78,7 +78,7 @@ final class FHIRValueSetGeneratorTest extends TestCase
         }
 
         // Backing values are preserved exactly (the symbols), only the case *names* are slugged.
-        $values = array_map(static fn ($c) => $c->getValue(), $cases);
+        $values = array_values(array_map(static fn ($c) => $c->getValue(), $cases));
         self::assertEqualsCanonicalizing(['N', '<', '>'], $values);
     }
 
