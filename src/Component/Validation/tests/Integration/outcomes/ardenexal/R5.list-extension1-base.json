@@ -1,5 +1,5 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -14,7 +14,11 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:UnknownInputChecker": [
+                "(root) — Unrecognized property 'fhir_comments'"
+            ]
+        },
         "warnings": {}
     }
 }

@@ -44,6 +44,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly PrimitiveFormatChecker $primitiveChecker = new PrimitiveFormatChecker(),
         private readonly CodingSystemChecker $codingSystemChecker = new CodingSystemChecker(),
         private readonly BundleEntryFullUrlChecker $bundleFullUrlChecker = new BundleEntryFullUrlChecker(),
+        private readonly UnknownInputChecker $unknownInputChecker = new UnknownInputChecker(),
     ) {
     }
 
@@ -101,6 +102,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // needs no terminology server: both rules read the URL alone. See CodingSystemChecker.
         foreach ($this->codingSystemChecker->check($resource) as $codingViolation) {
             $violations[] = $codingViolation;
+        }
+
+        // Elements the reader could not place on the model. Unconditional like the passes above,
+        // and it reads what deserialization recorded rather than the object: by this point the
+        // model holds only the names it could place, so the dropped ones are gone from it.
+        foreach ($this->unknownInputChecker->check($resource) as $unknownInputViolation) {
+            $violations[] = $unknownInputViolation;
         }
 
         // Bundle.entry.fullUrl must be absolute. Unconditional for the same reason again, and a shape
