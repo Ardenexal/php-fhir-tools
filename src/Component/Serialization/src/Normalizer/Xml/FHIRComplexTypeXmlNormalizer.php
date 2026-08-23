@@ -147,6 +147,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 : $this->instantiateWithEmptyArrays($reflection);
 
             $metaMap = $this->getPropertyMetadataMap($object);
+            $data    = $this->remapNamespacedElements($data, $metaMap, $object, $sourceElement);
 
             foreach ($data as $elementName => $value) {
                 // XmlEncoder attribute keys: @url → url (Extension.url); skip @value and # (XmlEncoder artifacts)
@@ -405,6 +406,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
     protected function normalizeForXML(object $object, FHIRSerializationContext $fhirContext, array $context): array
     {
         $data              = [];
+        /** @var array<string, list<mixed>> $namespacedData Buffered non-default-namespace elements, merged below */
+        $namespacedData    = [];
         $metaMap           = $this->getPropertyMetadataMap($object);
         $includeExtensions = $fhirContext->includeExtensions;
 
@@ -537,7 +540,22 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         : $this->normalizeBasicValue($value, 'xml', $context));
                 $normalizedValue = $this->applyElementNamespace($normalizedValue, $meta->xmlNamespace);
                 if ($normalizedValue !== null) {
-                    $data[$localKey] = $normalizedValue;
+                    // Buffered rather than written straight in: the stripped local name can equal a
+                    // sibling property's element name (Patient.raceCode vs Patient.sdtcRaceCode), and
+                    // a keyed write would let whichever property is declared later silently drop the
+                    // other. Merged after the loop so the outcome does not depend on declaration
+                    // order.
+                    //
+                    // An array-typed property already normalized to a list of elements; its members
+                    // are buffered individually so they stay siblings rather than becoming one
+                    // nested list.
+                    if (is_array($normalizedValue) && array_is_list($normalizedValue)) {
+                        foreach ($normalizedValue as $item) {
+                            $namespacedData[$localKey][] = $item;
+                        }
+                    } else {
+                        $namespacedData[$localKey][] = $normalizedValue;
+                    }
                 }
                 continue;
             }
@@ -565,6 +583,112 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 if ($normalizedValue !== null) {
                     $data[$xmlKey] = $normalizedValue;
                 }
+            }
+        }
+
+        // Fold buffered namespaced elements in. Where the local name is free the value keeps its
+        // natural shape; where it collides with an element the loop already emitted, the two become
+        // a list — XmlEncoder renders that as repeated siblings and honours the per-item @xmlns, so
+        // <raceCode/> and <raceCode xmlns="urn:hl7-org:sdtc"/> both survive as distinct elements.
+        foreach ($namespacedData as $localKey => $values) {
+            $existing = array_key_exists($localKey, $data) ? [$data[$localKey]] : [];
+            $merged   = array_merge($existing, $values);
+
+            $data[$localKey] = count($merged) === 1 ? $merged[0] : $merged;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Re-key decoded elements that were emitted under a different local name in their own XML
+     * namespace, so the existing property loop below can resolve them by property name as usual.
+     *
+     * normalizeForXML emits an sdtc property under its bare local name (sdtcStatusCode ->
+     * <statusCode xmlns="urn:hl7-org:sdtc">), so the decoded key is `statusCode` and never matches
+     * the `sdtcStatusCode` property. This is the inverse. Only properties whose emitted local name
+     * actually differs from the property name need remapping, which excludes the AU/ADHA extension
+     * elements — they emit under their own name and already resolve.
+     *
+     * Symfony's XmlEncoder decode is namespace-blind: a v3 <raceCode> and an sdtc <raceCode> collapse
+     * into one grouped key with no namespace anywhere in the result. The source DOM element is the
+     * only place the distinction survives, so it drives the split whenever it is available. Decoded
+     * siblings and DOM children are paired by index, which is sound precisely because both sequences
+     * are namespace-blind in the same way and both keep document order; a length mismatch means the
+     * pairing cannot be trusted, so the entry is left alone rather than guessed at.
+     *
+     * @param array<array-key, mixed>         $data
+     * @param array<string, PropertyMetadata> $metaMap
+     * @param object                          $subject The instance being populated, used for property lookup
+     *
+     * @return array<array-key, mixed>
+     */
+    private function remapNamespacedElements(array $data, array $metaMap, object $subject, ?\DOMElement $sourceElement): array
+    {
+        /** @var array<string, list<array{property: string, namespace: string}>> $candidates */
+        $candidates = [];
+        foreach ($metaMap as $propertyName => $meta) {
+            if ($meta->xmlNamespace === null) {
+                continue;
+            }
+
+            $localName = $this->cdaLocalElementName($propertyName, $meta);
+            if ($localName === $propertyName) {
+                // Emitted under its own name (AU/ADHA extensions, unprefixed sdtc properties) —
+                // the default property-name lookup already resolves it.
+                continue;
+            }
+
+            $candidates[$localName][] = ['property' => $propertyName, 'namespace' => $meta->xmlNamespace];
+        }
+
+        foreach ($candidates as $localName => $matches) {
+            if (!array_key_exists($localName, $data)) {
+                continue;
+            }
+
+            $collides = self::reflProp($subject, $localName) !== null;
+
+            if ($sourceElement === null) {
+                // No DOM to disambiguate with. A single unambiguous candidate can still be re-keyed
+                // blindly; a collision cannot, so it keeps the previous behaviour.
+                if (!$collides && count($matches) === 1) {
+                    $data[$matches[0]['property']] = $data[$localName];
+                    unset($data[$localName]);
+                }
+
+                continue;
+            }
+
+            $decoded     = $data[$localName];
+            $items       = is_array($decoded) && array_is_list($decoded) ? $decoded : [$decoded];
+            $domChildren = $this->childElementsByLocalName($sourceElement, $localName);
+
+            if (count($domChildren) !== count($items)) {
+                continue;
+            }
+
+            /** @var array<string, list<mixed>> $buckets */
+            $buckets = [];
+            foreach ($items as $index => $item) {
+                $namespace = $domChildren[$index]->namespaceURI;
+                $target    = $localName;
+
+                foreach ($matches as $match) {
+                    if ($match['namespace'] === $namespace) {
+                        $target = $match['property'];
+                        break;
+                    }
+                }
+
+                $buckets[$target][] = $item;
+            }
+
+            unset($data[$localName]);
+            foreach ($buckets as $property => $values) {
+                // A lone element decodes to a bare map rather than a list; hand the loop the same
+                // shape it would have seen had the element not needed remapping.
+                $data[$property] = count($values) === 1 ? $values[0] : $values;
             }
         }
 
