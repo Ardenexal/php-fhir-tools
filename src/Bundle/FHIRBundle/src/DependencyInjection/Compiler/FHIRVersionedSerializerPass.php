@@ -14,11 +14,13 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorIn
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRBackboneElementJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRComplexTypeJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRLogicalModelJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIROperationPayloadJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRPrimitiveTypeJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRResourceJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRBackboneElementXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRComplexTypeXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRLogicalModelXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIROperationPayloadXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRPrimitiveTypeXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRResourceXmlNormalizer;
@@ -239,6 +241,30 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
             ])
             ->setPublic(false);
 
+        // CDA logical models: XML-only serialization + a JSON guard that rejects them.
+        $logicalModelJsonId = "fhir.normalizer.logical_model.json.{$v}";
+        $container->register($logicalModelJsonId, FHIRLogicalModelJsonNormalizer::class)
+            ->setArguments([
+                new Reference(FHIRMetadataExtractorInterface::class),
+                null,
+                null,
+                $version->value,
+                $igRegistryRef,
+            ])
+            ->setPublic(false);
+
+        $logicalModelXmlId = "fhir.normalizer.logical_model.xml.{$v}";
+        $container->register($logicalModelXmlId, FHIRLogicalModelXmlNormalizer::class)
+            ->setArguments([
+                new Reference(FHIRMetadataExtractorInterface::class),
+                new Reference(FHIRTypeResolverInterface::class),
+                null,
+                null,
+                $version->value,
+                $igRegistryRef,
+            ])
+            ->setPublic(false);
+
         // ---- Version-scoped Symfony Serializer ----
 
         $serializerId = "fhir.serializer.{$v}";
@@ -249,9 +275,11 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
                     // one produces an object with every property null, silently.
                     new Reference($operationJsonId),
                     new Reference($operationXmlId),
+                    new Reference($logicalModelJsonId),
                     new Reference($resourceJsonId),
                     new Reference($resourceXmlId),
                     new Reference($complexJsonId),
+                    new Reference($logicalModelXmlId),
                     new Reference($complexXmlId),
                     new Reference($primitiveJsonId),
                     new Reference($primitiveXmlId),

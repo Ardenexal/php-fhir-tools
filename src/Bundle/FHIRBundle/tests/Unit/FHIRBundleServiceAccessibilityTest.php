@@ -120,7 +120,7 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
                 }
             }
 
-            // Verify that FHIRVersionedSerializerPass registers all 8 format-specific normalizer
+            // Verify that FHIRVersionedSerializerPass registers all 10 format-specific normalizer
             // services for the configured FHIR version. Normalizers are injected directly into
             // the Serializer constructor (not tagged), so we call the pass directly and check IDs.
             (new FHIRVersionedSerializerPass())->process($container);
@@ -131,9 +131,11 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
                 // generic normalizer reaching one yields an object with every property null.
                 "fhir.normalizer.operation_payload.json.{$v}",
                 "fhir.normalizer.operation_payload.xml.{$v}",
+                "fhir.normalizer.logical_model.json.{$v}",
                 "fhir.normalizer.resource.json.{$v}",
                 "fhir.normalizer.resource.xml.{$v}",
                 "fhir.normalizer.complex_type.json.{$v}",
+                "fhir.normalizer.logical_model.xml.{$v}",
                 "fhir.normalizer.complex_type.xml.{$v}",
                 "fhir.normalizer.primitive.json.{$v}",
                 "fhir.normalizer.primitive.xml.{$v}",
