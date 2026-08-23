@@ -152,9 +152,13 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 // XmlEncoder attribute keys: @url → url (Extension.url); skip @value and # (XmlEncoder artifacts)
                 if (str_starts_with($elementName, '@')) {
                     if ($elementName !== '@value') {
-                        $attrProp = self::reflProp($resolvedType, substr($elementName, 1));
+                        $attrName = substr($elementName, 1);
+                        $attrProp = self::reflProp($resolvedType, $attrName);
                         if ($attrProp !== null) {
-                            $attrProp->setValue($object, (string) $value);
+                            $attrProp->setValue(
+                                $object,
+                                $this->denormalizeXmlAttribute((string) $value, $attrProp, $metaMap[$attrName] ?? null),
+                            );
                         }
                     }
                     continue;
@@ -507,12 +511,17 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 }
             }
 
-            // xmlAttr properties emit as XML attributes on the parent element
-            if ($meta !== null && $meta->xmlSerializedName !== null && is_scalar($value)) {
-                $data[$meta->xmlSerializedName] = is_bool($value)
-                    ? ($value ? 'true' : 'false')
-                    : (string) $value;
-                continue;
+            // xmlAttr properties emit as XML attributes on the parent element. The value may be a
+            // scalar, a backed enum (CDA coded properties — propertyKind 'enum'), or a list of
+            // either: V3 SET<cs> attributes such as AD.use carry several codes in one attribute,
+            // space-delimited. A value that is none of those yields null here and falls through to
+            // the element-emitting branches below, preserving the previous behaviour.
+            if ($meta !== null && $meta->xmlSerializedName !== null) {
+                $attribute = $this->xmlAttributeValue($value);
+                if ($attribute !== null) {
+                    $data[$meta->xmlSerializedName] = $attribute;
+                    continue;
+                }
             }
 
             // CDA elements in a non-default namespace (sdtc extensions, AU/ADHA extensions): emit
@@ -560,6 +569,108 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         return $data;
+    }
+
+    /**
+     * Render an xmlAttr property value as an XML attribute string, or null when it is not
+     * representable as one (the caller then falls through to the element-emitting branches).
+     *
+     * A list renders as its space-delimited members, which is the V3 SET<cs> attribute form used by
+     * AD.use, EN.use, ENXP.qualifier and TEL.use. An empty list yields null rather than an empty
+     * attribute; callers skip empty arrays before reaching here, so this is defence in depth.
+     */
+    private function xmlAttributeValue(mixed $value): ?string
+    {
+        if (!is_array($value)) {
+            return $this->xmlAttributeScalar($value);
+        }
+
+        $parts = [];
+        foreach ($value as $item) {
+            $rendered = $this->xmlAttributeScalar($item);
+            if ($rendered === null) {
+                // A non-representable member disqualifies the whole attribute rather than silently
+                // emitting a partial code list.
+                return null;
+            }
+            $parts[] = $rendered;
+        }
+
+        return $parts === [] ? null : implode(' ', $parts);
+    }
+
+    /**
+     * Render one xmlAttr member. Backed enums (CDA coded properties) contribute their backing code;
+     * a bare enum object would otherwise reach the generic normalizer chain, which has no enum
+     * normalizer and throws.
+     */
+    private function xmlAttributeScalar(mixed $value): ?string
+    {
+        if ($value instanceof \BackedEnum) {
+            return (string) $value->value;
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        return is_scalar($value) ? (string) $value : null;
+    }
+
+    /**
+     * Coerce a decoded XML attribute string to the target property's declared type.
+     *
+     * Only enum-typed and array-typed properties need conversion; every other property keeps the
+     * historical plain-string assignment, so FHIR R4/R4B/R5 attribute handling is untouched — no
+     * generated FHIR property is enum- or array-typed on an xmlAttr, CDA is the only consumer.
+     */
+    private function denormalizeXmlAttribute(string $value, \ReflectionProperty $property, ?PropertyMetadata $meta): mixed
+    {
+        $type     = $property->getType();
+        $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : null;
+
+        if ($typeName === 'array') {
+            $codes     = preg_split('/\s+/', trim($value), -1, PREG_SPLIT_NO_EMPTY);
+            $codes     = $codes === false ? [] : $codes;
+            $itemClass = $meta?->phpItemClass !== null ? ltrim($meta->phpItemClass, '\\') : null;
+
+            if ($itemClass !== null && is_a($itemClass, \BackedEnum::class, true)) {
+                /** @var class-string<\BackedEnum> $itemClass */
+                return array_map(fn (string $code): \BackedEnum => $this->enumCase($itemClass, $code), $codes);
+            }
+
+            return $codes;
+        }
+
+        if ($typeName !== null && is_a($typeName, \BackedEnum::class, true)) {
+            /** @var class-string<\BackedEnum> $typeName */
+            return $this->enumCase($typeName, $value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Resolve one code to its enum case.
+     *
+     * An unrecognised code throws rather than yielding null: the property cannot represent the
+     * value, so a silent null would drop clinical data with no signal. The message names both the
+     * code and the enum so a gap between a published CDA document and the generated ValueSet enum
+     * is diagnosable at the point of failure.
+     *
+     * @param class-string<\BackedEnum> $enumClass
+     *
+     * @throws NotNormalizableValueException When the code is absent from the enum
+     */
+    private function enumCase(string $enumClass, string $code): \BackedEnum
+    {
+        $case = $enumClass::tryFrom($code);
+
+        if ($case === null) {
+            throw new NotNormalizableValueException(sprintf('Value "%s" is not a valid case of enum "%s".', $code, $enumClass));
+        }
+
+        return $case;
     }
 
     /**

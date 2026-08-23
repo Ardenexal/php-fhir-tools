@@ -7,8 +7,12 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuControlAct;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuEntry;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\ClinicalDocument;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\AD;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\TEL;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\PostalAddressUse;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
@@ -106,6 +110,79 @@ final class CdaXmlSerializationTest extends TestCase
         self::assertStringContainsString(
             '<controlAct xmlns="http://ns.electronichealth.net.au/Ci/Cda/Extensions/3.0"',
             $xml,
+        );
+    }
+
+    /**
+     * nullFlavor is declared on ANY, the root of the whole CDA datatype lattice, as an enum-typed
+     * xmlAttr. A BackedEnum is an object, so the xmlAttr emit branch must unwrap ->value rather than
+     * fall through to the generic normalizer chain (which has no enum normalizer and throws).
+     */
+    public function testEnumAttributeSerializesAsItsBackingCode(): void
+    {
+        $xml = $this->service()->serializeToXml(new II(root: '1.2.3', nullFlavor: NullFlavor::ni));
+
+        self::assertStringContainsString('nullFlavor="NI"', $xml);
+        self::assertStringNotContainsString('<nullFlavor', $xml);
+    }
+
+    public function testEnumAttributeRoundTripsToTheEnumCase(): void
+    {
+        $document = $this->service()->deserializeFromXml(
+            '<ClinicalDocument xmlns="urn:hl7-org:v3"><id nullFlavor="NI" /></ClinicalDocument>',
+            ClinicalDocument::class,
+        );
+
+        self::assertSame(NullFlavor::ni, $document->id?->nullFlavor);
+    }
+
+    /**
+     * V3 SET<cs> attributes (AD.use, EN.use, ENXP.qualifier) carry several codes in one attribute,
+     * space-delimited.
+     */
+    public function testEnumListAttributeSerializesSpaceDelimited(): void
+    {
+        $xml = $this->service()->serializeToXml(new AD(use: [PostalAddressUse::hp, PostalAddressUse::wp]));
+
+        self::assertStringContainsString('use="HP WP"', $xml);
+    }
+
+    public function testEnumListAttributeRoundTripsPreservingOrder(): void
+    {
+        $address = $this->service()->deserializeFromXml(
+            '<AD xmlns="urn:hl7-org:v3" use="HP WP" />',
+            AD::class,
+        );
+
+        self::assertSame([PostalAddressUse::hp, PostalAddressUse::wp], $address->use);
+    }
+
+    /**
+     * TEL.use is a list<string> xmlAttr with no bound enum, so the same array branch must split it
+     * into plain strings rather than assigning the raw attribute value to an array property.
+     */
+    public function testNonEnumListAttributeRoundTripsAsStrings(): void
+    {
+        $tel = $this->service()->deserializeFromXml(
+            '<TEL xmlns="urn:hl7-org:v3" use="HP WP" />',
+            TEL::class,
+        );
+
+        self::assertSame(['HP', 'WP'], $tel->use);
+    }
+
+    /**
+     * A code the generated enum does not carry must fail loudly and catchably, never be dropped:
+     * silent loss is what makes malformed CDA undetectable downstream.
+     */
+    public function testUnknownEnumCodeThrowsDescriptiveException(): void
+    {
+        $this->expectException(FHIRSerializationException::class);
+        $this->expectExceptionMessageMatches('/NOT_A_REAL_CODE/');
+
+        $this->service()->deserializeFromXml(
+            '<AD xmlns="urn:hl7-org:v3" use="NOT_A_REAL_CODE" />',
+            AD::class,
         );
     }
 }
