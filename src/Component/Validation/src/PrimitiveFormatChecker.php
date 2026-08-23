@@ -112,13 +112,6 @@ final class PrimitiveFormatChecker
     private const string DECIMAL = '/\A(?:' . self::DECIMAL_SOURCE . ')\z/';
 
     /**
-     * A well-formed number in canonical form: no leading zeros, no trailing dot, no stray characters.
-     *
-     * Deliberately looser than {@see self::DECIMAL} on precision and exponent size — it exists only to
-     * separate "not a number" from "a number FHIR will not accept", which is the difference between the
-     * reference validator's two decimal messages.
-     */
-    /**
      * The canonical FHIR `instant` pattern, quoted in the message exactly as the reference validator
      * writes it — see `outcomes/java` (search: `does not meet instant regex`).
      *
@@ -137,7 +130,37 @@ final class PrimitiveFormatChecker
      */
     private const string INSTANT_ANY_OFFSET = '/\A([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]{1,9})?(Z|(\+|-)\d{2}:\d{2})\z/';
 
+    /**
+     * A well-formed number in canonical form: no leading zeros, no trailing dot, no stray characters.
+     *
+     * Deliberately looser than {@see self::DECIMAL} on precision and exponent size — it exists only to
+     * separate "not a number" from "a number FHIR will not accept", which is the difference between the
+     * reference validator's two decimal messages.
+     */
     private const string CANONICAL_NUMBER = '/\A-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+\-]?[0-9]+)?\z/';
+
+    /**
+     * Every Unicode separator plus ASCII whitespace.
+     *
+     * `\s` under `/u` does not match U+00A0, which `R5.cs-v2-0550` needs, so `\p{Z}` is included.
+     */
+    private const string WHITESPACE_CLASS = '[\p{Z}\s]';
+
+    private const string URI_WHITESPACE = '/' . self::WHITESPACE_CLASS . '/u';
+
+    /** ASCII whitespace only; the base64 rule does not use {@see self::WHITESPACE_CLASS}. */
+    private const string BASE64_WHITESPACE = '/\s/u';
+
+    private const string ID = '/\A[A-Za-z0-9\-\.]{1,64}\z/';
+
+    /**
+     * An OID's node sequence, matched after the `urn:oid:` prefix has been stripped.
+     */
+    private const string OID = '/\A[0-2](\.(0|[1-9][0-9]*))+\z/';
+
+    private const string TIMEZONE_SUFFIX = '/(Z|[+\-]\d{2}:\d{2})\z/';
+
+    private const string URI_SCHEME = '/\A[a-zA-Z][a-zA-Z0-9+.\-]*:/';
 
     /** @var array<string, bool> keyed by declaring class and property name; reflection is not free */
     private array $decimalProperties = [];
@@ -339,7 +362,7 @@ final class PrimitiveFormatChecker
      */
     private function checkBase64(string $value, string $path, string $fhirVersion): array
     {
-        if (preg_match('/\s/u', $value) === 1) {
+        if (preg_match(self::BASE64_WHITESPACE, $value) === 1) {
             if ($fhirVersion !== 'R5') {
                 return [];
             }
@@ -374,7 +397,7 @@ final class PrimitiveFormatChecker
      */
     private function checkCode(string $value, string $path): array
     {
-        $ws = '[\p{Z}\s]';
+        $ws = self::WHITESPACE_CLASS;
 
         $offends = preg_match('/\A' . $ws . '/u', $value) === 1
             || preg_match('/' . $ws . '\z/u', $value)     === 1
@@ -400,7 +423,7 @@ final class PrimitiveFormatChecker
      */
     private function checkId(string $value, string $path): array
     {
-        if (preg_match('/\A[A-Za-z0-9\-\.]{1,64}\z/', $value) === 1) {
+        if (preg_match(self::ID, $value) === 1) {
             return [];
         }
 
@@ -442,7 +465,7 @@ final class PrimitiveFormatChecker
 
         $oid = substr($value, strlen('urn:oid:'));
 
-        if (preg_match('/\A[0-2](\.(0|[1-9][0-9]*))+\z/', $oid) !== 1) {
+        if (preg_match(self::OID, $oid) !== 1) {
             $violations[] = $this->violation($path, sprintf('OIDs must be valid (%s)', $oid));
         }
 
@@ -456,7 +479,7 @@ final class PrimitiveFormatChecker
      */
     private function checkUriWhitespace(string $value, string $path): array
     {
-        if (preg_match('/[\p{Z}\s]/u', $value) !== 1) {
+        if (preg_match(self::URI_WHITESPACE, $value) !== 1) {
             return [];
         }
 
@@ -596,7 +619,7 @@ final class PrimitiveFormatChecker
             return null;
         }
 
-        if (preg_match('/(Z|[+\-]\d{2}:\d{2})\z/', $lexeme) === 1) {
+        if (preg_match(self::TIMEZONE_SUFFIX, $lexeme) === 1) {
             return null;
         }
 
@@ -616,7 +639,7 @@ final class PrimitiveFormatChecker
     {
         $violations = $this->checkUriWhitespace($value, $path);
 
-        if (str_starts_with($value, '#') || preg_match('/\A[a-zA-Z][a-zA-Z0-9+.\-]*:/', $value) === 1) {
+        if (str_starts_with($value, '#') || preg_match(self::URI_SCHEME, $value) === 1) {
             return $violations;
         }
 
