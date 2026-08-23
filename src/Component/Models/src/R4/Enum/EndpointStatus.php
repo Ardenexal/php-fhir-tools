@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: EndpointStatus
  * URL: http://hl7.org/fhir/ValueSet/endpoint-status
  * Version: 4.0.1
  * Description: The status of the endpoint.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/endpoint-status', version: '4.0.1')]
 enum EndpointStatus: string
 {
     /** Active */

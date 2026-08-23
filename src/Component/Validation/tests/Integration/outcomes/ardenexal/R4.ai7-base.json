@@ -1,5 +1,29 @@
 {
     "errorCount": 3,
-    "warningCount": 2,
-    "infoCount": 2
+    "warningCount": 0,
+    "infoCount": 4,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "StructureDefinition.abstract: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/StructureDefinition|4.0.1)",
+            "StructureDefinition.name: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/StructureDefinition|4.0.1)",
+            "StructureDefinition.status: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/StructureDefinition|4.0.1)"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotBlank": [
+                "name — This value should not be blank.",
+                "status — This value should not be blank."
+            ],
+            "constraint:NotNull": [
+                "abstract — This value should not be null."
+            ]
+        },
+        "warnings": {}
+    }
 }

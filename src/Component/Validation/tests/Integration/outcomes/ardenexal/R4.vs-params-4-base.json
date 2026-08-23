@@ -1,5 +1,19 @@
 {
     "errorCount": 0,
-    "warningCount": 2,
-    "infoCount": 0
+    "warningCount": 0,
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "A ValueSet expression language must be 'text/fhirpath' not 'text/cql'"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

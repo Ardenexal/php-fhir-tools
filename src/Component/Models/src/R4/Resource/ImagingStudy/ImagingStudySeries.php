@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Each study has one or more series of images or other content.
@@ -42,7 +43,7 @@ class ImagingStudySeries extends BackboneElement
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
         public ?UnsignedIntPrimitive $number = null,
         /** @var Coding|null modality The modality of the instances in the series */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_29.html', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_29.html', strength: 'extensible')]
         public ?Coding $modality = null,
         /** @var StringPrimitive|string|null description A short human readable summary of the series */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -57,13 +58,14 @@ class ImagingStudySeries extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Endpoint'])]
         public array $endpoint = [],
         /** @var Coding|null bodySite Body part examined */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid]
         public ?Coding $bodySite = null,
         /** @var Coding|null laterality Body part laterality */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid]
         public ?Coding $laterality = null,
         /** @var array<Reference> specimen Specimen imaged */
         #[FhirProperty(
@@ -72,6 +74,7 @@ class ImagingStudySeries extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Specimen'])]
         public array $specimen = [],
         /** @var DateTimePrimitive|null started When the series started */
@@ -84,6 +87,7 @@ class ImagingStudySeries extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ImagingStudy\ImagingStudySeriesPerformer',
         )]
+        #[Valid]
         public array $performer = [],
         /** @var array<ImagingStudySeriesInstance> instance A single SOP instance from the series */
         #[FhirProperty(
@@ -92,6 +96,7 @@ class ImagingStudySeries extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ImagingStudy\ImagingStudySeriesInstance',
         )]
+        #[Valid]
         public array $instance = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

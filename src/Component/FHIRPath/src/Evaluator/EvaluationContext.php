@@ -22,6 +22,15 @@ final class EvaluationContext
      *                                                visitFunctionCall receives the full collection as input
      *                                                instead of a per-item single-item collection
      * @param bool                 $strictMode        When true, runtime semantic validation is enabled
+     * @param mixed                $containerResource The resource that CONTAINS $rootResource, set only when
+     *                                                $rootResource is a contained resource. FHIR defines
+     *                                                `%rootResource` as "the container resource for the resource
+     *                                                that contains the original node", which differs from
+     *                                                `%resource` exactly one level: inside `Patient.contained[0]`,
+     *                                                `%resource` is the contained resource and `%rootResource` is
+     *                                                the Patient. Leave null and `%rootResource` falls back to
+     *                                                $rootResource, which is correct whenever the node is not
+     *                                                inside a contained resource.
      */
     public function __construct(
         private mixed $rootResource = null,
@@ -32,6 +41,7 @@ final class EvaluationContext
         private ?string $fhirVersion = null,
         private ?Collection $collectionInput = null,
         private bool $strictMode = false,
+        private mixed $containerResource = null,
     ) {
     }
 
@@ -53,6 +63,16 @@ final class EvaluationContext
     public function getRootResource(): mixed
     {
         return $this->rootResource;
+    }
+
+    /**
+     * Get the resource containing the root resource, or null when the root is not contained.
+     *
+     * Only `%rootResource` reads this. `%resource` deliberately does not — see the constructor.
+     */
+    public function getContainerResource(): mixed
+    {
+        return $this->containerResource;
     }
 
     /**

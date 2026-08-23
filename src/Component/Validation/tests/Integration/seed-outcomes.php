@@ -11,8 +11,74 @@ declare(strict_types=1);
  *   php src/Component/Validation/tests/Integration/seed-outcomes.php r4b   # seeds R4B
  *
  * Writes one JSON file per qualifying test case to outcomes/ardenexal/.
- * Existing files are overwritten. Known-gap violations are excluded from counts,
- * matching the logic in FHIRValidatorSpecificationTest::isKnownGap().
+ * Existing files are overwritten. Every violation the validator reports is counted — nothing is
+ * filtered out; see ComparisonHarness for why no suppression filter belongs in this comparison.
+ *
+ * Each file carries the three asserted counts, a `java` block holding the reference validator's
+ * counts for the same case, and an `outcome` block holding the messages behind ours:
+ *
+ *   {
+ *     "errorCount": 1, "warningCount": 0, "infoCount": 0,
+ *     "java": {
+ *       "errorCount": 1, "warningCount": 0, "infoCount": 0,
+ *       "classification": "EQUAL", "warningClassification": "EQUAL",
+ *       "errors": ["Not a valid date format: 'not a date'"]
+ *     },
+ *     "outcome": {
+ *       "errors":   { "invariant:ref-1": ["Coverage.payor[0] — SHALL have a contained …"] },
+ *       "warnings": {}
+ *     }
+ *   }
+ *
+ * A case the deserializer rejected carries an extra `unread` block and `errorCount: 0`:
+ *
+ *   {
+ *     "errorCount": 0, "warningCount": 0, "infoCount": 0,
+ *     "unread": { "javaErrorCount": 108, "javaWarningCount": 0, "failure": "Unable to parse XML: …" },
+ *     "java": { …, "classification": "BELOW" },
+ *     "outcome": { "errors": { "deserialization": ["(root) — …"] }, … }
+ *   }
+ *
+ * The count is 0 because we produced no validation report at all — the document was never read. It was
+ * `1` until 2026-08-11, which is the F8 trap in miniature: 1 coincidentally equals Java's count on the
+ * many fixtures with exactly one error, so the file recorded `classification: EQUAL` and a capability
+ * gap read as agreement. At 0, an unread case can record EQUAL only when Java is also 0.
+ *
+ * FHIRValidatorSpecificationTest asserts on the *presence* of `unread`, in both directions: a case that
+ * starts parsing fails until re-seeded, and a case that stops parsing fails as a regression. Neither
+ * was detectable before — the R4 path asserted `errorCount >= 1` against the seed file itself (which
+ * cannot observe our behaviour at all) and R4B/R5 called markTestSkipped.
+ *
+ * The `outcome` block is what makes a count reviewable: `errorCount: 0` on its own cannot be told
+ * apart from a case whose findings were quietly dropped, and a count that reads right for the wrong
+ * reason is the failure mode this guards against. `errors` and `warnings` are the whole story:
+ * nothing is filtered, so every violation behind a count is listed.
+ *
+ * The `java` block exists so divergence from the oracle is readable in the file itself, without
+ * running compare-java-outcomes.php. **It is deliberately named `java`, not `expected`.** The
+ * expectation this suite asserts is `errorCount` — our own seeded count. Java's number is evidence
+ * about whether that expectation is *right*, and conflating the two invites "fixing" a BELOW case by
+ * editing the seed, which is precisely the failure the oracle exists to prevent.
+ *
+ * `classification` is ours-vs-Java on errors (ABOVE = we report more, BELOW = fewer);
+ * `warningClassification` is the same for warnings. `errors` lists Java's error/fatal issue texts.
+ *
+ * Two deliberate omissions, both to avoid widening JavaOutcome while it is load-bearing for
+ * CaseComparison and ComparisonReport:
+ *  - Java's *warning* and *info* texts. Warning divergence is already understood as structural (Java's
+ *    warnings are largely terminology-server findings we cannot produce offline), so counts suffice.
+ *  - The `expression` each Java issue is located at. JavaOutcome parses `details.text` only, so the
+ *    texts here carry no element path. Reviewing *where* a difference sits still needs the oracle file
+ *    at vendor/fhir/fhir-test-cases/validator/outcomes/java/. Worth adding when JavaOutcome is next
+ *    touched.
+ *
+ * `"java": null` means **no oracle exists** for the case — the manifest declares no `java` key, or the
+ * file is missing. That is not the same as Java finding nothing, which is a real result and encodes as
+ * counts of 0. Never collapse the two: it manufactures phantom EQUAL cases out of no-oracle skips.
+ *
+ * Only `errorCount` and `warningCount` are asserted by FHIRValidatorSpecificationTest; the `java` and
+ * `outcome` blocks are review evidence. Both are deterministic (sorted families, stable order) so an
+ * unchanged validator re-seeds byte-identically.
  */
 
 require_once __DIR__ . '/../../../../../vendor/autoload.php';
@@ -25,6 +91,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConst
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRUnreadableDocumentException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
@@ -32,6 +100,10 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationViolation;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\Classification;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\JavaOutcome;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\JavaOutcomeReader;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\ViolationFamilyClassifier;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPathInvariantValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPatternValueValidator;
@@ -46,7 +118,6 @@ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 // matchetype: FHIRPath pattern-matching syntax tests using $instant$ placeholders — not real dateTime values.
 const SKIP_MODULES = ['tx', 'cda', 'cdshooks', 'shc', 'matchetype'];
@@ -78,6 +149,12 @@ $manifest = json_decode((string) file_get_contents($manifestPath), true);
 $service  = createValidationService($fhirVersion);
 $serial   = FHIRSerializationService::createDefault($fhirVersion);
 
+// The harness's own oracle reader, reused rather than reimplemented. It handles both forms the
+// manifest uses for its "java" key — an inline counts object, or a path to an OperationOutcome file —
+// and returns null when there is no oracle at all. Reconstructing the path from our version prefix
+// would be wrong: the manifest sometimes points a case at an oracle under a different version prefix.
+$javaReader = new JavaOutcomeReader($vendorDir . '/fhir/fhir-test-cases/validator');
+
 $written  = 0;
 $skipped  = 0;
 $errors   = 0;
@@ -105,19 +182,130 @@ foreach ($cases as $name => $case) {
 
     try {
         $resource = $serial->deserialize($data);
-    } catch (Throwable $e) {
-        // Deserializer threw (bad format, bad XML, bad JSON, etc.).
-        // If Java also expects errors, seed errorCount=1 so the spec test asserts
-        // rather than staying Incomplete. If Java expects 0 errors (e.g. allow-comments
-        // JSON5 that we can't parse), leave unseeded so the test stays Incomplete.
-        $javaErrorCount = resolveJavaErrorCount($case, $vendorDir . '/fhir/fhir-test-cases/validator');
-        if ($javaErrorCount === null || $javaErrorCount === 0) {
-            echo "  SKIP (deserialize, java-clean) {$name}: {$e->getMessage()}\n";
+    } catch (FHIRConformanceViolationException $e) {
+        // Read, understood, rejected on a stated FHIR rule. This IS a finding — `bundle-dual-subject`
+        // emits `Composition.subject: max allowed = 1, but found 2`, which is the reference validator's
+        // error verbatim — so it is seeded as one error and compared normally. It is deliberately NOT
+        // marked `unread`: filing a correct, Java-matching result under "we could not read this" made it
+        // count 0 and read as a BELOW gap.
+        $javaOutcome = $javaReader->read($case);
+
+        $outcome = json_encode([
+            'errorCount'   => 1,
+            'warningCount' => 0,
+            'infoCount'    => 0,
+            'java'         => javaBlock($javaOutcome, ourErrorCount: 1, ourWarningCount: 0),
+            'outcome'      => [
+                // Keyed as the finding it is, not as `deserialization`, which would perpetuate exactly
+                // the confusion this split removes.
+                'errors'   => (object) ['conformance:deserialization' => ['(root) — ' . $e->finding]],
+                'warnings' => (object) [],
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+
+        $outFile = OUTCOMES_DIR . '/' . $outcomePrefix . '.' . sanitizeName($name) . '-base.json';
+        if (file_put_contents($outFile, $outcome) !== false) {
+            ++$written;
+        } else {
+            echo "  ERROR writing {$name}\n";
+            ++$errors;
+        }
+
+        continue;
+    } catch (FHIRUnreadableDocumentException $e) {
+        // The bytes are not a document at all. That is still a finding: Java answers every case in
+        // this class with an OperationOutcome error rather than declining to answer, so seeding 0 and
+        // marking it `unread` kept the case out of the comparison set entirely — in no class, visible
+        // to no regression check.
+        //
+        // The F8 coincidence the `unread` rule below guards against does not apply here. There it was
+        // real: a seeded 1 on a document we never read matched Java's 1 by accident. Here the 1 is a
+        // finding we actually made and can quote, so agreement is agreement.
+        $javaOutcome = $javaReader->read($case);
+
+        // Same no-oracle rule as the unread branch below, and it is not hypothetical here: `ex-pat`
+        // reaches this branch (`Unable to parse XML: Attribute class redefined`) while its manifest
+        // declares an oracle path that does not exist on disk. Without this guard the seeder writes a
+        // file with `"java": null` — an orphan the spec suite's provider drops outright, so it is read
+        // by nothing and merely accumulates. Absent oracle is not a comparison.
+        if ($javaOutcome === null) {
+            echo "  SKIP (unreadable, no oracle — case is not in the spec suite) {$name}: {$e->getMessage()}\n";
             ++$skipped;
             continue;
         }
 
-        $outcome = json_encode(['errorCount' => 1, 'warningCount' => 0, 'infoCount' => 0], JSON_PRETTY_PRINT) . "\n";
+        $outcome = json_encode([
+            'errorCount'   => 1,
+            'warningCount' => 0,
+            'infoCount'    => 0,
+            'java'         => javaBlock($javaOutcome, ourErrorCount: 1, ourWarningCount: 0),
+            'outcome'      => [
+                // Distinct from both `conformance:deserialization` (a stated FHIR rule we enforced) and
+                // `deserialization` (the residual unread class), so the three stay tellable apart in the
+                // seeded corpus rather than collapsing back into one bucket.
+                'errors'   => (object) ['unreadable:deserialization' => ['(root) — ' . $e->finding]],
+                'warnings' => (object) [],
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+
+        $outFile = OUTCOMES_DIR . '/' . $outcomePrefix . '.' . sanitizeName($name) . '-base.json';
+        if (file_put_contents($outFile, $outcome) !== false) {
+            ++$written;
+        } else {
+            echo "  ERROR writing {$name}\n";
+            ++$errors;
+        }
+
+        continue;
+    } catch (Throwable $e) {
+        // Deserializer threw and we could not attribute the failure to the document: we read it but
+        // cannot map it to a model, or a normalizer refused it. The payload never became a
+        // resource, so there is no validation report and no count of ours to compare.
+        //
+        // Every parse failure is seeded, including ones Java considers clean. Leaving those unseeded
+        // (the previous rule) made them markTestIncomplete, invisible to a grep for '"deserialization"',
+        // and reconcilable only against the harness — three ways for the same class to hide.
+        $javaOutcome = $javaReader->read($case);
+
+        // No resolvable oracle means FHIRValidatorSpecificationTest's data provider drops the case
+        // entirely (search: `resolveJavaErrorCount`), so a seed file here would be read by nothing.
+        // This is NOT the old "java-clean" skip being reinstated: an oracle reporting zero errors is a
+        // real result and is seeded. This is "no oracle exists at all", which the docblock above warns
+        // must never be collapsed with it. `ex-pat` is the live example — its manifest declares
+        // `java/R4.ex-pat-base.json` while the file on disk is `R5.ex-pat-base.json`, so all three
+        // instruments drop it for different reasons (harness: NoOracle; provider: excluded; here: this).
+        if ($javaOutcome === null) {
+            echo "  SKIP (deserialize, no oracle — case is not in the spec suite) {$name}: {$e->getMessage()}\n";
+            ++$skipped;
+            continue;
+        }
+
+        // errorCount is 0, NOT 1. We did not find one error; we found none, because we never read the
+        // document. The old `errorCount: 1` was the F8 trap in its purest form: it coincidentally equals
+        // Java's count on the many fixtures with exactly one error, so the file recorded
+        // `classification: EQUAL` and a real capability gap read as agreement. With 0, an unread case
+        // can only ever record EQUAL when Java is also 0 — the coincidence is structurally impossible.
+        //
+        // The `unread` block is what the spec test asserts on. It states plainly that this file
+        // describes a document we could not read, so the counts above are not a comparison.
+        $outcome = json_encode([
+            'errorCount'   => 0,
+            'warningCount' => 0,
+            'infoCount'    => 0,
+            'unread'       => [
+                'javaErrorCount'   => $javaOutcome?->errorCount   ?? 0,
+                'javaWarningCount' => $javaOutcome?->warningCount ?? 0,
+                // Recorded for review, deliberately NOT asserted: the test re-deserializes at run time
+                // and compares presence, not wording. Parse-error messages are upstream text (jsonlint,
+                // libxml) and must be free to improve without turning the suite red.
+                'failure'          => $e->getMessage(),
+            ],
+            'java'         => javaBlock($javaOutcome, ourErrorCount: 0, ourWarningCount: 0),
+            'outcome'      => [
+                'errors'   => (object) ['deserialization' => ['(root) — ' . $e->getMessage()]],
+                'warnings' => (object) [],
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
         $outFile = OUTCOMES_DIR . '/' . $outcomePrefix . '.' . sanitizeName($name) . '-base.json';
         if (file_put_contents($outFile, $outcome) !== false) {
             ++$written;
@@ -137,15 +325,29 @@ foreach ($cases as $name => $case) {
         continue;
     }
 
-    $errorCount   = count(array_filter($report->errors(), fn ($v) => !isKnownGap($v, $resource)));
-    $warningCount = count(array_filter($report->warnings(), fn ($v) => !isKnownGap($v, $resource)));
-    $infoCount    = count($report->info());
+    $countedErrors   = $report->errors();
+    $countedWarnings = $report->warnings();
+
+    $javaOutcome = $javaReader->read($case);
 
     $outcome = json_encode([
-        'errorCount'   => $errorCount,
-        'warningCount' => $warningCount,
-        'infoCount'    => $infoCount,
-    ], JSON_PRETTY_PRINT) . "\n";
+        'errorCount'   => count($countedErrors),
+        'warningCount' => count($countedWarnings),
+        'infoCount'    => count($report->info()),
+        // The reference validator's counts for the same case, so divergence is readable here rather
+        // than only via compare-java-outcomes.php. Evidence, never an assertion — see the file docblock
+        // on why this is `java` and not `expected`.
+        'java'         => javaBlock($javaOutcome, count($countedErrors), count($countedWarnings)),
+        // The counts alone cannot be reviewed. This is the evidence behind them: every message that
+        // produced a count, grouped by invariant key or constraint. Nothing is held back — every
+        // violation we reported is both counted above and listed here.
+        // Cast to object so an empty group encodes as `{}` rather than `[]` — the keys keep one
+        // shape whether or not they hold anything, which matters for anything reading these files.
+        'outcome'      => [
+            'errors'   => (object) groupViolations($countedErrors),
+            'warnings' => (object) groupViolations($countedWarnings),
+        ],
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
 
     $outFile = OUTCOMES_DIR . '/' . $outcomePrefix . '.' . sanitizeName($name) . '-base.json';
     if (file_put_contents($outFile, $outcome) !== false) {
@@ -166,51 +368,72 @@ function sanitizeName(string $name): string
 }
 
 /**
+ * Group violations by family, each entry rendered as `path — message`.
+ *
+ * Family labels come from the comparison harness's classifier, so they match what
+ * `compare-java-outcomes.php --family=<label>` accepts and a reviewer can pivot straight from a
+ * seeded outcome to the side-by-side Java comparison for that family.
+ *
+ * Keys are sorted and encounter order is preserved within a family, so re-seeding an unchanged
+ * validator produces a byte-identical file and the diff only ever shows real movement. The path is
+ * included because "which element failed" is the first question when reviewing a count that moved.
+ *
+ * @param list<FHIRValidationViolation> $violations
+ *
+ * @return array<string, list<string>>
+ */
+function groupViolations(array $violations): array
+{
+    static $classifier = null;
+    $classifier ??= new ViolationFamilyClassifier();
+
+    $grouped = [];
+    foreach ($violations as $violation) {
+        $family = $classifier->classify($violation);
+        $where  = $violation->path === '' ? '(root)' : $violation->path;
+
+        $grouped[$family][] = $where . ' — ' . $violation->message;
+    }
+
+    ksort($grouped);
+
+    return $grouped;
+}
+
+/**
  * Resolve the expected Java error count from either an inline object or an external file.
  *
  * @param array<string, mixed> $case
  */
-function resolveJavaErrorCount(array $case, string $outcomesBaseDir): ?int
+/**
+ * Build the `java` block: the reference validator's counts for this case, beside ours.
+ *
+ * Returns null when there is no oracle, which JavaOutcomeReader signals by returning null for both a
+ * missing "java" manifest key and an unreadable outcome file. Encoding that as zero counts would
+ * manufacture phantom EQUAL cases out of the no-oracle skips, so absence stays absent.
+ *
+ * `errors` is sorted so an unchanged oracle re-seeds byte-identically; Java's issue order is not
+ * something we control and must not leak into the diff.
+ *
+ * @return array{errorCount: int, warningCount: int, infoCount: int, classification: string, warningClassification: string, errors: list<string>}|null
+ */
+function javaBlock(?JavaOutcome $java, int $ourErrorCount, int $ourWarningCount): ?array
 {
-    $java = $case['java'] ?? null;
-
     if ($java === null) {
         return null;
     }
 
-    if (is_array($java)) {
-        return (int) ($java['errorCount'] ?? 0);
-    }
+    $errors = $java->errorTexts;
+    sort($errors);
 
-    if (is_string($java)) {
-        $outcomePath = $outcomesBaseDir . '/outcomes/' . $java;
-        if (!file_exists($outcomePath)) {
-            return null;
-        }
-
-        $raw = file_get_contents($outcomePath);
-        if ($raw === false) {
-            return null;
-        }
-
-        /** @var array<string, mixed> $outcome */
-        $outcome = json_decode($raw, true);
-
-        if (isset($outcome['issue']) && is_array($outcome['issue'])) {
-            $errorCount = 0;
-            foreach ($outcome['issue'] as $issue) {
-                if (in_array($issue['severity'] ?? '', ['error', 'fatal'], true)) {
-                    ++$errorCount;
-                }
-            }
-
-            return $errorCount;
-        }
-
-        return 0;
-    }
-
-    return null;
+    return [
+        'errorCount'            => $java->errorCount,
+        'warningCount'          => $java->warningCount,
+        'infoCount'             => $java->infoCount,
+        'classification'        => Classification::compare($ourErrorCount, $java->errorCount)->value,
+        'warningClassification' => Classification::compare($ourWarningCount, $java->warningCount)->value,
+        'errors'                => array_values($errors),
+    ];
 }
 
 /** @param list<array<string, mixed>> $testCases @return array<string, array<string, mixed>> */
@@ -253,28 +476,6 @@ function matchesVersion(array $case, FhirVersion $version): bool
         FhirVersion::R4B => $v === '4.3',
         FhirVersion::R5  => $v === null || in_array($v, ['5.0', '5.0.0'], true),
     };
-}
-
-function isKnownGap(FHIRValidationViolation $v, object $resource): bool
-{
-    if (str_contains($v->message, 'has no generated enum class')) {
-        return true;
-    }
-    if ($v->invariantKey === 'dom-3') {
-        return true;
-    }
-    if ($v->invariantKey === 'sdf-19') {
-        return true;
-    }
-    if ($v->constraintClass === NotBlank::class
-        && $v->path !== ''
-        && property_exists($resource, $v->path)
-        && isset($resource->{$v->path})
-        && $resource->{$v->path} === false) {
-        return true;
-    }
-
-    return false;
 }
 
 function createValidationService(FhirVersion $version = FhirVersion::R4): FHIRValidationService

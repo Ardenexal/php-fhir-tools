@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Contract Valued Item List.
@@ -58,16 +59,16 @@ class ContractTermAssetValuedItem extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public CodeableConcept|Reference|null $entity = null,
         /** @var Identifier|null identifier Contract Valued Item Number */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var DateTimePrimitive|null effectiveTime Contract Valued Item Effective Tiem */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $effectiveTime = null,
         /** @var Quantity|null quantity Count of Contract Valued Items */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Money|null unitPrice Contract Valued Item fee, charge, or cost */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $unitPrice = null,
         /** @var numeric-string|null factor Contract Valued Item Price Scaling Factor */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
@@ -76,7 +77,7 @@ class ContractTermAssetValuedItem extends BackboneElement
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $points = null,
         /** @var Money|null net Total Contract Valued Item Value */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $net = null,
         /** @var StringPrimitive|string|null payment Terms of valuation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -86,6 +87,7 @@ class ContractTermAssetValuedItem extends BackboneElement
         public ?DateTimePrimitive $paymentDate = null,
         /** @var Reference|null responsible Who will make payment */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/Patient',
@@ -96,6 +98,7 @@ class ContractTermAssetValuedItem extends BackboneElement
         public ?Reference $responsible = null,
         /** @var Reference|null recipient Who will receive payment */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/Patient',

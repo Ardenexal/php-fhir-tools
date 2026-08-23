@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Not a valid date format: 'not a date'"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:PrimitiveFormatChecker": [
+                "birthDate — Not a valid date format: 'not a date'"
+            ]
+        },
+        "warnings": {}
+    }
 }

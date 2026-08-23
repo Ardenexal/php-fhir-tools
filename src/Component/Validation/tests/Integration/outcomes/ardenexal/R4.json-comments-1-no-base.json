@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Comments are not allowed in JSON"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to detect data format: expected JSON (starting \"{\" or \"[\") or XML (starting \"<\"), got '// example with comments\r\n{\r\n  \"resourc…'"
+            ]
+        },
+        "warnings": {}
+    }
 }

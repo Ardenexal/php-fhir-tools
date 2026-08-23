@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: TypeRestfulInteraction
  * URL: http://hl7.org/fhir/ValueSet/type-restful-interaction
  * Version: 4.0.1
  * Description: Operations supported by REST at the type or instance level.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/type-restful-interaction', version: '4.0.1')]
 enum TypeRestfulInteraction: string
 {
     /** read */
@@ -30,11 +33,26 @@ enum TypeRestfulInteraction: string
     /** history */
     case history = 'history';
 
+    /** history-instance */
+    case historyinstance = 'history-instance';
+
+    /** history-type */
+    case historytype = 'history-type';
+
+    /** history-system */
+    case historysystem = 'history-system';
+
     /** create */
     case create = 'create';
 
     /** search */
     case search = 'search';
+
+    /** search-type */
+    case searchtype = 'search-type';
+
+    /** search-system */
+    case searchsystem = 'search-system';
 
     /** capabilities */
     case capabilities = 'capabilities';
@@ -47,13 +65,4 @@ enum TypeRestfulInteraction: string
 
     /** operation */
     case operation = 'operation';
-
-    /** history-instance */
-    case historyinstance = 'history-instance';
-
-    /** history-type */
-    case historytype = 'history-type';
-
-    /** search-type */
-    case searchtype = 'search-type';
 }

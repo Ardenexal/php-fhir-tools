@@ -1,5 +1,21 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 0
+    "warningCount": 0,
+    "infoCount": 0,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: ele-1: 'All FHIR elements must have a @value or children' (defined in http://hl7.org/fhir/StructureDefinition/Element)",
+            "Extension.url is required in order to identify, use and validate the extension",
+            "value cannot be empty"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

@@ -1,0 +1,26 @@
+{
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "unread": {
+        "javaErrorCount": 0,
+        "javaWarningCount": 0,
+        "failure": "Unable to detect target class from data"
+    },
+    "java": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": []
+    },
+    "outcome": {
+        "errors": {
+            "deserialization": [
+                "(root) — Unable to detect target class from data"
+            ]
+        },
+        "warnings": {}
+    }
+}

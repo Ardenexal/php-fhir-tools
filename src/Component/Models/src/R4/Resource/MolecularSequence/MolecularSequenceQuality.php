@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QualityTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An experimental feature attribute that defines the quality of the feature in a quantitative way, such as a phred quality score ([SO:0001686](http://www.sequenceontology.org/browser/current_svn/term/SO:0001686)).
@@ -32,10 +33,16 @@ class MolecularSequenceQuality extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var QualityTypeType|null type indel | snp | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/quality-type|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/quality-type|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\QualityType',
+        )]
         public ?QualityTypeType $type = null,
         /** @var CodeableConcept|null standardSequence Standard sequence for comparison */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $standardSequence = null,
         /** @var int|null start Start position of the sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
@@ -44,10 +51,10 @@ class MolecularSequenceQuality extends BackboneElement
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $end = null,
         /** @var Quantity|null score Quality score for the comparison */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $score = null,
         /** @var CodeableConcept|null method Method to get quality */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $method = null,
         /** @var numeric-string|null truthTP True positives from the perspective of the truth data */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
@@ -74,7 +81,7 @@ class MolecularSequenceQuality extends BackboneElement
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $fScore = null,
         /** @var MolecularSequenceQualityRoc|null roc Receiver Operator Characteristic (ROC) Curve */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?MolecularSequenceQualityRoc $roc = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -1,5 +1,20 @@
 {
-    "errorCount": 1,
+    "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 3
+    "infoCount": 8,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 1,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The element ElementDefinition.targetProfile is not valid",
+            "The fixed value for the extension URL is http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status which doesn't match the canonical URL http://hl7.org/fhir/test/StructureDefinition/structuredefinition-standards-status"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

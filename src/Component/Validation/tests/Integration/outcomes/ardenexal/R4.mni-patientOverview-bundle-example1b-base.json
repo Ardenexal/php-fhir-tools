@@ -1,5 +1,34 @@
 {
-    "errorCount": 0,
+    "errorCount": 3,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 6,
+    "java": {
+        "errorCount": 10,
+        "warningCount": 0,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Can't find 'Device/1' in the bundle (Composition.author). Note that there is a resource in the bundle with the same type and id, but it does not match because of the fullUrl based rules around matching relative references. Found 'Device/1', but it doesn't match because of the source fullUrl 'Composition/1'",
+            "Can't find 'Patient/1' in the bundle (Composition.subject). Note that there is a resource in the bundle with the same type and id, but it does not match because of the fullUrl based rules around matching relative references. Found 'Patient/1', but it doesn't match because of the source fullUrl 'Composition/1'",
+            "Duplicate id value '1a'",
+            "Duplicate id value '2'",
+            "Entry 'Device/1' isn't reachable by traversing links (forward or backward) from the Composition",
+            "Entry 'Patient/1' isn't reachable by traversing links (forward or backward) from the Composition",
+            "The fullUrl must be an absolute URL (not 'Composition/1')",
+            "The fullUrl must be an absolute URL (not 'Device/1')",
+            "The fullUrl must be an absolute URL (not 'Patient/1')",
+            "Wrong Display Name 'Patient summary Document' for http://loinc.org#60591-5. Valid display is one of 2 choices: 'Patientenkurzakte - Dokument' (de-DE) or 'Patient Summary' (de-AT) (for the language(s) 'de-CH')"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:BundleEntryFullUrlChecker": [
+                "entry[0].fullUrl — The fullUrl must be an absolute URL (not 'Composition/1')",
+                "entry[1].fullUrl — The fullUrl must be an absolute URL (not 'Patient/1')",
+                "entry[2].fullUrl — The fullUrl must be an absolute URL (not 'Device/1')"
+            ]
+        },
+        "warnings": {}
+    }
 }

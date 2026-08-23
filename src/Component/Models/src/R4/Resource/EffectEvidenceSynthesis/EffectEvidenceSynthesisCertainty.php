@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A description of the certainty of the effect estimate.
@@ -36,7 +37,12 @@ class EffectEvidenceSynthesisCertainty extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-quality', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-quality',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\QualityOfEvidenceRating',
+        )]
         public array $rating = [],
         /** @var array<Annotation> note Used for footnotes or explanatory notes */
         #[FhirProperty(
@@ -45,6 +51,7 @@ class EffectEvidenceSynthesisCertainty extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var array<EffectEvidenceSynthesisCertaintyCertaintySubcomponent> certaintySubcomponent A component that contributes to the overall certainty */
         #[FhirProperty(
@@ -53,6 +60,7 @@ class EffectEvidenceSynthesisCertainty extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\EffectEvidenceSynthesis\EffectEvidenceSynthesisCertaintyCertaintySubcomponent',
         )]
+        #[Valid]
         public array $certaintySubcomponent = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

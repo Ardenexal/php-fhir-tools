@@ -1,5 +1,32 @@
 {
     "errorCount": 0,
-    "warningCount": 0,
-    "infoCount": 2
+    "warningCount": 7,
+    "infoCount": 35,
+    "java": {
+        "errorCount": 4,
+        "warningCount": 0,
+        "infoCount": 55,
+        "classification": "BELOW",
+        "warningClassification": "ABOVE",
+        "errors": [
+            "Wrong Display Name 'History of Immunization Narrative' for http://loinc.org#11369-6. Valid display is one of 3 choices: 'History of Immunization note' (en-US), 'History of Immunization note' (en-US) or 'Hx of Immunization note' (en-US) (for the language(s) 'en-NZ')",
+            "Wrong Display Name 'Relevant diagnostic tests/laboratory data Narrative' for http://loinc.org#30954-2. Valid display is one of 3 choices: 'Relevant diagnostic tests/laboratory data note' (en-US), 'Relevant diagnostic tests/laboratory data note' (en-US) or 'Relevant dx tests/lab data note' (en-US) (for the language(s) 'en-NZ')",
+            "Wrong Display Name 'Social history Narrative' for http://loinc.org#29762-2. Valid display is one of 3 choices: 'Social history note' (en-US), 'Social history note' (en-US) or 'Social hx note' (en-US) (for the language(s) 'en-NZ')",
+            "Wrong Display Name 'Vital signs' for http://loinc.org#8716-3. Valid display is one of 3 choices: 'Vital signs note' (en-US), 'Vital signs note' (en-US) or 'Vital signs note' (en-US) (for the language(s) 'en-NZ')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "entry[20].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
+                "entry[21].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
+                "entry[22].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
+                "entry[23].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
+                "entry[24].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
+                "entry[25].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
+                "entry[26].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated."
+            ]
+        }
+    }
 }

@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A single data collection that is shared as part of the scenario.
@@ -75,7 +76,14 @@ class ExampleScenarioInstance extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $key = null,
         /** @var Coding|null structureType Data structure for example */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/examplescenario-instance-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/examplescenario-instance-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ExampleScenarioResourceType',
+        )]
         public ?Coding $structureType = null,
         /** @var StringPrimitive|string|null structureVersion E.g. 4.0.1 */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -108,7 +116,7 @@ class ExampleScenarioInstance extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var Reference|null content Example instance data */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid]
         public ?Reference $content = null,
         /** @var array<ExampleScenarioInstanceVersion> version Snapshot of instance that changes */
         #[FhirProperty(
@@ -117,6 +125,7 @@ class ExampleScenarioInstance extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario\ExampleScenarioInstanceVersion',
         )]
+        #[Valid]
         public array $version = [],
         /** @var array<ExampleScenarioInstanceContainedInstance> containedInstance Resources contained in the instance */
         #[FhirProperty(
@@ -125,6 +134,7 @@ class ExampleScenarioInstance extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario\ExampleScenarioInstanceContainedInstance',
         )]
+        #[Valid]
         public array $containedInstance = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

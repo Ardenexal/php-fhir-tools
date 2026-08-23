@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A definition of a resource-based event that triggers a notification based on the SubscriptionTopic. The criteria may be just a human readable description and/or a full FHIR search string or FHIRPath expression. Multiple triggers are considered OR joined (e.g., a resource update matching ANY of the definitions will trigger a notification).
@@ -36,7 +37,13 @@ class SubscriptionTopicResourceTrigger extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var UriPrimitive|null resource Data Type or Resource (reference to definition) for this trigger definition */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-types', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\SubscriptionTypes',
+        )]
         public ?UriPrimitive $resource = null,
         /** @var array<InteractionTriggerType> supportedInteraction create | update | delete */
         #[FhirProperty(
@@ -45,10 +52,14 @@ class SubscriptionTopicResourceTrigger extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\InteractionTriggerType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/interaction-trigger|5.0.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/interaction-trigger|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\InteractionTrigger',
+        )]
         public array $supportedInteraction = [],
         /** @var SubscriptionTopicResourceTriggerQueryCriteria|null queryCriteria Query based trigger rule */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?SubscriptionTopicResourceTriggerQueryCriteria $queryCriteria = null,
         /** @var StringPrimitive|string|null fhirPathCriteria FHIRPath based trigger rule */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

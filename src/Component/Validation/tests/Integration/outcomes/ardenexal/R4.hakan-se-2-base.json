@@ -1,5 +1,24 @@
 {
     "errorCount": 1,
-    "warningCount": 2,
-    "infoCount": 1
+    "warningCount": 0,
+    "infoCount": 1,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 1,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "If a date has a time, it must have a timezone",
+            "MedicationRequest.medication[x]: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/MedicationRequest|4.0.1)"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotBlank": [
+                "medication — This value should not be blank."
+            ]
+        },
+        "warnings": {}
+    }
 }

@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Error parsing JSON: Error parsing JSON source: Unexpected close marker '}'. Expected ']' at Line 16 (path=[//entry[]/entry/resource/name[]/nameChristopher])"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to parse JSON: Parse error on line 15:\n...          }        }      }    }  ]\n---------------------^\nExpected one of: ',', ']'"
+            ]
+        },
+        "warnings": {}
+    }
 }

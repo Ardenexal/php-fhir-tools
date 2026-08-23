@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A page / section in the implementation guide. The root page is the implementation guide home page.
@@ -73,7 +74,13 @@ class ImplementationGuideDefinitionPage extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $title = null,
         /** @var GuidePageGenerationType|null generation html | markdown | xml | generated */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/guide-page-generation|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/guide-page-generation|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\GuidePageGeneration',
+        )]
         public ?GuidePageGenerationType $generation = null,
         /** @var array<ImplementationGuideDefinitionPage> page Nested Pages / Sections */
         #[FhirProperty(
@@ -82,6 +89,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImplementationGuide\ImplementationGuideDefinitionPage',
         )]
+        #[Valid]
         public array $page = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

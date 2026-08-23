@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Structure Map Source List Mode
  * URL: http://hl7.org/fhir/ValueSet/map-source-list-mode
  * Version: 5.0.0
  * Description: If field is a list, how to manage the source.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/map-source-list-mode', version: '5.0.0')]
 enum StructureMapSourceListMode: string
 {
     /** First */

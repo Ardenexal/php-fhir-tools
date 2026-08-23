@@ -1,5 +1,21 @@
 {
-    "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 1
+    "errorCount": 1,
+    "warningCount": 0,
+    "infoCount": 1,
+    "java": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "ABOVE",
+        "warningClassification": "EQUAL",
+        "errors": []
+    },
+    "outcome": {
+        "errors": {
+            "constraint:Regex": [
+                "contained[0].id — Invalid Resource id: \"12345678901234567890123456789012345678901234567890123456789012345\" must be 1-64 characters of A-Z, a-z, 0-9, \"-\" or \".\"."
+            ]
+        },
+        "warnings": {}
+    }
 }

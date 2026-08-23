@@ -38,7 +38,12 @@ class Attachment extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var MimeTypesType|null contentType Mime type of the content, with charset etc. */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\MimeTypes',
+        )]
         public ?MimeTypesType $contentType = null,
         /** @var string|null language Human language of the content (BCP-47) */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
@@ -46,6 +51,7 @@ class Attachment extends Element
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Base64BinaryPrimitive|null data Data inline, base64ed */

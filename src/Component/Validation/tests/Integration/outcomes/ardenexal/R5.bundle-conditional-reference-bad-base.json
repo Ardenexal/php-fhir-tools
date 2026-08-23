@@ -1,5 +1,20 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 1,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Relative URLs must be of the format [ResourceName]/[id], or a search URL is allowed ([type]?parameters. Encountered Device?identifier=1234&?==)",
+            "The query part of the conditional reference is not a valid query string (Device?identifier=1234&?==)"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

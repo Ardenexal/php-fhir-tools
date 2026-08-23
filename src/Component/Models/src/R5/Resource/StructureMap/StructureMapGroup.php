@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Organizes the mapping into managable chunks for human review/ease of maintenance.
@@ -39,7 +40,12 @@ class StructureMapGroup extends BackboneElement
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $extends = null,
         /** @var StructureMapGroupTypeModeType|null typeMode types | type-and-types */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-group-type-mode|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-group-type-mode|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\StructureMapGroupTypeMode',
+        )]
         public ?StructureMapGroupTypeModeType $typeMode = null,
         /** @var StringPrimitive|string|null documentation Additional description/explanation for group */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -52,6 +58,7 @@ class StructureMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap\StructureMapGroupInput',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $input = [],
         /** @var array<StructureMapGroupRule> rule Transform Rule from source to target */
@@ -61,6 +68,7 @@ class StructureMapGroup extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap\StructureMapGroupRule',
         )]
+        #[Valid]
         public array $rule = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

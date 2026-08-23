@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Subscription Search Modifier
  * URL: http://hl7.org/fhir/ValueSet/subscription-search-modifier
  * Version: 4.3.0
  * Description: FHIR search modifiers allowed for use in Subscriptions and SubscriptionTopics.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/subscription-search-modifier', version: '4.3.0')]
 enum SubscriptionSearchModifier: string
 {
     /** = */

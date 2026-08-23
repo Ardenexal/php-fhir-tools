@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Context;
 
+use Seld\JsonLint\JsonParser;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
+
 /**
  * Factory for creating FHIR serialization contexts with appropriate defaults.
  *
@@ -34,6 +37,20 @@ class FHIRSerializationContextFactory
             'fhir_include_metadata'       => true,
             'fhir_unknown_element_policy' => 'ignore',
             'fhir_validate_references'    => false,
+
+            // Route JSON parse failures through seld/jsonlint. PHP's own json_last_error_msg()
+            // returns a bare "Syntax error" with no position at all, which is useless both to a
+            // caller debugging a payload and to the validator, which needs a location to attach a
+            // violation to. jsonlint reports the line, a caret column and the expected tokens.
+            //
+            // Gated on the class actually being loadable, NOT hardcoded true. seld/jsonlint is a hard
+            // `require` of this package, so this is normally always on — but Symfony throws
+            // UnsupportedException when the flag is set and the class is missing, which would replace
+            // the caller's real parse error with a message about our dependency configuration. That is
+            // not hypothetical: `demo/` maintains its own vendor tree and psr-4 map, so a new root
+            // runtime dependency does not reach it until it is added there too. Degrading to Symfony's
+            // plain message is always better than misreporting a malformed payload as a setup fault.
+            JsonDecode::DETAILED_ERROR_MESSAGES => class_exists(JsonParser::class),
         ];
 
         return array_merge($defaults, $overrides);

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Filter Operator
  * URL: http://hl7.org/fhir/ValueSet/filter-operator
  * Version: 5.0.0
  * Description: The kind of operation to perform as a part of a property based filter.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/filter-operator', version: '5.0.0')]
 enum FilterOperator: string
 {
     /** Equals */

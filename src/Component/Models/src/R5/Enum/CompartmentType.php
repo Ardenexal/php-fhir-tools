@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Compartment Type
  * URL: http://hl7.org/fhir/ValueSet/compartment-type
  * Version: 5.0.0
  * Description: Which type a compartment definition describes.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/compartment-type', version: '5.0.0')]
 enum CompartmentType: string
 {
     /** Patient */

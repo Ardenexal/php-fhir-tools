@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: RequestStatus
  * URL: http://hl7.org/fhir/ValueSet/request-status
  * Version: 5.0.0
  * Description: Codes identifying the lifecycle stage of a request.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/request-status', version: '5.0.0')]
 enum RequestStatus: string
 {
     /** Draft */

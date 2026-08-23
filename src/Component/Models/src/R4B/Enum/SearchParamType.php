@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: SearchParamType
  * URL: http://hl7.org/fhir/ValueSet/search-param-type
  * Version: 4.3.0
  * Description: Data types allowed to be used for search parameters.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/search-param-type', version: '4.3.0')]
 enum SearchParamType: string
 {
     /** Number */

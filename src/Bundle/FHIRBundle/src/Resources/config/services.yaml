@@ -178,6 +178,18 @@ services:
     Ardenexal\FHIRTools\Component\Validation\FHIRTypeHierarchyResolverInterface:
         alias: 'Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver'
 
+    # Narrative xhtml checker — reports which element/attribute breaks txt-1, not just that it broke.
+    Ardenexal\FHIRTools\Component\Validation\NarrativeXhtmlChecker: ~
+
+    # Primitive format checker — reports lexemes the deserializer retained rather than aborted on.
+    Ardenexal\FHIRTools\Component\Validation\PrimitiveFormatChecker: ~
+
+    # Coding.system URI checker — absolute-reference and value-set-as-code-system rules.
+    Ardenexal\FHIRTools\Component\Validation\CodingSystemChecker: ~
+
+    # Bundle.entry.fullUrl checker — the spec requires an absolute URL; nothing else enforces it.
+    Ardenexal\FHIRTools\Component\Validation\BundleEntryFullUrlChecker: ~
+
     # Validation Service
     Ardenexal\FHIRTools\Component\Validation\FHIRValidationService:
         public: true

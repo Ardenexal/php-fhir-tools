@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "A Comma is missing in the JSON"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to parse JSON: Parse error on line 6:\n... : \"Simmons\"\r      \"given\" : [\r       \n---------------------^\nExpected one of: 'EOF', '}', ':', ',', ']'"
+            ]
+        },
+        "warnings": {}
+    }
 }

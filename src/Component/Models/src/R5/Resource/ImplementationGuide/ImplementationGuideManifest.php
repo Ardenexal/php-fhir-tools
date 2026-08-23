@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about an assembled implementation guide, created by the publication tooling.
@@ -40,6 +41,7 @@ class ImplementationGuideManifest extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImplementationGuide\ImplementationGuideManifestResource',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $resource = [],
         /** @var array<ImplementationGuideManifestPage> page HTML page within the parent IG */
@@ -49,6 +51,7 @@ class ImplementationGuideManifest extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImplementationGuide\ImplementationGuideManifestPage',
         )]
+        #[Valid]
         public array $page = [],
         /** @var array<StringPrimitive|string> image Image within the IG */
         #[FhirProperty(

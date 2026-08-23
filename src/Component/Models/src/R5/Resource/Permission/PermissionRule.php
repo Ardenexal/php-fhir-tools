@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ConsentProvisionTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A set of rules.
@@ -30,7 +31,13 @@ class PermissionRule extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var ConsentProvisionTypeType|null type deny | permit */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-provision-type|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'Sets the context for the meaning of the rules.')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-provision-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConsentProvisionType',
+        )]
+        #[FHIRIsModifier(reason: 'Sets the context for the meaning of the rules.')]
         public ?ConsentProvisionTypeType $type = null,
         /** @var array<PermissionRuleData> data The selection criteria to identify data that is within scope of this provision */
         #[FhirProperty(
@@ -39,6 +46,7 @@ class PermissionRule extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Permission\PermissionRuleData',
         )]
+        #[Valid]
         public array $data = [],
         /** @var array<PermissionRuleActivity> activity A description or definition of which activities are allowed to be done on the data */
         #[FhirProperty(
@@ -47,6 +55,7 @@ class PermissionRule extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Permission\PermissionRuleActivity',
         )]
+        #[Valid]
         public array $activity = [],
         /** @var array<CodeableConcept> limit What limits apply to the use of the data */
         #[FhirProperty(
@@ -55,6 +64,7 @@ class PermissionRule extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $limit = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

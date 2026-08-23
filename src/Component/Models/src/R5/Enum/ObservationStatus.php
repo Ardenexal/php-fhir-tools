@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Observation Status
  * URL: http://hl7.org/fhir/ValueSet/observation-status
  * Version: 5.0.0
  * Description: Codes providing the status of an observation.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/observation-status', version: '5.0.0')]
 enum ObservationStatus: string
 {
     /** Registered */
@@ -23,6 +26,9 @@ enum ObservationStatus: string
 
     /** Amended */
     case amended = 'amended';
+
+    /** Corrected */
+    case corrected = 'corrected';
 
     /** Cancelled */
     case cancelled = 'cancelled';

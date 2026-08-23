@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -32,6 +33,7 @@ class CodeableConcept extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding',
         )]
+        #[Valid]
         public array $coding = [],
         /** @var StringPrimitive|string|null text Plain text representation of the concept */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

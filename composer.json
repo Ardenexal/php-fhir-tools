@@ -32,6 +32,7 @@
         "nette/php-generator": "^4.2.1",
         "psr/cache": "^3.0",
         "psr/http-client": "^1.0",
+        "seld/jsonlint": "^1.12.1",
         "symfony/config": "^6.4|^7.4",
         "symfony/console": "^6.4|^7.4",
         "symfony/dependency-injection": "^6.4|^7.4",
@@ -49,6 +50,7 @@
         "symfony/yaml": "^6.4|^7.4"
     },
     "require-dev": {
+        "blundergoat/gruff-php": "^0.5.2",
         "brianium/paratest": "^7.20",
         "fhir/fhir-test-cases": "1.7.49",
         "giorgiosironi/eris": "^1.0",
@@ -91,7 +93,9 @@
         "psr-4": {
             "Ardenexal\\FHIRTools\\Tests\\": "tests/",
             "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\Tests\\": "src/Bundle/FHIRBundle/tests/",
+            "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Tests\\": "src/Component/CodeGeneration/tests/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
+            "Ardenexal\\FHIRTools\\Component\\Metadata\\Tests\\": "src/Component/Metadata/tests/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/",
             "Ardenexal\\FHIRTools\\Component\\Validation\\Tests\\": "src/Component/Validation/tests/",
             "Ardenexal\\FHIRTools\\Component\\CdaModels\\Tests\\": "src/Component/CdaModels/tests/",

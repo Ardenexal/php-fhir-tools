@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about chromosome structure variation.
@@ -29,7 +30,7 @@ class MolecularSequenceStructureVariant extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null variantType Structural variant change type */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://loinc.org/vs/LL379-9|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid, FHIRValueSetBinding(valueSetUrl: 'http://loinc.org/vs/LL379-9|4.3.0', strength: 'required')]
         public ?CodeableConcept $variantType = null,
         /** @var bool|null exact Does the structural variant have base pair resolution breakpoints? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -38,10 +39,10 @@ class MolecularSequenceStructureVariant extends BackboneElement
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $length = null,
         /** @var MolecularSequenceStructureVariantOuter|null outer Structural variant outer */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?MolecularSequenceStructureVariantOuter $outer = null,
         /** @var MolecularSequenceStructureVariantInner|null inner Structural variant inner */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?MolecularSequenceStructureVariantInner $inner = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

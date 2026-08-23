@@ -14,6 +14,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A property value for this concept.
@@ -70,7 +72,7 @@ class ValueSetExpansionContainsProperty extends BackboneElement
                 ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|null $value = null,
         /** @var array<ValueSetExpansionContainsPropertySubProperty> subProperty SubProperty value for the concept */
         #[FhirProperty(
@@ -79,6 +81,7 @@ class ValueSetExpansionContainsProperty extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ValueSet\ValueSetExpansionContainsPropertySubProperty',
         )]
+        #[Valid]
         public array $subProperty = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -1,5 +1,44 @@
 {
-    "errorCount": 2,
+    "errorCount": 7,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 10,
+        "warningCount": 3,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Can't find 'Patient/123' in the bundle (Composition.subject). Note that there are 2 resources in the bundle with the same type and id, but they do not match because of the fullUrl based rules around matching relative references. Found 'urn:uuid:2b90dd2b-2dab-4c75-9bb9-a355e07401e8,urn:uuid:f5452d76-3d4e-4cd0-9fc0-1ac3623e5cbf', but none of them match because of the source fullUrl 'urn:uuid:30551ce1-5a28-4356-b684-1e639094ad4d'",
+            "Composition.author: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/Composition|4.0.1)",
+            "Composition.date: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/Composition|4.0.1)",
+            "Composition.status: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/Composition|4.0.1)",
+            "Composition.title: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/Composition|4.0.1)",
+            "Composition.type: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/Composition|4.0.1)",
+            "Constraint failed: bdl-10: 'A document must have a date'",
+            "Constraint failed: bdl-9: 'A document must have an identifier with a system and a value'",
+            "Entry 'urn:uuid:2b90dd2b-2dab-4c75-9bb9-a355e07401e8' isn't reachable by traversing links (forward or backward) from the Composition",
+            "Entry 'urn:uuid:f5452d76-3d4e-4cd0-9fc0-1ac3623e5cbf' isn't reachable by traversing links (forward or backward) from the Composition"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:Count": [
+                "entry[0].resource.author — This collection should contain 1 element or more."
+            ],
+            "constraint:NotBlank": [
+                "entry[0].resource.status — This value should not be blank.",
+                "entry[0].resource.type — This value should not be blank.",
+                "entry[0].resource.date — This value should not be blank.",
+                "entry[0].resource.title — This value should not be blank."
+            ],
+            "invariant:bdl-10": [
+                "(root) — A document must have a date"
+            ],
+            "invariant:bdl-9": [
+                "(root) — A document must have an identifier with a system and a value"
+            ]
+        },
+        "warnings": {}
+    }
 }

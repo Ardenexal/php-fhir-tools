@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The required capability must exist and are assumed to function correctly on the FHIR server being tested.
@@ -41,6 +42,7 @@ class TestScriptMetadata extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestScript\TestScriptMetadataLink',
         )]
+        #[Valid]
         public array $link = [],
         /** @var array<TestScriptMetadataCapability> capability Capabilities  that are assumed to function correctly on the FHIR server being tested */
         #[FhirProperty(
@@ -50,6 +52,7 @@ class TestScriptMetadata extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestScript\TestScriptMetadataCapability',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $capability = [],
     ) {

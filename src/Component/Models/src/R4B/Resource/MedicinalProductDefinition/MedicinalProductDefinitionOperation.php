@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A manufacturing or administrative process or step associated with (or performed on) the medicinal product.
@@ -33,13 +34,14 @@ class MedicinalProductDefinitionOperation extends BackboneElement
         public array $modifierExtension = [],
         /** @var CodeableReference|null type The type of manufacturing operation e.g. manufacturing itself, re-packaging */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
             'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
         ])]
         public ?CodeableReference $type = null,
         /** @var Period|null effectiveDate Date range of applicability */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $effectiveDate = null,
         /** @var array<Reference> organization The organization responsible for the particular process, e.g. the manufacturer or importer */
         #[FhirProperty(
@@ -48,10 +50,11 @@ class MedicinalProductDefinitionOperation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $organization = [],
         /** @var CodeableConcept|null confidentialityIndicator Specifies whether this process is considered proprietary or confidential */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $confidentialityIndicator = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

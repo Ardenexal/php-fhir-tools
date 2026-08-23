@@ -21,6 +21,11 @@
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\Metadata\\Tests\\": "tests/"
+        }
+    },
     "keywords": [
         "fhir",
         "healthcare",

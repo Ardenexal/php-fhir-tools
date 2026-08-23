@@ -36,7 +36,12 @@ class SubscriptionTopicCanFilterBy extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var UriPrimitive|null resource URL of the triggering Resource that this filter applies to */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/defined-types', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/defined-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRDefinedType',
+        )]
         public ?UriPrimitive $resource = null,
         /** @var StringPrimitive|string|null filterParameter Human-readable and computation-friendly name for a filter parameter usable by subscriptions on this topic, via Subscription.filterBy.filterParameter */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -51,7 +56,11 @@ class SubscriptionTopicCanFilterBy extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\SubscriptionSearchModifierType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-search-modifier|4.3.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-search-modifier|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SubscriptionSearchModifier',
+        )]
         public array $modifier = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

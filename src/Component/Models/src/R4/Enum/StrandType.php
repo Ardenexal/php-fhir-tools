@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: strandType
  * URL: http://hl7.org/fhir/ValueSet/strand-type
  * Version: 4.0.1
  * Description: Type for strand.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/strand-type', version: '4.0.1')]
 enum StrandType: string
 {
     /** Watson strand of referenceSeq */

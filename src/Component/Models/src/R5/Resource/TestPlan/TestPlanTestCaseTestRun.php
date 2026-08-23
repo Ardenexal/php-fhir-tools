@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The actual test to be executed.
@@ -31,7 +32,7 @@ class TestPlanTestCaseTestRun extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $narrative = null,
         /** @var TestPlanTestCaseTestRunScript|null script The test cases in a structured language e.g. gherkin, Postman, or FHIR TestScript */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?TestPlanTestCaseTestRunScript $script = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

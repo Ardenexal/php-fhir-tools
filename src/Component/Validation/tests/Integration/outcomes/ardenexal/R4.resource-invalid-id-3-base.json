@@ -1,5 +1,23 @@
 {
-    "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 1
+    "errorCount": 1,
+    "warningCount": 0,
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 1,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Invalid Resource id: Invalid Characters ('org_1')"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:Regex": [
+                "contained[0].id — Invalid Resource id: \"org_1\" must be 1-64 characters of A-Z, a-z, 0-9, \"-\" or \".\"."
+            ]
+        },
+        "warnings": {}
+    }
 }

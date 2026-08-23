@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Evidence variable such as population, exposure, or outcome.
@@ -43,12 +44,21 @@ class EvidenceVariableDefinition extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var CodeableConcept|null variableRole population | subpopulation | exposure | referenceExposure | measuredVariable | confounder */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/variable-role', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/variable-role',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\EvidenceVariableRole',
+        )]
         public ?CodeableConcept $variableRole = null,
         /** @var Reference|null observed Definition of the actual variable related to the statistic(s) */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Group',
             'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
@@ -56,13 +66,20 @@ class EvidenceVariableDefinition extends BackboneElement
         public ?Reference $observed = null,
         /** @var Reference|null intended Definition of the intended variable related to the Evidence */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Group',
             'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
         ])]
         public ?Reference $intended = null,
         /** @var CodeableConcept|null directnessMatch low | moderate | high | exact */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/directness', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/directness',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\EvidenceDirectness',
+        )]
         public ?CodeableConcept $directnessMatch = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

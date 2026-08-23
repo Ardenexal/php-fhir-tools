@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ConstraintSeverity
  * URL: http://hl7.org/fhir/ValueSet/constraint-severity
  * Version: 4.3.0
  * Description: SHALL applications comply with this constraint?
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/constraint-severity', version: '4.3.0')]
 enum ConstraintSeverity: string
 {
     /** Error */

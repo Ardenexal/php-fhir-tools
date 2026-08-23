@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Artifact Assessment Disposition
  * URL: http://hl7.org/fhir/ValueSet/artifactassessment-disposition
  * Version: 5.0.0
  * Description: Possible values for the disposition of a comment or change request, typically used for comments and change requests, to indicate the disposition of the responsible party towards the changes suggested by the comment or change request.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/artifactassessment-disposition', version: '5.0.0')]
 enum ArtifactAssessmentDisposition: string
 {
     /** Unresolved */

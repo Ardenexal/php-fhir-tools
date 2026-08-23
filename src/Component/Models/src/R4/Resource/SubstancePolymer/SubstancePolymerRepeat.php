@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Todo.
@@ -35,7 +36,7 @@ class SubstancePolymerRepeat extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $averageMolecularFormula = null,
         /** @var CodeableConcept|null repeatUnitAmountType Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $repeatUnitAmountType = null,
         /** @var array<SubstancePolymerRepeatRepeatUnit> repeatUnit Todo */
         #[FhirProperty(
@@ -44,6 +45,7 @@ class SubstancePolymerRepeat extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstancePolymer\SubstancePolymerRepeatRepeatUnit',
         )]
+        #[Valid]
         public array $repeatUnit = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

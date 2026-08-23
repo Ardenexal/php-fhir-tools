@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specific instances of data or objects that have been accessed.
@@ -40,16 +41,34 @@ class AuditEventEntity extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Reference|null what Specific instance of resource */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $what = null,
         /** @var Coding|null type Type of entity involved */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-entity-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-entity-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AuditEventEntityType',
+        )]
         public ?Coding $type = null,
         /** @var Coding|null role What role the entity played */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/object-role', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/object-role',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AuditEventEntityRole',
+        )]
         public ?Coding $role = null,
         /** @var Coding|null lifecycle Life-cycle stage for the entity */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/object-lifecycle-events', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/object-lifecycle-events',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ObjectLifecycleEvents',
+        )]
         public ?Coding $lifecycle = null,
         /** @var array<Coding> securityLabel Security labels on the entity */
         #[FhirProperty(
@@ -58,7 +77,12 @@ class AuditEventEntity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AllSecurityLabels',
+        )]
         public array $securityLabel = [],
         /** @var StringPrimitive|string|null name Descriptor for entity */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -76,6 +100,7 @@ class AuditEventEntity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\AuditEvent\AuditEventEntityDetail',
         )]
+        #[Valid]
         public array $detail = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

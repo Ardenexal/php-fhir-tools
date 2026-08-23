@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: GuidePageGeneration
  * URL: http://hl7.org/fhir/ValueSet/guide-page-generation
  * Version: 4.0.1
  * Description: A code that indicates how the page is generated.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/guide-page-generation', version: '4.0.1')]
 enum GuidePageGeneration: string
 {
     /** HTML */

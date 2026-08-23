@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\IdentityAssuranceLevelType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Link to a resource that concerns the same actual person.
@@ -33,6 +34,7 @@ class PersonLink extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null target The resource to which this actual person is associated */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
@@ -42,7 +44,12 @@ class PersonLink extends BackboneElement
         ])]
         public ?Reference $target = null,
         /** @var IdentityAssuranceLevelType|null assurance level1 | level2 | level3 | level4 */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/identity-assuranceLevel|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/identity-assuranceLevel|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\IdentityAssuranceLevel',
+        )]
         public ?IdentityAssuranceLevelType $assurance = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

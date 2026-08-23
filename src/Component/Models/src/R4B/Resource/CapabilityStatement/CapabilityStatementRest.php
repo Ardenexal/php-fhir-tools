@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RestfulCapabilityModeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A definition of the restful capabilities of the solution, if any.
@@ -40,13 +41,19 @@ class CapabilityStatementRest extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var RestfulCapabilityModeType|null mode client | server */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/restful-capability-mode|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/restful-capability-mode|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\RestfulCapabilityMode',
+        )]
         public ?RestfulCapabilityModeType $mode = null,
         /** @var MarkdownPrimitive|null documentation General description of implementation */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $documentation = null,
         /** @var CapabilityStatementRestSecurity|null security Information about security of implementation */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?CapabilityStatementRestSecurity $security = null,
         /** @var array<CapabilityStatementRestResource> resource Resource served on the REST interface */
         #[FhirProperty(
@@ -55,6 +62,7 @@ class CapabilityStatementRest extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CapabilityStatement\CapabilityStatementRestResource',
         )]
+        #[Valid]
         public array $resource = [],
         /** @var array<CapabilityStatementRestInteraction> interaction What operations are supported? */
         #[FhirProperty(
@@ -63,6 +71,7 @@ class CapabilityStatementRest extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CapabilityStatement\CapabilityStatementRestInteraction',
         )]
+        #[Valid]
         public array $interaction = [],
         /** @var array<CapabilityStatementRestResourceSearchParam> searchParam Search parameters for searching all resources */
         #[FhirProperty(
@@ -71,6 +80,7 @@ class CapabilityStatementRest extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CapabilityStatement\CapabilityStatementRestResourceSearchParam',
         )]
+        #[Valid]
         public array $searchParam = [],
         /** @var array<CapabilityStatementRestResourceOperation> operation Definition of a system level operation */
         #[FhirProperty(
@@ -79,6 +89,7 @@ class CapabilityStatementRest extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CapabilityStatement\CapabilityStatementRestResourceOperation',
         )]
+        #[Valid]
         public array $operation = [],
         /** @var array<CanonicalPrimitive> compartment Compartments served/used by system */
         #[FhirProperty(

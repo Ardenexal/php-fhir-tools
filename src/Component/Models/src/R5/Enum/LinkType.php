@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Link Type
  * URL: http://hl7.org/fhir/ValueSet/link-type
  * Version: 5.0.0
  * Description: The type of link between this Patient resource and another Patient/RelatedPerson resource.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/link-type', version: '5.0.0')]
 enum LinkType: string
 {
     /** Replaced-by */

@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\Base64BinaryPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specific instances of data or objects that have been accessed.
@@ -31,10 +32,10 @@ class AuditEventEntity extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Reference|null what Specific instance of resource */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $what = null,
         /** @var CodeableConcept|null role What role the entity played */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $role = null,
         /** @var array<CodeableConcept> securityLabel Security labels on the entity */
         #[FhirProperty(
@@ -43,6 +44,7 @@ class AuditEventEntity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $securityLabel = [],
         /** @var Base64BinaryPrimitive|null query Query parameters */
         #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive')]
@@ -54,6 +56,7 @@ class AuditEventEntity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\AuditEvent\AuditEventEntityDetail',
         )]
+        #[Valid]
         public array $detail = [],
         /** @var array<AuditEventAgent> agent Entity is attributed to this agent */
         #[FhirProperty(
@@ -62,6 +65,7 @@ class AuditEventEntity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\AuditEvent\AuditEventAgent',
         )]
+        #[Valid]
         public array $agent = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: EventStatus
  * URL: http://hl7.org/fhir/ValueSet/event-status
  * Version: 4.0.1
  * Description: Codes identifying the lifecycle stage of an event.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/event-status', version: '4.0.1')]
 enum EventStatus: string
 {
     /** Preparation */

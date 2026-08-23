@@ -1,5 +1,24 @@
 {
     "errorCount": 0,
     "warningCount": 1,
-    "infoCount": 1
+    "infoCount": 1,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 0,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "ABOVE",
+        "errors": [
+            "Stated Attachment Size 19 does not match actual attachment size 17",
+            "Wrong Display Name 'Progress note' for http://snomed.info/sct#371532007. Valid display is one of 4 choices: 'Progress report (qualifier value)' (en), 'Progress report' (en), 'Report of subsequent visit' (en) or 'Progress report (record artifact)' (en) (for the language(s) 'en-US')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "content[0].attachment.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
+            ]
+        }
+    }
 }

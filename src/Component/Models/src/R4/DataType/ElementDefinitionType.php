@@ -39,7 +39,13 @@ class ElementDefinitionType extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var UriPrimitive|null code Data type or Resource (reference to definition) */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/defined-types', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/defined-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRDefinedType',
+        )]
         public ?UriPrimitive $code = null,
         /** @var array<CanonicalPrimitive> profile Profiles (StructureDefinition or IG) - one must apply */
         #[FhirProperty(
@@ -72,10 +78,19 @@ class ElementDefinitionType extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\AggregationModeType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-aggregation-mode|4.0.1', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-aggregation-mode|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AggregationMode',
+        )]
         public array $aggregation = [],
         /** @var ReferenceVersionRulesType|null versioning either | independent | specific */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/reference-version-rules|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/reference-version-rules|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ReferenceVersionRules',
+        )]
         public ?ReferenceVersionRulesType $versioning = null,
     ) {
         parent::__construct($id, $extension);

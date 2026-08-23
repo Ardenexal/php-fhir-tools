@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A specification of the restful capabilities of the solution for a specific resource type.
@@ -45,7 +46,13 @@ class CapabilityStatementRestResource extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var ResourceTypeType|null type A resource type that is supported */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-types|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-types|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ResourceType',
+        )]
         public ?ResourceTypeType $type = null,
         /** @var CanonicalPrimitive|null profile Base System profile for all uses of resource */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
@@ -69,9 +76,15 @@ class CapabilityStatementRestResource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\CapabilityStatement\CapabilityStatementRestResourceInteraction',
         )]
+        #[Valid]
         public array $interaction = [],
         /** @var ResourceVersionPolicyType|null versioning no-version | versioned | versioned-update */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/versioning-policy|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/versioning-policy|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ResourceVersionPolicy',
+        )]
         public ?ResourceVersionPolicyType $versioning = null,
         /** @var bool|null readHistory Whether vRead can return past versions */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -83,13 +96,23 @@ class CapabilityStatementRestResource extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $conditionalCreate = null,
         /** @var ConditionalReadStatusType|null conditionalRead not-supported | modified-since | not-match | full-support */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conditional-read-status|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/conditional-read-status|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ConditionalReadStatus',
+        )]
         public ?ConditionalReadStatusType $conditionalRead = null,
         /** @var bool|null conditionalUpdate If allows/uses conditional update */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $conditionalUpdate = null,
         /** @var ConditionalDeleteStatusType|null conditionalDelete not-supported | single | multiple - how conditional delete is supported */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conditional-delete-status|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/conditional-delete-status|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ConditionalDeleteStatus',
+        )]
         public ?ConditionalDeleteStatusType $conditionalDelete = null,
         /** @var array<ReferenceHandlingPolicyType> referencePolicy literal | logical | resolves | enforced | local */
         #[FhirProperty(
@@ -98,7 +121,11 @@ class CapabilityStatementRestResource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ReferenceHandlingPolicyType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/reference-handling-policy|4.0.1', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/reference-handling-policy|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ReferenceHandlingPolicy',
+        )]
         public array $referencePolicy = [],
         /** @var array<StringPrimitive|string> searchInclude _include values supported by the server */
         #[FhirProperty(
@@ -123,6 +150,7 @@ class CapabilityStatementRestResource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\CapabilityStatement\CapabilityStatementRestResourceSearchParam',
         )]
+        #[Valid]
         public array $searchParam = [],
         /** @var array<CapabilityStatementRestResourceOperation> operation Definition of a resource operation */
         #[FhirProperty(
@@ -131,6 +159,7 @@ class CapabilityStatementRestResource extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\CapabilityStatement\CapabilityStatementRestResourceOperation',
         )]
+        #[Valid]
         public array $operation = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

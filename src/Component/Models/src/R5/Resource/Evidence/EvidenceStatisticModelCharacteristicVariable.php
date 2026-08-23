@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A variable adjusted for in the adjusted analysis.
@@ -36,6 +37,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null variableDefinition Description of the variable */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Group',
@@ -43,7 +45,12 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
         ])]
         public ?Reference $variableDefinition = null,
         /** @var EvidenceVariableHandlingType|null handling continuous | dichotomous | ordinal | polychotomous */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/variable-handling|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/variable-handling|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\EvidenceVariableHandling',
+        )]
         public ?EvidenceVariableHandlingType $handling = null,
         /** @var array<CodeableConcept> valueCategory Description for grouping of ordinal or polychotomous variables */
         #[FhirProperty(
@@ -52,6 +59,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $valueCategory = [],
         /** @var array<Quantity> valueQuantity Discrete value for grouping of ordinal or polychotomous variables */
         #[FhirProperty(
@@ -60,6 +68,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity',
         )]
+        #[Valid]
         public array $valueQuantity = [],
         /** @var array<Range> valueRange Range of values for grouping of ordinal or polychotomous variables */
         #[FhirProperty(
@@ -68,6 +77,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Range',
         )]
+        #[Valid]
         public array $valueRange = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

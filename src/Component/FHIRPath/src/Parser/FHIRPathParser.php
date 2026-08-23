@@ -27,7 +27,10 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
  *
  * Grammar (from FHIRPath spec, ordered highest to lowest precedence):
  * - expression:      term
- * - term:            comparison (('and' | 'or' | 'xor' | 'implies') comparison)*
+ * - term:            implies
+ * - implies:         or ('implies' or)*
+ * - or:              and (('or' | 'xor') and)*
+ * - and:             comparison ('and' comparison)*
  * - comparison:      union (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') union)*
  * - union:           additive (('|') additive)*
  * - additive:        multiplicative (('+' | '-' | '&') multiplicative)*
@@ -79,23 +82,68 @@ class FHIRPathParser
     }
 
     /**
-     * Parse a term (logical operators).
-     * term: comparison (('and' | 'or' | 'xor' | 'implies') comparison)*
+     * Parse a term (logical operators), loosest precedence level first.
+     *
+     * These are THREE precedence levels in the FHIRPath grammar, not one:
+     * `and` binds tighter than `xor`/`or`, which bind tighter than `implies`. Treating them as a
+     * single left-associative level parsed `A implies B and C` as `(A implies B) and C`, which is a
+     * different proposition: with `A` false the correct answer is `true` (a false antecedent implies
+     * anything) but the flat parse yields `true and C` — so a false `C` produced a violation.
+     *
+     * That is how `Task.tsk-1`
+     * (`restriction.exists() implies code.coding.where(...).exists() and focus.exists()`) reported a
+     * Task with no `restriction` as invalid, where the HL7 Java validator reports nothing.
+     *
+     * term: implies
      */
     private function parseTerm(): ExpressionNode
     {
+        return $this->parseImplies();
+    }
+
+    /**
+     * implies: or ('implies' or)*
+     */
+    private function parseImplies(): ExpressionNode
+    {
+        $left = $this->parseOr();
+
+        while ($this->match(TokenType::IMPLIES)) {
+            $operator = $this->previous();
+            $right    = $this->parseOr();
+            $left     = new BinaryOperatorNode($left, $operator->type, $right, $operator->line, $operator->column);
+        }
+
+        return $left;
+    }
+
+    /**
+     * or: and (('or' | 'xor') and)*
+     */
+    private function parseOr(): ExpressionNode
+    {
+        $left = $this->parseAnd();
+
+        while ($this->match(TokenType::OR, TokenType::XOR)) {
+            $operator = $this->previous();
+            $right    = $this->parseAnd();
+            $left     = new BinaryOperatorNode($left, $operator->type, $right, $operator->line, $operator->column);
+        }
+
+        return $left;
+    }
+
+    /**
+     * and: comparison ('and' comparison)*
+     */
+    private function parseAnd(): ExpressionNode
+    {
         $left = $this->parseComparison();
 
-        while ($this->match(TokenType::AND, TokenType::OR, TokenType::XOR, TokenType::IMPLIES)) {
+        while ($this->match(TokenType::AND)) {
             $operator = $this->previous();
             $right    = $this->parseComparison();
-            $left     = new BinaryOperatorNode(
-                $left,
-                $operator->type,
-                $right,
-                $operator->line,
-                $operator->column,
-            );
+            $left     = new BinaryOperatorNode($left, $operator->type, $right, $operator->line, $operator->column);
         }
 
         return $left;

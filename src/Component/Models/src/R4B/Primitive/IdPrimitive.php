@@ -32,7 +32,7 @@ class IdPrimitive extends StringPrimitive implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var string|null value Primitive value for id */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '[A-Za-z0-9\-\.]{1,64}')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '~\A(?:[A-Za-z0-9\-\.]{1,64})\z~')]
         public ?string $value = null,
     ) {
         parent::__construct($id, $extension, $value);

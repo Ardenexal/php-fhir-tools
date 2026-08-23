@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Search Comparator
  * URL: http://hl7.org/fhir/ValueSet/search-comparator
  * Version: 5.0.0
  * Description: What Search Comparator Codes are supported in search.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/search-comparator', version: '5.0.0')]
 enum SearchComparator: string
 {
     /** Equals */

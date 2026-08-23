@@ -15,11 +15,13 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRBackboneElementJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRComplexTypeJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRLogicalModelJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIROperationPayloadJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRPrimitiveTypeJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRResourceJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRBackboneElementXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRComplexTypeXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRLogicalModelXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIROperationPayloadXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRPrimitiveTypeXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRResourceXmlNormalizer;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -62,6 +64,15 @@ use Symfony\Component\Serializer\Serializer;
  */
 class FHIRVersionedSerializerPass implements CompilerPassInterface
 {
+    /**
+     * Tag priority for operation-payload normalizers in the application serializer.
+     *
+     * Must beat `ObjectNormalizer` (-1000), which claims any class and would silently return an
+     * empty payload. Comfortably above 0 so an application's own normalizers can still be ordered
+     * either side of it deliberately.
+     */
+    private const int APPLICATION_NORMALIZER_PRIORITY = 100;
+
     public function process(ContainerBuilder $container): void
     {
         /** @var string $defaultVersion */
@@ -179,6 +190,45 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
             ])
             ->setPublic(false);
 
+        // ---- Operation payloads ----
+        // Generated `…Input`/`…Output` classes carry no #[FhirResource], so no other normalizer
+        // here claims them. Two instances are registered per version, deliberately:
+        //
+        //  1. `$operationJsonId` / `$operationXmlId` join the FHIR serializer below, where the
+        //     sibling normalizers handle the inner `Parameters` leg via SerializerAwareInterface.
+        //  2. `…app` variants are tagged `serializer.normalizer` so the *framework* serializer —
+        //     and therefore API Platform's `input:` / `output:` — can build these classes. Those
+        //     are given an explicit reference to the FHIR serializer for the inner leg, because
+        //     the application chain has no FHIR normalizers in it.
+        //
+        // Two instances rather than one because a single service in both places would need to
+        // reference the serializer that contains it: a circular dependency.
+        $operationJsonId = "fhir.normalizer.operation_payload.json.{$v}";
+        $container->register($operationJsonId, FHIROperationPayloadJsonNormalizer::class)
+            ->setArguments([
+                new Reference(FHIRMetadataExtractorInterface::class),
+                new Reference(FHIRTypeResolverInterface::class),
+                null,
+                null,
+                $version->value,
+                $igRegistryRef,
+                null,             // inner leg handled by the siblings in this same serializer
+            ])
+            ->setPublic(false);
+
+        $operationXmlId = "fhir.normalizer.operation_payload.xml.{$v}";
+        $container->register($operationXmlId, FHIROperationPayloadXmlNormalizer::class)
+            ->setArguments([
+                new Reference(FHIRMetadataExtractorInterface::class),
+                new Reference(FHIRTypeResolverInterface::class),
+                null,
+                null,
+                $version->value,
+                $igRegistryRef,
+                null,
+            ])
+            ->setPublic(false);
+
         $backboneXmlId = "fhir.normalizer.backbone.xml.{$v}";
         $container->register($backboneXmlId, FHIRBackboneElementXmlNormalizer::class)
             ->setArguments([
@@ -221,6 +271,10 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
         $container->register($serializerId, Serializer::class)
             ->setArguments([
                 [
+                    // First: nothing else claims payload classes, and a generic normalizer reaching
+                    // one produces an object with every property null, silently.
+                    new Reference($operationJsonId),
+                    new Reference($operationXmlId),
                     new Reference($logicalModelJsonId),
                     new Reference($resourceJsonId),
                     new Reference($resourceXmlId),
@@ -249,5 +303,58 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
                 new Reference(FHIRMetadataExtractorInterface::class),
             ])
             ->setPublic(true);
+
+        $this->registerApplicationSerializerNormalizers($container, $version, $serializerId, $igRegistryRef);
+    }
+
+    /**
+     * Tag operation-payload normalizers into the application's own serializer.
+     *
+     * This is what makes API Platform work with generated operation classes:
+     *
+     * ```php
+     * #[Post(
+     *     uriTemplate: '/ValueSet/{id}/$validate-code',
+     *     input:       ValueSetValidateCodeInput::class,
+     *     processor:   ValueSetValidateCodeProcessor::class,
+     * )]
+     * ```
+     *
+     * API Platform delegates to the framework serializer, which has no FHIR normalizers in it. Left
+     * alone it falls through to `ObjectNormalizer`, which accepts the class, finds none of its
+     * constructor arguments in a `Parameters` body, and returns an object with every property null —
+     * no exception, no validation error. The priority below must stay above `ObjectNormalizer`
+     * (-1000) for that reason.
+     *
+     * All three version stacks are tagged. Each normalizer claims only payloads whose declared
+     * version matches its own, so exactly one handles any given class and none can shadow another.
+     */
+    private function registerApplicationSerializerNormalizers(
+        ContainerBuilder $container,
+        FhirVersion $version,
+        string $fhirSerializerId,
+        Reference $igRegistryRef,
+    ): void {
+        $v = strtolower($version->value);
+
+        foreach ([
+            "fhir.normalizer.operation_payload.json.{$v}.app" => FHIROperationPayloadJsonNormalizer::class,
+            "fhir.normalizer.operation_payload.xml.{$v}.app"  => FHIROperationPayloadXmlNormalizer::class,
+        ] as $id => $class) {
+            $container->register($id, $class)
+                ->setArguments([
+                    new Reference(FHIRMetadataExtractorInterface::class),
+                    new Reference(FHIRTypeResolverInterface::class),
+                    null,
+                    null,
+                    $version->value,
+                    $igRegistryRef,
+                    // The inner `Parameters` leg goes through the FHIR serializer, not the
+                    // application one — that is the whole point of this second instance.
+                    new Reference($fhirSerializerId),
+                ])
+                ->addTag('serializer.normalizer', ['priority' => self::APPLICATION_NORMALIZER_PRIORITY])
+                ->setPublic(false);
+        }
     }
 }

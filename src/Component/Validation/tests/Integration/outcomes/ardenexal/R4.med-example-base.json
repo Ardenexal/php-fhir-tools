@@ -1,5 +1,23 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 7,
+        "infoCount": 6,
+        "classification": "EQUAL",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The fullUrl must be an absolute URL (not 'Medication/12345')"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:BundleEntryFullUrlChecker": [
+                "entry[0].fullUrl — The fullUrl must be an absolute URL (not 'Medication/12345')"
+            ]
+        },
+        "warnings": {}
+    }
 }

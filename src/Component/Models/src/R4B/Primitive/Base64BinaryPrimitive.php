@@ -33,7 +33,7 @@ class Base64BinaryPrimitive extends Element implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var string|null value Primitive value for base64Binary */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '(\s*([0-9a-zA-Z\+/=]){4}\s*)+')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '~\A(?:(\s*([0-9a-zA-Z\+/=]){4}\s*)+)\z~')]
         public ?string $value = null,
     ) {
         parent::__construct($id, $extension);

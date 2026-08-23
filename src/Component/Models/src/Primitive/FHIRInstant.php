@@ -18,8 +18,9 @@ use Brick\DateTime\ZonedDateTime;
 final readonly class FHIRInstant implements FHIRTemporalValue
 {
     private function __construct(
-        private Instant $value,
+        private ?Instant $value,
         private string $originalString,
+        private ?string $parseError = null,
     ) {
     }
 
@@ -30,9 +31,19 @@ final readonly class FHIRInstant implements FHIRTemporalValue
         return new self($zdt->getInstant(), $raw);
     }
 
-    public function getValue(): Instant
+    public static function unparsed(string $raw, string $error): static
+    {
+        return new self(null, $raw, $error);
+    }
+
+    public function getValue(): ?Instant
     {
         return $this->value;
+    }
+
+    public function getParseError(): ?string
+    {
+        return $this->parseError;
     }
 
     /**

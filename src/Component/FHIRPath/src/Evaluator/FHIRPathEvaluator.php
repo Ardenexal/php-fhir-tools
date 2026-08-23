@@ -280,7 +280,16 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     public function evaluate(ExpressionNode $expression, mixed $resource, ?EvaluationContext $context = null): Collection
     {
         $this->context = $context ?? new EvaluationContext();
-        $this->context->setRootResource($resource);
+
+        // Only default the root to the evaluated node. A caller that supplied one means it:
+        // `%resource` / `%rootResource` / `%context` all resolve from here, and when an invariant is
+        // evaluated on a *nested* element the root is still the enclosing resource, not the element.
+        // Overwriting unconditionally made `Reference.ref-1` — which looks up
+        // `%rootResource.contained.id` — resolve against the Reference itself and fail for every
+        // legitimate local reference.
+        if ($this->context->getRootResource() === null) {
+            $this->context->setRootResource($resource);
+        }
         $this->context->setVariable('this', $resource);
         $this->context->setEvaluator($this);
 
@@ -737,14 +746,30 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      *   - FHIR R4 FHIRPath supplement: %resource, %rootResource, %sct, %loinc,
      *     %vs-<name>, %ext-<name>
      *
-     * Note: %resource differs from %rootResource when navigating contained
-     * resources via resolve() — for now both return rootResource since contained
-     * resource navigation is not yet implemented.
+     * %resource and %rootResource differ by exactly one level inside a contained
+     * resource: FHIR defines %resource as the resource containing the node and
+     * %rootResource as *that* resource's container. The evaluation context carries
+     * the container separately and only when there is one, so %rootResource falls
+     * back to %resource everywhere else — which is the spec's own equivalence for
+     * a node that is not inside a contained resource.
+     *
+     * %context is left resolving from the enclosing resource. That is not the
+     * spec's definition (it should be the constraint's context node) but it is
+     * pre-existing behaviour reachable from every variable-using invariant, so it
+     * is deliberately not changed here.
      */
     private function resolveEnvironmentVariable(string $name): Collection|string|null
     {
         // Node references
-        if ($name === 'context' || $name === 'resource' || $name === 'rootResource') {
+        if ($name === 'rootResource') {
+            // The container, when the enclosing resource is contained; otherwise the
+            // enclosing resource itself.
+            $node = $this->context->getContainerResource() ?? $this->context->getRootResource();
+
+            return $node !== null ? Collection::single($node) : Collection::empty();
+        }
+
+        if ($name === 'context' || $name === 'resource') {
             $root = $this->context->getRootResource();
 
             return $root !== null ? Collection::single($root) : Collection::empty();
@@ -1181,6 +1206,23 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     /**
      * Navigate a property on a node
      */
+    /**
+     * Whether a declared property actually holds a value on this instance.
+     *
+     * Generated model properties are typed and default-less, so "declared" and "readable" are not the
+     * same thing — reading an unassigned one raises an Error rather than returning null. Untyped and
+     * dynamic properties are always considered initialized.
+     */
+    private static function isPropertyInitialized(object $node, string $propertyName): bool
+    {
+        try {
+            return (new \ReflectionProperty($node, $propertyName))->isInitialized($node);
+        } catch (\ReflectionException) {
+            // Dynamic property: property_exists() found it, so it holds something.
+            return true;
+        }
+    }
+
     private function navigateProperty(mixed $node, string $propertyName): Collection
     {
         // FHIRTypedCollection wraps a raw data array with FHIR type context.
@@ -1244,8 +1286,17 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 }
             }
 
-            // Try direct property access
+            // Try direct property access.
+            // The initialisation check is load-bearing: generated models declare typed properties
+            // with no default, so a Reference that carries no `id` has `Element::$id` declared but
+            // uninitialized. Reading it throws, and the old code let that Error fall through to the
+            // choice-variant fallback below — where `id` then matched `identifier`. An uninitialized
+            // property holds nothing, so the honest answer is an empty collection, not a fall-through.
             if (property_exists($node, $propertyName)) {
+                if (!self::isPropertyInitialized($node, $propertyName)) {
+                    return Collection::empty();
+                }
+
                 try {
                     $value = $node->$propertyName;
 
@@ -1293,8 +1344,21 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
             // Handle polymorphic properties (value[x])
             // Look for properties like valueString, valueInteger, etc.
+            //
+            // The suffix MUST start with an uppercase letter, exactly as the raw-array branch above
+            // requires. FHIR names choice variants by appending a capitalised type — `valueString`,
+            // `valueQuantity` — so a lowercase continuation is a different element, not a variant.
+            // Without this guard, navigating `id` matched `identifier` and returned the wrong node,
+            // which broke `ele-1` (`children().count() > id.count()`) on every Reference carrying an
+            // identifier: `id.count()` came back as 1 instead of 0, so the comparison went false and
+            // valid resources were reported invalid.
             foreach (get_object_vars($node) as $prop => $value) {
                 if (str_starts_with($prop, $propertyName) && $prop !== $propertyName) {
+                    $suffix = substr($prop, strlen($propertyName));
+                    if ($suffix === '' || !ctype_upper($suffix[0])) {
+                        continue;
+                    }
+
                     // Look up FHIR type for the resolved variant property
                     $fhirType = $this->resolveFhirPropertyType($node, $prop);
                     if ($fhirType !== null && is_scalar($value)) {
