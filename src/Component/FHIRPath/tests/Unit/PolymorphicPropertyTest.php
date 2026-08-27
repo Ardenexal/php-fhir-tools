@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\FHIRPath\tests\Unit;
+namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
