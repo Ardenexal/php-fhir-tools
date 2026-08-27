@@ -149,7 +149,16 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             $metaMap = $this->getPropertyMetadataMap($object);
             $data    = $this->remapNamespacedElements($data, $metaMap, $object, $sourceElement);
 
+            // CDA narrative is read from the source DOM, not from $data: XmlEncoder's decode
+            // regroups same-named siblings and loses their order, which would silently reshuffle a
+            // narrative block. The element names handled here are skipped in the loop below.
+            $narrativeElements = $this->restoreNarrativeProperties($object, $metaMap, $sourceElement);
+
             foreach ($data as $elementName => $value) {
+                if (isset($narrativeElements[$elementName])) {
+                    continue;
+                }
+
                 // XmlEncoder attribute keys: @url → url (Extension.url); skip @value and # (XmlEncoder artifacts)
                 if (str_starts_with($elementName, '@')) {
                     if ($elementName !== '@value') {
@@ -492,6 +501,17 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 continue;
             }
 
+            // CDA narrative: the markup is held as a plain string, not an XhtmlPrimitive object, and
+            // must emit as element content in the document's own namespace (urn:hl7-org:v3) rather
+            // than escaped into a value attribute. `Section.text` is the only xhtml-typed element in
+            // the CDA package — it carries `representation: cdaText` upstream, and nothing else does
+            // — so the xhtml type alone identifies it and no extra metadata is needed.
+            if ($meta !== null && $meta->fhirType === 'xhtml' && is_string($value)) {
+                $data[$xmlKey] = ['#' => $this->buildNarrativeFragment($value)];
+
+                continue;
+            }
+
             // Xhtml: XhtmlPrimitive.value is either an array (from XML deserialization) or string (from JSON)
             if ($meta !== null && $meta->fhirType === 'xhtml' && is_object($value)) {
                 $xhtmlValProp = self::reflProp($value, 'value');
@@ -831,6 +851,170 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         return $normalized;
+    }
+
+    /**
+     * Set every string-typed xhtml property on a freshly denormalized object from its element in the
+     * source DOM, and return the element names consumed so the caller can skip them.
+     *
+     * Reading from the DOM rather than the decoded array is not an optimisation: XmlEncoder's decode
+     * regroups same-named siblings, so `<p/><table/><p/>` arrives as a two-element `p` plus a
+     * `table` with the interleaving lost. A narrative reshuffled that way would still be
+     * well-formed, which is exactly why it has to be read in document order instead.
+     *
+     * @param array<string, PropertyMetadata> $metaMap
+     *
+     * @return array<string, true> element names whose value has been consumed here
+     */
+    private function restoreNarrativeProperties(object $object, array $metaMap, ?\DOMElement $sourceElement): array
+    {
+        if ($sourceElement === null) {
+            return [];
+        }
+
+        $consumed = [];
+        foreach ($metaMap as $propertyName => $meta) {
+            if ($meta->fhirType !== 'xhtml') {
+                continue;
+            }
+
+            $property = self::reflProp($object, $propertyName);
+            if ($property === null) {
+                continue;
+            }
+            $type = $property->getType();
+            if (!$type instanceof \ReflectionNamedType || $type->getName() !== 'string') {
+                continue;
+            }
+
+            $elementName = $this->cdaLocalElementName($propertyName, $meta);
+            $children    = $this->childElementsByLocalName($sourceElement, $elementName);
+            if ($children === []) {
+                continue;
+            }
+
+            $property->setValue($object, $this->narrativeMarkupFrom($children[0]));
+            $consumed[$elementName] = true;
+        }
+
+        return $consumed;
+    }
+
+    /**
+     * Serialize an element's children back to a markup string, dropping the namespace declarations
+     * the parser resolved onto them.
+     *
+     * The inherited default namespace is deliberately not written back: it was never in the string
+     * the caller supplied, it is re-established on emit by the document root, and repeating it on
+     * every node would grow the markup on each round trip. Elements are rebuilt rather than
+     * string-edited so nothing depends on matching a namespace declaration by pattern.
+     */
+    private function narrativeMarkupFrom(\DOMElement $element): string
+    {
+        $target = new \DOMDocument();
+        $markup = '';
+
+        foreach ($element->childNodes as $child) {
+            $copy = $this->copyWithoutNamespaces($child, $target);
+            if ($copy === null) {
+                continue;
+            }
+            $markup .= (string) $target->saveXML($copy);
+        }
+
+        return $markup;
+    }
+
+    /**
+     * Recursively copy a narrative node into another document with no namespace bound to any
+     * element or attribute. Comments and processing instructions are dropped; text is preserved as
+     * text, CDATA sections included — DOMCdataSection extends DOMText, so they take the same branch.
+     */
+    private function copyWithoutNamespaces(\DOMNode $node, \DOMDocument $target): ?\DOMNode
+    {
+        if ($node instanceof \DOMText) {
+            return $target->createTextNode($node->nodeValue ?? '');
+        }
+
+        // A null localName means the node carries no element name to copy (DOM allows it on nodes
+        // that are not named elements), so there is nothing to rebuild.
+        if (!$node instanceof \DOMElement || $node->localName === null) {
+            return null;
+        }
+
+        $copy = $target->createElement($node->localName);
+        foreach ($node->attributes as $attribute) {
+            // Namespaced attributes are dropped along with the namespaces themselves; an attribute
+            // with no local name cannot be re-created.
+            if ($attribute->namespaceURI !== null || $attribute->localName === null) {
+                continue;
+            }
+
+            $copy->setAttribute($attribute->localName, $attribute->value);
+        }
+
+        foreach ($node->childNodes as $child) {
+            $childCopy = $this->copyWithoutNamespaces($child, $target);
+            if ($childCopy !== null) {
+                $copy->appendChild($childCopy);
+            }
+        }
+
+        return $copy;
+    }
+
+    /**
+     * Build a CDA narrative block as a DOMDocumentFragment, to be injected under the '#' key so
+     * XmlEncoder emits it verbatim as element content.
+     *
+     * The narrative is a StrucDoc markup tree — paragraphs, lists, tables — that this library keeps
+     * as a plain string on the model rather than as a generated class hierarchy (`hl7.cda.uv.core`
+     * publishes no StrucDoc StructureDefinition, so there is nothing to generate from, and callers
+     * overwhelmingly already hold the markup as text). Storing a string does not mean emitting one:
+     * CDA requires real child elements here, so the string is parsed on the way out.
+     *
+     * A fragment rather than a decoded array because XmlEncoder's decode regroups same-named
+     * siblings and destroys interleaved document order — fatal for narrative, where
+     * `<p>/<table>/<p>` must stay in that order. Children are created WITHOUT an explicit namespace
+     * so they inherit the in-scope default (urn:hl7-org:v3 declared on the CDA root), matching
+     * published CDA; createElementNS() would make libxml re-declare xmlns on every child.
+     *
+     * Markup that will not parse, and plain text with no markup at all, both become text content:
+     * a narrative is author-supplied and must never be able to break document serialization.
+     */
+    private function buildNarrativeFragment(string $narrative): \DOMDocumentFragment
+    {
+        $document = new \DOMDocument();
+        $fragment = $document->createDocumentFragment();
+
+        if (ltrim($narrative) === '' || !str_contains($narrative, '<')) {
+            $fragment->appendChild($document->createTextNode($narrative));
+
+            return $fragment;
+        }
+
+        // Parse under a throwaway root so multiple top-level nodes are allowed, with entity loading
+        // disabled and errors captured rather than raised.
+        $source   = new \DOMDocument();
+        $previous = libxml_use_internal_errors(true);
+        $parsed   = $source->loadXML(
+            '<narrative>' . $narrative . '</narrative>',
+            \LIBXML_NONET | \LIBXML_NOENT,
+        );
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        if (!$parsed || $source->documentElement === null) {
+            $fragment->appendChild($document->createTextNode($narrative));
+
+            return $fragment;
+        }
+
+        foreach ($source->documentElement->childNodes as $child) {
+            $fragment->appendChild($document->importNode($child, true));
+        }
+
+        return $fragment;
     }
 
     /**

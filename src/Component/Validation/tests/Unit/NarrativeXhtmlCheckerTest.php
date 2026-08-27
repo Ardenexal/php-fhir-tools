@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\ClinicalDocument;
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Component;
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Section;
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\StructuredBody;
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\StructuredBodyComponent;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\XhtmlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\ListResource;
@@ -118,6 +124,30 @@ final class NarrativeXhtmlCheckerTest extends TestCase
         self::assertSame('error', $violations[0]->severity);
         self::assertSame('txt-1', $violations[0]->invariantKey);
         self::assertNull($violations[1]->invariantKey);
+    }
+
+    /**
+     * A CDA section's narrative is a StrucDoc markup tree, not XHTML: it carries several top-level
+     * nodes instead of one wrapping div, and `paragraph`/`content` are not HTML 4.0 elements. Judged
+     * by FHIR's rules, a valid CDA narrative drew three errors — a spurious malformed-XHTML report
+     * caused by the extra top-level nodes, txt-1 for `paragraph`, and txt-2 claiming there was no
+     * content at all. Logical models are skipped so the checker cannot reject valid CDA.
+     */
+    public function testCdaNarrativeIsNotJudgedByFhirNarrativeRules(): void
+    {
+        $document = new ClinicalDocument(
+            id: new II(root: '1.2.3'),
+            component: new Component(
+                structuredBody: new StructuredBody(
+                    component: [new StructuredBodyComponent(section: new Section(
+                        text: '<paragraph>Current medications</paragraph>'
+                            . '<content styleCode="Bold">Review in 7 days</content>',
+                    ))],
+                ),
+            ),
+        );
+
+        self::assertSame([], (new NarrativeXhtmlChecker())->check($document));
     }
 
     /** @return list<string> */
