@@ -21,10 +21,10 @@ use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Printer;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Attribute\Ask;
-use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressIndicator;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -63,12 +63,21 @@ use Nette\InvalidStateException;
  * Usage:
  *   php bin/console fhir:generate --package=hl7.fhir.r4.core -vvv
  *
+ * **Console compatibility.** This package supports symfony/console ^6.4, so the command stays on
+ * classic configure()/execute(). The invokable style (`__invoke()` with `#[Option]` parameters)
+ * needs 7.3, and on 6.4 nothing fails to load: the options would simply never register.
+ *
+ * configure() therefore mirrors the definition those attributes produced on 7.x, down to option
+ * names, modes, defaults, descriptions and order, so the command behaves the same on both.
+ *
  * @see https://www.hl7.org/fhir/structuredefinition.html  StructureDefinition docs
  * @see https://www.hl7.org/fhir/valueset.html             ValueSet docs
  */
 #[AsCommand(name: 'fhir:generate', description: 'Generates FHIR model classes from FHIR definitions.')]
 class FHIRModelGeneratorCommand extends Command
 {
+    use PackageOptionTrait;
+
     /**
      * The HL7 terminology packages contain CodeSystem and ValueSet definitions shared
      * across all FHIR versions. The correct version-specific package is prepended
@@ -158,27 +167,27 @@ class FHIRModelGeneratorCommand extends Command
         $this->errorCollector = new ErrorCollector();
     }
 
+    /** Declares the --package and --offline definition that must stay identical on console 6.4 and 7.x. */
+    protected function configure(): void
+    {
+        $this
+            ->addOption('package', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Implementation Guide packages to include.', self::DEFAULT_IG_PACKAGES['R4'])
+            ->addOption('offline', null, InputOption::VALUE_NONE, 'Work offline using only cached packages');
+    }
+
     /**
      * Entry point invoked by Symfony Console when the user runs `fhir:generate`.
      *
-     * Symfony's invokable command pattern uses __invoke() instead of execute().
-     * The #[Option] and #[Ask] attributes tell Symfony how to wire CLI arguments
-     * to these parameters automatically.
-     *
-     * @param OutputInterface $output      Console output for writing messages
-     * @param array<string>   $packages    FHIR packages to process, e.g. ['hl7.fhir.r4.core#4.0.1']
-     * @param bool            $offlineMode When true, only use locally cached packages (no network)
+     * @param InputInterface  $input  Parsed CLI input carrying --package and --offline
+     * @param OutputInterface $output Console output for writing messages
      *
      * @return int Command::SUCCESS (0) or Command::FAILURE (1)
      */
-    public function __invoke(
-        OutputInterface $output,
-        #[Option(description: 'Implementation Guide packages to include.', name: 'package')]
-        #[Ask(question: 'Which FHIR Implementation Guide packages do you want to include?')]
-        array $packages = self::DEFAULT_IG_PACKAGES['R4'],
-        #[Option(description: 'Work offline using only cached packages', name: 'offline')]
-        bool $offlineMode = false,
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $packages    = $this->packageOption($input);
+        $offlineMode = (bool) $input->getOption('offline');
+
         try {
             $this->errorCollector->clear();
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Attributes;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Attributes;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 use PHPUnit\Framework\TestCase;
