@@ -13,9 +13,9 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-metadata": "^0.4",
-        "ardenexal/fhir-models": "^0.4",
-        "ardenexal/fhir-path": "^0.4",
+        "ardenexal/fhir-metadata": "^0.5",
+        "ardenexal/fhir-models": "^0.5",
+        "ardenexal/fhir-path": "^0.5",
         "brick/date-time": "^0.9.0",
         "psr/cache": "^3.0",
         "symfony/http-client-contracts": "^3.4",
@@ -47,7 +47,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.4.x-dev"
+            "dev-main": "0.5.x-dev"
         }
     }
 }
