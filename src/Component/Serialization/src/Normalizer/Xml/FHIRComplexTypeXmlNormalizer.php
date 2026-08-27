@@ -535,7 +535,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             }
 
             // xmlAttr properties emit as XML attributes on the parent element. The value may be a
-            // scalar, a backed enum (CDA coded properties — propertyKind 'enum'), or a list of
+            // scalar, a backed enum (CDA coded properties - propertyKind 'enum'), or a list of
             // either: V3 SET<cs> attributes such as AD.use carry several codes in one attribute,
             // space-delimited. A value that is none of those yields null here and falls through to
             // the element-emitting branches below, preserving the previous behaviour.
@@ -720,8 +720,9 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      * representable as one (the caller then falls through to the element-emitting branches).
      *
      * A list renders as its space-delimited members, which is the V3 SET<cs> attribute form used by
-     * AD.use, EN.use, ENXP.qualifier and TEL.use. An empty list yields null rather than an empty
-     * attribute; callers skip empty arrays before reaching here, so this is defence in depth.
+     * CDA properties such as AD.use, EN.use, ENXP.qualifier and TEL.use. An empty list yields null
+     * rather than an empty attribute; callers skip empty arrays before reaching here, so this is
+     * defence in depth.
      */
     private function xmlAttributeValue(mixed $value): ?string
     {
@@ -765,7 +766,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      * Coerce a decoded XML attribute string to the target property's declared type.
      *
      * Only enum-typed and array-typed properties need conversion; every other property keeps the
-     * historical plain-string assignment, so FHIR R4/R4B/R5 attribute handling is untouched — no
+     * historical plain-string assignment, so FHIR R4/R4B/R5 attribute handling is untouched - no
      * generated FHIR property is enum- or array-typed on an xmlAttr, CDA is the only consumer.
      */
     private function denormalizeXmlAttribute(string $value, \ReflectionProperty $property, ?PropertyMetadata $meta): mixed

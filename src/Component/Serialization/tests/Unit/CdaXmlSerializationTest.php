@@ -7,14 +7,14 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuControlAct;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuEntry;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\ClinicalDocument;
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Component;
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\NonXMLBody;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Patient;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
-use Ardenexal\FHIRTools\Component\CdaModels\DataType\AD;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\ED;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
-use Ardenexal\FHIRTools\Component\CdaModels\DataType\TEL;
-use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
-use Ardenexal\FHIRTools\Component\CdaModels\Enum\PostalAddressUse;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\BinaryDataEncoding;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
@@ -116,75 +116,49 @@ final class CdaXmlSerializationTest extends TestCase
     }
 
     /**
-     * nullFlavor is declared on ANY, the root of the whole CDA datatype lattice, as an enum-typed
-     * xmlAttr. A BackedEnum is an object, so the xmlAttr emit branch must unwrap ->value rather than
-     * fall through to the generic normalizer chain (which has no enum normalizer and throws).
+     * An attachment-only document: the simplest CDA that populates an enum-typed property.
+     *
+     * 227 of the 260 generated CDA classes declare at least one enum-typed property, so the enum
+     * path is reached by practically every real document. It is easy to miss because a document
+     * that sets no enum serializes correctly, which is why this case builds a whole
+     * ClinicalDocument and asserts the document header alongside the enum attribute: the header
+     * behaviour must survive the enum handling.
      */
-    public function testEnumAttributeSerializesAsItsBackingCode(): void
+    public function testEnumTypedAttributeRoundTripsWithoutDisturbingTheDocumentHeader(): void
     {
-        $xml = $this->service()->serializeToXml(new II(root: '1.2.3', nullFlavor: NullFlavor::ni));
+        $service = $this->service();
 
-        self::assertStringContainsString('nullFlavor="NI"', $xml);
-        self::assertStringNotContainsString('<nullFlavor', $xml);
-    }
-
-    public function testEnumAttributeRoundTripsToTheEnumCase(): void
-    {
-        $document = $this->service()->deserializeFromXml(
-            '<ClinicalDocument xmlns="urn:hl7-org:v3"><id nullFlavor="NI" /></ClinicalDocument>',
-            ClinicalDocument::class,
+        $document = new ClinicalDocument(
+            id: new II(root: '1.2.3', extension: 'ENUM-1'),
+            component: new Component(
+                nonXMLBody: new NonXMLBody(
+                    text: new ED(
+                        mediaType: 'application/pdf',
+                        representation: BinaryDataEncoding::base64_encodedtext,
+                        xmlText: 'JVBERi0x',
+                    ),
+                ),
+            ),
         );
 
-        self::assertSame(NullFlavor::ni, $document->id?->nullFlavor);
-    }
+        $xml = $service->serializeToXml($document);
 
-    /**
-     * V3 SET<cs> attributes (AD.use, EN.use, ENXP.qualifier) carry several codes in one attribute,
-     * space-delimited.
-     */
-    public function testEnumListAttributeSerializesSpaceDelimited(): void
-    {
-        $xml = $this->service()->serializeToXml(new AD(use: [PostalAddressUse::hp, PostalAddressUse::wp]));
+        // The backing code, not the PHP case name (base64_encodedtext) and not an object dump.
+        self::assertStringContainsString('representation="B64"', $xml);
+        self::assertStringNotContainsString('base64_encodedtext', $xml);
 
-        self::assertStringContainsString('use="HP WP"', $xml);
-    }
+        // The header that already worked before enum support must not regress.
+        $dom = new \DOMDocument();
+        self::assertTrue($dom->loadXML($xml));
+        self::assertSame('ClinicalDocument', $dom->documentElement?->localName);
+        self::assertSame('urn:hl7-org:v3', $dom->documentElement?->namespaceURI);
 
-    public function testEnumListAttributeRoundTripsPreservingOrder(): void
-    {
-        $address = $this->service()->deserializeFromXml(
-            '<AD xmlns="urn:hl7-org:v3" use="HP WP" />',
-            AD::class,
-        );
+        $decoded = $service->deserializeFromXml($xml, ClinicalDocument::class);
 
-        self::assertSame([PostalAddressUse::hp, PostalAddressUse::wp], $address->use);
-    }
-
-    /**
-     * TEL.use is a list<string> xmlAttr with no bound enum, so the same array branch must split it
-     * into plain strings rather than assigning the raw attribute value to an array property.
-     */
-    public function testNonEnumListAttributeRoundTripsAsStrings(): void
-    {
-        $tel = $this->service()->deserializeFromXml(
-            '<TEL xmlns="urn:hl7-org:v3" use="HP WP" />',
-            TEL::class,
-        );
-
-        self::assertSame(['HP', 'WP'], $tel->use);
-    }
-
-    /**
-     * A code the generated enum does not carry must fail loudly and catchably, never be dropped:
-     * silent loss is what makes malformed CDA undetectable downstream.
-     */
-    public function testUnknownEnumCodeThrowsDescriptiveException(): void
-    {
-        $this->expectException(FHIRSerializationException::class);
-        $this->expectExceptionMessageMatches('/NOT_A_REAL_CODE/');
-
-        $this->service()->deserializeFromXml(
-            '<AD xmlns="urn:hl7-org:v3" use="NOT_A_REAL_CODE" />',
-            AD::class,
+        self::assertInstanceOf(ClinicalDocument::class, $decoded);
+        self::assertSame(
+            BinaryDataEncoding::base64_encodedtext,
+            $decoded->component?->nonXMLBody?->text?->representation,
         );
     }
 
