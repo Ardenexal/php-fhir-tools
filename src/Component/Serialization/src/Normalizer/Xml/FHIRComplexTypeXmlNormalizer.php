@@ -147,14 +147,19 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 : $this->instantiateWithEmptyArrays($reflection);
 
             $metaMap = $this->getPropertyMetadataMap($object);
+            $data    = $this->remapNamespacedElements($data, $metaMap, $object, $sourceElement);
 
             foreach ($data as $elementName => $value) {
                 // XmlEncoder attribute keys: @url → url (Extension.url); skip @value and # (XmlEncoder artifacts)
                 if (str_starts_with($elementName, '@')) {
                     if ($elementName !== '@value') {
-                        $attrProp = self::reflProp($resolvedType, substr($elementName, 1));
+                        $attrName = substr($elementName, 1);
+                        $attrProp = self::reflProp($resolvedType, $attrName);
                         if ($attrProp !== null) {
-                            $attrProp->setValue($object, (string) $value);
+                            $attrProp->setValue(
+                                $object,
+                                $this->denormalizeXmlAttribute((string) $value, $attrProp, $metaMap[$attrName] ?? null),
+                            );
                         }
                     }
                     continue;
@@ -401,6 +406,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
     protected function normalizeForXML(object $object, FHIRSerializationContext $fhirContext, array $context): array
     {
         $data              = [];
+        /** @var array<string, list<mixed>> $namespacedData Buffered non-default-namespace elements, merged below */
+        $namespacedData    = [];
         $metaMap           = $this->getPropertyMetadataMap($object);
         $includeExtensions = $fhirContext->includeExtensions;
 
@@ -507,12 +514,17 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 }
             }
 
-            // xmlAttr properties emit as XML attributes on the parent element
-            if ($meta !== null && $meta->xmlSerializedName !== null && is_scalar($value)) {
-                $data[$meta->xmlSerializedName] = is_bool($value)
-                    ? ($value ? 'true' : 'false')
-                    : (string) $value;
-                continue;
+            // xmlAttr properties emit as XML attributes on the parent element. The value may be a
+            // scalar, a backed enum (CDA coded properties - propertyKind 'enum'), or a list of
+            // either: V3 SET<cs> attributes such as AD.use carry several codes in one attribute,
+            // space-delimited. A value that is none of those yields null here and falls through to
+            // the element-emitting branches below, preserving the previous behaviour.
+            if ($meta !== null && $meta->xmlSerializedName !== null) {
+                $attribute = $this->xmlAttributeValue($value);
+                if ($attribute !== null) {
+                    $data[$meta->xmlSerializedName] = $attribute;
+                    continue;
+                }
             }
 
             // CDA elements in a non-default namespace (sdtc extensions, AU/ADHA extensions): emit
@@ -528,7 +540,22 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         : $this->normalizeBasicValue($value, 'xml', $context));
                 $normalizedValue = $this->applyElementNamespace($normalizedValue, $meta->xmlNamespace);
                 if ($normalizedValue !== null) {
-                    $data[$localKey] = $normalizedValue;
+                    // Buffered rather than written straight in: the stripped local name can equal a
+                    // sibling property's element name (Patient.raceCode vs Patient.sdtcRaceCode), and
+                    // a keyed write would let whichever property is declared later silently drop the
+                    // other. Merged after the loop so the outcome does not depend on declaration
+                    // order.
+                    //
+                    // An array-typed property already normalized to a list of elements; its members
+                    // are buffered individually so they stay siblings rather than becoming one
+                    // nested list.
+                    if (is_array($normalizedValue) && array_is_list($normalizedValue)) {
+                        foreach ($normalizedValue as $item) {
+                            $namespacedData[$localKey][] = $item;
+                        }
+                    } else {
+                        $namespacedData[$localKey][] = $normalizedValue;
+                    }
                 }
                 continue;
             }
@@ -559,7 +586,216 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             }
         }
 
+        // Fold buffered namespaced elements in. Where the local name is free the value keeps its
+        // natural shape; where it collides with an element the loop already emitted, the two become
+        // a list — XmlEncoder renders that as repeated siblings and honours the per-item @xmlns, so
+        // <raceCode/> and <raceCode xmlns="urn:hl7-org:sdtc"/> both survive as distinct elements.
+        foreach ($namespacedData as $localKey => $values) {
+            $existing = array_key_exists($localKey, $data) ? [$data[$localKey]] : [];
+            $merged   = array_merge($existing, $values);
+
+            $data[$localKey] = count($merged) === 1 ? $merged[0] : $merged;
+        }
+
         return $data;
+    }
+
+    /**
+     * Re-key decoded elements that were emitted under a different local name in their own XML
+     * namespace, so the existing property loop below can resolve them by property name as usual.
+     *
+     * normalizeForXML emits an sdtc property under its bare local name (sdtcStatusCode ->
+     * <statusCode xmlns="urn:hl7-org:sdtc">), so the decoded key is `statusCode` and never matches
+     * the `sdtcStatusCode` property. This is the inverse. Only properties whose emitted local name
+     * actually differs from the property name need remapping, which excludes the AU/ADHA extension
+     * elements — they emit under their own name and already resolve.
+     *
+     * Symfony's XmlEncoder decode is namespace-blind: a v3 <raceCode> and an sdtc <raceCode> collapse
+     * into one grouped key with no namespace anywhere in the result. The source DOM element is the
+     * only place the distinction survives, so it drives the split whenever it is available. Decoded
+     * siblings and DOM children are paired by index, which is sound precisely because both sequences
+     * are namespace-blind in the same way and both keep document order; a length mismatch means the
+     * pairing cannot be trusted, so the entry is left alone rather than guessed at.
+     *
+     * @param array<array-key, mixed>         $data
+     * @param array<string, PropertyMetadata> $metaMap
+     * @param object                          $subject The instance being populated, used for property lookup
+     *
+     * @return array<array-key, mixed>
+     */
+    private function remapNamespacedElements(array $data, array $metaMap, object $subject, ?\DOMElement $sourceElement): array
+    {
+        /** @var array<string, list<array{property: string, namespace: string}>> $candidates */
+        $candidates = [];
+        foreach ($metaMap as $propertyName => $meta) {
+            if ($meta->xmlNamespace === null) {
+                continue;
+            }
+
+            $localName = $this->cdaLocalElementName($propertyName, $meta);
+            if ($localName === $propertyName) {
+                // Emitted under its own name (AU/ADHA extensions, unprefixed sdtc properties) —
+                // the default property-name lookup already resolves it.
+                continue;
+            }
+
+            $candidates[$localName][] = ['property' => $propertyName, 'namespace' => $meta->xmlNamespace];
+        }
+
+        foreach ($candidates as $localName => $matches) {
+            if (!array_key_exists($localName, $data)) {
+                continue;
+            }
+
+            $collides = self::reflProp($subject, $localName) !== null;
+
+            if ($sourceElement === null) {
+                // No DOM to disambiguate with. A single unambiguous candidate can still be re-keyed
+                // blindly; a collision cannot, so it keeps the previous behaviour.
+                if (!$collides && count($matches) === 1) {
+                    $data[$matches[0]['property']] = $data[$localName];
+                    unset($data[$localName]);
+                }
+
+                continue;
+            }
+
+            $decoded     = $data[$localName];
+            $items       = is_array($decoded) && array_is_list($decoded) ? $decoded : [$decoded];
+            $domChildren = $this->childElementsByLocalName($sourceElement, $localName);
+
+            if (count($domChildren) !== count($items)) {
+                continue;
+            }
+
+            /** @var array<string, list<mixed>> $buckets */
+            $buckets = [];
+            foreach ($items as $index => $item) {
+                $namespace = $domChildren[$index]->namespaceURI;
+                $target    = $localName;
+
+                foreach ($matches as $match) {
+                    if ($match['namespace'] === $namespace) {
+                        $target = $match['property'];
+                        break;
+                    }
+                }
+
+                $buckets[$target][] = $item;
+            }
+
+            unset($data[$localName]);
+            foreach ($buckets as $property => $values) {
+                // A lone element decodes to a bare map rather than a list; hand the loop the same
+                // shape it would have seen had the element not needed remapping.
+                $data[$property] = count($values) === 1 ? $values[0] : $values;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Render an xmlAttr property value as an XML attribute string, or null when it is not
+     * representable as one (the caller then falls through to the element-emitting branches).
+     *
+     * A list renders as its space-delimited members, which is the V3 SET<cs> attribute form used by
+     * CDA properties such as AD.use, EN.use, ENXP.qualifier and TEL.use. An empty list yields null
+     * rather than an empty attribute; callers skip empty arrays before reaching here, so this is
+     * defence in depth.
+     */
+    private function xmlAttributeValue(mixed $value): ?string
+    {
+        if (!is_array($value)) {
+            return $this->xmlAttributeScalar($value);
+        }
+
+        $parts = [];
+        foreach ($value as $item) {
+            $rendered = $this->xmlAttributeScalar($item);
+            if ($rendered === null) {
+                // A non-representable member disqualifies the whole attribute rather than silently
+                // emitting a partial code list.
+                return null;
+            }
+            $parts[] = $rendered;
+        }
+
+        return $parts === [] ? null : implode(' ', $parts);
+    }
+
+    /**
+     * Render one xmlAttr member. Backed enums (CDA coded properties) contribute their backing code;
+     * a bare enum object would otherwise reach the generic normalizer chain, which has no enum
+     * normalizer and throws.
+     */
+    private function xmlAttributeScalar(mixed $value): ?string
+    {
+        if ($value instanceof \BackedEnum) {
+            return (string) $value->value;
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        return is_scalar($value) ? (string) $value : null;
+    }
+
+    /**
+     * Coerce a decoded XML attribute string to the target property's declared type.
+     *
+     * Only enum-typed and array-typed properties need conversion; every other property keeps the
+     * historical plain-string assignment, so FHIR R4/R4B/R5 attribute handling is untouched - no
+     * generated FHIR property is enum- or array-typed on an xmlAttr, CDA is the only consumer.
+     */
+    private function denormalizeXmlAttribute(string $value, \ReflectionProperty $property, ?PropertyMetadata $meta): mixed
+    {
+        $type     = $property->getType();
+        $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : null;
+
+        if ($typeName === 'array') {
+            $codes     = preg_split('/\s+/', trim($value), -1, PREG_SPLIT_NO_EMPTY);
+            $codes     = $codes === false ? [] : $codes;
+            $itemClass = $meta?->phpItemClass !== null ? ltrim($meta->phpItemClass, '\\') : null;
+
+            if ($itemClass !== null && is_a($itemClass, \BackedEnum::class, true)) {
+                /** @var class-string<\BackedEnum> $itemClass */
+                return array_map(fn (string $code): \BackedEnum => $this->enumCase($itemClass, $code), $codes);
+            }
+
+            return $codes;
+        }
+
+        if ($typeName !== null && is_a($typeName, \BackedEnum::class, true)) {
+            /** @var class-string<\BackedEnum> $typeName */
+            return $this->enumCase($typeName, $value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Resolve one code to its enum case.
+     *
+     * An unrecognised code throws rather than yielding null: the property cannot represent the
+     * value, so a silent null would drop clinical data with no signal. The message names both the
+     * code and the enum so a gap between a published CDA document and the generated ValueSet enum
+     * is diagnosable at the point of failure.
+     *
+     * @param class-string<\BackedEnum> $enumClass
+     *
+     * @throws NotNormalizableValueException When the code is absent from the enum
+     */
+    private function enumCase(string $enumClass, string $code): \BackedEnum
+    {
+        $case = $enumClass::tryFrom($code);
+
+        if ($case === null) {
+            throw new NotNormalizableValueException(sprintf('Value "%s" is not a valid case of enum "%s".', $code, $enumClass));
+        }
+
+        return $case;
     }
 
     /**

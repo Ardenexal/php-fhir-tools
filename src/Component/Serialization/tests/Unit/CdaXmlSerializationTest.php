@@ -7,8 +7,14 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuControlAct;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuEntry;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\ClinicalDocument;
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Component;
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\NonXMLBody;
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Patient;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\ED;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\BinaryDataEncoding;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
@@ -107,5 +113,131 @@ final class CdaXmlSerializationTest extends TestCase
             '<controlAct xmlns="http://ns.electronichealth.net.au/Ci/Cda/Extensions/3.0"',
             $xml,
         );
+    }
+
+    /**
+     * An attachment-only document: the simplest CDA that populates an enum-typed property.
+     *
+     * 227 of the 260 generated CDA classes declare at least one enum-typed property, so the enum
+     * path is reached by practically every real document. It is easy to miss because a document
+     * that sets no enum serializes correctly, which is why this case builds a whole
+     * ClinicalDocument and asserts the document header alongside the enum attribute: the header
+     * behaviour must survive the enum handling.
+     */
+    public function testEnumTypedAttributeRoundTripsWithoutDisturbingTheDocumentHeader(): void
+    {
+        $service = $this->service();
+
+        $document = new ClinicalDocument(
+            id: new II(root: '1.2.3', extension: 'ENUM-1'),
+            component: new Component(
+                nonXMLBody: new NonXMLBody(
+                    text: new ED(
+                        mediaType: 'application/pdf',
+                        representation: BinaryDataEncoding::base64_encodedtext,
+                        xmlText: 'JVBERi0x',
+                    ),
+                ),
+            ),
+        );
+
+        $xml = $service->serializeToXml($document);
+
+        // The backing code, not the PHP case name (base64_encodedtext) and not an object dump.
+        self::assertStringContainsString('representation="B64"', $xml);
+        self::assertStringNotContainsString('base64_encodedtext', $xml);
+
+        // The header that already worked before enum support must not regress.
+        $dom = new \DOMDocument();
+        self::assertTrue($dom->loadXML($xml));
+        self::assertSame('ClinicalDocument', $dom->documentElement?->localName);
+        self::assertSame('urn:hl7-org:v3', $dom->documentElement?->namespaceURI);
+
+        $decoded = $service->deserializeFromXml($xml, ClinicalDocument::class);
+
+        self::assertInstanceOf(ClinicalDocument::class, $decoded);
+        self::assertSame(
+            BinaryDataEncoding::base64_encodedtext,
+            $decoded->component?->nonXMLBody?->text?->representation,
+        );
+    }
+
+    /**
+     * The emit side strips the sdtc prefix (sdtcStatusCode -> <statusCode xmlns="urn:hl7-org:sdtc">),
+     * so the denormalizer needs the matching inverse. Without it the element resolves to no property
+     * and is dropped by the unmatched-element continue, losing the value with no signal.
+     */
+    public function testSdtcElementDeserializesToItsPrefixedProperty(): void
+    {
+        $document = $this->service()->deserializeFromXml(
+            '<ClinicalDocument xmlns="urn:hl7-org:v3">'
+            . '<statusCode xmlns="urn:hl7-org:sdtc" code="active" />'
+            . '</ClinicalDocument>',
+            ClinicalDocument::class,
+        );
+
+        self::assertSame('active', $document->sdtcStatusCode?->code);
+    }
+
+    public function testSdtcElementSurvivesAFullRoundTrip(): void
+    {
+        $service = $this->service();
+        $xml     = $service->serializeToXml(new ClinicalDocument(
+            id: new II(root: '2.16.840.1.113883.19.5'),
+            sdtcStatusCode: new CS(code: 'active'),
+        ));
+
+        self::assertSame($xml, $service->serializeToXml($service->deserializeFromXml($xml, ClinicalDocument::class)));
+    }
+
+    /**
+     * Patient declares both a core raceCode (v3) and an sdtcRaceCode that emits under the same local
+     * name in the sdtc namespace. Symfony's XmlEncoder decode is namespace-blind, so both collapse
+     * into one grouped array key and only the source DOM can tell them apart. Three CDA classes hit
+     * this: Patient (raceCode, ethnicGroupCode) and CustodianOrganization (telecom).
+     */
+    public function testCollidingCoreAndSdtcElementsDeserializeToSeparateProperties(): void
+    {
+        $patient = $this->service()->deserializeFromXml(
+            '<Patient xmlns="urn:hl7-org:v3">'
+            . '<raceCode code="V3RACE" />'
+            . '<raceCode xmlns="urn:hl7-org:sdtc" code="SDTCRACE" />'
+            . '</Patient>',
+            Patient::class,
+        );
+
+        self::assertSame('V3RACE', $patient->raceCode?->code, 'the core v3 raceCode must keep its own value');
+        self::assertCount(1, $patient->sdtcRaceCode);
+        self::assertInstanceOf(CE::class, $patient->sdtcRaceCode[0]);
+        self::assertSame('SDTCRACE', $patient->sdtcRaceCode[0]->code);
+    }
+
+    /**
+     * Both properties emit under the local name `raceCode`, differing only by namespace, so a naive
+     * keyed write makes the second silently overwrite the first. XmlEncoder renders a list of maps
+     * as repeated siblings and honours a per-item @xmlns, so both must survive as separate elements.
+     */
+    public function testCollidingCoreAndSdtcElementsBothSerialize(): void
+    {
+        $xml = $this->service()->serializeToXml(new Patient(
+            raceCode: new CE(code: 'V3RACE'),
+            sdtcRaceCode: [new CE(code: 'SDTCRACE')],
+        ));
+
+        self::assertSame(2, substr_count($xml, '<raceCode'), 'both raceCode elements must be emitted');
+        self::assertStringContainsString('code="V3RACE"', $xml);
+        self::assertStringContainsString('code="SDTCRACE"', $xml);
+        self::assertStringContainsString('<raceCode xmlns="urn:hl7-org:sdtc"', $xml);
+    }
+
+    public function testCollidingCoreAndSdtcElementsSurviveAFullRoundTrip(): void
+    {
+        $service = $this->service();
+        $xml     = $service->serializeToXml(new Patient(
+            raceCode: new CE(code: 'V3RACE'),
+            sdtcRaceCode: [new CE(code: 'SDTCRACE')],
+        ));
+
+        self::assertSame($xml, $service->serializeToXml($service->deserializeFromXml($xml, Patient::class)));
     }
 }

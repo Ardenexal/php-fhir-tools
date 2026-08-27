@@ -7,11 +7,11 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-code-generation": "^0.4",
-        "ardenexal/fhir-metadata": "^0.4",
-        "ardenexal/fhir-path": "^0.4",
-        "ardenexal/fhir-serialization": "^0.4",
-        "ardenexal/fhir-validation": "^0.4",
+        "ardenexal/fhir-code-generation": "^0.5",
+        "ardenexal/fhir-metadata": "^0.5",
+        "ardenexal/fhir-path": "^0.5",
+        "ardenexal/fhir-serialization": "^0.5",
+        "ardenexal/fhir-validation": "^0.5",
         "psr/cache": "^3.0",
         "symfony/config": "^6.4|^7.4",
         "symfony/console": "^6.4|^7.4",
@@ -43,7 +43,7 @@
             "require": "^6.4|^7.4"
         },
         "branch-alias": {
-            "dev-main": "0.4.x-dev"
+            "dev-main": "0.5.x-dev"
         }
     }
 }
