@@ -7,7 +7,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-code-generation": "^0.4",
+        "ardenexal/fhir-code-generation": "^0.5",
         "ardenexal/fhir-metadata": "^0.5",
         "ardenexal/fhir-path": "^0.5",
         "ardenexal/fhir-serialization": "^0.5",
