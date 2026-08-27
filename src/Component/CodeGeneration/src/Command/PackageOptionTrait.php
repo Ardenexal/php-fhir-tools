@@ -21,7 +21,7 @@ trait PackageOptionTrait
      * VALUE_IS_ARRAY guarantees an array at runtime, but InputInterface::getOption() is
      * declared as returning mixed, so the values are narrowed here rather than at each use.
      *
-     * @param InputInterface $input Parsed CLI input
+     * @param InputInterface $input Console input holding the parsed --package values
      *
      * @return list<string> Package specs in the order they were given on the command line
      */

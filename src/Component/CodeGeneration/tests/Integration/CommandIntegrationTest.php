@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\Tests\Integration;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Integration;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
@@ -160,11 +160,10 @@ class CommandIntegrationTest extends TestCase
     }
 
     /**
-     * Registers a command in a console-version-agnostic way.
+     * Registers a command on either supported console version.
      *
-     * Application::addCommand() only exists from symfony/console 7.4, where it supersedes the
-     * now-deprecated add(). This package supports ^6.4, so the component's own test suite has
-     * to run on both.
+     * addCommand() arrived in symfony/console 7.4 and deprecated add(); this package supports
+     * ^6.4, so the component's own suite has to run on both.
      */
     private static function register(Application $application, Command $command): void
     {

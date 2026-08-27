@@ -66,14 +66,12 @@ use function Symfony\Component\String\u;
  *   # Chained IGs (AU Core extends AU Base):
  *   php bin/console fhir:generate-ig --package=hl7.fhir.au.base --package=hl7.fhir.au.core
  *
- * **Console compatibility** — deliberately written in the classic configure()/execute() style
- * rather than Symfony's invokable `__invoke()` + `#[Option]` style. The attribute-driven form
- * only exists from symfony/console 7.3 onwards, and this package supports ^6.4. On 6.4 PHP
- * never reflects the attributes, so nothing fails to load: the options simply go unregistered
- * (`The "--package" option does not exist`) and the un-overridden Command::execute() throws
- * `You must override the execute() method`. configure() below is a like-for-like transcription
- * of the definition the attributes produced on 7.x — same names, modes, defaults, descriptions
- * and order — so behaviour there is unchanged.
+ * **Console compatibility.** This package supports symfony/console ^6.4, so the command stays on
+ * classic configure()/execute(). The invokable style (`__invoke()` with `#[Option]` parameters)
+ * needs 7.3, and on 6.4 nothing fails to load: the options would simply never register.
+ *
+ * configure() therefore mirrors the definition those attributes produced on 7.x, down to option
+ * names, modes, defaults, descriptions and order, so the command behaves the same on both.
  *
  * @see FHIRExtensionGenerator
  * @see FHIRProfileGenerator
@@ -171,7 +169,7 @@ class FHIRIGGeneratorCommand extends Command
         ];
     }
 
-    /** Registers the --package and --offline options. */
+    /** Declares the --package and --offline definition that must stay identical on console 6.4 and 7.x. */
     protected function configure(): void
     {
         $this
@@ -182,9 +180,8 @@ class FHIRIGGeneratorCommand extends Command
     /**
      * Entry point for `fhir:generate-ig`.
      *
-     * When --package is supplied, those packages are used exclusively.
-     * When --package is omitted, the packages configured under fhir.ig.packages in the
-     * bundle configuration are used, enabling a no-argument workflow for end-user projects.
+     * A supplied --package is used exclusively; when it is omitted the packages configured under
+     * fhir.ig.packages are used instead, so end-user projects can run the command with no arguments.
      *
      * @param InputInterface  $input  Parsed CLI input carrying --package and --offline
      * @param OutputInterface $output Console output

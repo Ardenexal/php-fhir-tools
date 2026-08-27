@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Command;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Command;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRIGGeneratorCommand;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand;
@@ -16,14 +16,13 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Guards both generator commands against regressing to Symfony's invokable-command style.
  *
- * composer.json declares `symfony/console: ^6.4|^7.4`, but the invokable style — `__invoke()`
- * with `#[Option]`/`#[Argument]`/`#[Ask]` parameter attributes — only exists from 7.3. On 6.4
- * PHP never reflects those attributes, so the breakage is silent at load time and total at
- * invoke time: options go unregistered ("The \"--package\" option does not exist") and the
- * un-overridden Command::execute() throws ("You must override the execute() method").
+ * composer.json declares `symfony/console: ^6.4|^7.4`. The invokable style needs `__invoke()`
+ * plus parameter attributes that 6.4 does not ship: `#[Option]` and `#[Argument]` arrived in
+ * 7.3 and `#[Ask]` in 7.4.
  *
- * These assertions run on any console version, so they catch a reintroduction of the
- * incompatibility on a 7.x development machine, without waiting for the 6.4 CI leg.
+ * On 6.4 PHP never reflects those attributes, so the breakage is silent at load time and total
+ * at invoke time: options go unregistered and Command::execute() throws. These assertions run
+ * on any console version, so a reintroduction fails on a 7.x machine without waiting for CI.
  *
  * @covers \Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRIGGeneratorCommand
  * @covers \Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand
@@ -31,8 +30,8 @@ use Symfony\Component\Filesystem\Filesystem;
 final class SymfonyConsoleCompatibilityTest extends TestCase
 {
     /**
-     * Console attribute classes that do not exist before symfony/console 7.3. Referencing any
-     * of them from a command silently drops the corresponding CLI option on 6.4.
+     * Console attribute classes absent from symfony/console 6.4. Referencing any of them from a
+     * command silently drops the corresponding CLI option on that version.
      */
     private const array POST_64_ATTRIBUTES = [
         'Symfony\Component\Console\Attribute\Option',
@@ -147,8 +146,9 @@ final class SymfonyConsoleCompatibilityTest extends TestCase
     }
 
     /**
-     * Sanity check on the mode constants the commands pass, so the assertions above cannot be
-     * satisfied by an option that merely happens to look right.
+     * Sanity check on the mode constants the commands pass, so
+     * testPackageAndOfflineOptionsAreRegistered cannot be satisfied by an option that merely
+     * happens to look right.
      */
     public function testPackageOptionUsesArrayAndRequiredValueModes(): void
     {

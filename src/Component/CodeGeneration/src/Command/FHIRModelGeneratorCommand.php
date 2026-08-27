@@ -63,17 +63,12 @@ use Nette\InvalidStateException;
  * Usage:
  *   php bin/console fhir:generate --package=hl7.fhir.r4.core -vvv
  *
- * **Console compatibility** — deliberately written in the classic configure()/execute() style
- * rather than Symfony's invokable `__invoke()` + `#[Option]` style. The attribute-driven form
- * only exists from symfony/console 7.3 onwards, and this package supports ^6.4. On 6.4 PHP
- * never reflects the attributes, so nothing fails to load: the options simply go unregistered
- * (`The "--package" option does not exist`) and the un-overridden Command::execute() throws
- * `You must override the execute() method`. configure() below is a like-for-like transcription
- * of the definition the attributes produced on 7.x — same names, modes, defaults, descriptions
- * and order — so behaviour there is unchanged. The `#[Ask]` attribute that used to sit on the
- * packages parameter is gone rather than reimplemented: Symfony only honours `#[Ask]` on
- * `#[Argument]` parameters (Attribute\Argument::tryFrom is its only caller), so on an
- * `#[Option]` parameter it never prompted on 7.x either.
+ * **Console compatibility.** This package supports symfony/console ^6.4, so the command stays on
+ * classic configure()/execute(). The invokable style (`__invoke()` with `#[Option]` parameters)
+ * needs 7.3, and on 6.4 nothing fails to load: the options would simply never register.
+ *
+ * configure() therefore mirrors the definition those attributes produced on 7.x, down to option
+ * names, modes, defaults, descriptions and order, so the command behaves the same on both.
  *
  * @see https://www.hl7.org/fhir/structuredefinition.html  StructureDefinition docs
  * @see https://www.hl7.org/fhir/valueset.html             ValueSet docs
@@ -172,7 +167,7 @@ class FHIRModelGeneratorCommand extends Command
         $this->errorCollector = new ErrorCollector();
     }
 
-    /** Registers the --package and --offline options. */
+    /** Declares the --package and --offline definition that must stay identical on console 6.4 and 7.x. */
     protected function configure(): void
     {
         $this
