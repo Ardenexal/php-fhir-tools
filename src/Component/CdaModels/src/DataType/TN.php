@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 use Ardenexal\FHIRTools\Component\CdaModels\Enum\EntityNameUse;
 use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
+use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
 
 #[LogicalModel(
     url: 'http://hl7.org/cda/stds/core/StructureDefinition/TN',
@@ -17,8 +18,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class TN extends EN
 {
     /**
-     * @param list<EntityNameUse> $use
-     * @param list<string>        $item
+     * @param list<EntityNameUse>   $use
+     * @param list<ChoiceGroupItem> $item
      */
     public function __construct(
         array $use = [],

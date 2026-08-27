@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Method;
@@ -239,7 +240,7 @@ final class LogicalModelGenerator
             if (in_array(self::propertyNameFromPath($path), $inheritedNames, true)) {
                 continue;
             }
-            $descriptor = $this->deriveParameter($element, $urlToFqcn, $classXmlNamespace, $valueSetToEnumFqcn);
+            $descriptor = $this->deriveParameter($element, $urlToFqcn, $classXmlNamespace, $valueSetToEnumFqcn, $elements);
             if ($descriptor !== null) {
                 $params[] = $descriptor;
             }
@@ -257,6 +258,8 @@ final class LogicalModelGenerator
      * @param array<string, mixed>  $element
      * @param array<string, string> $urlToFqcn
      * @param array<string, string> $valueSetToEnumFqcn
+     * @param array<mixed>          $siblings           all elements of the owning snapshot, so a transparent
+     *                                                  choice group can read its own child slices
      *
      * @return array<string, mixed>|null
      */
@@ -265,6 +268,7 @@ final class LogicalModelGenerator
         array $urlToFqcn,
         string $classXmlNamespace,
         array $valueSetToEnumFqcn = [],
+        array $siblings = [],
     ): ?array {
         $path          = (string) ($element['path'] ?? '');
         $parameterName = self::propertyNameFromPath($path);
@@ -276,12 +280,38 @@ final class LogicalModelGenerator
         $min     = (int) ($element['min'] ?? 0);
         $isArray = !in_array($max, ['0', '1'], true);
 
-        // Resolve the property's PHP type and semantic kind from the first type code.
-        $typeCode    = '';
-        $types       = $element['type'] ?? [];
+        $typeCode = '';
+        $types    = $element['type'] ?? [];
         if (is_array($types) && isset($types[0]) && is_array($types[0])) {
             $typeCode = (string) ($types[0]['code'] ?? '');
         }
+
+        // Transparent choice group: the element's children emit directly under the parent, with no
+        // wrapper element, and their document order is significant. Handled before the type
+        // resolution below because the element's own declared type is the FHIR `Base` marker, which
+        // would otherwise fall through to the scalar-string default and drop the slices entirely.
+        if ($this->hasChoiceGroupExtension($element)) {
+            $variants = $this->choiceGroupVariants($path, $siblings, $urlToFqcn);
+            if ($variants !== []) {
+                return [
+                    'name'        => $parameterName,
+                    'phpType'     => 'array',
+                    'isArray'     => true,
+                    'itemType'    => '\\' . ChoiceGroupItem::class,
+                    'fixedScalar' => null,
+                    'fhirArgs'    => [
+                        'fhirType'     => $typeCode !== '' ? $typeCode : 'string',
+                        'propertyKind' => 'choiceGroup',
+                        'isArray'      => true,
+                        'isRequired'   => $min >= 1,
+                        'phpType'      => '\\' . ChoiceGroupItem::class,
+                        'variants'     => $variants,
+                    ],
+                ];
+            }
+        }
+
+        // Resolve the property's PHP type and semantic kind from the type code read above.
         [$phpType, $propertyKind, $itemFqcn] = $this->resolveType($typeCode, $urlToFqcn);
 
         // XML attribute representation → '@'-prefixed serialized name (read by the XML serializer).
@@ -343,6 +373,82 @@ final class LogicalModelGenerator
             'fixedScalar' => $fixedScalar,
             'fhirArgs'    => $attributeArgs,
         ];
+    }
+
+    /**
+     * True when an element carries the FHIR tooling `xml-choice-group` extension, marking it a
+     * transparent group whose children emit directly under the parent with no wrapper element.
+     *
+     * @param array<string, mixed> $element
+     */
+    private function hasChoiceGroupExtension(array $element): bool
+    {
+        $extensions = $element['extension'] ?? [];
+        if (!is_array($extensions)) {
+            return false;
+        }
+        foreach ($extensions as $extension) {
+            if (!is_array($extension) || !str_contains((string) ($extension['url'] ?? ''), 'xml-choice-group')) {
+                continue;
+            }
+
+            // The extension is a boolean flag; an explicit false disables the group.
+            return ($extension['valueBoolean'] ?? true) !== false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Build the variant list for a transparent choice group: one entry per direct child slice, keyed
+     * by the child's local XML element name, which is the discriminator the serializer dispatches on.
+     *
+     * Text-only slices are excluded. CDA declares one on each of these groups (`AD.item.xmlText` and
+     * its siblings) to carry character data between the element parts, but {@see ChoiceGroupItem}
+     * requires an element name and mixed element-and-text content has not been designed — emitting a
+     * variant for it would produce an `<xmlText>` element that is not in any CDA document. The
+     * boundary is documented on ChoiceGroupItem itself.
+     *
+     * @param array<mixed>          $siblings
+     * @param array<string, string> $urlToFqcn
+     *
+     * @return list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}>
+     */
+    private function choiceGroupVariants(string $path, array $siblings, array $urlToFqcn): array
+    {
+        $depth    = substr_count($path, '.') + 1;
+        $prefix   = $path . '.';
+        $variants = [];
+
+        foreach ($siblings as $sibling) {
+            if (!is_array($sibling)) {
+                continue;
+            }
+            $siblingPath = (string) ($sibling['path'] ?? '');
+            if (!str_starts_with($siblingPath, $prefix) || substr_count($siblingPath, '.') !== $depth) {
+                continue;
+            }
+
+            $localName = self::propertyNameFromPath($siblingPath);
+            if ($localName === '' || $localName === 'xmlText') {
+                continue;
+            }
+
+            $types    = $sibling['type'] ?? [];
+            $typeCode = (is_array($types) && isset($types[0]) && is_array($types[0]))
+                ? (string) ($types[0]['code'] ?? '')
+                : '';
+            [$phpType, $propertyKind] = $this->resolveType($typeCode, $urlToFqcn);
+
+            $variants[] = [
+                'fhirType'     => $typeCode !== '' ? $typeCode : 'string',
+                'propertyKind' => $propertyKind,
+                'phpType'      => $phpType,
+                'jsonKey'      => $localName,
+            ];
+        }
+
+        return $variants;
     }
 
     /**

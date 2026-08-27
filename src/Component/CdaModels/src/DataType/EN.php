@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\Enum\EntityNameUse;
 use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
+use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
 
 #[LogicalModel(
     url: 'http://hl7.org/cda/stds/core/StructureDefinition/EN',
@@ -18,8 +19,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class EN extends ANY
 {
     /**
-     * @param list<EntityNameUse> $use
-     * @param list<string>        $item
+     * @param list<EntityNameUse>   $use
+     * @param list<ChoiceGroupItem> $item
      */
     public function __construct(
         #[FhirProperty(
@@ -31,7 +32,45 @@ class EN extends ANY
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\Enum\EntityNameUse',
         )]
         public array $use = [],
-        #[FhirProperty(fhirType: 'http://hl7.org/fhir/StructureDefinition/Base', propertyKind: 'scalar', isArray: true, isRequired: false)]
+        #[FhirProperty(
+            fhirType: 'http://hl7.org/fhir/StructureDefinition/Base',
+            propertyKind: 'choiceGroup',
+            isArray: true,
+            isRequired: false,
+            phpType: '\Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem',
+            variants: [
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/ENXP',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ENXP',
+                    'jsonKey'      => 'delimiter',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/ENXP',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ENXP',
+                    'jsonKey'      => 'family',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/ENXP',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ENXP',
+                    'jsonKey'      => 'given',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/ENXP',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ENXP',
+                    'jsonKey'      => 'prefix',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/ENXP',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ENXP',
+                    'jsonKey'      => 'suffix',
+                ],
+            ],
+        )]
         public array $item = [],
         #[FhirProperty(
             fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/IVL-TS',
