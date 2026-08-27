@@ -1,13 +1,9 @@
 {
-    "name": "ardenexal/fhir-cda-models",
+    "name": "ardenexal/cda-sd-models",
     "description": "Pre-generated CDA R2 logical-model classes (HL7 cda.uv.core + AU Digital Health) for XML serialization",
     "type": "library",
     "license": "MIT",
     "authors": [
-        {
-            "name": "FHIR Tools Contributors",
-            "email": "contributors@fhirtools.dev"
-        }
     ],
     "minimum-stability": "stable",
     "prefer-stable": true,
