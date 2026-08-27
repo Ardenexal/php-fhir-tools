@@ -8,8 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- [CodeGeneration] `fhir:generate` and `fhir:generate-ig` now run on Symfony 6.4, which `ardenexal/fhir-code-generation` has always declared (`symfony/console: ^6.4|^7.4`). Both commands were written in Symfony's invokable style (`__invoke()` with `#[Option]`/`#[Ask]` parameter attributes), which only exists from 7.3, so on 6.4 the options were never registered (`The "--package" option does not exist`) and invoking either command threw `You must override the execute() method`. They now use `configure()`/`execute()`, with an option definition transcribed from what the attributes produced on 7.x — same names, modes, defaults, descriptions and order — so 7.x behaviour is unchanged
 - [Docs] Removed the stale "single-element repeating fields" XML limitation note from the serialization guide; single-value repeating fields (e.g. a `HumanName` with one `given`) already round-trip correctly through XML, and a regression test now guards this
 - [Docs] Corrected the Questionnaire validation guide: `enableWhenExpression` (SDC + Kanta variants) and `regex` constraints are now documented as covered, the implementation-rules table lists the enforced constraint/value-domain/quantity `error` rules, and the conformance-coverage section reflects that all 78 eligible R4 cases are seeded and asserted (only SDC `answerExpression`/`calculatedExpression` and R5 `answerConstraint` remain uncovered)
+
+### Infrastructure
+- [CI] New `symfony-console-lower-bound` job invokes both generator commands against `symfony/console:6.4.*` through a standalone consumer install (`tests/Compat/symfony-console-6.4`), including a real R4B generation. Neither the monorepo root nor the demo app can host this: `brianium/paratest` requires console `^7.4.7` and `demo/composer.json` pins Symfony to `7.4.*`, which is why the existing `cross-version-test` "6.4.*" matrix leg has only ever installed console 7.x
+- [CodeGeneration] Added `SymfonyConsoleCompatibilityTest`, which asserts on any console version that both commands override `execute()`, expose no `__invoke()`, reference none of the 7.3-only console attributes, and declare the documented `--package`/`--offline` surface
 
 ## [0.4.0] - 2026-06-12
 

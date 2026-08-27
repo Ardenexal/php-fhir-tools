@@ -1,0 +1,39 @@
+{
+    "name": "ardenexal/fhir-tools-console-64-compat",
+    "description": "Consumer harness that installs ardenexal/fhir-code-generation against the lowest declared symfony/console version.",
+    "type": "project",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../../src/Component/CodeGeneration",
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "ardenexal/fhir-code-generation": "0.4.999"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../../../src/Component/Metadata",
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "ardenexal/fhir-metadata": "0.4.999"
+                }
+            }
+        }
+    ],
+    "require": {
+        "php": ">=8.3",
+        "ardenexal/fhir-code-generation": "0.4.999",
+        "symfony/console": "6.4.*",
+        "symfony/http-client": "6.4.*"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
