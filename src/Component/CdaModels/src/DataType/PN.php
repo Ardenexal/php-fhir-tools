@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\Enum\EntityNameUse;
 use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
 
 #[LogicalModel(
     url: 'http://hl7.org/cda/stds/core/StructureDefinition/PN',
@@ -24,8 +25,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 class PN extends EN
 {
     /**
-     * @param list<EntityNameUse> $use
-     * @param list<string>        $item
+     * @param list<EntityNameUse>   $use
+     * @param list<ChoiceGroupItem> $item
      */
     public function __construct(
         array $use = [],
