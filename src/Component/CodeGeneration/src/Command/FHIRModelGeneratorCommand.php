@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRValueSetGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\LogicalModelGenerator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\NestedWrapperSynthesizer;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumType;
@@ -597,6 +598,17 @@ class FHIRModelGeneratorCommand extends Command
             }
         }
 
+        // Anonymous nested element groups (StructuredBody.component, Section.component,
+        // SubstanceAdministration.consumable, …) become real SDs here, and each wrapping element is
+        // retyped at the class that now describes it. CDA declares these wrappers inline rather
+        // than as named types, so without this pass the nested subtree is dropped and the property
+        // types at its declared base — emitting a section's own fields directly inside <component>.
+        // Runs before the pre-pass below so wrappers participate in naming, the parent chain and
+        // namespace routing exactly like a published logical model.
+        $synthesizer   = new NestedWrapperSynthesizer();
+        $definitions   = $synthesizer->expand($definitions);
+        $wrapperOwners = $synthesizer->wrapperOwners();
+
         // Pre-pass: parent maps, names, directly-declared xml namespaces, own property/constraint
         // sets. Two parent notions are tracked: `baseOf` (raw `baseDefinition`, drives the
         // xml-namespace inheritance walk) and `parentOf` (the EFFECTIVE PHP parent — `type` when it
@@ -627,7 +639,7 @@ class FHIRModelGeneratorCommand extends Command
         $urlToNs    = [];
         foreach ($definitions as $url => $sd) {
             $name             = $names[$url];
-            $isClinical       = $this->cdaIsClinicalClass($url, $parentOf, $names);
+            $isClinical       = $this->cdaIsClinicalClass($url, $parentOf, $names, $wrapperOwners);
             $namespace        = $isClinical ? $clinicalClassNs : $dataTypeNs;
             $urlToNs[$url]    = $namespace;
             $urlToFqcn[$url]  = '\\' . $namespace->getName() . '\\' . ClassNameResolver::logicalModelClassName($url, $name);
@@ -912,13 +924,20 @@ class FHIRModelGeneratorCommand extends Command
      * (clinical), `addr` → `AD` (datatype). Cycle-safe. For core SDs this is equivalent to the
      * previous name-or-`baseDefinition`-chain rule, so core routing is unchanged.
      *
+     * A synthesized nested wrapper is classified as the model it was lifted out of, because its own
+     * ancestry does not always reach CDA: `AssignedEntity.sdtcPatient` declares the FHIR `Base`
+     * type, so the chain dead-ends immediately and the wrapper would land among the datatypes
+     * despite belonging to a clinical class. Only output routing consults this; `extends` is
+     * unaffected.
+     *
      * @param array<string, string|null> $parentOf
      * @param array<string, string>      $names
+     * @param array<string, string>      $wrapperOwners synthetic wrapper URL → owning model URL
      */
-    private function cdaIsClinicalClass(string $url, array $parentOf, array $names): bool
+    private function cdaIsClinicalClass(string $url, array $parentOf, array $names, array $wrapperOwners = []): bool
     {
         $seen    = [];
-        $current = $url;
+        $current = $wrapperOwners[$url] ?? $url;
         while ($current !== '' && !isset($seen[$current])) {
             if (($names[$current] ?? '') === 'ClinicalDocument') {
                 return true;

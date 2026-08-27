@@ -69,12 +69,12 @@ class EncompassingEncounter extends InfrastructureRoot
         )]
         public ?CE $dischargeDispositionCode = null,
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/InfrastructureRoot',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/EncompassingEncounter-responsibleParty',
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
         )]
-        public ?InfrastructureRoot $responsibleParty = null,
+        public ?EncompassingEncounterResponsibleParty $responsibleParty = null,
         #[FhirProperty(
             fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/EncounterParticipant',
             propertyKind: 'complex',
@@ -84,12 +84,12 @@ class EncompassingEncounter extends InfrastructureRoot
         )]
         public array $encounterParticipant = [],
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/InfrastructureRoot',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/EncompassingEncounter-location',
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
         )]
-        public ?InfrastructureRoot $location = null,
+        public ?EncompassingEncounterLocation $location = null,
         array $realmCode = [],
         ?II $typeId = null,
         array $templateId = [],

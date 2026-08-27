@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDARoleClassMutualRelationship
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDARoleClassMutualRelationship
  * Version: 2.0.2-sd
  * Description: A relationship that is based on mutual behavior of the two Entities as being related. The basis of such relationship may be agreements (e.g., spouses, contract parties) or they may be de facto behavior (e.g. friends) or may be an incidental involvement with each other (e.g. parties over a dispute, siblings, children).
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDARoleClassMutualRelationship', version: '2.0.2-sd')]
 enum RoleClassMutualRelationship: string
 {
     /** LIC */

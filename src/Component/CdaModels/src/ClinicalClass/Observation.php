@@ -26,25 +26,25 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class Observation extends InfrastructureRoot
 {
     /**
-     * @param list<II>                 $id
-     * @param list<CD>                 $sdtcCategory
-     * @param list<CD>                 $value
-     * @param list<CE>                 $interpretationCode
-     * @param list<CE>                 $methodCode
-     * @param list<CD>                 $targetSiteCode
-     * @param list<Specimen>           $specimen
-     * @param list<Performer2>         $performer
-     * @param list<Author>             $author
-     * @param list<Informant>          $informant
-     * @param list<Participant2>       $participant
-     * @param list<EntryRelationship>  $entryRelationship
-     * @param list<Reference>          $reference
-     * @param list<Precondition>       $precondition
-     * @param list<Precondition2>      $sdtcPrecondition2
-     * @param list<InfrastructureRoot> $referenceRange
-     * @param list<InFulfillmentOf1>   $sdtcInFulfillmentOf1
-     * @param list<CS>                 $realmCode
-     * @param list<II>                 $templateId
+     * @param list<II>                        $id
+     * @param list<CD>                        $sdtcCategory
+     * @param list<CD>                        $value
+     * @param list<CE>                        $interpretationCode
+     * @param list<CE>                        $methodCode
+     * @param list<CD>                        $targetSiteCode
+     * @param list<Specimen>                  $specimen
+     * @param list<Performer2>                $performer
+     * @param list<Author>                    $author
+     * @param list<Informant>                 $informant
+     * @param list<Participant2>              $participant
+     * @param list<EntryRelationship>         $entryRelationship
+     * @param list<Reference>                 $reference
+     * @param list<Precondition>              $precondition
+     * @param list<Precondition2>             $sdtcPrecondition2
+     * @param list<ObservationReferenceRange> $referenceRange
+     * @param list<InFulfillmentOf1>          $sdtcInFulfillmentOf1
+     * @param list<CS>                        $realmCode
+     * @param list<II>                        $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
@@ -239,11 +239,11 @@ class Observation extends InfrastructureRoot
         )]
         public array $sdtcPrecondition2 = [],
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/InfrastructureRoot',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/Observation-referenceRange',
             propertyKind: 'complex',
             isArray: true,
             isRequired: false,
-            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\InfrastructureRoot',
+            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\ObservationReferenceRange',
         )]
         public array $referenceRange = [],
         #[FhirProperty(

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDARoleClassAssociative
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDARoleClassAssociative
  * Version: 2.0.2-sd
  * Description: A general association between two entities that is neither partitive nor ontological.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDARoleClassAssociative', version: '2.0.2-sd')]
 enum RoleClassAssociative: string
 {
     /** LIC */

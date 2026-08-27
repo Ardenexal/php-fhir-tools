@@ -121,12 +121,12 @@ class Supply extends InfrastructureRoot
         )]
         public ?IVLTS $expectedUseTime = null,
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/InfrastructureRoot',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/Supply-product',
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
         )]
-        public ?InfrastructureRoot $product = null,
+        public ?SupplyProduct $product = null,
         #[FhirProperty(
             fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/Subject',
             propertyKind: 'complex',

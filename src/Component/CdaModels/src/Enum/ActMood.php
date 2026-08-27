@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDAActMood
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDAActMood
  * Version: 2.0.2-sd
  * Description: A code distinguishing whether an Act is conceived of as a factual statement or in some other manner as a command, possibility, goal, etc.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDAActMood', version: '2.0.2-sd')]
 enum ActMood: string
 {
     /** INT */

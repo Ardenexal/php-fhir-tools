@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDARoleCode
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDARoleCode
  * Version: 2.0.2-sd
  * Description: A set of codes further specifying the kind of Role; specific classification codes for further qualifying RoleClass codes.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDARoleCode', version: '2.0.2-sd')]
 enum RoleCode: string
 {
     /** DX */

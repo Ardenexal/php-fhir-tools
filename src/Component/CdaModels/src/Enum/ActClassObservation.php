@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDAActClassObservation
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDAActClassObservation
  * Version: 2.0.2-sd
  * Description: An act that is intended to result in new information about a subject. The main difference between Observations and other Acts is that Observations have a value attribute.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDAActClassObservation', version: '2.0.2-sd')]
 enum ActClassObservation: string
 {
     /** CASE */

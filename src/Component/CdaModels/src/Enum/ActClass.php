@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDAActClass
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDAActClass
  * Version: 2.0.2-sd
  * Description: A code specifying the major type of Act that this Act-instance represents.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDAActClass', version: '2.0.2-sd')]
 enum ActClass: string
 {
     /** FCNTRCT */

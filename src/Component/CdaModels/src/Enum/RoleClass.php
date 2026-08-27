@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDARoleClass
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDARoleClass
  * Version: 2.0.2-sd
  * Description: Represent a Role which is an association or relationship between two entities - the entity that plays the role and the entity that scopes the role. Roles names are derived from the name of the playing entity in that role.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDARoleClass', version: '2.0.2-sd')]
 enum RoleClass: string
 {
     /** LIC */

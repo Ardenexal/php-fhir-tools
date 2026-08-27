@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDAActRelationshipType
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDAActRelationshipType
  * Version: 2.0.2-sd
  * Description: A code specifying the meaning and purpose of every ActRelationship instance. Each of its values implies specific constraints to what kinds of Act objects can be related and in which way.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDAActRelationshipType', version: '2.0.2-sd')]
 enum ActRelationshipType: string
 {
     /** RSON */

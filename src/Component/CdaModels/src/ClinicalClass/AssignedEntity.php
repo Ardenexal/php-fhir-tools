@@ -98,13 +98,13 @@ class AssignedEntity extends InfrastructureRoot
         )]
         public ?Organization $representedOrganization = null,
         #[FhirProperty(
-            fhirType: 'http://hl7.org/fhir/StructureDefinition/Base',
-            propertyKind: 'scalar',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/AssignedEntity-sdtcPatient',
+            propertyKind: 'complex',
             isArray: false,
             isRequired: false,
             xmlNamespace: 'urn:hl7-org:sdtc',
         )]
-        public ?string $sdtcPatient = null,
+        public ?AssignedEntitySdtcPatient $sdtcPatient = null,
         array $realmCode = [],
         ?II $typeId = null,
         array $templateId = [],

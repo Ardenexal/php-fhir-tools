@@ -143,12 +143,12 @@ class SubstanceAdministration extends InfrastructureRoot
         )]
         public ?CE $administrationUnitCode = null,
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/InfrastructureRoot',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/SubstanceAdministration-consumable',
             propertyKind: 'complex',
             isArray: false,
             isRequired: true,
         )]
-        public ?InfrastructureRoot $consumable = null,
+        public ?SubstanceAdministrationConsumable $consumable = null,
         #[FhirProperty(
             fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/Subject',
             propertyKind: 'complex',

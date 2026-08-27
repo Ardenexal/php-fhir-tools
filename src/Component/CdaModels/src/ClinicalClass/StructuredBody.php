@@ -20,9 +20,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class StructuredBody extends InfrastructureRoot
 {
     /**
-     * @param list<InfrastructureRoot> $component
-     * @param list<CS>                 $realmCode
-     * @param list<II>                 $templateId
+     * @param list<StructuredBodyComponent> $component
+     * @param list<CS>                      $realmCode
+     * @param list<II>                      $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
@@ -44,11 +44,11 @@ class StructuredBody extends InfrastructureRoot
         )]
         public ?CS $languageCode = null,
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/InfrastructureRoot',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/StructuredBody-component',
             propertyKind: 'complex',
             isArray: true,
             isRequired: true,
-            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\InfrastructureRoot',
+            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\StructuredBodyComponent',
         )]
         public array $component = [],
         array $realmCode = [],

@@ -21,12 +21,12 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class Section extends InfrastructureRoot
 {
     /**
-     * @param list<Author>             $author
-     * @param list<Informant>          $informant
-     * @param list<Entry>              $entry
-     * @param list<InfrastructureRoot> $component
-     * @param list<CS>                 $realmCode
-     * @param list<II>                 $templateId
+     * @param list<Author>           $author
+     * @param list<Informant>        $informant
+     * @param list<Entry>            $entry
+     * @param list<SectionComponent> $component
+     * @param list<CS>               $realmCode
+     * @param list<II>               $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'id', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@ID')]
@@ -104,11 +104,11 @@ class Section extends InfrastructureRoot
         )]
         public array $entry = [],
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/InfrastructureRoot',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/Section-component',
             propertyKind: 'complex',
             isArray: true,
             isRequired: false,
-            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\InfrastructureRoot',
+            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\SectionComponent',
         )]
         public array $component = [],
         array $realmCode = [],

@@ -21,10 +21,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class Person extends InfrastructureRoot
 {
     /**
-     * @param list<PN>                 $name
-     * @param list<InfrastructureRoot> $sdtcAsPatientRelationship
-     * @param list<CS>                 $realmCode
-     * @param list<II>                 $templateId
+     * @param list<PN>                              $name
+     * @param list<PersonSdtcAsPatientRelationship> $sdtcAsPatientRelationship
+     * @param list<CS>                              $realmCode
+     * @param list<II>                              $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
@@ -48,11 +48,11 @@ class Person extends InfrastructureRoot
         )]
         public ?ED $sdtcDesc = null,
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/InfrastructureRoot',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/Person-sdtcAsPatientRelationship',
             propertyKind: 'complex',
             isArray: true,
             isRequired: false,
-            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\InfrastructureRoot',
+            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\PersonSdtcAsPatientRelationship',
             xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcAsPatientRelationship = [],

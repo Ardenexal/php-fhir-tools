@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDAEntityCode
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDAEntityCode
  * Version: 2.0.2-sd
  * Description: A value representing the specific kind of Entity the instance represents.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDAEntityCode', version: '2.0.2-sd')]
 enum EntityCode: string
 {
     /** BED */

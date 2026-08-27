@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDARoleClassRoot
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDARoleClassRoot
  * Version: 2.0.2-sd
  * Description: Corresponds to the Role class
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDARoleClassRoot', version: '2.0.2-sd')]
 enum RoleClassRoot: string
 {
     /** LIC */

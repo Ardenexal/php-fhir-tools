@@ -24,9 +24,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class ObservationRange extends InfrastructureRoot
 {
     /**
-     * @param list<InfrastructureRoot> $sdtcPrecondition1
-     * @param list<CS>                 $realmCode
-     * @param list<II>                 $templateId
+     * @param list<ObservationRangeSdtcPrecondition1> $sdtcPrecondition1
+     * @param list<CS>                                $realmCode
+     * @param list<II>                                $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
@@ -62,11 +62,11 @@ class ObservationRange extends InfrastructureRoot
         )]
         public ?CE $interpretationCode = null,
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/InfrastructureRoot',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/ObservationRange-sdtcPrecondition1',
             propertyKind: 'complex',
             isArray: true,
             isRequired: false,
-            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\InfrastructureRoot',
+            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\ObservationRangeSdtcPrecondition1',
             xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcPrecondition1 = [],

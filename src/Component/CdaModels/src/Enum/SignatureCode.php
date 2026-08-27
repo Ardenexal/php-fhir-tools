@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDASignatureCode
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDASignatureCode
@@ -12,6 +14,7 @@ namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
  *
  * **Note:** CDA Release One represented either an intended (`X`) or actual (`S`) authenticator. CDA Release Two only represents an actual authenticator, so has deprecated the value of `X`.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDASignatureCode', version: '2.0.2-sd')]
 enum SignatureCode: string
 {
     /** S */

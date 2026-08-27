@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDANullFlavor
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDANullFlavor
  * Version: 2.0.2-sd
  * Description: CDA NullFlavors - limited to values allowed in original CDA definition
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDANullFlavor', version: '2.0.2-sd')]
 enum NullFlavor: string
 {
     /** NP */

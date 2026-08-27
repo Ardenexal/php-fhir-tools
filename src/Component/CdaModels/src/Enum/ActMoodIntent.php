@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDAActMoodIntent
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDAActMoodIntent
  * Version: 2.0.2-sd
  * Description: An intention or plan to perform a service.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDAActMoodIntent', version: '2.0.2-sd')]
 enum ActMoodIntent: string
 {
     /** INT */

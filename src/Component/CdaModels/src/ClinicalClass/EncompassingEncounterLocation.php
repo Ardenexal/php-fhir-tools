@@ -11,31 +11,27 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
 #[LogicalModel(
-    url: 'http://hl7.org/cda/stds/core/StructureDefinition/InFulfillmentOf1',
-    name: 'InFulfillmentOf1',
+    url: 'http://hl7.org/cda/stds/core/StructureDefinition/EncompassingEncounter-location',
+    name: 'EncompassingEncounterLocation',
     fhirVersion: '5.0.0',
-    xmlNamespace: 'urn:hl7-org:sdtc',
+    xmlNamespace: 'urn:hl7-org:v3',
 )]
-class InFulfillmentOf1 extends InfrastructureRoot
+class EncompassingEncounterLocation extends InfrastructureRoot
 {
     /**
      * @param list<CS> $realmCode
      * @param list<II> $templateId
      */
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: true, xmlSerializedName: '@typeCode')]
-        public string $typeCode = 'FLFS',
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@inversionInd')]
-        public ?bool $inversionInd = null,
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@negationInd')]
-        public ?bool $negationInd = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@typeCode')]
+        public string $typeCode = 'LOC',
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/InFulfillmentOf1-actReference',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/HealthCareFacility',
             propertyKind: 'complex',
             isArray: false,
             isRequired: true,
         )]
-        public ?InFulfillmentOf1ActReference $actReference = null,
+        public ?HealthCareFacility $healthCareFacility = null,
         array $realmCode = [],
         ?II $typeId = null,
         array $templateId = [],

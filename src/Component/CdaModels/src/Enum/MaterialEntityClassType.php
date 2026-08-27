@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDAMaterialEntityClassType
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDAMaterialEntityClassType
  * Version: 2.0.2-sd
  * Description: Types of Material for EntityClass “MAT”
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDAMaterialEntityClassType', version: '2.0.2-sd')]
 enum MaterialEntityClassType: string
 {
     /** PKG */

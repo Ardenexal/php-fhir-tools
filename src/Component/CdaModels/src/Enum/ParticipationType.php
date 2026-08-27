@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDAParticipationType
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDAParticipationType
  * Version: 2.0.2-sd
  * Description: A code specifying the meaning and purpose of every Participation instance. Each of its values implies specific constraints on the Roles undertaking the participation. Limited to values allowed in original CDA definition
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDAParticipationType', version: '2.0.2-sd')]
 enum ParticipationType: string
 {
     /** ADM */

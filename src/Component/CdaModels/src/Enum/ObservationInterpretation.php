@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDAObservationInterpretation
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDAObservationInterpretation
  * Version: 2.0.2-sd
  * Description: One or more codes providing a rough qualitative interpretation of the observation - limited to values available in original CDA
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDAObservationInterpretation', version: '2.0.2-sd')]
 enum ObservationInterpretation: string
 {
     /** B */
