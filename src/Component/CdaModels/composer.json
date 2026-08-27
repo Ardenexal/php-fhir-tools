@@ -1,0 +1,51 @@
+{
+    "name": "ardenexal/cda-sd-models",
+    "description": "Pre-generated CDA R2 logical-model classes (HL7 cda.uv.core + AU Digital Health) for XML serialization",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.3",
+        "ardenexal/fhir-metadata": "^0.5",
+        "brick/date-time": "^0.9.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\CdaModels\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\CdaModels\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage"
+    },
+    "keywords": [
+        "fhir",
+        "cda",
+        "hl7",
+        "healthcare",
+        "logical-model",
+        "myhealthrecord",
+        "php"
+    ],
+    "homepage": "https://github.com/ardenexal/fhir-tools",
+    "support": {
+        "issues": "https://github.com/ardenexal/fhir-tools/issues",
+        "source": "https://github.com/ardenexal/fhir-tools"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.5.x-dev"
+        }
+    }
+}

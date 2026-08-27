@@ -104,12 +104,19 @@ class FHIRValueSetGenerator implements GeneratorInterface
      * @param array<string,mixed>     $valueSet
      * @param string                  $version
      * @param BuilderContextInterface $builderContext
+     * @param string|null             $classNameOverride When set, used verbatim as the enum class
+     *                                                   name instead of deriving it from the
+     *                                                   ValueSet name. The CDA path passes a
+     *                                                   prefix-stripped name (see
+     *                                                   {@see ClassNameResolver::cdaEnumClassName()})
+     *                                                   so the emitted file name and the
+     *                                                   URL → FQCN binding map agree.
      *
      * @return EnumType
      */
-    public function generateEnum(array $valueSet, string $version, BuilderContextInterface $builderContext): EnumType
+    public function generateEnum(array $valueSet, string $version, BuilderContextInterface $builderContext, ?string $classNameOverride = null): EnumType
     {
-        $className = ClassNameResolver::resolveClassName($valueSet['url'], $valueSet['name']);
+        $className = $classNameOverride ?? ClassNameResolver::resolveClassName($valueSet['url'], $valueSet['name']);
         $enumType  = new EnumType($className, $builderContext->getEnumNamespace($version));
         $enumType->addComment('ValueSet: ' . ($valueSet['title'] ?? $valueSet['name']));
         $enumType->addComment('URL: ' . ($valueSet['url'] ?? 'unknown'));
@@ -228,7 +235,20 @@ class FHIRValueSetGenerator implements GeneratorInterface
                 }
                 $display  = $concept['display'] ?? $concept['code'];
                 $enumName = u($display)->upper()->snake()->toString();
-
+                // Codes that reduce to an empty or numeric-leading identifier (e.g. the symbolic
+                // CDA ObservationInterpretation codes '<' and '>', which snake() strips to '')
+                // fall back to the slugger, which maps '<','>','=','&' to words. Only the broken
+                // cases change name, so existing FHIR enum case names are unaffected.
+                if ($enumName === '' || is_numeric($enumName[0])) {
+                    $enumName = $this->getEnumName($concept);
+                    if ($enumName !== '' && is_numeric($enumName[0])) {
+                        $enumName = 'CODE_' . $enumName;
+                    }
+                }
+                if ($enumName === '') {
+                    // Still unrepresentable — skip this one concept rather than abort the enum.
+                    continue;
+                }
                 // Skip if the name OR the backing value is already present. The two are separate
                 // checks because this branch and the CodeSystem walk above name the same code
                 // differently: the CodeSystem supplies a display ("Unrestricted" → `unrestricted`)

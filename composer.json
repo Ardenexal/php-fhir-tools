@@ -83,6 +83,7 @@
             "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\": "src/Component/CodeGeneration/src/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\": "src/Component/Serialization/src/",
             "Ardenexal\\FHIRTools\\Component\\Models\\": "src/Component/Models/src/",
+            "Ardenexal\\FHIRTools\\Component\\CdaModels\\": "src/Component/CdaModels/src/",
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "src/Component/Metadata/src/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "src/Component/FHIRPath/src/",
             "Ardenexal\\FHIRTools\\Component\\Validation\\": "src/Component/Validation/src/"
@@ -97,6 +98,7 @@
             "Ardenexal\\FHIRTools\\Component\\Metadata\\Tests\\": "src/Component/Metadata/tests/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/",
             "Ardenexal\\FHIRTools\\Component\\Validation\\Tests\\": "src/Component/Validation/tests/",
+            "Ardenexal\\FHIRTools\\Component\\CdaModels\\Tests\\": "src/Component/CdaModels/tests/",
             "Ardenexal\\FHIRTools\\Benchmarks\\": "bench/",
             "App\\Mate\\": "mate/src/"
         }

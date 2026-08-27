@@ -14,12 +14,14 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRBackboneElementJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractOperationPayloadNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRLogicalModelJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRComplexTypeJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIROperationPayloadJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRPrimitiveTypeJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRResourceJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRBackboneElementXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRComplexTypeXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRLogicalModelXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIROperationPayloadXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRPrimitiveTypeXmlNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRResourceXmlNormalizer;
@@ -30,6 +32,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\LogicalModelLocatorTrait;
 
 /**
  * High-level FHIR serialization service providing convenient methods for FHIR data conversion.
@@ -41,6 +44,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class FHIRSerializationService
 {
+    use LogicalModelLocatorTrait;
+
     public function __construct(
         private readonly SerializerInterface $serializer,
         private readonly FHIRSerializationContextFactory $contextFactory,
@@ -91,9 +96,13 @@ class FHIRSerializationService
             // null, silently.
             new FHIROperationPayloadJsonNormalizer($metadataExtractor, $typeResolver, version: $version->value, igTypeRegistry: $registry),
             new FHIROperationPayloadXmlNormalizer($metadataExtractor, $typeResolver, version: $version->value, igTypeRegistry: $registry),
+            // CDA logical models are XML-only; this guard rejects JSON (de)serialization with a
+            // descriptive error before the complex-type JSON normalizers see the object.
+            new FHIRLogicalModelJsonNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
             new FHIRResourceJsonNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
             new FHIRResourceXmlNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
             new FHIRComplexTypeJsonNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRLogicalModelXmlNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
             new FHIRComplexTypeXmlNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
             new FHIRPrimitiveTypeJsonNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
             new FHIRPrimitiveTypeXmlNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
@@ -138,11 +147,13 @@ class FHIRSerializationService
         try {
             $xmlContext = $this->contextFactory->createXmlContext($context);
 
-            // The FHIR XML root element name must be the resource type (e.g. "Patient").
+            // The FHIR XML root element name must be the resource type (e.g. "Patient"), or for CDA
+            // logical models the model name (e.g. "ClinicalDocument").
             // Symfony XmlEncoder uses XmlEncoder::ROOT_NODE_NAME from context.
-            $resourceType = $this->extractResourceTypeFromObject($fhirObject);
-            if ($resourceType !== null) {
-                $xmlContext[XmlEncoder::ROOT_NODE_NAME] = $resourceType;
+            $rootName = $this->extractResourceTypeFromObject($fhirObject)
+                ?? $this->extractLogicalModelName($fhirObject);
+            if ($rootName !== null) {
+                $xmlContext[XmlEncoder::ROOT_NODE_NAME] = $rootName;
             }
 
             return $this->serializer->serialize($fhirObject, 'xml', $xmlContext);
@@ -174,6 +185,15 @@ class FHIRSerializationService
 
         // A profiled `Parameters` is still `Parameters` on the wire, so the literal is safe here.
         return AbstractOperationPayloadNormalizer::isOperationPayload($fhirObject) ? 'Parameters' : null;
+    }
+
+    /**
+     * Resolve the XML root element name for a CDA logical-model object from its (or an ancestor's)
+     * #[LogicalModel] attribute. Returns null for non-logical-model objects.
+     */
+    private function extractLogicalModelName(object $fhirObject): ?string
+    {
+        return $this->findLogicalModelAttribute($fhirObject)?->name;
     }
 
     /**
@@ -265,6 +285,16 @@ class FHIRSerializationService
             // Preserve all attribute values as strings so numeric-looking values (e.g. "1.0",
             // "2002") are not cast to float/int, which would lose precision on round-trip.
             $xmlContext[XmlEncoder::TYPE_CAST_ATTRIBUTES] = false;
+
+            // Stash the source document element so the denormalizer can recover document order for
+            // transparent xml-choice-group properties — Symfony's XmlEncoder decode regroups
+            // same-named siblings and loses the interleaving (CDA M7). LIBXML_NONET disables network
+            // access; DOCTYPE entities are not expanded. The denormalizer threads the element down to
+            // each complex child, so a choice group nested at any depth recovers its order.
+            $sourceDocument = new \DOMDocument();
+            if (@$sourceDocument->loadXML($xmlData, \LIBXML_NONET) && $sourceDocument->documentElement !== null) {
+                $xmlContext[FHIRComplexTypeXmlNormalizer::SOURCE_ELEMENT_CONTEXT_KEY] = $sourceDocument->documentElement;
+            }
 
             // Resolve prefixed element names to local names while the DOM's namespace scoping still
             // exists — XmlEncoder::decode() destroys child-declared prefix bindings, after which

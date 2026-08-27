@@ -21,12 +21,15 @@ final class PropertyMetadata
      * @param bool                               $isArray           True when the property holds a list
      * @param bool                               $isRequired        True when cardinality is 1..*
      * @param bool                               $isChoice          True for choice elements (value[x])
-     * @param list<PropertyVariantMetadata>|null $variants          Non-null only when isChoice is true
+     * @param list<PropertyVariantMetadata>|null $variants          Non-null for 'choice' (value[x]) and 'choiceGroup' properties; null otherwise
      * @param string|null                        $jsonKey           Key override; null = use PHP property name
      * @param string|null                        $phpItemClass      FQCN for complex/backbone array item class (e.g. HumanName::class);
      *                                                              null for primitives, scalars, and choice elements
      * @param string|null                        $xmlSerializedName XmlEncoder key when the property is an XML attribute (e.g. '@id', '@url');
      *                                                              null for normal child-element serialization
+     * @param string|null                        $xmlNamespace      XML namespace URI for this element when it differs from the owning class
+     *                                                              namespace (e.g. 'urn:hl7-org:sdtc' for sdtc-prefixed CDA properties, or the
+     *                                                              ADHA extension namespace for AU CDA elements); null = inherit class namespace
      */
     public function __construct(
         public readonly string $fhirType,
@@ -38,6 +41,7 @@ final class PropertyMetadata
         public readonly ?string $jsonKey,
         public readonly ?string $phpItemClass = null,
         public readonly ?string $xmlSerializedName = null,
+        public readonly ?string $xmlNamespace = null,
     ) {
     }
 }
