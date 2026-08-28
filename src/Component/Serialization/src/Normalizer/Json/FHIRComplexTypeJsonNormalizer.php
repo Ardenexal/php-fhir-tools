@@ -109,7 +109,7 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
             $isBackboneElement = !empty($reflection->getAttributes(FHIRBackboneElement::class));
             $object            = $isBackboneElement
                 ? $this->instantiateWithConstructorDefaults($reflection)
-                : $this->instantiateWithEmptyArrays($reflection);
+                : $this->instantiateWithDefaults($reflection);
 
             $metaMap = $this->getPropertyMetadataMap($object);
 

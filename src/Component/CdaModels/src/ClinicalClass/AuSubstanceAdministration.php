@@ -22,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-SubstanceAdministration',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/SubstanceAdministration',
 )]
 class AuSubstanceAdministration extends SubstanceAdministration
 {
@@ -76,7 +77,7 @@ class AuSubstanceAdministration extends SubstanceAdministration
         ?IVLPQ $rateQuantity = null,
         ?RTOPQPQ $maxDoseQuantity = null,
         ?CE $administrationUnitCode = null,
-        ?InfrastructureRoot $consumable = null,
+        ?SubstanceAdministrationConsumable $consumable = null,
         ?Subject $subject = null,
         array $specimen = [],
         array $performer = [],

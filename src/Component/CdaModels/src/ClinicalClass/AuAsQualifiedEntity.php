@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'asQualifiedEntity',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://ns.electronichealth.net.au/cda/StructureDefinition/asQualifications',
 )]
 class AuAsQualifiedEntity extends AuAsQualifications
 {

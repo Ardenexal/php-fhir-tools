@@ -14,7 +14,29 @@ and the output namespace layout.
 | Package | Version | FHIR base | Registry |
 |---|---|---|---|
 | `hl7.cda.uv.core` | `2.0.2-sd` | 5.0.0 (R5) | `packages.fhir.org` |
-| `au.digitalhealth.cda.schema` | `1.0.1` | 5.0.0 (R5) | `packages.fhir.org` |
+| `au.digitalhealth.cda.schema` | `1.0.1` | 5.0.0 (R5) | Pinned tarball — see Package Sources |
+
+### Package Sources
+
+`au.digitalhealth.cda.schema` is published to no FHIR registry: `packages.fhir.org` and
+`packages.simplifier.net` both 404 on it. `PackageLoader::KNOWN_PACKAGES` therefore pins its tarball
+URL and sha256, so the ~465KB binary stays out of git while generation stays reproducible:
+
+```
+https://implementer.digitalhealth.gov.au/fhir/cda-au-schema/1.0.1/package.tgz
+```
+
+The version segment is part of the pin. `current/` resolves to whatever the publisher last released
+and would reintroduce exactly the drift described below, so pin the version directory even when the
+release notes point at `current/`.
+
+**Pin the ADHA implementer release, never `build.fhir.org`.** The CI artifact at
+`https://build.fhir.org/ig/AuDigitalHealth/cda-au-schema/package.tgz` is a continuous build whose
+bytes drift under a fixed version number. When its hash moved off the pin, CDA regeneration stopped
+working entirely — and silently: `fhir:generate` clears the output directory before the package
+error surfaces, so the run deleted every `Au*` class and still exited 0. Recovery is
+`git checkout -- src/Component/CdaModels`. Check `git status src/Component/CdaModels` after any
+generation run naming a CDA package; the exit code will not tell you.
 
 Both packages use the standard FHIR `.tgz` format and are downloaded by the same
 `PackageLoader` used for FHIR R4/R4B/R5 packages.
@@ -35,6 +57,20 @@ The AU CDA schema uses `derivation: specialization` to **add new XML elements** 
 mechanism as the HL7 international core. AU classes (`au-ClinicalDocument`,
 `au-SubstanceAdministration`, etc.) extend corresponding core classes with
 Australian-specific XML elements. They are proper subclasses, not constrained views.
+
+**`derivation` does not settle what the element is called on the wire.** All 230 AU logical SDs are
+`derivation: specialization`, but 68 of the 105 AU-namespace SDs point `type` at another published
+type — and for XML that is a refinement: `au-ClinicalDocument` refines core `ClinicalDocument`, and
+CDA requires `<ClinicalDocument>` on the wire. `au-ClinicalDocument` is a StructureDefinition name,
+which is a *type* identifier; no CDA schema, schematron or consumer accepts it as an element name.
+
+The generator records the relationship rather than resolving it: `#[LogicalModel]` carries
+`refines`, the canonical URL from the SD's own `type` field (null when the definition introduces a
+type of its own), and `fhir-serialization` follows that chain to the type that named the element.
+Do not try to infer this from the shape of `url` or `name` — upstream defeats both. `au-Place` is
+published under the **core** HL7 URL (`http://hl7.org/cda/stds/core/StructureDefinition/au-Place`)
+despite refining core `Place`, while AU's own `code` type derives from `CE` without refining it; a
+URL-authority heuristic gets those two wrong in opposite directions.
 
 ---
 
@@ -165,6 +201,42 @@ class ClinicalDocument extends InfrastructureRoot { ... }
 The `xmlNamespace` field is `null` for JSON-capable logical models and non-null for XML-only
 targets (all CDA classes use `urn:hl7-org:v3`).
 
+The `refines` field is the canonical URL of the type this definition refines, taken from the SD's
+own `type` field — the same signal that chooses the PHP parent. It is omitted for a definition that
+introduces a type of its own, which is most of them (179 of the 247 classes: every core CDA type and
+37 of the 105 AU ones); the attribute defaults it to `null`, so `name` is already the element name.
+Where it is set, `name` is a profile identifier and the element name is the refined type's:
+
+```php
+#[LogicalModel(
+    url: 'http://ns.electronichealth.net.au/cda/StructureDefinition/au-ClinicalDocument',
+    name: 'au-ClinicalDocument',
+    fhirVersion: '5.0.0',
+    xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/ClinicalDocument',
+)]
+class AuClinicalDocument extends ClinicalDocument { ... }
+```
+
+`AuClinicalDocument` serialises as `<ClinicalDocument>`.
+
+Carrying `refines` is necessary but not sufficient for that rename. Pointing `type` at another
+published type covers two different things: profiling it, and merely reusing it as a base while
+naming an element of your own. AU does both — `asQualifiedEntity` declares `type` as AU's own
+`asQualifications`, but `Entity.asQualifiedEntity` and `Person.asQualifications` are two different
+elements on two different parents, and `templateId` declares `type` as the `II` datatype, which
+names no element at all. Renaming either would put another class's element on the wire.
+
+The serialiser separates the two by the characters in the name. HL7 V3 and CDA build every type and
+element name out of `[A-Za-z0-9_]` (`ClinicalDocument`, `templateId`, `IVXB_PQ`), so a name that
+contains anything else — the realm prefix in `au-ClinicalDocument` — cannot be an element name and
+must resolve through `refines`. A name that is already usable on the wire is kept. This declines
+rather than over-reaches: a package whose profile identifiers are plain names would simply stop
+being renamed.
+
+Every chain in the current packages resolves in a single hop; the serialiser walks `refines` to the
+end regardless, so a future refinement of a refinement needs no change here.
+
 `FhirProperty` is reused unchanged for all property-level metadata (type, cardinality,
 `xmlSerializedName`, `isArray`, `isRequired`, etc.).
 
@@ -221,4 +293,4 @@ CDA packages do not require FHIR terminology packages (`hl7.terminology.*`). CDA
 | AU package depends on a core version not yet generated | Medium | Medium | Enforce load/generate ordering; validate parent presence |
 | CDA ValueSets use different `compose` structure | Low | Medium | Verify against a real `NullFlavor` ValueSet before M3 |
 | `Class` as a PHP namespace segment (reserved word) | — | — | Resolved (ADR-009): the segment is `ClinicalClass`, namespace `…\Component\CdaModels\ClinicalClass\` |
-| `au.digitalhealth.cda.schema` not on `packages.fhir.org` | Low | Medium | Fall back to local package path option in `PackageLoader` |
+| `au.digitalhealth.cda.schema` not on `packages.fhir.org` | — | — | Confirmed, not a risk: it is on no registry (`packages.fhir.org` and `packages.simplifier.net` both 404). `PackageLoader::KNOWN_PACKAGES` pins the ADHA implementer release tarball and its sha256 — see Package Sources below |

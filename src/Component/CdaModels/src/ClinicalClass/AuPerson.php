@@ -19,17 +19,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-Person',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/Person',
 )]
 class AuPerson extends Person
 {
     /**
-     * @param list<AuAsEntityIdentifier>    $asEntityIdentifier
-     * @param list<AuPersonalRelationship>  $personalRelationship
-     * @param list<AuLanguageCommunication> $languageCommunication
-     * @param list<PN>                      $name
-     * @param list<InfrastructureRoot>      $sdtcAsPatientRelationship
-     * @param list<CS>                      $realmCode
-     * @param list<II>                      $templateId
+     * @param list<AuAsEntityIdentifier>            $asEntityIdentifier
+     * @param list<AuPersonalRelationship>          $personalRelationship
+     * @param list<AuLanguageCommunication>         $languageCommunication
+     * @param list<PN>                              $name
+     * @param list<PersonSdtcAsPatientRelationship> $sdtcAsPatientRelationship
+     * @param list<CS>                              $realmCode
+     * @param list<II>                              $templateId
      */
     public function __construct(
         #[FhirProperty(

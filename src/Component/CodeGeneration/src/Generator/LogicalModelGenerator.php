@@ -115,18 +115,38 @@ final class LogicalModelGenerator
         // no `use` management is needed because each class is printed in a fresh namespace.
         $type           = (string) ($definition['type'] ?? '');
         $baseDefinition = isset($definition['baseDefinition']) ? (string) $definition['baseDefinition'] : null;
-        if ($type !== '' && $type !== $url && isset($urlToFqcn[$type])) {
-            $class->setExtends($urlToFqcn[$type]);
+
+        // `type` naming a different generatable class is precisely the refinement signal: this
+        // definition constrains a type someone else published rather than introducing one.
+        $refines = ($type !== '' && $type !== $url && isset($urlToFqcn[$type])) ? $type : null;
+
+        if ($refines !== null) {
+            $class->setExtends($urlToFqcn[$refines]);
         } elseif ($baseDefinition !== null && isset($urlToFqcn[$baseDefinition])) {
             $class->setExtends($urlToFqcn[$baseDefinition]);
         }
 
-        $class->addAttribute(LogicalModel::class, [
+        // `refines` is recorded so serializers can resolve the wire element name by following the
+        // chain to the type that actually named the element. `name` cannot answer that on its own:
+        // for a refinement it is a profile identifier (`au-ClinicalDocument`), which is no element
+        // name — CDA requires `<ClinicalDocument>`. Emitting the relationship rather than a resolved
+        // name keeps the generated model to what the StructureDefinition states, leaving the naming
+        // policy in the serializer where it can be corrected without regenerating.
+        $arguments = [
             'url'          => $url,
             'name'         => $name,
             'fhirVersion'  => (string) ($definition['fhirVersion'] ?? '5.0.0'),
             'xmlNamespace' => $xmlNamespace,
-        ]);
+        ];
+
+        // Omitted rather than emitted as `refines: null`, which the attribute already defaults to:
+        // most definitions refine nothing (179 of the 247 CDA classes), so emitting it would add a
+        // line of noise to each of them that says only what its absence says.
+        if ($refines !== null) {
+            $arguments['refines'] = $refines;
+        }
+
+        $class->addAttribute(LogicalModel::class, $arguments);
 
         $this->addInvariants($class, $definition, $url, $inheritedConstraintKeys);
 

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CDAAddressUse
  * URL: http://hl7.org/cda/stds/core/ValueSet/CDAAddressUse
  * Version: 1.0.1
  * Description: Codes that provide guidance around the circumstances in which a given address should be used - limited to values allowed in original CDA definition
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/cda/stds/core/ValueSet/CDAAddressUse', version: '1.0.1')]
 enum AddressUse: string
 {
     /** H */

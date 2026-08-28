@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-EncompassingEncounter',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/EncompassingEncounter',
 )]
 class AuEncompassingEncounter extends EncompassingEncounter
 {
@@ -33,9 +34,9 @@ class AuEncompassingEncounter extends EncompassingEncounter
         ?IVLTS $effectiveTime = null,
         ?CE $sdtcAdmissionReferralSourceCode = null,
         ?CE $dischargeDispositionCode = null,
-        ?InfrastructureRoot $responsibleParty = null,
+        ?EncompassingEncounterResponsibleParty $responsibleParty = null,
         array $encounterParticipant = [],
-        ?InfrastructureRoot $location = null,
+        ?EncompassingEncounterLocation $location = null,
         array $realmCode = [],
         ?II $typeId = null,
         array $templateId = [],

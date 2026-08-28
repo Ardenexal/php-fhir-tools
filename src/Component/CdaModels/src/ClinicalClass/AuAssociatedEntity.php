@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-AssociatedEntity',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/AssociatedEntity',
 )]
 class AuAssociatedEntity extends AssociatedEntity
 {

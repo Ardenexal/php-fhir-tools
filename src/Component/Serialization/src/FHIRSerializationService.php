@@ -190,10 +190,18 @@ class FHIRSerializationService
     /**
      * Resolve the XML root element name for a CDA logical-model object from its (or an ancestor's)
      * #[LogicalModel] attribute. Returns null for non-logical-model objects.
+     *
+     * The attribute's `name` is deliberately NOT used directly: it is the StructureDefinition name,
+     * which for a definition refining another authority's type is a profile identifier and not an
+     * element name — `au-ClinicalDocument` is rejected by every CDA schema, schematron and consumer,
+     * while a profiled `ClinicalDocument` is still `ClinicalDocument` on the wire, exactly as
+     * {@see extractResourceTypeFromObject()} already assumes for a profiled `Parameters`.
+     * {@see LogicalModelLocatorTrait::logicalModelElementName()} resolves the refined type's name and
+     * documents why the chain cannot simply be walked to its base.
      */
     private function extractLogicalModelName(object $fhirObject): ?string
     {
-        return $this->findLogicalModelAttribute($fhirObject)?->name;
+        return $this->logicalModelElementName($fhirObject);
     }
 
     /**
