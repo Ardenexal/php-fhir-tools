@@ -23,8 +23,12 @@ and the output namespace layout.
 URL and sha256, so the ~465KB binary stays out of git while generation stays reproducible:
 
 ```
-https://implementer.digitalhealth.gov.au/fhir/cda-au-schema/current/package.tgz
+https://implementer.digitalhealth.gov.au/fhir/cda-au-schema/1.0.1/package.tgz
 ```
+
+The version segment is part of the pin. `current/` resolves to whatever the publisher last released
+and would reintroduce exactly the drift described below, so pin the version directory even when the
+release notes point at `current/`.
 
 **Pin the ADHA implementer release, never `build.fhir.org`.** The CI artifact at
 `https://build.fhir.org/ig/AuDigitalHealth/cda-au-schema/package.tgz` is a continuous build whose
@@ -214,9 +218,11 @@ Where it is set, `name` is a profile identifier and the element name is the refi
 class AuClinicalDocument extends ClinicalDocument { ... }
 ```
 
-`AuClinicalDocument` serialises as `<ClinicalDocument>`. Refinements chain — `asQualifiedEntity`
-refines AU's own `asQualifications` — so the serialiser follows `refines` to the end rather than
-taking one hop.
+`AuClinicalDocument` serialises as `<ClinicalDocument>`. The refined type is not always a core HL7
+one — `asQualifiedEntity` refines AU's own `asQualifications` — so the serialiser follows the
+declared `refines` link wherever it points rather than assuming a core target. Every chain in the
+current packages resolves in a single hop; the serialiser follows `refines` to the end regardless,
+so a future refinement of a refinement needs no change here.
 
 `FhirProperty` is reused unchanged for all property-level metadata (type, cardinality,
 `xmlSerializedName`, `isArray`, `isRequired`, etc.).

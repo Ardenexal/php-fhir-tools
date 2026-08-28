@@ -70,8 +70,14 @@ trait LogicalModelLocatorTrait
         // A refinement of a refinement is legal, so the chain is followed to the type that actually
         // named the element. The refined type is always an ancestor — the generator derives both
         // `refines` and `extends` from the same `type` field — so each hop is a search up the parent
-        // chain rather than a global registry lookup. `$seen` guards against a cycle in malformed
-        // metadata, which would otherwise hang serialization.
+        // chain rather than a global registry lookup. That also bounds the walk: every hop reassigns
+        // `$class` to a strict ancestor of itself, and a class hierarchy is finite and acyclic, so
+        // the loop terminates on its own however malformed the metadata is.
+        //
+        // `$seen` is therefore a determinism guard, not a termination one. Two classes in one chain
+        // declaring the same `url` is the case it covers: without it the walk could follow a link
+        // back to a type it already resolved through, making the element name depend on where the
+        // walk started rather than on what the definitions say.
         $seen = [$model->url => true];
 
         while ($model->refines !== null && !isset($seen[$model->refines])) {

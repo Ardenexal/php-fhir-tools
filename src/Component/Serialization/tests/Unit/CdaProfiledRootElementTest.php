@@ -17,6 +17,8 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\INTPOS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVXBPQ;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\LogicalModels\ChainedRefinementLeaf;
+use Ardenexal\FHIRTools\Component\Serialization\Tests\Fixtures\LogicalModels\ChainedRefinementMiddle;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -87,9 +89,9 @@ final class CdaProfiledRootElementTest extends TestCase
         // Upstream publishes au-Place under the *core* HL7 URL rather than the AU one, so nothing
         // about its URL marks it as AU. Only the declared `refines` link classifies it.
         yield 'place published under the core url' => [AuPlace::class, 'Place'];
-        // A refinement of a refinement: asQualifiedEntity refines AU's own asQualifications, so the
-        // chain has to be followed past the first hop rather than stopping at it.
-        yield 'refinement of a refinement' => [AuAsQualifiedEntity::class, 'asQualifications'];
+        // The refined type need not be a core HL7 one: asQualifiedEntity refines AU's own
+        // asQualifications, so the link is followed wherever it points rather than only into core.
+        yield 'refinement of an au type' => [AuAsQualifiedEntity::class, 'asQualifications'];
     }
 
     /**
@@ -122,6 +124,35 @@ final class CdaProfiledRootElementTest extends TestCase
         // AU's own `code` type derives from core CE without refining it: its SD names itself in
         // `type`, so it introduces a type and keeps its own element name.
         yield 'au type deriving without refining' => [AuCode::class, 'code'];
+    }
+
+    /**
+     * A refinement of a refinement resolves to the type at the end of the chain, not the next one up.
+     *
+     * Every `refines` link in the shipped CDA packages resolves in a single hop, so no generated
+     * class exercises the second iteration of the chain-following loop — including
+     * `AuAsQualifiedEntity`, whose target `AuAsQualifications` refines nothing further. The fixtures
+     * supply the two-hop case the packages do not, since the loop is what keeps the resolution
+     * correct for a package that later publishes such a chain.
+     */
+    public function testARefinementOfARefinementResolvesToTheEndOfTheChain(): void
+    {
+        $root = $this->rootElement($this->service()->serializeToXml(new ChainedRefinementLeaf()));
+
+        self::assertSame('ChainedBase', $root->localName);
+    }
+
+    /**
+     * The intermediate link resolves to the same element name, one hop rather than two.
+     *
+     * Pins that the leaf's result above comes from walking the chain and not from the resolver
+     * happening to land on the base-most `#[LogicalModel]` by another route.
+     */
+    public function testTheIntermediateRefinementResolvesToTheSameElement(): void
+    {
+        $root = $this->rootElement($this->service()->serializeToXml(new ChainedRefinementMiddle()));
+
+        self::assertSame('ChainedBase', $root->localName);
     }
 
     /**
