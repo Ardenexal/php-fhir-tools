@@ -124,11 +124,14 @@ final class SymfonyConsoleCompatibilityTest extends TestCase
             (new \ReflectionClass(PackageLoader::class))->newInstanceWithoutConstructor(),
         );
 
+        // These versions must match the ones fhir:generate-ig loads and the ones the
+        // generate-models-* composer scripts pin; see FHIRIGGeneratorCommand::BASE_PACKAGES for
+        // what drifting them costs.
         self::assertSame(
             [
                 'hl7.terminology.r4#7.0.0',
                 'hl7.fhir.r4.core#4.0.1',
-                'hl7.fhir.uv.extensions.r4#5.2.0',
+                'hl7.fhir.uv.extensions.r4#5.3.0',
             ],
             $command->getDefinition()->getOption('package')->getDefault(),
         );

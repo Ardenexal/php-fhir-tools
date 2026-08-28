@@ -201,19 +201,20 @@
         "generate-models": "php ./demo/bin/console fhir:generate -vvv",
         "generate-models-all": [
             "echo 'Generating FHIR R4 models...'",
-            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.uv.extensions.r4 --package=hl7.fhir.r4b.core --package=hl7.fhir.uv.extensions.r4b --package=hl7.fhir.r5.core --package=hl7.fhir.uv.extensions.r5 -vvv",
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core#4.0.1 --package=hl7.fhir.uv.extensions.r4#5.3.0 --package=hl7.fhir.r4b.core#4.3.0 --package=hl7.fhir.uv.extensions.r4b#5.3.0 --package=hl7.fhir.r5.core#5.0.0 --package=hl7.fhir.uv.extensions.r5#5.3.0 -vvv",
+            "@lint:models",
             "echo 'All FHIR models generated successfully!'"
         ],
         "generate-models-r4": [
-            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.uv.extensions.r4 -vvv",
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core#4.0.1 --package=hl7.fhir.uv.extensions.r4#5.3.0 -vvv",
             "@lint:models"
         ],
         "generate-models-r4b": [
-            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4b.core --package=hl7.fhir.uv.extensions.r4b -vvv",
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4b.core#4.3.0 --package=hl7.fhir.uv.extensions.r4b#5.3.0 -vvv",
             "@lint:models"
         ],
         "generate-models-r5": [
-            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r5.core --package=hl7.fhir.uv.extensions.r5 -vvv",
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r5.core#5.0.0 --package=hl7.fhir.uv.extensions.r5#5.3.0 -vvv",
             "@lint:models"
         ],
         "fix-newlines": "powershell -ExecutionPolicy Bypass -File scripts/fix-newlines.ps1",
