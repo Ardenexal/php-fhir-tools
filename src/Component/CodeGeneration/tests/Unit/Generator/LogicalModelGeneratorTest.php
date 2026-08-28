@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Generator;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\LogicalModelGenerator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;

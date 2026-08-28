@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Parser;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Parser;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Parser\AllowedTypeReader;
 use PHPUnit\Framework\TestCase;

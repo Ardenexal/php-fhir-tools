@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Eris\Generator;
 use Eris\TestTrait;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -22,7 +23,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * **Note on Filesystem Mocking:**
  * This test mocks the Filesystem object to prevent actual file operations. The
- * command's __invoke() method calls clearOutputDirectory() which would delete
+ * command's execute() method calls clearOutputDirectory() which would delete
  * the real Models directory at src/Component/Models/src, removing all generated
  * R4, R4B, and R5 model files. The mock is configured to return false for the
  * exists() method, which prevents clearOutputDirectory() from executing its
@@ -165,20 +166,14 @@ class GenerationProcessConsistencyPropertyTest extends TestCase
         $this->forAll(
             Generator\elements([['hl7.fhir.r4.core'], ['hl7.fhir.r4b.core'], ['hl7.fhir.r5.core']]),
         )->then(function(array $packages): void {
-            $output = new BufferedOutput();
-
             $this->packageLoader
                 ->method('installPackage')
                 ->willThrowException(new \Exception('Mocked package loading'));
 
-            $result = ($this->command)(
-                output: $output,
-                packages: $packages,
-            );
+            $tester = new CommandTester($this->command);
+            $tester->execute(['--package' => $packages]);
 
-            $outputContent = $output->fetch();
-
-            self::assertEquals(1, $result);
+            self::assertSame(Command::FAILURE, $tester->getStatusCode());
         });
     }
 
@@ -224,20 +219,16 @@ class GenerationProcessConsistencyPropertyTest extends TestCase
         $this->forAll(
             Generator\elements(['invalid-package', 'non-existent-package']),
         )->then(function(string $invalidPackage): void {
-            $output = new BufferedOutput();
-
             $this->packageLoader
                 ->method('installPackage')
                 ->willThrowException(new \Exception("Package not found: {$invalidPackage}"));
 
-            $result = ($this->command)(
-                output: $output,
-                packages: [$invalidPackage],
-            );
+            $tester = new CommandTester($this->command);
+            $tester->execute(['--package' => [$invalidPackage]]);
 
-            $outputContent = $output->fetch();
+            $outputContent = $tester->getDisplay();
 
-            self::assertEquals(1, $result);
+            self::assertSame(Command::FAILURE, $tester->getStatusCode());
             self::assertStringContainsString('error', strtolower($outputContent));
             self::assertStringContainsString($invalidPackage, $outputContent);
         });

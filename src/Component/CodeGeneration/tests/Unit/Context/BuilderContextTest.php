@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Context;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Context;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Nette\PhpGenerator\PhpNamespace;

@@ -16,9 +16,10 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Printer;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressIndicator;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -65,6 +66,13 @@ use function Symfony\Component\String\u;
  *   # Chained IGs (AU Core extends AU Base):
  *   php bin/console fhir:generate-ig --package=hl7.fhir.au.base --package=hl7.fhir.au.core
  *
+ * **Console compatibility.** This package supports symfony/console ^6.4, so the command stays on
+ * classic configure()/execute(). The invokable style (`__invoke()` with `#[Option]` parameters)
+ * needs 7.3, and on 6.4 nothing fails to load: the options would simply never register.
+ *
+ * configure() therefore mirrors the definition those attributes produced on 7.x, down to option
+ * names, modes, defaults, descriptions and order, so the command behaves the same on both.
+ *
  * @see FHIRExtensionGenerator
  * @see FHIRProfileGenerator
  * @see FHIRModelGeneratorCommand
@@ -72,6 +80,8 @@ use function Symfony\Component\String\u;
 #[AsCommand(name: 'fhir:generate-ig', description: 'Generates typed PHP classes for IG extensions and profiles.')]
 class FHIRIGGeneratorCommand extends Command
 {
+    use PackageOptionTrait;
+
     /**
      * Base FHIR packages that must be loaded for type resolution, indexed by FHIR version.
      * These are never written to disk — they only populate the BuilderContext types.
@@ -159,24 +169,30 @@ class FHIRIGGeneratorCommand extends Command
         ];
     }
 
+    /** Declares the --package and --offline definition that must stay identical on console 6.4 and 7.x. */
+    protected function configure(): void
+    {
+        $this
+            ->addOption('package', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'IG packages to generate (specify in dependency order). Overrides fhir.ig.packages config when supplied.', [])
+            ->addOption('offline', null, InputOption::VALUE_NONE, 'Work offline using only cached packages. Defaults to fhir.ig.offline config when not passed.');
+    }
+
     /**
      * Entry point for `fhir:generate-ig`.
      *
-     * When --package is supplied, those packages are used exclusively.
-     * When --package is omitted, the packages configured under fhir.ig.packages in the
-     * bundle configuration are used, enabling a no-argument workflow for end-user projects.
+     * A supplied --package is used exclusively; when it is omitted the packages configured under
+     * fhir.ig.packages are used instead, so end-user projects can run the command with no arguments.
      *
-     * @param OutputInterface $output      Console output
-     * @param array<string>   $packages    IG packages to generate, e.g. ['hl7.fhir.au.base#1.0.0']
-     * @param bool            $offlineMode Use cached packages only — no network
+     * @param InputInterface  $input  Parsed CLI input carrying --package and --offline
+     * @param OutputInterface $output Console output
+     *
+     * @return int Command::SUCCESS (0) or Command::FAILURE (1)
      */
-    public function __invoke(
-        OutputInterface $output,
-        #[Option(description: 'IG packages to generate (specify in dependency order). Overrides fhir.ig.packages config when supplied.', name: 'package')]
-        array $packages = [],
-        #[Option(description: 'Work offline using only cached packages. Defaults to fhir.ig.offline config when not passed.', name: 'offline')]
-        bool $offlineMode = false,
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $packages    = $this->packageOption($input);
+        $offlineMode = (bool) $input->getOption('offline');
+
         // Resolve effective package list: CLI args take priority, config is the fallback
         $effectivePackages = !empty($packages) ? $packages : $this->configuredPackages;
         $effectiveOffline  = $offlineMode || $this->offlineByDefault;
