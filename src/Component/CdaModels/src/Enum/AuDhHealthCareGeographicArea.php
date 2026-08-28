@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Health Care Geographic Area
  * URL: http://ns.electronichealth.net.au/cda/ValueSet/dh-HealthCareGeographicArea
  * Version: 1.0.1
  * Description: Health Care Client Identifier Geographic Area
  */
+#[FHIRValueSetSource(url: 'http://ns.electronichealth.net.au/cda/ValueSet/dh-HealthCareGeographicArea', version: '1.0.1')]
 enum AuDhHealthCareGeographicArea: string
 {
     /** Local Client (Unit Record) Identifier */

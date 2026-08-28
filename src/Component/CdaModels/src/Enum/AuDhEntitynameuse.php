@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Entity Name Use
  * URL: http://ns.electronichealth.net.au/cda/ValueSet/dh-entitynameuse
  * Version: 1.0.1
  * Description: Extended Entity Name Use code value set with Organisation Name Use Value from AS 4846-2006 Organisation Name Usage
  */
+#[FHIRValueSetSource(url: 'http://ns.electronichealth.net.au/cda/ValueSet/dh-entitynameuse', version: '1.0.1')]
 enum AuDhEntitynameuse: string
 {
     /** ABC */

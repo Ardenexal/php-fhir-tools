@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-Supply',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/Supply',
 )]
 class AuSupply extends Supply
 {
@@ -83,7 +84,7 @@ class AuSupply extends Supply
         ?BL $independentInd = null,
         ?PQ $quantity = null,
         ?IVLTS $expectedUseTime = null,
-        ?InfrastructureRoot $product = null,
+        ?SupplyProduct $product = null,
         ?Subject $subject = null,
         array $specimen = [],
         array $performer = [],

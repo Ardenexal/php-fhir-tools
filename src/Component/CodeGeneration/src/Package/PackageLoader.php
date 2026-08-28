@@ -60,20 +60,27 @@ class PackageLoader
      * Packages that are not published to any FHIR registry and must be fetched from a pinned
      * build artifact instead of resolved via `packages.fhir.org`.
      *
-     * `au.digitalhealth.cda.schema` is only available as a CI build at build.fhir.org (it 404s on
-     * every registry — see CDA M4). We pin its tarball URL and sha256 so generation is
-     * reproducible WITHOUT committing the ~467KB binary to git: the tgz downloads into the
-     * gitignored `.fhir` cache and is verified against the pinned hash on download. A CI republish
-     * that changes the bytes fails loudly rather than silently shifting generated output. The
-     * `1.0.1` artifact is byte-identical across day-apart fetches, so the pin is stable.
+     * `au.digitalhealth.cda.schema` is published by the Australian Digital Health Agency but not to
+     * any FHIR registry (`packages.fhir.org` and `packages.simplifier.net` both 404 on it — see
+     * CDA M4, re-confirmed 2026-08-28). We pin its tarball URL and sha256 so generation is
+     * reproducible WITHOUT committing the ~465KB binary to git: the tgz downloads into the
+     * gitignored `.fhir` cache and is verified against the pinned hash on download. A republish
+     * that changes the bytes fails loudly rather than silently shifting generated output.
+     *
+     * The tarball is the ADHA implementer release, NOT the build.fhir.org CI artifact this used to
+     * point at. That artifact is a continuous build whose bytes drift under a fixed version number:
+     * its hash moved off the pin (to 27df4447…), which took CDA regeneration down entirely, because
+     * `fhir:generate` clears the output directory before the package error surfaces — deleting every
+     * `Au*` class and still exiting 0. The release URL is versioned content from the publisher, so
+     * a hash change there is a genuine republish worth failing on.
      *
      * @var array<string, array{version: string, tarball: string, sha256: string, fhirVersion: string}>
      */
     private const array KNOWN_PACKAGES = [
         'au.digitalhealth.cda.schema' => [
             'version'     => '1.0.1',
-            'tarball'     => 'https://build.fhir.org/ig/AuDigitalHealth/cda-au-schema/package.tgz',
-            'sha256'      => 'ad7273572a206b23c52bdf2c8c119e6efbc37b6951f80dc27fee8244c3725df4',
+            'tarball'     => 'https://implementer.digitalhealth.gov.au/fhir/cda-au-schema/1.0.1/package.tgz',
+            'sha256'      => '497a76e33fdacda8539d8d4da70561525f34067f15d9313c3c07e0dd626c95b9',
             'fhirVersion' => '5.0.0',
         ],
     ];

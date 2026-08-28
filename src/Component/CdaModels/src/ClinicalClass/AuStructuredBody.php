@@ -15,13 +15,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-StructuredBody',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/StructuredBody',
 )]
 class AuStructuredBody extends StructuredBody
 {
     /**
-     * @param list<InfrastructureRoot> $component
-     * @param list<CS>                 $realmCode
-     * @param list<II>                 $templateId
+     * @param list<StructuredBodyComponent> $component
+     * @param list<CS>                      $realmCode
+     * @param list<II>                      $templateId
      */
     public function __construct(
         string $classCode = 'DOCBODY',

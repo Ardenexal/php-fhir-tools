@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-ComponentOf',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/ComponentOf',
 )]
 class AuComponentOf extends ComponentOf
 {

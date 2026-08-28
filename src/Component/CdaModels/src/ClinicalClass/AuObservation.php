@@ -22,30 +22,31 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-Observation',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/Observation',
 )]
 class AuObservation extends Observation
 {
     /**
-     * @param list<AuInFulfillmentOf>  $inFulfillmentOf
-     * @param list<II>                 $id
-     * @param list<CD>                 $sdtcCategory
-     * @param list<CD>                 $value
-     * @param list<CE>                 $interpretationCode
-     * @param list<CE>                 $methodCode
-     * @param list<CD>                 $targetSiteCode
-     * @param list<Specimen>           $specimen
-     * @param list<Performer2>         $performer
-     * @param list<Author>             $author
-     * @param list<Informant>          $informant
-     * @param list<Participant2>       $participant
-     * @param list<EntryRelationship>  $entryRelationship
-     * @param list<Reference>          $reference
-     * @param list<Precondition>       $precondition
-     * @param list<Precondition2>      $sdtcPrecondition2
-     * @param list<InfrastructureRoot> $referenceRange
-     * @param list<InFulfillmentOf1>   $sdtcInFulfillmentOf1
-     * @param list<CS>                 $realmCode
-     * @param list<II>                 $templateId
+     * @param list<AuInFulfillmentOf>         $inFulfillmentOf
+     * @param list<II>                        $id
+     * @param list<CD>                        $sdtcCategory
+     * @param list<CD>                        $value
+     * @param list<CE>                        $interpretationCode
+     * @param list<CE>                        $methodCode
+     * @param list<CD>                        $targetSiteCode
+     * @param list<Specimen>                  $specimen
+     * @param list<Performer2>                $performer
+     * @param list<Author>                    $author
+     * @param list<Informant>                 $informant
+     * @param list<Participant2>              $participant
+     * @param list<EntryRelationship>         $entryRelationship
+     * @param list<Reference>                 $reference
+     * @param list<Precondition>              $precondition
+     * @param list<Precondition2>             $sdtcPrecondition2
+     * @param list<ObservationReferenceRange> $referenceRange
+     * @param list<InFulfillmentOf1>          $sdtcInFulfillmentOf1
+     * @param list<CS>                        $realmCode
+     * @param list<II>                        $templateId
      */
     public function __construct(
         #[FhirProperty(

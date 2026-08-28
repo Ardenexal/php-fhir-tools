@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-AssignedEntity',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/AssignedEntity',
 )]
 class AuAssignedEntity extends AssignedEntity
 {
@@ -40,7 +41,7 @@ class AuAssignedEntity extends AssignedEntity
         array $telecom = [],
         ?Person $assignedPerson = null,
         ?Organization $representedOrganization = null,
-        ?string $sdtcPatient = null,
+        ?AssignedEntitySdtcPatient $sdtcPatient = null,
         array $realmCode = [],
         ?II $typeId = null,
         array $templateId = [],

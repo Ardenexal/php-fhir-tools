@@ -17,17 +17,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-Section',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/Section',
 )]
 class AuSection extends Section
 {
     /**
-     * @param list<AuCoverage2>        $coverage2
-     * @param list<Author>             $author
-     * @param list<Informant>          $informant
-     * @param list<Entry>              $entry
-     * @param list<InfrastructureRoot> $component
-     * @param list<CS>                 $realmCode
-     * @param list<II>                 $templateId
+     * @param list<AuCoverage2>      $coverage2
+     * @param list<Author>           $author
+     * @param list<Informant>        $informant
+     * @param list<Entry>            $entry
+     * @param list<SectionComponent> $component
+     * @param list<CS>               $realmCode
+     * @param list<II>               $templateId
      */
     public function __construct(
         #[FhirProperty(

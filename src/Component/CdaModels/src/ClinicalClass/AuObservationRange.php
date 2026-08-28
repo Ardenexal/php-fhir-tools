@@ -19,13 +19,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-ObservationRange',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    refines: 'http://hl7.org/cda/stds/core/StructureDefinition/ObservationRange',
 )]
 class AuObservationRange extends ObservationRange
 {
     /**
-     * @param list<InfrastructureRoot> $sdtcPrecondition1
-     * @param list<CS>                 $realmCode
-     * @param list<II>                 $templateId
+     * @param list<ObservationRangeSdtcPrecondition1> $sdtcPrecondition1
+     * @param list<CS>                                $realmCode
+     * @param list<II>                                $templateId
      */
     public function __construct(
         ?ActClassObservation $classCode = null,
