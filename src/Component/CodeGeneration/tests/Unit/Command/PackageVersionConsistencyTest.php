@@ -128,17 +128,24 @@ class PackageVersionConsistencyTest extends TestCase
 
     /**
      * Regenerating without running Pint leaves the whole tree formatted differently, which reads as
-     * thousands of changed files. Every generate script must chain the formatter.
+     * thousands of changed files. Every generate script must chain a formatter step.
+     *
+     * Any `@lint:*` step satisfies this — the CDA script chains `@lint:cda-models` because its
+     * output lands in `CdaModels/`, which `@lint:models` (scoped to `Models/`) does not cover.
      *
      * @return void
      */
     public function testEveryGenerateModelsScriptRunsThePintStep(): void
     {
         foreach (self::generateModelsScripts() as $name => $steps) {
-            self::assertContains(
-                '@lint:models',
+            $lintSteps = array_filter(
                 $steps,
-                "Script '{$name}' must run @lint:models, or a regen looks like a repo-wide diff",
+                static fn (string $step): bool => str_starts_with($step, '@lint:'),
+            );
+
+            self::assertNotEmpty(
+                $lintSteps,
+                "Script '{$name}' must chain a @lint: step, or a regen looks like a repo-wide diff",
             );
         }
     }

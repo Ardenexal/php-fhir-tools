@@ -204,6 +204,7 @@ class AD extends ANY
                     'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ADXP',
                     'jsonKey'      => 'precinct',
                 ],
+                ['fhirType' => 'string', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'xmlText'],
             ],
         )]
         public array $item = [],
