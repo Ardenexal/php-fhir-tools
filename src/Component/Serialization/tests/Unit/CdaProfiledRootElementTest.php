@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuPlace;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuSection;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\ClinicalDocument;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\AuCode;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\AuTemplateId;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\INTPOS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVXBPQ;
@@ -26,18 +27,26 @@ use PHPUnit\Framework\TestCase;
 /**
  * A profiled CDA logical model must not rename its own XML element.
  *
- * `#[LogicalModel]`'s `name` is the StructureDefinition name, which for a definition that refines
- * another type is a profile identifier (`au-ClinicalDocument`) that was never an element name — no
- * CDA schema, schematron or consumer accepts `<au-ClinicalDocument>`. The element name is the
- * refined type's, reached by following the generated `refines` link.
+ * `#[LogicalModel]`'s `name` is the StructureDefinition name, which for a profile is an identifier
+ * (`au-ClinicalDocument`) that was never an element name — no CDA schema, schematron or consumer
+ * accepts `<au-ClinicalDocument>`. There the element name is the refined type's, reached by
+ * following the generated `refines` link.
+ *
+ * Carrying `refines` is necessary but not sufficient, which is the second axis these cases pin.
+ * A definition whose `type` names another published type may be profiling it, or may merely be
+ * reusing it as a base while naming an element of its own; only the first may take the refined
+ * name. So the suite is split: {@see profiledModels()} must be renamed, and
+ * {@see modelsThatKeepTheirOwnName()} must not — including two that carry `refines` and still keep
+ * their own name.
  *
  * Every assertion here reads `local-name(/*)` off the parsed document rather than searching the
  * serialized string: `au-ClinicalDocument` *contains* `ClinicalDocument`, so a substring assertion
  * passes against the very output this test exists to reject.
  *
- * The cases are chosen to pin the resolution to the StructureDefinition's declared `refines` link
- * rather than to the shape of the URL or the name. `AuPlace` and `AuCode` are the two that decide
- * this: inferring the refinement from the URL authority gets both wrong, in opposite directions.
+ * `AuPlace` and `AuCode` are the cases that rule out inferring any of this from the URL: it is
+ * published under the *core* HL7 URL despite being an AU profile, while `AuCode` is an AU type
+ * under the AU URL that profiles nothing. A URL-authority test gets both wrong, in opposite
+ * directions.
  */
 #[CoversClass(FHIRSerializationService::class)]
 final class CdaProfiledRootElementTest extends TestCase
@@ -89,20 +98,20 @@ final class CdaProfiledRootElementTest extends TestCase
         // Upstream publishes au-Place under the *core* HL7 URL rather than the AU one, so nothing
         // about its URL marks it as AU. Only the declared `refines` link classifies it.
         yield 'place published under the core url' => [AuPlace::class, 'Place'];
-        // The refined type need not be a core HL7 one: asQualifiedEntity refines AU's own
-        // asQualifications, so the link is followed wherever it points rather than only into core.
-        yield 'refinement of an au type' => [AuAsQualifiedEntity::class, 'asQualifications'];
     }
 
     /**
-     * A definition that introduces a type of its own carries no `refines` and keeps its own name,
-     * even where it derives from another type: `IVXB_PQ` must not collapse into its parent `PQ`.
-     * These are the regressions a naive "walk to the base-most #[LogicalModel]" rule ships.
+     * A definition keeps its own name whenever that name is already an element name — whether it
+     * carries no `refines` at all (`IVXB_PQ` must not collapse into its parent `PQ`) or carries one
+     * but merely reuses another type as its base instead of profiling it.
+     *
+     * The first group is what a naive "walk to the base-most #[LogicalModel]" rule breaks; the
+     * second is what following `refines` unconditionally breaks.
      *
      * @param class-string $modelClass
      */
-    #[DataProvider('unrefinedModels')]
-    public function testTypesThatRefineNothingKeepTheirOwnName(string $modelClass, string $expectedElement): void
+    #[DataProvider('modelsThatKeepTheirOwnName')]
+    public function testModelsThatAlreadyNameAnElementKeepTheirOwnName(string $modelClass, string $expectedElement): void
     {
         $root = $this->rootElement($this->service()->serializeToXml(new $modelClass()));
 
@@ -112,7 +121,7 @@ final class CdaProfiledRootElementTest extends TestCase
     /**
      * @return iterable<string, array{0: class-string, 1: string}>
      */
-    public static function unrefinedModels(): iterable
+    public static function modelsThatKeepTheirOwnName(): iterable
     {
         // Core CDA datatypes whose SD name differs from the generated class name, and which derive
         // from a concrete parent (PQ, INT) without refining it.
@@ -124,6 +133,13 @@ final class CdaProfiledRootElementTest extends TestCase
         // AU's own `code` type derives from core CE without refining it: its SD names itself in
         // `type`, so it introduces a type and keeps its own element name.
         yield 'au type deriving without refining' => [AuCode::class, 'code'];
+        // Carries `refines` — its SD declares `type` as AU's own `asQualifications` — but names an
+        // element of its own. `Entity.asQualifiedEntity` and `Person.asQualifications` are two
+        // different elements on two different parents, so following the link emits the other one.
+        yield 'refines another type but names its own element' => [AuAsQualifiedEntity::class, 'asQualifiedEntity'];
+        // Also carries `refines`, pointing at the `II` datatype — a type name that appears as no
+        // CDA element. The link must not be followed here either.
+        yield 'refines a datatype but names its own element' => [AuTemplateId::class, 'templateId'];
     }
 
     /**

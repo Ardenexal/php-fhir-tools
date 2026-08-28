@@ -218,11 +218,24 @@ Where it is set, `name` is a profile identifier and the element name is the refi
 class AuClinicalDocument extends ClinicalDocument { ... }
 ```
 
-`AuClinicalDocument` serialises as `<ClinicalDocument>`. The refined type is not always a core HL7
-one — `asQualifiedEntity` refines AU's own `asQualifications` — so the serialiser follows the
-declared `refines` link wherever it points rather than assuming a core target. Every chain in the
-current packages resolves in a single hop; the serialiser follows `refines` to the end regardless,
-so a future refinement of a refinement needs no change here.
+`AuClinicalDocument` serialises as `<ClinicalDocument>`.
+
+Carrying `refines` is necessary but not sufficient for that rename. Pointing `type` at another
+published type covers two different things: profiling it, and merely reusing it as a base while
+naming an element of your own. AU does both — `asQualifiedEntity` declares `type` as AU's own
+`asQualifications`, but `Entity.asQualifiedEntity` and `Person.asQualifications` are two different
+elements on two different parents, and `templateId` declares `type` as the `II` datatype, which
+names no element at all. Renaming either would put another class's element on the wire.
+
+The serialiser separates the two by the characters in the name. HL7 V3 and CDA build every type and
+element name out of `[A-Za-z0-9_]` (`ClinicalDocument`, `templateId`, `IVXB_PQ`), so a name that
+contains anything else — the realm prefix in `au-ClinicalDocument` — cannot be an element name and
+must resolve through `refines`. A name that is already usable on the wire is kept. This declines
+rather than over-reaches: a package whose profile identifiers are plain names would simply stop
+being renamed.
+
+Every chain in the current packages resolves in a single hop; the serialiser walks `refines` to the
+end regardless, so a future refinement of a refinement needs no change here.
 
 `FhirProperty` is reused unchanged for all property-level metadata (type, cardinality,
 `xmlSerializedName`, `isArray`, `isRequired`, etc.).

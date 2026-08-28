@@ -12,6 +12,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
  * Its own `name` is a profile identifier, so stopping the walk here would emit `profile-middle` —
  * which is the failure the second loop iteration exists to prevent.
  *
+ * The hyphen in that name is load-bearing, not decoration: the resolver only follows `refines` past
+ * a definition whose name cannot be an element name, so renaming this to a plain identifier would
+ * halt the walk here and break the two-hop test rather than the one-hop one.
+ *
  * @see ChainedRefinementLeaf
  */
 #[LogicalModel(

@@ -46,12 +46,18 @@ trait LogicalModelLocatorTrait
      * definition states rather than inferred. A model that refines nothing carries no `refines` and
      * its own `name` is the element name — which is the common case, and every core CDA type.
      *
-     * Inference from the shape of `url` and `name` is deliberately not attempted. It is unsound on
-     * real upstream data: `au-Place` is published under the *core* HL7 URL
+     * `refines` alone does not settle it, though, because `type` naming another published type
+     * covers two different things: a profile of that type, and a definition that merely reuses it as
+     * its base while naming an element of its own. Only the first may take the refined type's name.
+     * {@see isElementName()} separates them, and the walk stops as soon as it reaches a definition
+     * that names an element.
+     *
+     * Inference from the shape of the *URL* is deliberately not attempted — it is unsound on real
+     * upstream data: `au-Place` is published under the *core* HL7 URL
      * (`http://hl7.org/cda/stds/core/StructureDefinition/au-Place`) despite refining core `Place`,
      * so no comparison of authorities can classify it, while AU's own `code` type derives from `CE`
      * without refining it and would be misread as a refinement. Both are decided correctly by
-     * `refines`.
+     * `refines` plus the name test.
      *
      * @param object|class-string|string $subject An instance or fully-qualified class name
      *
@@ -80,7 +86,7 @@ trait LogicalModelLocatorTrait
         // walk started rather than on what the definitions say.
         $seen = [$model->url => true];
 
-        while ($model->refines !== null && !isset($seen[$model->refines])) {
+        while (!self::isElementName($model->name) && $model->refines !== null && !isset($seen[$model->refines])) {
             $seen[$model->refines] = true;
             $refined               = self::ancestorDeclaring($class, $model->refines);
 
@@ -92,6 +98,37 @@ trait LogicalModelLocatorTrait
         }
 
         return $model->name;
+    }
+
+    /**
+     * Whether a StructureDefinition name is an element name in its own right, rather than a profile
+     * identifier standing in for one.
+     *
+     * A refinement may only take the refined type's name when its own name is not usable on the
+     * wire, and the two are told apart by the characters they are built from. HL7 V3 and CDA name
+     * every type and element out of `[A-Za-z0-9_]` — `ClinicalDocument`, `templateId`, `IVXB_PQ` —
+     * while the realm-prefixed profile identifiers published against them are not: no
+     * `xmlSerializedName` anywhere in the generated CDA models contains a character outside that
+     * set, so a name that does cannot be an element name.
+     *
+     * This is what keeps the walk off definitions that reuse another type without profiling it.
+     * `asQualifiedEntity` declares `type` as AU's own `asQualifications`, but both are real and
+     * *different* elements — `Entity.asQualifiedEntity` and `Person.asQualifications` — so following
+     * the link would emit another class's element. `templateId` declares `type` as the `II`
+     * datatype, and `II` names no element at all. Both keep their own name.
+     *
+     * The rule declines rather than over-reaches. A package whose profile identifiers happen to be
+     * plain names would stop being renamed and ship those identifiers, which is the behaviour from
+     * before `refines` existed — not a new way to emit the wrong element.
+     *
+     * @param string $name The StructureDefinition name from a #[LogicalModel] attribute
+     *
+     * @return bool True when the name may be written to the wire as-is
+     */
+    private static function isElementName(string $name): bool
+    {
+        // Every character drawn from the HL7 V3 name alphabet; anything else marks a profile identifier.
+        return preg_match('/^[A-Za-z0-9_]++$/', $name) === 1;
     }
 
     /**
