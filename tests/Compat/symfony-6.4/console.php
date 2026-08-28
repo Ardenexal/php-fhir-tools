@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 /*
  * Minimal console application that registers the two code-generation commands the way an
- * end-user project does, so they can be invoked against symfony/console 6.4 — the lowest
- * version ardenexal/fhir-code-generation declares support for.
+ * end-user project does, so they can be invoked against Symfony 6.4, the lowest version
+ * ardenexal/fhir-code-generation declares support for.
  *
  * The demo application cannot serve this purpose: demo/composer.json pins every Symfony
  * package to 7.4.*, and the monorepo root cannot install console 6.4 either because

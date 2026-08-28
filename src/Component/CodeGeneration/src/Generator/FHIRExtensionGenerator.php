@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterfac
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Method;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;
 
@@ -216,7 +217,7 @@ class FHIRExtensionGenerator
                 // Single concrete type: generate a named, typed property
                 $code      = $types[0]['code'] ?? 'string';
                 $phpType   = $this->resolvePhpType($code, $version, $context, $errorCollector);
-                $paramName = 'value' . u($code)->pascal()->toString();
+                $paramName = 'value' . StringCase::pascal($code);
                 $shortDesc = $valueElement['short'] ?? 'Value of extension';
 
                 if ($phpType !== 'bool' && $phpType !== 'int' && $phpType !== 'string') {
@@ -317,7 +318,7 @@ class FHIRExtensionGenerator
                 'fhirType'     => $code,
                 'propertyKind' => $this->resolvePropertyKindFromCode($code),
                 'phpType'      => ltrim($phpType, '\\'),
-                'jsonKey'      => 'value' . u($code)->pascal()->toString(),
+                'jsonKey'      => 'value' . StringCase::pascal($code),
             ];
         }
 
@@ -758,14 +759,14 @@ class FHIRExtensionGenerator
         $baseNs = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
 
         if (in_array($code, self::PRIMITIVE_TYPES, true)) {
-            $className = u($code)->pascal()->toString() . 'Primitive';
+            $className = StringCase::pascal($code) . 'Primitive';
 
             return "\\{$baseNs}\\Primitive\\{$className}";
         }
 
         // Fallback: produce a valid pascal-cased PHP identifier and warn so the user knows
         // this type could not be resolved (the package providing it may not be installed).
-        $className    = u($code)->pascal()->toString();
+        $className    = StringCase::pascal($code);
         $fallbackFqcn = "\\{$baseNs}\\DataType\\{$className}";
 
         $errorCollector?->addWarning(

@@ -1,16 +1,21 @@
 #!/usr/bin/env bash
 #
 # Acceptance checks for the fhir:generate / fhir:generate-ig commands against the installed
-# symfony/console version. Intended for the 6.4 lower bound, but it runs unchanged on 7.x,
-# which is what makes the two comparable.
+# Symfony versions. Intended for the 6.4 lower bound of every symfony/* package the component
+# constrains to ^6.4, but it runs unchanged on 7.x, which is what makes the two comparable.
 #
 # Usage:
-#   composer install --working-dir=tests/Compat/symfony-console-6.4
-#   tests/Compat/symfony-console-6.4/acceptance.sh [--with-generation]
+#   composer install --working-dir=tests/Compat/symfony-6.4
+#   tests/Compat/symfony-6.4/acceptance.sh [--with-generation]
 #
-# --with-generation additionally runs a real R4B generation, which needs network access and
-# writes into this harness's vendor/ardenexal/Models/ sandbox. Without it the script stays
-# offline and only exercises option parsing plus the guarded failure paths.
+# --with-generation additionally runs two real generations: R4B core through fhir:generate and
+# hl7.fhir.au.base through fhir:generate-ig. Both need network access and write into this
+# harness's vendor/ardenexal/Models/ sandbox. Without it the script stays offline and only
+# exercises option parsing plus the guarded failure paths.
+#
+# Both are run because they are separate pipelines reaching different generators: fhir:generate-ig
+# is the only one that exercises the profile and extension generators, and it is the invocation
+# the pascal() breakage was reported against.
 
 set -euo pipefail
 
@@ -46,16 +51,22 @@ run() {
     php console.php "$@" 2>&1 || true
 }
 
-console_version="$(php -r '
-    $packages = json_decode(file_get_contents("vendor/composer/installed.json"), true)["packages"];
-    foreach ($packages as $package) {
-        if ($package["name"] === "symfony/console") {
-            echo ltrim($package["version"], "v");
+installed_version() {
+    php -r '
+        $packages = json_decode(file_get_contents("vendor/composer/installed.json"), true)["packages"];
+        foreach ($packages as $package) {
+            if ($package["name"] === $argv[1]) {
+                echo ltrim($package["version"], "v");
+            }
         }
-    }
-')"
+    ' "$1"
+}
+
+console_version="$(installed_version symfony/console)"
+string_version="$(installed_version symfony/string)"
 
 echo "symfony/console ${console_version}"
+echo "symfony/string  ${string_version}"
 
 # Documents why this harness exists: on 6.4 these attribute classes are absent, so the
 # invokable-command style silently registers no options at all.
@@ -66,6 +77,19 @@ php -r '
     foreach (["AsCommand", "Option", "Argument", "Ask"] as $name) {
         $class = "Symfony\\Component\\Console\\Attribute\\" . $name;
         printf("  %-10s %s%s", $name, class_exists($class) ? "present" : "absent", PHP_EOL);
+    }
+'
+
+# The same disclosure for symfony/string. pascal() arrived in 7.3 and kebab() in 7.2, but the
+# component declares ^6.4|^7.0, so both are absent across 6.4 through 7.2. Calling either threw
+# on every StructureDefinition and produced no classes at all. Printed rather than asserted,
+# because the harness must stay runnable on 7.x for the output comparison below.
+echo
+echo "string method availability"
+php -r '
+    require "vendor/autoload.php";
+    foreach (["camel", "snake", "title", "pascal", "kebab"] as $method) {
+        printf("  %-10s %s%s", $method, method_exists("Symfony\\Component\\String\\AbstractString", $method) ? "present" : "absent", PHP_EOL);
     }
 '
 
@@ -170,12 +194,50 @@ if [[ "$WITH_GENERATION" -eq 1 ]]; then
     else
         fail "fhir:generate did not complete successfully"
     fi
+
+    # fhir:generate-ig runs the profile and extension generators, which the R4B run above never
+    # reaches, and it is the invocation the pascal() breakage was reported against (108 failed
+    # StructureDefinitions, no output directory).
+    #
+    # The error count is asserted alongside the file count, not just the exit status: both
+    # commands report per-definition failures and continue, so a partial outage still leaves a
+    # populated output directory behind. Under the pascal() bug fhir:generate exited non-zero
+    # having written 103 of its usual 1700 files, which a "did it write anything" check passes.
+    echo
+    echo "a real IG generation completes with no per-definition errors"
+    rm -rf vendor/ardenexal/Models
+    ig_output="$(run fhir:generate-ig --package=hl7.fhir.au.base)"
+    ig_errors="$(grep -c "IG_GENERATION_ERROR" <<<"$ig_output" || true)"
+
+    if [[ "$ig_errors" -eq 0 ]]; then
+        pass "no IG_GENERATION_ERROR lines"
+    else
+        fail "${ig_errors} IG_GENERATION_ERROR line(s):"
+        grep -m3 "IG_GENERATION_ERROR" <<<"$ig_output" | sed 's/^/        /'
+    fi
+
+    ig_generated="$(find vendor/ardenexal/Models -name '*.php' 2>/dev/null | wc -l)"
+    if [[ "$ig_generated" -gt 0 ]]; then
+        pass "generated ${ig_generated} IG PHP files with symfony/string ${string_version}"
+    else
+        fail "the IG output directory was never created or is empty"
+    fi
+
+    # Spot-checks the reason hl7.fhir.au.base is generated at all: au-ihi must come out as a
+    # constrained Identifier pinning the IHI namespace. A class-naming regression would move or
+    # rename this file rather than fail, so the path is asserted as well as the constant.
+    ihi_profile="vendor/ardenexal/Models/src/IG/R4/AuBase/Profile/AUIHIProfile.php"
+    if [[ -f "$ihi_profile" ]] && grep -q "http://ns.electronichealth.net.au/id/hi/ihi/1.0" "$ihi_profile"; then
+        pass "au-ihi generated AUIHIProfile with the pinned IHI system"
+    else
+        fail "expected ${ihi_profile} to pin http://ns.electronichealth.net.au/id/hi/ihi/1.0"
+    fi
 fi
 
 echo
 if [[ "$failures" -gt 0 ]]; then
-    echo "${failures} check(s) failed against symfony/console ${console_version}"
+    echo "${failures} check(s) failed against symfony/console ${console_version} + symfony/string ${string_version}"
     exit 1
 fi
 
-echo "all checks passed against symfony/console ${console_version}"
+echo "all checks passed against symfony/console ${console_version} + symfony/string ${string_version}"

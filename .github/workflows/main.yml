@@ -130,7 +130,7 @@ jobs:
     # brianium/paratest (a root dev dependency) requires ^7.4.7, so the "6.4.*" leg has always
     # installed console 7.x. That is why nothing here caught the generator commands being written
     # in Symfony's 7.3-only invokable style. The console lower bound is covered by the
-    # symfony-console-lower-bound job below, which installs the component standalone.
+    # symfony-lower-bound job below, which installs the component standalone.
     cross-version-test:
         runs-on: ubuntu-latest
         needs: quality-gate
@@ -159,10 +159,10 @@ jobs:
             -   name: Test bundle integration
                 run: composer run test:bundle
 
-    # Invokes both generator commands against symfony/console 6.4 — the lowest version
-    # ardenexal/fhir-code-generation declares. See tests/Compat/symfony-console-6.4/README.md and
+    # Invokes both generator commands against Symfony 6.4 — the lowest version
+    # ardenexal/fhir-code-generation declares. See tests/Compat/symfony-6.4/README.md and
     # the identical job in pr.yml, which is where this actually gates changes.
-    symfony-console-lower-bound:
+    symfony-lower-bound:
         runs-on: ubuntu-latest
         needs: quality-gate
         env:
@@ -176,17 +176,24 @@ jobs:
                     php-version: '8.3'
                     extensions: ctype, iconv, zip, curl
 
-            -   name: Install the symfony/console 6.4 consumer harness
-                run: composer install --working-dir=tests/Compat/symfony-console-6.4 --prefer-dist --no-progress
+            -   name: Install the Symfony 6.4 consumer harness
+                run: composer install --working-dir=tests/Compat/symfony-6.4 --prefer-dist --no-progress
 
-            -   name: Assert symfony/console 6.4 was actually installed
+            # Guards the guard, for every pinned package rather than just console. This job used
+            # to check console alone, so symfony/string floated to 7.4 under its own ^6.4|^7.0
+            # constraint and the acceptance run below — real generation included — passed against
+            # a string version that has pascal(), while every 6.4 consumer was dead on arrival.
+            -   name: Assert Symfony 6.4 was actually installed
                 run: |
-                    version="$(composer show --working-dir=tests/Compat/symfony-console-6.4 --format=json symfony/console | php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];')"
-                    echo "symfony/console ${version}"
-                    case "$version" in
-                      v6.4.*) ;;
-                      *) echo "expected a 6.4 release, got ${version}"; exit 1 ;;
-                    esac
+                    status=0
+                    for package in console dependency-injection filesystem finder http-client intl string validator; do
+                      version="$(composer show --working-dir=tests/Compat/symfony-6.4 --format=json "symfony/${package}" | php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];')"
+                      case "$version" in
+                        v6.4.*) echo "ok   symfony/${package} ${version}" ;;
+                        *) echo "FAIL symfony/${package} ${version} — expected a 6.4 release"; status=1 ;;
+                      esac
+                    done
+                    exit "$status"
 
-            -   name: Run the console 6.4 acceptance checks
-                run: tests/Compat/symfony-console-6.4/acceptance.sh --with-generation
+            -   name: Run the Symfony 6.4 acceptance checks
+                run: tests/Compat/symfony-6.4/acceptance.sh --with-generation

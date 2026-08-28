@@ -2,7 +2,7 @@
 
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
-use function Symfony\Component\String\u;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 class ClassNameResolver
 {
@@ -58,7 +58,7 @@ class ClassNameResolver
 
     public static function resolveClassName(string $definitionUrl, string $definitionName): string
     {
-        return self::DEFINITION_TO_CLASS_OVERRIDES[$definitionUrl] ?? u($definitionName)->pascal()->toString();
+        return self::DEFINITION_TO_CLASS_OVERRIDES[$definitionUrl] ?? StringCase::pascal($definitionName);
     }
 
     /**
@@ -89,7 +89,7 @@ class ClassNameResolver
         if (str_contains($definitionUrl, self::AU_CDA_NAMESPACE)) {
             $id   = substr($definitionUrl, (int) strrpos($definitionUrl, '/') + 1);
             $id   = (string) preg_replace('/^au-/i', '', $id);
-            $name = 'Au' . u($id)->pascal()->toString();
+            $name = 'Au' . StringCase::pascal($id);
         } else {
             $name = self::resolveClassName($definitionUrl, $definitionName);
         }
