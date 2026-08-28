@@ -263,7 +263,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     ) {
                         $items             = !array_is_list($value) ? [$value] : $value;
                         $denormalizedValue = $this->denormalizeExtensionArray($items, 'xml', $context);
-                    } elseif (is_string($value) && $value !== '' && $meta !== null && self::expectsComplexValue($meta)) {
+                    } elseif (is_string($value) && $meta !== null && self::expectsComplexValue($meta)) {
                         // An element whose content is only character data (`<name>Example Clinic</name>`)
                         // decodes to a bare PHP string, so there is no array for the object path to
                         // consume. Left alone it falls through to the builtin branch below and the raw
@@ -271,6 +271,15 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         // string, which the declaration cannot catch because the property is typed
                         // `array`. Build the object from the source DOM element instead, which is
                         // where the character data still lives in its original form.
+                        //
+                        // The empty string is included deliberately: `<name/>` and `<name></name>`
+                        // are present-but-empty elements, and excluding them left exactly the shape
+                        // above — `$organization->name[0]` was a string, so reading `->item` on it
+                        // warned and yielded null. They build an ON with no members, because an
+                        // empty element has no child nodes for the choice-group read to walk. Note
+                        // this is NOT the same as whitespace-only content: `<name> </name>` carries
+                        // a text node, which is content when nothing else is in the element, and
+                        // still comes back as a one-member group.
                         $denormalizedValue = $this->denormalizeCharacterDataElement(
                             $value,
                             $meta,
@@ -1283,8 +1292,16 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
         $xml     = $child->ownerDocument?->saveXML($child);
         $decoded = is_string($xml) ? $this->xmlEncoder->decode($xml, 'xml') : null;
+
+        // An element carrying no attributes and only text decodes to a bare string rather than an
+        // array — and that is the shape published CDA uses for every name and address part
+        // (`<family>Clinic</family>`). Returning the text here left the member a raw string while
+        // its variant declares a datatype class, so `$item->value->xmlText` warned and yielded
+        // null. Reshape it into the text-content form the target already reads, which is the same
+        // inverse denormalizeCharacterDataElement applies one level up. The string is still the
+        // fallback below when this does not produce an object.
         if (!is_array($decoded)) {
-            return $child->textContent;
+            $decoded = ['#' => $child->textContent];
         }
 
         /** @var class-string $phpType */

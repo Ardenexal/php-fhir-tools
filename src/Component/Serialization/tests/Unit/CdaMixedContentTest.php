@@ -233,6 +233,42 @@ final class CdaMixedContentTest extends TestCase
         ));
         self::assertSame('Example ', $items[0]->value);
         self::assertSame(' Pty', $items[2]->value);
+
+        // The element member is checked too, not just the text ones. Published CDA writes name
+        // parts as bare `<family>Clinic</family>` with no attributes, and an element in that shape
+        // decodes to a string rather than an array — so without this the member came back as a raw
+        // string while the variant declares ENXP, and `->value->xmlText` warned and yielded null.
+        self::assertInstanceOf(ENXP::class, $items[1]->value, 'an element member must build its declared variant type');
+        self::assertSame('Clinic', $items[1]->value->xmlText);
+    }
+
+    /**
+     * Round-tripping a bare element member is deliberately NOT byte-stable.
+     *
+     * `<family>Clinic</family>` now reads back as the `ENXP` its variant declares, and a
+     * denormalized model carries its constructor defaults — the post-instantiation pass fills every
+     * uninitialized property — so `ENXP`'s CDA schema defaults come back out as attributes. The
+     * output stays schema-valid and semantically identical.
+     *
+     * This is not new behaviour, only newly consistent: the array path has always done it, and an
+     * element written with one of the two attributes already gained the other on round-trip. The
+     * zero-attribute case merely looked stable while it was returning a raw string instead of the
+     * declared type. Pinned here so the shape is a decision rather than a later surprise.
+     */
+    public function testBareElementMemberRoundTripsWithItsSchemaDefaultAttributes(): void
+    {
+        $organization = $this->service()->deserializeFromXml(
+            '<Organization xmlns="' . self::V3 . '"><name>Example <family>Clinic</family> Pty</name></Organization>',
+            Organization::class,
+        );
+
+        self::assertInstanceOf(Organization::class, $organization);
+        self::assertSame(
+            '<Organization xmlns="' . self::V3 . '" classCode="ORG" determinerCode="INSTANCE">'
+            . '<name>Example <family representation="TXT" mediaType="text/plain">Clinic</family> Pty</name>'
+            . '</Organization>',
+            $this->serialize($organization),
+        );
     }
 
     /**
@@ -271,8 +307,51 @@ final class CdaMixedContentTest extends TestCase
     }
 
     /**
+     * A present-but-empty element is still an object, not a raw string.
+     *
+     * The bare-text branch was gated on a non-empty string, so `<name/>` skipped it and the empty
+     * string was assigned straight to the property — leaving `$organization->name[0]` holding a
+     * string inside a `list<ON>`. The declaration cannot catch that, because the property is typed
+     * `array`; it surfaces only as "Attempt to read property on string" at whoever reads `->item`.
+     *
+     * @param string $xml an Organization whose name element is present and empty
+     */
+    #[DataProvider('emptyNameProvider')]
+    public function testPresentButEmptyNameIsStillAnObject(string $xml): void
+    {
+        $organization = $this->service()->deserializeFromXml($xml, Organization::class);
+
+        self::assertInstanceOf(Organization::class, $organization);
+        self::assertCount(1, $organization->name);
+        self::assertInstanceOf(
+            ON::class,
+            $organization->name[0],
+            'an empty name must still build an ON, not leave a raw string in list<ON>',
+        );
+        self::assertSame([], $organization->name[0]->item, 'an empty element has no group members');
+    }
+
+    /**
+     * Both spellings of an empty element, which libxml reports identically but XmlEncoder does not.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function emptyNameProvider(): array
+    {
+        return [
+            'self-closing' => ['<Organization xmlns="' . self::V3 . '"><name/></Organization>'],
+            'empty pair'   => ['<Organization xmlns="' . self::V3 . '"><name></name></Organization>'],
+        ];
+    }
+
+    /**
      * The other side of that rule: whitespace that is the element's only content is content, since
      * there are no element members for it to be separating.
+     *
+     * Deliberately different from {@see self::testPresentButEmptyNameIsStillAnObject}, which wants
+     * NO members. Collapsing whitespace-only content to the empty string would make the two agree
+     * and break this one — the normalizer's bare-text branch admits the empty string but must not
+     * normalize whitespace into it.
      */
     public function testWhitespaceOnlyNameIsPreservedWhenItIsTheOnlyContent(): void
     {
