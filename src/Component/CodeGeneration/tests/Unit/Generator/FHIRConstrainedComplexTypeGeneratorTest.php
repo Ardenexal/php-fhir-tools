@@ -485,6 +485,100 @@ class FHIRConstrainedComplexTypeGeneratorTest extends TestCase
     /**
      * @return array<string, mixed>
      */
+    // -----------------------------------------------------------------
+    // Constructor parameter types — PHPStan level 8 compatibility
+    // -----------------------------------------------------------------
+
+    /**
+     * An array param is forwarded verbatim to a parent that declares it non-nullable, so
+     * declaring it `?array` advertises an argument the profile cannot pass on — PHPStan
+     * level 8 reports `argument.type` and passing null is a runtime TypeError.
+     */
+    public function testIterableParamMirrorsNonNullableParent(): void
+    {
+        $sd    = $this->loadFixture('AUIHI.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $param = $class->getMethod('__construct')->getParameter('extension');
+
+        self::assertSame('array', $param->getType());
+        self::assertFalse($param->isNullable(), 'extension must not be nullable: the parent declares array, not ?array');
+        self::assertSame([], $param->getDefaultValue());
+        self::assertStringNotContainsString('?array $extension', (string) $class);
+    }
+
+    /**
+     * PHP has no native generics, so level 8 needs the element type from a docblock
+     * (`missingType.iterableValue`). The shape must match the parent's `@var` exactly —
+     * `list<Extension>` against an `array<Extension>` parent trades one error for another.
+     */
+    public function testIterableParamCarriesElementTypeDocblock(): void
+    {
+        $sd       = $this->loadFixture('AUIHI.json');
+        $class    = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $comment  = (string) $class->getMethod('__construct')->getComment();
+
+        self::assertStringContainsString('@param array<Extension> $extension', $comment);
+    }
+
+    /**
+     * The docblock is resolved in the generated file's namespace, so the element type has to
+     * be imported or PHPStan swaps `missingType.iterableValue` for "class not found".
+     */
+    public function testIterableElementTypeIsImported(): void
+    {
+        $sd = $this->loadFixture('AUIHI.json');
+        $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+
+        self::assertContains(
+            'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension',
+            array_values($this->namespace->getUses()),
+        );
+    }
+
+    /**
+     * Generalises the extension case: no exposed param may be nullable unless the parent
+     * param it forwards to is, since the value goes straight through parent::__construct().
+     */
+    public function testNoParamWidensANonNullableParent(): void
+    {
+        $sd          = $this->loadFixture('AUIHI.json');
+        $class       = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $parentCtor  = (new \ReflectionClass(Identifier::class))->getConstructor();
+        self::assertNotNull($parentCtor);
+
+        $parentAllowsNull = [];
+
+        foreach ($parentCtor->getParameters() as $parentParam) {
+            $type                                        = $parentParam->getType();
+            $parentAllowsNull[$parentParam->getName()]   = $type === null || $type->allowsNull();
+        }
+
+        foreach ($class->getMethod('__construct')->getParameters() as $name => $param) {
+            self::assertArrayHasKey($name, $parentAllowsNull, "Unexpected param {$name}");
+
+            if ($parentAllowsNull[$name]) {
+                continue;
+            }
+
+            self::assertFalse(
+                $param->isNullable(),
+                "Param {$name} is nullable but forwards to a non-nullable parent parameter",
+            );
+        }
+    }
+
+    /**
+     * Guards the positional contract: `new AUIHIProfile('…')` must still set `value`.
+     */
+    public function testRequiredValueParamStaysFirst(): void
+    {
+        $sd         = $this->loadFixture('AUIHI.json');
+        $class      = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $paramNames = array_keys($class->getMethod('__construct')->getParameters());
+
+        self::assertSame('value', $paramNames[0] ?? null);
+    }
+
     private function loadFixture(string $filename): array
     {
         $path = self::FIXTURES_DIR . '/' . $filename;
