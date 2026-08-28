@@ -113,17 +113,17 @@ class FHIRModelGeneratorCommand extends Command
         'R4' => [
             'hl7.terminology.r4#7.0.0',
             'hl7.fhir.r4.core#4.0.1',
-            'hl7.fhir.uv.extensions.r4#5.2.0',
+            'hl7.fhir.uv.extensions.r4#5.3.0',
         ],
         'R4B' => [
             'hl7.terminology.r4b#6.0.2',
             'hl7.fhir.r4b.core#4.3.0',
-            'hl7.fhir.uv.extensions.r4b#5.2.0',
+            'hl7.fhir.uv.extensions.r4b#5.3.0',
         ],
         'R5' => [
             'hl7.terminology.r5#7.0.0',
             'hl7.fhir.r5.core#5.0.0',
-            'hl7.fhir.uv.extensions.r5#5.2.0',
+            'hl7.fhir.uv.extensions.r5#5.3.0',
         ],
     ];
 

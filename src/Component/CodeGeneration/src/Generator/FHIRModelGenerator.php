@@ -40,6 +40,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;
@@ -749,6 +750,10 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     private function trackProfileBindings(string $profileUrl, BuilderContextInterface $builderContext): void
     {
+        // Definitions are indexed under the bare canonical URL. A versioned `type.profile`
+        // reference misses silently, dropping every binding the profile declares.
+        $profileUrl = CanonicalUrl::stripVersion($profileUrl);
+
         // Try to resolve the profile StructureDefinition
         $profileDefinition = $builderContext->getDefinition($profileUrl);
 
@@ -1767,10 +1772,7 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     private function extractBaseValueSetUrl(string $valueSetUrl): string
     {
-        // Split on pipe character to separate URL from version
-        $urlParts = explode('|', $valueSetUrl);
-
-        return $urlParts[0];
+        return CanonicalUrl::stripVersion($valueSetUrl);
     }
 
     /**

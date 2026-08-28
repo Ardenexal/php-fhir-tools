@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
@@ -530,7 +531,7 @@ final class LogicalModelGenerator
         if (!is_string($valueSet) || $valueSet === '') {
             return null;
         }
-        $valueSet = explode('|', $valueSet)[0];
+        $valueSet = CanonicalUrl::stripVersion($valueSet);
 
         return $valueSetToEnumFqcn[$valueSet] ?? null;
     }

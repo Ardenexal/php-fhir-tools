@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Command;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\DefinitionOrderer;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRConstrainedComplexTypeGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator;
@@ -84,14 +85,27 @@ class FHIRIGGeneratorCommand extends Command
 
     /**
      * Base FHIR packages that must be loaded for type resolution, indexed by FHIR version.
-     * These are never written to disk — they only populate the BuilderContext types.
+     *
+     * These populate the BuilderContext, and {@see generateBaseExtensionsInMemory()} and
+     * {@see generateBaseProfilesInMemory()} also **write** classes derived from them into
+     * `Models/src/{version}/`. That directory belongs to `fhir:generate`, which clears and
+     * regenerates it wholesale, so these versions must match the ones `fhir:generate` uses.
+     *
+     * When they drift, this command writes classes `fhir:generate` does not produce, they get
+     * committed as generated output, and the next regen deletes them again. R4 extensions were
+     * pinned here at 5.2.0 while `fhir:generate` resolved 5.3.0, which produced two duplicate
+     * classes for URLs already covered: `PatAdoptionInfoExtension` alongside `AdoptionInfoExtension`
+     * (`patient-adoptionInfo`, whose 5.3.0 definition was dropped in favour of the one in
+     * `hl7.fhir.r4.core`) and `PatNoFixedAddressExtension` alongside `NoFixedAddressExtension`
+     * (`no-fixed-address`, renamed between 5.2.0 and 5.3.0). Two classes claiming one extension URL
+     * is exactly the collision {@see ClassNameResolver} exists to prevent.
      *
      * @var array<string, list<string>>
      */
     private const array BASE_PACKAGES = [
-        'R4'  => ['hl7.terminology.r4#7.0.0', 'hl7.fhir.r4.core#4.0.1', 'hl7.fhir.uv.extensions.r4#5.2.0'],
-        'R4B' => ['hl7.terminology.r4b#6.0.2', 'hl7.fhir.r4b.core#4.3.0', 'hl7.fhir.uv.extensions.r4b#5.2.0'],
-        'R5'  => ['hl7.terminology.r5#7.0.0', 'hl7.fhir.r5.core#5.0.0', 'hl7.fhir.uv.extensions.r5#5.2.0'],
+        'R4'  => ['hl7.terminology.r4#7.0.0', 'hl7.fhir.r4.core#4.0.1', 'hl7.fhir.uv.extensions.r4#5.3.0'],
+        'R4B' => ['hl7.terminology.r4b#6.0.2', 'hl7.fhir.r4b.core#4.3.0', 'hl7.fhir.uv.extensions.r4b#5.3.0'],
+        'R5'  => ['hl7.terminology.r5#7.0.0', 'hl7.fhir.r5.core#5.0.0', 'hl7.fhir.uv.extensions.r5#5.3.0'],
     ];
 
     /**
@@ -694,6 +708,11 @@ class FHIRIGGeneratorCommand extends Command
         // types that appear within the same package (e.g. an extension's value type is
         // another type defined in the same IG).
         $this->context[$version]->loadDefinitions($definitions);
+
+        // A profile is only registered in the context once generated, so a profile deriving from
+        // another profile in this same package must be generated after it. Package enumeration
+        // order does not guarantee that and varies by filesystem.
+        $definitions = DefinitionOrderer::byBaseDefinition($definitions);
 
         foreach ($definitions as $url => $def) {
             if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
