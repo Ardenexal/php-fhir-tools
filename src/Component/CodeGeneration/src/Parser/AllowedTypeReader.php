@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Parser;
 
-use function Symfony\Component\String\u;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 /**
  * Resolves the set of concrete FHIR types an OperationDefinition parameter may carry.
@@ -104,6 +104,6 @@ final class AllowedTypeReader
      */
     public static function jsonKeyFor(string $fhirType): string
     {
-        return 'value' . u($fhirType)->pascal()->toString();
+        return 'value' . StringCase::pascal($fhirType);
     }
 }

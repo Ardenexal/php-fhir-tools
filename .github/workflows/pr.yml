@@ -214,18 +214,25 @@ jobs:
                       exit 1
                     fi
 
-    # Exercises the LOWEST symfony/console version ardenexal/fhir-code-generation declares
-    # ("^6.4|^7.4"). Nothing did before, which is how both generator commands came to be written
-    # in Symfony's 7.3-only invokable style: Composer was satisfied, autoloading was satisfied,
-    # and PHPStan on a 7.x checkout saw nothing, because PHP does not resolve attribute classes
-    # until they are reflected. The commands still appeared in `list fhir` and only failed when a
-    # 6.4 consumer invoked them ("You must override the execute() method" / "The \"--package\"
-    # option does not exist").
+    # Exercises the LOWEST version of every symfony/* package ardenexal/fhir-code-generation
+    # constrains to ^6.4. Nothing did before, which is how the generator commands came to be written in
+    # Symfony's 7.3-only invokable style: Composer was satisfied, autoloading was satisfied, and
+    # PHPStan on a 7.x checkout saw nothing, because PHP does not resolve attribute classes until
+    # they are reflected. The commands still appeared in `list fhir` and only failed when a 6.4
+    # consumer invoked them ("You must override the execute() method" / "The \"--package\" option
+    # does not exist").
+    #
+    # The first version of this job pinned only symfony/console, which left the same class of bug
+    # live one layer down: symfony/string floated to 7.4 under its own ^6.4|^7.0 constraint, so
+    # the generators' AbstractString::pascal() calls (7.3+) resolved here while throwing "Call to
+    # undefined method" for every 6.4 consumer, on every StructureDefinition. A partial pin tests
+    # the lower bound of one package and the upper bound of the rest, so the harness now pins all
+    # of them and the assertion below covers each.
     #
     # This cannot run in the monorepo root or the demo app: brianium/paratest requires
     # symfony/console ^7.4.7, and demo/composer.json pins every Symfony package to 7.4.*. Hence
-    # the standalone consumer install under tests/Compat/symfony-console-6.4.
-    symfony-console-lower-bound:
+    # the standalone consumer install under tests/Compat/symfony-6.4.
+    symfony-lower-bound:
         runs-on: ubuntu-latest
         env:
             COMPOSER_NO_INTERACTION: 1
@@ -238,25 +245,34 @@ jobs:
                     php-version: '8.3'
                     extensions: ctype, iconv, zip, curl
 
-            -   name: Install the symfony/console 6.4 consumer harness
-                run: composer install --working-dir=tests/Compat/symfony-console-6.4 --prefer-dist --no-progress
+            -   name: Install the Symfony 6.4 consumer harness
+                run: composer install --working-dir=tests/Compat/symfony-6.4 --prefer-dist --no-progress
 
-            -   name: Assert symfony/console 6.4 was actually installed
-                # Guards the guard: if the constraint ever resolves to 7.x the acceptance checks
-                # below would pass while testing nothing.
+            -   name: Assert Symfony 6.4 was actually installed
+                # Guards the guard: if any constraint resolves to 7.x the acceptance checks below
+                # would pass while testing that package's upper bound instead of its lower one.
                 run: |
-                    version="$(composer show --working-dir=tests/Compat/symfony-console-6.4 --format=json symfony/console | php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];')"
-                    echo "symfony/console ${version}"
-                    case "$version" in
-                      v6.4.*) ;;
-                      *) echo "expected a 6.4 release, got ${version}"; exit 1 ;;
-                    esac
+                    status=0
+                    for package in console dependency-injection filesystem finder http-client intl string validator; do
+                      version="$(composer show --working-dir=tests/Compat/symfony-6.4 --format=json "symfony/${package}" | php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];')"
+                      case "$version" in
+                        v6.4.*) echo "ok   symfony/${package} ${version}" ;;
+                        *) echo "FAIL symfony/${package} ${version} — expected a 6.4 release"; status=1 ;;
+                      esac
+                    done
+                    exit "$status"
 
-            # --with-generation runs a real R4B generation into the harness's own vendor sandbox.
-            # A parse-only check would prove the options register but not that the pipeline behind
-            # them works on 6.4, and untested-lower-bound is exactly the failure being fixed.
-            -   name: Run the console 6.4 acceptance checks
-                run: tests/Compat/symfony-console-6.4/acceptance.sh --with-generation
+            # --with-generation runs real R4B and IG generations into the harness's own vendor
+            # sandbox. A parse-only check would prove the options register but not that the
+            # pipeline behind them works on 6.4, and untested-lower-bound is exactly the failure
+            # being fixed.
+            #
+            # The IG run is not redundant with the R4B one: it is the only thing that exercises
+            # the profile and extension generators. Note that the R4B run alone would have caught
+            # pascal() too, once symfony/string was actually pinned — the version pin above, not
+            # the extra invocation, is what closed that hole.
+            -   name: Run the Symfony 6.4 acceptance checks
+                run: tests/Compat/symfony-6.4/acceptance.sh --with-generation
 
     recipe-validation:
         runs-on: ubuntu-latest

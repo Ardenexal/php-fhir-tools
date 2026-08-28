@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRSliceDiscriminator;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;
 
@@ -247,7 +248,7 @@ class FHIRConstrainedComplexTypeGenerator
 
         $segment      = (string) u($baseDefinitionUrl)->afterLast('/');
         $baseNs       = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
-        $className    = u($segment)->pascal()->toString();
+        $className    = StringCase::pascal($segment);
         $fallbackFqcn = "{$baseNs}\\DataType\\{$className}";
 
         $errorCollector?->addWarning(
@@ -782,13 +783,13 @@ class FHIRConstrainedComplexTypeGenerator
         $baseNs = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
 
         if (in_array($fhirType, self::PRIMITIVE_TYPES, true)) {
-            $className = u($fhirType)->pascal()->toString() . 'Primitive';
+            $className = StringCase::pascal($fhirType) . 'Primitive';
 
             return "\\{$baseNs}\\Primitive\\{$className}";
         }
 
         // Assume DataType namespace for complex types
-        $className = u($fhirType)->pascal()->toString();
+        $className = StringCase::pascal($fhirType);
 
         return "\\{$baseNs}\\DataType\\{$className}";
     }

@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Validator\Constraints\Count;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;
 
@@ -581,7 +582,7 @@ class FHIRProfileGenerator
         // Fallback: derive class name from the URL segment
         $segment      = (string) u($baseDefinitionUrl)->afterLast('/');
         $baseNs       = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
-        $className    = u($segment)->pascal()->toString();
+        $className    = StringCase::pascal($segment);
         $fallbackFqcn = "{$baseNs}\\Resource\\{$className}Resource";
 
         $errorCollector?->addWarning(
