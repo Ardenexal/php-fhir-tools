@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Command;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\DefinitionOrderer;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRConstrainedComplexTypeGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator;
@@ -694,6 +695,11 @@ class FHIRIGGeneratorCommand extends Command
         // types that appear within the same package (e.g. an extension's value type is
         // another type defined in the same IG).
         $this->context[$version]->loadDefinitions($definitions);
+
+        // A profile is only registered in the context once generated, so a profile deriving from
+        // another profile in this same package must be generated after it. Package enumeration
+        // order does not guarantee that and varies by filesystem.
+        $definitions = DefinitionOrderer::byBaseDefinition($definitions);
 
         foreach ($definitions as $url => $def) {
             if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
