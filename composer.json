@@ -116,6 +116,7 @@
     "scripts": {
         "phpstan": "php ./vendor/bin/phpstan.phar analyse --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:bundle": "php ./vendor/bin/phpstan.phar analyse src/Bundle/ --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:ig": "php ./vendor/bin/phpstan.phar analyse --configuration=phpstan-ig.neon --memory-limit=-1 -v",
         "phpstan:codegen": "php ./vendor/bin/phpstan.phar analyse src/Component/CodeGeneration/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:serialization": "php ./vendor/bin/phpstan.phar analyse src/Component/Serialization/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:fhir-path": "php ./vendor/bin/phpstan.phar analyse src/Component/FHIRPath/ --configuration=phpstan.neon --memory-limit=-1 -v",
