@@ -10,11 +10,14 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Command;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRIGGeneratorCommand;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Three places pin FHIR package versions: `FHIRIGGeneratorCommand::BASE_PACKAGES`,
- * `FHIRModelGeneratorCommand::DEFAULT_IG_PACKAGES`, and the `generate-models-*` composer scripts.
+ * Four places pin FHIR package versions: `FHIRIGGeneratorCommand::BASE_PACKAGES`,
+ * `FHIRModelGeneratorCommand::DEFAULT_IG_PACKAGES`, `PackageLoader::KNOWN_PACKAGES` (the packages
+ * no registry serves, pinned to a tarball URL and hash), and the `generate-models-*` composer
+ * scripts.
  *
  * They must agree. `fhir:generate` clears and regenerates `Models/src/{version}` wholesale, while
  * `fhir:generate-ig` also writes into that same tree. When the pins drift, the IG command emits
@@ -127,18 +130,89 @@ class PackageVersionConsistencyTest extends TestCase
     }
 
     /**
+     * A composer script must not pin a registry-less package to a version other than the one
+     * `PackageLoader` knows how to fetch. `au.digitalhealth.cda.schema` is published by ADHA to a
+     * versioned URL rather than to any FHIR registry, so the loader holds the authoritative version
+     * beside its tarball and hash, and `generate-models-cda` repeats that version by hand.
+     *
+     * The command-defaults check above cannot catch this. `DEFAULT_IG_PACKAGES` and `BASE_PACKAGES`
+     * are keyed R4/R4B/R5 and name no CDA package, so both CDA pins fall straight through its
+     * `isset($defaults[$package])` guard and are never compared to anything. Drift here is silent
+     * and destructive: `fhir:generate` clears the output directory before the package error
+     * surfaces, so a stale pin deletes every generated CDA class and still exits 0.
+     *
+     * @return void
+     */
+    public function testComposerScriptsAgreeWithTheKnownPackagePins(): void
+    {
+        $known = self::knownPackagePins();
+        self::assertNotSame([], $known, 'PackageLoader::KNOWN_PACKAGES names no packages');
+
+        $compared = 0;
+
+        foreach (self::composerScriptPins() as $script => $pins) {
+            foreach ($pins as $package => $version) {
+                if (!isset($known[$package])) {
+                    continue;
+                }
+
+                ++$compared;
+                self::assertSame(
+                    $known[$package],
+                    $version,
+                    "Script '{$script}' pins '{$package}' at {$version}, but PackageLoader fetches {$known[$package]}",
+                );
+            }
+        }
+
+        // Without this the guard passes vacuously the moment the script is renamed or its package
+        // argument dropped — which is exactly the state it exists to detect.
+        self::assertGreaterThan(
+            0,
+            $compared,
+            'No generate-models-* script pins a KNOWN_PACKAGES entry, so this guard compared nothing',
+        );
+    }
+
+    /**
+     * Collect `package => version` from `PackageLoader::KNOWN_PACKAGES`.
+     *
+     * @return array<string, string> package name → the version whose tarball the loader pins
+     */
+    private static function knownPackagePins(): array
+    {
+        $pins = [];
+
+        foreach (self::constant(PackageLoader::class, 'KNOWN_PACKAGES') as $package => $spec) {
+            self::assertIsArray($spec, "KNOWN_PACKAGES entry '{$package}' must be a spec array");
+            self::assertArrayHasKey('version', $spec, "KNOWN_PACKAGES entry '{$package}' must pin a version");
+            self::assertIsString($spec['version'], "KNOWN_PACKAGES entry '{$package}' must pin a string version");
+            $pins[$package] = $spec['version'];
+        }
+
+        return $pins;
+    }
+
+    /**
      * Regenerating without running Pint leaves the whole tree formatted differently, which reads as
-     * thousands of changed files. Every generate script must chain the formatter.
+     * thousands of changed files. Every generate script must chain a formatter step.
+     *
+     * Any `@lint:*` step satisfies this — the CDA script chains `@lint:cda-models` because its
+     * output lands in `CdaModels/`, which `@lint:models` (scoped to `Models/`) does not cover.
      *
      * @return void
      */
     public function testEveryGenerateModelsScriptRunsThePintStep(): void
     {
         foreach (self::generateModelsScripts() as $name => $steps) {
-            self::assertContains(
-                '@lint:models',
+            $lintSteps = array_filter(
                 $steps,
-                "Script '{$name}' must run @lint:models, or a regen looks like a repo-wide diff",
+                static fn (string $step): bool => str_starts_with($step, '@lint:'),
+            );
+
+            self::assertNotEmpty(
+                $lintSteps,
+                "Script '{$name}' must chain a @lint: step, or a regen looks like a repo-wide diff",
             );
         }
     }

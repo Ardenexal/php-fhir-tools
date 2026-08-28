@@ -51,11 +51,11 @@ final class CdaChoiceGroupTest extends TestCase
         $datatype = 'Ardenexal\\FHIRTools\\Component\\CdaModels\\DataType\\';
 
         return [
-            'postal address'      => [$datatype . 'AD', 27],
-            'entity name'         => [$datatype . 'EN', 5],
-            'organisation name'   => [$datatype . 'ON', 5],
-            'person name'         => [$datatype . 'PN', 5],
-            'trivial name'        => [$datatype . 'TN', 5],
+            'postal address'      => [$datatype . 'AD', 28],
+            'entity name'         => [$datatype . 'EN', 6],
+            'organisation name'   => [$datatype . 'ON', 6],
+            'person name'         => [$datatype . 'PN', 6],
+            'trivial name'        => [$datatype . 'TN', 6],
         ];
     }
 

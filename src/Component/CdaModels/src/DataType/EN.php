@@ -69,6 +69,7 @@ class EN extends ANY
                     'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ENXP',
                     'jsonKey'      => 'suffix',
                 ],
+                ['fhirType' => 'string', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'xmlText'],
             ],
         )]
         public array $item = [],

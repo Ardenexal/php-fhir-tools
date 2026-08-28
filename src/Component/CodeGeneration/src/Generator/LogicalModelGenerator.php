@@ -424,11 +424,16 @@ final class LogicalModelGenerator
      * Build the variant list for a transparent choice group: one entry per direct child slice, keyed
      * by the child's local XML element name, which is the discriminator the serializer dispatches on.
      *
-     * Text-only slices are excluded. CDA declares one on each of these groups (`AD.item.xmlText` and
-     * its siblings) to carry character data between the element parts, but {@see ChoiceGroupItem}
-     * requires an element name and mixed element-and-text content has not been designed — emitting a
-     * variant for it would produce an `<xmlText>` element that is not in any CDA document. The
-     * boundary is documented on ChoiceGroupItem itself.
+     * These groups are mixed element-and-text, so one slice per group is character data rather than
+     * an element (`EN.item.xmlText`, `AD.item.xmlText`, …). It is marked by `representation: xmlText`
+     * — the same mechanism `xmlAttr` uses above — and gets a string variant under the reserved key
+     * {@see ChoiceGroupItem::TEXT_ELEMENT_NAME}, which the serializer emits as the parent's text
+     * content rather than as a child element. The group's own invariant treats it as a peer of the
+     * element slices (`EN-1`: `(delimiter | family | given | prefix | suffix | xmlText).count() = 1`).
+     *
+     * The marker is the only signal read. Matching on the slice's local name instead would silently
+     * capture a future element genuinely named `xmlText`; per the published CDA IG no element by
+     * that name appears in an instance, so the marked slice is unambiguous.
      *
      * @param array<mixed>          $siblings
      * @param array<string, string> $urlToFqcn
@@ -451,7 +456,19 @@ final class LogicalModelGenerator
             }
 
             $localName = self::propertyNameFromPath($siblingPath);
-            if ($localName === '' || $localName === 'xmlText') {
+            if ($localName === '') {
+                continue;
+            }
+
+            $representations = $sibling['representation'] ?? [];
+            if (is_array($representations) && in_array('xmlText', $representations, true)) {
+                $variants[] = [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'scalar',
+                    'phpType'      => 'string',
+                    'jsonKey'      => ChoiceGroupItem::TEXT_ELEMENT_NAME,
+                ];
+
                 continue;
             }
 

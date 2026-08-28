@@ -263,6 +263,31 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     ) {
                         $items             = !array_is_list($value) ? [$value] : $value;
                         $denormalizedValue = $this->denormalizeExtensionArray($items, 'xml', $context);
+                    } elseif (is_string($value) && $meta !== null && self::expectsComplexValue($meta)) {
+                        // An element whose content is only character data (`<name>Example Clinic</name>`)
+                        // decodes to a bare PHP string, so there is no array for the object path to
+                        // consume. Left alone it falls through to the builtin branch below and the raw
+                        // string is assigned to a complex-typed property — a `list<ON>` holding a
+                        // string, which the declaration cannot catch because the property is typed
+                        // `array`. Build the object from the source DOM element instead, which is
+                        // where the character data still lives in its original form.
+                        //
+                        // The empty string is included deliberately: `<name/>` and `<name></name>`
+                        // are present-but-empty elements, and excluding them left exactly the shape
+                        // above — `$organization->name[0]` was a string, so reading `->item` on it
+                        // warned and yielded null. They build an ON with no members, because an
+                        // empty element has no child nodes for the choice-group read to walk. Note
+                        // this is NOT the same as whitespace-only content: `<name> </name>` carries
+                        // a text node, which is content when nothing else is in the element, and
+                        // still comes back as a one-member group.
+                        $denormalizedValue = $this->denormalizeCharacterDataElement(
+                            $value,
+                            $meta,
+                            $property,
+                            $elementName,
+                            $sourceElement,
+                            $context,
+                        );
                     } elseif (is_array($value) && $meta !== null && $meta->phpItemClass !== null) {
                         $phpItemClass = $meta->phpItemClass;
                         $items        = $this->unwrapXmlValue($value, 'array');
@@ -1026,6 +1051,12 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      * into the element via buildDomFromArray (attributes + text content + any child elements),
      * interleaved with the other items in list order.
      *
+     * These groups are mixed element-and-text, so an item named ChoiceGroupItem::TEXT_ELEMENT_NAME
+     * is appended as a bare text node instead of an element — the text half of the content model
+     * (CDA `<name>Example Clinic</name>`). It goes into this same fragment, so text and elements
+     * interleave in list order and both survive; a scalar property alongside the group could not do
+     * that, because the '#' key it would write is the one this fragment already occupies.
+     *
      * Children are created WITHOUT an explicit namespace so that, once XmlEncoder imports the
      * fragment, they inherit the in-scope default namespace (e.g. urn:hl7-org:v3 declared on the
      * CDA root) — matching published CDA. Creating them with createElementNS() instead makes libxml
@@ -1045,29 +1076,59 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 continue;
             }
 
-            $element = $document->createElement($item->elementName);
-            $value   = $item->value;
+            $value = $item->value;
 
-            if (is_string($value)) {
+            if ($item->elementName === ChoiceGroupItem::TEXT_ELEMENT_NAME && is_string($value)) {
                 if ($value !== '') {
-                    $element->appendChild($document->createTextNode($value));
+                    $fragment->appendChild($document->createTextNode($value));
                 }
-            } else {
-                $normalized = $this->normalizer !== null
-                    ? $this->normalizer->normalize($value, 'xml', $context)
-                    : $this->normalizeBasicValue($value, 'xml', $context);
 
-                if (is_array($normalized)) {
-                    $this->buildDomFromArray($document, $element, $normalized);
-                } elseif (is_scalar($normalized)) {
-                    $element->appendChild($document->createTextNode((string) $normalized));
-                }
+                continue;
             }
 
+            $element = $document->createElement($item->elementName);
+            $this->fillChoiceGroupElement($document, $element, $value, $context);
             $fragment->appendChild($element);
         }
 
         return $fragment;
+    }
+
+    /**
+     * Populate one element member of a choice-group fragment: a string value becomes the element's
+     * text content; an object value is normalized through the serializer and built out via
+     * buildDomFromArray (attributes + text content + any child elements).
+     *
+     * @param \DOMDocument         $document The fragment's owner document, used to create nodes
+     * @param \DOMElement          $element  The member element to populate, already named
+     * @param object|string        $value    The ChoiceGroupItem's value
+     * @param array<string, mixed> $context  Serialization context for normalizing object values
+     *
+     * @return void The element is populated in place
+     */
+    private function fillChoiceGroupElement(
+        \DOMDocument $document,
+        \DOMElement $element,
+        object|string $value,
+        array $context,
+    ): void {
+        if (is_string($value)) {
+            if ($value !== '') {
+                $element->appendChild($document->createTextNode($value));
+            }
+
+            return;
+        }
+
+        $normalized = $this->normalizer !== null
+            ? $this->normalizer->normalize($value, 'xml', $context)
+            : $this->normalizeBasicValue($value, 'xml', $context);
+
+        if (is_array($normalized)) {
+            $this->buildDomFromArray($document, $element, $normalized);
+        } elseif (is_scalar($normalized)) {
+            $element->appendChild($document->createTextNode((string) $normalized));
+        }
     }
 
     /**
@@ -1076,6 +1137,12 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      * ChoiceGroupItem with the value denormalized to that variant's phpType. All element names map
      * to the one list property and append (no key-based dispatch) — this is the ordered read the
      * XmlEncoder-decoded array cannot provide.
+     *
+     * Inverse of the text half of the mixed content model (see buildChoiceGroupFragment): character
+     * data between the element members becomes a ChoiceGroupItem::TEXT_ELEMENT_NAME item, so
+     * `<name>Example Clinic</name>` reads back as text rather than as an empty name. Text is read
+     * straight off the DOM node here and does NOT go through denormalizeChoiceGroupValue — that
+     * method's builtin branch handles an element-wrapped string variant, which is a different case.
      *
      * @param list<PropertyVariantMetadata> $variants
      * @param array<string, mixed>          $context
@@ -1089,8 +1156,26 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             $variantByName[$variant->jsonKey] = $variant;
         }
 
+        $textIsAllowed = isset($variantByName[ChoiceGroupItem::TEXT_ELEMENT_NAME]);
+        $hasElements   = $this->hasChildElement($element);
+
         $items = [];
         foreach ($element->childNodes as $child) {
+            // \DOMCdataSection extends \DOMText, so CDATA sections are covered here too.
+            if ($child instanceof \DOMText) {
+                $text = $child->data;
+                // Whitespace separating element members is XML layout, not content: keeping it would
+                // turn a pretty-printed `<name>` into text/given/text/family/text. Whitespace is
+                // preserved when it is the element's ONLY content, where it cannot be layout.
+                if (!$textIsAllowed || $text === '' || ($hasElements && trim($text) === '')) {
+                    continue;
+                }
+
+                $items[] = ChoiceGroupItem::text($text);
+
+                continue;
+            }
+
             if (!$child instanceof \DOMElement) {
                 continue;
             }
@@ -1105,6 +1190,90 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         return $items;
+    }
+
+    /**
+     * Build a complex-typed property from an element whose content was only character data.
+     *
+     * The decoded value is a bare string, so the object is denormalized from the text-content array
+     * shape instead, with the element's own source DOM node threaded down. That node is what lets
+     * the target recover the text: a type with a scalar `xmlText` property picks it up from the '#'
+     * key, and a type whose content is a choice group rebuilds an ordered list carrying a
+     * ChoiceGroupItem::TEXT_ELEMENT_NAME member (CDA `<name>Example Clinic</name>` -> an ON holding
+     * one text member).
+     *
+     * @param string               $value         The element's character data
+     * @param PropertyMetadata     $meta          Declared metadata for the property being filled
+     * @param \ReflectionProperty  $property      The property being filled, for its declared type
+     * @param string               $elementName   Local XML name, used to re-find the source child
+     * @param \DOMElement|null     $sourceElement The parent's source element, when one was threaded in
+     * @param array<string, mixed> $context       Denormalization context
+     *
+     * @return object|list<object>|null The datatype object, wrapped in a list for a repeating property
+     */
+    private function denormalizeCharacterDataElement(
+        string $value,
+        PropertyMetadata $meta,
+        \ReflectionProperty $property,
+        string $elementName,
+        ?\DOMElement $sourceElement,
+        array $context,
+    ): object|array|null {
+        $targetClass = $meta->phpItemClass ?? $this->getPropertyType($property);
+        if ($targetClass === null || $this->isBuiltinType($targetClass) || $this->denormalizer === null) {
+            return null;
+        }
+
+        $sourceChild = $sourceElement !== null
+            ? ($this->childElementsByLocalName($sourceElement, $elementName)[0] ?? null)
+            : null;
+        if ($sourceChild !== null) {
+            $context[self::SOURCE_ELEMENT_CONTEXT_KEY] = $sourceChild;
+        }
+
+        /** @var class-string $targetClass guarded by the isBuiltinType check above */
+        $denormalized = $this->denormalizer->denormalize(['#' => $value], $targetClass, 'xml', $context);
+        if (!is_object($denormalized)) {
+            return null;
+        }
+
+        return $meta->isArray ? [$denormalized] : $denormalized;
+    }
+
+    /**
+     * True when a property's declared metadata targets a datatype object rather than a raw scalar,
+     * so an element that decoded to a bare string still has to be built into an object.
+     *
+     * `phpItemClass` covers a repeating complex property (`list<ON>`); `propertyKind: 'complex'`
+     * covers a single-valued one. Primitives are excluded deliberately — they are handled by
+     * denormalizePrimitiveProperty above and already carry their own text-content inverse.
+     *
+     * @param PropertyMetadata $meta The property's declared metadata
+     *
+     * @return bool Whether the decoded string needs re-shaping into a text-content array
+     */
+    private static function expectsComplexValue(PropertyMetadata $meta): bool
+    {
+        return $meta->phpItemClass !== null || $meta->propertyKind === 'complex';
+    }
+
+    /**
+     * True when the element has at least one child element, i.e. its content is element-bearing and
+     * any whitespace-only text between those children is layout rather than content.
+     *
+     * @param \DOMElement $element The choice-group parent whose children are being classified
+     *
+     * @return bool Whether any direct child is an element
+     */
+    private function hasChildElement(\DOMElement $element): bool
+    {
+        foreach ($element->childNodes as $child) {
+            if ($child instanceof \DOMElement) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1123,8 +1292,16 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
         $xml     = $child->ownerDocument?->saveXML($child);
         $decoded = is_string($xml) ? $this->xmlEncoder->decode($xml, 'xml') : null;
+
+        // An element carrying no attributes and only text decodes to a bare string rather than an
+        // array — and that is the shape published CDA uses for every name and address part
+        // (`<family>Clinic</family>`). Returning the text here left the member a raw string while
+        // its variant declares a datatype class, so `$item->value->xmlText` warned and yielded
+        // null. Reshape it into the text-content form the target already reads, which is the same
+        // inverse denormalizeCharacterDataElement applies one level up. The string is still the
+        // fallback below when this does not produce an object.
         if (!is_array($decoded)) {
-            return $child->textContent;
+            $decoded = ['#' => $child->textContent];
         }
 
         /** @var class-string $phpType */
