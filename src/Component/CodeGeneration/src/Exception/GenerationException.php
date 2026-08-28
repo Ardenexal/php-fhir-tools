@@ -173,6 +173,33 @@ class GenerationException extends \Exception
     }
 
     /**
+     * Create exception for a `baseDefinition` that resolves to no loadable class.
+     *
+     * Raised instead of emitting the derived FQCN as a best guess. A generated `extends` clause
+     * naming a class that does not exist is not a recoverable degradation: PHPStan treats it as a
+     * severe error and aborts analysis of the whole consuming project, so one unresolvable
+     * definition hides every other finding in the generated tree. Failing here keeps the error
+     * attached to the definition that caused it.
+     *
+     * @param string $baseDefinitionUrl The unresolvable `baseDefinition` canonical URL
+     * @param string $derivedFqcn       The FQCN derived from it, which does not exist
+     *
+     * @return self
+     */
+    public static function unresolvableBaseDefinition(string $baseDefinitionUrl, string $derivedFqcn): self
+    {
+        return new self(
+            "Could not resolve baseDefinition URL '{$baseDefinitionUrl}': derived class "
+            . "'{$derivedFqcn}' does not exist. Ensure the package providing this type is included "
+            . 'in your --package list.',
+            [
+                'base_definition_url' => $baseDefinitionUrl,
+                'derived_fqcn'        => $derivedFqcn,
+            ],
+        );
+    }
+
+    /**
      * Create exception for unsupported FHIR version
      *
      * @param string $version The unsupported version

@@ -17,6 +17,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Validator\Constraints\Count;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;
@@ -98,7 +100,7 @@ class FHIRProfileGenerator
         }
 
         // Resolve the parent class — may be a base FHIR type or an IG profile class
-        $parentFqcn = $this->resolveParentFqcn($baseDefinitionUrl, $version, $context, $errorCollector);
+        $parentFqcn = $this->resolveParentFqcn($baseDefinitionUrl, $version, $context);
         $class->setExtends('\\' . $parentFqcn);
         $namespace->addUse($parentFqcn);
 
@@ -560,39 +562,45 @@ class FHIRProfileGenerator
      *   2. BuilderContext resources — covers FHIR resource types
      *   3. Fallback: construct FQCN from the FHIR type name using known namespace conventions
      *
-     * When the fallback is used, a warning is recorded via the ErrorCollector so the caller
-     * can surface it to the user.
+     * The version suffix is stripped before any lookup: the context indexes definitions under
+     * their bare canonical URL, so a published IG's versioned `baseDefinition`
+     * (`.../StructureDefinition/Endpoint|4.0.1`) misses every index and falls through to the
+     * fallback, which then pascal-cases the suffix into the class name (`Endpoint401Resource`).
+     * {@see CanonicalUrl} for why that failure mode is worth guarding explicitly.
      *
-     * @throws \RuntimeException When the base definition cannot be resolved
+     * The fallback FQCN is only returned when the class actually exists. Emitting a name that
+     * cannot be loaded turns a clear generation-time error into a confusing downstream one —
+     * PHPStan reports it as a severe error and aborts the consuming project's entire analysis,
+     * which hides every other finding in the generated tree.
+     *
+     * @throws GenerationException When the base definition cannot be resolved to a real class
      */
-    private function resolveParentFqcn(string $baseDefinitionUrl, string $version, BuilderContext $context, ?ErrorCollector $errorCollector = null): string
+    private function resolveParentFqcn(string $baseDefinitionUrl, string $version, BuilderContext $context): string
     {
+        $bareUrl = CanonicalUrl::stripVersion($baseDefinitionUrl);
+
         // Try types first (covers DataType, Primitive, and IG profiles)
-        $info = $context->getType($baseDefinitionUrl);
+        $info = $context->getType($bareUrl);
         if ($info !== null) {
             return ltrim($info->fqcn, '\\');
         }
 
         // Try resources
-        $resourceInfo = $context->getResource($baseDefinitionUrl);
+        $resourceInfo = $context->getResource($bareUrl);
         if ($resourceInfo !== null) {
             return ltrim($resourceInfo->fqcn, '\\');
         }
 
-        // Fallback: derive class name from the URL segment
-        $segment      = (string) u($baseDefinitionUrl)->afterLast('/');
+        // Fallback: derive class name from the bare URL segment
+        $segment      = (string) u($bareUrl)->afterLast('/');
         $baseNs       = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
         $className    = StringCase::pascal($segment);
         $fallbackFqcn = "{$baseNs}\\Resource\\{$className}Resource";
 
-        $errorCollector?->addWarning(
-            "Could not resolve baseDefinition URL '{$baseDefinitionUrl}' — using fallback FQCN "
-            . "'{$fallbackFqcn}'. Ensure the package providing this type is included in your --package list.",
-            $baseDefinitionUrl,
-        );
+        if (!class_exists($fallbackFqcn)) {
+            throw GenerationException::unresolvableBaseDefinition($baseDefinitionUrl, $fallbackFqcn);
+        }
 
-        // Heuristic: if it looks like a resource (starts with uppercase and is known FHIR kind),
-        // put it in Resource/ with the Resource suffix. Otherwise DataType/.
         return $fallbackFqcn;
     }
 }

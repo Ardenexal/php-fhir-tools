@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
@@ -181,10 +182,17 @@ class FHIRProfileGeneratorTest extends TestCase
     }
 
     // -----------------------------------------------------------------
-    // Cross-package base definition: unresolvable URL → warning
+    // Cross-package base definition: unresolvable URL → hard failure
     // -----------------------------------------------------------------
 
-    public function testUnresolvableBaseDefinitionRecordsWarning(): void
+    /**
+     * An unresolvable baseDefinition used to be a warning plus an invented FQCN. The invented name
+     * was emitted into the `extends` clause of every affected class, and PHPStan reports a missing
+     * parent class as a *severe* error that aborts analysis of the entire consuming project — so one
+     * unresolvable definition silently hid every other finding in the generated tree. Failing at
+     * generation time keeps the error attached to the definition that caused it.
+     */
+    public function testUnresolvableBaseDefinitionThrows(): void
     {
         // A profile whose baseDefinition is from an unloaded external package
         $sd = [
@@ -197,14 +205,46 @@ class FHIRProfileGeneratorTest extends TestCase
             'baseDefinition' => 'http://hl7.org/fhir/uv/extensions/StructureDefinition/ext-patient-nationality',
         ];
 
+        $this->expectException(GenerationException::class);
+        $this->expectExceptionMessageMatches('/Could not resolve baseDefinition URL/');
+        $this->expectExceptionMessageMatches('/ext-patient-nationality/');
+
+        $this->generator->generate($sd, 'R4', $this->context, $this->namespace, new ErrorCollector());
+    }
+
+    /**
+     * Published IGs carry versioned canonicals (`.../Endpoint|4.0.1`). The context indexes
+     * definitions under the bare URL, so the version must be stripped before lookup. Without the
+     * strip the lookup missed and the fallback pascal-cased the suffix into the class name, emitting
+     * `…\Resource\Endpoint401Resource` — a class that does not exist.
+     */
+    public function testVersionedBaseDefinitionResolvesToUnversionedClass(): void
+    {
+        $sd = [
+            'resourceType'   => 'StructureDefinition',
+            'url'            => 'http://example.org/fhir/StructureDefinition/versioned-parent',
+            'name'           => 'VersionedParent',
+            'type'           => 'Patient',
+            'kind'           => 'resource',
+            'derivation'     => 'constraint',
+            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/Patient|4.0.1',
+        ];
+
         $errorCollector = new ErrorCollector();
-        $this->generator->generate($sd, 'R4', $this->context, $this->namespace, $errorCollector);
+        $class          = $this->generator->generate($sd, 'R4', $this->context, $this->namespace, $errorCollector);
 
-        self::assertTrue($errorCollector->hasWarnings(), 'Expected a warning for unresolvable baseDefinition URL');
+        self::assertFalse(
+            $errorCollector->hasWarnings(),
+            'A versioned baseDefinition must resolve, not fall through to the fallback',
+        );
 
-        $warnings = $errorCollector->getWarnings();
-        self::assertStringContainsString('Could not resolve baseDefinition URL', $warnings[0]['message']);
-        self::assertStringContainsString('ext-patient-nationality', $warnings[0]['message']);
+        $parent = (string) $class->getExtends();
+        self::assertDoesNotMatchRegularExpression(
+            '/\d/',
+            (string) preg_replace('/^.*\\\\R4\\\\/', '', $parent),
+            "Version suffix leaked into the parent class name: {$parent}",
+        );
+        self::assertTrue(class_exists($parent), "Emitted parent class does not exist: {$parent}");
     }
 
     public function testNoWarningWhenBaseDefinitionResolvesFromContext(): void

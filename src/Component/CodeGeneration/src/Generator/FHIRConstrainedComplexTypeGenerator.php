@@ -9,6 +9,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRSliceDiscriminator;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;
@@ -52,7 +54,7 @@ use function Symfony\Component\String\u;
  *             extension: $extension,
  *             use: $use,
  *             type: new CodeableConcept(...),
- *             system: new UriPrimitive(self::FIXED_SYSTEM),
+ *             system: new UriPrimitive(value: self::FIXED_SYSTEM),
  *             value: $value,
  *             period: $period,
  *             assigner: $assigner,
@@ -184,7 +186,7 @@ class FHIRConstrainedComplexTypeGenerator
         }
 
         // Resolve parent class — may be the base FHIR type or a previously generated IG profile
-        $parentFqcn = $this->resolveParentFqcn($baseDefinitionUrl, $version, $context, $errorCollector);
+        $parentFqcn = $this->resolveParentFqcn($baseDefinitionUrl, $version, $context);
         $class->setExtends('\\' . $parentFqcn);
         $namespace->addUse($parentFqcn);
 
@@ -228,34 +230,36 @@ class FHIRConstrainedComplexTypeGenerator
     /**
      * Resolve the FQCN of the parent class.
      *
-     * @see FHIRProfileGenerator::resolveParentFqcn() — same lookup logic
+     * @see FHIRProfileGenerator::resolveParentFqcn() — same lookup logic, including the
+     *      version strip and the class_exists() gate on the fallback
+     *
+     * @throws GenerationException When the base definition cannot be resolved to a real class
      */
     private function resolveParentFqcn(
         string $baseDefinitionUrl,
         string $version,
         BuilderContext $context,
-        ?ErrorCollector $errorCollector = null,
     ): string {
-        $info = $context->getType($baseDefinitionUrl);
+        $bareUrl = CanonicalUrl::stripVersion($baseDefinitionUrl);
+
+        $info = $context->getType($bareUrl);
         if ($info !== null) {
             return ltrim($info->fqcn, '\\');
         }
 
-        $resourceInfo = $context->getResource($baseDefinitionUrl);
+        $resourceInfo = $context->getResource($bareUrl);
         if ($resourceInfo !== null) {
             return ltrim($resourceInfo->fqcn, '\\');
         }
 
-        $segment      = (string) u($baseDefinitionUrl)->afterLast('/');
+        $segment      = (string) u($bareUrl)->afterLast('/');
         $baseNs       = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
         $className    = StringCase::pascal($segment);
         $fallbackFqcn = "{$baseNs}\\DataType\\{$className}";
 
-        $errorCollector?->addWarning(
-            "Could not resolve baseDefinition URL '{$baseDefinitionUrl}' — using fallback FQCN "
-            . "'{$fallbackFqcn}'. Ensure the package providing this type is included.",
-            $baseDefinitionUrl,
-        );
+        if (!class_exists($fallbackFqcn)) {
+            throw GenerationException::unresolvableBaseDefinition($baseDefinitionUrl, $fallbackFqcn);
+        }
 
         return $fallbackFqcn;
     }
@@ -577,7 +581,7 @@ class FHIRConstrainedComplexTypeGenerator
                 $namespace->addUse(ltrim($phpClass, '\\'));
                 $shortClass = (string) u($phpClass)->afterLast('\\');
 
-                return "new {$shortClass}(self::{$constantName})";
+                return "new {$shortClass}(value: self::{$constantName})";
             }
 
             // Scalar (bool/int/string) — just use the constant directly
@@ -670,7 +674,7 @@ class FHIRConstrainedComplexTypeGenerator
                 $namespace->addUse(ltrim($strClass, '\\'));
                 $shortStr = (string) u($strClass)->afterLast('\\');
                 $text     = addslashes($value['text']);
-                $args[]   = "text: new {$shortStr}('{$text}')";
+                $args[]   = "text: new {$shortStr}(value: '{$text}')";
             }
         }
 
@@ -706,21 +710,21 @@ class FHIRConstrainedComplexTypeGenerator
             $namespace->addUse(ltrim($uriClass, '\\'));
             $shortUri = (string) u($uriClass)->afterLast('\\');
             $system   = addslashes($coding['system']);
-            $args[]   = "system: new {$shortUri}('{$system}')";
+            $args[]   = "system: new {$shortUri}(value: '{$system}')";
         }
 
         if (isset($coding['code']) && is_string($coding['code']) && $codeClass !== null) {
             $namespace->addUse(ltrim($codeClass, '\\'));
             $shortCode = (string) u($codeClass)->afterLast('\\');
             $code      = addslashes($coding['code']);
-            $args[]    = "code: new {$shortCode}('{$code}')";
+            $args[]    = "code: new {$shortCode}(value: '{$code}')";
         }
 
         if (isset($coding['display']) && is_string($coding['display']) && $strClass !== null) {
             $namespace->addUse(ltrim($strClass, '\\'));
             $shortStr = (string) u($strClass)->afterLast('\\');
             $display  = addslashes($coding['display']);
-            $args[]   = "display: new {$shortStr}('{$display}')";
+            $args[]   = "display: new {$shortStr}(value: '{$display}')";
         }
 
         return "new {$shortClass}(" . implode(', ', $args) . ')';
