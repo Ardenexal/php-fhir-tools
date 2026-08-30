@@ -49,11 +49,11 @@ jobs:
                     extensions: ctype, iconv, zip
                     tools: composer-require-checker
 
-            # Sibling ardenexal/* packages are released together and the new (0.4.x) versions are
+            # Sibling ardenexal/* packages are released together and the new (0.5.x) versions are
             # not on Packagist yet, so resolve them from the in-repo source via path repositories.
-            # Each sibling carries a dev-main -> 0.4.x-dev branch-alias, so relax stability for this
+            # Each sibling carries a dev-main -> 0.5.x-dev branch-alias, so relax stability for this
             # isolation install only (the edits below land on the ephemeral CI checkout, never the
-            # committed manifest). Once 0.4.0 is tagged, siblings resolve as stable and these are no-ops.
+            # committed manifest). Once 0.5.0 is tagged, siblings resolve as stable and these are no-ops.
             -   name: Wire sibling path repositories
                 working-directory: ${{ matrix.path }}
                 run: |
@@ -69,8 +69,8 @@ jobs:
                         composer config "repositories.$key" path "$dir"
                         # Pin an explicit dev version on the sibling so detached-HEAD CI checkouts
                         # don't fall back to dev-<sha> (which the dev-main branch-alias can't match)
-                        # and the ^0.4 sibling constraints resolve. No-op once 0.4.0 is tagged.
-                        composer config version 0.4.x-dev --working-dir="$dir"
+                        # and the ^0.5 sibling constraints resolve. No-op once 0.5.0 is tagged.
+                        composer config version 0.5.x-dev --working-dir="$dir"
                     done
 
             -   name: Install in isolation (declared production deps only)

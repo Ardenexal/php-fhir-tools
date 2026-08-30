@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\Serialization\tests;
+namespace Ardenexal\FHIRTools\Component\Serialization\Tests;
 
 use Eris\Generator;
 

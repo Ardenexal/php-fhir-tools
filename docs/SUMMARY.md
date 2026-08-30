@@ -15,6 +15,7 @@
 * [Generating Implementation Guides](code-generation/implementation-guides.md)
 * [Generating Operation Classes](code-generation/operations.md)
 * [Generated Output Structure](code-generation/output-structure.md)
+* [Generating CDA Logical Models](code-generation/cda.md)
 
 ## Models
 

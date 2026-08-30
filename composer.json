@@ -83,6 +83,7 @@
             "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\": "src/Component/CodeGeneration/src/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\": "src/Component/Serialization/src/",
             "Ardenexal\\FHIRTools\\Component\\Models\\": "src/Component/Models/src/",
+            "Ardenexal\\FHIRTools\\Component\\CdaModels\\": "src/Component/CdaModels/src/",
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "src/Component/Metadata/src/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "src/Component/FHIRPath/src/",
             "Ardenexal\\FHIRTools\\Component\\Validation\\": "src/Component/Validation/src/"
@@ -97,6 +98,7 @@
             "Ardenexal\\FHIRTools\\Component\\Metadata\\Tests\\": "src/Component/Metadata/tests/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/",
             "Ardenexal\\FHIRTools\\Component\\Validation\\Tests\\": "src/Component/Validation/tests/",
+            "Ardenexal\\FHIRTools\\Component\\CdaModels\\Tests\\": "src/Component/CdaModels/tests/",
             "Ardenexal\\FHIRTools\\Benchmarks\\": "bench/",
             "App\\Mate\\": "mate/src/"
         }
@@ -114,6 +116,7 @@
     "scripts": {
         "phpstan": "php ./vendor/bin/phpstan.phar analyse --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:bundle": "php ./vendor/bin/phpstan.phar analyse src/Bundle/ --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:ig": "php ./vendor/bin/phpstan.phar analyse --configuration=phpstan-ig.neon --memory-limit=-1 -v",
         "phpstan:codegen": "php ./vendor/bin/phpstan.phar analyse src/Component/CodeGeneration/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:serialization": "php ./vendor/bin/phpstan.phar analyse src/Component/Serialization/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:fhir-path": "php ./vendor/bin/phpstan.phar analyse src/Component/FHIRPath/ --configuration=phpstan.neon --memory-limit=-1 -v",
@@ -128,6 +131,7 @@
         "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4",
         "lint:bundle": "php ./vendor/bin/pint src/Bundle/ -v --parallel --max-processes=4",
         "lint:models": "php ./vendor/bin/pint src/Component/Models -v",
+        "lint:cda-models": "php ./vendor/bin/pint src/Component/CdaModels -v",
         "lint:codegen": "php ./vendor/bin/pint src/Component/CodeGeneration/ -v --parallel --max-processes=4",
         "lint:serialization": "php ./vendor/bin/pint src/Component/Serialization/ -v --parallel --max-processes=4",
         "lint:fhir-path": "php ./vendor/bin/pint src/Component/FHIRPath/ -v --parallel --max-processes=4",
@@ -197,21 +201,26 @@
         "generate-ig-au-core": "php ./demo/bin/console fhir:generate-ig --package=hl7.fhir.au.base --package=hl7.fhir.au.core -vvv",
         "generate-ig-us-core": "php ./demo/bin/console fhir:generate-ig --package=hl7.fhir.us.core -vvv",
         "generate-models": "php ./demo/bin/console fhir:generate -vvv",
+        "generate-models-cda": [
+            "php ./demo/bin/console fhir:generate --package=hl7.cda.uv.core#2.0.2-sd --package=au.digitalhealth.cda.schema#1.0.1 -vvv",
+            "@lint:cda-models"
+        ],
         "generate-models-all": [
             "echo 'Generating FHIR R4 models...'",
-            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.uv.extensions.r4 --package=hl7.fhir.r4b.core --package=hl7.fhir.uv.extensions.r4b --package=hl7.fhir.r5.core --package=hl7.fhir.uv.extensions.r5 -vvv",
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core#4.0.1 --package=hl7.fhir.uv.extensions.r4#5.3.0 --package=hl7.fhir.r4b.core#4.3.0 --package=hl7.fhir.uv.extensions.r4b#5.3.0 --package=hl7.fhir.r5.core#5.0.0 --package=hl7.fhir.uv.extensions.r5#5.3.0 -vvv",
+            "@lint:models",
             "echo 'All FHIR models generated successfully!'"
         ],
         "generate-models-r4": [
-            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.uv.extensions.r4 -vvv",
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core#4.0.1 --package=hl7.fhir.uv.extensions.r4#5.3.0 -vvv",
             "@lint:models"
         ],
         "generate-models-r4b": [
-            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4b.core --package=hl7.fhir.uv.extensions.r4b -vvv",
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4b.core#4.3.0 --package=hl7.fhir.uv.extensions.r4b#5.3.0 -vvv",
             "@lint:models"
         ],
         "generate-models-r5": [
-            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r5.core --package=hl7.fhir.uv.extensions.r5 -vvv",
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r5.core#5.0.0 --package=hl7.fhir.uv.extensions.r5#5.3.0 -vvv",
             "@lint:models"
         ],
         "fix-newlines": "powershell -ExecutionPolicy Bypass -File scripts/fix-newlines.ps1",

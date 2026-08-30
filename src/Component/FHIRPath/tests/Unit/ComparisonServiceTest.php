@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\FHIRPath\tests\Unit;
+namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\ComparisonService;

@@ -1,0 +1,53 @@
+{
+    "name": "ardenexal/fhir-tools-console-64-compat",
+    "description": "Consumer harness that installs ardenexal/fhir-code-generation against the lowest declared symfony/console version.",
+    "type": "project",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../../src/Component/CodeGeneration",
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "ardenexal/fhir-code-generation": "0.5.999"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../../../src/Component/Metadata",
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "ardenexal/fhir-metadata": "0.5.999"
+                }
+            }
+        }
+    ],
+    "comment": [
+        "Every symfony/* package that ardenexal/fhir-code-generation declares at ^6.4 is pinned to",
+        "6.4.* here, not just the ones a given bug happened to involve. Pinning only console let",
+        "symfony/string float to 7.4 under its own ^6.4|^7.0 constraint, so the harness ran a real",
+        "generation against a string version that has pascal() (added in 7.3) and reported success",
+        "while every 6.4 consumer was failing on Call to undefined method. A partial pin tests the",
+        "lower bound of one package and the upper bound of the rest."
+    ],
+    "require": {
+        "php": ">=8.3",
+        "ardenexal/fhir-code-generation": "0.5.999",
+        "symfony/console": "6.4.*",
+        "symfony/dependency-injection": "6.4.*",
+        "symfony/filesystem": "6.4.*",
+        "symfony/finder": "6.4.*",
+        "symfony/http-client": "6.4.*",
+        "symfony/intl": "6.4.*",
+        "symfony/string": "6.4.*",
+        "symfony/validator": "6.4.*"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

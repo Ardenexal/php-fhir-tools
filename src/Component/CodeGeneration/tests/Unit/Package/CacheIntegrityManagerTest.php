@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Package;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Package;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\CacheIntegrityManager;

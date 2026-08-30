@@ -40,6 +40,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\CanonicalUrl;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;
 
@@ -474,7 +476,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 // Track ValueSet dependencies for complex elements with bindings
                 $this->trackValueSetDependencies($element, $builderContext);
 
-                $className = u($element['path'])->pascal()->toString();
+                $className = StringCase::pascal($element['path']);
 
                 // Determine if this is a backbone element or regular element
                 $isBackboneElement = isset($element['type'][0]['code']) && $element['type'][0]['code'] === 'BackboneElement';
@@ -748,6 +750,10 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     private function trackProfileBindings(string $profileUrl, BuilderContextInterface $builderContext): void
     {
+        // Definitions are indexed under the bare canonical URL. A versioned `type.profile`
+        // reference misses silently, dropping every binding the profile declares.
+        $profileUrl = CanonicalUrl::stripVersion($profileUrl);
+
         // Try to resolve the profile StructureDefinition
         $profileDefinition = $builderContext->getDefinition($profileUrl);
 
@@ -1437,7 +1443,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 'oid', 'id', 'markdown', 'unsignedInt', 'positiveInt', 'uuid', 'xhtml',
             ];
             $suffix    = in_array($code, $primitiveTypes, true) ? 'Primitive' : '';
-            $className = u($code)->pascal()->toString() . $suffix;
+            $className = StringCase::pascal($code) . $suffix;
 
             return $correctNamespace . '\\' . $className;
         } catch (\Throwable) {
@@ -1520,7 +1526,7 @@ class FHIRModelGenerator implements GeneratorInterface
     {
         // First, check if this type has already been generated and stored in the builder context
         // This ensures we use the actual namespace where the type was generated
-        $className  = u($code)->pascal()->toString();
+        $className  = StringCase::pascal($code);
         $storedType = $builderContext->getType($className);
         if ($storedType !== null) {
             return $storedType->namespace;
@@ -1766,10 +1772,7 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     private function extractBaseValueSetUrl(string $valueSetUrl): string
     {
-        // Split on pipe character to separate URL from version
-        $urlParts = explode('|', $valueSetUrl);
-
-        return $urlParts[0];
+        return CanonicalUrl::stripVersion($valueSetUrl);
     }
 
     /**
@@ -1961,7 +1964,7 @@ class FHIRModelGenerator implements GeneratorInterface
 
             if ($code === 'string') {
                 $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
-                $types[]          = '\\' . $correctNamespace . '\\' . u($code)->pascal() . 'Primitive';
+                $types[]          = '\\' . $correctNamespace . '\\' . StringCase::pascal($code) . 'Primitive';
                 $types[]          = 'string';
 
                 continue;
@@ -2024,7 +2027,7 @@ class FHIRModelGenerator implements GeneratorInterface
                         'oid', 'id', 'markdown', 'unsignedInt', 'positiveInt', 'uuid', 'xhtml',
                     ];
                     $suffix    = in_array($code, $primitiveTypes, true) ? 'Primitive' : '';
-                    $className = u($code)->pascal()->toString() . $suffix;
+                    $className = StringCase::pascal($code) . $suffix;
                     $types[]   = '\\' . $correctNamespace . '\\' . $className;
                 } catch (\Throwable $e) {
                     // Log the error but don't fail generation - the type may be resolved later

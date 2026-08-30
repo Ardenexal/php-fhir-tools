@@ -57,6 +57,35 @@ class PackageLoader
     private const VERSION_SEPARATOR = '_';
 
     /**
+     * Packages that are not published to any FHIR registry and must be fetched from a pinned
+     * build artifact instead of resolved via `packages.fhir.org`.
+     *
+     * `au.digitalhealth.cda.schema` is published by the Australian Digital Health Agency but not to
+     * any FHIR registry (`packages.fhir.org` and `packages.simplifier.net` both 404 on it — see
+     * CDA M4, re-confirmed 2026-08-28). We pin its tarball URL and sha256 so generation is
+     * reproducible WITHOUT committing the ~465KB binary to git: the tgz downloads into the
+     * gitignored `.fhir` cache and is verified against the pinned hash on download. A republish
+     * that changes the bytes fails loudly rather than silently shifting generated output.
+     *
+     * The tarball is the ADHA implementer release, NOT the build.fhir.org CI artifact this used to
+     * point at. That artifact is a continuous build whose bytes drift under a fixed version number:
+     * its hash moved off the pin (to 27df4447…), which took CDA regeneration down entirely, because
+     * `fhir:generate` clears the output directory before the package error surfaces — deleting every
+     * `Au*` class and still exiting 0. The release URL is versioned content from the publisher, so
+     * a hash change there is a genuine republish worth failing on.
+     *
+     * @var array<string, array{version: string, tarball: string, sha256: string, fhirVersion: string}>
+     */
+    private const array KNOWN_PACKAGES = [
+        'au.digitalhealth.cda.schema' => [
+            'version'     => '1.0.1',
+            'tarball'     => 'https://implementer.digitalhealth.gov.au/fhir/cda-au-schema/1.0.1/package.tgz',
+            'sha256'      => '497a76e33fdacda8539d8d4da70561525f34067f15d9313c3c07e0dd626c95b9',
+            'fhirVersion' => '5.0.0',
+        ],
+    ];
+
+    /**
      * Retry handler for resilient network operations
      *
      * @var RetryHandler
@@ -230,18 +259,25 @@ class PackageLoader
                 throw PackageException::packageNotAvailableOffline($packageName, $version);
             }
 
-            // Resolve version if not specified (requires network)
-            if ($version === null) {
-                $availableVersions = $this->getAvailableVersions($packageName, $registry ?? self::DEFAULT_REGISTRY);
-                $version           = $this->versionResolver->getLatestVersion($availableVersions);
-            } elseif ($this->versionResolver->isValidConstraint($version)) {
-                // Resolve version constraint
-                $availableVersions = $this->getAvailableVersions($packageName, $registry ?? self::DEFAULT_REGISTRY);
-                $version           = $this->versionResolver->resolveBestVersion($version, $availableVersions);
-            }
+            if (isset(self::KNOWN_PACKAGES[$packageName])) {
+                // Registry-less package (M4): use the pinned build artifact. Forces the pinned
+                // version and skips registry resolution, which would 404 for these packages.
+                $packageMetadata = $this->buildKnownPackageMetadata($packageName);
+                $version         = $packageMetadata->getVersion();
+            } else {
+                // Resolve version if not specified (requires network)
+                if ($version === null) {
+                    $availableVersions = $this->getAvailableVersions($packageName, $registry ?? self::DEFAULT_REGISTRY);
+                    $version           = $this->versionResolver->getLatestVersion($availableVersions);
+                } elseif ($this->versionResolver->isValidConstraint($version)) {
+                    // Resolve version constraint
+                    $availableVersions = $this->getAvailableVersions($packageName, $registry ?? self::DEFAULT_REGISTRY);
+                    $version           = $this->versionResolver->resolveBestVersion($version, $availableVersions);
+                }
 
-            // Get package metadata from registry
-            $packageMetadata = $this->getPackageMetadata($packageName, $version, $registry ?? self::DEFAULT_REGISTRY);
+                // Get package metadata from registry
+                $packageMetadata = $this->getPackageMetadata($packageName, $version, $registry ?? self::DEFAULT_REGISTRY);
+            }
 
             // Check if package is already cached with integrity verification
             if ($this->isPackageCachedWithIntegrity($packageMetadata)) {
@@ -258,6 +294,13 @@ class PackageLoader
 
             // Download and install package
             $this->downloadAndInstallPackage($packageMetadata, $registry ?? self::DEFAULT_REGISTRY);
+
+            // For pinned registry-less packages, verify the freshly downloaded tarball against the
+            // pinned sha256 before it is trusted — guards against a mutable CI build silently
+            // changing generated output.
+            if (isset(self::KNOWN_PACKAGES[$packageName])) {
+                $this->verifyPinnedChecksum($packageName);
+            }
 
             // Resolve dependencies if requested
             if ($resolveDeps) {
@@ -423,6 +466,43 @@ class PackageLoader
         } catch (ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
             throw PackageException::packageNotFound($packageName, $version);
         }
+    }
+
+    /**
+     * Build {@see PackageMetadata} for a registry-less pinned package ({@see KNOWN_PACKAGES})
+     * without any registry round-trip. The tarball URL and version come from the pinned entry;
+     * the raw FHIR version is normalized by {@see PackageMetadata::fromPackageData()}.
+     */
+    private function buildKnownPackageMetadata(string $packageName): PackageMetadata
+    {
+        $known = self::KNOWN_PACKAGES[$packageName];
+
+        return PackageMetadata::fromPackageData([
+            'name'         => $packageName,
+            'version'      => $known['version'],
+            'url'          => $known['tarball'],
+            'fhirVersions' => [$known['fhirVersion']],
+        ]);
+    }
+
+    /**
+     * Verify the cached tarball of a pinned registry-less package ({@see KNOWN_PACKAGES}) matches
+     * its pinned sha256. Throws if the artifact has drifted from the pin (e.g. the mutable CI
+     * build was republished), so generated output can never silently change underneath the pin.
+     *
+     * @throws PackageException When the downloaded artifact does not match the pinned checksum
+     */
+    private function verifyPinnedChecksum(string $packageName): void
+    {
+        $known       = self::KNOWN_PACKAGES[$packageName];
+        $packageFile = $this->getPackageCachePath($packageName, $known['version']) . '.tgz';
+        $actual      = $this->integrityManager->generateChecksum($packageFile);
+
+        if (!hash_equals($known['sha256'], $actual)) {
+            throw PackageException::invalidPackageFormat($packageName, "pinned sha256 mismatch: expected {$known['sha256']}, got {$actual} (the build artifact at {$known['tarball']} has changed; verify the new build " . 'and update the pin in KNOWN_PACKAGES)');
+        }
+
+        $this->logger->info("Verified pinned checksum for {$packageName}@{$known['version']}");
     }
 
     /**

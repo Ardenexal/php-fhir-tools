@@ -9,6 +9,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRSliceDiscriminator;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\CanonicalUrl;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;
 
@@ -51,7 +54,7 @@ use function Symfony\Component\String\u;
  *             extension: $extension,
  *             use: $use,
  *             type: new CodeableConcept(...),
- *             system: new UriPrimitive(self::FIXED_SYSTEM),
+ *             system: new UriPrimitive(value: self::FIXED_SYSTEM),
  *             value: $value,
  *             period: $period,
  *             assigner: $assigner,
@@ -92,6 +95,24 @@ class FHIRConstrainedComplexTypeGenerator
         'http://hl7.org/fhirpath/System.Decimal' => 'string',
         'http://hl7.org/fhirpath/System.String'  => 'string',
     ];
+
+    /**
+     * Docblock type names that are not class names and therefore need no import.
+     *
+     * @var list<string>
+     */
+    private const array DOC_BUILTIN_TYPES = [
+        'string', 'int', 'float', 'bool', 'mixed', 'null', 'array', 'object', 'callable',
+        'iterable', 'scalar', 'true', 'false', 'self', 'static', 'class-string',
+        'non-empty-string', 'numeric-string', 'positive-int', 'negative-int', 'int-mask',
+    ];
+
+    /**
+     * Per-file map of short class name => FQCN, parsed from the file's use statements.
+     *
+     * @var array<string, array<string, string>>
+     */
+    private array $useMapCache = [];
 
     /**
      * Determine whether a StructureDefinition has any fixed[x] or pattern[x] constraints
@@ -183,7 +204,7 @@ class FHIRConstrainedComplexTypeGenerator
         }
 
         // Resolve parent class — may be the base FHIR type or a previously generated IG profile
-        $parentFqcn = $this->resolveParentFqcn($baseDefinitionUrl, $version, $context, $errorCollector);
+        $parentFqcn = $this->resolveParentFqcn($baseDefinitionUrl, $version, $context);
         $class->setExtends('\\' . $parentFqcn);
         $namespace->addUse($parentFqcn);
 
@@ -227,34 +248,36 @@ class FHIRConstrainedComplexTypeGenerator
     /**
      * Resolve the FQCN of the parent class.
      *
-     * @see FHIRProfileGenerator::resolveParentFqcn() — same lookup logic
+     * @see FHIRProfileGenerator::resolveParentFqcn() — same lookup logic, including the
+     *      version strip and the class_exists() gate on the fallback
+     *
+     * @throws GenerationException When the base definition cannot be resolved to a real class
      */
     private function resolveParentFqcn(
         string $baseDefinitionUrl,
         string $version,
         BuilderContext $context,
-        ?ErrorCollector $errorCollector = null,
     ): string {
-        $info = $context->getType($baseDefinitionUrl);
+        $bareUrl = CanonicalUrl::stripVersion($baseDefinitionUrl);
+
+        $info = $context->getType($bareUrl);
         if ($info !== null) {
             return ltrim($info->fqcn, '\\');
         }
 
-        $resourceInfo = $context->getResource($baseDefinitionUrl);
+        $resourceInfo = $context->getResource($bareUrl);
         if ($resourceInfo !== null) {
             return ltrim($resourceInfo->fqcn, '\\');
         }
 
-        $segment      = (string) u($baseDefinitionUrl)->afterLast('/');
+        $segment      = (string) u($bareUrl)->afterLast('/');
         $baseNs       = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
-        $className    = u($segment)->pascal()->toString();
+        $className    = StringCase::pascal($segment);
         $fallbackFqcn = "{$baseNs}\\DataType\\{$className}";
 
-        $errorCollector?->addWarning(
-            "Could not resolve baseDefinition URL '{$baseDefinitionUrl}' — using fallback FQCN "
-            . "'{$fallbackFqcn}'. Ensure the package providing this type is included.",
-            $baseDefinitionUrl,
-        );
+        if (!class_exists($fallbackFqcn)) {
+            throw GenerationException::unresolvableBaseDefinition($baseDefinitionUrl, $fallbackFqcn);
+        }
 
         return $fallbackFqcn;
     }
@@ -476,9 +499,15 @@ class FHIRConstrainedComplexTypeGenerator
 
             // Variable param: expose it as a constructor parameter
             $phpType    = $this->resolveParamPhpType($param);
-            $isRequired = isset($minCardinality[$paramName]) && $minCardinality[$paramName] >= 1
-                                                             && !$param->isVariadic()
-                                                             && $phpType !== 'array';
+            $parentType = $param->getType();
+            $allowsNull = $parentType === null || $parentType->allowsNull();
+
+            // A parent param that is neither nullable nor defaulted has no safe default to
+            // synthesise here, so it stays required whatever the profile's cardinality says.
+            $isRequired = (isset($minCardinality[$paramName]) && $minCardinality[$paramName] >= 1
+                                                              && !$param->isVariadic()
+                                                              && $phpType !== 'array')
+                || (!$allowsNull && !$param->isDefaultValueAvailable() && !$param->isVariadic());
 
             $varData = [
                 'name'       => $paramName,
@@ -504,20 +533,42 @@ class FHIRConstrainedComplexTypeGenerator
             /** @var \ReflectionParameter $reflParam */
             $reflParam  = $varData['param'];
 
+            $parentType = $reflParam->getType();
+            $allowsNull = $parentType === null || $parentType->allowsNull();
+
             $p = $constructor->addParameter($paramName)->setType($phpType);
 
             if (!$isRequired) {
-                $p->setNullable(str_contains($phpType, '|null') === false && !str_starts_with($phpType, '?'));
+                // Mirror the parent's nullability. The value is forwarded straight into
+                // parent::__construct(), so widening a non-nullable parent param to nullable
+                // would advertise an argument this class cannot actually pass on.
+                $p->setNullable(
+                    $allowsNull
+                    && str_contains($phpType, '|null') === false
+                    && !str_starts_with($phpType, '?'),
+                );
 
-                if ($phpType === 'array') {
-                    $p->setDefaultValue([]);
-                } elseif (!str_contains($phpType, 'array')) {
-                    // Carry over the parent's default if available, otherwise null
-                    try {
-                        $p->setDefaultValue($reflParam->isDefaultValueAvailable() ? $reflParam->getDefaultValue() : null);
-                    } catch (\ReflectionException) {
-                        $p->setDefaultValue(null);
+                // Carry over the parent's default if available, otherwise null
+                try {
+                    $p->setDefaultValue($reflParam->isDefaultValueAvailable() ? $reflParam->getDefaultValue() : null);
+                } catch (\ReflectionException) {
+                    $p->setDefaultValue(null);
+                }
+            }
+
+            // PHP has no native generics, so an iterable param loses its element type in the
+            // signature. Mirror the parent's docblock so consumers on PHPStan level 8 keep it.
+            if ($this->isIterablePhpType($phpType)) {
+                $docType = $this->resolveIterableDocType($reflParam, $namespace);
+
+                if ($docType !== null) {
+                    // The docblock narrows the native type, so it has to keep the null the
+                    // signature admits — otherwise the `= null` default contradicts it.
+                    if ($p->isNullable()) {
+                        $docType .= '|null';
                     }
+
+                    $constructor->addComment("@param {$docType} \${$paramName}");
                 }
             }
 
@@ -576,7 +627,7 @@ class FHIRConstrainedComplexTypeGenerator
                 $namespace->addUse(ltrim($phpClass, '\\'));
                 $shortClass = (string) u($phpClass)->afterLast('\\');
 
-                return "new {$shortClass}(self::{$constantName})";
+                return "new {$shortClass}(value: self::{$constantName})";
             }
 
             // Scalar (bool/int/string) — just use the constant directly
@@ -669,7 +720,7 @@ class FHIRConstrainedComplexTypeGenerator
                 $namespace->addUse(ltrim($strClass, '\\'));
                 $shortStr = (string) u($strClass)->afterLast('\\');
                 $text     = addslashes($value['text']);
-                $args[]   = "text: new {$shortStr}('{$text}')";
+                $args[]   = "text: new {$shortStr}(value: '{$text}')";
             }
         }
 
@@ -705,21 +756,21 @@ class FHIRConstrainedComplexTypeGenerator
             $namespace->addUse(ltrim($uriClass, '\\'));
             $shortUri = (string) u($uriClass)->afterLast('\\');
             $system   = addslashes($coding['system']);
-            $args[]   = "system: new {$shortUri}('{$system}')";
+            $args[]   = "system: new {$shortUri}(value: '{$system}')";
         }
 
         if (isset($coding['code']) && is_string($coding['code']) && $codeClass !== null) {
             $namespace->addUse(ltrim($codeClass, '\\'));
             $shortCode = (string) u($codeClass)->afterLast('\\');
             $code      = addslashes($coding['code']);
-            $args[]    = "code: new {$shortCode}('{$code}')";
+            $args[]    = "code: new {$shortCode}(value: '{$code}')";
         }
 
         if (isset($coding['display']) && is_string($coding['display']) && $strClass !== null) {
             $namespace->addUse(ltrim($strClass, '\\'));
             $shortStr = (string) u($strClass)->afterLast('\\');
             $display  = addslashes($coding['display']);
-            $args[]   = "display: new {$shortStr}('{$display}')";
+            $args[]   = "display: new {$shortStr}(value: '{$display}')";
         }
 
         return "new {$shortClass}(" . implode(', ', $args) . ')';
@@ -782,13 +833,13 @@ class FHIRConstrainedComplexTypeGenerator
         $baseNs = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
 
         if (in_array($fhirType, self::PRIMITIVE_TYPES, true)) {
-            $className = u($fhirType)->pascal()->toString() . 'Primitive';
+            $className = StringCase::pascal($fhirType) . 'Primitive';
 
             return "\\{$baseNs}\\Primitive\\{$className}";
         }
 
         // Assume DataType namespace for complex types
-        $className = u($fhirType)->pascal()->toString();
+        $className = StringCase::pascal($fhirType);
 
         return "\\{$baseNs}\\DataType\\{$className}";
     }
@@ -846,6 +897,165 @@ class FHIRConstrainedComplexTypeGenerator
         }
 
         return $this->reflectionTypeToString($type);
+    }
+
+    /**
+     * Whether a native type string contains an array/iterable member.
+     */
+    private function isIterablePhpType(string $phpType): bool
+    {
+        foreach (explode('|', str_replace('?', '', $phpType)) as $part) {
+            if (in_array(trim($part), ['array', 'iterable'], true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Recover the element type of an iterable parameter from the parent's docblock.
+     *
+     * PHP cannot express `array<Extension>` natively, so the base models carry it in a
+     * `@var` docblock on the promoted property. Mirroring that shape exactly keeps the
+     * generated `@param` in agreement with the parameter it forwards to — a `list<>` here
+     * against an `array<>` there would trade one PHPStan error for another.
+     *
+     * Returns null when the element type cannot be resolved to an importable class, since
+     * a wrong docblock is worse than a missing one.
+     */
+    private function resolveIterableDocType(\ReflectionParameter $param, PhpNamespace $namespace): ?string
+    {
+        $declaringClass = $param->getDeclaringClass();
+
+        if ($declaringClass === null) {
+            return null;
+        }
+
+        try {
+            $property = $declaringClass->getProperty($param->getName());
+        } catch (\ReflectionException) {
+            return null;
+        }
+
+        $docComment = $property->getDocComment();
+
+        if ($docComment === false
+            || preg_match('/@var\s+(array|list|iterable)<([^<>]+)>/', $docComment, $matches) !== 1
+        ) {
+            return null;
+        }
+
+        // Resolve short names against the class that declares the property, not the parent
+        // being extended — a profile deriving from another profile inherits the docblock but
+        // not its namespace or imports.
+        $source     = $property->getDeclaringClass();
+        $resolved   = [];
+
+        foreach (explode('|', $matches[2]) as $part) {
+            $part = trim($part);
+
+            if ($part === '') {
+                return null;
+            }
+
+            if (in_array(strtolower($part), self::DOC_BUILTIN_TYPES, true)) {
+                $resolved[] = strtolower($part);
+                continue;
+            }
+
+            $fqcn = $this->resolveDocClassName($part, $source);
+
+            if ($fqcn === null) {
+                return null;
+            }
+
+            $namespace->addUse($fqcn);
+            $resolved[] = $namespace->simplifyName($fqcn);
+        }
+
+        return $matches[1] . '<' . implode('|', $resolved) . '>';
+    }
+
+    /**
+     * Resolve a docblock class name against the namespace and imports of the file it came from.
+     *
+     * @param \ReflectionClass<object> $source
+     */
+    private function resolveDocClassName(string $name, \ReflectionClass $source): ?string
+    {
+        if (str_contains($name, '\\')) {
+            $candidate = ltrim($name, '\\');
+
+            return $this->typeExists($candidate) ? $candidate : null;
+        }
+
+        $sameNamespace = $source->getNamespaceName() . '\\' . $name;
+
+        if ($this->typeExists($sameNamespace)) {
+            return $sameNamespace;
+        }
+
+        $imported = $this->readUseMap($source)[$name] ?? null;
+
+        if ($imported !== null && $this->typeExists($imported)) {
+            return $imported;
+        }
+
+        return $this->typeExists($name) ? $name : null;
+    }
+
+    /**
+     * Parse the `use` statements of the file declaring a class into short name => FQCN.
+     *
+     * @param \ReflectionClass<object> $source
+     *
+     * @return array<string, string>
+     */
+    private function readUseMap(\ReflectionClass $source): array
+    {
+        $file = $source->getFileName();
+
+        if ($file === false) {
+            return [];
+        }
+
+        if (isset($this->useMapCache[$file])) {
+            return $this->useMapCache[$file];
+        }
+
+        $contents = @file_get_contents($file);
+        $map      = [];
+
+        if (is_string($contents) && preg_match_all('/^use\s+([^;(]+);/m', $contents, $matches) > 0) {
+            foreach ($matches[1] as $clause) {
+                foreach (explode(',', $clause) as $entry) {
+                    $entry = trim($entry);
+
+                    if ($entry === '' || str_starts_with($entry, 'function ') || str_starts_with($entry, 'const ')) {
+                        continue;
+                    }
+
+                    if (preg_match('/^(\S+)\s+as\s+(\S+)$/i', $entry, $aliased) === 1) {
+                        $map[$aliased[2]] = ltrim($aliased[1], '\\');
+                        continue;
+                    }
+
+                    $entry                                              = ltrim($entry, '\\');
+                    $map[(string) u($entry)->afterLast('\\') ?: $entry] = $entry;
+                }
+            }
+        }
+
+        return $this->useMapCache[$file] = $map;
+    }
+
+    /**
+     * Whether a fully qualified name refers to a loadable class, interface or enum.
+     */
+    private function typeExists(string $fqcn): bool
+    {
+        return class_exists($fqcn) || interface_exists($fqcn);
     }
 
     /**

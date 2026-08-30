@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Generator;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRConstrainedComplexTypeGenerator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
@@ -333,10 +334,18 @@ class FHIRConstrainedComplexTypeGeneratorTest extends TestCase
     }
 
     // -----------------------------------------------------------------
-    // Unresolvable parent class → warning, no constructor
+    // Unresolvable parent class → hard failure
     // -----------------------------------------------------------------
 
-    public function testUnresolvableParentClassRecordsWarningAndSkipsConstructor(): void
+    /**
+     * A parent class that cannot be loaded is now a generation-time failure rather than a warning
+     * plus an invented FQCN. The invented name went straight into the `extends` clause, and PHPStan
+     * treats a missing parent as a severe error that aborts the consuming project's whole analysis —
+     * so the "recoverable" path actually hid every other finding in the generated tree.
+     *
+     * @return void
+     */
+    public function testUnresolvableParentClassThrows(): void
     {
         $sd = [
             'resourceType'   => 'StructureDefinition',
@@ -359,15 +368,114 @@ class FHIRConstrainedComplexTypeGeneratorTest extends TestCase
             ],
         ];
 
+        $this->expectException(GenerationException::class);
+        $this->expectExceptionMessageMatches('/Could not resolve baseDefinition URL/');
+        $this->expectExceptionMessageMatches('/FantasyType/');
+
+        $this->generator->generate($sd, 'R4', $this->context, $this->namespace, new ErrorCollector());
+    }
+
+    /**
+     * A versioned canonical must resolve to the unversioned parent instead of pascal-casing the
+     * version into the class name (`Identifier|4.0.1` → `Identifier401`, which does not exist).
+     *
+     * @return void
+     */
+    public function testVersionedBaseDefinitionResolvesToUnversionedParent(): void
+    {
+        $sd = [
+            'resourceType'   => 'StructureDefinition',
+            'url'            => 'http://example.org/StructureDefinition/versioned-identifier',
+            'name'           => 'VersionedIdentifierProfile',
+            'type'           => 'Identifier',
+            'derivation'     => 'constraint',
+            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/Identifier|4.0.1',
+            'snapshot'       => [
+                'element' => [
+                    ['path' => 'Identifier', 'min' => 0, 'max' => '1'],
+                    [
+                        'path'     => 'Identifier.system',
+                        'min'      => 1,
+                        'max'      => '1',
+                        'type'     => [['code' => 'uri']],
+                        'fixedUri' => 'http://example.org/system',
+                    ],
+                ],
+            ],
+        ];
+
         $errorCollector = new ErrorCollector();
         $class          = $this->generator->generate($sd, 'R4', $this->context, $this->namespace, $errorCollector);
 
-        // The class is still generated (thin marker + constants + discriminators).
-        // Name already ends in 'Profile' so no suffix is doubled.
-        self::assertSame('OrphanProfile', $class->getName());
+        self::assertFalse(
+            $errorCollector->hasWarnings(),
+            'A versioned baseDefinition must resolve, not fall through to the fallback',
+        );
 
-        // A warning should be recorded for the unresolvable parent
-        self::assertTrue($errorCollector->hasWarnings(), 'Expected warning for unresolvable parent class');
+        $parent = ltrim((string) $class->getExtends(), '\\');
+        self::assertTrue(class_exists($parent), "Emitted parent class does not exist: {$parent}");
+        self::assertStringNotContainsString('401', $parent, 'Version suffix leaked into the parent class name');
+    }
+
+    /**
+     * Fixed values must be constructed with a named `value:` argument. The primitive constructors are
+     * `(id, extension, value)`, so the previous positional form set `id` and left `value` null —
+     * every profile-built Identifier serialized as `<system id="…"/>` with no system at all.
+     *
+     * @return void
+     */
+    public function testFixedPrimitiveValuesUseNamedValueArgument(): void
+    {
+        $sd = [
+            'resourceType'   => 'StructureDefinition',
+            'url'            => 'http://example.org/StructureDefinition/named-arg-identifier',
+            'name'           => 'NamedArgIdentifierProfile',
+            'type'           => 'Identifier',
+            'derivation'     => 'constraint',
+            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/Identifier',
+            'snapshot'       => [
+                'element' => [
+                    ['path' => 'Identifier', 'min' => 0, 'max' => '1'],
+                    [
+                        'path'     => 'Identifier.system',
+                        'min'      => 1,
+                        'max'      => '1',
+                        'type'     => [['code' => 'uri']],
+                        'fixedUri' => 'http://example.org/system',
+                    ],
+                    [
+                        'path'                   => 'Identifier.type',
+                        'min'                    => 1,
+                        'max'                    => '1',
+                        'type'                   => [['code' => 'CodeableConcept']],
+                        'patternCodeableConcept' => [
+                            'coding' => [[
+                                'system' => 'http://terminology.hl7.org/CodeSystem/v2-0203',
+                                'code'   => 'NI',
+                            ]],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace, new ErrorCollector());
+        $body  = (string) $class->getMethod('__construct')->getBody();
+
+        self::assertStringContainsString('new UriPrimitive(value: self::FIXED_SYSTEM)', $body);
+        self::assertStringContainsString("code: new CodePrimitive(value: 'NI')", $body);
+        self::assertStringContainsString(
+            "system: new UriPrimitive(value: 'http://terminology.hl7.org/CodeSystem/v2-0203')",
+            $body,
+        );
+
+        // No primitive may be constructed positionally: `new XPrimitive('…')` or `new XPrimitive(self::…)`
+        // would land the scalar in `id`.
+        self::assertDoesNotMatchRegularExpression(
+            '/new [A-Za-z]+Primitive\\((?!value:)/',
+            $body,
+            'A primitive is still constructed positionally, which sets id instead of value',
+        );
     }
 
     // -----------------------------------------------------------------
@@ -377,6 +485,100 @@ class FHIRConstrainedComplexTypeGeneratorTest extends TestCase
     /**
      * @return array<string, mixed>
      */
+    // -----------------------------------------------------------------
+    // Constructor parameter types — PHPStan level 8 compatibility
+    // -----------------------------------------------------------------
+
+    /**
+     * An array param is forwarded verbatim to a parent that declares it non-nullable, so
+     * declaring it `?array` advertises an argument the profile cannot pass on — PHPStan
+     * level 8 reports `argument.type` and passing null is a runtime TypeError.
+     */
+    public function testIterableParamMirrorsNonNullableParent(): void
+    {
+        $sd    = $this->loadFixture('AUIHI.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $param = $class->getMethod('__construct')->getParameter('extension');
+
+        self::assertSame('array', $param->getType());
+        self::assertFalse($param->isNullable(), 'extension must not be nullable: the parent declares array, not ?array');
+        self::assertSame([], $param->getDefaultValue());
+        self::assertStringNotContainsString('?array $extension', (string) $class);
+    }
+
+    /**
+     * PHP has no native generics, so level 8 needs the element type from a docblock
+     * (`missingType.iterableValue`). The shape must match the parent's `@var` exactly —
+     * `list<Extension>` against an `array<Extension>` parent trades one error for another.
+     */
+    public function testIterableParamCarriesElementTypeDocblock(): void
+    {
+        $sd       = $this->loadFixture('AUIHI.json');
+        $class    = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $comment  = (string) $class->getMethod('__construct')->getComment();
+
+        self::assertStringContainsString('@param array<Extension> $extension', $comment);
+    }
+
+    /**
+     * The docblock is resolved in the generated file's namespace, so the element type has to
+     * be imported or PHPStan swaps `missingType.iterableValue` for "class not found".
+     */
+    public function testIterableElementTypeIsImported(): void
+    {
+        $sd = $this->loadFixture('AUIHI.json');
+        $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+
+        self::assertContains(
+            'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension',
+            array_values($this->namespace->getUses()),
+        );
+    }
+
+    /**
+     * Generalises the extension case: no exposed param may be nullable unless the parent
+     * param it forwards to is, since the value goes straight through parent::__construct().
+     */
+    public function testNoParamWidensANonNullableParent(): void
+    {
+        $sd          = $this->loadFixture('AUIHI.json');
+        $class       = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $parentCtor  = (new \ReflectionClass(Identifier::class))->getConstructor();
+        self::assertNotNull($parentCtor);
+
+        $parentAllowsNull = [];
+
+        foreach ($parentCtor->getParameters() as $parentParam) {
+            $type                                        = $parentParam->getType();
+            $parentAllowsNull[$parentParam->getName()]   = $type === null || $type->allowsNull();
+        }
+
+        foreach ($class->getMethod('__construct')->getParameters() as $name => $param) {
+            self::assertArrayHasKey($name, $parentAllowsNull, "Unexpected param {$name}");
+
+            if ($parentAllowsNull[$name]) {
+                continue;
+            }
+
+            self::assertFalse(
+                $param->isNullable(),
+                "Param {$name} is nullable but forwards to a non-nullable parent parameter",
+            );
+        }
+    }
+
+    /**
+     * Guards the positional contract: `new AUIHIProfile('…')` must still set `value`.
+     */
+    public function testRequiredValueParamStaysFirst(): void
+    {
+        $sd         = $this->loadFixture('AUIHI.json');
+        $class      = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $paramNames = array_keys($class->getMethod('__construct')->getParameters());
+
+        self::assertSame('value', $paramNames[0] ?? null);
+    }
+
     private function loadFixture(string $filename): array
     {
         $path = self::FIXTURES_DIR . '/' . $filename;

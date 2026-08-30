@@ -53,6 +53,9 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /** @var array<class-string, array<string, array{0: string, 1: string, 2: string}>> */
     private static array $choiceKeyIndexCache = [];
 
+    /** @var array<class-string, array<string, mixed>> */
+    private static array $ctorDefaultsCache = [];
+
     private readonly string $baseExtensionClass;
 
     private readonly string $fhirVersion;
@@ -1268,29 +1271,48 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
-     * Instantiate a class the way `newInstanceWithoutConstructor()` cannot: with its repeating
-     * elements already empty rather than uninitialized.
+     * Instantiate a class the way `newInstanceWithoutConstructor()` cannot: in the state PHP's own
+     * constructor would have produced.
      *
-     * Generated models declare every repeating element as a promoted `public array $x = []`, so an
-     * instance produced by PHP's own constructor never has an uninitialized array property. The
-     * denormalizers bypass the constructor, which leaves that state reachable — and it is not
-     * equivalent to `[]`:
+     * The denormalizers bypass the constructor, so every property the constructor would have
+     * defaulted is left *uninitialized* instead — a third state the model never declared, and the
+     * only one that throws on read:
      *
-     *  - reading `$resource->item` raises "must not be accessed before initialization" for consumers;
+     *  - reading `$resource->item` or `$patient->gender` raises "must not be accessed before
+     *    initialization" for consumers, and `?->` does not help (null-safe guards against null,
+     *    which uninitialized is not);
      *  - Symfony's `PropertyMetadata::getPropertyValue()` maps the uninitialized slot to `null`, and
      *    `CountValidator` returns early on null, so every generated `#[Count(min: 1)]` was dead.
      *
-     * Only properties declared exactly `array` are filled. A nullable `?array` is left alone: there
-     * null is a value the model chose to allow, not an artefact of skipping the constructor.
+     * The guarantee made here is a single one — *a denormalized instance is in the same state the
+     * constructor would have produced* — rather than a list of per-type special cases: every
+     * uninitialized public property whose constructor parameter declares a default gets that
+     * default. Generated models declare repeating elements as `public array $x = []` and optional
+     * elements as `public ?T $x = null`, so both come out right from the same rule. Matching is by
+     * parameter *name*, which is what reaches inherited properties too: subclasses re-declare
+     * inherited elements as non-promoted passthrough params, so the defaults for a parent-declared
+     * property are found on the child's own constructor.
+     *
+     * Where no constructor default exists the property is left uninitialized — that is genuinely the
+     * model's choice and not an artefact. The one exception is a non-nullable `array`, which is
+     * still filled with `[]`: FHIR has no representation for an absent repeating element, so `[]` is
+     * the only state it can be in.
      *
      * @param \ReflectionClass<object> $reflection
      */
-    protected function instantiateWithEmptyArrays(\ReflectionClass $reflection): object
+    protected function instantiateWithDefaults(\ReflectionClass $reflection): object
     {
-        $object = $reflection->newInstanceWithoutConstructor();
+        $object   = $reflection->newInstanceWithoutConstructor();
+        $defaults = self::constructorDefaults($reflection);
 
         foreach (self::reflPublicProps($reflection->getName()) as $property) {
             if ($property->isStatic() || $property->isInitialized($object)) {
+                continue;
+            }
+
+            $name = $property->getName();
+            if (array_key_exists($name, $defaults)) {
+                $property->setValue($object, $defaults[$name]);
                 continue;
             }
 
@@ -1301,6 +1323,35 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         return $object;
+    }
+
+    /**
+     * Constructor parameter name → default value, for every parameter that declares one.
+     *
+     * Cached per class: defaults are constant expressions (null, scalars, arrays, enum cases), all
+     * of which are immutable or copied on assignment, so one resolved value is safely shared across
+     * instances.
+     *
+     * @param \ReflectionClass<object> $reflection
+     *
+     * @return array<string, mixed>
+     */
+    private static function constructorDefaults(\ReflectionClass $reflection): array
+    {
+        $class = $reflection->getName();
+
+        if (array_key_exists($class, self::$ctorDefaultsCache)) {
+            return self::$ctorDefaultsCache[$class];
+        }
+
+        $defaults = [];
+        foreach ($reflection->getConstructor()?->getParameters() ?? [] as $parameter) {
+            if ($parameter->isDefaultValueAvailable()) {
+                $defaults[$parameter->getName()] = $parameter->getDefaultValue();
+            }
+        }
+
+        return self::$ctorDefaultsCache[$class] = $defaults;
     }
 
     /**

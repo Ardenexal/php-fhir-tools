@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
 /**
  * Checks every `xhtml`-typed value in a resource tree (in practice `Narrative.div`) and reports
@@ -137,6 +138,17 @@ final class NarrativeXhtmlChecker
         $visited[$id] = true;
         $violations   = [];
         $ref          = new \ReflectionClass($node);
+
+        // Logical models (CDA) are not walked. Their narrative is a StrucDoc markup tree, not
+        // XHTML: it carries several top-level nodes rather than one wrapping div, and its vocabulary
+        // (paragraph, content, linkHtml, styleCode) does not overlap the HTML 4.0 subset txt-1
+        // enforces. Judging one by the other's rules reported three errors on a valid CDA section —
+        // a spurious "malformed XHTML" from the extra top-level nodes, txt-1 for `paragraph`, and
+        // txt-2 claiming there was no content at all. CDA narrative conformance is a separate
+        // concern and is not implemented here.
+        if ($ref->getAttributes(LogicalModel::class) !== []) {
+            return [];
+        }
 
         foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
             if ($prop->isInitialized($node) === false) {

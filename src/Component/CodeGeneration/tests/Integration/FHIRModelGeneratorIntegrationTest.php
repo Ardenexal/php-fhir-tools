@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\Tests\Integration;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Integration;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
