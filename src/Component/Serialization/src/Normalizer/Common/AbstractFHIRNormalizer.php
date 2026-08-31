@@ -674,7 +674,10 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
 
             $validatedValue = $this->validateAndConvertValue($value, $type);
 
-            $instance = $reflection->newInstanceWithoutConstructor();
+            // Constructor-defaulted, not bare: a primitive wrapper carries inherited `id` and
+            // `extension` slots that this method never assigns when the payload omits them, and an
+            // unassigned slot throws on read rather than reading back as the declared default.
+            $instance = $this->instantiateWithDefaults($reflection);
 
             $valueProp = self::reflProp($type, 'value');
             if ($valueProp !== null) {
@@ -1274,9 +1277,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * uninitialized public property whose constructor parameter declares a default gets that
      * default. Generated models declare repeating elements as `public array $x = []` and optional
      * elements as `public ?T $x = null`, so both come out right from the same rule. Matching is by
-     * parameter *name*, which is what reaches inherited properties too: subclasses re-declare
-     * inherited elements as non-promoted passthrough params, so the defaults for a parent-declared
-     * property are found on the child's own constructor.
+     * parameter *name*, resolved across the whole class hierarchy rather than the most-derived
+     * constructor alone; see `constructorDefaults()` for which parameters a child constructor hides.
      *
      * Where no constructor default exists the property is left uninitialized — that is genuinely the
      * model's choice and not an artefact. The one exception is a non-nullable `array`, which is
@@ -1311,11 +1313,20 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
-     * Constructor parameter name → default value, for every parameter that declares one.
+     * Constructor parameter name → default value, for every parameter that declares one anywhere in
+     * the class hierarchy.
      *
-     * Cached per class: defaults are constant expressions (null, scalars, arrays, enum cases), all
-     * of which are immutable or copied on assignment, so one resolved value is safely shared across
-     * instances.
+     * The whole chain is walked because generated subclasses narrow their signature and forward the
+     * rest to `parent::__construct()`, and which parameters that hides depends on the kind. A
+     * code-type wrapper declares only `__construct(?string $value = null)`, so its ancestor's `id`
+     * and `extension` are the invisible ones. A typed extension declares `id` and its own
+     * `value<Type>`, but supplies `url` as a computed argument, and does the same for the inherited
+     * `value` whenever it narrows to a typed one. Ancestors are merged first so the most-derived
+     * declaration wins on any name they share.
+     *
+     * Cached per concrete class: defaults are constant expressions (null, scalars, arrays, enum
+     * cases), all of which are immutable or copied on assignment, so one resolved value is safely
+     * shared across instances.
      *
      * @param \ReflectionClass<object> $reflection
      *
@@ -1329,10 +1340,23 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return self::$ctorDefaultsCache[$class];
         }
 
+        $hierarchy = [];
+        for ($current = $reflection; $current !== false; $current = $current->getParentClass()) {
+            $hierarchy[] = $current;
+        }
+
         $defaults = [];
-        foreach ($reflection->getConstructor()?->getParameters() ?? [] as $parameter) {
-            if ($parameter->isDefaultValueAvailable()) {
-                $defaults[$parameter->getName()] = $parameter->getDefaultValue();
+        // Root first, so a re-declared parameter keeps the most-derived class's default.
+        foreach (array_reverse($hierarchy) as $current) {
+            $constructor = $current->getConstructor();
+            if ($constructor === null || $constructor->getDeclaringClass()->getName() !== $current->getName()) {
+                continue;
+            }
+
+            foreach ($constructor->getParameters() as $parameter) {
+                if ($parameter->isDefaultValueAvailable()) {
+                    $defaults[$parameter->getName()] = $parameter->getDefaultValue();
+                }
             }
         }
 
