@@ -17,6 +17,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'Device',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'determinerCode',
+        'code',
+        'manufacturerModelName',
+        'softwareName',
+    ],
 )]
 class Device extends InfrastructureRoot
 {

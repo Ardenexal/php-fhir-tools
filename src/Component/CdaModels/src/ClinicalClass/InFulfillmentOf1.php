@@ -15,6 +15,16 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'InFulfillmentOf1',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:sdtc',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'inversionInd',
+        'negationInd',
+        'actReference',
+    ],
 )]
 class InFulfillmentOf1 extends InfrastructureRoot
 {

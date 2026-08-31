@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'AssignedCustodian',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'realmCode', 'typeId', 'templateId', 'classCode', 'representedCustodianOrganization'],
 )]
 class AssignedCustodian extends InfrastructureRoot
 {

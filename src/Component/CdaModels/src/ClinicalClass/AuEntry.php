@@ -16,6 +16,24 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/Entry',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'contextConductionInd',
+        'act',
+        'encounter',
+        'observation',
+        'observationMedia',
+        'organizer',
+        'procedure',
+        'regionOfInterest',
+        'substanceAdministration',
+        'supply',
+        'controlAct',
+    ],
 )]
 class AuEntry extends Entry
 {

@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'IVXB_TS',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'value', 'inclusive'],
 )]
 class IVXBTS extends TS
 {

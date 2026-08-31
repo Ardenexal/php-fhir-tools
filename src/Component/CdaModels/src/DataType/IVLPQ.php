@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'IVL_PQ',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'unit', 'value', 'translation', 'operator', 'low', 'center', 'width', 'high'],
 )]
 #[FHIRPathInvariant(
     key: 'ivl-pq-center',

@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ClassNameResolver;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ContentModelOrderResolver;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIROperationGenerator;
@@ -685,6 +686,11 @@ class FHIRModelGeneratorCommand extends Command
             $this->resolveFullCdaParameters((string) $url, $parentOf, $ownParams, $fullParams);
         }
 
+        // Each class's content model: every property name it can serialize, in published order.
+        // Deliberately NOT $fullParams' own-then-parent concatenation, which is the order that puts
+        // an inherited `templateId` last on every act. See ContentModelOrderResolver.
+        $propertyOrders = (new ContentModelOrderResolver())->resolve($parentOf, $ownPropNames, $ownParams);
+
         $generated = 0;
         foreach ($definitions as $url => $sd) {
             $namespace    = $urlToNs[$url];
@@ -699,7 +705,7 @@ class FHIRModelGeneratorCommand extends Command
             $inheritedConstraintKeys = ($parent !== '' && isset($ownConstraints[$parent])) ? $ownConstraints[$parent] : [];
             $inheritedParams         = ($parent !== '' && isset($fullParams[$parent])) ? $fullParams[$parent] : [];
             try {
-                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys, $valueSetToEnumFqcn, $inheritedParams);
+                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys, $valueSetToEnumFqcn, $inheritedParams, $propertyOrders[$url] ?? []);
             } catch (\Throwable $e) {
                 $this->errorCollector->addError(
                     "CDA class generation failed for {$url}: {$e->getMessage()}",

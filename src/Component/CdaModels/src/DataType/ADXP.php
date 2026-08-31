@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'ADXP',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'representation', 'mediaType', 'language', 'xmlText', 'partType'],
 )]
 class ADXP extends ST
 {

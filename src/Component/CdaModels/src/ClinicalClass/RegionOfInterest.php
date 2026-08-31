@@ -16,6 +16,28 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'RegionOfInterest',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'ID',
+        'classCode',
+        'moodCode',
+        'id',
+        'code',
+        'value',
+        'subject',
+        'specimen',
+        'performer',
+        'author',
+        'informant',
+        'participant',
+        'entryRelationship',
+        'reference',
+        'precondition',
+        'sdtcPrecondition2',
+    ],
 )]
 class RegionOfInterest extends InfrastructureRoot
 {

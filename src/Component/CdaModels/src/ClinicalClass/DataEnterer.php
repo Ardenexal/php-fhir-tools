@@ -16,6 +16,16 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'DataEnterer',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'contextControlCode',
+        'time',
+        'assignedEntity',
+    ],
 )]
 class DataEnterer extends InfrastructureRoot
 {

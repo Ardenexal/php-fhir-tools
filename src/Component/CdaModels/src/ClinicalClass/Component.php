@@ -16,6 +16,16 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'Component',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'contextConductionInd',
+        'nonXMLBody',
+        'structuredBody',
+    ],
 )]
 #[FHIRPathInvariant(
     key: 'body-choice',

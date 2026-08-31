@@ -445,7 +445,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         $metaMap           = $this->getPropertyMetadataMap($object);
         $includeExtensions = $fhirContext->includeExtensions;
 
-        $properties = self::reflPublicProps($object);
+        $properties = self::orderByContentModel(self::reflPublicProps($object), $this->contentModelOrder($object));
 
         foreach ($properties as $property) {
             $propertyName = $property->getName();
@@ -601,6 +601,12 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     } else {
                         $namespacedData[$localKey][] = $normalizedValue;
                     }
+                    // Reserve this element's position with a null placeholder the fold recognises.
+                    // Overwriting an existing PHP array key keeps its original position, so the fold
+                    // writes the value back here rather than appending it after every sibling — which
+                    // is what put an AU extension element last regardless of its content-model
+                    // position. Buffering still owns the collision case.
+                    $data[$localKey] ??= null;
                 }
                 continue;
             }
@@ -636,13 +642,77 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         // a list — XmlEncoder renders that as repeated siblings and honours the per-item @xmlns, so
         // <raceCode/> and <raceCode xmlns="urn:hl7-org:sdtc"/> both survive as distinct elements.
         foreach ($namespacedData as $localKey => $values) {
-            $existing = array_key_exists($localKey, $data) ? [$data[$localKey]] : [];
+            // A reserved slot holds null and is not a sibling value; anything else is a real element
+            // the loop emitted under the same local name, which becomes the first of the merged list.
+            $reserved = array_key_exists($localKey, $data) && $data[$localKey] === null;
+            $existing = (array_key_exists($localKey, $data) && !$reserved) ? [$data[$localKey]] : [];
             $merged   = array_merge($existing, $values);
 
             $data[$localKey] = count($merged) === 1 ? $merged[0] : $merged;
         }
 
         return $data;
+    }
+
+    /**
+     * The type's published content-model order, or an empty list when it declares none.
+     *
+     * Empty is the answer for standard FHIR: its generated resources and complex types already
+     * declare their elements in published order, so reflection order is already right and must not be
+     * disturbed. CDA logical models override this — see FHIRLogicalModelXmlNormalizer.
+     *
+     * @return list<string> property names in published order
+     */
+    protected function contentModelOrder(object $object): array
+    {
+        return [];
+    }
+
+    /**
+     * Reorder properties to match a published content model, leaving them untouched when there is no
+     * order to apply.
+     *
+     * Ordering the property list is what makes one change enough: every emit branch in
+     * {@see normalizeForXML()} — element, XML attribute, text content, and the wrapper-less
+     * choice-group fragment under the `#` key — writes into `$data` in iteration order, so all of them
+     * land correctly without knowing that ordering exists.
+     *
+     * The `#` case is currently untested rather than verified, because nothing exercises it: the only
+     * choice-group-bearing CDA types are `AD` and `EN`, both of which extend `ANY` and so have no
+     * inherited elements to reorder, and their eight subclasses (`AuAddress`, `PN`, `ON`, …) add no
+     * properties of their own. For all ten, this sort is a no-op. A future CDA type that both carries a
+     * choice group and inherits elements would be the first real exercise of that interaction.
+     *
+     * Reflection order cannot serve as the content model. `ReflectionClass::getProperties()` returns a
+     * class's own properties first and its ancestors' last, so CDA's `InfrastructureRoot` elements —
+     * `realmCode`, `typeId`, `templateId`, which the content model puts first — come last on every act
+     * that inherits them. Nor can the class hierarchy: AU's `completionCode` is declared on the child
+     * yet belongs mid-sequence in the parent's elements.
+     *
+     * A property the order does not name keeps its reflection position, after every named one. PHP's
+     * sort has been stable since 8.0, so equal ranks preserve that relative order.
+     *
+     * @param list<\ReflectionProperty> $properties
+     * @param list<string>              $order      property names in published order; empty to leave as-is
+     *
+     * @return list<\ReflectionProperty> the same properties in published order
+     */
+    private static function orderByContentModel(array $properties, array $order): array
+    {
+        if ($order === []) {
+            return $properties;
+        }
+
+        // Case-sensitive by construction: CDA `Section` declares both an `ID` attribute and an `id`
+        // element, and folding case would rank them as one property.
+        $rank = array_flip($order);
+
+        usort(
+            $properties,
+            static fn (\ReflectionProperty $left, \ReflectionProperty $right): int => ($rank[$left->getName()] ?? PHP_INT_MAX) <=> ($rank[$right->getName()] ?? PHP_INT_MAX),
+        );
+
+        return $properties;
     }
 
     /**

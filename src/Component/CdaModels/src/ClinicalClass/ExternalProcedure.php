@@ -17,6 +17,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'ExternalProcedure',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'moodCode',
+        'id',
+        'code',
+        'text',
+        'sdtcAuthor',
+    ],
 )]
 class ExternalProcedure extends InfrastructureRoot
 {

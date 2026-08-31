@@ -12,6 +12,19 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'CV',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'code',
+        'codeSystem',
+        'codeSystemName',
+        'codeSystemVersion',
+        'displayName',
+        'sdtcValueSet',
+        'sdtcValueSetVersion',
+        'originalText',
+        'qualifier',
+        'translation',
+    ],
 )]
 class CV extends CE
 {

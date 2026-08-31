@@ -17,6 +17,22 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/EncompassingEncounter',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'moodCode',
+        'id',
+        'code',
+        'effectiveTime',
+        'sdtcAdmissionReferralSourceCode',
+        'dischargeDispositionCode',
+        'responsibleParty',
+        'encounterParticipant',
+        'location',
+    ],
 )]
 class AuEncompassingEncounter extends EncompassingEncounter
 {

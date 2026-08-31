@@ -20,6 +20,22 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'AssignedAuthor',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'sdtcIdentifiedBy',
+        'code',
+        'sdtcSpecialty',
+        'addr',
+        'telecom',
+        'assignedPerson',
+        'assignedAuthoringDevice',
+        'representedOrganization',
+    ],
 )]
 #[FHIRPathInvariant(
     key: 'assigned-author-choice',

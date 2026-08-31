@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'interpreterRequiredInd',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'realmCode', 'typeId', 'templateId'],
 )]
 class AuInterpreterRequiredInd extends InfrastructureRoot
 {

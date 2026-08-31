@@ -16,6 +16,16 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'asEntityIdentifier',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'code',
+        'assigningGeographicArea',
+    ],
 )]
 class AuAsEntityIdentifier extends InfrastructureRoot
 {

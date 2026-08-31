@@ -16,6 +16,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/StructuredBody',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'moodCode',
+        'confidentialityCode',
+        'languageCode',
+        'component',
+    ],
 )]
 class AuStructuredBody extends StructuredBody
 {

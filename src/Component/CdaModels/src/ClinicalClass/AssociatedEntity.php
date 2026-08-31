@@ -20,6 +20,21 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'AssociatedEntity',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'sdtcIdentifiedBy',
+        'code',
+        'sdtcSpecialty',
+        'addr',
+        'telecom',
+        'associatedPerson',
+        'scopingOrganization',
+    ],
 )]
 class AssociatedEntity extends InfrastructureRoot
 {

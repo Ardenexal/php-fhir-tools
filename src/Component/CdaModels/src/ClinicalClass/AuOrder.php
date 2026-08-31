@@ -17,6 +17,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/Order',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'moodCode',
+        'id',
+        'code',
+        'priorityCode',
+    ],
 )]
 class AuOrder extends Order
 {
