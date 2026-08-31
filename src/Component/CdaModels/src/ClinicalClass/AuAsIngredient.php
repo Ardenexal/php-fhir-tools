@@ -16,6 +16,16 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'asIngredient',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'ingredientManufacturedMaterial',
+        'quantity',
+    ],
 )]
 class AuAsIngredient extends InfrastructureRoot
 {

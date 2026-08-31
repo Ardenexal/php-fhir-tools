@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'IVL_TS',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'value', 'operator', 'low', 'center', 'width', 'high'],
 )]
 #[FHIRPathInvariant(
     key: 'ivl-ts-center',

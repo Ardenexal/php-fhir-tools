@@ -20,6 +20,20 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'personalRelationship',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'code',
+        'addr',
+        'telecom',
+        'statusCode',
+        'effectiveTime',
+        'asPersonalRelationship',
+    ],
 )]
 class AuPersonalRelationship extends InfrastructureRoot
 {

@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'asPersonalRelationship',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'classCode', 'determinerCode', 'id', 'administrativeGenderCode'],
 )]
 class AuAsPersonalRelationship extends ANY
 {

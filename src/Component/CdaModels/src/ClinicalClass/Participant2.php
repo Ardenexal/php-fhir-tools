@@ -18,6 +18,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'Participant2',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'contextControlCode',
+        'sdtcFunctionCode',
+        'time',
+        'awarenessCode',
+        'participantRole',
+    ],
 )]
 class Participant2 extends InfrastructureRoot
 {

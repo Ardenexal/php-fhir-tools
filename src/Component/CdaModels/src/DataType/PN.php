@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
     name: 'PN',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'use', 'item', 'validTime'],
 )]
 #[FHIRPathInvariant(
     key: 'pn-no-ls',

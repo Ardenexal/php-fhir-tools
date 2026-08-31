@@ -16,6 +16,22 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'Precondition2',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:sdtc',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'negationInd',
+        'conjunctionCode',
+        'allTrue',
+        'allFalse',
+        'atLeastOneTrue',
+        'atLeastOneFalse',
+        'onlyOneTrue',
+        'onlyOneFalse',
+        'criterion',
+    ],
 )]
 #[FHIRPathInvariant(
     key: 'precondition2-only-one',

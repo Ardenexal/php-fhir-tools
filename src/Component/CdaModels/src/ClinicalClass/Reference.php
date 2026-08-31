@@ -17,6 +17,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'Reference',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'seperatableInd',
+        'externalAct',
+        'externalObservation',
+        'externalProcedure',
+        'externalDocument',
+    ],
 )]
 #[FHIRPathInvariant(
     key: 'reference-external',

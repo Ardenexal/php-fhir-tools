@@ -18,6 +18,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'Material',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'determinerCode',
+        'code',
+        'name',
+        'lotNumberText',
+        'sdtcExpirationTime',
+    ],
 )]
 class Material extends InfrastructureRoot
 {

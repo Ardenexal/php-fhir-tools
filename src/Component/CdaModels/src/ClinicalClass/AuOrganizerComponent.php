@@ -17,6 +17,26 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/OrganizerComponent',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'contextConductionInd',
+        'sequenceNumber',
+        'sdtcPriorityNumber',
+        'seperatableInd',
+        'act',
+        'encounter',
+        'observation',
+        'observationMedia',
+        'organizer',
+        'procedure',
+        'regionOfInterest',
+        'substanceAdministration',
+        'supply',
+    ],
 )]
 class AuOrganizerComponent extends OrganizerComponent
 {

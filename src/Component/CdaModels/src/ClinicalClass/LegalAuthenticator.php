@@ -17,6 +17,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'LegalAuthenticator',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'contextControlCode',
+        'time',
+        'signatureCode',
+        'sdtcSignatureText',
+        'assignedEntity',
+    ],
 )]
 class LegalAuthenticator extends InfrastructureRoot
 {

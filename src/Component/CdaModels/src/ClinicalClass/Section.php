@@ -17,6 +17,26 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'Section',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'ID',
+        'classCode',
+        'moodCode',
+        'id',
+        'code',
+        'title',
+        'text',
+        'confidentialityCode',
+        'languageCode',
+        'subject',
+        'author',
+        'informant',
+        'entry',
+        'component',
+    ],
 )]
 class Section extends InfrastructureRoot
 {

@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
     name: 'EN',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'use', 'item', 'validTime'],
 )]
 class EN extends ANY
 {

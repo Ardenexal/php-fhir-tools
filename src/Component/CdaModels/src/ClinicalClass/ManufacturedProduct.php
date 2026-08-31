@@ -17,6 +17,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'ManufacturedProduct',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'sdtcIdentifiedBy',
+        'manufacturedLabeledDrug',
+        'manufacturedMaterial',
+        'manufacturerOrganization',
+    ],
 )]
 #[FHIRPathInvariant(
     key: 'product-choice',

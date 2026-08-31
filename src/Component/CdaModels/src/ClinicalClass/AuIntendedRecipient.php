@@ -21,6 +21,20 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/IntendedRecipient',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'sdtcIdentifiedBy',
+        'code',
+        'addr',
+        'telecom',
+        'informationRecipient',
+        'receivedOrganization',
+    ],
 )]
 class AuIntendedRecipient extends IntendedRecipient
 {

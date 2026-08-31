@@ -17,6 +17,16 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'LanguageCommunication',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'languageCode',
+        'modeCode',
+        'proficiencyLevelCode',
+        'preferenceInd',
+    ],
 )]
 class LanguageCommunication extends InfrastructureRoot
 {

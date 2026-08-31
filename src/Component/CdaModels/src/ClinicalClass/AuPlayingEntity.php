@@ -21,6 +21,23 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/PlayingEntity',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'determinerCode',
+        'code',
+        'quantity',
+        'name',
+        'sdtcBirthTime',
+        'desc',
+        'administrativeGenderCode',
+        'birthTime',
+        'asEntityIdentifier',
+        'asSpecimenInContainer',
+    ],
 )]
 class AuPlayingEntity extends PlayingEntity
 {

@@ -18,6 +18,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'ExternalAct',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'moodCode',
+        'id',
+        'code',
+        'text',
+        'sdtcAuthor',
+    ],
 )]
 class ExternalAct extends InfrastructureRoot
 {

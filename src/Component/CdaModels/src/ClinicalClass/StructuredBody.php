@@ -16,6 +16,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'StructuredBody',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'moodCode',
+        'confidentialityCode',
+        'languageCode',
+        'component',
+    ],
 )]
 class StructuredBody extends InfrastructureRoot
 {

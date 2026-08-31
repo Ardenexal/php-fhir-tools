@@ -16,6 +16,28 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'ObservationMedia',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'ID',
+        'classCode',
+        'moodCode',
+        'id',
+        'languageCode',
+        'value',
+        'subject',
+        'specimen',
+        'performer',
+        'author',
+        'informant',
+        'participant',
+        'entryRelationship',
+        'reference',
+        'precondition',
+        'sdtcPrecondition2',
+    ],
 )]
 class ObservationMedia extends InfrastructureRoot
 {

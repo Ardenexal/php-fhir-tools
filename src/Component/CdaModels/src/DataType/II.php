@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'II',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'assigningAuthorityName', 'displayable', 'root', 'extension'],
 )]
 #[FHIRPathInvariant(
     key: 'II-1',

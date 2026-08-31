@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'PreconditionBase',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:sdtc',
+    propertyOrder: ['nullFlavor', 'realmCode', 'typeId', 'templateId', 'classCode', 'moodCode', 'id', 'precondition'],
 )]
 class PreconditionBase extends InfrastructureRoot
 {

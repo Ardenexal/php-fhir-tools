@@ -21,6 +21,22 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'ParticipantRole',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'sdtcIdentifiedBy',
+        'code',
+        'sdtcSpecialty',
+        'addr',
+        'telecom',
+        'playingDevice',
+        'playingEntity',
+        'scopingEntity',
+    ],
 )]
 #[FHIRPathInvariant(
     key: 'role-choice',

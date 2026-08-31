@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'AlternateIdentification',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['classCode', 'id', 'code', 'statusCode', 'effectiveTime'],
 )]
 class AlternateIdentification
 {

@@ -20,6 +20,20 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'Guardian',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'sdtcIdentifiedBy',
+        'code',
+        'addr',
+        'telecom',
+        'guardianPerson',
+        'guardianOrganization',
+    ],
 )]
 #[FHIRPathInvariant(
     key: 'guardian-choice',

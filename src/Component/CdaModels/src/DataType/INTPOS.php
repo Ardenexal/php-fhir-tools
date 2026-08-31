@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'INT_POS',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:sdtc',
+    propertyOrder: ['nullFlavor', 'value'],
 )]
 class INTPOS extends INTType
 {
