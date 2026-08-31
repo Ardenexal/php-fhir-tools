@@ -135,6 +135,17 @@ final class JavaFindingMatcher
     ];
 
     /**
+     * The clause that commits either validator to the Bundle fullUrl matching rules.
+     *
+     * Deliberately not `in the bundle`, which the neighbouring rules also use: `Found 2 matches for
+     * 'X' in the bundle` is ambiguity and `Can't find 'X' in the bundle` alone is plain absence, and
+     * pairing this family against either would credit us with a rule we have not written. This clause
+     * appears in all three of the reference validator's sentence templates for the rule and in neither
+     * of the others. See {@see matchesByBundleResolution()}.
+     */
+    private const string BUNDLE_RESOLUTION_PHRASE = 'fullurl based rules';
+
+    /**
      * Our invariant key => the reference validator's paraphrases of it, when it never cites the key.
      *
      * `ele-1` is the case: on `group-choice-empty` and `list-empty1` we report
@@ -301,6 +312,7 @@ final class JavaFindingMatcher
             $this->matchesByText($javaText, $ours)                                 => 'same-text',
             $this->matchesByCardinality($javaText, $ours, $javaExpression)         => 'cardinality',
             $this->matchesBySharedPhrase($javaText, $ours, $javaExpression)        => 'shared-phrase',
+            $this->matchesByBundleResolution($javaText, $ours)                     => 'bundle-resolution',
             $this->matchesByInvariantParaphrase($javaText, $ours, $javaExpression) => 'invariant-paraphrase',
             default                                                                => null,
         };
@@ -407,6 +419,120 @@ final class JavaFindingMatcher
         $dot = strrpos($path, '.');
 
         return $dot === false ? '' : substr($path, 0, $dot);
+    }
+
+    /**
+     * Both sides say the same reference fails the Bundle fullUrl matching rules.
+     *
+     * This family needs its own rule because neither general route reaches it.
+     *
+     * {@see matchesByText()} cannot: the reference validator's sentence carries an unquoted context
+     * label (`Section Entry`, `MessageHeader Data`, `Composition.subject`) which survives
+     * {@see normalise()} and which we would have to reproduce from a lookup table fitted to seven
+     * corpus cases. Fitting our own message text to the oracle is the same move as reseeding an outcome
+     * to go green, so our wording is our own.
+     *
+     * {@see matchesBySharedPhrase()} cannot either, because its path agreement is unavailable: **the
+     * reference validator's `expression` is off by one for this family.** On `bundle-urn` it reports
+     * `Bundle.entry[1].resource.subject` for a reference that lives on the Composition at `entry[0]`;
+     * `entry[1]` is the Patient, which has no `subject` at all. The same holds on every case: the
+     * carrying resource is `entry[0]` in all seven, and every expression names `entry[1]`. It is
+     * specific to these bundle-level rules: the structural findings in the same outcome file are
+     * correctly zero-based, which is why `matchesBySharedPhrase()` can trust the expression and this
+     * cannot. Three of `bundle-urn`'s findings carry the bare expression `Bundle`, which carries no
+     * path at all.
+     *
+     * So this rule reads the field the reference validator gets **right**, the context label inside the
+     * message, and ignores the one it gets wrong. Three agreements where the label is a path:
+     *
+     *  1. the rule, via a phrase that commits either validator to fullUrl matching rather than to plain
+     *     absence (`Can't find …` alone) or ambiguity (`Found 2 matches …`);
+     *  2. the reference being resolved, quoted identically by both sides;
+     *  3. the element, taken as the label's trailing property name. `Bundle.entry[2].resource.subject`
+     *     and `Composition.author` both yield the property, which is what separates `bundle-urn`'s four
+     *     findings that all name `Patient/98549f1a-…`.
+     *
+     * `Section Entry` and `MessageHeader Data` are the reference validator's own names for spec slots
+     * and yield no property, so those pair on the first two agreements only. That is a deliberate,
+     * narrower guarantee, and it is safe on today's corpus because every finding wearing those two
+     * labels names a distinct reference within its case. Should a case ever carry two `Section Entry`
+     * findings for one reference, they would pair in arbitrary order, the same exposure
+     * {@see matchesByCardinality()} refuses, recorded here rather than hidden.
+     */
+    private function matchesByBundleResolution(string $javaText, FHIRValidationViolation $ours): bool
+    {
+        $java = strtolower($javaText);
+        $mine = strtolower($ours->message);
+
+        if (!str_contains($java, self::BUNDLE_RESOLUTION_PHRASE) || !str_contains($mine, self::BUNDLE_RESOLUTION_PHRASE)) {
+            return false;
+        }
+
+        // Agreement 2: the reference itself, which both sides quote first.
+        if (preg_match("/can't find '([^']*)'/", $java, $javaRef) !== 1) {
+            return false;
+        }
+
+        if (preg_match("/can't find '([^']*)'/", $mine, $ourRef) !== 1 || $javaRef[1] !== $ourRef[1]) {
+            return false;
+        }
+
+        // Agreement 3: the element, from the context label where that label is a path.
+        if (preg_match('/in the bundle \(([^)]*)\)/', $java, $context) !== 1) {
+            return false;
+        }
+
+        // Where the label is bundle-rooted it carries the entry index too, which is a whole path and
+        // the strongest form of this agreement. `bundle-urn` needs it: three of its findings name the
+        // same `Patient/98549f1a-…` and all three end in `subject`, so a trailing-property comparison
+        // pairs them in whatever order they arrive. Comparing the full path pins each to its entry.
+        if (str_starts_with($context[1], 'Bundle.')) {
+            return substr($context[1], strlen('Bundle.')) === $this->withoutTrailingIndex($ours->path);
+        }
+
+        $property = $this->contextProperty($context[1]);
+
+        if ($property === null) {
+            return true;
+        }
+
+        $tail = $this->withoutTrailingIndex($ours->path);
+        $dot  = strrpos($tail, '.');
+
+        return ($dot === false ? $tail : substr($tail, $dot + 1)) === $property;
+    }
+
+    /**
+     * Our path indexes repeating elements such as `author[0]` while the context label never does, so
+     * the index is dropped on our side rather than invented on the reference validator's.
+     */
+    private function withoutTrailingIndex(string $path): string
+    {
+        return (string) preg_replace('/\[\d+\]\z/', '', $path);
+    }
+
+    /**
+     * The trailing property of a context label, or null when the label is a friendly name.
+     *
+     * `Bundle.entry[2].resource.subject` and `Composition.author` yield `subject` and `author`;
+     * `Section Entry` and `MessageHeader Data` contain a space and name no element, so they yield null
+     * and the caller falls back to two agreements.
+     */
+    private function contextProperty(string $context): ?string
+    {
+        if ($context === '' || str_contains($context, ' ')) {
+            return null;
+        }
+
+        $dot = strrpos($context, '.');
+
+        if ($dot === false) {
+            return null;
+        }
+
+        $property = substr($context, $dot + 1);
+
+        return preg_match('/\A[A-Za-z]+\z/', $property) === 1 ? $property : null;
     }
 
     /**

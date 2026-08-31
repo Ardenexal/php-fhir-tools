@@ -47,6 +47,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly PrimitiveFormatChecker $primitiveChecker = new PrimitiveFormatChecker(),
         private readonly CodingSystemChecker $codingSystemChecker = new CodingSystemChecker(),
         private readonly BundleEntryFullUrlChecker $bundleFullUrlChecker = new BundleEntryFullUrlChecker(),
+        private readonly BundleReferenceResolutionChecker $bundleReferenceChecker = new BundleReferenceResolutionChecker(),
         private readonly UnknownInputChecker $unknownInputChecker = new UnknownInputChecker(),
     ) {
     }
@@ -131,6 +132,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // work. See BundleEntryFullUrlChecker.
         foreach ($this->bundleFullUrlChecker->check($resource) as $fullUrlViolation) {
             $violations[] = $fullUrlViolation;
+        }
+
+        // A relative reference the fullUrl rules refuse to resolve to an entry the bundle does hold.
+        // Unconditional like the pass above and resolves nothing off-box: it compares the reference
+        // against the entries already in hand. See BundleReferenceResolutionChecker.
+        foreach ($this->bundleReferenceChecker->check($resource) as $bundleReferenceViolation) {
+            $violations[] = $bundleReferenceViolation;
         }
 
         // Extension.url is a structural rule, not a resolution one: it needs no registry, so unlike
