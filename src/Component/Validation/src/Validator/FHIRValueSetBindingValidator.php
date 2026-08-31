@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireValidator;
 
 /**
  * Validates that a coded value conforms to the value set bound to a property.
@@ -31,6 +32,8 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     public const string DEFAULT_INVALID_VALUE_MESSAGE = 'The value {{ value }} is not a valid case of value set {{ url }}.';
 
     public const string DEFAULT_UNCHECKED_BINDING_MESSAGE = 'Terminology validation for value set {{ url }} was skipped: no terminology client is configured.';
+
+    public const string DEFAULT_WRONG_DISPLAY_MESSAGE = 'The display {{ value }} is not valid for code {{ code }} in system {{ system }}; the terminology server gives {{ expected }}.';
 
     /**
      * @param string[]                            $enumNamespaceRoots Namespace roots to probe for generated enum classes,
@@ -73,11 +76,121 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
 
         if ($constraint->strength === 'required') {
             $this->validateRequired($value, $constraint);
+        } else {
+            $this->validateNonRequired($value, $constraint);
+        }
 
+        $this->validateDisplays($value, $constraint);
+    }
+
+    /**
+     * Report a coding whose display the terminology server rejects.
+     *
+     * Runs after whichever membership branch applied, because the two questions are independent: a code
+     * can belong to the value set and still be labelled wrongly. Membership is already reported above,
+     * and the client returns no correction for a code it rejected, so the two cannot double up on one
+     * coding.
+     *
+     * Warning, never error, following {@see FHIRQuestionnaireValidator}
+     * which has reported display this way since it was the only caller. It is also what keeps this safe:
+     * the conformance comparison counts error severity, so this rule cannot move a corpus case into
+     * `ABOVE` however the harness is later wired.
+     *
+     * Silent unless a real terminology client is configured. Display text is not derivable from
+     * anything this repository holds - the generated enums carry it as a docblock comment, not as data -
+     * so a caller who configures nothing sees exactly what they saw before.
+     *
+     * The language question that governs this rule is answered by delegation. A display can be correct
+     * in one declared language and wrong in another, and the server is the authority on that; asking it
+     * is the whole point of {@see FHIRTerminologyClientInterface::validateCodingWithDisplay()}, which
+     * returns a correction only when the display was actually rejected.
+     */
+    private function validateDisplays(mixed $value, FHIRValueSetBinding $constraint): void
+    {
+        if ($this->terminologyClient === null || $this->terminologyClient instanceof NullFHIRTerminologyClient) {
             return;
         }
 
-        $this->validateNonRequired($value, $constraint);
+        // Example-strength bindings are documentation only (ADR-004), display included.
+        if ($constraint->strength === 'example') {
+            return;
+        }
+
+        $override = $this->messageRegistry->getOverride('FHIRValueSetBindingDisplay');
+
+        foreach ($this->displayCandidates($value) as [$system, $code, $display]) {
+            $result = $this->terminologyClient->validateCodingWithDisplay($constraint->valueSetUrl, $system, $code, $display);
+
+            if ($result->correctDisplay === null) {
+                continue;
+            }
+
+            $this->context->buildViolation($override ?? self::DEFAULT_WRONG_DISPLAY_MESSAGE)
+                ->setParameters([
+                    '{{ value }}'    => $display,
+                    '{{ code }}'     => $code,
+                    '{{ system }}'   => $system,
+                    '{{ expected }}' => $result->correctDisplay,
+                ])
+                ->setInvalidValue($display)
+                ->setCode(FHIRViolationCode::WARNING)
+                ->addViolation();
+        }
+    }
+
+    /**
+     * Every coding that can be asked about, as `[system, code, display]`.
+     *
+     * All three are required and a coding missing any of them is skipped. A display cannot be judged
+     * without the system that gives the code its meaning, and a coding carrying no display has made no
+     * claim to check. A `code`-typed element never reaches here for the same reason: it holds a code
+     * alone, with nowhere to put a label.
+     *
+     * @return list<array{string, string, string}>
+     */
+    private function displayCandidates(mixed $value): array
+    {
+        if (is_array($value)) {
+            $candidates = [];
+            foreach ($value as $item) {
+                foreach ($this->displayCandidates($item) as $candidate) {
+                    $candidates[] = $candidate;
+                }
+            }
+
+            return $candidates;
+        }
+
+        if (!is_object($value)) {
+            return [];
+        }
+
+        $coding = self::readPublicProperty($value, 'coding');
+        if (is_array($coding)) {
+            return $this->displayCandidates($coding);
+        }
+
+        $system  = self::readableString(self::readPublicProperty($value, 'system'));
+        $code    = self::readableString(self::readPublicProperty($value, 'code'));
+        $display = self::readableString(self::readPublicProperty($value, 'display'));
+
+        if ($system === null || $code === null || $display === null) {
+            return [];
+        }
+
+        return [[$system, $code, $display]];
+    }
+
+    /** A non-empty string out of a primitive wrapper or a bare string, or null for anything else. */
+    private static function readableString(mixed $value): ?string
+    {
+        if (!self::isTestableCode($value)) {
+            return null;
+        }
+
+        $string = (string) $value;
+
+        return $string === '' ? null : $string;
     }
 
     private function validateRequired(mixed $value, FHIRValueSetBinding $constraint): void
@@ -87,7 +200,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         if ($enumFqcn === null) {
             if ($this->terminologyClient !== null) {
                 $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
-                foreach (is_array($value) ? $value : [$value] as $item) {
+                foreach ($this->codeValues($value) as $item) {
                     if (!$this->terminologyClient->validateCode($constraint->valueSetUrl, $item)) {
                         $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
                             ->setParameters(['{{ value }}' => (string) $item, '{{ url }}' => $constraint->valueSetUrl])
@@ -110,36 +223,16 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         }
 
         /** @var class-string<\BackedEnum> $enumFqcn */
-        if (is_array($value)) {
-            $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
-            foreach ($value as $item) {
-                if (!self::isTestableCode($item)) {
-                    continue;
-                }
+        $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
 
-                if (!$this->isValidEnumCase($enumFqcn, $item)) {
-                    $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
-                        ->setParameters(['{{ value }}' => (string) $item, '{{ url }}' => $constraint->valueSetUrl])
-                        ->setInvalidValue($item)
-                        ->setCode(FHIRViolationCode::ERROR)
-                        ->addViolation();
-                }
+        foreach ($this->codeValues($value) as $item) {
+            if (!$this->isValidEnumCase($enumFqcn, $item)) {
+                $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
+                    ->setParameters(['{{ value }}' => (string) $item, '{{ url }}' => $constraint->valueSetUrl])
+                    ->setInvalidValue($item)
+                    ->setCode(FHIRViolationCode::ERROR)
+                    ->addViolation();
             }
-
-            return;
-        }
-
-        if (!self::isTestableCode($value)) {
-            return;
-        }
-
-        if (!$this->isValidEnumCase($enumFqcn, $value)) {
-            $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
-            $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
-                ->setParameters(['{{ value }}' => (string) $value, '{{ url }}' => $constraint->valueSetUrl])
-                ->setInvalidValue($value)
-                ->setCode(FHIRViolationCode::ERROR)
-                ->addViolation();
         }
     }
 
@@ -174,20 +267,22 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         $override    = $this->messageRegistry->getOverride('FHIRValueSetBinding');
         $bindingCode = $constraint->strict ? FHIRViolationCode::ERROR : FHIRViolationCode::WARNING;
 
-        if (!$this->terminologyClient->validateCode($constraint->valueSetUrl, $value)) {
-            $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
-                ->setParameters(['{{ value }}' => (string) $value, '{{ url }}' => $constraint->valueSetUrl])
-                ->setInvalidValue($value)
-                ->setCode($bindingCode)
-                ->addViolation();
-        }
+        foreach ($this->codeValues($value) as $item) {
+            if (!$this->terminologyClient->validateCode($constraint->valueSetUrl, $item)) {
+                $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
+                    ->setParameters(['{{ value }}' => (string) $item, '{{ url }}' => $constraint->valueSetUrl])
+                    ->setInvalidValue($item)
+                    ->setCode($bindingCode)
+                    ->addViolation();
+            }
 
-        if ($constraint->maxValueSetUrl !== null && !$this->terminologyClient->validateCode($constraint->maxValueSetUrl, $value)) {
-            $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
-                ->setParameters(['{{ value }}' => (string) $value, '{{ url }}' => $constraint->maxValueSetUrl])
-                ->setInvalidValue($value)
-                ->setCode(FHIRViolationCode::ERROR)
-                ->addViolation();
+            if ($constraint->maxValueSetUrl !== null && !$this->terminologyClient->validateCode($constraint->maxValueSetUrl, $item)) {
+                $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
+                    ->setParameters(['{{ value }}' => (string) $item, '{{ url }}' => $constraint->maxValueSetUrl])
+                    ->setInvalidValue($item)
+                    ->setCode(FHIRViolationCode::ERROR)
+                    ->addViolation();
+            }
         }
     }
 
@@ -349,6 +444,85 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     private static function isTestableCode(mixed $value): bool
     {
         return is_string($value) || is_int($value) || $value instanceof \Stringable;
+    }
+
+    /**
+     * Every code a bound value carries, flattened.
+     *
+     * A binding lands on three shapes and only the first was ever checked. A `code`-typed element
+     * arrives as a string or a primitive wrapper. A `Coding` arrives as an object holding the code one
+     * level down. A `CodeableConcept` holds a list of `Coding`s, any of which can carry the bound code.
+     * Before this existed, {@see isTestableCode()} rejected both objects outright on the required path,
+     * and on the non-required path the whole object reached the terminology client, whose
+     * implementations return their default for a non-scalar — so it passed. Every `CodeableConcept`
+     * binding in the generated model went unchecked in both directions, `Condition.clinicalStatus` and
+     * `AllergyIntolerance.clinicalStatus` among them.
+     *
+     * Only the code is read, never the system. A `CodeableConcept` whose coding carries the right code
+     * under the wrong system therefore passes. That is a miss rather than a false positive, and the
+     * conservative direction is the deliberate one: this rule is switched on across every coded element
+     * at once, so it is written to under-report rather than to invent findings on data it has not seen.
+     *
+     * A `CodeableConcept` holding only `text` yields nothing and stays silent, which is the same
+     * reasoning. FHIR allows a text-only concept, and reporting one would be a new class of finding
+     * rather than the one this method exists to enable.
+     *
+     * @return list<mixed> values {@see isValidEnumCase()} and the terminology client can both read
+     */
+    private function codeValues(mixed $value): array
+    {
+        if (is_array($value)) {
+            $codes = [];
+            foreach ($value as $item) {
+                foreach ($this->codeValues($item) as $code) {
+                    $codes[] = $code;
+                }
+            }
+
+            return $codes;
+        }
+
+        if (self::isTestableCode($value) || $value instanceof \BackedEnum) {
+            return [$value];
+        }
+
+        if (!is_object($value)) {
+            return [];
+        }
+
+        // CodeableConcept: every coding it carries is a candidate for the bound code.
+        $coding = self::readPublicProperty($value, 'coding');
+        if (is_array($coding)) {
+            return $this->codeValues($coding);
+        }
+
+        // Coding: the code sits one level down.
+        $code = self::readPublicProperty($value, 'code');
+
+        return self::isTestableCode($code) || $code instanceof \BackedEnum ? [$code] : [];
+    }
+
+    /**
+     * Read a public property, treating an uninitialized one as absent.
+     *
+     * Deserializers bypass the constructor, so a field the document omitted is uninitialized rather
+     * than null and reading it directly throws.
+     */
+    private static function readPublicProperty(object $node, string $property): mixed
+    {
+        $reflection = new \ReflectionClass($node);
+
+        if (!$reflection->hasProperty($property)) {
+            return null;
+        }
+
+        $reflected = $reflection->getProperty($property);
+
+        if (!$reflected->isPublic() || !$reflected->isInitialized($node)) {
+            return null;
+        }
+
+        return $reflected->getValue($node);
     }
 
     private function classNameFromUrl(string $valueSetUrl): string

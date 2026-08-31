@@ -281,7 +281,16 @@ final class HttpFHIRTerminologyClientTest extends TestCase
         self::assertNull($result->correctDisplay);
     }
 
-    public function testValidateCodingWithDisplayReturnsCorrectDisplayWhenResponseIncludesDisplayParam(): void
+    /**
+     * An accepted concept is not a wrong display, however the server chooses to label it.
+     *
+     * The `display` out-parameter is the server's own preferred label, not a verdict on the one that
+     * was sent, so a server answering `result: true` has accepted the display. This case is the exact
+     * shape that used to be reported: a differing label on a concept the server was happy with, here a
+     * difference of casing alone. Treating that as a finding is a false positive on ordinary data, and
+     * it reached every caller of the Questionnaire display check.
+     */
+    public function testAcceptedConceptIsNotAWrongDisplayEvenWhenTheServerPrefersAnotherLabel(): void
     {
         $body = json_encode([
             'resourceType' => 'Parameters',
@@ -296,7 +305,80 @@ final class HttpFHIRTerminologyClientTest extends TestCase
         $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'heart rate');
 
         self::assertTrue($result->valid);
+        self::assertNull($result->correctDisplay);
+    }
+
+    /**
+     * A rejection whose code validates on its own was a rejection of the display, and the server's
+     * label is then the correction.
+     */
+    public function testRejectedDisplayOnAValidCodeIsReportedAsACorrection(): void
+    {
+        $rejected = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [
+                ['name' => 'result', 'valueBoolean' => false],
+                ['name' => 'display', 'valueString' => 'Heart rate'],
+            ],
+        ]);
+        $codeAlone = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'result', 'valueBoolean' => true]],
+        ]);
+        $mockClient = new MockHttpClient([
+            new MockResponse($rejected ?: '{}'),
+            new MockResponse($codeAlone ?: '{}'),
+        ]);
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Not the label');
+
+        self::assertTrue($result->valid);
         self::assertSame('Heart rate', $result->correctDisplay);
+    }
+
+    /**
+     * A rejection whose code also fails on its own is a membership failure. The display is not the
+     * story and naming it would send the caller after the wrong problem.
+     */
+    public function testRejectedCodeIsAMembershipFailureRatherThanADisplayCorrection(): void
+    {
+        $rejected = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [
+                ['name' => 'result', 'valueBoolean' => false],
+                ['name' => 'display', 'valueString' => 'Heart rate'],
+            ],
+        ]);
+        $stillRejected = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'result', 'valueBoolean' => false]],
+        ]);
+        $mockClient = new MockHttpClient([
+            new MockResponse($rejected ?: '{}'),
+            new MockResponse($stillRejected ?: '{}'),
+        ]);
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', 'not-a-code', 'Heart rate');
+
+        self::assertFalse($result->valid);
+        self::assertNull($result->correctDisplay);
+    }
+
+    /** An accepted concept costs one request; the second is only paid on a rejection. */
+    public function testAcceptedConceptCostsASingleRequest(): void
+    {
+        $body = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'result', 'valueBoolean' => true]],
+        ]);
+        $mockClient = new MockHttpClient(new MockResponse($body ?: '{}'));
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
+
+        self::assertSame(1, $mockClient->getRequestsCount());
     }
 
     public function testValidateCodingWithDisplayReturnsFalseValidOnNon2xxResponse(): void
