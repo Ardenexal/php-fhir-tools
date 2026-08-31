@@ -975,7 +975,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
                 // readExtensionUrl(), not getExtensionUrl(): deserializer-origin objects leave the
                 // promoted typed $url uninitialized, and a bare read throws an Error that would take
-                // the whole case out of the comparison as `validate-crashed` -- lowering the apparent
+                // the whole case out of the comparison as `validate-crashed`, lowering the apparent
                 // gap while fixing nothing. See footguns/model-object-initialization.md.
                 $url = $this->readExtensionUrl($ext);
 
