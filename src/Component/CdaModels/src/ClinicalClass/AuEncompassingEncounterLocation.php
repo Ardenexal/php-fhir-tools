@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'au-EncompassingEncounterLocation',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'realmCode', 'typeId', 'templateId', 'typeCode', 'healthCareFacility'],
 )]
 class AuEncompassingEncounterLocation extends InfrastructureRoot
 {

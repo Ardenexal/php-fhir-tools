@@ -20,6 +20,21 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/Organization',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'determinerCode',
+        'id',
+        'name',
+        'telecom',
+        'addr',
+        'standardIndustryClassCode',
+        'asOrganizationPartOf',
+        'asEntityIdentifier',
+    ],
 )]
 class AuOrganization extends Organization
 {

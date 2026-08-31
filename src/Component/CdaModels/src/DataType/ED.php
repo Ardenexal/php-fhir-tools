@@ -16,6 +16,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'ED',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'compression',
+        'integrityCheck',
+        'integrityCheckAlgorithm',
+        'language',
+        'mediaType',
+        'representation',
+        'xmlText',
+        'reference',
+        'thumbnail',
+    ],
 )]
 #[FHIRPathInvariant(
     key: 'ed-base64',

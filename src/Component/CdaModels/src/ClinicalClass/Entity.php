@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'Entity',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'realmCode', 'typeId', 'templateId', 'classCode', 'determinerCode', 'id', 'code', 'desc'],
 )]
 class Entity extends InfrastructureRoot
 {

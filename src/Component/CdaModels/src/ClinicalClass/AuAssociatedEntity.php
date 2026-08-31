@@ -20,6 +20,21 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/AssociatedEntity',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'sdtcIdentifiedBy',
+        'code',
+        'sdtcSpecialty',
+        'addr',
+        'telecom',
+        'associatedPerson',
+        'scopingOrganization',
+    ],
 )]
 class AuAssociatedEntity extends AssociatedEntity
 {

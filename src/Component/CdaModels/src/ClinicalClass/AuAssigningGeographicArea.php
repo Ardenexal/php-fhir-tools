@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'assigningGeographicArea',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'realmCode', 'typeId', 'templateId', 'classCode', 'name'],
 )]
 class AuAssigningGeographicArea extends InfrastructureRoot
 {

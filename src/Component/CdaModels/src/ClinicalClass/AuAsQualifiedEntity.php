@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://ns.electronichealth.net.au/cda/StructureDefinition/asQualifications',
+    propertyOrder: ['nullFlavor', 'realmCode', 'typeId', 'templateId', 'classCode', 'code'],
 )]
 class AuAsQualifiedEntity extends AuAsQualifications
 {

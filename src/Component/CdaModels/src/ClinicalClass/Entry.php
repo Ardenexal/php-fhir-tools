@@ -16,6 +16,23 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
     name: 'Entry',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'contextConductionInd',
+        'act',
+        'encounter',
+        'observation',
+        'observationMedia',
+        'organizer',
+        'procedure',
+        'regionOfInterest',
+        'substanceAdministration',
+        'supply',
+    ],
 )]
 #[FHIRPathInvariant(
     key: 'entry-only-one',

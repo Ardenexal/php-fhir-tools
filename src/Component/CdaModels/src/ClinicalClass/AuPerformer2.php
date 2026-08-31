@@ -17,6 +17,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/Performer2',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'sdtcFunctionCode',
+        'time',
+        'modeCode',
+        'assignedEntity',
+    ],
 )]
 class AuPerformer2 extends Performer2
 {

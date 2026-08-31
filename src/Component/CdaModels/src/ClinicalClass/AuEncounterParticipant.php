@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/EncounterParticipant',
+    propertyOrder: ['nullFlavor', 'realmCode', 'typeId', 'templateId', 'typeCode', 'time', 'assignedEntity'],
 )]
 class AuEncounterParticipant extends EncounterParticipant
 {

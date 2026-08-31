@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'LabeledDrug',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'realmCode', 'typeId', 'templateId', 'classCode', 'determinerCode', 'code', 'name'],
 )]
 class LabeledDrug extends InfrastructureRoot
 {

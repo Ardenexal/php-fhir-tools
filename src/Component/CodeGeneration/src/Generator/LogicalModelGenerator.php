@@ -80,6 +80,14 @@ final class LogicalModelGenerator
      *                                                            PHP does NOT run a parent constructor automatically,
      *                                                            so without this every inherited typed property is
      *                                                            uninitialised and throws on access.
+     * @param list<string>               $propertyOrder           Every property name this class can serialize, own and
+     *                                                            inherited, in published content-model order. Recorded
+     *                                                            on the class attribute because neither reflection nor
+     *                                                            the class hierarchy can reconstruct it: own properties
+     *                                                            reflect before inherited ones, while the content model
+     *                                                            puts a CDA parent's `realmCode`/`typeId`/`templateId`
+     *                                                            first and can place a child's own element mid-sequence.
+     *                                                            Omitted from the attribute when empty.
      */
     public function generate(
         array $definition,
@@ -90,6 +98,7 @@ final class LogicalModelGenerator
         array $inheritedConstraintKeys = [],
         array $valueSetToEnumFqcn = [],
         array $inheritedParams = [],
+        array $propertyOrder = [],
     ): ClassType {
         $url  = (string) ($definition['url'] ?? '');
         $name = (string) ($definition['name'] ?? '');
@@ -144,6 +153,13 @@ final class LogicalModelGenerator
         // line of noise to each of them that says only what its absence says.
         if ($refines !== null) {
             $arguments['refines'] = $refines;
+        }
+
+        // Omitted rather than emitted as an empty list, matching `refines`: an empty list is the
+        // attribute's default and means "no ordering opinion", which serializers read as a signal to
+        // keep their previous behaviour.
+        if ($propertyOrder !== []) {
+            $arguments['propertyOrder'] = $propertyOrder;
         }
 
         $class->addAttribute(LogicalModel::class, $arguments);

@@ -18,6 +18,27 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
     refines: 'http://hl7.org/cda/stds/core/StructureDefinition/Section',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'ID',
+        'classCode',
+        'moodCode',
+        'id',
+        'code',
+        'title',
+        'text',
+        'confidentialityCode',
+        'languageCode',
+        'subject',
+        'author',
+        'informant',
+        'entry',
+        'component',
+        'coverage2',
+    ],
 )]
 class AuSection extends Section
 {

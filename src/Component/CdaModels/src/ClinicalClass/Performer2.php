@@ -17,6 +17,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'Performer2',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'typeCode',
+        'sdtcFunctionCode',
+        'time',
+        'modeCode',
+        'assignedEntity',
+    ],
 )]
 class Performer2 extends InfrastructureRoot
 {

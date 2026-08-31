@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'PIVL_TS',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'value', 'operator', 'phase', 'period', 'alignment', 'institutionSpecified'],
 )]
 class PIVLTS extends SXCMTS
 {

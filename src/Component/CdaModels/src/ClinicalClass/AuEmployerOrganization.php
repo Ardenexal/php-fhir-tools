@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'employerOrganization',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'realmCode', 'typeId', 'templateId', 'id', 'name', 'asOrganizationPartOf'],
 )]
 class AuEmployerOrganization extends InfrastructureRoot
 {

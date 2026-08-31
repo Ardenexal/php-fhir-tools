@@ -107,6 +107,26 @@ class FHIRLogicalModelXmlNormalizer extends FHIRComplexTypeXmlNormalizer
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * CDA fixes the order of an element's children, and the generator records it on the class as
+     * `propertyOrder` because nothing at runtime can reconstruct it: reflection reports a class's own
+     * properties before its ancestors', so `InfrastructureRoot`'s `realmCode`/`typeId`/`templateId` —
+     * first in the content model — arrive last on every act, and AU's `completionCode` is declared on
+     * the child yet belongs mid-sequence in `ClinicalDocument`'s elements.
+     *
+     * The nearest attribute in the hierarchy is the right one: every generated CDA class carries its
+     * own, holding the complete list for that concrete type. The list is empty on a class generated
+     * before the field existed, and empty means "keep reflection order".
+     */
+    protected function contentModelOrder(object $object): array
+    {
+        // `??` already covers a null attribute — it suppresses the whole property chain — so nullsafe
+        // access here would be redundant.
+        return $this->findLogicalModelAttribute($object)->propertyOrder ?? [];
+    }
+
+    /**
      * Read the XML namespace declared by the object's (or an ancestor's) #[LogicalModel] attribute.
      */
     private function logicalModelXmlNamespace(object $object): ?string

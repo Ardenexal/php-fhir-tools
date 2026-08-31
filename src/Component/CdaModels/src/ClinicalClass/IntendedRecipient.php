@@ -19,6 +19,19 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'IntendedRecipient',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'id',
+        'sdtcIdentifiedBy',
+        'addr',
+        'telecom',
+        'informationRecipient',
+        'receivedOrganization',
+    ],
 )]
 class IntendedRecipient extends InfrastructureRoot
 {

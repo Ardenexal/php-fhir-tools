@@ -20,6 +20,19 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'PlayingEntity',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'determinerCode',
+        'code',
+        'quantity',
+        'name',
+        'sdtcBirthTime',
+        'desc',
+    ],
 )]
 class PlayingEntity extends InfrastructureRoot
 {

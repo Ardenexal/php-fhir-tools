@@ -21,6 +21,23 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'SubjectPerson',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'determinerCode',
+        'sdtcId',
+        'name',
+        'sdtcDesc',
+        'administrativeGenderCode',
+        'birthTime',
+        'sdtcDeceasedInd',
+        'sdtcDeceasedTime',
+        'sdtcMultipleBirthInd',
+        'sdtcMultipleBirthOrderNumber',
+    ],
 )]
 class SubjectPerson extends InfrastructureRoot
 {

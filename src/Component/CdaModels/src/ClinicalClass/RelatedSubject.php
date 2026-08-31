@@ -18,6 +18,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'RelatedSubject',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'sdtcId',
+        'code',
+        'addr',
+        'telecom',
+        'subject',
+    ],
 )]
 class RelatedSubject extends InfrastructureRoot
 {

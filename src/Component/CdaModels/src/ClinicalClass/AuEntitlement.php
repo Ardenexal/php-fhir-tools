@@ -17,6 +17,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
     name: 'entitlement',
     fhirVersion: '5.0.0',
     xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: [
+        'nullFlavor',
+        'realmCode',
+        'typeId',
+        'templateId',
+        'classCode',
+        'moodCode',
+        'id',
+        'code',
+        'effectiveTime',
+        'participant',
+    ],
 )]
 class AuEntitlement extends InfrastructureRoot
 {
