@@ -75,6 +75,7 @@ $harness = new ComparisonHarness(
     validation: OracleValidationServiceFactory::create($version),
     serialization: FHIRSerializationService::createWithIG(version: $version, includeBaseProfiles: true),
     version: $version,
+    validationWithoutExtensionResolution: OracleValidationServiceFactory::create($version, resolveExtensions: false),
 );
 
 if (!$asJson) {

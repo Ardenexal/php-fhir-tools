@@ -4,13 +4,23 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
 
+use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\FHIRModifierExtensionValidationTest;
+
 /**
  * Corpus cases we can never match offline, declared explicitly rather than absorbed into seed counts.
  *
- * Every entry here is a case where **all** of the reference validator's errors need a code system we
- * do not have and cannot obtain: LOINC, SNOMED CT and CVX are license-restricted and are not vendored
- * in any form. Deciding them needs a terminology server, so no amount of work on this codebase closes
- * them. They are documentation, not backlog.
+ * Every entry here is a case where **all** of the reference validator's errors are blocked by one
+ * obstacle no work on this codebase removes. There are two such obstacles.
+ *
+ * The first is an unobtainable code system: LOINC, SNOMED CT and CVX are license-restricted and are
+ * not vendored in any form, so deciding them needs a terminology server.
+ *
+ * The second is a recorded design decision, which is just as final until the decision changes. See
+ * {@see REASON_UNKNOWN_EXTENSION}: this project does not report an unresolvable regular extension,
+ * and {@see FHIRModifierExtensionValidationTest}
+ * pins that. Findings the reference validator raises under that rule can never be matched while the
+ * decision stands, so they are documentation rather than backlog. But unlike a licence, a decision
+ * can be revisited, and these entries are where to look when it is.
  *
  * Why a map rather than a rule in `isKnownGap()`: the suppression this replaces was keyed by
  * *invariant key*, which meant it silently swallowed anything matching the rule — including, as it
@@ -25,7 +35,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
  *
  * Deliberately excluded, because they are ours to fix and must not hide here:
  * `qr-bad-ref2` (canonical resolves to the wrong resource type), `vs-params-4` (a ValueSet expression
- * language rule), `contained-canonical` (unknown extension), `obs-de-notx` (a fixed-value mismatch),
+ * language rule), `obs-de-notx` (a fixed-value mismatch),
  * `mimic` (its package *is* vendored — the instance has a system-URI typo), and `obs-temp-bad`
  * (the reference validator's hard-coded vitals code table, a different kind of limitation entirely).
  *
@@ -47,6 +57,24 @@ final class DeclaredLimitations
     public const REASON_HL7_DISPLAY = 'display validation against a vendored CodeSystem is not implemented';
 
     /**
+     * An unresolvable *regular* extension is not an error here, by decision.
+     *
+     * The reference validator reports `The extension <url> could not be found so is not allowed here`
+     * whenever it cannot locate an extension's definition. This project deliberately does not: only
+     * *modifier* extensions are enforced, because those change the meaning of the containing resource,
+     * while an unrecognised regular extension is ignorable (`FHIRValidationService`, search:
+     * `validateModifierExtensions`).
+     *
+     * Reversing it was measured on 2026-08-31 and rejected: it closes 29 R4 findings but leaves four
+     * cases `ABOVE` that no manifest signal can gate, because the reference validator is itself
+     * inconsistent here: it reports nothing at all on `http://example.org/additional-information`
+     * (`questionnaire-enableWhen-dw`) and `http://acme.com/some_url` (R5 `list-extension`) while
+     * erroring on the identical shape in `q-bp`. Matching it would mean reproducing that
+     * inconsistency, and over-reporting is the one direction this comparison must never move.
+     */
+    public const REASON_UNKNOWN_EXTENSION = 'an unresolvable regular extension is not reported, by decision; only modifier extensions are enforced';
+
+    /**
      * case name => [reason, ourErrorCount, javaErrorCount]
      *
      * `ourErrorCount` is what we legitimately report today — 0 for all current entries, but recorded
@@ -61,6 +89,14 @@ final class DeclaredLimitations
             'uk-msg'                   => ['reason' => self::REASON_SNOMED, 'ours' => 0, 'java' => 4],
             'bundle-id-5'              => ['reason' => self::REASON_CVX, 'ours' => 0, 'java' => 1],
             'patient-translated-codes' => ['reason' => self::REASON_HL7_DISPLAY, 'ours' => 0, 'java' => 2],
+
+            // Every Java error on these three is `could not be found`. Cases that carry one of those
+            // findings *beside* something else are deliberately absent: `target-ref-profile-empty`
+            // (7 of 8) and `bundle-urn` (1 of 11) stay BELOW on their remaining findings, exactly as
+            // the partly-terminology-bound cases do.
+            'q-bp'                                 => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 17],
+            'pat-dob-ext'                          => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
+            'nested-questionnaire-nested-valueset' => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
         ],
         'R4B' => [],
         'R5'  => [
@@ -69,6 +105,7 @@ final class DeclaredLimitations
             'observation-triglyceride-good2'         => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'observation-triglyceride-bad-wrongcode' => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'demo-example-2'                         => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
+            'contained-canonical'                    => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
         ],
     ];
 
@@ -138,6 +175,10 @@ final class DeclaredLimitations
     public const DECLARED_SIGNATURES = [
         'doctype is disallowed'       => self::REASON_XXE_REFUSAL,
         'found a doctype declaration' => self::REASON_XXE_REFUSAL,
+        // Deliberately the full sentence, not 'could not be found'. The short form also matches
+        // profile and value-set messages that are ordinary open work, and writing those off is the
+        // failure mode this whole class exists to prevent.
+        'could not be found so is not allowed here' => self::REASON_UNKNOWN_EXTENSION,
     ];
 
     /**
@@ -155,16 +196,22 @@ final class DeclaredLimitations
      */
     public const EXPECTED_FINDING_COUNTS = [
         'R4' => [
-            self::REASON_LOINC  => 27,
-            self::REASON_SNOMED => 19,
-            self::REASON_ICD10  => 4,
-            self::REASON_CVX    => 3,
-            self::REASON_NCI    => 1,
+            // Order matters: the observed histogram is arsort()ed and the pin compares with
+            // assertSame, so these must be listed largest first.
+            self::REASON_UNKNOWN_EXTENSION => 30,
+            self::REASON_LOINC             => 27,
+            self::REASON_SNOMED            => 19,
+            self::REASON_ICD10             => 4,
+            self::REASON_CVX               => 3,
+            self::REASON_NCI               => 1,
         ],
         'R4B' => [],
         'R5'  => [
-            self::REASON_LOINC       => 7,
-            self::REASON_XXE_REFUSAL => 1,
+            self::REASON_LOINC             => 7,
+            // Order matters: the observed histogram is arsort()ed, and the pin compares arrays with
+            // assertSame, so equal counts must appear in the order the harness produces them.
+            self::REASON_UNKNOWN_EXTENSION => 1,
+            self::REASON_XXE_REFUSAL       => 1,
         ],
     ];
 

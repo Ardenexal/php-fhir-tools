@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConst
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistryFactory;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
@@ -42,7 +43,7 @@ use Symfony\Component\Validator\Validation;
  */
 final class OracleValidationServiceFactory
 {
-    public static function create(FhirVersion $version): FHIRValidationService
+    public static function create(FhirVersion $version, bool $resolveExtensions = true): FHIRValidationService
     {
         $accessor       = PropertyAccess::createPropertyAccessor();
         $registry       = new FHIRValidationMessageRegistry();
@@ -92,6 +93,15 @@ final class OracleValidationServiceFactory
             ->setConstraintValidatorFactory($factory)
             ->getValidator();
 
-        return new FHIRValidationService($validator, $pathService, typeResolver: new FhirPropertyTypeHierarchyResolver());
+        // The IG type registry gates FHIRValidationService's extension pass entirely
+        // ($this->registry !== null). Without it the harness measured a validator with extension
+        // resolution switched off, so neither unknown-extension rule could ever fire here.
+        // create() with no IG directory still scans the generated base Extension directories.
+        return new FHIRValidationService(
+            $validator,
+            $pathService,
+            registry: $resolveExtensions ? FHIRIGTypeRegistryFactory::create() : null,
+            typeResolver: new FhirPropertyTypeHierarchyResolver(),
+        );
     }
 }

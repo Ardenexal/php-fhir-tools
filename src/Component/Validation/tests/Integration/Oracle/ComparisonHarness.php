@@ -51,6 +51,12 @@ final class ComparisonHarness
         private readonly FHIRValidationService $validation,
         private readonly FHIRSerializationService $serialization,
         private readonly FhirVersion $version,
+        /**
+         * The same validator with extension resolution switched off, for cases the reference
+         * validator ran with extension definitions we do not load. Null falls back to $validation,
+         * which measures those cases as if we had the same inputs; we do not.
+         */
+        private readonly ?FHIRValidationService $validationWithoutExtensionResolution = null,
         ?ViolationFamilyClassifier $familyClassifier = null,
         ?JavaFindingMatcher $matcher = null,
         ?MissingFindingClassifier $missingClassifier = null,
@@ -169,7 +175,14 @@ final class ComparisonHarness
                 continue;
             }
 
-            $comparison = $this->compareCase($name, $data, $javaOutcome, $skips, $unread);
+            $comparison = $this->compareCase(
+                $name,
+                $data,
+                $javaOutcome,
+                $skips,
+                $unread,
+                self::referenceHadExtensionSourcesWeLack($case),
+            );
             if ($comparison === null) {
                 continue;
             }
@@ -202,6 +215,7 @@ final class ComparisonHarness
         JavaOutcome $javaOutcome,
         array &$skips,
         array &$unread,
+        bool $referenceHadExtraExtensionSources = false,
     ): ?CaseComparison {
         try {
             $resource = $this->serialization->deserialize($data);
@@ -281,7 +295,17 @@ final class ComparisonHarness
             // a document claiming a profile is checked against it. It is only reachable because the
             // serialization service below is built with includeBaseProfiles, so such a document
             // deserializes into the typed profile subclass rather than the base resource class.
-            $report = $this->validation->validate($resource, deriveProfilesFromClass: true);
+            // A case whose manifest entry hands the reference validator extension definitions we do
+            // not load is validated with extension resolution off. Reporting "could not be found"
+            // there measures the inputs, not the validator: on `uk-msg` the manifest declares
+            // allowed-extension-domain https://fhir.nhs.uk/StructureDefinition, so the reference
+            // validator is told those extensions are legitimate without a definition, and every one
+            // we flagged was a false positive of our own making.
+            $service = $referenceHadExtraExtensionSources
+                ? ($this->validationWithoutExtensionResolution ?? $this->validation)
+                : $this->validation;
+
+            $report = $service->validate($resource, deriveProfilesFromClass: true);
         } catch (\Throwable) {
             $skips[$name] = SkipReason::ValidateCrashed;
 
@@ -308,6 +332,42 @@ final class ComparisonHarness
             ),
             delta: $this->delta($javaOutcome->errorTexts, $errors, $javaOutcome->errorExpressions),
         );
+    }
+
+    /**
+     * Did the reference validator hold extension definitions, or a permission to skip them, that we do not?
+     *
+     * Our unknown-extension rule can only be compared against a run configured like ours. The manifest
+     * records four ways the reference validator was given more than we load:
+     *
+     * - `packages` — IG packages loaded for this case (`obs-de` loads four German profile packages).
+     * - `allowed-extension-domain` — a domain whose extensions are accepted with no definition at all
+     *   (`uk-msg` declares https://fhir.nhs.uk/StructureDefinition).
+     * - `profile` / `supporting5` — StructureDefinitions supplied beside the instance, whether as the
+     *   profile validated against (`test-input-params-example1` supplies an ADHA Parameters profile)
+     *   or as extra definitions (`no/Person-test` supplies SimpleExtension and ComplexExtension). The
+     *   top-level `supporting` and `profiles` keys are already dropped in {@see selectCases()}; these
+     *   nested ones are not.
+     * - `module: xver` — the cross-version extension mechanism, where a URL such as
+     *   `http://hl7.org/fhir/3.0/StructureDefinition/extension-Observation.value` is resolved
+     *   structurally from another version rather than looked up.
+     *
+     * Deliberately not a skip: the case stays compared, and every other rule keeps measuring it. Only
+     * extension resolution is switched off, so the gate cannot quietly shrink the compared set.
+     *
+     * @param array<string, mixed> $case one manifest `test-cases` entry
+     */
+    private static function referenceHadExtensionSourcesWeLack(array $case): bool
+    {
+        if (isset($case['packages']) || isset($case['allowed-extension-domain']) || isset($case['supporting5'])) {
+            return true;
+        }
+
+        if (($case['module'] ?? '') === 'xver') {
+            return true;
+        }
+
+        return is_array($case['profile'] ?? null);
     }
 
     /**

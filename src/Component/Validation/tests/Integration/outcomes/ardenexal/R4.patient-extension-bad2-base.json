@@ -1,5 +1,5 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -16,6 +16,9 @@
     },
     "outcome": {
         "errors": {
+            "constraint:FHIRValidationService": [
+                "extension — Extension.url is required in order to identify, use and validate the extension"
+            ],
             "constraint:PrimitiveFormatChecker": [
                 "extension[0].url — value cannot be empty"
             ]
