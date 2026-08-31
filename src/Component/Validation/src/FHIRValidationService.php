@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionCon
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
@@ -51,10 +52,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     /**
      * Validates a FHIR resource against constraints, extension contexts, and optional profiles.
      *
-     * @param object                     $resource               The FHIR resource to validate
-     * @param list<string>               $profileUrls            FHIR profile canonical URLs to validate against (empty array uses default constraints only)
-     * @param bool                       $includeMustSupportInfo When true, includes info-level violations for unpopulated must-support properties
-     * @param FHIRObligationContext|null $obligationContext      When provided, applies obligation codes (SHALL_POPULATE, SHOULD_POPULATE, etc.)
+     * @param object                     $resource                The FHIR resource to validate
+     * @param list<string>               $profileUrls             FHIR profile canonical URLs to validate against (empty array uses default constraints only)
+     * @param bool                       $includeMustSupportInfo  When true, includes info-level violations for unpopulated must-support properties
+     * @param FHIRObligationContext|null $obligationContext       When provided, applies obligation codes (SHALL_POPULATE, SHOULD_POPULATE, etc.)
+     * @param bool                       $deriveProfilesFromClass When true, also validates against every profile the resource's own class declares,
+     *                                                            including those it inherits. Off by default: it activates constraint groups the
+     *                                                            caller did not ask for.
      *
      * @return FHIRValidationReport A structured report containing all violations found at all severity levels
      */
@@ -63,8 +67,17 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         array $profileUrls = [],
         bool $includeMustSupportInfo = false,
         ?FHIRObligationContext $obligationContext = null,
+        bool $deriveProfilesFromClass = false,
     ): FHIRValidationReport {
         $groups = ['Default', ...$profileUrls];
+
+        if ($deriveProfilesFromClass) {
+            foreach ($this->declaredProfileUrls($resource) as $derived) {
+                if (!in_array($derived, $groups, true)) {
+                    $groups[] = $derived;
+                }
+            }
+        }
 
         $rawViolations = $this->validator->validate($resource, null, $groups);
 
@@ -167,15 +180,38 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * Converts a Symfony ConstraintViolation into a structured FHIRValidationViolation.
+     * Canonical URLs of every profile the resource's class declares, nearest ancestor last.
      *
-     * Maps severity codes, extracts the constraint type and profile group, and preserves violation
-     * path and message. Handles FHIRPath invariants and FHIRProfile constraints specially.
+     * A profile class carries #[FHIRProfileConstraint]s under its own canonical URL as the group,
+     * and a derived profile inherits its parent's constraints without re-declaring them:
+     * ObservationBpProfile holds `component` min=2, while `category`, `code`, `subject` and
+     * `effective[x]` come from ObservationVitalsignsProfile and stay grouped under the *vitalsigns*
+     * URL. Activating only the URL the instance names would leave every inherited rule inert, so the
+     * whole chain is walked rather than just the leaf.
      *
-     * @param ConstraintViolationInterface $violation The Symfony constraint violation to convert
+     * A resource that is not a profile subclass yields nothing, which is what keeps the profile rules
+     * silent on documents that declare no profile.
      *
-     * @return FHIRValidationViolation A structured FHIR validation violation
+     * @return list<string>
      */
+    private function declaredProfileUrls(object $resource): array
+    {
+        $urls = [];
+
+        for ($class = new \ReflectionClass($resource); $class !== false; $class = $class->getParentClass()) {
+            foreach ($class->getAttributes(FHIRProfile::class) as $attribute) {
+                /** @var FHIRProfile $profile */
+                $profile = $attribute->newInstance();
+
+                if ($profile->profileUrl !== '' && !in_array($profile->profileUrl, $urls, true)) {
+                    $urls[] = $profile->profileUrl;
+                }
+            }
+        }
+
+        return $urls;
+    }
+
     private function mapViolation(ConstraintViolationInterface $violation): FHIRValidationViolation
     {
         $code = $violation->getCode();

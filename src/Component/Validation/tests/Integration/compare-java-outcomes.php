@@ -73,7 +73,7 @@ $only    = match (true) {
 $harness = new ComparisonHarness(
     vendorDir: __DIR__ . '/../../../../../vendor',
     validation: OracleValidationServiceFactory::create($version),
-    serialization: FHIRSerializationService::createDefault($version),
+    serialization: FHIRSerializationService::createWithIG(version: $version, includeBaseProfiles: true),
     version: $version,
 );
 

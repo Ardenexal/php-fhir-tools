@@ -277,7 +277,11 @@ final class ComparisonHarness
             // \Throwable, not \Error: the cascade's known fatal (NoSuchMetadataException on a
             // non-object) extends Symfony's RuntimeException, so catching \Error would let it
             // escape and abort the whole run with no partial results.
-            $report = $this->validation->validate($resource);
+            // deriveProfilesFromClass mirrors what the reference validator does with meta.profile:
+            // a document claiming a profile is checked against it. It is only reachable because the
+            // serialization service below is built with includeBaseProfiles, so such a document
+            // deserializes into the typed profile subclass rather than the base resource class.
+            $report = $this->validation->validate($resource, deriveProfilesFromClass: true);
         } catch (\Throwable) {
             $skips[$name] = SkipReason::ValidateCrashed;
 
