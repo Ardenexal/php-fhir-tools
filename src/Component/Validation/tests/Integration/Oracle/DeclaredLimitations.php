@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
 
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\FHIRModifierExtensionValidationTest;
+use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
 
 /**
  * Corpus cases we can never match offline, declared explicitly rather than absorbed into seed counts.
@@ -54,7 +55,26 @@ final class DeclaredLimitations
 
     public const REASON_CVX = 'CVX vaccine code displays are not vendored';
 
-    public const REASON_HL7_DISPLAY = 'display validation against a vendored CodeSystem is not implemented';
+    /**
+     * Display text is checked by a terminology server, not by this codebase.
+     *
+     * The reference validator answers "is this display right for this code" with a set of
+     * language-tagged alternatives, which is what a `$validate-code` call returns. The contract for it
+     * already exists here — {@see FHIRTerminologyClientInterface::validateCodingWithDisplay()}
+     * returns the corrected display — but `FHIRValidationService` is constructed with no terminology
+     * client at all, so general resource validation has no path to one. The only production caller is
+     * `FHIRQuestionnaireValidator`.
+     *
+     * Wiring one in is worth doing for callers who have a server, and it would answer LOINC and SNOMED
+     * displays that no amount of vendoring can. It cannot move this comparison, because the corpus is
+     * validated offline by design. So the finding is declared rather than counted as open work here.
+     *
+     * Measured 2026-08-31 across the whole corpus: of 71 `Wrong Display Name` findings, 52 name LOINC or
+     * SNOMED and carry their own licence reason; the rest name systems that are either unvendored or sit
+     * on cases `ComparisonHarness::selectCases()` never selects. Exactly two reach this reason, both on
+     * `patient-translated-codes`, and both need language designations rather than a base display.
+     */
+    public const REASON_HL7_DISPLAY = 'display validation is a terminology-server operation and no terminology client is wired into FHIRValidationService; the corpus is validated offline';
 
     /**
      * An unresolvable *regular* extension is not an error here, by decision.
@@ -179,6 +199,11 @@ final class DeclaredLimitations
         // profile and value-set messages that are ordinary open work, and writing those off is the
         // failure mode this whole class exists to prevent.
         'could not be found so is not allowed here' => self::REASON_UNKNOWN_EXTENSION,
+        // Safe to match on the opening phrase alone: it is the literal opening of exactly one reference
+        // validator rule and cannot reach a structural finding. Order saves the attribution — the
+        // licence-bound systems are matched first in reasonFor(), so a LOINC display keeps REASON_LOINC
+        // and only a display on a system with no licence excuse falls through to here.
+        'wrong display name' => self::REASON_HL7_DISPLAY,
     ];
 
     /**
@@ -203,6 +228,7 @@ final class DeclaredLimitations
             self::REASON_SNOMED            => 19,
             self::REASON_ICD10             => 4,
             self::REASON_CVX               => 3,
+            self::REASON_HL7_DISPLAY       => 2,
             self::REASON_NCI               => 1,
         ],
         'R4B' => [],
