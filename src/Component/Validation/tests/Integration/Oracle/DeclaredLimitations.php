@@ -156,7 +156,7 @@ final class DeclaredLimitations
      *
      * A system-keyed rule is the same *shape* as the invariant-keyed suppression this class replaced, and
      * that shape failed by absorbing whatever matched. What made the case map safe was not its key but its
-     * **pinned counts**, so that property is kept: see {@see DECLARED_FINDING_COUNTS}. A new LOINC finding
+     * **pinned counts**, so that property is kept: see {@see EXPECTED_FINDING_COUNTS}. A new LOINC finding
      * appearing must fail a test rather than quietly joining the written-off pile.
      *
      * Verified 2026-08-20 against what is actually reachable at validation time. That is **not** the
@@ -210,9 +210,11 @@ final class DeclaredLimitations
      * version => reason => how many findings it blocks, as measured 2026-08-20.
      *
      * The property that made the case-keyed {@see MAP} safe, kept for the system-keyed rule: a claim that
-     * cannot fail is not worth making. Pinned by `DeclaredLimitationsTest`, so a new LOINC finding has to
-     * fail a test rather than quietly join the written-off pile — which is exactly how the invariant-keyed
-     * suppression this class replaced went wrong.
+     * cannot fail is not worth making. Pinned by
+     * `MissingFindingMeasurementTest::testDeclaredLimitationsMatchTheirPinnedCounts()` — not by
+     * `DeclaredLimitationsTest`, which pins {@see MAP} instead — so a new LOINC finding has to fail a test
+     * rather than quietly join the written-off pile, which is exactly how the invariant-keyed suppression
+     * this class replaced went wrong.
      *
      * Update these only after reading why the number moved. Growing means more findings are being written
      * off; shrinking means a limitation stopped being one and its entry should go.
@@ -221,8 +223,8 @@ final class DeclaredLimitations
      */
     public const EXPECTED_FINDING_COUNTS = [
         'R4' => [
-            // Order matters: the observed histogram is arsort()ed and the pin compares with
-            // assertSame, so these must be listed largest first.
+            // Order matters: the pin compares with assertSame against a histogram sorted by count
+            // descending, then by reason text, so list these largest first and break ties the same way.
             self::REASON_UNKNOWN_EXTENSION => 30,
             self::REASON_LOINC             => 27,
             self::REASON_SNOMED            => 19,
@@ -234,8 +236,8 @@ final class DeclaredLimitations
         'R4B' => [],
         'R5'  => [
             self::REASON_LOINC             => 7,
-            // Order matters: the observed histogram is arsort()ed, and the pin compares arrays with
-            // assertSame, so equal counts must appear in the order the harness produces them.
+            // These two are tied at one, so their order is decided by reason text rather than by
+            // whatever order the corpus produced them in. See ComparisonReport::declaredByReason().
             self::REASON_UNKNOWN_EXTENSION => 1,
             self::REASON_XXE_REFUSAL       => 1,
         ],

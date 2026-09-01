@@ -44,11 +44,16 @@ final class UnknownInputRecorder
      * overwhelming majority, and a reflection walk per resource costs more than double the R4
      * conformance harness wall-clock.
      *
-     * @return bool true when the table has never been written to
+     * A table that has been written to and has since emptied counts as empty. Checking only for a null
+     * field would latch this false for the rest of the process: the `WeakMap` stays allocated after every
+     * entry it held has been collected, so one document carrying unknown input would cost every later
+     * clean resource the full walk this guard exists to skip.
+     *
+     * @return bool true when the table holds no records
      */
     public static function isEmpty(): bool
     {
-        return self::$records === null;
+        return self::$records === null || self::$records->count() === 0;
     }
 
     /**

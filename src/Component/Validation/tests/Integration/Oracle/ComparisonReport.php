@@ -181,7 +181,19 @@ final class ComparisonReport
             }
         }
 
-        arsort($histogram);
+        // Descending by count, then by reason text, so equal counts have one defined order.
+        //
+        // `arsort()` alone was not enough. PHP's sort is stable, so reasons tied on count came out in
+        // whatever order the corpus happened to produce them — and R5 holds two reasons tied at one.
+        // The pin in `MissingFindingMeasurementTest` compares with `assertSame`, which is order
+        // sensitive, so adding or removing an unrelated case could flip a tied pair and fail it with
+        // "a declared limitation changed size" when nothing had changed size. Sorting the tiebreak
+        // explicitly keeps the pin strict about counts without making it hostage to iteration order.
+        $counts = $histogram;
+        uksort(
+            $histogram,
+            static fn (string $first, string $second): int => [$counts[$second], $first] <=> [$counts[$first], $second],
+        );
 
         return $histogram;
     }

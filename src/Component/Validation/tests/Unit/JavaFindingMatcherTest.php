@@ -125,6 +125,53 @@ final class JavaFindingMatcherTest extends TestCase
         self::assertSame($java, $this->matcher->unmatched($java, $ours));
     }
 
+    /**
+     * The invariant-key rule is location-blind on purpose, and this records what that costs.
+     *
+     * Every other path-aware rule here has a refuses-a-different-location test; this one has none,
+     * because it is the only rule that never receives the per-finding expression. An invariant key names
+     * a rule rather than an occurrence, so two findings of the same key in one document pair in arrival
+     * order — the aggregate stays right and the attribution can cross, which is what this pins.
+     *
+     * Deliberately a characterisation test rather than a fix. Requiring path agreement sounds like the
+     * obvious remedy and is not: our paths and the reference validator's expressions are different
+     * shapes (`parameter[14].value` against `Parameters.parameter[14].value.ofType(string)`), which is
+     * why this file carries `instancePath()`, `withoutTrailingIndex()` and `contextProperty()` to
+     * reconcile them elsewhere. Demanding agreement here would break pairs that are currently correct.
+     *
+     * Not reachable on the corpus today: the only two cases where the reference validator repeats a key
+     * at different paths are `primitive-bad` (`ele-1`) and `ips-htmlrefs-forwards` (`txt-1`), and we
+     * carry no finding with either key on either — `PrimitiveFormatChecker` sets `invariantKey: null`
+     * throughout. It becomes reachable the moment a checker starts emitting one of those keys as an
+     * invariant, so this test is the tripwire for that day.
+     */
+    public function testTwoFindingsSharingAnInvariantKeyPairInArrivalOrderNotByPath(): void
+    {
+        $text = "Constraint failed: ele-1: 'All FHIR elements must have a @value or children'";
+        $java = [$text, $text];
+
+        // The reference expressions are deliberately the reverse of our arrival order.
+        $expressions = [
+            'Parameters.parameter[35].value.ofType(markdown)',
+            'Parameters.parameter[14].value.ofType(string)',
+        ];
+
+        $ours = [
+            $this->invariant('ele-1', 'parameter[14].value', 'All FHIR elements must have a @value or children'),
+            $this->invariant('ele-1', 'parameter[35].value', 'All FHIR elements must have a @value or children'),
+        ];
+
+        self::assertSame([], $this->matcher->unmatched($java, $ours, $expressions), 'both should still pair');
+
+        $pairs = $this->matcher->matchedPairs($java, $ours, $expressions);
+        self::assertCount(2, $pairs);
+        self::assertSame('invariant-key', $pairs[0]['rule']);
+
+        // The first reference finding names parameter[35], and is explained by our parameter[14] one.
+        self::assertSame('parameter[14].value', $pairs[0]['ourPath']);
+        self::assertSame('parameter[35].value', $pairs[1]['ourPath']);
+    }
+
     /** Quoted values differ between renderings of one rule; the rule wording does not. */
     public function testIdenticalWordingPairsDespiteDifferentQuotedValues(): void
     {

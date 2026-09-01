@@ -111,11 +111,45 @@ final class JavaOutcomeReader
                 // same thing. Either says which element the finding is about, which the message text does
                 // not: it names the element by type (`List.status`), so two Lists in one document are
                 // indistinguishable without this.
-                $where              = $issue['expression'] ?? $issue['location'] ?? null;
-                $errorExpressions[] = is_array($where) && is_string($where[0] ?? null) ? $where[0] : '';
+                //
+                // Falling through on emptiness rather than on null. `??` only skips a field that is absent,
+                // so an `expression: []` — present but carrying nothing — would shadow a usable `location`
+                // and yield `''`, which makes every path-aware pairing rule refuse the finding. The
+                // vendored corpus does not currently contain that shape, and in fact never exercises
+                // `location` at all: of its error findings all but four carry a usable `expression` and
+                // those four (JSON parse failures) carry neither field. So this branch is untested by the
+                // corpus, which is the reason to make it correct by construction rather than by luck.
+                $errorExpressions[] = self::firstUsableString($issue['expression'] ?? null)
+                    ?? self::firstUsableString($issue['location'] ?? null)
+                    ?? '';
             }
         }
 
         return new JavaOutcome($errors, $warnings, $info, $errorTexts, $errorExpressions);
+    }
+
+    /**
+     * The first usable string in an OperationOutcome location-ish field, or null when there is none.
+     *
+     * Treats "present but carrying nothing" the same as "absent", so a caller can chain fallbacks with
+     * `??` and have them actually fall through.
+     *
+     * @param mixed $field the raw `expression` or `location` value as it appeared in the outcome
+     *
+     * @return string|null the first non-empty string it holds, or null when it holds no usable one
+     */
+    private static function firstUsableString(mixed $field): ?string
+    {
+        if (!is_array($field)) {
+            return null;
+        }
+
+        foreach ($field as $entry) {
+            if (is_string($entry) && $entry !== '') {
+                return $entry;
+            }
+        }
+
+        return null;
     }
 }

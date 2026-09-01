@@ -160,6 +160,16 @@ final class PrimitiveFormatChecker
 
     private const string TIMEZONE_SUFFIX = '/(Z|[+\-]\d{2}:\d{2})\z/';
 
+    /**
+     * A timezone FHIR actually permits: `Z`, or an offset within ±14:00.
+     *
+     * {@see TIMEZONE_SUFFIX} asks only whether a suffix is present, which is the wrong question once the
+     * value has parsed — brick accepts offsets the specification does not, so `-15:00` reads fine. The
+     * offset alternation here is the same one {@see INSTANT_SOURCE} carries, kept as its own constant so
+     * the `dateTime` branch can reuse it without relaxing the whole instant pattern.
+     */
+    private const string VALID_TIMEZONE_SUFFIX = '/(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))\z/';
+
     private const string URI_SCHEME = '/\A[a-zA-Z][a-zA-Z0-9+.\-]*:/';
 
     /** @var array<string, bool> keyed by declaring class and property name; reflection is not free */
@@ -619,8 +629,18 @@ final class PrimitiveFormatChecker
             return null;
         }
 
-        if (preg_match(self::TIMEZONE_SUFFIX, $lexeme) === 1) {
+        // A timezone is present and inside the range FHIR permits, so the value is well formed.
+        if (preg_match(self::VALID_TIMEZONE_SUFFIX, $lexeme) === 1) {
             return null;
+        }
+
+        // A suffix that is present but outside ±14:00 is a malformed dateTime, not a missing timezone.
+        // Checking only for presence let `1983-01-01T12:32:45-15:00` through while the identical lexeme
+        // typed `instant` was rejected by the branch above, so one type enforced the offset range and the
+        // other did not. The wording is the one {@see MALFORMED} already uses for an unparseable
+        // dateTime, because the reference validator does not distinguish the two either.
+        if (preg_match(self::TIMEZONE_SUFFIX, $lexeme) === 1) {
+            return $this->violation($path, sprintf(self::MALFORMED[FHIRDateTime::class], $lexeme));
         }
 
         return $this->violation($path, 'If a date has a time, it must have a timezone');

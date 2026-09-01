@@ -114,10 +114,19 @@ final class MissingFindingClassifierTest extends TestCase
     /**
      * Every finding whose text matches more than one label, with the label that must win.
      *
-     * These seven collisions are the complete set on the vendored corpus, found by matching each finding
-     * against every signature rather than stopping at the first hit. They are the only placements where
-     * `SIGNATURES` order decides the answer; anything not listed here survives any reordering. Texts are
-     * verbatim from `vendor/fhir/fhir-test-cases/validator/outcomes/java/`.
+     * Measured by matching all 1313 reference error texts against every signature rather than stopping at
+     * the first hit: the corpus holds **eleven** distinct label contests. Five of the eleven occur only on
+     * cases carrying no committed fixture, so nothing compares them and no ordering decision reaches them.
+     * The remaining six are pinned here and by the two standalone tests above.
+     *
+     * An earlier version of this docblock claimed seven collisions and called them complete, which was
+     * wrong in both directions: the provider held four entries, and two of the six pins cover the *same*
+     * contest (`primitive:format BEATS profile:structure` — the invalid-id test above and the whitespace
+     * case below). Counting tests is not counting contests, which is how `invariant:unevaluated BEATS
+     * bundle:fullurl` went unpinned while being the one mislabel {@see MissingFindingClassifier::SIGNATURES}
+     * names as its own reason for ordering invariants first.
+     *
+     * Texts are verbatim from `vendor/fhir/fhir-test-cases/validator/outcomes/java/`.
      *
      * @return iterable<string, array{string, string}>
      */
@@ -148,6 +157,17 @@ final class MissingFindingClassifierTest extends TestCase
         yield 'a whitespace rule on a code is a string check' => [
             "The code ' asdasd' is not valid (whitespace rules)",
             'primitive:format',
+        ];
+
+        // The mislabel the SIGNATURES comment cites as its reason for ordering invariants first, and the
+        // only contest on a compared case that nothing pinned until now. `bdl-7`'s description mentions
+        // fullUrl, so `bundle:fullurl` — a single broad `fullurl` substring — also matches it. The
+        // capability an unevaluated invariant needs is invariant evaluation, whatever its description
+        // happens to mention. Live on `japanese-utf8-ok`, which is compared.
+        yield 'an invariant beats a bundle rule its description mentions' => [
+            "Constraint failed: bdl-7: 'FullUrl must be unique in a bundle, or else entries with the same "
+            . "fullUrl must have different meta.versionId (except in history bundles)'",
+            'invariant:unevaluated',
         ];
 
         // Both labels are terminology and both are blocked by the same accepted decision, so the split

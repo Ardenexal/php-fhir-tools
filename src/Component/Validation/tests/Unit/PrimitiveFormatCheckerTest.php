@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\OidPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\ListResource;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\InstantPrimitive;
@@ -86,6 +87,57 @@ final class PrimitiveFormatCheckerTest extends TestCase
     public function testParsedTemporalIsNotReported(): void
     {
         self::assertSame([], $this->messagesFor(new DateTimePrimitive(value: FHIRDateTime::parse('2013-01-01T12:32:45+10:00'))));
+    }
+
+    /**
+     * The offset range is enforced on `dateTime`, not only on `instant`.
+     *
+     * brick parses an offset the specification forbids, so a presence-only timezone test let this through
+     * while the identical lexeme typed `instant` was rejected. One type enforcing the range and the other
+     * not is the asymmetry this pins.
+     */
+    public function testDateTimeWithAnOffsetOutsideTheAllowedRangeIsReported(): void
+    {
+        self::assertSame(
+            ["Not a valid date/time format: '1983-01-01T12:32:45-15:00'"],
+            $this->messagesFor(new DateTimePrimitive(value: FHIRDateTime::parse('1983-01-01T12:32:45-15:00'))),
+        );
+    }
+
+    /**
+     * The empty-scalar rule and the generated `Regex` cover disjoint inputs, so neither doubles up.
+     *
+     * `Resource.id` is a plain `propertyKind: 'scalar'` and therefore reachable by
+     * {@see PrimitiveFormatChecker::isEmptyReportableScalar()}, which looks like it should collide with
+     * the `Regex` the generator emits on the same property. It does not: Symfony constraints treat an
+     * empty string as nothing to judge — that is `NotBlank`'s job — so the regex is silent on `''` and
+     * this rule is silent on anything non-empty. Pinned because the collision would be an over-report,
+     * the one direction this comparison must never move, and because a change to either rule's emptiness
+     * handling would create it silently.
+     */
+    public function testEmptyScalarAndTheGeneratedRegexDoNotBothReportOneId(): void
+    {
+        $checker = new PrimitiveFormatChecker();
+
+        $empty = $checker->check(new ListResource(id: ''));
+        self::assertCount(1, $empty, 'an empty id is this rule alone');
+        self::assertSame('value cannot be empty', $empty[0]->message);
+
+        // A malformed-but-present id belongs to the generated Regex, so this pass must stay quiet.
+        self::assertSame([], $checker->check(new ListResource(id: 'has space')));
+    }
+
+    /** The boundary FHIR does allow, and `Z`, both stay silent. */
+    public function testDateTimeAtTheOffsetBoundaryIsAccepted(): void
+    {
+        self::assertSame(
+            [],
+            $this->messagesFor(
+                new DateTimePrimitive(value: FHIRDateTime::parse('1983-01-01T12:32:45+14:00')),
+                new DateTimePrimitive(value: FHIRDateTime::parse('1983-01-01T12:32:45-13:59')),
+                new DateTimePrimitive(value: FHIRDateTime::parse('1983-01-01T12:32:45Z')),
+            ),
+        );
     }
 
     /**

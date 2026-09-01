@@ -117,7 +117,17 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             return new CodingValidationResult(false, null);
         }
 
-        if ($this->parseResultParameter($body)) {
+        $accepted = self::parseOptionalResultParameter($body);
+
+        // The server answered, but not with a readable `result`. That is a malformed response, not a
+        // verdict on the display, so it must not become a display finding. Reported as invalid because
+        // that is what every other unreadable answer here reports, and silence would claim membership we
+        // never established.
+        if ($accepted === null) {
+            return new CodingValidationResult(false, null);
+        }
+
+        if ($accepted) {
             return new CodingValidationResult(true, null);
         }
 
@@ -126,7 +136,18 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             return new CodingValidationResult(false, null);
         }
 
-        return new CodingValidationResult(true, self::parseDisplayParameter($body) ?? $display);
+        $correctDisplay = self::parseDisplayParameter($body);
+
+        // The code is a member, so the display was what the server rejected — but a correction we cannot
+        // name is not reportable. `CodingValidationResult` carries a replacement label or nothing, and
+        // returning the caller's own display as its own correction yields a finding that names no defect
+        // and no fix. Widening the published interface to express "rejected, no replacement offered" is a
+        // contract decision rather than part of this rule, so the honest answer is silence.
+        if ($correctDisplay === null || $correctDisplay === $display) {
+            return new CodingValidationResult(true, null);
+        }
+
+        return new CodingValidationResult(true, $correctDisplay);
     }
 
     /**
@@ -168,10 +189,27 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
      */
     private function parseResultParameter(string $body): bool
     {
+        return self::parseOptionalResultParameter($body) === true;
+    }
+
+    /**
+     * The `result` boolean, or null when the body carries no readable one.
+     *
+     * The plain boolean form cannot tell a server that said `result: false` from one whose answer could
+     * not be read at all, and those are different facts: the first is a verdict, the second is a broken
+     * exchange. Callers that only need "did this validate" collapse both to false; the display rule needs
+     * them apart, because inferring a wrong display from an unreadable response invents a finding.
+     *
+     * @param string $body raw response body from a `$validate-code` call
+     *
+     * @return bool|null the server's verdict, or null when it stated none this method could read
+     */
+    private static function parseOptionalResultParameter(string $body): ?bool
+    {
         $data = json_decode($body, true);
 
-        if (!is_array($data) || !isset($data['parameter']) || !is_array($data['parameter'])) {
-            return false;
+        if (!is_array($data) || !is_array($data['parameter'] ?? null)) {
+            return null;
         }
 
         foreach ($data['parameter'] as $param) {
@@ -184,12 +222,9 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             }
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * Parses both the result boolean and optional display correction from a FHIR Parameters response body.
-     */
     /**
      * The server's preferred label for the concept, when it offered one.
      *
