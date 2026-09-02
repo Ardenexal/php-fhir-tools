@@ -1,5 +1,5 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -14,7 +14,11 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:PrimitiveFormatChecker": [
+                "entry[0].fullUrl — value cannot be empty"
+            ]
+        },
         "warnings": {}
     }
 }

@@ -1,5 +1,5 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -16,7 +16,11 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:FHIRValidationService": [
+                "extension — Extension.url is required in order to identify, use and validate the extension"
+            ]
+        },
         "warnings": {}
     }
 }

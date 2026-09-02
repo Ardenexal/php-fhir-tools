@@ -1,19 +1,23 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 1,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "BELOW",
         "errors": [
             "Extension.url must be an absolute URL"
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:FHIRValidationService": [
+                "extension — Extension.url must be an absolute URL"
+            ]
+        },
         "warnings": {}
     }
 }

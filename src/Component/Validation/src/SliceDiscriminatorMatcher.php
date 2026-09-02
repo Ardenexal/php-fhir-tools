@@ -64,18 +64,22 @@ final class SliceDiscriminatorMatcher
         string $path,
         mixed $expected,
     ): bool {
-        $actual = $this->readPath($item, $path);
+        foreach ($this->readPathValues($item, $path) as $actual) {
+            // Coerce both sides to string for FHIR primitives (UriPrimitive, StringPrimitive, etc.)
+            if ($actual instanceof \Stringable || is_string($actual)) {
+                if ((string) $actual === (string) $expected) {
+                    return true;
+                }
 
-        if ($actual === null) {
-            return false;
+                continue;
+            }
+
+            if ($actual === $expected) {
+                return true;
+            }
         }
 
-        // Coerce both sides to string for FHIR primitives (UriPrimitive, StringPrimitive, etc.)
-        if ($actual instanceof \Stringable || is_string($actual)) {
-            return (string) $actual === (string) $expected;
-        }
-
-        return $actual === $expected;
+        return false;
     }
 
     /**
@@ -89,22 +93,22 @@ final class SliceDiscriminatorMatcher
         string $path,
         mixed $expected,
     ): bool {
-        $actual = $this->readPath($item, $path);
-
-        if ($actual === null) {
-            return false;
-        }
-
         if (!is_array($expected)) {
             // Scalar pattern — fall back to value matching
             return $this->matchesValue($item, $path, $expected);
         }
 
-        $actualArray = $actual instanceof \JsonSerializable
-            ? (array) $actual->jsonSerialize()
-            : (array) $actual;
+        foreach ($this->readPathValues($item, $path) as $actual) {
+            $actualArray = $actual instanceof \JsonSerializable
+                ? (array) $actual->jsonSerialize()
+                : (array) $actual;
 
-        return $this->isSubset($expected, $actualArray);
+            if ($this->isSubset($expected, $actualArray)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -119,8 +123,7 @@ final class SliceDiscriminatorMatcher
         string $path,
         mixed $expected,
     ): bool {
-        $actual  = $this->readPath($item, $path);
-        $present = $actual !== null;
+        $present = $this->readPathValues($item, $path) !== [];
 
         return (bool) $expected === $present;
     }
@@ -141,22 +144,53 @@ final class SliceDiscriminatorMatcher
     }
 
     /**
-     * Read the value at a dot-notation property path using Symfony PropertyAccessor.
-     * Returns null if the path is not readable or the value is null.
+     * Every value reachable at $path, following repeating elements rather than stopping at them.
+     *
+     * A discriminator path is FHIRPath, not a PHP property path. `coding.code` means "the code of
+     * each coding", and a slice matches when *any* occurrence satisfies the rule — the vital-signs
+     * `VSCat` slice discriminates on exactly that path, against a `category` whose `coding` repeats.
+     * PropertyAccessor has no such notion: handed `coding.code` with a list at `coding`, it throws
+     * `NoSuchPropertyException`. That read as "no value", which read as "no match", which reported a
+     * required slice missing on documents that plainly satisfied it. So the path is walked one
+     * segment at a time and every repetition is followed.
      *
      * @param object|array<string, mixed> $item
+     *
+     * @return list<mixed> Non-null values found, empty when the path is unreachable
      */
-    private function readPath(object|array $item, string $path): mixed
+    private function readPathValues(object|array $item, string $path): array
     {
         if ($path === '') {
-            return null;
+            return [];
         }
 
-        try {
-            return $this->propertyAccessor->getValue($item, $path);
-        } catch (\Throwable) {
-            return null;
+        $current = [$item];
+
+        foreach (explode('.', FHIRElementPath::toPropertyPath($path)) as $segment) {
+            $next = [];
+
+            foreach ($current as $node) {
+                if (!is_object($node) && !is_array($node)) {
+                    continue;
+                }
+
+                try {
+                    $value = $this->propertyAccessor->getValue($node, $segment);
+                } catch (\Throwable) {
+                    continue;
+                }
+
+                foreach (is_array($value) ? $value : [$value] as $entry) {
+                    if ($entry !== null) {
+                        $next[] = $entry;
+                    }
+                }
+            }
+
+            $current = $next;
         }
+
+        return $current;
     }
 
     /**

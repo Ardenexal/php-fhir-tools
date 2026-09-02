@@ -1,5 +1,5 @@
 {
-    "errorCount": 7,
+    "errorCount": 8,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -23,6 +23,9 @@
     },
     "outcome": {
         "errors": {
+            "constraint:BundleReferenceResolutionChecker": [
+                "entry[0].resource.subject — Can't find 'Patient/123' in the bundle. 2 resources with the same type and id are present at fullUrls 'urn:uuid:2b90dd2b-2dab-4c75-9bb9-a355e07401e8,urn:uuid:f5452d76-3d4e-4cd0-9fc0-1ac3623e5cbf', but the fullUrl based rules around matching relative references match none of them against the source fullUrl 'urn:uuid:30551ce1-5a28-4356-b684-1e639094ad4d'"
+            ],
             "constraint:Count": [
                 "entry[0].resource.author — This collection should contain 1 element or more."
             ],

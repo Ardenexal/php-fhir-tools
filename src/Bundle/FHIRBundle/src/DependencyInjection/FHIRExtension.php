@@ -111,23 +111,33 @@ class FHIRExtension extends Extension
             }
         }
 
-        // Wire CachingFHIRTerminologyClient as a decorator when a cache pool is configured
+        // Always wire CachingFHIRTerminologyClient as a decorator; the PSR-6 pool is what is optional.
+        //
+        // The decorator holds two layers: a per-instance array and, when given one, a cache pool. Only
+        // the pool used to be optional-by-absence-of-the-whole-decorator, which meant a caller who
+        // configured a terminology server but no pool got no deduplication at all. That mattered little
+        // while the only consumer was FHIRQuestionnaireValidator, and matters now that
+        // FHIRValueSetBindingValidator asks the server about the display on every coded element of every
+        // resource: one Bundle repeating a handful of codes became one request per coding.
+        //
+        // Registering it unconditionally cannot change an answer — the in-process layer only returns what
+        // the inner client already returned for identical arguments — it only removes repeat calls.
         $terminologyCachePool = $config['validation']['terminology_cache_pool'];
         $terminologyCacheTtl  = $config['validation']['terminology_cache_ttl'];
 
         if ($terminologyCachePool !== null) {
             $container->setAlias('fhir.terminology_cache', $terminologyCachePool)->setPublic(false);
-
-            $container->register('fhir.caching_terminology_client', CachingFHIRTerminologyClient::class)
-                ->setAutowired(false)
-                ->setArguments([
-                    new Reference('fhir.caching_terminology_client.inner'),
-                    new Reference('fhir.terminology_cache'),
-                    $terminologyCacheTtl,
-                ])
-                ->setDecoratedService(FHIRTerminologyClientInterface::class)
-                ->setPublic(false);
         }
+
+        $container->register('fhir.caching_terminology_client', CachingFHIRTerminologyClient::class)
+            ->setAutowired(false)
+            ->setArguments([
+                new Reference('fhir.caching_terminology_client.inner'),
+                $terminologyCachePool === null ? null : new Reference('fhir.terminology_cache'),
+                $terminologyCacheTtl,
+            ])
+            ->setDecoratedService(FHIRTerminologyClientInterface::class)
+            ->setPublic(false);
     }
 
     public function getAlias(): string

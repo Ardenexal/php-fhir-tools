@@ -77,18 +77,23 @@ class FHIRSerializationService
      * building a FHIRIGTypeRegistry that enables typed extension deserialization,
      * profile URL resolution, and discriminator-based slice resolution.
      *
-     * @param string $igOutputDirectory Absolute path to IG output directory (e.g. '/app/src/FHIRIG').
-     *                                  Pass an empty string (default) to skip IG scanning.
-     * @param string $igNamespace       PSR-4 namespace root for the IG output directory
-     *                                  (e.g. 'App\FHIR\IG'). Pass an empty string (default) to skip.
+     * @param string $igOutputDirectory   Absolute path to IG output directory (e.g. '/app/src/FHIRIG').
+     *                                    Pass an empty string (default) to skip IG scanning.
+     * @param string $igNamespace         PSR-4 namespace root for the IG output directory
+     *                                    (e.g. 'App\FHIR\IG'). Pass an empty string (default) to skip.
+     * @param bool   $includeBaseProfiles Also register the base-spec profile classes (bp, vitalsigns,
+     *                                    bodyweight, …), so a document whose meta.profile names one
+     *                                    deserializes into that typed subclass rather than the base
+     *                                    resource class. Off by default: it changes resolved types.
      */
     public static function createWithIG(
         string $igOutputDirectory = '',
         string $igNamespace = '',
-        FhirVersion $version = FhirVersion::R4
+        FhirVersion $version = FhirVersion::R4,
+        bool $includeBaseProfiles = false,
     ): self {
         $metadataExtractor = new FHIRMetadataExtractor();
-        $registry          = FHIRIGTypeRegistryFactory::create($igOutputDirectory, $igNamespace);
+        $registry          = FHIRIGTypeRegistryFactory::create($igOutputDirectory, $igNamespace, $includeBaseProfiles, $version->value);
         $typeResolver      = new FHIRSerializedTypeResolver(igTypeRegistry: $registry, fhirVersion: $version->value);
 
         $normalizers = [

@@ -74,6 +74,21 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     /**
      * {@inheritDoc}
      */
+    public function owningClassOf(object|string $subject, string $property): ?string
+    {
+        $class = self::classOf($subject);
+
+        if ($class === null || !property_exists($class, $property)) {
+            return null;
+        }
+
+        try {
+            return (new \ReflectionProperty($class, $property))->getDeclaringClass()->getName();
+        } catch (\ReflectionException) {
+            return null;
+        }
+    }
+
     public function declaredClassOf(object|string $subject, string $property): ?string
     {
         $type = self::propertyType($subject, $property);

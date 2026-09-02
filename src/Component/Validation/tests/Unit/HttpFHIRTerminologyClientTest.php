@@ -281,7 +281,16 @@ final class HttpFHIRTerminologyClientTest extends TestCase
         self::assertNull($result->correctDisplay);
     }
 
-    public function testValidateCodingWithDisplayReturnsCorrectDisplayWhenResponseIncludesDisplayParam(): void
+    /**
+     * An accepted concept is not a wrong display, however the server chooses to label it.
+     *
+     * The `display` out-parameter is the server's own preferred label, not a verdict on the one that
+     * was sent, so a server answering `result: true` has accepted the display. This case is the exact
+     * shape that used to be reported: a differing label on a concept the server was happy with, here a
+     * difference of casing alone. Treating that as a finding is a false positive on ordinary data, and
+     * it reached every caller of the Questionnaire display check.
+     */
+    public function testAcceptedConceptIsNotAWrongDisplayEvenWhenTheServerPrefersAnotherLabel(): void
     {
         $body = json_encode([
             'resourceType' => 'Parameters',
@@ -296,7 +305,160 @@ final class HttpFHIRTerminologyClientTest extends TestCase
         $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'heart rate');
 
         self::assertTrue($result->valid);
+        self::assertNull($result->correctDisplay);
+    }
+
+    /**
+     * A rejection whose code validates on its own was a rejection of the display, and the server's
+     * label is then the correction.
+     */
+    public function testRejectedDisplayOnAValidCodeIsReportedAsACorrection(): void
+    {
+        $rejected = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [
+                ['name' => 'result', 'valueBoolean' => false],
+                ['name' => 'display', 'valueString' => 'Heart rate'],
+            ],
+        ]);
+        $codeAlone = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'result', 'valueBoolean' => true]],
+        ]);
+        $mockClient = new MockHttpClient([
+            new MockResponse($rejected ?: '{}'),
+            new MockResponse($codeAlone ?: '{}'),
+        ]);
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Not the label');
+
+        self::assertTrue($result->valid);
         self::assertSame('Heart rate', $result->correctDisplay);
+    }
+
+    /**
+     * A rejection whose code also fails on its own is a membership failure. The display is not the
+     * story and naming it would send the caller after the wrong problem.
+     */
+    public function testRejectedCodeIsAMembershipFailureRatherThanADisplayCorrection(): void
+    {
+        $rejected = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [
+                ['name' => 'result', 'valueBoolean' => false],
+                ['name' => 'display', 'valueString' => 'Heart rate'],
+            ],
+        ]);
+        $stillRejected = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'result', 'valueBoolean' => false]],
+        ]);
+        $mockClient = new MockHttpClient([
+            new MockResponse($rejected ?: '{}'),
+            new MockResponse($stillRejected ?: '{}'),
+        ]);
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', 'not-a-code', 'Heart rate');
+
+        self::assertFalse($result->valid);
+        self::assertNull($result->correctDisplay);
+    }
+
+    /**
+     * A rejection naming no replacement label yields no correction.
+     *
+     * The code is a member, so the display was what the server rejected — but `CodingValidationResult`
+     * carries a replacement or nothing, and handing back the caller's own display as its own correction
+     * produces a finding that names no defect and no fix: "the display 'X' is not valid … the server
+     * gives 'X'". Silence under-reports a real rejection, which is the conservative direction and the
+     * only honest one without widening the published interface.
+     */
+    public function testRejectedDisplayWithNoServerLabelYieldsNoCorrection(): void
+    {
+        $rejected = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'result', 'valueBoolean' => false]],
+        ]);
+        $codeAlone = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'result', 'valueBoolean' => true]],
+        ]);
+        $mockClient = new MockHttpClient([
+            new MockResponse($rejected ?: '{}'),
+            new MockResponse($codeAlone ?: '{}'),
+        ]);
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
+
+        self::assertTrue($result->valid);
+        self::assertNull($result->correctDisplay);
+    }
+
+    /** A server echoing the display it rejected is not offering a correction either. */
+    public function testRejectedDisplayEchoedBackUnchangedYieldsNoCorrection(): void
+    {
+        $rejected = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [
+                ['name' => 'result', 'valueBoolean' => false],
+                ['name' => 'display', 'valueString' => 'Heart rate'],
+            ],
+        ]);
+        $codeAlone = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'result', 'valueBoolean' => true]],
+        ]);
+        $mockClient = new MockHttpClient([
+            new MockResponse($rejected ?: '{}'),
+            new MockResponse($codeAlone ?: '{}'),
+        ]);
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
+
+        self::assertTrue($result->valid);
+        self::assertNull($result->correctDisplay);
+    }
+
+    /**
+     * An unreadable answer is not a rejection, so it costs one request and reports no display.
+     *
+     * A body carrying no `result` parameter is indistinguishable from `result: false` to a plain boolean
+     * parser, which sent a malformed response down the rejection path: a second request, and then a
+     * display correction inferred from an exchange that never stated a verdict.
+     */
+    public function testAResponseWithNoResultParameterIsNotTreatedAsARejection(): void
+    {
+        $body = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'message', 'valueString' => 'something went wrong']],
+        ]);
+        $mockClient = new MockHttpClient(new MockResponse($body ?: '{}'));
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
+
+        self::assertFalse($result->valid);
+        self::assertNull($result->correctDisplay);
+        self::assertSame(1, $mockClient->getRequestsCount());
+    }
+
+    /** An accepted concept costs one request; the second is only paid on a rejection. */
+    public function testAcceptedConceptCostsASingleRequest(): void
+    {
+        $body = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'result', 'valueBoolean' => true]],
+        ]);
+        $mockClient = new MockHttpClient(new MockResponse($body ?: '{}'));
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
+
+        self::assertSame(1, $mockClient->getRequestsCount());
     }
 
     public function testValidateCodingWithDisplayReturnsFalseValidOnNon2xxResponse(): void

@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Metadata\UnknownInput;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
@@ -289,7 +290,15 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
 
             foreach ($data as $elementName => $value) {
-                if (str_starts_with($elementName, '_') || str_starts_with($elementName, '@')) {
+                // `resourceType` is the JSON type discriminator, already consumed to choose this
+                // class, and no model declares it. Skipping it explicitly matters because the
+                // fall-through is the unknown-property path, which records what it drops.
+                //
+                // XML needs no equivalent: there the type is the element name, not a child.
+                if ($elementName === 'resourceType'
+                    || str_starts_with($elementName, '_')
+                    || str_starts_with($elementName, '@')
+                ) {
                     continue;
                 }
 
@@ -398,7 +407,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
 
                     self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                 } else {
-                    $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, $object, $elementName);
+                    $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, UnknownInput::FORMAT_JSON, $object, $elementName);
                 }
             }
 

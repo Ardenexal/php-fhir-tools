@@ -1,5 +1,5 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 1,
     "java": {
@@ -14,7 +14,11 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:BundleReferenceResolutionChecker": [
+                "entry[0].resource.author[0] — Can't find 'Organization/666' in the bundle. A resource with the same type and id is present at fullUrl 'urn:uuid:2aaf815f-3ebe-4a03-9b87-05d0700313b2', but the fullUrl based rules around matching relative references do not match it against the source fullUrl 'urn:uuid:10a67a86-a9ec-427e-ba3f-f042cef21733'"
+            ]
+        },
         "warnings": {}
     }
 }

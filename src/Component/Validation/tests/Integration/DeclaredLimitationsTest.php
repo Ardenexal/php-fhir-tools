@@ -106,10 +106,16 @@ final class DeclaredLimitationsTest extends TestCase
      * map did exactly that to six cases — a canonical type mismatch, a ValueSet expression-language
      * rule, an unknown extension, a fixed-value mismatch, and two others — all of which are ours to fix.
      *
+     * Every error must be blocked by a reason {@see DeclaredLimitations::reasonFor()} can name from the
+     * text itself, which since 2026-08-31 is two obstacle classes rather than one: an unobtainable code
+     * system, and a recorded design decision. Widened deliberately when the decision not to report
+     * unresolvable regular extensions was taken: a terminology-only check would have forced that
+     * decision to hide somewhere without a pin, which is the outcome this test exists to prevent.
+     *
      * @param array{reason: string, ours: int, java: int} $entry
      */
     #[DataProvider('declaredCases')]
-    public function testEveryReferenceErrorIsTerminologyBound(string $version, string $name, array $entry): void
+    public function testEveryReferenceErrorHasADeclaredObstacle(string $version, string $name, array $entry): void
     {
         $texts = self::oracleErrorTexts($name);
 
@@ -119,20 +125,23 @@ final class DeclaredLimitationsTest extends TestCase
         );
 
         foreach ($texts as $text) {
-            $matched = false;
-            foreach (DeclaredLimitations::TERMINOLOGY_SIGNATURES as $signature) {
-                if (str_contains($text, $signature)) {
-                    $matched = true;
-                    break;
+            $matched = DeclaredLimitations::reasonFor($text) !== null;
+
+            if (!$matched) {
+                foreach (DeclaredLimitations::TERMINOLOGY_SIGNATURES as $signature) {
+                    if (str_contains($text, $signature)) {
+                        $matched = true;
+                        break;
+                    }
                 }
             }
 
             self::assertTrue(
                 $matched,
                 sprintf(
-                    "'%s' is declared unreachable offline, but this reference-validator error is not a "
-                    . "terminology lookup:\n  %s\nIf it is decidable without a code system, it is ours to fix "
-                    . 'and must not be declared here.',
+                    "'%s' is declared unreachable, but nothing in DeclaredLimitations blocks this "
+                    . "reference-validator error:\n  %s\nIf it is decidable here — no missing code system, "
+                    . 'no recorded decision — it is ours to fix and must not be declared.',
                     $name,
                     $text,
                 ),

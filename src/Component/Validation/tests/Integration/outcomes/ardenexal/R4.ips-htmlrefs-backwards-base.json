@@ -1,5 +1,5 @@
 {
-    "errorCount": 0,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 1,
     "java": {
@@ -16,7 +16,12 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:FHIRValidationService": [
+                "entry[2].resource.extension — The Extension 'http://hl7.org/fhir/StructureDefinition/narrativeLink' definition allows for the types [url] but found type uri",
+                "entry[3].resource.extension — The Extension 'http://hl7.org/fhir/StructureDefinition/narrativeLink' definition allows for the types [url] but found type uri"
+            ]
+        },
         "warnings": {}
     }
 }

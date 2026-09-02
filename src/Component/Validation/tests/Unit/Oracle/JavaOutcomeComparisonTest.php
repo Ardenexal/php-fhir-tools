@@ -89,6 +89,66 @@ final class JavaOutcomeComparisonTest extends TestCase
         self::assertCount(4, $outcome->errorTexts);
     }
 
+    /**
+     * An `expression` present but carrying nothing must not shadow a usable `location`.
+     *
+     * The two fields are alternative spellings of the same fact, chained with `??` — which only skips a
+     * field that is absent, so `expression: []` used to win and store `''`. An empty expression makes
+     * every path-aware pairing rule refuse the finding, so this reads as a missing capability rather
+     * than as a reader defect. Not a shape the vendored corpus currently contains, which is precisely
+     * why it needs a test: nothing else exercises the `location` branch at all.
+     */
+    public function testAnEmptyExpressionFallsThroughToLocation(): void
+    {
+        $outcome = JavaOutcomeReader::fromOperationOutcome([
+            'issue' => [
+                [
+                    'severity'   => 'error',
+                    'details'    => ['text' => 'minimum required = 1, but only found 0'],
+                    'expression' => [],
+                    'location'   => ['/f:List/f:status'],
+                ],
+            ],
+        ]);
+
+        self::assertSame(['/f:List/f:status'], $outcome->errorExpressions);
+    }
+
+    /** An expression whose entries are unusable is treated as absent too, not as a path of its own. */
+    public function testAnExpressionHoldingNoUsableStringFallsThroughToLocation(): void
+    {
+        $outcome = JavaOutcomeReader::fromOperationOutcome([
+            'issue' => [
+                [
+                    'severity'   => 'error',
+                    'details'    => ['text' => 'minimum required = 1, but only found 0'],
+                    'expression' => ['', null],
+                    'location'   => ['/f:List/f:mode'],
+                ],
+            ],
+        ]);
+
+        self::assertSame(['/f:List/f:mode'], $outcome->errorExpressions);
+    }
+
+    /** With neither field usable the slot is still filled, so texts and expressions stay aligned. */
+    public function testAnIssueWithNoLocationAtAllStillOccupiesItsSlot(): void
+    {
+        $outcome = JavaOutcomeReader::fromOperationOutcome([
+            'issue' => [
+                ['severity' => 'error', 'details' => ['text' => 'Error parsing JSON'], 'expression' => []],
+                [
+                    'severity'   => 'error',
+                    'details'    => ['text' => 'minimum required = 1, but only found 0'],
+                    'expression' => ['List.status'],
+                ],
+            ],
+        ]);
+
+        self::assertSame(['', 'List.status'], $outcome->errorExpressions);
+        self::assertCount(2, $outcome->errorTexts);
+    }
+
     /** FHIR "fatal" has no separate tier in our report, so it is counted as an error on both sides. */
     public function testFatalCountsAsError(): void
     {

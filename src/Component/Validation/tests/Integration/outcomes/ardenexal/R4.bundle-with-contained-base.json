@@ -1,5 +1,5 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 1,
     "java": {
@@ -17,7 +17,11 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:BundleReferenceResolutionChecker": [
+                "entry[0].resource.focus[0] — Can't find 'Organization/SampleLabelerOrganization' in the bundle. A resource with the same type and id is present at fullUrl 'http://example.org/Organization/SampleLabelerOrganization', but the fullUrl based rules around matching relative references do not match it against the source fullUrl 'http://example.org/MessageHeader/LabelerCodeRequestMessage'"
+            ]
+        },
         "warnings": {}
     }
 }

@@ -26,6 +26,9 @@ final class FHIRAttributeReader implements FHIRAttributeReaderInterface
     /** @var array<string, bool> keyed by `class::attribute` */
     private array $hierarchyCache = [];
 
+    /** @var array<string, list<object>> keyed by `class::attribute` */
+    private array $hierarchyAttributeCache = [];
+
     /** @var array<string, bool> */
     private array $backedEnumCache = [];
 
@@ -91,6 +94,40 @@ final class FHIRAttributeReader implements FHIRAttributeReaderInterface
     /**
      * @param class-string<object> $attributeClass
      */
+    /**
+     * {@inheritDoc}
+     *
+     * @template T of object
+     *
+     * @param class-string<T> $attributeClass
+     *
+     * @return list<T>
+     */
+    public function classAttributesInHierarchy(object|string $subject, string $attributeClass): array
+    {
+        $class = self::classOf($subject);
+
+        if ($class === null) {
+            return [];
+        }
+
+        $key = $class . '::' . $attributeClass;
+
+        if (!isset($this->hierarchyAttributeCache[$key])) {
+            $found = [];
+
+            for ($cursor = $class; $cursor !== false; $cursor = get_parent_class($cursor)) {
+                foreach (self::instantiate((new \ReflectionClass($cursor))->getAttributes($attributeClass)) as $attribute) {
+                    $found[] = $attribute;
+                }
+            }
+
+            $this->hierarchyAttributeCache[$key] = $found;
+        }
+
+        return self::narrow($this->hierarchyAttributeCache[$key], $attributeClass);
+    }
+
     public function declaresInHierarchy(object|string $subject, string $attributeClass): bool
     {
         $class = self::classOf($subject);

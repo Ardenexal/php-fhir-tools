@@ -69,6 +69,23 @@ interface FHIRAttributeReaderInterface
     public function declaresInHierarchy(object|string $subject, string $attributeClass): bool;
 
     /**
+     * Every instance of an attribute declared anywhere in the class hierarchy, most-derived first.
+     *
+     * Distinct from {@see self::classAttributes()}, which reads one class and stops. A repeatable
+     * attribute that a profile inherits rather than re-declares is invisible to that method, and the
+     * consequence is silence rather than an error: a derived profile whose parent carries the
+     * declaration behaves as though the declaration were absent.
+     *
+     * @template T of object
+     *
+     * @param object|string   $subject        Instance or class name to read
+     * @param class-string<T> $attributeClass Attribute to look for
+     *
+     * @return list<T> Declaration order within each class, walking from the subject upwards
+     */
+    public function classAttributesInHierarchy(object|string $subject, string $attributeClass): array;
+
+    /**
      * Whether the name refers to a loadable backed enum.
      *
      * False for a non-existent class, a plain class, and a pure (non-backed) enum. Folds the

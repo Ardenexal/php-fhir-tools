@@ -70,6 +70,24 @@ interface FHIRModelAccessorInterface
     public function declaredClassOf(object|string $subject, string $property): ?string;
 
     /**
+     * The class that declares a property, which is not the class the property is typed as.
+     *
+     * Deliberately not named next to {@see self::declaredClassOf()}: that answers "what type does
+     * this property hold", this answers "who declares it", and the two are unrelated. A `string`
+     * property has no declared class at all and still has an owner.
+     *
+     * The distinction is load-bearing wherever an attribute on the owner decides how a property is
+     * treated -- a primitive wrapper's own `value` slot is not the element a validator reports on,
+     * while an `id` that wrapper inherits from Element still is.
+     *
+     * @param object|string $subject  An instance or class name
+     * @param string        $property Property name to inspect
+     *
+     * @return string|null The declaring class, or null when the class or property is unknown
+     */
+    public function owningClassOf(object|string $subject, string $property): ?string;
+
+    /**
      * Constructor default values across the whole hierarchy, most-derived winning.
      *
      * Walks root-first so a re-declared parameter keeps the most-derived class's default.

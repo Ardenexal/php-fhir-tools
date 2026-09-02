@@ -1,5 +1,5 @@
 {
-    "errorCount": 2,
+    "errorCount": 3,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -19,6 +19,9 @@
         "errors": {
             "constraint:NotBlank": [
                 "medication — This value should not be blank."
+            ],
+            "constraint:PrimitiveFormatChecker": [
+                "authoredOn — If a date has a time, it must have a timezone"
             ],
             "invariant:ref-1": [
                 "requester — SHALL have a contained resource if a local reference is provided"
