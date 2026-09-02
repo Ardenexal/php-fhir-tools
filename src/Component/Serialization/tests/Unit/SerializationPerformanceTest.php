@@ -134,7 +134,7 @@ class SerializationPerformanceTest extends TestCase
                 $className = "TestClass{$i}";
                 $cache->cacheFHIRTypeMetadata($className, "TestType{$i}");
                 $cache->cacheFHIRVersionMetadata($className, 'R4B');
-                $cache->cacheStructureTypeMetadata($className, 'resource');
+                $cache->cacheStructureFlag($className, FHIRMetadataCache::FLAG_RESOURCE, true);
             }
 
             $writeEndTime  = microtime(true);
@@ -147,12 +147,12 @@ class SerializationPerformanceTest extends TestCase
                 $className     = "TestClass{$i}";
                 $fhirType      = $cache->getFHIRTypeMetadata($className);
                 $fhirVersion   = $cache->getFHIRVersionMetadata($className);
-                $structureType = $cache->getStructureTypeMetadata($className);
+                $isResource    = $cache->getStructureFlag($className, FHIRMetadataCache::FLAG_RESOURCE);
 
                 // Verify cached values
                 self::assertSame("TestType{$i}", $fhirType);
                 self::assertSame('R4B', $fhirVersion);
-                self::assertSame('resource', $structureType);
+                self::assertTrue($isResource);
             }
 
             $readEndTime  = microtime(true);
@@ -180,7 +180,7 @@ class SerializationPerformanceTest extends TestCase
             $stats = $cache->getCacheStats();
             self::assertSame($iterations, $stats['fhir_type_entries']);
             self::assertSame($iterations, $stats['fhir_version_entries']);
-            self::assertSame($iterations, $stats['structure_type_entries']);
+            self::assertSame($iterations, $stats['structure_flag_entries']);
         });
     }
 
