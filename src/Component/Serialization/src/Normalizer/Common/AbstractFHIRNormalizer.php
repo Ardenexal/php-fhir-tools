@@ -14,6 +14,8 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Metadata\UnknownInput;
+use Ardenexal\FHIRTools\Component\Metadata\UnknownInputRecorder;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
@@ -639,9 +641,22 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
 
     /**
      * Handle unknown properties according to the configured policy.
+     *
+     * The record is written whatever the policy says, because recording is not a behaviour: it
+     * neither places the value nor rejects the document, so every existing policy reads as it did
+     * before. Only validation decides whether a record becomes a finding.
+     *
+     * @param string $propertyName the element or property name as the document spelled it
+     * @param mixed  $value        the value that could not be placed
+     * @param string $policy       one of FHIRSerializationContext::UNKNOWN_POLICY_*
+     * @param string $format       UnknownInput::FORMAT_JSON or FORMAT_XML, which decides the wording
+     * @param object $object       the model object being read into, and the record's key
+     * @param string $elementPath  path for the error message, when the policy throws
      */
-    protected function handleUnknownProperty(string $propertyName, mixed $value, string $policy, object $object, ?string $elementPath = null): void
+    protected function handleUnknownProperty(string $propertyName, mixed $value, string $policy, string $format, object $object, ?string $elementPath = null): void
     {
+        UnknownInputRecorder::record($object, new UnknownInput($propertyName, $format));
+
         switch ($policy) {
             case FHIRSerializationContext::UNKNOWN_POLICY_ERROR:
                 throw FHIRSerializationException::unknownElementError($propertyName, $policy, $elementPath, ['property_value' => $value]);

@@ -1,19 +1,23 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Undefined element 'telecom' at /f:Organization"
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:UnknownInputChecker": [
+                "(root) — Undefined element 'telecom' at /f:Organization"
+            ]
+        },
         "warnings": {}
     }
 }

@@ -13,7 +13,9 @@
         "infoCount": 0,
         "classification": "BELOW",
         "warningClassification": "EQUAL",
-        "errors": []
+        "errors": [
+            "(the corpus records this error as a count with no message)"
+        ]
     },
     "outcome": {
         "errors": {

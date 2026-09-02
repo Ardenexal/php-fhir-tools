@@ -13,7 +13,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionCon
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -44,16 +47,21 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly PrimitiveFormatChecker $primitiveChecker = new PrimitiveFormatChecker(),
         private readonly CodingSystemChecker $codingSystemChecker = new CodingSystemChecker(),
         private readonly BundleEntryFullUrlChecker $bundleFullUrlChecker = new BundleEntryFullUrlChecker(),
+        private readonly BundleReferenceResolutionChecker $bundleReferenceChecker = new BundleReferenceResolutionChecker(),
+        private readonly UnknownInputChecker $unknownInputChecker = new UnknownInputChecker(),
     ) {
     }
 
     /**
      * Validates a FHIR resource against constraints, extension contexts, and optional profiles.
      *
-     * @param object                     $resource               The FHIR resource to validate
-     * @param list<string>               $profileUrls            FHIR profile canonical URLs to validate against (empty array uses default constraints only)
-     * @param bool                       $includeMustSupportInfo When true, includes info-level violations for unpopulated must-support properties
-     * @param FHIRObligationContext|null $obligationContext      When provided, applies obligation codes (SHALL_POPULATE, SHOULD_POPULATE, etc.)
+     * @param object                     $resource                The FHIR resource to validate
+     * @param list<string>               $profileUrls             FHIR profile canonical URLs to validate against (empty array uses default constraints only)
+     * @param bool                       $includeMustSupportInfo  When true, includes info-level violations for unpopulated must-support properties
+     * @param FHIRObligationContext|null $obligationContext       When provided, applies obligation codes (SHALL_POPULATE, SHOULD_POPULATE, etc.)
+     * @param bool                       $deriveProfilesFromClass When true, also validates against every profile the resource's own class declares,
+     *                                                            including those it inherits. Off by default: it activates constraint groups the
+     *                                                            caller did not ask for.
      *
      * @return FHIRValidationReport A structured report containing all violations found at all severity levels
      */
@@ -62,8 +70,17 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         array $profileUrls = [],
         bool $includeMustSupportInfo = false,
         ?FHIRObligationContext $obligationContext = null,
+        bool $deriveProfilesFromClass = false,
     ): FHIRValidationReport {
         $groups = ['Default', ...$profileUrls];
+
+        if ($deriveProfilesFromClass) {
+            foreach ($this->declaredProfileUrls($resource) as $derived) {
+                if (!in_array($derived, $groups, true)) {
+                    $groups[] = $derived;
+                }
+            }
+        }
 
         $rawViolations = $this->validator->validate($resource, null, $groups);
 
@@ -103,11 +120,34 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $violations[] = $codingViolation;
         }
 
+        // Elements the reader could not place on the model. Unconditional like the passes above,
+        // and it reads what deserialization recorded rather than the object: by this point the
+        // model holds only the names it could place, so the dropped ones are gone from it.
+        foreach ($this->unknownInputChecker->check($resource) as $unknownInputViolation) {
+            $violations[] = $unknownInputViolation;
+        }
+
         // Bundle.entry.fullUrl must be absolute. Unconditional for the same reason again, and a shape
         // test on the URL alone — it resolves nothing, so it is independent of the reference-resolution
         // work. See BundleEntryFullUrlChecker.
         foreach ($this->bundleFullUrlChecker->check($resource) as $fullUrlViolation) {
             $violations[] = $fullUrlViolation;
+        }
+
+        // A relative reference the fullUrl rules refuse to resolve to an entry the bundle does hold.
+        // Unconditional like the pass above and resolves nothing off-box: it compares the reference
+        // against the entries already in hand. See BundleReferenceResolutionChecker.
+        foreach ($this->bundleReferenceChecker->check($resource) as $bundleReferenceViolation) {
+            $violations[] = $bundleReferenceViolation;
+        }
+
+        // Extension.url is a structural rule, not a resolution one: it needs no registry, so unlike
+        // the pass below it runs unconditionally. An extension without a url cannot be identified at
+        // all, which is why the reference validator reports it even where it tolerates an extension
+        // whose definition it merely cannot find.
+        $urlVisited = [];
+        foreach ($this->validateExtensionStructure($resource, '', $urlVisited, false) as $urlViolation) {
+            $violations[] = $urlViolation;
         }
 
         if ($this->registry !== null) {
@@ -159,15 +199,38 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * Converts a Symfony ConstraintViolation into a structured FHIRValidationViolation.
+     * Canonical URLs of every profile the resource's class declares, nearest ancestor last.
      *
-     * Maps severity codes, extracts the constraint type and profile group, and preserves violation
-     * path and message. Handles FHIRPath invariants and FHIRProfile constraints specially.
+     * A profile class carries #[FHIRProfileConstraint]s under its own canonical URL as the group,
+     * and a derived profile inherits its parent's constraints without re-declaring them:
+     * ObservationBpProfile holds `component` min=2, while `category`, `code`, `subject` and
+     * `effective[x]` come from ObservationVitalsignsProfile and stay grouped under the *vitalsigns*
+     * URL. Activating only the URL the instance names would leave every inherited rule inert, so the
+     * whole chain is walked rather than just the leaf.
      *
-     * @param ConstraintViolationInterface $violation The Symfony constraint violation to convert
+     * A resource that is not a profile subclass yields nothing, which is what keeps the profile rules
+     * silent on documents that declare no profile.
      *
-     * @return FHIRValidationViolation A structured FHIR validation violation
+     * @return list<string>
      */
+    private function declaredProfileUrls(object $resource): array
+    {
+        $urls = [];
+
+        for ($class = new \ReflectionClass($resource); $class !== false; $class = $class->getParentClass()) {
+            foreach ($class->getAttributes(FHIRProfile::class) as $attribute) {
+                /** @var FHIRProfile $profile */
+                $profile = $attribute->newInstance();
+
+                if ($profile->profileUrl !== '' && !in_array($profile->profileUrl, $urls, true)) {
+                    $urls[] = $profile->profileUrl;
+                }
+            }
+        }
+
+        return $urls;
+    }
+
     private function mapViolation(ConstraintViolationInterface $violation): FHIRValidationViolation
     {
         $code = $violation->getCode();
@@ -670,6 +733,224 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
+     * Walk $resource and every nested object, reporting extensions that are structurally wrong.
+     *
+     * Three rules, all structural, each worded as the reference validator words them so the comparison
+     * pairs them by text:
+     *
+     * - no readable `url` at any depth — `Extension.url is required in order to identify, use and
+     *   validate the extension`;
+     * - a top-level extension whose `url` is not absolute — `Extension.url must be an absolute URL`;
+     * - a value whose type the extension's own definition does not allow, reported by
+     *   {@see extensionValueTypeMismatch()}, which also explains why only a typed class can answer it.
+     *
+     * The absoluteness rule deliberately stops at the first level. A *sub*-extension's url is a slice
+     * name rather than a canonical (`x-breed`, `species-x`), so requiring absoluteness there would
+     * invent findings on every correctly-formed complex extension. $insideExtension carries that.
+     *
+     * The url is read through {@see readExtensionUrl()}, which treats an uninitialized typed property
+     * as absent rather than letting the `Error` escape. That is the same thing here, since an
+     * extension whose url never deserialized has no url to validate against.
+     *
+     * @param array<int, true> $visited spl_object_id keys of already-visited objects (cycle guard)
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    private function validateExtensionStructure(object $resource, string $path, array &$visited, bool $insideExtension): array
+    {
+        $id = spl_object_id($resource);
+
+        if (isset($visited[$id])) {
+            return [];
+        }
+
+        $visited[$id] = true;
+        $violations   = [];
+
+        foreach (['extension', 'modifierExtension'] as $property) {
+            if (!property_exists($resource, $property) || !isset($resource->$property) || !is_array($resource->$property)) {
+                continue;
+            }
+
+            $extPath = $path !== '' ? $path . '.' . $property : $property;
+
+            foreach ($resource->$property as $ext) {
+                if (!is_object($ext)) {
+                    continue;
+                }
+
+                $url = $this->readExtensionUrl($ext);
+
+                if ($url === '') {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'error',
+                        path: $extPath,
+                        message: 'Extension.url is required in order to identify, use and validate the extension',
+                        constraintClass: self::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                    );
+                } elseif (!$insideExtension && !$this->isAbsoluteUrl($url)) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'error',
+                        path: $extPath,
+                        message: 'Extension.url must be an absolute URL',
+                        constraintClass: self::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                    );
+                }
+
+                $typeMismatch = $this->extensionValueTypeMismatch($ext, $url);
+
+                if ($typeMismatch !== null) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'error',
+                        path: $extPath,
+                        message: $typeMismatch,
+                        constraintClass: self::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                    );
+                }
+            }
+        }
+
+        $ref = new \ReflectionClass($resource);
+
+        foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
+            if ($prop->isInitialized($resource) === false) {
+                continue;
+            }
+
+            $name       = $prop->getName();
+            $isExtProp  = $name === 'extension' || $name === 'modifierExtension';
+            $childInExt = $insideExtension      || $isExtProp;
+            $value      = $prop->getValue($resource);
+            $propPath   = $path !== '' ? $path . '.' . $name : $name;
+
+            if (is_object($value)) {
+                foreach ($this->validateExtensionStructure($value, $propPath, $visited, $childInExt) as $v) {
+                    $violations[] = $v;
+                }
+            } elseif (is_array($value)) {
+                foreach ($value as $i => $item) {
+                    if (is_object($item)) {
+                        foreach ($this->validateExtensionStructure($item, $propPath . '[' . $i . ']', $visited, $childInExt) as $v) {
+                            $violations[] = $v;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $violations;
+    }
+
+    /**
+     * The reference validator's sentence when an extension's value is not a type its definition allows.
+     *
+     * Only typed extension classes can answer this. A generated class carries
+     * `#[FHIRExtensionDefinition]` and narrows the value in its constructor, as in
+     * `NarrativeLinkExtension::__construct(public ?UrlPrimitive $valueUrl = null)`, so the allowed
+     * types are its `value*` promoted parameters and nothing else has to be looked up. An extension
+     * that deserialized as the base `Extension`, or one we hold no class for, yields null: with no
+     * definition in hand there is no allowed set to compare against, and guessing one would invent
+     * findings the reference validator does not report.
+     *
+     * The FHIR type name comes from `#[FHIRPrimitive(primitiveType: ...)]` rather than from the PHP
+     * class name: the attribute is the generator's own declaration of the FHIR type a class carries,
+     * which a class name only ever resembles by convention.
+     *
+     * @return string|null the message, or null when the value is allowed or nothing can be decided
+     */
+    private function extensionValueTypeMismatch(object $extension, string $url): ?string
+    {
+        $ref = new \ReflectionClass($extension);
+
+        if ($ref->getAttributes(FHIRExtensionDefinition::class) === []) {
+            return null;
+        }
+
+        if (!isset($extension->value) || !is_object($extension->value)) {
+            return null;
+        }
+
+        $allowed = [];
+
+        foreach ($ref->getConstructor()?->getParameters() ?? [] as $param) {
+            if (!$param->isPromoted() || !str_starts_with($param->getName(), 'value')) {
+                continue;
+            }
+
+            $type = $param->getType();
+
+            if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+                continue;
+            }
+
+            $name = $this->fhirTypeNameOfClass($type->getName());
+
+            if ($name !== null) {
+                $allowed[] = $name;
+            }
+        }
+
+        if ($allowed === []) {
+            return null;
+        }
+
+        $found = $this->fhirTypeNameOfClass($extension->value::class);
+
+        if ($found === null || in_array($found, $allowed, true)) {
+            return null;
+        }
+
+        return sprintf(
+            "The Extension '%s' definition allows for the types [%s] but found type %s",
+            $url,
+            implode(', ', $allowed),
+            $found,
+        );
+    }
+
+    /**
+     * The FHIR type name a model class represents, or null when the class does not say.
+     *
+     * Primitives answer through `#[FHIRPrimitive]`; complex types are named by the class itself.
+     */
+    private function fhirTypeNameOfClass(string $class): ?string
+    {
+        if (!class_exists($class)) {
+            return null;
+        }
+
+        $ref        = new \ReflectionClass($class);
+        $primitives = $ref->getAttributes(FHIRPrimitive::class);
+
+        if ($primitives !== []) {
+            /** @var FHIRPrimitive $attr */
+            $attr = $primitives[0]->newInstance();
+
+            return $attr->primitiveType;
+        }
+
+        return $ref->getShortName();
+    }
+
+    /**
+     * Is this url absolute, in the sense the reference validator means?
+     *
+     * A scheme followed by `:` is the whole test. Deliberately not `filter_var(..., FILTER_VALIDATE_URL)`:
+     * FHIR canonicals include urn forms (`urn:uuid:`, `urn:oid:`) that filter_var rejects, and rejecting
+     * those would report findings the reference validator does not.
+     */
+    private function isAbsoluteUrl(string $url): bool
+    {
+        return preg_match('/^[A-Za-z][A-Za-z0-9+.-]*:/', $url) === 1;
+    }
+
+    /**
      * Walk $resource and all nested complex-type objects, raising fhir:error for each
      * modifier extension whose URL is not resolvable via the IG type registry.
      *
@@ -700,9 +981,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     continue;
                 }
 
-                $url = method_exists($ext, 'getExtensionUrl') ? $ext->getExtensionUrl() : null;
+                // readExtensionUrl(), not getExtensionUrl(): deserializer-origin objects leave the
+                // promoted typed $url uninitialized, and a bare read throws an Error that would take
+                // the whole case out of the comparison as `validate-crashed`, lowering the apparent
+                // gap while fixing nothing. See footguns/model-object-initialization.md.
+                $url = $this->readExtensionUrl($ext);
 
-                if ($url === null) {
+                if ($url === '') {
                     continue;
                 }
 

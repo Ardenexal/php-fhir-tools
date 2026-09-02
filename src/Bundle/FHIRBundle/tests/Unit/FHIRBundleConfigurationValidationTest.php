@@ -189,7 +189,17 @@ class FHIRBundleConfigurationValidationTest extends TestCase
         self::assertSame(3600, $config['validation']['terminology_cache_ttl']);
     }
 
-    public function testTerminologyCachePoolOmittedNoDecoratorRegistered(): void
+    /**
+     * With no pool configured the decorator is still registered, holding a null pool.
+     *
+     * It used not to be, which left a caller who configured a terminology server but no pool with no
+     * deduplication at all — not even the decorator's per-instance layer. That was tolerable while the
+     * only consumer was the Questionnaire display check and stopped being so once
+     * `FHIRValueSetBindingValidator` began asking the server about the display on every coded element:
+     * one Bundle repeating a handful of codes cost one request per coding. The in-process layer cannot
+     * change an answer, only remove repeat calls, so it is safe to have on by default.
+     */
+    public function testTerminologyCachePoolOmittedStillRegistersTheDecoratorWithoutAPool(): void
     {
         $container = new ContainerBuilder();
         $extension = new FHIRExtension();
@@ -199,7 +209,12 @@ class FHIRBundleConfigurationValidationTest extends TestCase
 
         $extension->load([[]], $container);
 
-        self::assertFalse($container->hasDefinition('fhir.caching_terminology_client'));
+        self::assertTrue($container->hasDefinition('fhir.caching_terminology_client'));
+
+        $def = $container->getDefinition('fhir.caching_terminology_client');
+        self::assertEquals(new Reference('fhir.caching_terminology_client.inner'), $def->getArgument(0));
+        self::assertNull($def->getArgument(1), 'no cache pool was configured, so none should be injected');
+        self::assertFalse($container->hasAlias('fhir.terminology_cache'));
     }
 
     public function testTerminologyCachePoolConfiguredRegistersDecorator(): void

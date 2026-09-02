@@ -1,5 +1,5 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 1,
     "infoCount": 1,
     "java": {
@@ -18,6 +18,9 @@
         "errors": {
             "constraint:FHIRValueSetBinding": [
                 "fhirVersion — The value 5.0.0 is not a valid case of value set http://hl7.org/fhir/ValueSet/FHIR-version|4.0.1."
+            ],
+            "constraint:UnknownInputChecker": [
+                "(root) — Undefined element 'identifier' at /f:CapabilityStatement"
             ]
         },
         "warnings": {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
+use Ardenexal\FHIRTools\Component\Validation\FHIRElementPath;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
@@ -40,15 +41,29 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
      *
      * @var \WeakMap<ExecutionContextInterface, array<string, true>>
      */
-    private \WeakMap $processedKeys;
+    private static ?\WeakMap $processedKeys = null;
 
     public function __construct(
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly SliceDiscriminatorMatcher $matcher,
     ) {
-        /** @var \WeakMap<ExecutionContextInterface, array<string, true>> $processedKeys */
-        $processedKeys       = new \WeakMap();
-        $this->processedKeys = $processedKeys;
+    }
+
+    /**
+     * Static on purpose. A ConstraintValidatorFactory is free to return a fresh validator for every
+     * constraint it is asked about, and the common ones do — so per-instance dedup state is always
+     * empty and never dedups anything. `bp` declares two slices on `component`, which meant the
+     * property was matched twice and every finding reported twice over. Keying on the
+     * ExecutionContext keeps runs isolated, and the WeakMap lets each entry go when its context does.
+     *
+     * @return \WeakMap<ExecutionContextInterface, array<string, true>>
+     */
+    private static function processedKeys(): \WeakMap
+    {
+        /** @var \WeakMap<ExecutionContextInterface, array<string, true>> $map */
+        $map = self::$processedKeys ??= new \WeakMap();
+
+        return $map;
     }
 
     public function validate(mixed $value, Constraint $constraint): void
@@ -72,19 +87,22 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         // Only process each (property, group) combination once per $validator->validate() call.
         // Keyed on the ExecutionContext so the dedup resets when a new call creates a fresh context.
         $ctx       = $this->context;
-        $processed = $this->processedKeys[$ctx] ?? [];
+        $keys      = self::processedKeys();
+        $processed = $keys[$ctx] ?? [];
         if (isset($processed[$dedupKey])) {
             return;
         }
-        $processed[$dedupKey]      = true;
-        $this->processedKeys[$ctx] = $processed;
+        $processed[$dedupKey] = true;
+        $keys[$ctx]           = $processed;
 
         // Read the property value (must be an array for sliced properties)
-        if (!$this->propertyAccessor->isReadable($value, $property)) {
+        $readPath = FHIRElementPath::toPropertyPath($property);
+
+        if (!$this->propertyAccessor->isReadable($value, $readPath)) {
             return;
         }
 
-        $items = $this->propertyAccessor->getValue($value, $property);
+        $items = $this->propertyAccessor->getValue($value, $readPath);
         if (!is_array($items)) {
             return;
         }
@@ -245,17 +263,24 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         string $activeGroup,
     ): array {
         $results = [];
-        foreach ($refl->getAttributes(FHIRSliceConstraint::class) as $attr) {
-            /** @var FHIRSliceConstraint $sc */
-            $sc = $attr->newInstance();
-            if ($sc->property !== $property) {
-                continue;
+        // Walk ancestors: a derived profile inherits its parent's slices without re-declaring them.
+        // ObservationBpProfile extends ObservationVitalsignsProfile, and the VSCat slice on category
+        // lives on the parent -- but ReflectionClass::getAttributes() reports only what the class
+        // itself declares, so reading the instance class alone finds nothing and the required slice
+        // is silently never checked.
+        for ($class = $refl; $class !== false; $class = $class->getParentClass()) {
+            foreach ($class->getAttributes(FHIRSliceConstraint::class) as $attr) {
+                /** @var FHIRSliceConstraint $sc */
+                $sc = $attr->newInstance();
+                if ($sc->property !== $property) {
+                    continue;
+                }
+                $groups = $sc->groups ?? [];
+                if ($groups !== [] && !in_array($activeGroup, $groups, true)) {
+                    continue;
+                }
+                $results[] = $sc;
             }
-            $groups = $sc->groups ?? [];
-            if ($groups !== [] && !in_array($activeGroup, $groups, true)) {
-                continue;
-            }
-            $results[] = $sc;
         }
 
         return $results;
@@ -269,17 +294,21 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         string $property,
         string $activeGroup,
     ): ?FHIRSlicingRules {
-        foreach ($refl->getAttributes(FHIRSlicingRules::class) as $attr) {
-            /** @var FHIRSlicingRules $rules */
-            $rules = $attr->newInstance();
-            if ($rules->property !== $property) {
-                continue;
-            }
-            if ($rules->groups !== [] && !in_array($activeGroup, $rules->groups, true)) {
-                continue;
-            }
+        // Ancestors too, for the same reason as collectSliceConstraints(): an inherited slice brings
+        // its inherited slicing rules with it, and losing them turns closed slicing into open.
+        for ($class = $refl; $class !== false; $class = $class->getParentClass()) {
+            foreach ($class->getAttributes(FHIRSlicingRules::class) as $attr) {
+                /** @var FHIRSlicingRules $rules */
+                $rules = $attr->newInstance();
+                if ($rules->property !== $property) {
+                    continue;
+                }
+                if ($rules->groups !== [] && !in_array($activeGroup, $rules->groups, true)) {
+                    continue;
+                }
 
-            return $rules;
+                return $rules;
+            }
         }
 
         return null;

@@ -196,4 +196,68 @@ final class SliceDiscriminatorMatcherTest extends TestCase
         self::assertFalse($result);
         self::assertStringContainsString('not supported', $warning ?? '');
     }
+
+    // ------------------------------------------------------------------
+    // repeating elements along the discriminator path
+    // ------------------------------------------------------------------
+
+    /**
+     * The vital-signs VSCat slice discriminates on 'coding.code' against a CodeableConcept whose
+     * coding repeats. PropertyAccessor cannot read a property off a list, so before the path was
+     * walked segment by segment this threw, was swallowed, and reported a required slice missing on
+     * documents that satisfied it.
+     */
+    public function testValueMatchesThroughARepeatingElement(): void
+    {
+        $item = $this->codeableConceptWithCodes('vital-signs');
+
+        self::assertTrue($this->matcher->matches($item, 'value', 'coding.code', 'vital-signs'));
+    }
+
+    public function testValueMatchesWhenOnlyOneOfSeveralRepetitionsCarriesTheValue(): void
+    {
+        $item = $this->codeableConceptWithCodes('survey', 'vital-signs', 'exam');
+
+        self::assertTrue($this->matcher->matches($item, 'value', 'coding.code', 'vital-signs'));
+    }
+
+    public function testValueDoesNotMatchWhenNoRepetitionCarriesTheValue(): void
+    {
+        $item = $this->codeableConceptWithCodes('survey', 'exam');
+
+        self::assertFalse($this->matcher->matches($item, 'value', 'coding.code', 'vital-signs'));
+    }
+
+    public function testValueDoesNotMatchWhenTheRepeatingElementIsEmpty(): void
+    {
+        $item = $this->codeableConceptWithCodes();
+
+        self::assertFalse($this->matcher->matches($item, 'value', 'coding.code', 'vital-signs'));
+    }
+
+    public function testExistsFollowsRepeatingElements(): void
+    {
+        self::assertTrue(
+            $this->matcher->matches($this->codeableConceptWithCodes('survey'), 'exists', 'coding.code', true),
+        );
+        self::assertTrue(
+            $this->matcher->matches($this->codeableConceptWithCodes(), 'exists', 'coding.code', false),
+        );
+    }
+
+    /** Shaped like a CodeableConcept: a repeating `coding`, each with a `code`. */
+    private function codeableConceptWithCodes(string ...$codes): \stdClass
+    {
+        $item         = new \stdClass();
+        $item->coding = [];
+
+        foreach ($codes as $code) {
+            $coding         = new \stdClass();
+            $coding->code   = $code;
+            $coding->system = 'http://terminology.hl7.org/CodeSystem/observation-category';
+            $item->coding[] = $coding;
+        }
+
+        return $item;
+    }
 }

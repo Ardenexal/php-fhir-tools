@@ -3,7 +3,7 @@ date: 2026-08-27
 status: accepted
 ---
 
-# ADR-010: CDA Narrative Is a Markup String, Not a Generated Type
+# ADR-015: CDA Narrative Is a Markup String, Not a Generated Type
 
 **Status:** accepted
 **Date:** 2026-08-27

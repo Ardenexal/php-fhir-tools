@@ -70,16 +70,35 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
     /**
      * Validates the system+code pair and checks whether the provided display matches the canonical one.
      *
-     * Calls GET /ValueSet/$validate-code with url, system, code, and display parameters. Parses
-     * both the result boolean and the optional display parameter from the response. Returns
-     * valid=false on any HTTP error, transport failure, or malformed response.
+     * Calls `$validate-code` with the display supplied. When the server accepts the concept details,
+     * the display was acceptable and nothing is reported.
+     *
+     * ## Why a differing `display` in the response is not a mismatch
+     *
+     * The `display` out-parameter is the server's own preferred label for the concept, not a verdict on
+     * the one that was sent. A server answering in its default language returns a different string for a
+     * display that is perfectly valid as a synonym or in another language, and treating that difference
+     * as an error is a false positive on ordinary data. It is not a rare shape: across the vendored
+     * reference outcomes every display finding is language-tagged and most offer several valid displays
+     * for one code.
+     *
+     * This method therefore reports a wrong display only when the server **rejected** the details, and
+     * it separates the two reasons a rejection can happen by asking once more without the display. If
+     * the concept validates without it, the display was the problem and the server's label is the
+     * correction. If it still fails, the code is not a member and the display is not the story.
+     *
+     * The second request is only made on failure, so the common path stays a single call. Passing
+     * `displayLanguage` would answer this in one request, but the language is not part of
+     * {@see FHIRTerminologyClientInterface::validateCodingWithDisplay()} and widening a published
+     * contract is not this method's decision to make.
      *
      * @param string $valueSetUrl Canonical URL of the value set to check against
      * @param string $system      The coding system URI (e.g. 'http://loinc.org')
      * @param string $code        The code within that system
      * @param string $display     The display string to validate against the canonical display
      *
-     * @return CodingValidationResult Validity flag and optional corrected display string
+     * @return CodingValidationResult valid=false when the code is not a member; a non-null
+     *                                correctDisplay when the code is a member but the display was rejected
      */
     public function validateCodingWithDisplay(
         string $valueSetUrl,
@@ -98,7 +117,37 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             return new CodingValidationResult(false, null);
         }
 
-        return $this->parseFullResult($body, $display);
+        $accepted = self::parseOptionalResultParameter($body);
+
+        // The server answered, but not with a readable `result`. That is a malformed response, not a
+        // verdict on the display, so it must not become a display finding. Reported as invalid because
+        // that is what every other unreadable answer here reports, and silence would claim membership we
+        // never established.
+        if ($accepted === null) {
+            return new CodingValidationResult(false, null);
+        }
+
+        if ($accepted) {
+            return new CodingValidationResult(true, null);
+        }
+
+        // Rejected. Ask again without the display to learn which half failed.
+        if (!$this->validateCoding($valueSetUrl, $system, $code)) {
+            return new CodingValidationResult(false, null);
+        }
+
+        $correctDisplay = self::parseDisplayParameter($body);
+
+        // The code is a member, so the display was what the server rejected — but a correction we cannot
+        // name is not reportable. `CodingValidationResult` carries a replacement label or nothing, and
+        // returning the caller's own display as its own correction yields a finding that names no defect
+        // and no fix. Widening the published interface to express "rejected, no replacement offered" is a
+        // contract decision rather than part of this rule, so the honest answer is silence.
+        if ($correctDisplay === null || $correctDisplay === $display) {
+            return new CodingValidationResult(true, null);
+        }
+
+        return new CodingValidationResult(true, $correctDisplay);
     }
 
     /**
@@ -140,10 +189,27 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
      */
     private function parseResultParameter(string $body): bool
     {
+        return self::parseOptionalResultParameter($body) === true;
+    }
+
+    /**
+     * The `result` boolean, or null when the body carries no readable one.
+     *
+     * The plain boolean form cannot tell a server that said `result: false` from one whose answer could
+     * not be read at all, and those are different facts: the first is a verdict, the second is a broken
+     * exchange. Callers that only need "did this validate" collapse both to false; the display rule needs
+     * them apart, because inferring a wrong display from an unreadable response invents a finding.
+     *
+     * @param string $body raw response body from a `$validate-code` call
+     *
+     * @return bool|null the server's verdict, or null when it stated none this method could read
+     */
+    private static function parseOptionalResultParameter(string $body): ?bool
+    {
         $data = json_decode($body, true);
 
-        if (!is_array($data) || !isset($data['parameter']) || !is_array($data['parameter'])) {
-            return false;
+        if (!is_array($data) || !is_array($data['parameter'] ?? null)) {
+            return null;
         }
 
         foreach ($data['parameter'] as $param) {
@@ -156,39 +222,30 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             }
         }
 
-        return false;
+        return null;
     }
 
     /**
-     * Parses both the result boolean and optional display correction from a FHIR Parameters response body.
+     * The server's preferred label for the concept, when it offered one.
+     *
+     * Read only after a rejection, where it is the correction. On an accepted concept it is a
+     * suggestion and carries no finding; see {@see validateCodingWithDisplay()}.
      */
-    private function parseFullResult(string $body, string $providedDisplay): CodingValidationResult
+    private static function parseDisplayParameter(string $body): ?string
     {
         $data = json_decode($body, true);
 
-        if (!is_array($data) || !isset($data['parameter']) || !is_array($data['parameter'])) {
-            return new CodingValidationResult(false, null);
+        if (!is_array($data) || !is_array($data['parameter'] ?? null)) {
+            return null;
         }
-
-        $valid          = false;
-        $correctDisplay = null;
 
         foreach ($data['parameter'] as $param) {
-            if (!is_array($param)) {
-                continue;
-            }
-
-            if (($param['name'] ?? null) === 'result' && array_key_exists('valueBoolean', $param)) {
-                $valid = (bool) $param['valueBoolean'];
-            } elseif (($param['name'] ?? null) === 'display' && isset($param['valueString'])) {
-                $serverDisplay = (string) $param['valueString'];
-                if ($serverDisplay !== $providedDisplay) {
-                    $correctDisplay = $serverDisplay;
-                }
+            if (is_array($param) && ($param['name'] ?? null) === 'display' && isset($param['valueString'])) {
+                return (string) $param['valueString'];
             }
         }
 
-        return new CodingValidationResult($valid, $correctDisplay);
+        return null;
     }
 
     /**

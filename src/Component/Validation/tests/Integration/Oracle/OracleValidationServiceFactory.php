@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConst
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistryFactory;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
@@ -42,13 +43,13 @@ use Symfony\Component\Validator\Validation;
  */
 final class OracleValidationServiceFactory
 {
-    public static function create(FhirVersion $version): FHIRValidationService
+    public static function create(FhirVersion $version, bool $resolveExtensions = true): FHIRValidationService
     {
+        $collaborators  = self::collaborators($resolveExtensions);
         $accessor       = PropertyAccess::createPropertyAccessor();
         $registry       = new FHIRValidationMessageRegistry();
         $pathService    = new FHIRPathService();
         $matcher        = new SliceDiscriminatorMatcher($accessor);
-        $resolver       = new NullFHIRReferenceResolver();
         $defaultFactory = new ConstraintValidatorFactory();
         $enumNamespace  = "Ardenexal\\FHIRTools\\Component\\Models\\{$version->value}\\Enum";
 
@@ -57,7 +58,7 @@ final class OracleValidationServiceFactory
             $registry,
             $pathService,
             $matcher,
-            $resolver,
+            $collaborators,
             $defaultFactory,
             $enumNamespace,
         ) implements ConstraintValidatorFactoryInterface {
@@ -66,22 +67,27 @@ final class OracleValidationServiceFactory
                 private readonly FHIRValidationMessageRegistry $registry,
                 private readonly FHIRPathService $pathService,
                 private readonly SliceDiscriminatorMatcher $matcher,
-                private readonly NullFHIRReferenceResolver $resolver,
+                private readonly OracleHarnessCollaborators $collaborators,
                 private readonly ConstraintValidatorFactory $default,
                 private readonly string $enumNamespace,
             ) {
             }
 
+            /**
+             * The optional collaborators are read off $collaborators rather than defaulted, so a
+             * pass that receives nothing says so at its call site instead of relying on a
+             * constructor default that reads as if a client were configured.
+             */
             public function getInstance(Constraint $constraint): ConstraintValidatorInterface
             {
                 return match (true) {
                     $constraint instanceof FHIRProfileConstraint => new FHIRProfileConstraintValidator($this->accessor),
                     $constraint instanceof FHIRPathInvariant     => new FHIRPathInvariantValidator($this->pathService, $this->registry),
-                    $constraint instanceof FHIRValueSetBinding   => new FHIRValueSetBindingValidator($this->registry, [$this->enumNamespace]),
+                    $constraint instanceof FHIRValueSetBinding   => new FHIRValueSetBindingValidator($this->registry, [$this->enumNamespace], $this->collaborators->terminologyClient),
                     $constraint instanceof FHIRFixedValue        => new FHIRFixedValueValidator($this->registry),
                     $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->registry),
                     $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, $this->matcher),
-                    $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->resolver, $this->registry),
+                    $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->collaborators->referenceResolver, $this->registry),
                     default                                      => $this->default->getInstance($constraint),
                 };
             }
@@ -92,6 +98,38 @@ final class OracleValidationServiceFactory
             ->setConstraintValidatorFactory($factory)
             ->getValidator();
 
-        return new FHIRValidationService($validator, $pathService, typeResolver: new FhirPropertyTypeHierarchyResolver());
+        // The IG type registry gates FHIRValidationService's extension pass entirely
+        // ($this->registry !== null). Without it the harness measured a validator with extension
+        // resolution switched off, so neither unknown-extension rule could ever fire here.
+        // create() with no IG directory still scans the generated base Extension directories.
+        return new FHIRValidationService(
+            $validator,
+            $pathService,
+            registry: $collaborators->igTypeRegistry,
+            typeResolver: new FhirPropertyTypeHierarchyResolver(),
+        );
+    }
+
+    /**
+     * The optional collaborators this harness wires, and the ones it leaves absent.
+     *
+     * Separate from create() so OracleHarnessCollaboratorsTest can assert
+     * OracleHarnessCollaborators::DECLARED_ABSENT against what is actually built. create() reads
+     * every optional collaborator from here, so the guard cannot pass while the wiring differs.
+     *
+     * @param bool $resolveExtensions false drops the IG type registry, which switches
+     *                                FHIRValidationService's extension pass off wholesale — a
+     *                                deliberate variant compare-java-outcomes.php uses to show what
+     *                                that pass contributes, not a configuration to measure against
+     *
+     * @return OracleHarnessCollaborators the slots as create() will fill them
+     */
+    public static function collaborators(bool $resolveExtensions = true): OracleHarnessCollaborators
+    {
+        return new OracleHarnessCollaborators(
+            referenceResolver: new NullFHIRReferenceResolver(),
+            terminologyClient: null,
+            igTypeRegistry: $resolveExtensions ? FHIRIGTypeRegistryFactory::create() : null,
+        );
     }
 }

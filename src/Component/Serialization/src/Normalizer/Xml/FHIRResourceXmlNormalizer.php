@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Metadata\UnknownInput;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
@@ -443,7 +444,7 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
 
                     $property->setValue($object, $denormalizedValue);
                 } else {
-                    $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, $object, $elementName);
+                    $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, UnknownInput::FORMAT_XML, $object, $elementName);
                 }
             }
 
