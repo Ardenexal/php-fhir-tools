@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -45,6 +47,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     public function __construct(
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly SliceDiscriminatorMatcher $matcher,
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
     ) {
         /** @var \WeakMap<ExecutionContextInterface, array<string, true>> $processedKeys */
         $processedKeys       = new \WeakMap();
@@ -89,16 +92,14 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             return;
         }
 
-        $refl = new \ReflectionClass($value);
-
         // Collect all slice constraints for this property + active group
-        $sliceConstraints = $this->collectSliceConstraints($refl, $property, $activeGroup);
+        $sliceConstraints = $this->collectSliceConstraints($value, $property, $activeGroup);
         if ($sliceConstraints === []) {
             return;
         }
 
         // Read slicing rules for this property (if any)
-        $slicingRules = $this->readSlicingRules($refl, $property, $activeGroup);
+        $slicingRules = $this->readSlicingRules($value, $property, $activeGroup);
 
         // Match items → slices
         $this->validateSlices($items, $sliceConstraints, $slicingRules, $property);
@@ -235,19 +236,15 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     }
 
     /**
-     * @param \ReflectionClass<object> $refl
-     *
      * @return list<FHIRSliceConstraint>
      */
     private function collectSliceConstraints(
-        \ReflectionClass $refl,
+        object $subject,
         string $property,
         string $activeGroup,
     ): array {
         $results = [];
-        foreach ($refl->getAttributes(FHIRSliceConstraint::class) as $attr) {
-            /** @var FHIRSliceConstraint $sc */
-            $sc = $attr->newInstance();
+        foreach ($this->attributes->classAttributes($subject, FHIRSliceConstraint::class) as $sc) {
             if ($sc->property !== $property) {
                 continue;
             }
@@ -261,17 +258,12 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         return $results;
     }
 
-    /**
-     * @param \ReflectionClass<object> $refl
-     */
     private function readSlicingRules(
-        \ReflectionClass $refl,
+        object $subject,
         string $property,
         string $activeGroup,
     ): ?FHIRSlicingRules {
-        foreach ($refl->getAttributes(FHIRSlicingRules::class) as $attr) {
-            /** @var FHIRSlicingRules $rules */
-            $rules = $attr->newInstance();
+        foreach ($this->attributes->classAttributes($subject, FHIRSlicingRules::class) as $rules) {
             if ($rules->property !== $property) {
                 continue;
             }

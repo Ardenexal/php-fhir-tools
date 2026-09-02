@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 
 /**
  * Reports `Coding.system` values that are not usable as a code-system identity.
@@ -45,8 +49,14 @@ final class CodingSystemChecker
      */
     private const string SCHEME = '/\A[A-Za-z][A-Za-z0-9+.\-]*:/';
 
-    /** @var array<class-string, bool> keyed by class name; reflection is not free */
+    /** @var array<class-string, bool> keyed by class name; the attribute read is cached upstream too, this saves the call */
     private array $isCoding = [];
+
+    public function __construct(
+        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
+    ) {
+    }
 
     /**
      * Walk a resource and report every unusable `Coding.system`.
@@ -75,20 +85,20 @@ final class CodingSystemChecker
 
         $visited[$id] = true;
         $violations   = [];
-        $ref          = new \ReflectionClass($node);
-        $nodeIsCoding = $this->isCoding($ref);
+        $nodeIsCoding = $this->isCoding($node);
 
-        foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
+        foreach ($this->models->publicPropertyNames($node) as $name) {
             // Deserializers bypass the constructor, so an absent field is uninitialized rather than
             // null; reading it would throw \Error and drop the whole case out of the comparison set.
-            if ($prop->isInitialized($node) === false) {
+            // The guarded read answers null for both, and every branch below skips on null anyway.
+            if (!$this->models->isPropertyInitialized($node, $name)) {
                 continue;
             }
 
-            $value   = $prop->getValue($node);
-            $subPath = $path === '' ? $prop->getName() : $path . '.' . $prop->getName();
+            $value   = $this->models->readInitializedValue($node, $name);
+            $subPath = $path === '' ? $name : $path . '.' . $name;
 
-            if ($nodeIsCoding && $prop->getName() === 'system') {
+            if ($nodeIsCoding && $name === 'system') {
                 $violation = $this->checkSystem($value, $subPath);
 
                 if ($violation !== null) {
@@ -174,23 +184,21 @@ final class CodingSystemChecker
     }
 
     /**
-     * @param \ReflectionClass<object> $ref
+     * Reads the concrete class only, which is what the raw reflection did. Three classes carry
+     * `#[FHIRComplexType(typeName: 'Coding')]` -- one per FHIR version -- and none of them is
+     * extended anywhere in the generated or CDA models, so an ancestor walk would widen the match
+     * for nothing.
      */
-    private function isCoding(\ReflectionClass $ref): bool
+    private function isCoding(object $node): bool
     {
-        $key = $ref->getName();
+        $key = $node::class;
 
         if (isset($this->isCoding[$key])) {
             return $this->isCoding[$key];
         }
 
-        $isCoding   = false;
-        $attributes = $ref->getAttributes(FHIRComplexType::class);
+        $attributes = $this->attributes->classAttributes($node, FHIRComplexType::class);
 
-        if ($attributes !== []) {
-            $isCoding = $attributes[0]->newInstance()->typeName === self::CODING;
-        }
-
-        return $this->isCoding[$key] = $isCoding;
+        return $this->isCoding[$key] = $attributes !== [] && $attributes[0]->typeName === self::CODING;
     }
 }

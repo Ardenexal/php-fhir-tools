@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FhirPropertyTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeHierarchyResolverInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
@@ -46,6 +50,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly PrimitiveFormatChecker $primitiveChecker = new PrimitiveFormatChecker(),
         private readonly CodingSystemChecker $codingSystemChecker = new CodingSystemChecker(),
         private readonly BundleEntryFullUrlChecker $bundleFullUrlChecker = new BundleEntryFullUrlChecker(),
+        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
     ) {
     }
 
@@ -222,17 +228,17 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     private function collectMustSupportInfo(object $resource): array
     {
         $violations = [];
-        $ref        = new \ReflectionClass($resource);
 
-        foreach ($ref->getProperties() as $property) {
-            if ($property->getAttributes(FHIRMustSupport::class) === []) {
+        // Public properties only, where the raw reflection enumerated every visibility.
+        foreach ($this->models->publicPropertyNames($resource) as $name) {
+            if ($this->attributes->propertyAttributes($resource, $name, FHIRMustSupport::class) === []) {
                 continue;
             }
 
             // Deserializers bypass the constructor, so an absent field is uninitialized (not null).
-            // Treat uninitialized as not-populated so the must-support info still fires (and we never
-            // call getValue() on an uninitialized typed property, which would throw \Error).
-            $value = $property->isInitialized($resource) ? $property->getValue($resource) : null;
+            // Treat uninitialized as not-populated so the must-support info still fires; the guarded
+            // read answers null for both, which is exactly what this test wants.
+            $value = $this->models->readInitializedValue($resource, $name);
 
             if ($value !== null && $value !== []) {
                 continue;
@@ -240,8 +246,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
             $violations[] = new FHIRValidationViolation(
                 severity: 'info',
-                path: $property->getName(),
-                message: sprintf('Must-support property "%s" is not populated.', $property->getName()),
+                path: $name,
+                message: sprintf('Must-support property "%s" is not populated.', $name),
                 constraintClass: FHIRMustSupport::class,
                 profileGroup: null,
                 invariantKey: null,
@@ -302,11 +308,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $extensions = $resource->getExtensions();
 
             foreach ($extensions as $extIndex => $extension) {
-                $ref          = new \ReflectionClass($extension);
-                $contextAttrs = array_map(
-                    static fn (\ReflectionAttribute $a): FHIRExtensionContext => $a->newInstance(),
-                    $ref->getAttributes(FHIRExtensionContext::class),
-                );
+                $contextAttrs = $this->attributes->classAttributes($extension, FHIRExtensionContext::class);
 
                 if ($contextAttrs !== []
                     && $this->classifyExtensionContexts($contextAttrs, $resource, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes, $ancestorExtensionUrls) === self::CONTEXT_DENY
@@ -330,10 +332,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 // contexts; evaluating them against a parent Extension (nested frame) would
                 // yield empty results and false errors. Defer them for nested extensions —
                 // same defer-not-deny property as context classification.
-                $invariantAttrs = $resource instanceof FHIRExtensionInterface ? [] : array_map(
-                    static fn (\ReflectionAttribute $a): FHIRContextInvariant => $a->newInstance(),
-                    $ref->getAttributes(FHIRContextInvariant::class),
-                );
+                $invariantAttrs = $resource instanceof FHIRExtensionInterface
+                    ? []
+                    : $this->attributes->classAttributes($extension, FHIRContextInvariant::class);
 
                 foreach ($invariantAttrs as $invariant) {
                     try {
@@ -404,29 +405,27 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             return $violations;
         }
 
-        $ref = new \ReflectionClass($resource);
-
-        foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
-            if (in_array($prop->getName(), ['extension', 'modifierExtension'], true)) {
+        foreach ($this->models->publicPropertyNames($resource) as $name) {
+            if (in_array($name, ['extension', 'modifierExtension'], true)) {
                 continue;
             }
-            if ($prop->isInitialized($resource) === false) {
+            if (!$this->models->isPropertyInitialized($resource, $name)) {
                 continue;
             }
 
-            $value       = $prop->getValue($resource);
-            $subFhirPath = $fhirPath . '.' . $prop->getName();
-            $subRelPath  = $relPath !== '' ? $relPath . '.' . $prop->getName() : $prop->getName();
+            $value       = $this->models->readInitializedValue($resource, $name);
+            $subFhirPath = $fhirPath . '.' . $name;
+            $subRelPath  = $relPath !== '' ? $relPath . '.' . $name : $name;
 
             if (is_object($value)) {
-                $childCandidates = $this->childTypeCandidates($value, $resource, $prop->getName(), $typeCandidates);
+                $childCandidates = $this->childTypeCandidates($value, $resource, $name, $typeCandidates);
                 foreach ($this->validateExtensionContexts($value, $subFhirPath, $subRelPath, $childCandidates, $visited, []) as $v) {
                     $violations[] = $v;
                 }
             } elseif (is_array($value)) {
                 foreach ($value as $i => $item) {
                     if (is_object($item)) {
-                        $childCandidates = $this->childTypeCandidates($item, $resource, $prop->getName(), $typeCandidates);
+                        $childCandidates = $this->childTypeCandidates($item, $resource, $name, $typeCandidates);
                         foreach ($this->validateExtensionContexts($item, $subFhirPath, $subRelPath . '[' . $i . ']', $childCandidates, $visited, []) as $v) {
                             $violations[] = $v;
                         }
@@ -724,18 +723,16 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             }
         }
 
-        $ref = new \ReflectionClass($resource);
-
-        foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
-            if ($prop->getName() === 'modifierExtension') {
+        foreach ($this->models->publicPropertyNames($resource) as $name) {
+            if ($name === 'modifierExtension') {
                 continue;
             }
-            if ($prop->isInitialized($resource) === false) {
+            if (!$this->models->isPropertyInitialized($resource, $name)) {
                 continue;
             }
 
-            $value    = $prop->getValue($resource);
-            $propPath = $path !== '' ? $path . '.' . $prop->getName() : $prop->getName();
+            $value    = $this->models->readInitializedValue($resource, $name);
+            $propPath = $path !== '' ? $path . '.' . $name : $name;
 
             if (is_object($value)) {
                 foreach ($this->validateModifierExtensions($value, $propPath, $visited) as $v) {
@@ -769,24 +766,22 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     private function collectObligationViolations(object $resource, FHIRObligationContext $context): array
     {
         $violations = [];
-        $ref        = new \ReflectionClass($resource);
 
-        foreach ($ref->getProperties() as $property) {
-            $attrs = $property->getAttributes(FHIRObligation::class);
+        // Public properties only; see the note in collectMustSupportInfo. The same 12 non-public
+        // properties carry no #[FHIRObligation] either, so none of them ever reached the body.
+        foreach ($this->models->publicPropertyNames($resource) as $name) {
+            $attrs = $this->attributes->propertyAttributes($resource, $name, FHIRObligation::class);
 
             if ($attrs === []) {
                 continue;
             }
 
             // Uninitialized (constructor-bypassed deserialization) counts as absent → empty, so the
-            // obligation still fires; never call getValue() on an uninitialized typed property (\Error).
-            $value   = $property->isInitialized($resource) ? $property->getValue($resource) : null;
+            // obligation still fires; the guarded read answers null for uninitialized and for null.
+            $value   = $this->models->readInitializedValue($resource, $name);
             $isEmpty = $value === null || $value === [];
 
-            foreach ($attrs as $attr) {
-                /** @var FHIRObligation $obligation */
-                $obligation = $attr->newInstance();
-
+            foreach ($attrs as $obligation) {
                 if (!$context->matchesObligation($obligation)) {
                     continue;
                 }
@@ -814,8 +809,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
                 $violations[] = new FHIRValidationViolation(
                     severity: $severity,
-                    path: $property->getName(),
-                    message: sprintf('Obligation %s: property "%s" must be populated.', $obligation->code, $property->getName()),
+                    path: $name,
+                    message: sprintf('Obligation %s: property "%s" must be populated.', $obligation->code, $name),
                     constraintClass: FHIRObligation::class,
                     profileGroup: null,
                     invariantKey: null,
@@ -836,17 +831,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     private function applyNoErrorSuppression(object $resource, array $violations, FHIRObligationContext $context): array
     {
         $suppressedPaths = [];
-        $ref             = new \ReflectionClass($resource);
 
-        foreach ($ref->getProperties() as $property) {
-            foreach ($property->getAttributes(FHIRObligation::class) as $attr) {
-                /** @var FHIRObligation $obligation */
-                $obligation = $attr->newInstance();
-
+        foreach ($this->models->publicPropertyNames($resource) as $name) {
+            foreach ($this->attributes->propertyAttributes($resource, $name, FHIRObligation::class) as $obligation) {
                 if ($context->matchesObligation($obligation)
                     && ObligationCode::tryFrom($obligation->code) === ObligationCode::SHALL_NO_ERROR
                 ) {
-                    $suppressedPaths[] = $property->getName();
+                    $suppressedPaths[] = $name;
                 }
             }
         }

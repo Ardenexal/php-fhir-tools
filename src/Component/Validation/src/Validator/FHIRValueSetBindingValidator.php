@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
@@ -42,6 +44,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         private readonly FHIRValidationMessageRegistry $messageRegistry,
         private readonly array $enumNamespaceRoots = [],
         private readonly ?FHIRTerminologyClientInterface $terminologyClient = null,
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
     ) {
     }
 
@@ -239,15 +242,13 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     {
         foreach ($this->enumNamespaceRoots as $root) {
             $fqcn = $root . '\\' . $className;
-            if (!class_exists($fqcn) || !enum_exists($fqcn)) {
+
+            // Folds the existence, enum and backing checks into one question: a candidate name built
+            // from a namespace root plus a class name is expected to miss most of the time.
+            if (!$this->attributes->isBackedEnum($fqcn)) {
                 continue;
             }
 
-            if (!(new \ReflectionEnum($fqcn))->isBacked()) {
-                continue;
-            }
-
-            /** @var class-string<\BackedEnum> $fqcn */
             return $fqcn;
         }
 
@@ -268,7 +269,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     {
         if ($constraint->enumClass !== null) {
             $direct = $this->qualifyEnum($constraint->enumClass);
-            if ($direct !== null && self::enumDeclaresValueSet($direct, $constraint->valueSetUrl)) {
+            if ($direct !== null && $this->enumDeclaresValueSet($direct, $constraint->valueSetUrl)) {
                 return $direct;
             }
         }
@@ -309,14 +310,14 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
      *
      * @param class-string $enumFqcn
      */
-    private static function enumDeclaresValueSet(string $enumFqcn, string $boundValueSetUrl): bool
+    private function enumDeclaresValueSet(string $enumFqcn, string $boundValueSetUrl): bool
     {
-        $attributes = (new \ReflectionClass($enumFqcn))->getAttributes(FHIRValueSetSource::class);
+        $attributes = $this->attributes->classAttributes($enumFqcn, FHIRValueSetSource::class);
         if ($attributes === []) {
             return false;
         }
 
-        $declared = $attributes[0]->newInstance()->url;
+        $declared = $attributes[0]->url;
 
         return self::bareUrl($declared) === self::bareUrl($boundValueSetUrl);
     }
@@ -330,11 +331,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     /** @phpstan-assert-if-true class-string<\BackedEnum> $fqcn */
     private function isUsableBackedEnum(string $fqcn): bool
     {
-        if (!class_exists($fqcn) || !enum_exists($fqcn)) {
-            return false;
-        }
-
-        return (new \ReflectionEnum($fqcn))->isBacked();
+        return $this->attributes->isBackedEnum($fqcn);
     }
 
     /**

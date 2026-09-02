@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
@@ -33,6 +35,7 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
     public function __construct(
         private readonly FHIRReferenceResolverInterface $resolver,
         private readonly FHIRValidationMessageRegistry $messageRegistry,
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
     ) {
     }
 
@@ -97,7 +100,7 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
             return;
         }
 
-        $profileAttrs = (new \ReflectionClass($resolved))->getAttributes(FHIRProfile::class);
+        $profileAttrs = $this->attributes->classAttributes($resolved, FHIRProfile::class);
 
         if ($profileAttrs === []) {
             $override = $this->messageRegistry->getOverride('FHIRTargetProfile');
@@ -109,16 +112,14 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
             return;
         }
 
-        foreach ($profileAttrs as $attr) {
-            /** @var FHIRProfile $profile */
-            $profile = $attr->newInstance();
+        foreach ($profileAttrs as $profile) {
             if (in_array($profile->profileUrl, $constraint->targetProfiles, true)) {
                 return;
             }
         }
 
         $actualUrls = array_map(
-            static fn (\ReflectionAttribute $a): string => $a->newInstance()->profileUrl,
+            static fn (FHIRProfile $profile): string => $profile->profileUrl,
             $profileAttrs,
         );
 
