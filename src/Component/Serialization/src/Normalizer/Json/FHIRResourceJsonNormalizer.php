@@ -181,21 +181,16 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
         $data                 = [];
         $data['resourceType'] = $resourceType;
 
-        $properties = self::reflPublicProps($object);
-        $metaMap    = $this->getPropertyMetadataMap($object);
+        $metaMap = $this->getPropertyMetadataMap($object);
 
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-
+        foreach (self::modelAccessor()->publicPropertyNames($object) as $propertyName) {
             if ($propertyName === 'resourceType') {
                 continue;
             }
 
-            if (!$property->isInitialized($object)) {
-                continue;
-            }
-
-            $value = $property->getValue($object);
+            // Unwritten and explicitly null both read as null, and shouldOmitValue below treats them
+            // the same: every emit branch guards against null regardless of the omitNullValues option.
+            $value = self::modelAccessor()->readInitializedValue($object, $propertyName);
 
             if ($this->shouldOmitValue($value, $fhirContext)) {
                 continue;
@@ -289,7 +284,6 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            $reflection            = self::reflClass($resolvedType);
             $object                = $this->instantiateWithDefaults($resolvedType);
             $metaMap               = $this->getPropertyMetadataMap($object);
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
@@ -299,16 +293,15 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                     continue;
                 }
 
-                $property      = self::reflProp($resolvedType, $elementName);
-                $choiceMapping = $property === null
+                $hasProperty   = self::modelAccessor()->hasProperty($resolvedType, $elementName);
+                $choiceMapping = !$hasProperty
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $resolvedType)
                     : null;
 
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
-                    $choiceProp = self::reflProp($resolvedType, $propertyName);
-                    if ($choiceProp !== null) {
+                    if (self::modelAccessor()->hasProperty($resolvedType, $propertyName)) {
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'json', $context);
                         } else {
@@ -317,12 +310,12 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                                 : $value;
                         }
 
-                        $choiceProp->setValue($object, $denormalizedValue);
+                        self::modelAccessor()->writeValue($object, $propertyName, $denormalizedValue);
                         continue;
                     }
                 }
 
-                if ($property !== null) {
+                if ($hasProperty) {
                     $meta         = $metaMap[$elementName] ?? null;
                     $phpItemClass = $meta?->phpItemClass;
 
@@ -379,9 +372,9 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                             $denormalizedValue[] = $denormalizer->denormalize($item, $phpItemClass, 'json', $context);
                         }
                     } elseif ($this->denormalizer !== null && $meta !== null && $meta->propertyKind === 'primitive') {
-                        $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'json', $context, $metaMap);
+                        $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $resolvedType, $elementName, $value, 'json', $context, $metaMap);
                     } elseif ($this->denormalizer !== null) {
-                        $propertyType = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
+                        $propertyType = $this->getPropertyType($resolvedType, $elementName);
                         if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                             // Captured before the cardinality guard, which PHPStan treats as impure.
                             $denormalizer = $this->denormalizer;
@@ -403,13 +396,13 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                         $denormalizedValue = $value;
                     }
 
-                    $property->setValue($object, $denormalizedValue);
+                    self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                 } else {
                     $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, $object, $elementName);
                 }
             }
 
-            $this->applyPrimitiveExtensions($reflection, $object, $data, $metaMap, 'json', $context);
+            $this->applyPrimitiveExtensions($object, $data, $metaMap, 'json', $context);
 
             return $object;
         } catch (\ReflectionException $e) {

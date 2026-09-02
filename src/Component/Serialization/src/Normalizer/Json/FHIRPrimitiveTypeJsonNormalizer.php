@@ -47,7 +47,7 @@ class FHIRPrimitiveTypeJsonNormalizer extends AbstractFHIRNormalizer
             throw new InvalidArgumentException('Object is not a FHIR primitive type');
         }
 
-        return $this->normalizeForJSON($object, self::reflClass($object));
+        return $this->normalizeForJSON($object);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -96,17 +96,9 @@ class FHIRPrimitiveTypeJsonNormalizer extends AbstractFHIRNormalizer
         return ['object' => true];
     }
 
-    /**
-     * @param \ReflectionClass<object> $reflection
-     */
-    private function normalizeForJSON(object $object, \ReflectionClass $reflection): mixed
+    private function normalizeForJSON(object $object): mixed
     {
-        $value     = null;
-        $valueProp = self::reflProp($object, 'value');
-
-        if ($valueProp !== null && $valueProp->isInitialized($object)) {
-            $value = $valueProp->getValue($object);
-        }
+        $value = self::modelAccessor()->readInitializedValue($object, 'value');
 
         if ($value instanceof FHIRTemporalValue) {
             $value = (string) $value;

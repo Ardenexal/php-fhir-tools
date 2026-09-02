@@ -202,6 +202,20 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     /**
      * {@inheritDoc}
      */
+    public function instantiateBare(object|string $subject): object
+    {
+        $class = self::classOf($subject);
+
+        if ($class === null) {
+            throw new \ReflectionException(sprintf('Cannot instantiate unknown class "%s".', is_string($subject) ? $subject : $subject::class));
+        }
+
+        return self::reflect($class)->newInstanceWithoutConstructor();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function readInitializedValue(object $object, string $property): mixed
     {
         $reflection = self::reflect($object::class);
@@ -213,6 +227,34 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
         $handle = $reflection->getProperty($property);
 
         return $handle->isInitialized($object) ? $handle->getValue($object) : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isPropertyInitialized(object $object, string $property): bool
+    {
+        $reflection = self::reflect($object::class);
+
+        if (!$reflection->hasProperty($property)) {
+            return false;
+        }
+
+        return $reflection->getProperty($property)->isInitialized($object);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function writeValue(object $object, string $property, mixed $value): void
+    {
+        $reflection = self::reflect($object::class);
+
+        if (!$reflection->hasProperty($property)) {
+            return;
+        }
+
+        $reflection->getProperty($property)->setValue($object, $value);
     }
 
     /**

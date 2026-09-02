@@ -14,8 +14,10 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Type;
  * single-valued element the declared PHP type is the sole source of truth.
  *
  * Whole operations are exposed rather than reflection primitives. `instantiateWithDefaults()` is a
- * method here instead of a `setValue()` a caller drives, because handing back the pieces would put the
- * handle back in the caller and defeat the point.
+ * method here rather than a handle a caller drives, because handing back the pieces would put the
+ * handle back in the caller and defeat the point. `writeValue()` is the deliberate exception: the
+ * deserializer genuinely has to assign one named property at a time, and it takes a name and a value
+ * so no handle crosses the boundary to do it.
  *
  * @author Ardenexal
  */
@@ -108,6 +110,21 @@ interface FHIRModelAccessorInterface
     public function instantiateWithConstructorDefaults(object|string $subject): object;
 
     /**
+     * An instance with nothing assigned at all, not even declared defaults.
+     *
+     * Deliberately distinct from {@see instantiateWithDefaults()}: this leaves every typed slot
+     * unwritten, so reading one throws until it is assigned. Only for callers that populate what they
+     * need and hand the object straight on -- an XHTML wrapper built to hold one string, say.
+     *
+     * @param object|string $subject An instance to copy the class of, or a class name
+     *
+     * @return object A bare instance of that class
+     *
+     * @throws \ReflectionException When the name does not resolve to a loadable class
+     */
+    public function instantiateBare(object|string $subject): object;
+
+    /**
      * Read a property's value, or null when the typed slot was never assigned.
      *
      * A typed property that the deserializer never populated throws on direct access rather than
@@ -119,6 +136,37 @@ interface FHIRModelAccessorInterface
      * @return mixed The value, or null when the property is absent or uninitialised
      */
     public function readInitializedValue(object $object, string $property): mixed;
+
+    /**
+     * Whether a property's typed slot has ever been assigned.
+     *
+     * Distinct from reading it: `readInitializedValue()` answers null for an unwritten slot and for
+     * one holding null, which is the right collapse almost everywhere. It is wrong where the two
+     * outcomes differ -- a normalizer that omits unwritten properties but emits explicit nulls, or a
+     * default that only applies to a slot nobody has touched. Those need this.
+     *
+     * @param object $object   Instance to probe
+     * @param string $property Property name to probe
+     *
+     * @return bool False when the property is absent, matching what a missing-property read returns
+     */
+    public function isPropertyInitialized(object $object, string $property): bool;
+
+    /**
+     * Assign a property's value, or do nothing when the class does not declare the property.
+     *
+     * The silent no-op mirrors `readInitializedValue()`, and matches how the deserializer already
+     * treats an absent property: decoded payloads carry keys that no generated class declares, and
+     * those are skipped rather than rejected.
+     *
+     * Takes an instance rather than a class name because a write has nowhere to land without one.
+     *
+     * @param object $object   Instance to write to
+     * @param string $property Property name to assign
+     * @param mixed  $value    Value to assign; no type check is performed, so a value that conflicts
+     *                         with the declared type throws just as a direct assignment would
+     */
+    public function writeValue(object $object, string $property, mixed $value): void;
 
     /**
      * Copy a typed `value[x]` choice back onto the plain `value` property of an extension.

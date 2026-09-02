@@ -85,7 +85,6 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            $reflection = self::reflClass($type);
             $object     = $this->instantiateWithConstructorDefaults($type);
             $metaMap    = $this->getPropertyMetadataMap($object);
 
@@ -94,16 +93,15 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                     continue;
                 }
 
-                $property      = self::reflProp($type, $elementName);
-                $choiceMapping = $property === null
+                $hasProperty   = self::modelAccessor()->hasProperty($type, $elementName);
+                $choiceMapping = !$hasProperty
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $type)
                     : null;
 
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
-                    $choiceProp = self::reflProp($type, $propertyName);
-                    if ($choiceProp !== null) {
+                    if (self::modelAccessor()->hasProperty($type, $propertyName)) {
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
                         } else {
@@ -128,12 +126,12 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                             };
                         }
 
-                        $choiceProp->setValue($object, $denormalizedValue);
+                        self::modelAccessor()->writeValue($object, $propertyName, $denormalizedValue);
                         continue;
                     }
                 }
 
-                if ($property === null) {
+                if (!$hasProperty) {
                     continue;
                 }
                 $meta     = $metaMap[$elementName] ?? null;
@@ -147,7 +145,7 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                         $resolvedClass = $this->typeResolver->resolveResourceType(['resourceType' => $resourceElementName]);
                         if ($resolvedClass !== null) {
                             $denormalizedValue = $this->denormalizer->denormalize($value[$resourceElementName], $resolvedClass, 'xml', $context);
-                            $property->setValue($object, $denormalizedValue);
+                            self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                             continue;
                         }
                     }
@@ -169,7 +167,7 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                         $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $context);
                     }
                 } elseif ($this->denormalizer !== null) {
-                    $propertyType = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
+                    $propertyType = $this->getPropertyType($type, $elementName);
                     if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                         $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
                     } else {
@@ -185,13 +183,13 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                         // backbone scalar primitives need coercion on this XML path at all.
                     }
                 } else {
-                    $propertyType      = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
+                    $propertyType      = $this->getPropertyType($type, $elementName);
                     $denormalizedValue = ($propertyType !== null && !$this->isBuiltinType($propertyType))
                         ? null
                         : $this->denormalizeBasicValue($value, 'xml', $context);
                 }
 
-                $property->setValue($object, $denormalizedValue);
+                self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
             }
 
             return $object;
@@ -243,16 +241,9 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
         $metaMap           = $this->getPropertyMetadataMap($object);
         $includeExtensions = $fhirContext->includeExtensions;
 
-        $properties = self::reflPublicProps($object);
-
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-
-            if (!$property->isInitialized($object)) {
-                continue;
-            }
-
-            $value = $property->getValue($object);
+        foreach (self::modelAccessor()->publicPropertyNames($object) as $propertyName) {
+            // Unwritten and explicitly null both read as null here, and the skip below catches both.
+            $value = self::modelAccessor()->readInitializedValue($object, $propertyName);
 
             if ($value === null || (is_array($value) && empty($value))) {
                 continue;

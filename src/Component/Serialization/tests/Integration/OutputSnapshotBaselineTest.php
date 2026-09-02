@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Integration;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\ClinicalDocument;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use PHPUnit\Framework\TestCase;
@@ -107,6 +108,83 @@ XML;
             $service->serializeToXml($fromXml),
             $backToXml,
             'a JSON round trip must not change the XML rendering',
+        );
+    }
+
+    /** A patient whose name exercises the one FHIR element pair whose order is easy to invert. */
+    private const string PATIENT_JSON = '{"resourceType":"Patient","id":"p1","active":true,"name":[{"family":"Doe","given":["Jane"]}],"birthDate":"1980-01-01","gender":"female"}';
+
+    /**
+     * FHIR XML element order comes from nothing but the property enumeration sequence.
+     *
+     * No FHIR type carries a published content model -- `contentModelOrder()` returns an empty list
+     * for everything outside CDA, and an empty list means the ordering sort returns its input
+     * untouched. So for every resource and complex type in the library, the sequence the enumeration
+     * hands over *is* the emitted element order, with nothing downstream to correct it.
+     *
+     * That was unpinned until this test. Reversing the enumeration input leaves all 4678 other tests
+     * green while emitting `<given>` before `<family>`, which is invalid against the R4 schema --
+     * verified by running exactly that on 2026-09-02. `HumanName` is used because its order is fixed
+     * by the specification (use, text, family, given, prefix, suffix, period) and the two elements
+     * sit adjacent, so an inverted sequence shows up as a swap rather than as a plausible variant.
+     */
+    public function testFhirXmlElementOrderFollowsThePropertyEnumerationSequence(): void
+    {
+        $service = FHIRSerializationService::createDefault();
+
+        $xml = $service->serializeToXml($service->deserializeFromJson(self::PATIENT_JSON, PatientResource::class));
+
+        $familyAt = strpos($xml, '<family ');
+        $givenAt  = strpos($xml, '<given ');
+
+        self::assertIsInt($familyAt, 'the fixture must actually emit a family element');
+        self::assertIsInt($givenAt, 'the fixture must actually emit a given element');
+        self::assertLessThan(
+            $givenAt,
+            $familyAt,
+            'HumanName declares family before given, and nothing but the enumeration order enforces it',
+        );
+    }
+
+    /**
+     * An unwritten property and one holding null serialize identically, even with nulls kept.
+     *
+     * This is the equivalence that lets the normalizers read state through one guarded call instead
+     * of probing initialisation and then reading. It is not obvious from the code: `shouldOmitValue`
+     * skips null only when `omitNullValues` is on, so with the option off a null value does get past
+     * that gate -- but every emit branch downstream guards `$normalizedValue !== null` regardless, so
+     * it is dropped there instead. The option chooses where a null is discarded, not whether.
+     *
+     * Pinned because the collapse depends on it and nothing else in the suite passes a non-default
+     * `omitNullValues`: no test file mentions the option or its `fhir_omit_null_values` context key.
+     * If a future change makes nulls emit, this fails and the guarded read has to grow the
+     * distinction back.
+     */
+    public function testUnwrittenAndExplicitlyNullPropertiesSerializeIdenticallyEvenWhenNullsAreKept(): void
+    {
+        $service = FHIRSerializationService::createDefault();
+        $context = ['fhir_omit_null_values' => false];
+
+        $unwritten = (new \ReflectionClass(PatientResource::class))->newInstanceWithoutConstructor();
+        (new \ReflectionProperty(PatientResource::class, 'id'))->setValue($unwritten, 'p1');
+
+        $explicitNull         = new PatientResource(id: 'p1');
+        $explicitNull->gender = null;
+
+        self::assertFalse(
+            (new \ReflectionProperty(PatientResource::class, 'gender'))->isInitialized($unwritten),
+            'the fixture must really leave gender unwritten',
+        );
+
+        self::assertSame(
+            $service->serializeToJson($explicitNull, $context),
+            $service->serializeToJson($unwritten, $context),
+            'JSON cannot tell an unwritten property from an explicit null',
+        );
+        self::assertSame(
+            $service->serializeToXml($explicitNull, $context),
+            $service->serializeToXml($unwritten, $context),
+            'nor can XML',
         );
     }
 

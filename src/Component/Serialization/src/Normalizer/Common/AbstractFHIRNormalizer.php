@@ -26,6 +26,8 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIROperationMetadataProvider;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIROperationMetadataProviderInterface;
 
@@ -44,6 +46,9 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * uninitialised on some paths. The accessor is stateless apart from its caches.
      */
     private static ?FHIRModelAccessorInterface $sharedModelAccessor = null;
+
+    /** Shared for the same reason as the accessor above: derived from class shape, so stateless. */
+    private static ?FHIRStructureKindProviderInterface $sharedStructureKinds = null;
 
     /** Shared operation-metadata reader; stateless apart from its caches. */
     private static ?FHIROperationMetadataProviderInterface $sharedOperationMetadata = null;
@@ -68,21 +73,26 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         return self::$sharedModelAccessor ??= new FHIRModelAccessor();
     }
 
+    /**
+     * The shared structure-kind provider.
+     *
+     * The concrete normalizers take one by constructor injection, but methods on this base class are
+     * reached from paths that never see it, so they share this one instead. Its caches are derived
+     * from generated class shape, so two instances cannot disagree.
+     *
+     * @return FHIRStructureKindProviderInterface Reader for structural attributes
+     */
+    protected static function structureKinds(): FHIRStructureKindProviderInterface
+    {
+        return self::$sharedStructureKinds ??= new FHIRStructureKindProvider();
+    }
+
     protected ?NormalizerInterface $normalizer = null;
 
     protected ?DenormalizerInterface $denormalizer = null;
 
     /** @var array<string, FHIRPrimitive|null> */
     private array $primitiveAttributeCache = [];
-
-    /** @var array<class-string, \ReflectionClass<object>> */
-    private static array $reflClassCache = [];
-
-    /** @var array<class-string, list<\ReflectionProperty>> */
-    private static array $reflPropsCache = [];
-
-    /** @var array<class-string, array<string, \ReflectionProperty>> */
-    private static array $reflPropByNameCache = [];
 
     /** @var array<class-string, array<string, array{0: string, 1: string, 2: string}>> */
     private static array $choiceKeyIndexCache = [];
@@ -119,56 +129,6 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     // -------------------------------------------------------------------------
-    // Reflection cache helpers
-    // -------------------------------------------------------------------------
-
-    /**
-     * @param string|object $subject class-string or object instance
-     *
-     * @return \ReflectionClass<object>
-     */
-    protected static function reflClass(string|object $subject): \ReflectionClass
-    {
-        /** @var class-string $name */
-        $name = is_object($subject) ? get_class($subject) : $subject;
-
-        return self::$reflClassCache[$name] ??= new \ReflectionClass($name);
-    }
-
-    /**
-     * @param string|object $subject class-string or object instance
-     *
-     * @return list<\ReflectionProperty>
-     */
-    protected static function reflPublicProps(string|object $subject): array
-    {
-        /** @var class-string $name */
-        $name = is_object($subject) ? get_class($subject) : $subject;
-
-        return self::$reflPropsCache[$name]
-            ??= self::reflClass($name)->getProperties(\ReflectionProperty::IS_PUBLIC);
-    }
-
-    /**
-     * @param string|object $subject class-string or object instance
-     */
-    protected static function reflProp(string|object $subject, string $propName): ?\ReflectionProperty
-    {
-        /** @var class-string $name */
-        $name = is_object($subject) ? get_class($subject) : $subject;
-
-        if (!array_key_exists($name, self::$reflPropByNameCache)) {
-            $map = [];
-            foreach (self::reflPublicProps($name) as $p) {
-                $map[$p->getName()] = $p;
-            }
-            self::$reflPropByNameCache[$name] = $map;
-        }
-
-        return self::$reflPropByNameCache[$name][$propName] ?? null;
-    }
-
-    // -------------------------------------------------------------------------
     // Primitive detection
     // -------------------------------------------------------------------------
 
@@ -190,23 +150,9 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return $this->primitiveAttributeCache[$type];
         }
 
-        try {
-            $reflection = self::reflClass($type);
-
-            do {
-                $attributes = $reflection->getAttributes(FHIRPrimitive::class);
-                if (!empty($attributes)) {
-                    /** @var FHIRPrimitive */
-                    return $this->primitiveAttributeCache[$type] = $attributes[0]->newInstance();
-                }
-
-                $reflection = $reflection->getParentClass();
-            } while ($reflection !== false);
-
-            return $this->primitiveAttributeCache[$type] = null;
-        } catch (\ReflectionException) {
-            return $this->primitiveAttributeCache[$type] = null;
-        }
+        // An unloadable name answers null here rather than throwing, which is what the caught
+        // ReflectionException produced when this walked the chain itself.
+        return $this->primitiveAttributeCache[$type] = self::structureKinds()->nearestPrimitiveAttribute($type);
     }
 
     protected function hasFHIRPrimitiveAttribute(string $type): bool
@@ -229,46 +175,44 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return null;
         }
 
-        $result        = [];
-        $valueProperty = self::reflProp($value, 'value');
+        $result = [];
+        $raw    = self::modelAccessor()->readInitializedValue($value, 'value');
 
-        if ($valueProperty !== null && $valueProperty->isInitialized($value)) {
-            $raw = $valueProperty->getValue($value);
+        // Each conversion below tests its own input, so running them on a null read is a no-op and
+        // the guarded read needs no initialisation branch of its own.
+        if ($raw instanceof FHIRTemporalValue) {
+            $raw = (string) $raw;
+        }
 
-            if ($raw instanceof FHIRTemporalValue) {
-                $raw = (string) $raw;
-            }
+        // XmlEncoder casts PHP booleans to int; FHIR XML requires "true"/"false".
+        if (is_bool($raw) && $format === 'xml') {
+            $raw = $raw ? 'true' : 'false';
+        }
 
-            // XmlEncoder casts PHP booleans to int; FHIR XML requires "true"/"false".
-            if (is_bool($raw) && $format === 'xml') {
-                $raw = $raw ? 'true' : 'false';
-            }
-
-            if (is_string($raw) && is_numeric($raw) && $format !== 'xml') {
-                if ($this->isDecimalPrimitive($value)) {
-                    $raw = (float) $raw;
-                }
-            }
-
-            if ($raw !== null) {
-                $valueKey          = ($format === 'xml') ? '@value' : 'value';
-                $result[$valueKey] = $raw;
+        if (is_string($raw) && is_numeric($raw) && $format !== 'xml') {
+            if ($this->isDecimalPrimitive($value)) {
+                $raw = (float) $raw;
             }
         }
 
+        if ($raw !== null) {
+            $valueKey          = ($format === 'xml') ? '@value' : 'value';
+            $result[$valueKey] = $raw;
+        }
+
         if ($includeExtensions) {
-            $extensionProperty = self::reflProp($value, 'extension');
-            if ($extensionProperty !== null) {
-                $extensions = $extensionProperty->isInitialized($value) ? $extensionProperty->getValue($value) : null;
-                if ($extensions !== null && !empty($extensions)) {
-                    if ($this->normalizer !== null) {
-                        $normalizedExtensions = $this->normalizer->normalize($extensions, $format, $context);
-                    } else {
-                        $normalizedExtensions = $extensions;
-                    }
-                    $extensionKey          = ($format === 'xml') ? 'extension' : 'extensions';
-                    $result[$extensionKey] = $normalizedExtensions;
+            // A class with no `extension` property and one whose slot is unwritten both read as null,
+            // which is the same skip the absent-property branch used to make separately.
+            $extensions = self::modelAccessor()->readInitializedValue($value, 'extension');
+
+            if ($extensions !== null && !empty($extensions)) {
+                if ($this->normalizer !== null) {
+                    $normalizedExtensions = $this->normalizer->normalize($extensions, $format, $context);
+                } else {
+                    $normalizedExtensions = $extensions;
                 }
+                $extensionKey          = ($format === 'xml') ? 'extension' : 'extensions';
+                $result[$extensionKey] = $normalizedExtensions;
             }
         }
 
@@ -455,16 +399,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         if (is_object($value)) {
-            $result     = [];
-            $properties = self::reflPublicProps($value);
+            $result   = [];
+            $accessor = self::modelAccessor();
 
-            foreach ($properties as $property) {
-                if (!$property->isInitialized($value)) {
-                    continue;
-                }
-                $propertyValue = $property->getValue($value);
+            foreach ($accessor->publicPropertyNames($value) as $propertyName) {
+                $propertyValue = $accessor->readInitializedValue($value, $propertyName);
                 if ($propertyValue !== null) {
-                    $result[$property->getName()] = $this->normalizeBasicValue($propertyValue, $format, $context);
+                    $result[$propertyName] = $this->normalizeBasicValue($propertyValue, $format, $context);
                 }
             }
 
@@ -487,14 +428,15 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
-     * @param \ReflectionClass<object>        $reflection
+     * @param object|string                   $owner        An instance or class name owning the property
+     * @param string                          $propertyName Property being filled
      * @param array<string, PropertyMetadata> $metaMap
      * @param array<string, mixed>            $context
      */
     protected function denormalizePrimitiveProperty(
         PropertyMetadata $meta,
-        \ReflectionProperty $property,
-        \ReflectionClass $reflection,
+        object|string $owner,
+        string $propertyName,
         mixed $value,
         ?string $format,
         array $context,
@@ -505,7 +447,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         if ($meta->isArray && is_array($value)) {
-            $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
+            $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($owner, $meta->fhirType, $metaMap);
             if ($primitiveClass === null) {
                 return $value;
             }
@@ -519,7 +461,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         if (!$meta->isArray) {
-            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property->getDeclaringClass()->getName(), $property->getName());
+            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($owner, $propertyName);
             if ($primitiveClass === null) {
                 // XML encodes primitive values as attributes: <lang value="x"/> → ['@value' => 'x'].
                 // Builtin PHP types can't hold extensions, so extract the scalar or return null.
@@ -539,19 +481,19 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /**
      * Second-pass: attach underscore-prefixed extension data to already-denormalized primitive properties.
      *
-     * @param \ReflectionClass<object>        $reflection
      * @param array<string, mixed>            $data
      * @param array<string, PropertyMetadata> $metaMap
      * @param array<string, mixed>            $context
      */
     protected function applyPrimitiveExtensions(
-        \ReflectionClass $reflection,
         object $object,
         array $data,
         array $metaMap,
         ?string $format,
         array $context,
     ): void {
+        $accessor = self::modelAccessor();
+
         foreach ($data as $elementName => $extData) {
             if (!str_starts_with($elementName, '_')) {
                 continue;
@@ -560,41 +502,47 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             $baseName = substr($elementName, 1);
             $meta     = $metaMap[$baseName] ?? null;
 
-            if ($meta === null || $meta->propertyKind !== 'primitive' || !$reflection->hasProperty($baseName)) {
+            if ($meta === null || $meta->propertyKind !== 'primitive' || !$accessor->hasProperty($object, $baseName)) {
                 continue;
             }
-
-            $property = $reflection->getProperty($baseName);
 
             if (!$meta->isArray) {
                 if (!is_array($extData) || !isset($extData['extension']) || !is_array($extData['extension'])) {
                     continue;
                 }
 
-                $current = $property->isInitialized($object) ? $property->getValue($object) : null;
+                $current = $accessor->readInitializedValue($object, $baseName);
 
                 if (!is_object($current)) {
-                    $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property->getDeclaringClass()->getName(), $property->getName());
+                    $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($object, $baseName);
                     if ($primitiveClass === null || $this->denormalizer === null) {
                         continue;
                     }
 
                     $rawValue = is_scalar($current) ? $current : null;
                     $current  = $this->denormalizer->denormalize($rawValue, $primitiveClass, $format, $context);
-                    $property->setValue($object, $current);
+                    $accessor->writeValue($object, $baseName, $current);
                 }
 
-                $extensionProp = self::reflProp($current, 'extension');
-                if ($extensionProp !== null) {
-                    $denormalizedExtensions = $this->denormalizeExtensionArray($extData['extension'], $format, $context);
-                    $extensionProp->setValue($current, $denormalizedExtensions);
-                }
+                // A class with no `extension` property is skipped by writeValue itself, which is what
+                // the absent-handle check did.
+                $accessor->writeValue(
+                    $current,
+                    'extension',
+                    $this->denormalizeExtensionArray($extData['extension'], $format, $context),
+                );
             } else {
                 if (!is_array($extData)) {
                     continue;
                 }
 
-                $currentArray = $property->isInitialized($object) ? $property->getValue($object) : [];
+                // Not a plain guarded read: an unwritten slot must continue as an empty array while
+                // an initialised null must fall through to the is_array skip below, and one null
+                // answer cannot express both.
+                $currentArray = $accessor->isPropertyInitialized($object, $baseName)
+                    ? $accessor->readInitializedValue($object, $baseName)
+                    : [];
+
                 if (!is_array($currentArray)) {
                     continue;
                 }
@@ -610,7 +558,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                             continue;
                         }
 
-                        $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
+                        $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($object, $meta->fhirType, $metaMap);
                         if ($primitiveClass === null || $this->denormalizer === null) {
                             continue;
                         }
@@ -618,21 +566,23 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                         $currentArray[$i] = $this->denormalizer->denormalize(null, $primitiveClass, $format, $context);
                     }
 
-                    $extensionProp = self::reflProp($currentArray[$i], 'extension');
-
-                    if ($extensionProp === null) {
+                    if (!$accessor->hasProperty($currentArray[$i], 'extension')) {
                         continue;
                     }
 
                     if ($hasExtensionData) {
-                        $denormalizedExtensions = $this->denormalizeExtensionArray($extEntry['extension'], $format, $context);
-                        $extensionProp->setValue($currentArray[$i], $denormalizedExtensions);
-                    } elseif (!$extensionProp->isInitialized($currentArray[$i])) {
-                        $extensionProp->setValue($currentArray[$i], []);
+                        $accessor->writeValue(
+                            $currentArray[$i],
+                            'extension',
+                            $this->denormalizeExtensionArray($extEntry['extension'], $format, $context),
+                        );
+                    } elseif (!$accessor->isPropertyInitialized($currentArray[$i], 'extension')) {
+                        // Only an unwritten slot gets the default; an explicit null is left alone.
+                        $accessor->writeValue($currentArray[$i], 'extension', []);
                     }
                 }
 
-                $property->setValue($object, $currentArray);
+                $accessor->writeValue($object, $baseName, $currentArray);
             }
         }
     }
@@ -706,29 +656,25 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     protected function createPrimitiveInstance(string $type, mixed $value, mixed $extensions, ?string $format = null, array $context = []): mixed
     {
         try {
-            $reflection = self::reflClass($type);
-
-            $validatedValue = $this->validateAndConvertValue($value, $type);
-
             // Constructor-defaulted, not bare: a primitive wrapper carries inherited `id` and
             // `extension` slots that this method never assigns when the payload omits them, and an
             // unassigned slot throws on read rather than reading back as the declared default.
+            //
+            // Built before the value is validated so an unloadable type still raises
+            // ReflectionException first, as reflecting the class up front used to.
             $instance = $this->instantiateWithDefaults($type);
+            $accessor = self::modelAccessor();
 
-            $valueProp = self::reflProp($type, 'value');
-            if ($valueProp !== null) {
-                $valueProp->setValue($instance, $validatedValue);
-            }
+            $accessor->writeValue($instance, 'value', $this->validateAndConvertValue($value, $type));
 
             if ($extensions !== null) {
-                $extensionProp = self::reflProp($type, 'extension');
-                if ($extensionProp !== null) {
-                    if ($this->denormalizer !== null && is_array($extensions)) {
-                        $extensionProp->setValue($instance, $this->denormalizeExtensionArray($extensions, $format, $context));
-                    } else {
-                        $extensionProp->setValue($instance, $extensions);
-                    }
-                }
+                $accessor->writeValue(
+                    $instance,
+                    'extension',
+                    $this->denormalizer !== null && is_array($extensions)
+                        ? $this->denormalizeExtensionArray($extensions, $format, $context)
+                        : $extensions,
+                );
             }
 
             return $instance;
@@ -1032,16 +978,14 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
 
     private static function shortTypeName(string $fqcn): string
     {
-        if (class_exists($fqcn)) {
-            $reflection = new \ReflectionClass($fqcn);
-            foreach ($reflection->getAttributes() as $attribute) {
-                $type = $attribute->getArguments()['type'] ?? null;
-                if (is_string($type) && $type !== '') {
-                    return $type;
-                }
-            }
+        $declared = self::structureKinds()->declaredFhirTypeName($fqcn);
+
+        if ($declared !== null) {
+            return $declared;
         }
 
+        // No declared name: an unloadable string, or a profile subclass that declares no attribute of
+        // its own. Both fall back to the class's short name, as before.
         $tail = strrchr($fqcn, '\\');
 
         return $tail === false ? $fqcn : substr($tail, 1);

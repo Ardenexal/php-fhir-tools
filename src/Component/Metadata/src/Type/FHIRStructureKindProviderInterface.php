@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
+
 /**
  * Answers what kind of FHIR structure a class is, with the inheritance question made explicit.
  *
@@ -63,6 +65,34 @@ interface FHIRStructureKindProviderInterface
      *                                ancestor declares any of them
      */
     public function nearestKindAmong(object|string $subject, FHIRStructureKind ...$kinds): ?FHIRStructureKind;
+
+    /**
+     * The FHIR type name a class declares on its own structural attribute.
+     *
+     * Every structural attribute the generator emits carries a `type` argument holding the published
+     * FHIR name -- `HumanName`, `Patient`, `code` -- which is what a conformance message should say
+     * rather than a PHP class name. Read from the class's own attributes only: a profile subclass
+     * declares none, so it answers null and the caller falls back to the class name, which is the
+     * behaviour a profile should get.
+     *
+     * @param object|string $subject An instance or class name; an unloadable name gives null
+     *
+     * @return string|null The declared FHIR type name, or null when the class declares none
+     */
+    public function declaredFhirTypeName(object|string $subject): ?string;
+
+    /**
+     * The nearest `#[FHIRPrimitive]` up the class chain, as an instance rather than a kind.
+     *
+     * `inheritedKindOf()` answers *whether* a class is a primitive and discards the attribute that
+     * said so. Callers that need the attribute's own fields -- the FHIR type name it records, say --
+     * have to read it, and doing that by hand is a reflection walk in the caller. This returns it.
+     *
+     * @param object|string $subject An instance or class name; an unloadable name gives null
+     *
+     * @return FHIRPrimitive|null The attribute from the nearest class carrying one, or null
+     */
+    public function nearestPrimitiveAttribute(object|string $subject): ?FHIRPrimitive;
 
     /**
      * Whether the class is marked as defining a FHIR extension.

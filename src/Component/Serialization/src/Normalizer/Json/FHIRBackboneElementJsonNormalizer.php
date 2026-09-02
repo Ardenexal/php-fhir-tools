@@ -77,7 +77,6 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            $reflection = self::reflClass($type);
             $object     = $this->instantiateWithConstructorDefaults($type);
             $metaMap    = $this->getPropertyMetadataMap($object);
 
@@ -86,16 +85,15 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
                     continue;
                 }
 
-                $property      = self::reflProp($type, $elementName);
-                $choiceMapping = $property === null
+                $hasProperty   = self::modelAccessor()->hasProperty($type, $elementName);
+                $choiceMapping = !$hasProperty
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $type)
                     : null;
 
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
-                    $choiceProp = self::reflProp($type, $propertyName);
-                    if ($choiceProp !== null) {
+                    if (self::modelAccessor()->hasProperty($type, $propertyName)) {
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'json', $context);
                         } else {
@@ -104,12 +102,12 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
                                 : $value;
                         }
 
-                        $choiceProp->setValue($object, $denormalizedValue);
+                        self::modelAccessor()->writeValue($object, $propertyName, $denormalizedValue);
                         continue;
                     }
                 }
 
-                if ($property !== null) {
+                if ($hasProperty) {
                     if ($elementName === 'extension' || $elementName === 'modifierExtension') {
                         $denormalizedValue = is_array($value)
                             ? array_values($this->denormalizeExtensionArray(array_values($value), 'json', $context))
@@ -126,9 +124,9 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
                                     $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'json', $context);
                                 }
                             } elseif ($meta !== null && $meta->propertyKind === 'primitive') {
-                                $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'json', $context, $metaMap);
+                                $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $type, $elementName, $value, 'json', $context, $metaMap);
                             } else {
-                                $propertyType = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
+                                $propertyType = $this->getPropertyType($type, $elementName);
                                 if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                                     $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
                                 } else {
@@ -136,18 +134,18 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
                                 }
                             }
                         } else {
-                            $propertyType      = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
+                            $propertyType      = $this->getPropertyType($type, $elementName);
                             $denormalizedValue = ($propertyType !== null && !$this->isBuiltinType($propertyType))
                                 ? null
                                 : $this->denormalizeBasicValue($value, 'json', $context);
                         }
                     }
 
-                    $property->setValue($object, $denormalizedValue);
+                    self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                 }
             }
 
-            $this->applyPrimitiveExtensions($reflection, $object, $data, $metaMap, 'json', $context);
+            $this->applyPrimitiveExtensions($object, $data, $metaMap, 'json', $context);
 
             return $object;
         } catch (\ReflectionException $e) {
@@ -196,16 +194,9 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
         $metaMap           = $this->getPropertyMetadataMap($object);
         $includeExtensions = $fhirContext->includeExtensions;
 
-        $properties = self::reflPublicProps($object);
-
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-
-            if (!$property->isInitialized($object)) {
-                continue;
-            }
-
-            $value = $property->getValue($object);
+        foreach (self::modelAccessor()->publicPropertyNames($object) as $propertyName) {
+            // Unwritten and explicitly null both read as null here, and the skip below catches both.
+            $value = self::modelAccessor()->readInitializedValue($object, $propertyName);
 
             if ($value === null || (is_array($value) && empty($value))) {
                 continue;

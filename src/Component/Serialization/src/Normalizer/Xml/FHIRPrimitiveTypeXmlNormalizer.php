@@ -47,7 +47,7 @@ class FHIRPrimitiveTypeXmlNormalizer extends AbstractFHIRNormalizer
             throw new InvalidArgumentException('Object is not a FHIR primitive type');
         }
 
-        return $this->normalizeForXML($object, self::reflClass($object), $context);
+        return $this->normalizeForXML($object, $context);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -97,42 +97,38 @@ class FHIRPrimitiveTypeXmlNormalizer extends AbstractFHIRNormalizer
     }
 
     /**
-     * @param \ReflectionClass<object> $reflection
-     * @param array<string, mixed>     $context
+     * @param array<string, mixed> $context
      *
      * @return array<string, mixed>
      */
-    private function normalizeForXML(object $object, \ReflectionClass $reflection, array $context): array
+    private function normalizeForXML(object $object, array $context): array
     {
         $result = [];
 
-        $valueProp = self::reflProp($object, 'value');
-        if ($valueProp !== null) {
-            $value = $valueProp->isInitialized($object) ? $valueProp->getValue($object) : null;
+        $accessor = self::modelAccessor();
+        $value    = $accessor->readInitializedValue($object, 'value');
 
-            if ($value instanceof FHIRTemporalValue) {
-                $value = (string) $value;
-            }
-
-            // XmlEncoder casts PHP booleans to int (true→1, false→0). FHIR XML requires "true"/"false".
-            if (is_bool($value)) {
-                $value = $value ? 'true' : 'false';
-            }
-
-            if ($value !== null) {
-                $result['@value'] = $value;
-            }
+        if ($value instanceof FHIRTemporalValue) {
+            $value = (string) $value;
         }
 
-        $extensionProp = self::reflProp($object, 'extension');
-        if ($extensionProp !== null) {
-            $extensions = $extensionProp->isInitialized($object) ? $extensionProp->getValue($object) : null;
+        // XmlEncoder casts PHP booleans to int (true→1, false→0). FHIR XML requires "true"/"false".
+        if (is_bool($value)) {
+            $value = $value ? 'true' : 'false';
+        }
 
-            if ($extensions !== null && !empty($extensions)) {
-                $result['extension'] = $this->normalizer !== null
-                    ? $this->normalizer->normalize($extensions, 'xml', $context)
-                    : $extensions;
-            }
+        if ($value !== null) {
+            $result['@value'] = $value;
+        }
+
+        // An absent `extension` property and an unwritten one both read as null, which the emptiness
+        // test below already skips -- so the separate absent-handle branch is gone.
+        $extensions = $accessor->readInitializedValue($object, 'extension');
+
+        if ($extensions !== null && !empty($extensions)) {
+            $result['extension'] = $this->normalizer !== null
+                ? $this->normalizer->normalize($extensions, 'xml', $context)
+                : $extensions;
         }
 
         return $result;

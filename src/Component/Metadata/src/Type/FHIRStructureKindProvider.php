@@ -50,6 +50,12 @@ final class FHIRStructureKindProvider implements FHIRStructureKindProviderInterf
     /** @var array<class-string, bool> */
     private array $extensionCache = [];
 
+    /** @var array<class-string, FHIRPrimitive|false> */
+    private array $primitiveAttributeCache = [];
+
+    /** @var array<class-string, string|false> */
+    private array $typeNameCache = [];
+
     /**
      * {@inheritDoc}
      */
@@ -116,6 +122,68 @@ final class FHIRStructureKindProvider implements FHIRStructureKindProviderInterf
         }
 
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function declaredFhirTypeName(object|string $subject): ?string
+    {
+        $class = self::classOf($subject);
+
+        if ($class === null) {
+            return null;
+        }
+
+        if (!isset($this->typeNameCache[$class])) {
+            $found = null;
+
+            // Any attribute carrying a non-empty `type`, not a fixed list: the structural attributes
+            // all spell it the same way, and pinning the list here would go stale as they are added.
+            foreach ((new \ReflectionClass($class))->getAttributes() as $attribute) {
+                $type = $attribute->getArguments()['type'] ?? null;
+
+                if (is_string($type) && $type !== '') {
+                    $found = $type;
+                    break;
+                }
+            }
+
+            $this->typeNameCache[$class] = $found ?? false;
+        }
+
+        return $this->typeNameCache[$class] ?: null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function nearestPrimitiveAttribute(object|string $subject): ?FHIRPrimitive
+    {
+        $class = self::classOf($subject);
+
+        if ($class === null) {
+            return null;
+        }
+
+        if (!isset($this->primitiveAttributeCache[$class])) {
+            $found = null;
+
+            // Same walk as inheritedKindOf, kept separate because it stops only at FHIRPrimitive: a
+            // primitive's ancestor carrying FHIRComplexType must not end the search early.
+            for ($cursor = $class; $cursor !== false; $cursor = get_parent_class($cursor)) {
+                $attributes = (new \ReflectionClass($cursor))->getAttributes(FHIRPrimitive::class);
+
+                if ($attributes !== []) {
+                    $found = $attributes[0]->newInstance();
+                    break;
+                }
+            }
+
+            $this->primitiveAttributeCache[$class] = $found ?? false;
+        }
+
+        return $this->primitiveAttributeCache[$class] ?: null;
     }
 
     /**

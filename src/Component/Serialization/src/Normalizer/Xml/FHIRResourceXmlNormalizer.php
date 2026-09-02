@@ -180,21 +180,16 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
             $data['@xmlns'] = 'http://hl7.org/fhir';
         }
 
-        $properties = self::reflPublicProps($object);
-        $metaMap    = $this->getPropertyMetadataMap($object);
+        $metaMap = $this->getPropertyMetadataMap($object);
 
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-
+        foreach (self::modelAccessor()->publicPropertyNames($object) as $propertyName) {
             if ($propertyName === 'resourceType') {
                 continue;
             }
 
-            if (!$property->isInitialized($object)) {
-                continue;
-            }
-
-            $value = $property->getValue($object);
+            // Unwritten and explicitly null both read as null, and shouldOmitValue below treats them
+            // the same: every emit branch guards against null regardless of the omitNullValues option.
+            $value = self::modelAccessor()->readInitializedValue($object, $propertyName);
 
             if ($this->shouldOmitValue($value, $fhirContext)) {
                 continue;
@@ -305,7 +300,6 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
         $resolvedType = $type;
 
         try {
-            $reflection            = self::reflClass($resolvedType);
             $object                = $this->instantiateWithDefaults($resolvedType);
             $metaMap               = $this->getPropertyMetadataMap($object);
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
@@ -315,16 +309,15 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                     continue;
                 }
 
-                $property      = self::reflProp($resolvedType, $elementName);
-                $choiceMapping = $property === null
+                $hasProperty   = self::modelAccessor()->hasProperty($resolvedType, $elementName);
+                $choiceMapping = !$hasProperty
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $resolvedType)
                     : null;
 
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
-                    $choiceProp = self::reflProp($resolvedType, $propertyName);
-                    if ($choiceProp !== null) {
+                    if (self::modelAccessor()->hasProperty($resolvedType, $propertyName)) {
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
                         } else {
@@ -338,13 +331,13 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                             };
                         }
 
-                        $choiceProp->setValue($object, $denormalizedValue);
+                        self::modelAccessor()->writeValue($object, $propertyName, $denormalizedValue);
                         continue;
                     }
                 }
 
-                if ($property !== null) {
-                    $propertyType     = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
+                if ($hasProperty) {
+                    $propertyType     = $this->getPropertyType($resolvedType, $elementName);
                     $propertyMetadata = $metaMap[$elementName] ?? null;
                     $phpItemClass     = $propertyMetadata?->phpItemClass;
 
@@ -366,7 +359,7 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                                 }
                             }
 
-                            $property->setValue($object, $denormalizedValue);
+                            self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                             continue;
                         }
 
@@ -376,7 +369,7 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
 
                             if ($resolvedClass !== null && $this->denormalizer !== null) {
                                 $denormalizedValue = $this->denormalizer->denormalize($value[$resourceElementName], $resolvedClass, 'xml', $context);
-                                $property->setValue($object, $denormalizedValue);
+                                self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                                 continue;
                             }
                         }
@@ -440,7 +433,7 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                         }
                     }
 
-                    $property->setValue($object, $denormalizedValue);
+                    self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                 } else {
                     $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, $object, $elementName);
                 }

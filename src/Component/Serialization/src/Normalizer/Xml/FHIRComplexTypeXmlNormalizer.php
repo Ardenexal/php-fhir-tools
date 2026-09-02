@@ -127,8 +127,6 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            $reflection = self::reflClass($resolvedType);
-
             if (is_a($resolvedType, FHIRComplexExtensionInterface::class, true)
                 && isset($data['extension'])
                 && is_array($data['extension'])
@@ -163,11 +161,15 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 if (str_starts_with($elementName, '@')) {
                     if ($elementName !== '@value') {
                         $attrName = substr($elementName, 1);
-                        $attrProp = self::reflProp($resolvedType, $attrName);
-                        if ($attrProp !== null) {
-                            $attrProp->setValue(
+                        if (self::modelAccessor()->hasProperty($resolvedType, $attrName)) {
+                            self::modelAccessor()->writeValue(
                                 $object,
-                                $this->denormalizeXmlAttribute((string) $value, $attrProp, $metaMap[$attrName] ?? null),
+                                $attrName,
+                                $this->denormalizeXmlAttribute(
+                                    (string) $value,
+                                    self::modelAccessor()->declaredTypeOf($resolvedType, $attrName),
+                                    $metaMap[$attrName] ?? null,
+                                ),
                             );
                         }
                     }
@@ -181,21 +183,20 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     // it. Other '#' artifacts (e.g. empty text on attribute-only elements) are
                     // ignored.
                     if (($elementName === '#' || $elementName === '#text') && is_string($value) && $value !== '') {
-                        self::reflProp($resolvedType, 'xmlText')?->setValue($object, $value);
+                        self::modelAccessor()->writeValue($object, 'xmlText', $value);
                     }
                     continue;
                 }
 
-                $property      = self::reflProp($resolvedType, $elementName);
-                $choiceMapping = $property === null
+                $hasProperty   = self::modelAccessor()->hasProperty($resolvedType, $elementName);
+                $choiceMapping = !$hasProperty
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $resolvedType)
                     : null;
 
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
-                    $choiceProp = self::reflProp($resolvedType, $propertyName);
-                    if ($choiceProp !== null) {
+                    if (self::modelAccessor()->hasProperty($resolvedType, $propertyName)) {
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
                         } else {
@@ -228,12 +229,12 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                             };
                         }
 
-                        $choiceProp->setValue($object, $denormalizedValue);
+                        self::modelAccessor()->writeValue($object, $propertyName, $denormalizedValue);
                         continue;
                     }
                 }
 
-                if ($property === null) {
+                if (!$hasProperty) {
                     continue;
                 }
 
@@ -241,22 +242,22 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
                 if ($this->denormalizer !== null) {
                     if (is_array($value) && $meta !== null && $meta->fhirType === 'xhtml') {
-                        $xhtmlClass = $this->getFirstNonBuiltinTypeFromProperty($property->getDeclaringClass()->getName(), $property->getName());
+                        $xhtmlClass = $this->getFirstNonBuiltinTypeFromProperty($resolvedType, $elementName);
                         if ($xhtmlClass !== null) {
-                            /** @var class-string $xhtmlClass */
-                            $xhtmlRefl     = self::reflClass($xhtmlClass);
-                            $xhtmlInstance = $xhtmlRefl->newInstanceWithoutConstructor();
-                            $xhtmlValProp  = self::reflProp($xhtmlClass, 'value');
-                            if ($xhtmlValProp !== null) {
-                                $xmlString = $this->encodeXhtmlToString($value, 'div');
-                                $xhtmlValProp->setValue($xhtmlInstance, $xmlString);
-                            }
+                            // Bare, not defaulted: this instance is handed straight on carrying only
+                            // its value, which is what the previous construction did.
+                            $xhtmlInstance = self::modelAccessor()->instantiateBare($xhtmlClass);
+                            self::modelAccessor()->writeValue(
+                                $xhtmlInstance,
+                                'value',
+                                $this->encodeXhtmlToString($value, 'div'),
+                            );
                             $denormalizedValue = $xhtmlInstance;
                         } else {
                             $denormalizedValue = null;
                         }
                     } elseif ($meta !== null && $meta->propertyKind === 'primitive') {
-                        $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'xml', $context, $metaMap);
+                        $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $resolvedType, $elementName, $value, 'xml', $context, $metaMap);
                     } elseif (is_array($value)
                         && $meta !== null
                         && ($meta->propertyKind === 'extension' || $meta->propertyKind === 'modifierExtension')
@@ -283,7 +284,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         $denormalizedValue = $this->denormalizeCharacterDataElement(
                             $value,
                             $meta,
-                            $property,
+                            $resolvedType,
                             $elementName,
                             $sourceElement,
                             $context,
@@ -321,13 +322,13 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                             if ($resolvedClass !== null) {
                                 $innerData         = is_array($value[$resourceElementName] ?? null) ? $value[$resourceElementName] : $value;
                                 $denormalizedValue = $this->denormalizer->denormalize($innerData, $resolvedClass, 'xml', $context);
-                                $property->setValue($object, $denormalizedValue);
+                                self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                                 continue;
                             }
                         }
                         $denormalizedValue = null;
                     } else {
-                        $propertyType = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
+                        $propertyType = $this->getPropertyType($resolvedType, $elementName);
                         if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                             // Captured before the cardinality guard: that call is impure to PHPStan,
                             // which would otherwise widen $this->denormalizer back to nullable.
@@ -352,7 +353,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     $denormalizedValue = $this->denormalizeBasicValue($value, 'xml', $context);
                 }
 
-                $property->setValue($object, $denormalizedValue);
+                self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
             }
 
             // Transparent xml-choice-group: rebuild the ordered list<ChoiceGroupItem> from the
@@ -365,8 +366,9 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     if ($choiceMeta->propertyKind !== 'choiceGroup' || $choiceMeta->variants === null) {
                         continue;
                     }
-                    self::reflProp($resolvedType, $choicePropertyName)?->setValue(
+                    self::modelAccessor()->writeValue(
                         $object,
+                        $choicePropertyName,
                         $this->denormalizeChoiceGroup($sourceElement, $choiceMeta->variants, $context),
                     );
                 }
@@ -442,16 +444,14 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         $metaMap           = $this->getPropertyMetadataMap($object);
         $includeExtensions = $fhirContext->includeExtensions;
 
-        $properties = self::orderByContentModel(self::reflPublicProps($object), $this->contentModelOrder($object));
+        $propertyNames = self::orderByContentModel(
+            self::modelAccessor()->publicPropertyNames($object),
+            $this->contentModelOrder($object),
+        );
 
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-
-            if (!$property->isInitialized($object)) {
-                continue;
-            }
-
-            $value = $property->getValue($object);
+        foreach ($propertyNames as $propertyName) {
+            // Unwritten and explicitly null both read as null, and the skip below catches both.
+            $value = self::modelAccessor()->readInitializedValue($object, $propertyName);
 
             if ($value === null || (is_array($value) && empty($value))) {
                 continue;
@@ -536,9 +536,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
             // Xhtml: XhtmlPrimitive.value is either an array (from XML deserialization) or string (from JSON)
             if ($meta !== null && $meta->fhirType === 'xhtml' && is_object($value)) {
-                $xhtmlValProp = self::reflProp($value, 'value');
-                if ($xhtmlValProp !== null) {
-                    $rawXhtml = $xhtmlValProp->getValue($value);
+                if (self::modelAccessor()->hasProperty($value, 'value')) {
+                    $rawXhtml = self::modelAccessor()->readInitializedValue($value, 'value');
                     if (is_array($rawXhtml)) {
                         $xhtmlArray           = $rawXhtml;
                         $xhtmlArray['@xmlns'] = 'http://www.w3.org/1999/xhtml';
@@ -689,15 +688,15 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      * A property the order does not name keeps its reflection position, after every named one. PHP's
      * sort has been stable since 8.0, so equal ranks preserve that relative order.
      *
-     * @param list<\ReflectionProperty> $properties
-     * @param list<string>              $order      property names in published order; empty to leave as-is
+     * @param list<string> $names property names in enumeration order
+     * @param list<string> $order property names in published order; empty to leave as-is
      *
-     * @return list<\ReflectionProperty> the same properties in published order
+     * @return list<string> the same names in published order
      */
-    private static function orderByContentModel(array $properties, array $order): array
+    private static function orderByContentModel(array $names, array $order): array
     {
         if ($order === []) {
-            return $properties;
+            return $names;
         }
 
         // Case-sensitive by construction: CDA `Section` declares both an `ID` attribute and an `id`
@@ -705,11 +704,11 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         $rank = array_flip($order);
 
         usort(
-            $properties,
-            static fn (\ReflectionProperty $left, \ReflectionProperty $right): int => ($rank[$left->getName()] ?? PHP_INT_MAX) <=> ($rank[$right->getName()] ?? PHP_INT_MAX),
+            $names,
+            static fn (string $left, string $right): int => ($rank[$left] ?? PHP_INT_MAX) <=> ($rank[$right] ?? PHP_INT_MAX),
         );
 
-        return $properties;
+        return $names;
     }
 
     /**
@@ -759,7 +758,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 continue;
             }
 
-            $collides = self::reflProp($subject, $localName) !== null;
+            $collides = self::modelAccessor()->hasProperty($subject, $localName);
 
             if ($sourceElement === null) {
                 // No DOM to disambiguate with. A single unambiguous candidate can still be re-keyed
@@ -861,11 +860,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      * historical plain-string assignment, so FHIR R4/R4B/R5 attribute handling is untouched - no
      * generated FHIR property is enum- or array-typed on an xmlAttr, CDA is the only consumer.
      */
-    private function denormalizeXmlAttribute(string $value, \ReflectionProperty $property, ?PropertyMetadata $meta): mixed
+    private function denormalizeXmlAttribute(string $value, ?string $typeName, ?PropertyMetadata $meta): mixed
     {
-        $type     = $property->getType();
-        $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : null;
-
         if ($typeName === 'array') {
             $codes     = preg_split('/\s+/', trim($value), -1, PREG_SPLIT_NO_EMPTY);
             $codes     = $codes === false ? [] : $codes;
@@ -971,12 +967,9 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 continue;
             }
 
-            $property = self::reflProp($object, $propertyName);
-            if ($property === null) {
-                continue;
-            }
-            $type = $property->getType();
-            if (!$type instanceof \ReflectionNamedType || $type->getName() !== 'string') {
+            // declaredTypeOf answers null for an absent property and the bare name for a nullable
+            // one, so this single test covers both halves of what the handle checked.
+            if (self::modelAccessor()->declaredTypeOf($object, $propertyName) !== 'string') {
                 continue;
             }
 
@@ -986,7 +979,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 continue;
             }
 
-            $property->setValue($object, $this->narrativeMarkupFrom($children[0]));
+            self::modelAccessor()->writeValue($object, $propertyName, $this->narrativeMarkupFrom($children[0]));
             $consumed[$elementName] = true;
         }
 
@@ -1271,8 +1264,10 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      *
      * @param string               $value         The element's character data
      * @param PropertyMetadata     $meta          Declared metadata for the property being filled
-     * @param \ReflectionProperty  $property      The property being filled, for its declared type
-     * @param string               $elementName   Local XML name, used to re-find the source child
+     * @param object|string        $owner         Instance or class name owning the property
+     * @param string               $propertyName  Property being filled, and the local XML name to
+     *                                            re-find the source child by -- the caller resolves
+     *                                            both from one decoded key, so they are one value
      * @param \DOMElement|null     $sourceElement The parent's source element, when one was threaded in
      * @param array<string, mixed> $context       Denormalization context
      *
@@ -1281,18 +1276,18 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
     private function denormalizeCharacterDataElement(
         string $value,
         PropertyMetadata $meta,
-        \ReflectionProperty $property,
-        string $elementName,
+        object|string $owner,
+        string $propertyName,
         ?\DOMElement $sourceElement,
         array $context,
     ): object|array|null {
-        $targetClass = $meta->phpItemClass ?? $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
+        $targetClass = $meta->phpItemClass ?? $this->getPropertyType($owner, $propertyName);
         if ($targetClass === null || $this->isBuiltinType($targetClass) || $this->denormalizer === null) {
             return null;
         }
 
         $sourceChild = $sourceElement !== null
-            ? ($this->childElementsByLocalName($sourceElement, $elementName)[0] ?? null)
+            ? ($this->childElementsByLocalName($sourceElement, $propertyName)[0] ?? null)
             : null;
         if ($sourceChild !== null) {
             $context[self::SOURCE_ELEMENT_CONTEXT_KEY] = $sourceChild;
