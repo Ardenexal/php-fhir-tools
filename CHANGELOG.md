@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **BREAKING** [Metadata] [Serialization] The FHIR type and property metadata layer moved from `Ardenexal\FHIRTools\Component\Serialization\Metadata\` to `Ardenexal\FHIRTools\Component\Metadata\Type\`. Twelve classes relocated unchanged (`FHIRMetadataExtractor`, `FHIRMetadataExtractorInterface`, `FHIRMetadataCache`, `PropertyMetadataProvider`, `PropertyMetadataProviderInterface`, `PropertyMetadata`, `PropertyVariantMetadata`, `LogicalModelLocatorTrait`, and the four `*Metadata` records), so that a single component owns the question "what does this FHIR class look like" instead of Serialization, Validation and FHIRPath each answering it with their own reflection. Update imports; there are no aliases or deprecated stubs, the package being pre-1.0
+- **BREAKING** [Metadata] [Serialization] `Serialization\FHIRTypeResolver` moved to `Metadata\Type\FHIRSerializedTypeResolver`, and `Serialization\FHIRTypeResolverInterface` to `Metadata\Type\FHIRTypeResolverInterface`. The leaf was renamed because `FHIRPath\Type\FHIRTypeResolver` is a different abstraction with no shared method -- one maps serialized data to a model class, the other implements FHIRPath `is`/`as`/`ofType`. The FHIRPath class is unaffected
+- [Metadata] `PropertyMetadataProvider::cacheKey()` now carries a schema token. A PSR-6 pool warmed before this release held entries under the old class shape and the read guard would have served them back; the token makes those entries unreachable rather than misread. Pools repopulate on first use
+
+### Added
+- [Metadata] `FHIRIGTypeRegistryInterface`, extracted from `FHIRIGTypeRegistry` so the registry can be decorated, cached or replaced by a test double. Read methods only -- construction stays off the interface because the registry takes plain arrays and returns hydrated objects, an asymmetry the compiled container requires
+
 ### Added
 - [CodeGeneration] `fhir:generate` now generates CDA R2 logical models. `LogicalModelGenerator` handles `kind: logical` StructureDefinitions from `hl7.cda.uv.core` and `au.digitalhealth.cda.schema`, emitting 260 classes (179 clinical classes, 50 datatypes, 31 ValueSet enums) into the new standalone `ardenexal/cda-sd-models` package under `Ardenexal\FHIRTools\Component\CdaModels\{ClinicalClass,DataType,Enum}`; see `docs/code-generation/cda.md`
 - [CodeGeneration] AU CDA classes generate as core specializations, not profiles. `au.digitalhealth.cda.schema` uses `derivation: specialization` to *add* XML elements rather than restrict them, so `au-ClinicalDocument` and its siblings are generated as real subclasses of their core counterparts instead of constrained views

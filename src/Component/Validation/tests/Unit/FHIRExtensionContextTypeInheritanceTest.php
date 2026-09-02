@@ -9,9 +9,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionCon
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\HumanName;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\PatientResource;
-use Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FhirPropertyTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
-use Ardenexal\FHIRTools\Component\Validation\NullFHIRTypeHierarchyResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\NullFHIRTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\BareTypeDomainResourceExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\BareTypeElementExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\BareTypeObservationExtensionFixture;

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRBackboneElementMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRComplexTypeMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataCache;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRPrimitiveTypeMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRResourceMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRBackboneElementMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRComplexTypeMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataCache;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRPrimitiveTypeMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRResourceMetadata;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 
 /**

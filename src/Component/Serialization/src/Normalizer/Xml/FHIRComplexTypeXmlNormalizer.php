@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyVariantMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyVariantMetadata;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -49,6 +48,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         ?DenormalizerInterface $denormalizer = null,
         string $fhirVersion = 'R4',
         ?FHIRIGTypeRegistry $igTypeRegistry = null,
+        private readonly FHIRStructureKindProviderInterface $structureKinds = new FHIRStructureKindProvider(),
     ) {
         parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
         $this->xmlEncoder = new XmlEncoder();
@@ -141,10 +141,10 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 return $resolvedType::fromSubExtensions($subExtensions, $id);
             }
 
-            $isBackboneElement = !empty($reflection->getAttributes(FHIRBackboneElement::class));
+            $isBackboneElement = $this->structureKinds->declaredKindOf($type) === FHIRStructureKind::BackboneElement;
             $object            = $isBackboneElement
-                ? $this->instantiateWithConstructorDefaults($reflection)
-                : $this->instantiateWithDefaults($reflection);
+                ? $this->instantiateWithConstructorDefaults($type)
+                : $this->instantiateWithDefaults($type);
 
             $metaMap = $this->getPropertyMetadataMap($object);
             $data    = $this->remapNamespacedElements($data, $metaMap, $object, $sourceElement);
@@ -241,7 +241,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
                 if ($this->denormalizer !== null) {
                     if (is_array($value) && $meta !== null && $meta->fhirType === 'xhtml') {
-                        $xhtmlClass = $this->getFirstNonBuiltinTypeFromProperty($property);
+                        $xhtmlClass = $this->getFirstNonBuiltinTypeFromProperty($property->getDeclaringClass()->getName(), $property->getName());
                         if ($xhtmlClass !== null) {
                             /** @var class-string $xhtmlClass */
                             $xhtmlRefl     = self::reflClass($xhtmlClass);
@@ -327,7 +327,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         }
                         $denormalizedValue = null;
                     } else {
-                        $propertyType = $this->getPropertyType($property);
+                        $propertyType = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
                         if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                             // Captured before the cardinality guard: that call is impure to PHPStan,
                             // which would otherwise widen $this->denormalizer back to nullable.
@@ -373,9 +373,9 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             }
 
             if (!$object instanceof FHIRComplexExtensionInterface
-                && !empty($reflection->getAttributes(FHIRExtensionDefinition::class))
+                && $this->structureKinds->isExtensionDefinition($type)
             ) {
-                $this->copyTypedExtensionValueBack($reflection, $object);
+                $this->copyTypedExtensionValueBack($object);
             }
 
             return $object;
@@ -402,23 +402,20 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            $reflection = self::reflClass($type);
-            $r          = $reflection;
+            // Walks past any other kind on the way up: a backbone-element ancestor is neither a
+            // primitive nor a complex type for this question, and the walk must continue through it.
+            $kind = $this->structureKinds->nearestKindAmong(
+                $type,
+                FHIRStructureKind::PrimitiveType,
+                FHIRStructureKind::ComplexType,
+            );
 
-            do {
-                if (!empty($r->getAttributes(FHIRPrimitive::class))) {
-                    return $cache[$type] = false;
-                }
-
-                if (!empty($r->getAttributes(FHIRComplexType::class))) {
-                    return $cache[$type] = true;
-                }
-
-                $r = $r->getParentClass();
-            } while ($r !== false);
+            if ($kind !== null) {
+                return $cache[$type] = $kind === FHIRStructureKind::ComplexType;
+            }
 
             return $cache[$type] = is_a($type, FHIRComplexExtensionInterface::class, true)
-                || !empty($reflection->getAttributes(FHIRExtensionDefinition::class));
+                || $this->structureKinds->isExtensionDefinition($type);
         } catch (\ReflectionException) {
             return $cache[$type] = false;
         }
@@ -1289,7 +1286,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         ?\DOMElement $sourceElement,
         array $context,
     ): object|array|null {
-        $targetClass = $meta->phpItemClass ?? $this->getPropertyType($property);
+        $targetClass = $meta->phpItemClass ?? $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
         if ($targetClass === null || $this->isBuiltinType($targetClass) || $this->denormalizer === null) {
             return null;
         }

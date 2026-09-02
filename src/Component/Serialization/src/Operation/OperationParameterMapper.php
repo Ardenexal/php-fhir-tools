@@ -13,11 +13,15 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProviderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProviderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIROperationMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIROperationMetadataProviderInterface;
 
 /**
  * Maps typed operation payloads to and from a `Parameters` resource.
@@ -73,6 +77,32 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvide
  */
 final class OperationParameterMapper
 {
+    /** Shared operation-metadata reader; stateless apart from its caches. */
+    private static ?FHIROperationMetadataProviderInterface $sharedOperationMetadata = null;
+
+    /**
+     * The shared operation-metadata provider.
+     *
+     * @return FHIROperationMetadataProviderInterface Reader for operation attributes
+     */
+    private static function operationMetadata(): FHIROperationMetadataProviderInterface
+    {
+        return self::$sharedOperationMetadata ??= new FHIROperationMetadataProvider();
+    }
+
+    /** Shared model accessor; the only holder of reflection handles for model classes. */
+    private static ?FHIRModelAccessorInterface $sharedModelAccessor = null;
+
+    /**
+     * The shared model accessor.
+     *
+     * @return FHIRModelAccessorInterface Reader for generated model shape
+     */
+    private static function modelAccessor(): FHIRModelAccessorInterface
+    {
+        return self::$sharedModelAccessor ??= new FHIRModelAccessor();
+    }
+
     /**
      * FHIR temporal types whose primitive wrapper takes a value object rather than a string.
      *
@@ -145,7 +175,7 @@ final class OperationParameterMapper
         string $igNamespace = '',
         FhirVersion $version = FhirVersion::R4,
     ): self {
-        return new self(new FHIRTypeResolver(
+        return new self(new FHIRSerializedTypeResolver(
             igTypeRegistry: FHIRIGTypeRegistryFactory::create($igOutputDirectory, $igNamespace),
             fhirVersion: $version->value,
         ));
@@ -365,13 +395,13 @@ final class OperationParameterMapper
             throw OperationMappingException::notAnOperationHolder($operationClass);
         }
 
-        $attributes = (new \ReflectionClass($operationClass))->getAttributes(FhirOperation::class);
+        $operation = self::operationMetadata()->operationOf($operationClass);
 
-        if ($attributes === []) {
+        if ($operation === null) {
             throw OperationMappingException::notAnOperationHolder($operationClass);
         }
 
-        return $attributes[0]->newInstance();
+        return $operation;
     }
 
     /**
@@ -711,13 +741,7 @@ final class OperationParameterMapper
      */
     private function describe(string $class): array
     {
-        $descriptors = [];
-
-        foreach ((new \ReflectionClass($class))->getProperties() as $property) {
-            foreach ($property->getAttributes(FhirOperationParameter::class) as $attribute) {
-                $descriptors[] = $attribute->newInstance();
-            }
-        }
+        $descriptors = self::operationMetadata()->parametersOf($class);
 
         if ($descriptors === []) {
             throw OperationMappingException::notAnOperationPayload($class);
@@ -748,9 +772,7 @@ final class OperationParameterMapper
 
     private function readProperty(object $payload, string $phpName): mixed
     {
-        $property = new \ReflectionProperty($payload::class, $phpName);
-
-        return $property->isInitialized($payload) ? $property->getValue($payload) : null;
+        return self::modelAccessor()->readInitializedValue($payload, $phpName);
     }
 
     /**

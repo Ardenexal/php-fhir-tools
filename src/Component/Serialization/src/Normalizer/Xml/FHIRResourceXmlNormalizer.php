@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
 
 /**
  * XML normalizer for FHIR resource classes.
@@ -31,6 +33,7 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
         ?DenormalizerInterface $denormalizer = null,
         string $fhirVersion = 'R4',
         ?FHIRIGTypeRegistry $igTypeRegistry = null,
+        private readonly FHIRStructureKindProviderInterface $structureKinds = new FHIRStructureKindProvider(),
     ) {
         parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
     }
@@ -144,15 +147,11 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
 
         try {
             /** @var class-string $type */
-            $refl = new \ReflectionClass($type);
 
-            do {
-                if (!empty($refl->getAttributes(FhirResource::class))) {
-                    return $cache[$type] = true;
-                }
-
-                $refl = $refl->getParentClass();
-            } while ($refl !== false);
+            // Walks past any other kind: only a resource ancestor answers this question.
+            if ($this->structureKinds->nearestKindAmong($type, FHIRStructureKind::Resource) !== null) {
+                return $cache[$type] = true;
+            }
 
             return $cache[$type] = false;
         } catch (\ReflectionException) {
@@ -307,7 +306,7 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
 
         try {
             $reflection            = self::reflClass($resolvedType);
-            $object                = $this->instantiateWithDefaults($reflection);
+            $object                = $this->instantiateWithDefaults($resolvedType);
             $metaMap               = $this->getPropertyMetadataMap($object);
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
 
@@ -345,7 +344,7 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                 }
 
                 if ($property !== null) {
-                    $propertyType     = $this->getPropertyType($property);
+                    $propertyType     = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
                     $propertyMetadata = $metaMap[$elementName] ?? null;
                     $phpItemClass     = $propertyMetadata?->phpItemClass;
 

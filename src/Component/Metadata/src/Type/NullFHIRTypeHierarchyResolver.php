@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Validation;
+namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
 /**
  * Null-object implementation used when no real type hierarchy resolver is configured.

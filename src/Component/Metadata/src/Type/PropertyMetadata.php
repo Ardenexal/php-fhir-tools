@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
+namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
 /**
  * Immutable value object describing the serialization semantics of a single FHIR property.

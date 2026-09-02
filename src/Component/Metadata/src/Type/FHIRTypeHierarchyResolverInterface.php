@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Validation;
+namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
 /**
  * Resolves the FHIR type name for a named property on a FHIR element object.

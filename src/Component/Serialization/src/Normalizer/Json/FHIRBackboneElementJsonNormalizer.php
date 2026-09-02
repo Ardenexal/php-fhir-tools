@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
 
 /**
  * JSON normalizer for FHIR backbone elements.
@@ -27,6 +29,7 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
         ?DenormalizerInterface $denormalizer = null,
         string $fhirVersion = 'R4',
         ?FHIRIGTypeRegistry $igTypeRegistry = null,
+        private readonly FHIRStructureKindProviderInterface $structureKinds = new FHIRStructureKindProvider(),
     ) {
         parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
     }
@@ -75,7 +78,7 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
 
         try {
             $reflection = self::reflClass($type);
-            $object     = $this->instantiateWithConstructorDefaults($reflection);
+            $object     = $this->instantiateWithConstructorDefaults($type);
             $metaMap    = $this->getPropertyMetadataMap($object);
 
             foreach ($data as $elementName => $value) {
@@ -125,7 +128,7 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
                             } elseif ($meta !== null && $meta->propertyKind === 'primitive') {
                                 $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'json', $context, $metaMap);
                             } else {
-                                $propertyType = $this->getPropertyType($property);
+                                $propertyType = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
                                 if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                                     $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
                                 } else {
@@ -133,7 +136,7 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
                                 }
                             }
                         } else {
-                            $propertyType      = $this->getPropertyType($property);
+                            $propertyType      = $this->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
                             $denormalizedValue = ($propertyType !== null && !$this->isBuiltinType($propertyType))
                                 ? null
                                 : $this->denormalizeBasicValue($value, 'json', $context);
@@ -168,7 +171,7 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            return $cache[$type] = !empty(self::reflClass($type)->getAttributes(FHIRBackboneElement::class));
+            return $cache[$type] = $this->structureKinds->declaredKindOf($type) === FHIRStructureKind::BackboneElement;
         } catch (\ReflectionException) {
             return $cache[$type] = false;
         }

@@ -19,7 +19,7 @@ namespace Ardenexal\FHIRTools\Component\Metadata;
  *
  * @author Ardenexal
  */
-class FHIRIGTypeRegistry
+class FHIRIGTypeRegistry implements FHIRIGTypeRegistryInterface
 {
     /**
      * @param array<string, array<string, class-string>>                                                      $extensionMappings          Extension URL → [fhirVersion → typed extension class].

@@ -16,14 +16,18 @@ use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolati
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyVariantMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyVariantMetadata;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIROperationMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIROperationMetadataProviderInterface;
 
 /**
  * Abstract base class for FHIR normalizers providing shared utility methods.
@@ -32,6 +36,38 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, SerializerAwareInterface
 {
+    /**
+     * Reads generated model shape so this hierarchy never holds a reflection handle itself.
+     *
+     * Shared and lazily built rather than injected: every subclass in this hierarchy has its own
+     * constructor and not all of them chain to a parent, so a constructor-assigned property would be
+     * uninitialised on some paths. The accessor is stateless apart from its caches.
+     */
+    private static ?FHIRModelAccessorInterface $sharedModelAccessor = null;
+
+    /** Shared operation-metadata reader; stateless apart from its caches. */
+    private static ?FHIROperationMetadataProviderInterface $sharedOperationMetadata = null;
+
+    /**
+     * The shared operation-metadata provider.
+     *
+     * @return FHIROperationMetadataProviderInterface Reader for operation attributes
+     */
+    protected static function operationMetadata(): FHIROperationMetadataProviderInterface
+    {
+        return self::$sharedOperationMetadata ??= new FHIROperationMetadataProvider();
+    }
+
+    /**
+     * The shared model accessor.
+     *
+     * @return FHIRModelAccessorInterface Reader for generated model shape
+     */
+    protected static function modelAccessor(): FHIRModelAccessorInterface
+    {
+        return self::$sharedModelAccessor ??= new FHIRModelAccessor();
+    }
+
     protected ?NormalizerInterface $normalizer = null;
 
     protected ?DenormalizerInterface $denormalizer = null;
@@ -483,7 +519,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         if (!$meta->isArray) {
-            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property);
+            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property->getDeclaringClass()->getName(), $property->getName());
             if ($primitiveClass === null) {
                 // XML encodes primitive values as attributes: <lang value="x"/> → ['@value' => 'x'].
                 // Builtin PHP types can't hold extensions, so extract the scalar or return null.
@@ -538,7 +574,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                 $current = $property->isInitialized($object) ? $property->getValue($object) : null;
 
                 if (!is_object($current)) {
-                    $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property);
+                    $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property->getDeclaringClass()->getName(), $property->getName());
                     if ($primitiveClass === null || $this->denormalizer === null) {
                         continue;
                     }
@@ -677,7 +713,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             // Constructor-defaulted, not bare: a primitive wrapper carries inherited `id` and
             // `extension` slots that this method never assigns when the payload omits them, and an
             // unassigned slot throws on read rather than reading back as the declared default.
-            $instance = $this->instantiateWithDefaults($reflection);
+            $instance = $this->instantiateWithDefaults($type);
 
             $valueProp = self::reflProp($type, 'value');
             if ($valueProp !== null) {
@@ -1166,14 +1202,9 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         return str_starts_with($propertyName, 'value') && strlen($propertyName) > 5;
     }
 
-    protected function getPropertyType(\ReflectionProperty $property): ?string
+    protected function getPropertyType(object|string $subject, string $propertyName): ?string
     {
-        $type = $property->getType();
-        if ($type instanceof \ReflectionNamedType) {
-            return $type->getName();
-        }
-
-        return null;
+        return self::modelAccessor()->declaredTypeOf($subject, $propertyName);
     }
 
     /**
@@ -1183,41 +1214,27 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * FHIRString|null), returns the first non-builtin, non-null member. Returns null when the
      * property has no usable class type — typically a primitive whose value cannot hold extensions.
      */
-    protected function getFirstNonBuiltinTypeFromProperty(\ReflectionProperty $property): ?string
+    protected function getFirstNonBuiltinTypeFromProperty(object|string $subject, string $propertyName): ?string
     {
-        $type = $property->getType();
-
-        if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
-            return $type->getName();
-        }
-
-        if ($type instanceof \ReflectionUnionType) {
-            foreach ($type->getTypes() as $member) {
-                if ($member instanceof \ReflectionNamedType && !$member->isBuiltin() && $member->getName() !== 'null') {
-                    return $member->getName();
-                }
-            }
-        }
-
-        return null;
+        return self::modelAccessor()->declaredClassOf($subject, $propertyName);
     }
 
     /**
-     * @param \ReflectionClass<object>        $class
+     * @param object|string                   $subject An instance or class name owning the sibling properties
      * @param array<string, PropertyMetadata> $metaMap
      */
-    protected function resolvePrimitiveArrayItemClass(\ReflectionClass $class, string $fhirType, array $metaMap): ?string
+    protected function resolvePrimitiveArrayItemClass(object|string $subject, string $fhirType, array $metaMap): ?string
     {
         foreach ($metaMap as $siblingName => $siblingMeta) {
             if ($siblingMeta->propertyKind !== 'primitive' || $siblingMeta->isArray || $siblingMeta->fhirType !== $fhirType) {
                 continue;
             }
 
-            if (!$class->hasProperty($siblingName)) {
+            if (!self::modelAccessor()->hasProperty($subject, $siblingName)) {
                 continue;
             }
 
-            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($class->getProperty($siblingName));
+            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($subject, $siblingName);
             if ($primitiveClass !== null) {
                 return $primitiveClass;
             }
@@ -1285,31 +1302,11 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * still filled with `[]`: FHIR has no representation for an absent repeating element, so `[]` is
      * the only state it can be in.
      *
-     * @param \ReflectionClass<object> $reflection
+     * @param object|string $subject An instance or class name to build from
      */
-    protected function instantiateWithDefaults(\ReflectionClass $reflection): object
+    protected function instantiateWithDefaults(object|string $subject): object
     {
-        $object   = $reflection->newInstanceWithoutConstructor();
-        $defaults = self::constructorDefaults($reflection);
-
-        foreach (self::reflPublicProps($reflection->getName()) as $property) {
-            if ($property->isStatic() || $property->isInitialized($object)) {
-                continue;
-            }
-
-            $name = $property->getName();
-            if (array_key_exists($name, $defaults)) {
-                $property->setValue($object, $defaults[$name]);
-                continue;
-            }
-
-            $type = $property->getType();
-            if ($type instanceof \ReflectionNamedType && !$type->allowsNull() && $type->getName() === 'array') {
-                $property->setValue($object, []);
-            }
-        }
-
-        return $object;
+        return self::modelAccessor()->instantiateWithDefaults($subject);
     }
 
     /**
@@ -1328,84 +1325,33 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * cases), all of which are immutable or copied on assignment, so one resolved value is safely
      * shared across instances.
      *
-     * @param \ReflectionClass<object> $reflection
+     * @param object|string $subject An instance or class name to read constructor defaults from
      *
      * @return array<string, mixed>
      */
-    private static function constructorDefaults(\ReflectionClass $reflection): array
+    private static function constructorDefaults(object|string $subject): array
     {
-        $class = $reflection->getName();
-
-        if (array_key_exists($class, self::$ctorDefaultsCache)) {
-            return self::$ctorDefaultsCache[$class];
-        }
-
-        $hierarchy = [];
-        for ($current = $reflection; $current !== false; $current = $current->getParentClass()) {
-            $hierarchy[] = $current;
-        }
-
-        $defaults = [];
-        // Root first, so a re-declared parameter keeps the most-derived class's default.
-        foreach (array_reverse($hierarchy) as $current) {
-            $constructor = $current->getConstructor();
-            if ($constructor === null || $constructor->getDeclaringClass()->getName() !== $current->getName()) {
-                continue;
-            }
-
-            foreach ($constructor->getParameters() as $parameter) {
-                if ($parameter->isDefaultValueAvailable()) {
-                    $defaults[$parameter->getName()] = $parameter->getDefaultValue();
-                }
-            }
-        }
-
-        return self::$ctorDefaultsCache[$class] = $defaults;
+        return self::modelAccessor()->constructorDefaults($subject);
     }
 
     /**
      * Instantiate an object of the given class, providing constructor default values if a constructor exists.
      *
-     * @param \ReflectionClass<object> $reflection
+     * @param object|string $subject An instance or class name to build from
      */
-    protected function instantiateWithConstructorDefaults(\ReflectionClass $reflection): object
+    protected function instantiateWithConstructorDefaults(object|string $subject): object
     {
-        $constructor = $reflection->getConstructor();
-        if ($constructor !== null) {
-            $args = [];
-            foreach ($constructor->getParameters() as $param) {
-                $args[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
-            }
-
-            return $reflection->newInstanceArgs($args);
-        }
-
-        return $reflection->newInstanceWithoutConstructor();
+        return self::modelAccessor()->instantiateWithConstructorDefaults($subject);
     }
 
     /**
      * For simple typed extensions, copy the first initialised `value*` property back to the inherited `value` slot.
      *
-     * @param \ReflectionClass<object> $reflection
+     * @param object $object The extension instance to normalize in place
      */
-    protected function copyTypedExtensionValueBack(\ReflectionClass $reflection, object $object): void
+    protected function copyTypedExtensionValueBack(object $object): void
     {
-        if (!$reflection->hasProperty('value')) {
-            return;
-        }
-
-        $valueProperty = $reflection->getProperty('value');
-        foreach (self::reflPublicProps($reflection->getName()) as $prop) {
-            $propName = $prop->getName();
-            if ($propName !== 'value'
-                && str_starts_with($propName, 'value')
-                && $prop->isInitialized($object)
-                && $prop->getValue($object) !== null
-            ) {
-                $valueProperty->setValue($object, $prop->getValue($object));
-                break;
-            }
-        }
+        self::modelAccessor()->copyTypedExtensionValueBack($object);
     }
 
     /**

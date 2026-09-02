@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
+namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Psr\Cache\CacheItemPoolInterface;
@@ -28,11 +28,24 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     }
 
     /**
+     * Identifies the shape of the cached payload, not its content.
+     *
+     * A warm PSR-6 pool outlives a deployment, and the entries it holds are serialized objects whose
+     * class names are part of that payload. The read guard is a bare array check, so a pool warmed
+     * before this component moved namespaces would be served straight back as the old shape rather
+     * than rejected. Bump this whenever the cached structure changes -- a namespace move counts.
+     */
+    private const string CACHE_SCHEMA = 'metadata-type-v2';
+
+    /**
      * Returns the canonical PSR-6 cache key for a FHIR model class.
+     *
+     * The schema token is part of the key rather than part of the value, so entries written by an
+     * older shape become unreachable instead of being read back and misinterpreted.
      */
     public static function cacheKey(string $className): string
     {
-        return 'fhir.property_metadata.' . hash('sha256', $className);
+        return 'fhir.property_metadata.' . self::CACHE_SCHEMA . '.' . hash('sha256', $className);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Serialization;
+namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 
@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
  *
  * @author Ardenexal
  */
-class FHIRTypeResolver implements FHIRTypeResolverInterface
+class FHIRSerializedTypeResolver implements FHIRTypeResolverInterface
 {
     /** @var array<string, string> */
     private array $resourceTypeMapping = [];
