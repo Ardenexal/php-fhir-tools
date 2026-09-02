@@ -27,4 +27,17 @@ interface PropertyMetadataProviderInterface
      * @return array<string, PropertyMetadata> Empty array if the class has no FHIR property metadata
      */
     public function getPropertyMetadata(string $className): array;
+
+    /**
+     * Returns true when the class carries FHIR property metadata at all.
+     *
+     * `getPropertyMetadata()` answers the empty array for three different situations: a class that is
+     * not a FHIR model, a class that cannot be loaded, and a FHIR model that declares no properties.
+     * Callers that must distinguish "not a FHIR model" from "a model with nothing on it" cannot get
+     * that from the map, because an empty array is falsy either way. Ask this instead of testing the
+     * map for emptiness, so the question is stated rather than inferred from a container's size.
+     *
+     * @param class-string $className
+     */
+    public function isFhirModelClass(string $className): bool;
 }

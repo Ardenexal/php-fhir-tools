@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -30,6 +31,28 @@ final class FHIRStructureKindProvider implements FHIRStructureKindProviderInterf
         FHIRPrimitive::class       => FHIRStructureKind::PrimitiveType,
         LogicalModel::class        => FHIRStructureKind::LogicalModel,
         FHIRComplexType::class     => FHIRStructureKind::ComplexType,
+    ];
+
+    /**
+     * Attributes that carry a declared FHIR type name, in the order they are tested.
+     *
+     * Ordered like {@see KIND_ATTRIBUTES} and for the same reason: a class carrying more than one
+     * marker should answer with the more specific name. `FHIRProfile` is tested last so a class that
+     * declares both a profile and its base marker answers from the marker.
+     *
+     * Every entry here needs an arm in {@see typeNameOf()}. `FHIRStructureKindProviderTest` pins the
+     * two together, so an attribute added to one and not the other fails a test rather than quietly
+     * answering null -- which is exactly how this method used to fail.
+     *
+     * @var list<class-string>
+     */
+    private const array TYPE_NAME_ATTRIBUTES = [
+        FHIRBackboneElement::class,
+        FhirResource::class,
+        FHIRPrimitive::class,
+        LogicalModel::class,
+        FHIRComplexType::class,
+        FHIRProfile::class,
     ];
 
     /**
@@ -138,13 +161,17 @@ final class FHIRStructureKindProvider implements FHIRStructureKindProviderInterf
         if (!isset($this->typeNameCache[$class])) {
             $found = null;
 
-            // Any attribute carrying a non-empty `type`, not a fixed list: the structural attributes
-            // all spell it the same way, and pinning the list here would go stale as they are added.
-            foreach ((new \ReflectionClass($class))->getAttributes() as $attribute) {
-                $type = $attribute->getArguments()['type'] ?? null;
+            foreach (self::TYPE_NAME_ATTRIBUTES as $attribute) {
+                $declared = self::declaredAttribute($class, $attribute);
 
-                if (is_string($type) && $type !== '') {
-                    $found = $type;
+                if ($declared === null) {
+                    continue;
+                }
+
+                $name = self::typeNameOf($declared);
+
+                if ($name !== null && $name !== '') {
+                    $found = $name;
                     break;
                 }
             }
@@ -237,8 +264,9 @@ final class FHIRStructureKindProvider implements FHIRStructureKindProviderInterf
     /**
      * Whether a class declares a given attribute itself.
      *
-     * The one place this class touches reflection. It takes a class name and returns a boolean, so no
-     * reflection handle is created for a caller or passed between methods.
+     * Takes a class name and returns a boolean, so no reflection handle is created for a caller or
+     * passed between methods. {@see declaredAttribute()} is the sibling for callers that need the
+     * attribute's own fields rather than its presence.
      *
      * @param class-string $class     Class to inspect
      * @param class-string $attribute Attribute to look for
@@ -252,5 +280,78 @@ final class FHIRStructureKindProvider implements FHIRStructureKindProviderInterf
         } catch (\ReflectionException) {
             return false;
         }
+    }
+
+    /**
+     * The instance of an attribute a class declares itself, or null when it declares none.
+     *
+     * Sibling of {@see hasDeclaredAttribute()}, for the callers that need the attribute's own fields.
+     *
+     * @param class-string $class     Class to inspect
+     * @param class-string $attribute Attribute to look for
+     *
+     * @return object|null The instantiated attribute, or null when the class does not carry it
+     */
+    private static function declaredAttribute(string $class, string $attribute): ?object
+    {
+        try {
+            $attributes = (new \ReflectionClass($class))->getAttributes($attribute);
+        } catch (\ReflectionException) {
+            return null;
+        }
+
+        if ($attributes === []) {
+            return null;
+        }
+
+        try {
+            return $attributes[0]->newInstance();
+        } catch (\Throwable) {
+            // Swallowing a malformed attribute is a real cost -- it is a genuine bug and this hides
+            // it. It is still the right trade here, because the caller is building the text of a
+            // conformance error: a fatal raised while formatting that message destroys the finding
+            // the caller was reporting, and replaces it with a crash that names the attribute rather
+            // than the document. Answering null costs the message its FHIR type name and nothing
+            // else -- it falls back to the PHP short name, which is what it printed before this
+            // method resolved anything at all.
+            //
+            // Deliberately \Throwable and not something narrower: attribute arguments are evaluated
+            // here, not at parse time, so an unresolvable constant raises \Error, a renamed
+            // constructor parameter raises \ArgumentCountError, a retyped one raises \TypeError,
+            // and a constructor of its own can raise anything. None of them is \ReflectionException.
+            return null;
+        }
+    }
+
+    /**
+     * The FHIR type name an instantiated structural attribute carries.
+     *
+     * A match on the attribute's own type, not a lookup by argument name. The argument names disagree
+     * -- `typeName`, `primitiveType`, `elementPath`, `name`, `baseType` -- and only `FhirResource`
+     * spells it `type`, so the argument-name scan this replaces answered null for every class but a
+     * resource, silently, because the fallback to the PHP short name happened to be right for the
+     * ordinary complex types anyone would spot-check.
+     *
+     * Written this way PHPStan checks that each property exists, so renaming one fails analysis
+     * instead of reintroducing the silent null.
+     *
+     * @param object $attribute An instantiated attribute from {@see TYPE_NAME_ATTRIBUTES}
+     *
+     * @return string|null The declared FHIR type name, or null for an attribute that carries none
+     */
+    private static function typeNameOf(object $attribute): ?string
+    {
+        return match (true) {
+            // `elementPath` is already the published dotted name -- `Substance.ingredient`.
+            $attribute instanceof FHIRBackboneElement => $attribute->elementPath,
+            $attribute instanceof FhirResource        => $attribute->type,
+            $attribute instanceof FHIRPrimitive       => $attribute->primitiveType,
+            $attribute instanceof LogicalModel        => $attribute->name,
+            $attribute instanceof FHIRComplexType     => $attribute->typeName,
+            // A profile answers as the type it constrains. A conformance message should name a type
+            // the reader can look up in the spec, not the generated profile class.
+            $attribute instanceof FHIRProfile         => $attribute->baseType,
+            default                                   => null,
+        };
     }
 }

@@ -4,7 +4,18 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Type;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelClassLocator;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelClassLocatorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeAncestryProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeAncestryProviderInterface;
 
 /**
  * Resolves and validates FHIR types using the generated FHIR models.
@@ -17,6 +28,32 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
  */
 class FHIRTypeResolver
 {
+    private FHIRAttributeReaderInterface $attributes;
+
+    private FHIRStructureKindProviderInterface $structureKinds;
+
+    private FHIRTypeAncestryProviderInterface $ancestry;
+
+    private FHIRModelClassLocatorInterface $modelClasses;
+
+    /**
+     * Every collaborator is optional so that the many `new FHIRTypeResolver()` call sites keep
+     * working unchanged. The defaults are the same implementations the container wires, and each
+     * memoizes per class, so a resolver built without arguments is slower on first touch and
+     * identical in its answers.
+     */
+    public function __construct(
+        ?FHIRAttributeReaderInterface $attributes = null,
+        ?FHIRStructureKindProviderInterface $structureKinds = null,
+        ?FHIRTypeAncestryProviderInterface $ancestry = null,
+        ?FHIRModelClassLocatorInterface $modelClasses = null,
+    ) {
+        $this->attributes     = $attributes     ?? new FHIRAttributeReader();
+        $this->structureKinds = $structureKinds ?? new FHIRStructureKindProvider();
+        $this->ancestry       = $ancestry       ?? new FHIRTypeAncestryProvider();
+        $this->modelClasses   = $modelClasses   ?? new FHIRModelClassLocator();
+    }
+
     /**
      * Maps FHIRPath System.* type specifiers to their canonical FHIR type names.
      *
@@ -36,36 +73,18 @@ class FHIRTypeResolver
     ];
 
     /**
-     * FHIR type hierarchy: maps each derived type to its immediate parent.
+     * FHIR primitive type to the PHP type FHIRPath treats it as.
      *
-     * Used by isOfType() to test conformance ("is a subtype of"), e.g.
-     * code → string means 'code is string' returns true.
+     * The PHP type half is not derivable and deliberately disagrees with the models: `decimal` maps to
+     * `float` here while `DecimalPrimitive::$value` is a `?string`, because the model preserves decimal
+     * precision and FHIRPath wants the numeric type. Deriving this from declared property types would
+     * silently turn decimal handling into string handling.
      *
-     * @var array<string, string>
-     */
-    private const TYPE_PARENTS = [
-        'code'         => 'string',
-        'id'           => 'string',
-        'markdown'     => 'string',
-        'base64Binary' => 'string',
-        'uri'          => 'string',
-        'url'          => 'uri',
-        'canonical'    => 'uri',
-        'oid'          => 'uri',
-        'uuid'         => 'uri',
-        'positiveInt'  => 'integer',
-        'unsignedInt'  => 'integer',
-        'instant'      => 'dateTime',
-        // FHIR profile types that extend Quantity (per FHIR spec §4.2 data type hierarchy)
-        'Age'          => 'Quantity',
-        'Count'        => 'Quantity',
-        'Distance'     => 'Quantity',
-        'Duration'     => 'Quantity',
-        'Money'        => 'Quantity',
-    ];
-
-    /**
-     * Primitive FHIR types mapping.
+     * Membership is no longer read from these keys. `isPrimitiveType()` asks Metadata whether a
+     * generated primitive class exists for the name, so the set follows the models; this map answers
+     * only "and what PHP type does FHIRPath treat it as". The two had drifted: `XhtmlPrimitive` is
+     * generated, `xhtml` had no key, and so `x as xhtml` was an execution error for a type FHIR
+     * defines. It now resolves, and the `xhtml` entry below keeps the PHP-type half total.
      *
      * @var array<string, string>
      */
@@ -89,6 +108,7 @@ class FHIRTypeResolver
         'instant'      => 'string',
         'unsignedInt'  => 'integer',
         'positiveInt'  => 'integer',
+        'xhtml'        => 'string',
     ];
 
     /**
@@ -194,8 +214,7 @@ class FHIRTypeResolver
         if (is_object($value)) {
             // Walk the class hierarchy to find a FHIRPrimitive attribute — subclasses
             // (e.g. NameUseType → CodePrimitive → StringPrimitive) carry it on an ancestor.
-            $ref       = new \ReflectionClass($value);
-            $primitive = $this->findPrimitiveAttribute($ref);
+            $primitive = $this->structureKinds->nearestPrimitiveAttribute($value);
 
             if ($primitive !== null) {
                 return $primitive->primitiveType;
@@ -204,7 +223,7 @@ class FHIRTypeResolver
             // FHIR resources carry a canonical type name in their #[FhirResource(type: '...')]
             // attribute (e.g. PatientResource → 'Patient'). Prefer this over the PHP class
             // short name to avoid 'PatientResource' ≠ 'Patient' mismatches.
-            $resourceType = $this->findResourceTypeFromAttribute($ref);
+            $resourceType = $this->resourceTypeInHierarchy($value);
             if ($resourceType !== null) {
                 return $resourceType;
             }
@@ -212,7 +231,7 @@ class FHIRTypeResolver
             // FHIR complex data types (HumanName, Quantity, Age, etc.) carry a canonical type
             // name in their #[FHIRComplexType(typeName: '...')] attribute. Walk the class
             // hierarchy so that subclasses (Age extends Quantity) are also matched.
-            $complexType = $this->findComplexTypeFromAttribute($ref);
+            $complexType = $this->declaredComplexTypeName($value);
             if ($complexType !== null) {
                 return $complexType;
             }
@@ -241,16 +260,20 @@ class FHIRTypeResolver
     /**
      * Check if a value is of a specific FHIR type.
      *
-     * @param mixed  $value    The value to check
-     * @param string $typeName The FHIR type name to check against
-     * @param bool   $strict   When false (default), walks the FHIR type hierarchy so that
-     *                         subtypes conform to their parents (e.g. 'code is string' = true).
-     *                         When true, only exact type identity is tested — used by ofType()
-     *                         and as() which must NOT include subtypes per the FHIRPath spec.
+     * @param mixed       $value       The value to check
+     * @param string      $typeName    The FHIR type name to check against
+     * @param bool        $strict      When false (default), walks the FHIR type hierarchy so that
+     *                                 subtypes conform to their parents (e.g. 'code is string' = true).
+     *                                 When true, only exact type identity is tested — used by ofType()
+     *                                 and as() which must NOT include subtypes per the FHIRPath spec.
+     * @param string|null $fhirVersion Version whose model inheritance answers the conformance walk.
+     *                                 Ancestry is per-version -- `uri` derives from `Element` in R4 and R4B
+     *                                 and from `PrimitiveType` in R5 -- so a caller that knows its version
+     *                                 should pass it. Null searches R4, then R4B, then R5.
      *
      * @return bool True if the value is of the specified type
      */
-    public function isOfType(mixed $value, string $typeName, bool $strict = false): bool
+    public function isOfType(mixed $value, string $typeName, bool $strict = false, ?string $fhirVersion = null): bool
     {
         // Detect FHIRPath System.* type specifiers BEFORE normalization so that
         // 'Boolean' (= System.Boolean) can be distinguished from 'boolean' (= FHIR.boolean).
@@ -292,11 +315,13 @@ class FHIRTypeResolver
 
         // Walk the FHIR type hierarchy: e.g. 'code' conforms to 'string'.
         // Only for the `is` operator — ofType() and as() use strict matching.
+        //
+        // Read from generated model inheritance rather than a hand-written parent table. The table
+        // this replaces disagreed with the models in four places, and in all four the models match
+        // the StructureDefinitions; see the milestone notes for the expressions that changed.
         if (!$strict) {
-            $checkType = $actualType;
-            while (isset(self::TYPE_PARENTS[$checkType])) {
-                $checkType = self::TYPE_PARENTS[$checkType];
-                if ($checkType === $typeName || strcasecmp($checkType, $typeName) === 0) {
+            foreach ($this->ancestry->ancestryOf($actualType, $fhirVersion) as $ancestor) {
+                if ($ancestor === $typeName || strcasecmp($ancestor, $typeName) === 0) {
                     return true;
                 }
             }
@@ -316,10 +341,10 @@ class FHIRTypeResolver
         // allows `Age is Quantity` to return true without needing explicit TYPE_PARENTS
         // entries for every profile.
         if (!$strict && is_object($value)) {
-            $parentRef = (new \ReflectionClass($value))->getParentClass();
-            while ($parentRef !== false) {
-                $parentTypeName = $this->findComplexTypeFromAttribute($parentRef)
-                    ?? $this->findResourceTypeFromAttribute($parentRef);
+            $parentClass = get_parent_class($value);
+            while ($parentClass !== false) {
+                $parentTypeName = $this->declaredComplexTypeName($parentClass)
+                    ?? $this->declaredResourceTypeName($parentClass);
                 if ($parentTypeName !== null && (
                     $parentTypeName === $typeName || strcasecmp($parentTypeName, $typeName) === 0
                 )) {
@@ -327,13 +352,13 @@ class FHIRTypeResolver
                 }
 
                 // Also check the bare PHP class short name (for models without attributes)
-                $parts     = explode('\\', $parentRef->getName());
+                $parts     = explode('\\', $parentClass);
                 $shortName = (string) end($parts);
                 if ($shortName === $typeName || strcasecmp($shortName, $typeName) === 0) {
                     return true;
                 }
 
-                $parentRef = $parentRef->getParentClass();
+                $parentClass = get_parent_class($parentClass);
             }
         }
 
@@ -362,10 +387,11 @@ class FHIRTypeResolver
         // Extract value from FHIR primitives before casting
         $castValue = $value;
         if (is_object($value)) {
-            $ref   = new \ReflectionClass($value);
-            $attrs = $ref->getAttributes(FHIRPrimitive::class);
+            // Declared on the class itself, not inherited: this mirrors the original
+            // getAttributes() call, which did not walk the parent chain.
+            $isPrimitive = $this->attributes->classAttributes($value, FHIRPrimitive::class) !== [];
 
-            if (!empty($attrs) && property_exists($value, 'value')) {
+            if ($isPrimitive && property_exists($value, 'value')) {
                 $castValue = $value->value;
             }
         }
@@ -392,7 +418,7 @@ class FHIRTypeResolver
      */
     public function isPrimitiveType(string $typeName): bool
     {
-        return isset(self::PRIMITIVE_TYPES[$typeName]);
+        return $this->modelClasses->locate($typeName, null, FHIRStructureKind::PrimitiveType) !== null;
     }
 
     /**
@@ -422,7 +448,7 @@ class FHIRTypeResolver
         $normalized = $this->normalizeTypeName($rawTypeName);
 
         // Known FHIR primitive types
-        if (isset(self::PRIMITIVE_TYPES[$normalized])) {
+        if ($this->isPrimitiveType($normalized)) {
             return true;
         }
 
@@ -452,51 +478,44 @@ class FHIRTypeResolver
     }
 
     /**
-     * Walk the class hierarchy of $ref looking for a #[FHIRComplexType(typeName: '...')] attribute.
+     * The FHIR type name a class declares through #[FHIRComplexType], reading that class only.
      *
-     * Returns the canonical FHIR type string (e.g. 'HumanName', 'Quantity', 'Age') from the
-     * FIRST class in the hierarchy that carries the attribute — i.e., the most-derived type.
-     *
-     * @param \ReflectionClass<object> $ref
+     * Class attributes are not inherited in PHP and this deliberately does not simulate inheritance:
+     * callers here want the most-specific type, and the one caller that needs the chain walks it
+     * itself one class at a time.
      */
-    private function findComplexTypeFromAttribute(\ReflectionClass $ref): ?string
+    private function declaredComplexTypeName(object|string $subject): ?string
     {
-        // Only check the given class (not parents) — we want the most-specific type.
-        // Callers walk parents themselves when they need hierarchy traversal.
-        foreach ($ref->getAttributes() as $attr) {
-            if (str_ends_with($attr->getName(), 'FHIRComplexType')) {
-                $args     = $attr->getArguments();
-                $typeName = $args['typeName'] ?? $args[0] ?? null;
+        $attributes = $this->attributes->classAttributes($subject, FHIRComplexType::class);
 
-                return is_string($typeName) ? $typeName : null;
-            }
-        }
-
-        return null;
+        return $attributes === [] ? null : $attributes[0]->typeName;
     }
 
     /**
-     * Walk the class hierarchy of $ref looking for a #[FhirResource(type: '...')] attribute.
-     *
-     * Returns the canonical FHIR resource type string (e.g. 'Patient') when found,
-     * or null when the class tree carries no such attribute.
-     *
-     * @param \ReflectionClass<object> $ref
+     * The FHIR resource type a class declares through #[FhirResource], reading that class only.
      */
-    private function findResourceTypeFromAttribute(\ReflectionClass $ref): ?string
+    private function declaredResourceTypeName(object|string $subject): ?string
     {
-        do {
-            foreach ($ref->getAttributes() as $attr) {
-                if (str_ends_with($attr->getName(), 'FhirResource')) {
-                    $args = $attr->getArguments();
-                    $type = $args['type'] ?? $args[0] ?? null;
+        $attributes = $this->attributes->classAttributes($subject, FhirResource::class);
 
-                    return is_string($type) ? $type : null;
-                }
+        return $attributes === [] ? null : $attributes[0]->getResourceType();
+    }
+
+    /**
+     * The nearest #[FhirResource] type walking up from the class, so that a profile subclass
+     * answers with the resource type its base declares.
+     */
+    private function resourceTypeInHierarchy(object|string $subject): ?string
+    {
+        $cursor = is_object($subject) ? $subject::class : $subject;
+
+        for (; $cursor !== false; $cursor = get_parent_class($cursor)) {
+            $type = $this->declaredResourceTypeName($cursor);
+
+            if ($type !== null) {
+                return $type;
             }
-
-            $ref = $ref->getParentClass();
-        } while ($ref !== false);
+        }
 
         return null;
     }
@@ -504,10 +523,10 @@ class FHIRTypeResolver
     /**
      * Returns true if the object is a generated FHIR model class.
      *
-     * Detection: walks the class hierarchy looking for any PHP attribute whose short
-     * class name begins with 'Fhir' or 'FHIR'. All generated model classes carry at
-     * least one such attribute (FHIRPrimitive, FhirResource, FhirComplexType, etc.).
-     * This approach is namespace-independent and survives refactors.
+     * Detection asks Metadata what kind of structure the class is, walking the parent chain. That
+     * replaces a scan for any attribute whose short name merely began with 'Fhir' — a spelling test
+     * that would have matched an unrelated attribute from another package and could not distinguish
+     * a model from a class that happened to be annotated.
      */
     private function isFhirModelObject(mixed $value): bool
     {
@@ -515,43 +534,7 @@ class FHIRTypeResolver
             return false;
         }
 
-        $ref = new \ReflectionClass($value);
-        do {
-            foreach ($ref->getAttributes() as $attr) {
-                $name      = $attr->getName();
-                $shortName = substr($name, strrpos($name, '\\') + 1);
-                if (str_starts_with($shortName, 'Fhir') || str_starts_with($shortName, 'FHIR')) {
-                    return true;
-                }
-            }
-
-            $ref = $ref->getParentClass();
-        } while ($ref !== false);
-
-        return false;
-    }
-
-    /**
-     * Walk the class hierarchy of $ref looking for a #[FHIRPrimitive] attribute.
-     *
-     * Returns the first FHIRPrimitive instance found, or null when the class tree
-     * carries no such attribute.
-     *
-     * @param \ReflectionClass<object> $ref
-     */
-    private function findPrimitiveAttribute(\ReflectionClass $ref): ?FHIRPrimitive
-    {
-        do {
-            $attrs = $ref->getAttributes(FHIRPrimitive::class);
-            if (!empty($attrs)) {
-                /** @var FHIRPrimitive */
-                return $attrs[0]->newInstance();
-            }
-
-            $ref = $ref->getParentClass();
-        } while ($ref !== false);
-
-        return null;
+        return $this->structureKinds->inheritedKindOf($value) !== null;
     }
 
     /**

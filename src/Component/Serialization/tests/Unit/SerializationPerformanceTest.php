@@ -134,7 +134,7 @@ class SerializationPerformanceTest extends TestCase
                 $className = "TestClass{$i}";
                 $cache->cacheFHIRTypeMetadata($className, "TestType{$i}");
                 $cache->cacheFHIRVersionMetadata($className, 'R4B');
-                $cache->cacheStructureTypeMetadata($className, 'resource');
+                $cache->cacheStructureKindFlag($className, 'resource', true);
             }
 
             $writeEndTime  = microtime(true);
@@ -147,12 +147,12 @@ class SerializationPerformanceTest extends TestCase
                 $className     = "TestClass{$i}";
                 $fhirType      = $cache->getFHIRTypeMetadata($className);
                 $fhirVersion   = $cache->getFHIRVersionMetadata($className);
-                $structureType = $cache->getStructureTypeMetadata($className);
+                $structureType = $cache->getStructureKindFlag($className, 'resource');
 
                 // Verify cached values
                 self::assertSame("TestType{$i}", $fhirType);
                 self::assertSame('R4B', $fhirVersion);
-                self::assertSame('resource', $structureType);
+                self::assertTrue($structureType);
             }
 
             $readEndTime  = microtime(true);

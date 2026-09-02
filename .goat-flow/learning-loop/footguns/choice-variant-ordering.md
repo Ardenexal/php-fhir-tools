@@ -56,7 +56,7 @@ Interpolating a model class name from a version — `"Ardenexal\FHIRTools\Compon
 - an IG profile discovered through `meta.profile` in `FHIRIGTypeRegistry::resolveProfileClass()`.
 
 The failure is silent and asymmetric: the normalizers *do* go through
-`FHIRTypeResolver::resolveResourceType()` (`src/Component/Serialization/src/FHIRTypeResolver.php`,
+`FHIRTypeResolver::resolveResourceType()` (`src/Component/Metadata/src/Type/FHIRSerializedTypeResolver.php`,
 search: `function resolveResourceType`), so they honour the profile while the hand-built path
 produces the base class. Nothing errors; the two halves just disagree about what type is in play.
 

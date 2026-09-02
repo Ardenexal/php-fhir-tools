@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypedScalar;
@@ -28,8 +31,21 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Type\TypeInfo;
  */
 final class TypeFunction extends AbstractFunction
 {
-    public function __construct()
-    {
+    private FHIRStructureKindProviderInterface $structureKinds;
+
+    private FHIRMetadataExtractorInterface $metadata;
+
+    /**
+     * Both collaborators are optional so the registry can keep building this function with no
+     * arguments. Passing the shared instances lets one set of caches serve every function.
+     */
+    public function __construct(
+        ?FHIRStructureKindProviderInterface $structureKinds = null,
+        ?FHIRMetadataExtractorInterface $metadata = null,
+    ) {
+        $this->structureKinds = $structureKinds ?? new FHIRStructureKindProvider();
+        $this->metadata       = $metadata       ?? new FHIRMetadataExtractor();
+
         parent::__construct('type');
     }
 
@@ -104,17 +120,15 @@ final class TypeFunction extends AbstractFunction
 
         // FHIR object types (generated models)
         if (is_object($value)) {
-            $ref = new \ReflectionClass($value);
-
             // Walk hierarchy for #[FHIRPrimitive] — subclasses (e.g. NameUseType → CodePrimitive)
             // carry the attribute on an ancestor rather than directly.
-            $primitive = $this->findPrimitiveAttribute($ref);
+            $primitive = $this->structureKinds->nearestPrimitiveAttribute($value);
             if ($primitive !== null) {
                 return TypeInfo::fhir($primitive->primitiveType);
             }
 
             // Walk hierarchy for #[FhirResource(type: '...')] — returns 'Patient' not 'PatientResource'
-            $resourceType = $this->findResourceTypeFromAttribute($ref);
+            $resourceType = $this->metadata->extractResourceType($value);
             if ($resourceType !== null) {
                 return TypeInfo::fhir($resourceType);
             }
@@ -143,54 +157,5 @@ final class TypeFunction extends AbstractFunction
         }
 
         return TypeInfo::system('Any');
-    }
-
-    /**
-     * Walk the class hierarchy of $ref looking for a #[FHIRPrimitive] attribute.
-     *
-     * Returns the first FHIRPrimitive instance found, or null when the class tree
-     * carries no such attribute.
-     *
-     * @param \ReflectionClass<object> $ref
-     */
-    private function findPrimitiveAttribute(\ReflectionClass $ref): ?FHIRPrimitive
-    {
-        do {
-            $attrs = $ref->getAttributes(FHIRPrimitive::class);
-            if (!empty($attrs)) {
-                /** @var FHIRPrimitive */
-                return $attrs[0]->newInstance();
-            }
-
-            $ref = $ref->getParentClass();
-        } while ($ref !== false);
-
-        return null;
-    }
-
-    /**
-     * Walk the class hierarchy of $ref looking for a #[FhirResource(type: '...')] attribute.
-     *
-     * Returns the canonical FHIR resource type string (e.g. 'Patient') when found,
-     * or null when the class tree carries no such attribute.
-     *
-     * @param \ReflectionClass<object> $ref
-     */
-    private function findResourceTypeFromAttribute(\ReflectionClass $ref): ?string
-    {
-        do {
-            foreach ($ref->getAttributes() as $attr) {
-                if (str_ends_with($attr->getName(), 'FhirResource')) {
-                    $args = $attr->getArguments();
-                    $type = $args['type'] ?? $args[0] ?? null;
-
-                    return is_string($type) ? $type : null;
-                }
-            }
-
-            $ref = $ref->getParentClass();
-        } while ($ref !== false);
-
-        return null;
     }
 }

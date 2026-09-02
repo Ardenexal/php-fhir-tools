@@ -69,11 +69,21 @@ interface FHIRStructureKindProviderInterface
     /**
      * The FHIR type name a class declares on its own structural attribute.
      *
-     * Every structural attribute the generator emits carries a `type` argument holding the published
-     * FHIR name -- `HumanName`, `Patient`, `code` -- which is what a conformance message should say
-     * rather than a PHP class name. Read from the class's own attributes only: a profile subclass
-     * declares none, so it answers null and the caller falls back to the class name, which is the
-     * behaviour a profile should get.
+     * The published FHIR name -- `HumanName`, `Patient`, `code`, `Substance.ingredient` -- which is
+     * what a conformance message should say rather than a PHP class name, whose suffixes (`Resource`,
+     * `Primitive`, `Profile`) and flattened dots (`DosageDoseAndRate`) do not exist in the spec.
+     *
+     * Each structural attribute spells the argument differently -- `typeName`, `primitiveType`,
+     * `elementPath`, `name`, `baseType`, and `type` on `FhirResource` alone -- so implementations MUST
+     * read the specific attribute rather than scanning arguments for a shared name. A scan looks
+     * general and answers null for everything but a resource.
+     *
+     * A profile answers as the type it constrains, from `#[FHIRProfile(baseType:)]`: a message naming
+     * `ActualGroupProfile` sends the reader looking for a spec type that does not exist, where `Group`
+     * is the type they can actually look up.
+     *
+     * Read from the class's own attributes only. A subclass that declares no structural attribute of
+     * its own answers null, and the caller falls back to the class name.
      *
      * @param object|string $subject An instance or class name; an unloadable name gives null
      *

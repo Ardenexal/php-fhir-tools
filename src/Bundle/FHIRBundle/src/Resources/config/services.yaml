@@ -65,6 +65,11 @@ services:
     Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry: ~
 
     # Serialization - Type Resolver
+    #
+    # Deliberately unversioned: this is the fallback for anything autowiring the interface outside a
+    # versioned serializer stack, and an unversioned resolver searches R4, then R4B, then R5. The
+    # per-version resolvers the stacks actually use are registered as fhir.type_resolver.{version} by
+    # FHIRVersionedSerializerPass -- referencing this service from a stack resolves every type to R4.
     Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver: ~
 
     Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface:

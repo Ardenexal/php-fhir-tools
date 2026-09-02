@@ -909,13 +909,6 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
-     * The FHIR type name for a generated class, for messages a reader can match against the spec.
-     *
-     * Prefers `#[FhirResource(type: …)]` / `#[FHIRDataType(type: …)]` over the PHP class name, so the
-     * message says `Composition.subject` rather than `CompositionResource.subject` and lines up with
-     * the reference validator's wording. Falls back to the short class name.
-     */
-    /**
      * Reject a repeating element supplied as a JSON object instead of an array.
      *
      * FHIR JSON represents a `0..*` element as an array, always — even for a single occurrence. An
@@ -976,6 +969,19 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         throw FHIRConformanceViolationException::inFormat('json', sprintf('The property %s must be an Object, not a Null (at %s.%s)', $elementName, self::shortTypeName($ownerType), $elementName));
     }
 
+    /**
+     * The FHIR type name for a generated class, for messages a reader can match against the spec.
+     *
+     * Reads the class's own structural attribute, so the message says `Composition.subject` rather
+     * than `CompositionResource.subject`, `Dosage.doseAndRate.type` rather than
+     * `DosageDoseAndRate.type`, and `Group.member` rather than `ActualGroupProfile.member` -- lining
+     * up with the reference validator's wording, which is what the conformance corpus compares
+     * against.
+     *
+     * Do not be tempted to drop this and use the short class name: it is right only for the ordinary
+     * complex types (`Coding` really is `Coding`), which is precisely why a version of this that
+     * always fell through to the class name went unnoticed.
+     */
     private static function shortTypeName(string $fqcn): string
     {
         $declared = self::structureKinds()->declaredFhirTypeName($fqcn);
@@ -984,8 +990,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return $declared;
         }
 
-        // No declared name: an unloadable string, or a profile subclass that declares no attribute of
-        // its own. Both fall back to the class's short name, as before.
+        // No declared name: an unloadable string, or a subclass carrying no structural attribute of
+        // its own. Both fall back to the class's short name.
         $tail = strrchr($fqcn, '\\');
 
         return $tail === false ? $fqcn : substr($tail, 1);

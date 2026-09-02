@@ -646,8 +646,14 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     /**
      * Resolves the FHIR type name of a resource object.
      *
-     * Reads the #[FhirResource] attribute if present, falling back to the class name with
-     * "Resource" suffix removed (e.g., "PatientResource" becomes "Patient").
+     * Reads the most-derived FHIR type name in the class hierarchy, so a profile subclass that
+     * declares no #[FhirResource] of its own reports the resource type it profiles rather than its
+     * PHP class name. The previous read looked at the concrete class only and then guessed from the
+     * class name, which for `AUBasePatientProfile` produced `AUBasePatientProfile` — a type name no
+     * extension context can ever match, so every context check on a profiled resource passed by
+     * failing to apply.
+     *
+     * The class-name fallback stays for an object the hierarchy cannot name at all.
      *
      * @param object $resource The FHIR resource object to inspect
      *
@@ -655,17 +661,14 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      */
     private function getResourceFhirType(object $resource): string
     {
-        $ref   = new \ReflectionClass($resource);
-        $attrs = $ref->getAttributes(FhirResource::class);
+        $hierarchy = $this->typeResolver->resolveTypeHierarchy($resource);
 
-        if ($attrs !== []) {
-            /** @var FhirResource $attr */
-            $attr = $attrs[0]->newInstance();
-
-            return $attr->type;
+        if ($hierarchy !== []) {
+            return $hierarchy[0];
         }
 
-        $name = $ref->getShortName();
+        $parts = explode('\\', $resource::class);
+        $name  = (string) end($parts);
 
         return str_ends_with($name, 'Resource') ? substr($name, 0, -8) : $name;
     }

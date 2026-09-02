@@ -87,6 +87,14 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function isFhirModelClass(string $className): bool
+    {
+        return $this->getPropertyMetadata($className) !== [];
+    }
+
+    /**
      * Resolve metadata by reflecting #[FhirProperty] attributes on constructor parameters.
      *
      * Walks the full class hierarchy (child → parent) so that typed IG subclasses — which

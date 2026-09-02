@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
 
 /**
  * getValue(): System.[type]
@@ -48,8 +51,16 @@ final class GetValueFunction extends AbstractFunction
      */
     private array $primitiveCache = [];
 
-    public function __construct()
+    private FHIRStructureKindProviderInterface $structureKinds;
+
+    /**
+     * Optional so the registry can keep building this function with no arguments; passing the shared
+     * provider lets one set of caches serve every function.
+     */
+    public function __construct(?FHIRStructureKindProviderInterface $structureKinds = null)
     {
+        $this->structureKinds = $structureKinds ?? new FHIRStructureKindProvider();
+
         parent::__construct('getValue');
     }
 
@@ -114,29 +125,14 @@ final class GetValueFunction extends AbstractFunction
     }
 
     /**
-     * Walk the class hierarchy and return true if any class carries a
-     * #[FHIRPrimitive] attribute.
+     * Whether the class, or any ancestor, is a FHIR primitive.
      *
-     * Uses attribute name string matching (str_ends_with 'FHIRPrimitive') so that
-     * this function does not need to import the CodeGeneration attribute class.
+     * Previously matched attribute names by string suffix to avoid importing the attribute class.
+     * Metadata owns the question now, so the check is typed and the local reason for the string
+     * match is gone.
      */
     private function detectFhirPrimitive(string $class): bool
     {
-        if (!class_exists($class)) {
-            return false;
-        }
-
-        $reflection = new \ReflectionClass($class);
-        do {
-            foreach ($reflection->getAttributes() as $attribute) {
-                if (str_ends_with($attribute->getName(), 'FHIRPrimitive')) {
-                    return true;
-                }
-            }
-
-            $reflection = $reflection->getParentClass();
-        } while ($reflection !== false);
-
-        return false;
+        return $this->structureKinds->inheritedKindOf($class) === FHIRStructureKind::PrimitiveType;
     }
 }

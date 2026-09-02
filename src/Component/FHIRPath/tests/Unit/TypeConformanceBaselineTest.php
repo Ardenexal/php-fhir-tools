@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypedScalar;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Age;
@@ -24,24 +25,26 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UuidPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\XhtmlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Profile\SimpleQuantityProfile;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 
 /**
- * Pins every FHIR type-conformance answer the FHIRPath resolver gives today, before the type tables
- * move into Metadata.
+ * Pins every FHIR type-conformance answer the FHIRPath resolver gives.
  *
- * `FHIRTypeResolver` (search: `TYPE_PARENTS`) hand-maintains a 17-entry parent map, and the generated
- * models encode the same hierarchy as PHP inheritance. The two disagree in four places, and in those
- * four the models match the R4 StructureDefinitions and the table does not. Those answers are pinned
- * here as they are today, WRONG INCLUDED, so that:
+ * The resolver used to hand-maintain a 17-entry parent map. It disagreed with generated model
+ * inheritance in four places, and in all four the models matched the R4 StructureDefinitions and the
+ * table did not. Conformance now reads that inheritance through
+ * `Metadata\Type\FHIRTypeAncestryProviderInterface`, and the cases below were re-pinned as a
+ * deliberate change with each flip judged, not edited to clear a red suite.
  *
- *  - moving the knowledge into Metadata can be proven to change nothing, and
- *  - correcting it later shows up as an explicit diff on named cases.
+ * Cases marked CORRECTED are the ones whose answer changed. Every one of them changed towards the
+ * StructureDefinition: `uri`, `base64Binary` and `instant` derive from `Element`, not from `string`
+ * or `dateTime`, and R4 redefined `Money` as its own type rather than a `Quantity` specialization.
  *
- * Do not "fix" an expectation in this file to make a suite green. Cases marked PINS-A-DEFECT are the
- * only ones expected to change, and only in the milestone that deliberately changes them.
+ * Do not edit an expectation here to make a suite green. A flip means either the models changed or
+ * the resolver did, and both deserve a look before an expectation moves.
  */
 class TypeConformanceBaselineTest extends TestCase
 {
@@ -70,15 +73,15 @@ class TypeConformanceBaselineTest extends TestCase
         yield 'Distance is Quantity'    => [new Distance(), 'Quantity', true];
         yield 'Duration is Quantity'    => [new Duration(), 'Quantity', true];
 
-        // PINS-A-DEFECT. R4 gives all four a baseDefinition of Element. The table says otherwise, and
-        // the table is the only thing producing these answers.
-        yield 'uri is string'           => [new UriPrimitive(value: 'http://x'), 'string', true];
-        yield 'base64Binary is string'  => [new Base64BinaryPrimitive(value: 'eA=='), 'string', true];
-        yield 'Money is Quantity'       => [new Money(), 'Quantity', true];
+        // CORRECTED. R4 gives all four a baseDefinition of Element, and the retired table was the
+        // only thing that ever answered true here.
+        yield 'uri is string'           => [new UriPrimitive(value: 'http://x'), 'string', false];
+        yield 'base64Binary is string'  => [new Base64BinaryPrimitive(value: 'eA=='), 'string', false];
+        yield 'Money is Quantity'       => [new Money(), 'Quantity', false];
         yield 'instant is dateTime'     => [
             new InstantPrimitive(value: FHIRInstant::parse('2020-01-01T00:00:00Z')),
             'dateTime',
-            true,
+            false,
         ];
     }
 
@@ -96,17 +99,16 @@ class TypeConformanceBaselineTest extends TestCase
     }
 
     /**
-     * The parent walk is gated on non-strict matching, and `as` and `ofType` match strictly, so none
-     * of the table's answers reach them and a filter such as ofType(string) does not over-select.
+     * The ancestry walk is gated on non-strict matching, and `as` and `ofType` match strictly, so no
+     * conformance answer reaches them and a filter such as ofType(string) does not over-select.
      *
      * @param object $subject     an instance of the derived type under test
-     * @param string $parentType  the type the table claims it conforms to
+     * @param string $parentType  the candidate ancestor type
      * @param bool   $doesConform unused here; strict matching rejects every case regardless
      */
     #[DataProvider('conformanceCases')]
-    public function testStrictMatchingIgnoresTheParentTableEntirely(object $subject, string $parentType, bool $doesConform): void
+    public function testStrictMatchingIgnoresTheAncestryWalkEntirely(object $subject, string $parentType, bool $doesConform): void
     {
-        self::assertTrue($doesConform, 'every case in this provider conforms non-strictly');
         self::assertFalse((new FHIRTypeResolver())->isOfType($subject, $parentType, true));
     }
 
@@ -124,17 +126,92 @@ class TypeConformanceBaselineTest extends TestCase
     }
 
     /**
-     * Isolates the defect. Money does NOT extend Quantity, so the inheritance walk cannot be what
-     * makes `Money is Quantity` true — only the table entry can. Same shape for uri and base64Binary,
-     * whose PHP parent is Element rather than the string primitive.
+     * The corrected answers now agree with PHP inheritance, which is what makes them checkable.
+     *
+     * Money does not extend Quantity and a uri primitive does not extend the string primitive, so
+     * under the retired table the resolver contradicted the very models it was answering about. The
+     * conformance answer and the `instanceof` answer now agree.
      */
-    public function testTheDefectiveAnswersComeFromTheTableAndNotFromInheritance(): void
+    public function testTheCorrectedAnswersAgreeWithInheritance(): void
     {
         self::assertNotInstanceOf(Quantity::class, new Money());
         self::assertNotInstanceOf(UriPrimitive::class, new Base64BinaryPrimitive(value: 'eA=='));
 
         $resolver = new FHIRTypeResolver();
-        self::assertTrue($resolver->isOfType(new Money(), 'Quantity', false));
-        self::assertTrue($resolver->isOfType(new UriPrimitive(value: 'http://x'), 'string', false));
+        self::assertFalse($resolver->isOfType(new Money(), 'Quantity', false));
+        self::assertFalse($resolver->isOfType(new UriPrimitive(value: 'http://x'), 'string', false));
+    }
+
+    /**
+     * The same conformance questions asked of a value that has no class behind it.
+     *
+     * `FHIRTypedScalar` is what the evaluator wraps a resource property in when the property is stored
+     * as a PHP scalar, so it carries a FHIR type name and nothing else. Every case above supplies an
+     * instance, and an instance can be answered by walking PHP inheritance; these cannot. The parent
+     * table is the only mechanism that answers them, which is what the negative cases below establish.
+     *
+     * @return iterable<string, array{0: string, 1: string, 2: bool}>
+     */
+    public static function nameOnlyConformanceCases(): iterable
+    {
+        // Answered by a table entry.
+        yield 'code is string'         => ['code', 'string', true];
+        yield 'id is string'           => ['id', 'string', true];
+        yield 'positiveInt is integer' => ['positiveInt', 'integer', true];
+
+        // CORRECTED, by consequence rather than directly: url derives from uri, and uri derives from
+        // Element, so the chain to string that the table asserted never existed.
+        yield 'url is string'          => ['url', 'string', false];
+
+        // CORRECTED. Each derives from Element in R4.
+        yield 'uri is string'          => ['uri', 'string', false];
+        yield 'base64Binary is string' => ['base64Binary', 'string', false];
+        yield 'instant is dateTime'    => ['instant', 'dateTime', false];
+
+        // CORRECTED. The table stopped at its own last entry, so an ancestor further up was
+        // unreachable; a derived walk reaches the whole chain.
+        yield 'code is Element'        => ['code', 'Element', true];
+
+        // Negative control: a type the locator cannot place answers nothing at all.
+        yield 'xhtml is string'        => ['xhtml', 'string', false];
+    }
+
+    /**
+     * Freezes the answers for values carrying a type name and no class.
+     *
+     * @param string $fhirType    the FHIR type name the scalar carries
+     * @param string $parentType  the type it is asked to conform to
+     * @param bool   $doesConform the answer observed today, which this test freezes
+     */
+    #[DataProvider('nameOnlyConformanceCases')]
+    public function testTheNameOnlyAnswerIsUnchanged(string $fhirType, string $parentType, bool $doesConform): void
+    {
+        $scalar = new FHIRTypedScalar('x', $fhirType);
+
+        self::assertSame($doesConform, (new FHIRTypeResolver())->isOfType($scalar, $parentType, false));
+    }
+
+    /**
+     * CORRECTED. The primitive set now follows the generated models rather than a hand-written list.
+     *
+     * `XhtmlPrimitive` is generated and carries #[FHIRPrimitive], but `xhtml` had no entry in the
+     * resolver's map, so it was not a known type name and `x as xhtml` was an execution error for a
+     * type FHIR defines. Membership is read from the models now, which closes that gap and keeps the
+     * set from drifting again.
+     */
+    public function testThePrimitiveSetFollowsTheGeneratedModels(): void
+    {
+        $resolver = new FHIRTypeResolver();
+
+        self::assertTrue(class_exists(XhtmlPrimitive::class), 'the generated primitive exists');
+        self::assertTrue($resolver->isPrimitiveType('xhtml'));
+        self::assertTrue($resolver->isKnownTypeName('xhtml'));
+
+        self::assertTrue($resolver->isPrimitiveType('markdown'));
+        self::assertTrue($resolver->isKnownTypeName('markdown'));
+
+        // Complex types and resources are still not primitives.
+        self::assertFalse($resolver->isPrimitiveType('Quantity'));
+        self::assertFalse($resolver->isPrimitiveType('Patient'));
     }
 }

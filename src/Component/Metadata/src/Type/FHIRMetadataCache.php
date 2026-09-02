@@ -32,7 +32,7 @@ class FHIRMetadataCache
     /** @var array<string, string|null> */
     private array $fhirVersionCache = [];
 
-    /** @var array<string, string|null> */
+    /** @var array<string, array<string, bool>> */
     private array $structureTypeCache = [];
 
     /**
@@ -140,23 +140,26 @@ class FHIRMetadataCache
     }
 
     /**
-     * Get cached structure type for a class
+     * Whether a class was already found to be, or not to be, one particular structure kind.
+     *
+     * Null means the question has not been asked for this class and kind, which is a different state
+     * from a recorded "no". One slot per class could not represent that: it held a single kind string,
+     * so a recorded answer for one kind was served to every other kind's question, and a negative
+     * answer was indistinguishable from a cache miss and so never memoized at all. The kinds happen
+     * to be mutually exclusive in the generated output, which is the only reason the first of those
+     * did not produce wrong answers.
      */
-    public function getStructureTypeMetadata(string $className): ?string
+    public function getStructureKindFlag(string $className, string $kind): ?bool
     {
-        if (!array_key_exists($className, $this->structureTypeCache)) {
-            return null;
-        }
-
-        return $this->structureTypeCache[$className];
+        return $this->structureTypeCache[$className][$kind] ?? null;
     }
 
     /**
-     * Cache structure type for a class
+     * Record whether a class is one particular structure kind.
      */
-    public function cacheStructureTypeMetadata(string $className, ?string $structureType): void
+    public function cacheStructureKindFlag(string $className, string $kind, bool $isKind): void
     {
-        $this->structureTypeCache[$className] = $structureType;
+        $this->structureTypeCache[$className][$kind] = $isKind;
     }
 
     /**
@@ -203,7 +206,7 @@ class FHIRMetadataCache
             'backbone_element_entries' => count($this->backboneElementCache),
             'fhir_type_entries'        => count($this->fhirTypeCache),
             'fhir_version_entries'     => count($this->fhirVersionCache),
-            'structure_type_entries'   => count($this->structureTypeCache),
+            'structure_type_entries'   => array_sum(array_map('count', $this->structureTypeCache)),
         ];
     }
 
