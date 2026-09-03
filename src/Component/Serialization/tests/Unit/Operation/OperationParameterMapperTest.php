@@ -9,7 +9,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Operation\CodeSystemLookup\CodeSyste
 use Ardenexal\FHIRTools\Component\Models\R5\Operation\CodeSystemLookup\CodeSystemLookupInput as R5Input;
 use Ardenexal\FHIRTools\Component\Models\R5\Operation\CodeSystemLookup\CodeSystemLookupOutput as R5Output;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Operation\OperationMappingException;
 use Ardenexal\FHIRTools\Component\Serialization\Operation\OperationParameterMapper;
@@ -432,7 +432,7 @@ final class OperationParameterMapperTest extends TestCase
      */
     public function testARegisteredProfileClassIsUsedInsteadOfTheBaseResource(): void
     {
-        $resolver = new FHIRTypeResolver(
+        $resolver = new FHIRSerializedTypeResolver(
             resourceTypeMapping: ['Parameters' => ProfiledParametersResource::class],
             fhirVersion: FhirVersion::R4->value,
         );

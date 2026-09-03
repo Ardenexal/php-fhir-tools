@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit\Operation;
 
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIROperationPayloadJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIROperationPayloadXmlNormalizer;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -142,8 +142,8 @@ final class OperationPayloadNormalizerTest extends TestCase
      */
     public function testItClaimsOnlyOperationPayloads(): void
     {
-        $json = new FHIROperationPayloadJsonNormalizer(new FHIRMetadataExtractor(), new FHIRTypeResolver(), version: 'R5');
-        $xml  = new FHIROperationPayloadXmlNormalizer(new FHIRMetadataExtractor(), new FHIRTypeResolver(), version: 'R5');
+        $json = new FHIROperationPayloadJsonNormalizer(new FHIRMetadataExtractor(), new FHIRSerializedTypeResolver(), version: 'R5');
+        $xml  = new FHIROperationPayloadXmlNormalizer(new FHIRMetadataExtractor(), new FHIRSerializedTypeResolver(), version: 'R5');
 
         self::assertTrue($json->supportsDenormalization([], self::inputClass('R5'), 'json'));
         self::assertTrue($json->supportsDenormalization([], self::outputClass('R5'), 'json'));
@@ -175,7 +175,7 @@ final class OperationPayloadNormalizerTest extends TestCase
     {
         $normalizer = new FHIROperationPayloadJsonNormalizer(
             new FHIRMetadataExtractor(),
-            new FHIRTypeResolver(fhirVersion: 'R5'),
+            new FHIRSerializedTypeResolver(fhirVersion: 'R5'),
             version: 'R5',
         );
 

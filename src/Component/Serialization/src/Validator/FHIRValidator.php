@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Validator;
 
 use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 
 /**
  * FHIR validation service for validating FHIR objects against business rules.

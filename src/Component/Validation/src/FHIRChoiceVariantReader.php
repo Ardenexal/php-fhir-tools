@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProviderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -17,6 +20,8 @@ final class FHIRChoiceVariantReader
     /** Takes the accessor used for ordinary property reads; choice variants are resolved by reflection. */
     public function __construct(
         private readonly PropertyAccessorInterface $propertyAccessor,
+        private readonly PropertyMetadataProviderInterface $properties = new PropertyMetadataProvider(),
+        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
     ) {
     }
 
@@ -159,31 +164,26 @@ final class FHIRChoiceVariantReader
      */
     private function readChoiceVariant(object $node, string $segment): array
     {
-        foreach ((new \ReflectionClass($node))->getProperties() as $property) {
-            foreach ($property->getAttributes(FhirProperty::class) as $attribute) {
-                /** @var FhirProperty $meta the attribute instance, whose variants name the choice's JSON keys */
-                $meta = $attribute->newInstance();
-
-                foreach ($meta->variants ?? [] as $variant) {
-                    if ($variant['jsonKey'] !== $segment) {
-                        continue;
-                    }
-
-                    if (!$property->isInitialized($node)) {
-                        return [];
-                    }
-
-                    $held    = $property->getValue($node);
-                    $phpType = $variant['phpType'];
-
-                    // The property holds whichever variant the document used. Counting it for a
-                    // different variant's rule would report a Quantity as a CodeableConcept.
-                    if ($held === null || !$held instanceof $phpType) {
-                        return [];
-                    }
-
-                    return [$held];
+        foreach ($this->properties->getPropertyMetadata($node::class) as $name => $meta) {
+            foreach ($meta->variants ?? [] as $variant) {
+                if ($variant->jsonKey !== $segment) {
+                    continue;
                 }
+
+                if (!$this->models->isPropertyInitialized($node, $name)) {
+                    return [];
+                }
+
+                $held    = $this->models->readInitializedValue($node, $name);
+                $phpType = $variant->phpType;
+
+                // The property holds whichever variant the document used. Counting it for a
+                // different variant's rule would report a Quantity as a CodeableConcept.
+                if ($held === null || !$held instanceof $phpType) {
+                    return [];
+                }
+
+                return [$held];
             }
         }
 

@@ -6,5 +6,57 @@
     "storage.xml_storage_path": ".phpbench",
     "runner.iterations": [5],
     "runner.revs": [10],
-    "runner.warmup": 1
+    "runner.warmup": 1,
+    "report.generators": {
+        "ci_summary": {
+            "generator": "expression",
+            "title": "CI summary",
+            "description": "Unformatted columns for machine consumption. Rendered with --output=json and turned into markdown by .github/workflows/pr.yml; the JSON renderer drops any column that does not evaluate to a scalar, so keep these expressions free of display units (`as time`, `as memory`) and let the consumer format them.",
+            "cols": {
+                "benchmark": "first(benchmark_name)",
+                "subject": "first(subject_name)",
+                "set": "first(variant_name)",
+                "revs": "first(variant_revs)",
+                "its": "first(variant_iterations)",
+                "mem_peak": "max(result_mem_peak)",
+                "best": "min(result_time_avg)",
+                "mode": "mode(result_time_avg)",
+                "worst": "max(result_time_avg)",
+                "rstdev": "rstdev(result_time_avg)"
+            }
+        },
+        "ci_compare": {
+            "generator": "expression",
+            "title": "CI baseline comparison",
+            "description": "The ci_summary columns paired with the stored baseline's, for --output=json. Only a `run --ref=<tag>` populates the baseline_* values: the generator reads one suite (`firstOnly`), so rendering this from a dumped XML yields \"ERR\" in every baseline column. The current-value expressions are repeated verbatim under baseline_expressions to *suppress* the generator's own defaults, which otherwise replace `mode`, `mem_peak` and `rstdev` with a display string pairing the baseline value and a percent difference -- readable in a console, useless to a JSON consumer.",
+            "expressions": {
+                "benchmark": "first(benchmark_name)",
+                "subject": "first(subject_name)",
+                "mode": "mode(result_time_avg)",
+                "baseline_mode": "null",
+                "mem_peak": "max(result_mem_peak)",
+                "baseline_mem_peak": "null",
+                "rstdev": "rstdev(result_time_avg)",
+                "baseline_rstdev": "null"
+            },
+            "baseline_expressions": {
+                "mode": "mode(result_time_avg)",
+                "mem_peak": "max(result_mem_peak)",
+                "rstdev": "rstdev(result_time_avg)",
+                "baseline_mode": "mode(baseline_time_avg)",
+                "baseline_mem_peak": "first(baseline_mem_peak)",
+                "baseline_rstdev": "rstdev(baseline_time_avg)"
+            },
+            "cols": [
+                "benchmark",
+                "subject",
+                "mode",
+                "baseline_mode",
+                "mem_peak",
+                "baseline_mem_peak",
+                "rstdev",
+                "baseline_rstdev"
+            ]
+        }
+    }
 }

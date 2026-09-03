@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 use Ardenexal\FHIRTools\Component\Metadata\UnknownInput;
 use Ardenexal\FHIRTools\Component\Metadata\UnknownInputRecorder;
 
@@ -20,6 +24,12 @@ use Ardenexal\FHIRTools\Component\Metadata\UnknownInputRecorder;
  */
 final class UnknownInputChecker
 {
+    public function __construct(
+        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
+    ) {
+    }
+
     /**
      * The namespace every FHIR XML element must be in, named in the wrong-namespace finding.
      */
@@ -70,15 +80,13 @@ final class UnknownInputChecker
             $violations[] = $this->violation($unknown, $node, $path);
         }
 
-        $ref = new \ReflectionClass($node);
-
-        foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
-            if (!$prop->isInitialized($node)) {
+        foreach ($this->models->publicPropertyNames($node) as $name) {
+            if (!$this->models->isPropertyInitialized($node, $name)) {
                 continue;
             }
 
-            $value    = $prop->getValue($node);
-            $propPath = $path === '' ? $prop->getName() : $path . '.' . $prop->getName();
+            $value    = $this->models->readInitializedValue($node, $name);
+            $propPath = $path === '' ? $name : $path . '.' . $name;
 
             if (is_object($value)) {
                 $violations = [...$violations, ...$this->walk($value, $propPath, $visited)];
@@ -156,17 +164,18 @@ final class UnknownInputChecker
      */
     private function fhirTypeOf(object $node): string
     {
-        $ref   = new \ReflectionClass($node);
-        $attrs = $ref->getAttributes(FhirResource::class);
+        // The class's own attribute, not an inherited one: this reports the type of the object in
+        // hand, and a profile subclass that declares none falls through to the class-name rule below
+        // exactly as it did before.
+        $attrs = $this->attributes->classAttributes($node, FhirResource::class);
 
         if ($attrs !== []) {
-            /** @var FhirResource $attr the attribute carries the spec type name, which the class name only approximates */
-            $attr = $attrs[0]->newInstance();
-
-            return $attr->type;
+            // The attribute carries the spec type name, which the class name only approximates.
+            return $attrs[0]->getResourceType();
         }
 
-        $name = $ref->getShortName();
+        $parts = explode('\\', $node::class);
+        $name  = (string) end($parts);
 
         return str_ends_with($name, 'Resource') ? substr($name, 0, -8) : $name;
     }

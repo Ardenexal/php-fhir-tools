@@ -7,7 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor;
 use PHPUnit\Framework\TestCase;
 
 /**

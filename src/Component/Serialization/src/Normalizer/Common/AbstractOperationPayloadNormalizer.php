@@ -6,8 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirOperationPayload;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Operation\OperationMappingException;
 use Ardenexal\FHIRTools\Component\Serialization\Operation\OperationParameterMapper;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -197,9 +197,7 @@ abstract class AbstractOperationPayloadNormalizer extends AbstractFHIRNormalizer
             return null;
         }
 
-        $attributes = self::reflClass($class)->getAttributes(FhirOperationPayload::class);
-
-        return $attributes === [] ? null : $attributes[0]->newInstance();
+        return self::operationMetadata()->payloadOf($class);
     }
 
     /**

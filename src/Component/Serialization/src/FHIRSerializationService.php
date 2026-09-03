@@ -10,8 +10,10 @@ use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugIn
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRUnreadableDocumentException;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRBackboneElementJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractOperationPayloadNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRLogicalModelJsonNormalizer;
@@ -32,7 +34,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\LogicalModelLocatorTrait;
+use Ardenexal\FHIRTools\Component\Metadata\Type\LogicalModelLocatorTrait;
 
 /**
  * High-level FHIR serialization service providing convenient methods for FHIR data conversion.
@@ -51,7 +53,7 @@ class FHIRSerializationService
         private readonly FHIRSerializationContextFactory $contextFactory,
         private readonly FHIRSerializationDebugInfo $debugInfo,
         private readonly FHIRMetadataExtractorInterface $metadataExtractor = new FHIRMetadataExtractor(),
-        private readonly FHIRTypeResolverInterface $typeResolver = new FHIRTypeResolver(),
+        private readonly FHIRTypeResolverInterface $typeResolver = new FHIRSerializedTypeResolver(),
         private readonly XmlNamespacePrefixResolver $namespacePrefixResolver = new XmlNamespacePrefixResolver(),
     ) {
     }
@@ -92,7 +94,7 @@ class FHIRSerializationService
     ): self {
         $metadataExtractor = new FHIRMetadataExtractor();
         $registry          = FHIRIGTypeRegistryFactory::create($igOutputDirectory, $igNamespace, $includeBaseProfiles, $version->value);
-        $typeResolver      = new FHIRTypeResolver(igTypeRegistry: $registry, fhirVersion: $version->value);
+        $typeResolver      = new FHIRSerializedTypeResolver(igTypeRegistry: $registry, fhirVersion: $version->value);
 
         $normalizers = [
             // Operation payloads first. They carry no #[FhirResource], so nothing else in this chain
@@ -484,7 +486,7 @@ class FHIRSerializationService
     /**
      * Detect the target class from the data content.
      *
-     * Delegates to FHIRTypeResolver so that profile-based resolution (via meta.profile) and
+     * Delegates to FHIRSerializedTypeResolver so that profile-based resolution (via meta.profile) and
      * the IG type registry are applied when available, in addition to the default resourceType
      * convention lookup.
      */

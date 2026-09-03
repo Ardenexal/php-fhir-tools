@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRBackboneElementMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRComplexTypeMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataCache;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRPrimitiveTypeMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRResourceMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRBackboneElementMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRComplexTypeMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataCache;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRPrimitiveTypeMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRResourceMetadata;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 
 /**
@@ -131,52 +131,42 @@ class FHIRMetadataCacheTest extends TestCase
         self::assertSame($fhirVersion, $this->cache->getFHIRVersionMetadata($className));
     }
 
-    public function testStructureFlagCaching()
+    public function testStructureKindFlagCaching()
     {
         $className = 'TestClass';
 
         // Initially should return null
-        self::assertNull($this->cache->getStructureFlag($className, FHIRMetadataCache::FLAG_RESOURCE));
+        self::assertNull($this->cache->getStructureKindFlag($className, 'resource'));
 
-        // Cache the answer
-        $this->cache->cacheStructureFlag($className, FHIRMetadataCache::FLAG_RESOURCE, true);
+        // Cache the answer for one kind
+        $this->cache->cacheStructureKindFlag($className, 'resource', true);
 
-        // Should return the cached answer
-        self::assertTrue($this->cache->getStructureFlag($className, FHIRMetadataCache::FLAG_RESOURCE));
+        // Should return the cached answer, and only for the kind that was asked
+        self::assertTrue($this->cache->getStructureKindFlag($className, 'resource'));
+        self::assertNull($this->cache->getStructureKindFlag($className, 'complex-type'));
     }
 
     /**
-     * The four structural questions are independent, because they are not mutually exclusive.
+     * Two kinds hold two different answers for the same class at the same time.
      *
-     * A single shared slot let the first question asked answer all four. Every FHIR primitive
-     * class carries #[FHIRPrimitive] itself and inherits #[FHIRComplexType] from Element, so the
-     * answers genuinely differ per question and one slot silently conflated them.
+     * The kinds are not mutually exclusive on the class itself: every FHIR primitive carries
+     * #[FHIRPrimitive] and inherits #[FHIRComplexType] from Element, so both questions genuinely
+     * reach an answer and the answers differ. One slot per class served the first recorded answer
+     * to every later question, which made classification depend on call order.
      */
-    public function testEachStructuralQuestionHoldsItsOwnAnswer()
+    public function testEachStructureKindHoldsItsOwnAnswer()
     {
         $className = 'TestClass';
 
-        $this->cache->cacheStructureFlag($className, FHIRMetadataCache::FLAG_PRIMITIVE_TYPE, true);
-        $this->cache->cacheStructureFlag($className, FHIRMetadataCache::FLAG_COMPLEX_TYPE, false);
+        $this->cache->cacheStructureKindFlag($className, 'primitive-type', true);
+        $this->cache->cacheStructureKindFlag($className, 'complex-type', false);
 
-        self::assertTrue($this->cache->getStructureFlag($className, FHIRMetadataCache::FLAG_PRIMITIVE_TYPE));
-        self::assertFalse($this->cache->getStructureFlag($className, FHIRMetadataCache::FLAG_COMPLEX_TYPE));
+        self::assertTrue($this->cache->getStructureKindFlag($className, 'primitive-type'));
+        self::assertFalse($this->cache->getStructureKindFlag($className, 'complex-type'));
         self::assertNull(
-            $this->cache->getStructureFlag($className, FHIRMetadataCache::FLAG_BACKBONE_ELEMENT),
+            $this->cache->getStructureKindFlag($className, 'backbone-element'),
             'An unasked question must stay unanswered rather than inherit a sibling answer.',
         );
-    }
-
-    /**
-     * A negative answer is cached, so it is not recomputed by reflection on every call.
-     */
-    public function testNegativeStructureFlagsAreCachedRatherThanRecomputed()
-    {
-        $className = 'TestClass';
-
-        $this->cache->cacheStructureFlag($className, FHIRMetadataCache::FLAG_RESOURCE, false);
-
-        self::assertFalse($this->cache->getStructureFlag($className, FHIRMetadataCache::FLAG_RESOURCE));
     }
 
     public function testCacheNullValues()
@@ -192,6 +182,11 @@ class FHIRMetadataCacheTest extends TestCase
         self::assertNull($this->cache->getResourceMetadata($className));
         self::assertNull($this->cache->getFHIRTypeMetadata($className));
         self::assertNull($this->cache->getFHIRVersionMetadata($className));
+
+        // Structure kinds are the exception: a recorded "no" is false rather than null, which is
+        // what makes a negative answer memoize instead of reading back as a miss.
+        $this->cache->cacheStructureKindFlag($className, 'resource', false);
+        self::assertFalse($this->cache->getStructureKindFlag($className, 'resource'));
     }
 
     public function testInvalidateCache()
@@ -248,7 +243,7 @@ class FHIRMetadataCacheTest extends TestCase
         self::assertSame(0, $stats['backbone_element_entries']);
         self::assertSame(0, $stats['fhir_type_entries']);
         self::assertSame(0, $stats['fhir_version_entries']);
-        self::assertSame(0, $stats['structure_flag_entries']);
+        self::assertSame(0, $stats['structure_type_entries']);
 
         // Add some entries
         $this->cache->cacheResourceMetadata('TestClass1', new FHIRResourceMetadata('Patient', 'R4B'));
@@ -263,7 +258,7 @@ class FHIRMetadataCacheTest extends TestCase
         self::assertSame(0, $stats['backbone_element_entries']);
         self::assertSame(1, $stats['fhir_type_entries']);
         self::assertSame(0, $stats['fhir_version_entries']);
-        self::assertSame(0, $stats['structure_flag_entries']);
+        self::assertSame(0, $stats['structure_type_entries']);
     }
 
     public function testIsEmpty()

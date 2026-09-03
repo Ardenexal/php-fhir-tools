@@ -7,7 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\HumanName as HumanNameR5;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureDefinitionResource;
-use Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FhirPropertyTypeHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 final class FhirPropertyTypeHierarchyResolverTest extends TestCase

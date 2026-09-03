@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -33,6 +32,7 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
         ?DenormalizerInterface $denormalizer = null,
         string $fhirVersion = 'R4',
         ?FHIRIGTypeRegistry $igTypeRegistry = null,
+        private readonly FHIRStructureKindProviderInterface $structureKinds = new FHIRStructureKindProvider(),
     ) {
         parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
     }
@@ -94,8 +94,6 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            $reflection = self::reflClass($resolvedType);
-
             if (is_a($resolvedType, FHIRComplexExtensionInterface::class, true)
                 && isset($data['extension'])
                 && is_array($data['extension'])
@@ -106,10 +104,16 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
                 return $resolvedType::fromSubExtensions($subExtensions, $id);
             }
 
-            $isBackboneElement = !empty($reflection->getAttributes(FHIRBackboneElement::class));
+            // Instantiate the RESOLVED type, not the declared one. Every gate below asks
+            // hasProperty($resolvedType, ...), and writeValue() is a silent no-op when the property
+            // is absent from the instance — so building the base class here passes each gate and
+            // then discards the value, losing an IG profile's or slice's own properties with no
+            // error. declaredKindOf reads only what the class itself declares, matching the
+            // getAttributes() call this replaced.
+            $isBackboneElement = $this->structureKinds->declaredKindOf($resolvedType) === FHIRStructureKind::BackboneElement;
             $object            = $isBackboneElement
-                ? $this->instantiateWithConstructorDefaults($reflection)
-                : $this->instantiateWithDefaults($reflection);
+                ? $this->instantiateWithConstructorDefaults($resolvedType)
+                : $this->instantiateWithDefaults($resolvedType);
 
             $metaMap = $this->getPropertyMetadataMap($object);
 
@@ -124,16 +128,15 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
                     continue;
                 }
 
-                $property      = self::reflProp($resolvedType, $elementName);
-                $choiceMapping = $property === null
+                $hasProperty   = self::modelAccessor()->hasProperty($resolvedType, $elementName);
+                $choiceMapping = !$hasProperty
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $resolvedType)
                     : null;
 
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
-                    $choiceProp = self::reflProp($resolvedType, $propertyName);
-                    if ($choiceProp !== null) {
+                    if (self::modelAccessor()->hasProperty($resolvedType, $propertyName)) {
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'json', $context);
                         } else {
@@ -142,17 +145,17 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
                                 : $value;
                         }
 
-                        $choiceProp->setValue($object, $denormalizedValue);
+                        self::modelAccessor()->writeValue($object, $propertyName, $denormalizedValue);
                         continue;
                     }
                 }
 
-                if ($property !== null) {
+                if ($hasProperty) {
                     $meta = $metaMap[$elementName] ?? null;
 
                     if ($this->denormalizer !== null) {
                         if ($meta !== null && $meta->propertyKind === 'primitive') {
-                            $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'json', $context, $metaMap);
+                            $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $resolvedType, $elementName, $value, 'json', $context, $metaMap);
                         } else {
                             $phpItemClass = $meta?->phpItemClass;
                             if (is_array($value)
@@ -167,7 +170,7 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
                                     $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'json', $context);
                                 }
                             } else {
-                                $propertyType = $this->getPropertyType($property);
+                                $propertyType = $this->getPropertyType($resolvedType, $elementName);
                                 if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                                     $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
                                 } else {
@@ -179,16 +182,16 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
                         $denormalizedValue = $this->denormalizeBasicValue($value, 'json', $context);
                     }
 
-                    $property->setValue($object, $denormalizedValue);
+                    self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                 }
             }
 
-            $this->applyPrimitiveExtensions($reflection, $object, $data, $metaMap, 'json', $context);
+            $this->applyPrimitiveExtensions($object, $data, $metaMap, 'json', $context);
 
             if (!$object instanceof FHIRComplexExtensionInterface
-                && !empty($reflection->getAttributes(FHIRExtensionDefinition::class))
+                && $this->structureKinds->isExtensionDefinition($type)
             ) {
-                $this->copyTypedExtensionValueBack($reflection, $object);
+                $this->copyTypedExtensionValueBack($object);
             }
 
             return $object;
@@ -213,23 +216,20 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            $reflection = self::reflClass($type);
-            $r          = $reflection;
+            // Walks past any other kind on the way up: a backbone-element ancestor is neither a
+            // primitive nor a complex type for this question, and the walk must continue through it.
+            $kind = $this->structureKinds->nearestKindAmong(
+                $type,
+                FHIRStructureKind::PrimitiveType,
+                FHIRStructureKind::ComplexType,
+            );
 
-            do {
-                if (!empty($r->getAttributes(FHIRPrimitive::class))) {
-                    return $cache[$type] = false;
-                }
-
-                if (!empty($r->getAttributes(FHIRComplexType::class))) {
-                    return $cache[$type] = true;
-                }
-
-                $r = $r->getParentClass();
-            } while ($r !== false);
+            if ($kind !== null) {
+                return $cache[$type] = $kind === FHIRStructureKind::ComplexType;
+            }
 
             return $cache[$type] = is_a($type, FHIRComplexExtensionInterface::class, true)
-                || !empty($reflection->getAttributes(FHIRExtensionDefinition::class));
+                || $this->structureKinds->isExtensionDefinition($type);
         } catch (\ReflectionException) {
             return $cache[$type] = false;
         }
@@ -254,16 +254,9 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
         $metaMap           = $this->getPropertyMetadataMap($object);
         $includeExtensions = $fhirContext->includeExtensions;
 
-        $properties = self::reflPublicProps($object);
-
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-
-            if (!$property->isInitialized($object)) {
-                continue;
-            }
-
-            $value = $property->getValue($object);
+        foreach (self::modelAccessor()->publicPropertyNames($object) as $propertyName) {
+            // Unwritten and explicitly null both read as null here, and the skip below catches both.
+            $value = self::modelAccessor()->readInitializedValue($object, $propertyName);
 
             if ($value === null || (is_array($value) && empty($value))) {
                 continue;

@@ -7,7 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataCache;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataCache;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\Generator;
 use Eris\TestTrait;
@@ -134,7 +134,7 @@ class SerializationPerformanceTest extends TestCase
                 $className = "TestClass{$i}";
                 $cache->cacheFHIRTypeMetadata($className, "TestType{$i}");
                 $cache->cacheFHIRVersionMetadata($className, 'R4B');
-                $cache->cacheStructureFlag($className, FHIRMetadataCache::FLAG_RESOURCE, true);
+                $cache->cacheStructureKindFlag($className, 'resource', true);
             }
 
             $writeEndTime  = microtime(true);
@@ -147,12 +147,12 @@ class SerializationPerformanceTest extends TestCase
                 $className     = "TestClass{$i}";
                 $fhirType      = $cache->getFHIRTypeMetadata($className);
                 $fhirVersion   = $cache->getFHIRVersionMetadata($className);
-                $isResource    = $cache->getStructureFlag($className, FHIRMetadataCache::FLAG_RESOURCE);
+                $structureType = $cache->getStructureKindFlag($className, 'resource');
 
                 // Verify cached values
                 self::assertSame("TestType{$i}", $fhirType);
                 self::assertSame('R4B', $fhirVersion);
-                self::assertTrue($isResource);
+                self::assertTrue($structureType);
             }
 
             $readEndTime  = microtime(true);
@@ -180,7 +180,7 @@ class SerializationPerformanceTest extends TestCase
             $stats = $cache->getCacheStats();
             self::assertSame($iterations, $stats['fhir_type_entries']);
             self::assertSame($iterations, $stats['fhir_version_entries']);
-            self::assertSame($iterations, $stats['structure_flag_entries']);
+            self::assertSame($iterations, $stats['structure_type_entries']);
         });
     }
 

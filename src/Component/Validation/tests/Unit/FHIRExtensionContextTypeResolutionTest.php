@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
-use Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FhirPropertyTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
-use Ardenexal\FHIRTools\Component\Validation\NullFHIRTypeHierarchyResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\NullFHIRTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\BareTypeHumanNameExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\ForeignRootOnlyExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\NestedContactWithExtensionsFixture;

@@ -6,7 +6,7 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection;
 
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\CacheWarmer\FHIRMetadataCacheWarmer;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\Compatibility\SymfonyVersionHelper;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
 use Ardenexal\FHIRTools\Component\Validation\CachingFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;

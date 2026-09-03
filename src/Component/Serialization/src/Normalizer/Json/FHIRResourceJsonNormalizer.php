@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Metadata\UnknownInput;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
 
 /**
  * JSON normalizer for FHIR resource classes.
@@ -32,6 +34,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
         ?DenormalizerInterface $denormalizer = null,
         string $fhirVersion = 'R4',
         ?FHIRIGTypeRegistry $igTypeRegistry = null,
+        private readonly FHIRStructureKindProviderInterface $structureKinds = new FHIRStructureKindProvider(),
     ) {
         parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
     }
@@ -149,15 +152,11 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
 
         try {
             /** @var class-string $type */
-            $refl = new \ReflectionClass($type);
 
-            do {
-                if (!empty($refl->getAttributes(FhirResource::class))) {
-                    return $cache[$type] = true;
-                }
-
-                $refl = $refl->getParentClass();
-            } while ($refl !== false);
+            // Walks past any other kind: only a resource ancestor answers this question.
+            if ($this->structureKinds->nearestKindAmong($type, FHIRStructureKind::Resource) !== null) {
+                return $cache[$type] = true;
+            }
 
             return $cache[$type] = false;
         } catch (\ReflectionException) {
@@ -183,21 +182,16 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
         $data                 = [];
         $data['resourceType'] = $resourceType;
 
-        $properties = self::reflPublicProps($object);
-        $metaMap    = $this->getPropertyMetadataMap($object);
+        $metaMap = $this->getPropertyMetadataMap($object);
 
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-
+        foreach (self::modelAccessor()->publicPropertyNames($object) as $propertyName) {
             if ($propertyName === 'resourceType') {
                 continue;
             }
 
-            if (!$property->isInitialized($object)) {
-                continue;
-            }
-
-            $value = $property->getValue($object);
+            // Unwritten and explicitly null both read as null, and shouldOmitValue below treats them
+            // the same: every emit branch guards against null regardless of the omitNullValues option.
+            $value = self::modelAccessor()->readInitializedValue($object, $propertyName);
 
             if ($this->shouldOmitValue($value, $fhirContext)) {
                 continue;
@@ -291,8 +285,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            $reflection            = self::reflClass($resolvedType);
-            $object                = $this->instantiateWithDefaults($reflection);
+            $object                = $this->instantiateWithDefaults($resolvedType);
             $metaMap               = $this->getPropertyMetadataMap($object);
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
 
@@ -309,16 +302,15 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                     continue;
                 }
 
-                $property      = self::reflProp($resolvedType, $elementName);
-                $choiceMapping = $property === null
+                $hasProperty   = self::modelAccessor()->hasProperty($resolvedType, $elementName);
+                $choiceMapping = !$hasProperty
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $resolvedType)
                     : null;
 
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
-                    $choiceProp = self::reflProp($resolvedType, $propertyName);
-                    if ($choiceProp !== null) {
+                    if (self::modelAccessor()->hasProperty($resolvedType, $propertyName)) {
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'json', $context);
                         } else {
@@ -327,12 +319,12 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                                 : $value;
                         }
 
-                        $choiceProp->setValue($object, $denormalizedValue);
+                        self::modelAccessor()->writeValue($object, $propertyName, $denormalizedValue);
                         continue;
                     }
                 }
 
-                if ($property !== null) {
+                if ($hasProperty) {
                     $meta         = $metaMap[$elementName] ?? null;
                     $phpItemClass = $meta?->phpItemClass;
 
@@ -389,9 +381,9 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                             $denormalizedValue[] = $denormalizer->denormalize($item, $phpItemClass, 'json', $context);
                         }
                     } elseif ($this->denormalizer !== null && $meta !== null && $meta->propertyKind === 'primitive') {
-                        $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'json', $context, $metaMap);
+                        $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $resolvedType, $elementName, $value, 'json', $context, $metaMap);
                     } elseif ($this->denormalizer !== null) {
-                        $propertyType = $this->getPropertyType($property);
+                        $propertyType = $this->getPropertyType($resolvedType, $elementName);
                         if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                             // Captured before the cardinality guard, which PHPStan treats as impure.
                             $denormalizer = $this->denormalizer;
@@ -413,13 +405,13 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                         $denormalizedValue = $value;
                     }
 
-                    $property->setValue($object, $denormalizedValue);
+                    self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                 } else {
                     $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, UnknownInput::FORMAT_JSON, $object, $elementName);
                 }
             }
 
-            $this->applyPrimitiveExtensions($reflection, $object, $data, $metaMap, 'json', $context);
+            $this->applyPrimitiveExtensions($object, $data, $metaMap, 'json', $context);
 
             return $object;
         } catch (\ReflectionException $e) {

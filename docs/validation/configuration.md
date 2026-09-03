@@ -148,7 +148,7 @@ type of the element they apply to. It exposes `resolvePropertyType()` and `resol
 
 ```php
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
-use Ardenexal\FHIRTools\Component\Validation\NullFHIRTypeHierarchyResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\NullFHIRTypeHierarchyResolver;
 
 // Default resolver is used when typeResolver is omitted.
 $service = new FHIRValidationService(

@@ -6,7 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json;
 
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -47,7 +47,7 @@ class FHIRPrimitiveTypeJsonNormalizer extends AbstractFHIRNormalizer
             throw new InvalidArgumentException('Object is not a FHIR primitive type');
         }
 
-        return $this->normalizeForJSON($object, self::reflClass($object));
+        return $this->normalizeForJSON($object);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -96,17 +96,9 @@ class FHIRPrimitiveTypeJsonNormalizer extends AbstractFHIRNormalizer
         return ['object' => true];
     }
 
-    /**
-     * @param \ReflectionClass<object> $reflection
-     */
-    private function normalizeForJSON(object $object, \ReflectionClass $reflection): mixed
+    private function normalizeForJSON(object $object): mixed
     {
-        $value     = null;
-        $valueProp = self::reflProp($object, 'value');
-
-        if ($valueProp !== null && $valueProp->isInitialized($object)) {
-            $value = $valueProp->getValue($object);
-        }
+        $value = self::modelAccessor()->readInitializedValue($object, 'value');
 
         if ($value instanceof FHIRTemporalValue) {
             $value = (string) $value;

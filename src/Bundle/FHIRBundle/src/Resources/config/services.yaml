@@ -51,24 +51,29 @@ services:
         public: true
 
     # Serialization - Metadata
-    Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider: ~
+    Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider: ~
 
-    Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor:
+    Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor:
         arguments:
-            $propertyMetadataProvider: '@Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider'
+            $propertyMetadataProvider: '@Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider'
 
-    Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface:
-        alias: 'Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor'
+    Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor'
         public: true
 
     # Serialization - IG Type Registry (maps populated by FHIRIGRegistryCompilerPass at container build time)
     Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry: ~
 
     # Serialization - Type Resolver
-    Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver: ~
+    #
+    # Deliberately unversioned: this is the fallback for anything autowiring the interface outside a
+    # versioned serializer stack, and an unversioned resolver searches R4, then R4B, then R5. The
+    # per-version resolvers the stacks actually use are registered as fhir.type_resolver.{version} by
+    # FHIRVersionedSerializerPass -- referencing this service from a stack resolves every type to R4.
+    Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver: ~
 
-    Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface:
-        alias: 'Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver'
+    Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver'
 
     # Serialization - Context helpers
     Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory: ~
@@ -173,10 +178,10 @@ services:
 
     # Type hierarchy resolver — enables inheritance-aware extension context validation
     # (supertype and foreign-root type-path contexts). Monotonic: only removes false positives.
-    Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver: ~
+    Ardenexal\FHIRTools\Component\Metadata\Type\FhirPropertyTypeHierarchyResolver: ~
 
-    Ardenexal\FHIRTools\Component\Validation\FHIRTypeHierarchyResolverInterface:
-        alias: 'Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver'
+    Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeHierarchyResolverInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Metadata\Type\FhirPropertyTypeHierarchyResolver'
 
     # Narrative xhtml checker — reports which element/attribute breaks txt-1, not just that it broke.
     Ardenexal\FHIRTools\Component\Validation\NarrativeXhtmlChecker: ~
