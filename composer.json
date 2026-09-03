@@ -232,7 +232,7 @@
         "bench:serialization": "php ./vendor/bin/phpbench run bench/Serialization/ --report=aggregate",
         "bench:fhirpath": "php ./vendor/bin/phpbench run bench/FHIRPath/ --report=aggregate",
         "bench:baseline": "php ./vendor/bin/phpbench run bench/ --report=aggregate --store --tag=baseline",
-        "bench:regression": "php ./vendor/bin/phpbench run bench/ --report=compare --ref=baseline --assert=\"mode(variant.time.avg) < mode(baseline.time.avg) * 1.50\""
+        "bench:regression": "php ./vendor/bin/phpbench run bench/ --report=benchmark_compare --ref=baseline --assert=\"mode(variant.time.avg) < mode(baseline.time.avg) * 1.50\""
     },
     "extra": {
         "ai-mate": {

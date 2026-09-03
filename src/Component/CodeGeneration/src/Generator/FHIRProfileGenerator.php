@@ -82,7 +82,7 @@ class FHIRProfileGenerator
         $baseDefinitionUrl = $structureDefinition['baseDefinition'] ?? '';
         $kind              = $structureDefinition['kind']           ?? 'resource';
 
-        $className = $this->resolveProfileClassName($name, $kind);
+        $className = $this->resolveProfileClassName($url, $name);
 
         $class = new ClassType($className, $namespace);
         $class->addAttribute(FHIRProfile::class, [
@@ -541,10 +541,17 @@ class FHIRProfileGenerator
      *
      * Resources get a "Profile" suffix (e.g. AUCorePatientProfile).
      * Complex types also get "Profile" (e.g. AUCoreHumanNameProfile).
+     *
+     * The canonical URL is passed through because `name` is not unique within a package and
+     * {@see ClassNameResolver::DEFINITION_TO_CLASS_OVERRIDES} is keyed on the URL to settle exactly
+     * that. Passing the empty string here meant no profile could ever match an override, so a
+     * collision had no way to be resolved and the last definition written simply won -- by
+     * enumeration order, which differs between machines. R4B's five lipid profiles all declare
+     * `name: "Example Lipid Profile"`, so four of them were never generated at all.
      */
-    private function resolveProfileClassName(string $name, string $kind): string
+    private function resolveProfileClassName(string $url, string $name): string
     {
-        $base = ClassNameResolver::resolveClassName('', $name);
+        $base = ClassNameResolver::resolveClassName($url, $name);
 
         // If the IG already appended "Profile" to the name, avoid doubling it
         if (str_ends_with($base, 'Profile')) {
