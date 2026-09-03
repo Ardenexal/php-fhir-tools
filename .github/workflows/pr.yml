@@ -566,6 +566,11 @@ jobs:
             pull-requests: write
             contents: read
 
+        env:
+            # Defined once: the threshold phpbench asserts on and the one the PR
+            # comment explains have to be the same number.
+            REGRESSION_MULTIPLIER: '1.50'
+
         steps:
             -   uses: actions/checkout@v4
 
@@ -616,13 +621,20 @@ jobs:
                     # under `bash -e`, so a non-zero phpbench exit aborted the script before
                     # the output was ever written -- and an unset output compares unequal to
                     # '0', which reported every crash as a performance regression.
+                    # `ci_compare` has to be rendered by this run, not from the dump above:
+                    # the expression generator reads a single suite, so the baseline_* columns
+                    # only resolve where `--ref` attached one. phpbench keeps stdout to the
+                    # JSON alone -- even when the assertion fails -- and puts its own errors on
+                    # stderr, so the two streams separate cleanly into data and diagnosis.
                     exit_code=0
                     php ./vendor/bin/phpbench run bench/ \
-                        --report=benchmark_compare \
+                        --report=ci_compare \
+                        --output=json \
+                        --progress=none \
                         --ref=baseline \
-                        --assert="mode(variant.time.avg) < mode(baseline.time.avg) * 1.50" \
+                        --assert="mode(variant.time.avg) < mode(baseline.time.avg) * ${REGRESSION_MULTIPLIER}" \
                         --no-interaction \
-                        > results/regression.txt 2>&1 || exit_code=$?
+                        > results/regression.json 2> results/regression-error.txt || exit_code=$?
 
                     # phpbench exits 2 when an assertion fails, 1 when a subject threw or the
                     # tool itself could not run. Only 2 is a verdict about performance.
@@ -662,7 +674,9 @@ jobs:
                           baselineExists,
                           regressionStatus: '${{ steps.regression.outputs.status }}',
                           regressionExitCode: '${{ steps.regression.outputs.exit_code }}',
-                          regressionOutput: baselineExists ? readOrNull('results/regression.txt') : null,
+                          comparisonJson: baselineExists ? readOrNull('results/regression.json') : null,
+                          regressionError: baselineExists ? readOrNull('results/regression-error.txt') : null,
+                          regressionMultiplier: Number('${{ env.REGRESSION_MULTIPLIER }}'),
                           runUrl: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
                         });
 

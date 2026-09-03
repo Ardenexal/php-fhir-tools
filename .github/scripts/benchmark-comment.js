@@ -189,23 +189,93 @@ function renderTable(rows) {
 }
 
 /**
- * A collapsed block of preformatted text.
+ * A collapsed block wrapping markdown.
  *
  * The blank line after `</summary>` is load-bearing: without it GitHub treats
  * the following block as raw HTML content and stops rendering markdown inside
  * the `<details>`.
  */
+function renderMarkdownDetails(summary, lines) {
+    return ['<details>', `<summary>${summary}</summary>`, '', ...lines, '', '</details>'];
+}
+
+/**
+ * A collapsed block of preformatted text.
+ */
 function renderDetails(summary, preformatted) {
-    return [
-        '<details>',
-        `<summary>${summary}</summary>`,
-        '',
-        '```',
-        preformatted.replace(/```/g, "`` `"),
-        '```',
-        '',
-        '</details>',
-    ];
+    return renderMarkdownDetails(summary, ['```', preformatted.replace(/```/g, "`` `"), '```']);
+}
+
+/**
+ * Format a change against the baseline, given both readings.
+ *
+ * Rows at or over the threshold the workflow asserts on are the ones that fail
+ * the build, so they are marked; a change either side of which is noisier than
+ * the change itself is marked too, because it is not evidence of anything.
+ */
+function formatChange(current, baseline, rstdev, baselineRstdev, multiplier) {
+    if (
+        typeof current !== 'number' ||
+        typeof baseline !== 'number' ||
+        !Number.isFinite(current) ||
+        !Number.isFinite(baseline) ||
+        baseline === 0
+    ) {
+        return '—';
+    }
+
+    const percent = ((current - baseline) / baseline) * 100;
+    const arrow = percent > 0 ? '▲' : '▼';
+    let rendered = `${arrow} ${Math.abs(percent).toFixed(1)}%`;
+
+    if (typeof multiplier === 'number' && current >= baseline * multiplier) {
+        rendered = `${rendered} ❌`;
+    } else {
+        const noise = Math.max(
+            typeof rstdev === 'number' && Number.isFinite(rstdev) ? rstdev : 0,
+            typeof baselineRstdev === 'number' && Number.isFinite(baselineRstdev) ? baselineRstdev : 0,
+        );
+
+        if (Math.abs(percent) < noise) {
+            rendered = `${rendered} ≈`;
+        }
+    }
+
+    return rendered;
+}
+
+/**
+ * Render the baseline comparison as one markdown table per benchmark class.
+ */
+function renderComparison(rows, multiplier) {
+    const lines = [];
+
+    for (const { benchmark, rows: grouped } of groupByBenchmark(rows)) {
+        lines.push(
+            `#### ${benchmark}`,
+            '',
+            '| Subject | Mode | Baseline | Change | Mem peak | Baseline | RSD |',
+            '| :--- | ---: | ---: | ---: | ---: | ---: | ---: |',
+        );
+
+        for (const row of grouped) {
+            lines.push(
+                `| \`${row.subject ?? '—'}\` | ${formatTime(row.mode)} | ${formatTime(row.baseline_mode)} | ` +
+                    `${formatChange(row.mode, row.baseline_mode, row.rstdev, row.baseline_rstdev, multiplier)} | ` +
+                    `${formatMemory(row.mem_peak)} | ${formatMemory(row.baseline_mem_peak)} | ` +
+                    `${formatRstdev(row.rstdev)} |`,
+            );
+        }
+
+        lines.push('');
+    }
+
+    lines.push(
+        `❌ marks a subject at or over the ${multiplier ?? '?'}× threshold that fails the build; ` +
+            '≈ marks a change smaller than the noise in the readings it is drawn from.',
+    );
+
+    return lines;
 }
 
 /**
@@ -219,7 +289,9 @@ function renderDetails(summary, preformatted) {
  *     else for a check that did not produce a verdict
  * @param {string|null} input.regressionExitCode phpbench's exit code, quoted in the
  *     error case so the log is easier to find
- * @param {string|null} input.regressionOutput
+ * @param {string|null} input.comparisonJson    contents of the ci_compare JSON render
+ * @param {string|null} input.regressionError   phpbench's stderr from the check
+ * @param {number|null} input.regressionMultiplier the threshold the check asserts on
  * @param {string|null} input.runUrl            link back to the workflow run
  */
 function buildBody(input) {
@@ -229,7 +301,9 @@ function buildBody(input) {
         baselineExists = false,
         regressionStatus = null,
         regressionExitCode = null,
-        regressionOutput = null,
+        comparisonJson = null,
+        regressionError = null,
+        regressionMultiplier = null,
         runUrl = null,
     } = input;
 
@@ -295,8 +369,23 @@ function buildBody(input) {
             body.push(`> ${note}`, '');
         }
 
-        if (regressionOutput) {
-            body.push(...renderDetails('Comparison vs baseline', regressionOutput), '');
+        const comparison = parseRows(comparisonJson);
+
+        if (comparison !== null && comparison.length > 0) {
+            body.push(
+                ...renderMarkdownDetails(
+                    'Comparison vs baseline',
+                    renderComparison(comparison, regressionMultiplier),
+                ),
+                '',
+            );
+        }
+
+        // Only reached when the check produced no table of its own: phpbench
+        // writes the comparison to stdout and its failures to stderr, so this is
+        // the reason it could not run rather than a duplicate of the table.
+        if ((comparison === null || comparison.length === 0) && regressionError && regressionError.trim() !== '') {
+            body.push(...renderDetails('Why the check did not run', regressionError), '');
         }
     } else {
         body.push(
@@ -342,6 +431,7 @@ module.exports = {
     MARKER,
     NOISY_RSTDEV,
     buildBody,
+    formatChange,
     formatMemory,
     formatRstdev,
     formatTime,
@@ -434,7 +524,7 @@ if (require.main === module) {
     check('the run is linked', body.match(/\[workflow run\]\((.+?)\)/)?.[1] === RUN_URL);
     // Without this blank line GitHub renders the block as literal HTML.
     check('details blocks breathe', !/<\/summary>\n```/.test(body));
-    check('markdown survives inside details', body.split('<summary>').length === 3);
+    check('markdown survives inside details', body.split('<summary>').length === 2);
     check('the body fits GitHub\'s limit', body.length <= MAX_BODY);
 
     const noBaseline = buildBody({ summaryJson: FIXTURE, rawOutput: null, baselineExists: false });
@@ -461,6 +551,70 @@ if (require.main === module) {
         check(`a check with no verdict (${JSON.stringify(status)}) is not blamed on the PR`, !broken.includes('Regression detected'));
         check(`a check with no verdict (${JSON.stringify(status)}) names the exit code`, broken.includes('phpbench exited 1'));
     }
+
+    // Baseline comparison.
+    check('a slowdown reads as an increase', formatChange(150, 100, 1, 1, 1.5).startsWith('▲ 50.0%'));
+    check('a speedup reads as a decrease', formatChange(50, 100, 1, 1, 1.5).startsWith('▼ 50.0%'));
+    check('a change at the threshold is flagged', formatChange(150, 100, 1, 1, 1.5).endsWith('❌'));
+    check('a change under the threshold is not flagged', !formatChange(140, 100, 1, 1, 1.5).includes('❌'));
+    check('a change inside the noise is marked', formatChange(105, 100, 20, 1, 1.5).endsWith('≈'));
+    check('a change outside the noise is not marked', !formatChange(140, 100, 2, 1, 1.5).includes('≈'));
+    check('a missing baseline reading degrades', formatChange(100, null, 1, 1, 1.5) === '—');
+    check('a zero baseline does not divide', formatChange(100, 0, 1, 1, 1.5) === '—');
+
+    const COMPARISON = JSON.stringify([
+        {
+            benchmark: 'SerializationJsonBench',
+            subject: 'benchJsonSerializeBundle',
+            mode: 330,
+            baseline_mode: 300,
+            mem_peak: 23135080,
+            baseline_mem_peak: 22000000,
+            rstdev: 3.2,
+            baseline_rstdev: 2.9,
+        },
+        {
+            benchmark: 'FHIRPathParsingBench',
+            subject: 'benchParseSimple',
+            mode: 90,
+            baseline_mode: 15,
+            mem_peak: 2257632,
+            baseline_mem_peak: 2257632,
+            rstdev: 1.1,
+            baseline_rstdev: 1.2,
+        },
+    ]);
+
+    const compared = buildBody({
+        summaryJson: FIXTURE,
+        baselineExists: true,
+        regressionStatus: 'regressed',
+        regressionExitCode: '2',
+        comparisonJson: COMPARISON,
+        regressionMultiplier: 1.5,
+    });
+
+    check('the comparison is a markdown table', compared.includes('| Subject | Mode | Baseline | Change | Mem peak | Baseline | RSD |'));
+    check('the comparison groups by benchmark', compared.includes('#### FHIRPathParsingBench'));
+    check('a compared row renders', compared.includes('| `benchParseSimple` | 90.000 µs | 15.000 µs | ▲ 500.0% ❌ |'));
+    check('a within-threshold row is unflagged', compared.includes('| `benchJsonSerializeBundle` | 330.000 µs | 300.000 µs | ▲ 10.0% |'));
+    check('the threshold is explained', compared.includes('1.5× threshold'));
+    // The comparison is markdown, so it must not be inside a fenced block.
+    check('the comparison is not fenced', !/```\n\| Subject \| Mode \| Baseline/.test(compared));
+    check('markdown survives inside the comparison details', compared.split('<summary>').length === 2);
+
+    const comparisonMissing = buildBody({
+        summaryJson: FIXTURE,
+        baselineExists: true,
+        regressionStatus: 'error',
+        regressionExitCode: '1',
+        comparisonJson: null,
+        regressionError: 'No generator configuration named "typo" exists',
+        regressionMultiplier: 1.5,
+    });
+    check('a failed check explains itself', comparisonMissing.includes('Why the check did not run'));
+    check('a failed check quotes phpbench', comparisonMissing.includes('No generator configuration named "typo" exists'));
+    check('a failed check shows no comparison table', !comparisonMissing.includes('| Subject | Mode | Baseline |'));
 
     const brokenNoCode = buildBody({
         summaryJson: FIXTURE,
