@@ -6,5 +6,24 @@
     "storage.xml_storage_path": ".phpbench",
     "runner.iterations": [5],
     "runner.revs": [10],
-    "runner.warmup": 1
+    "runner.warmup": 1,
+    "report.generators": {
+        "ci_summary": {
+            "generator": "expression",
+            "title": "CI summary",
+            "description": "Unformatted columns for machine consumption. Rendered with --output=json and turned into markdown by .github/workflows/pr.yml; the JSON renderer drops any column that does not evaluate to a scalar, so keep these expressions free of display units (`as time`, `as memory`) and let the consumer format them.",
+            "cols": {
+                "benchmark": "first(benchmark_name)",
+                "subject": "first(subject_name)",
+                "set": "first(variant_name)",
+                "revs": "first(variant_revs)",
+                "its": "first(variant_iterations)",
+                "mem_peak": "max(result_mem_peak)",
+                "best": "min(result_time_avg)",
+                "mode": "mode(result_time_avg)",
+                "worst": "max(result_time_avg)",
+                "rstdev": "rstdev(result_time_avg)"
+            }
+        }
+    }
 }

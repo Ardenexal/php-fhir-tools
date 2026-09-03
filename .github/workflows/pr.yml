@@ -590,19 +590,51 @@ jobs:
                 id: bench
                 run: |
                     mkdir -p results
-                    php ./vendor/bin/phpbench run bench/ --report=aggregate --no-interaction > results/benchmarks.txt 2>&1 || true
+                    php ./vendor/bin/phpbench run bench/ \
+                        --report=aggregate \
+                        --progress=plain \
+                        --dump-file=results/suite.xml \
+                        --no-interaction > results/benchmarks.txt 2>&1 || true
+
+            # Re-renders the run dumped above rather than benchmarking again, so the
+            # markdown table and the raw log describe the same measurements and the
+            # suite is only executed once.
+            -   name: Render benchmark summary as JSON
+                if: ${{ !cancelled() }}
+                run: |
+                    php ./vendor/bin/phpbench report \
+                        --file=results/suite.xml \
+                        --report=ci_summary \
+                        --output=json \
+                        --no-interaction > results/benchmarks.json || true
 
             -   name: Assert no regression against baseline
                 id: regression
                 if: hashFiles('.phpbench/**/*.xml') != ''
                 run: |
+                    # `|| exit_code=$?` rather than reading `$?` on the next line: steps run
+                    # under `bash -e`, so a non-zero phpbench exit aborted the script before
+                    # the output was ever written -- and an unset output compares unequal to
+                    # '0', which reported every crash as a performance regression.
+                    exit_code=0
                     php ./vendor/bin/phpbench run bench/ \
                         --report=benchmark_compare \
                         --ref=baseline \
                         --assert="mode(variant.time.avg) < mode(baseline.time.avg) * 1.50" \
                         --no-interaction \
-                        > results/regression.txt 2>&1
-                    echo "exit_code=$?" >> $GITHUB_OUTPUT
+                        > results/regression.txt 2>&1 || exit_code=$?
+
+                    # phpbench exits 2 when an assertion fails, 1 when a subject threw or the
+                    # tool itself could not run. Only 2 is a verdict about performance.
+                    case "$exit_code" in
+                        0) status=passed ;;
+                        2) status=regressed ;;
+                        *) status=error ;;
+                    esac
+
+                    echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+                    echo "status=$status" >> "$GITHUB_OUTPUT"
+                    echo "phpbench exited ${exit_code} -> ${status}"
                 continue-on-error: true
 
             -   name: Comment PR with benchmark results
@@ -611,41 +643,62 @@ jobs:
                 with:
                     script: |
                         const fs = require('fs');
+                        // Body construction lives in a module so it can be run against a
+                        // recorded phpbench payload outside of CI.
+                        const { MARKER, buildBody } = require('${{ github.workspace }}/.github/scripts/benchmark-comment.js');
 
-                        let benchOutput = '';
-                        try {
-                            benchOutput = fs.readFileSync('results/benchmarks.txt', 'utf8');
-                        } catch (e) {
-                            benchOutput = 'Could not read benchmark output.';
-                        }
+                        const readOrNull = (path) => {
+                          try {
+                            return fs.readFileSync(path, 'utf8');
+                          } catch (error) {
+                            return null;
+                          }
+                        };
 
                         const baselineExists = '${{ hashFiles('.phpbench/**/*.xml') }}' !== '';
-                        let regressionSection = '';
+                        const commentBody = buildBody({
+                          summaryJson: readOrNull('results/benchmarks.json'),
+                          rawOutput: readOrNull('results/benchmarks.txt'),
+                          baselineExists,
+                          regressionStatus: '${{ steps.regression.outputs.status }}',
+                          regressionExitCode: '${{ steps.regression.outputs.exit_code }}',
+                          regressionOutput: baselineExists ? readOrNull('results/regression.txt') : null,
+                          runUrl: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+                        });
 
-                        if (baselineExists) {
-                            let regressionOutput = '';
-                            try {
-                                regressionOutput = fs.readFileSync('results/regression.txt', 'utf8');
-                            } catch (e) {
-                                regressionOutput = 'Could not read regression output.';
-                            }
-                            const passed = '${{ steps.regression.outputs.exit_code }}' === '0';
-                            const icon = passed ? '✅' : '❌';
-                            const label = passed ? 'Regression check passed' : 'Regression detected (>50% slower than baseline)';
-                            regressionSection = `\n### ${icon} ${label}\n\n<details>\n<summary>Comparison vs baseline</summary>\n\n\`\`\`\n${regressionOutput}\n\`\`\`\n</details>`;
+                        // Find this workflow's previous comment (by marker) and update it; else create one.
+                        const comments = await github.paginate(github.rest.issues.listComments, {
+                          issue_number: context.issue.number,
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          per_page: 100,
+                        });
+                        const prior = comments.find(
+                          (c) => c.user?.type === 'Bot' && c.body?.includes(MARKER),
+                        );
+
+                        if (prior) {
+                          await github.rest.issues.updateComment({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            comment_id: prior.id,
+                            body: commentBody,
+                          });
                         } else {
-                            regressionSection = '\n> No baseline stored yet. Run `composer bench:baseline` and commit `.phpbench/` to enable regression checks.';
-                        }
-
-                        const commentBody = `## Benchmark Results\n\n<details>\n<summary>Serialization + FHIRPath benchmarks</summary>\n\n\`\`\`\n${benchOutput}\n\`\`\`\n</details>\n${regressionSection}\n\n*Run \`composer bench\` locally for full results.*`;
-
-                        github.rest.issues.createComment({
+                          await github.rest.issues.createComment({
                             issue_number: context.issue.number,
                             owner: context.repo.owner,
                             repo: context.repo.repo,
-                            body: commentBody
-                        });
+                            body: commentBody,
+                          });
+                        }
 
-            -   name: Fail if regression detected
-                if: steps.regression.outputs.exit_code != '0' && hashFiles('.phpbench/**/*.xml') != ''
-                run: exit 1
+            -   name: Fail if the regression check did not pass
+                if: hashFiles('.phpbench/**/*.xml') != '' && steps.regression.outputs.status != 'passed'
+                run: |
+                    if [ "${{ steps.regression.outputs.status }}" = "regressed" ]; then
+                        echo "::error::Benchmarks are more than 50% slower than the stored baseline. See the comparison in the PR comment."
+                    else
+                        echo "::error::The regression check produced no verdict (phpbench exit ${{ steps.regression.outputs.exit_code }}). This is a harness failure, not a measured regression -- see the 'Assert no regression against baseline' step log."
+                    fi
+                    exit 1
