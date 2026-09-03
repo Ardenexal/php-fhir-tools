@@ -139,10 +139,16 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 return $resolvedType::fromSubExtensions($subExtensions, $id);
             }
 
-            $isBackboneElement = $this->structureKinds->declaredKindOf($type) === FHIRStructureKind::BackboneElement;
+            // Instantiate the RESOLVED type, not the declared one. Every gate below asks
+            // hasProperty($resolvedType, ...), and writeValue() is a silent no-op when the property
+            // is absent from the instance — so building the base class here passes each gate and
+            // then discards the value, losing an IG profile's or slice's own properties with no
+            // error. declaredKindOf reads only what the class itself declares, matching the
+            // getAttributes() call this replaced.
+            $isBackboneElement = $this->structureKinds->declaredKindOf($resolvedType) === FHIRStructureKind::BackboneElement;
             $object            = $isBackboneElement
-                ? $this->instantiateWithConstructorDefaults($type)
-                : $this->instantiateWithDefaults($type);
+                ? $this->instantiateWithConstructorDefaults($resolvedType)
+                : $this->instantiateWithDefaults($resolvedType);
 
             $metaMap = $this->getPropertyMetadataMap($object);
             $data    = $this->remapNamespacedElements($data, $metaMap, $object, $sourceElement);
