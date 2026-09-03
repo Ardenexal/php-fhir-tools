@@ -22,9 +22,14 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     /** @var array<class-string, array<string, PropertyMetadata>> */
     private array $cache = [];
 
+    /** Answers whether a class is a FHIR model at all, which the property map cannot. */
+    private FHIRStructureKindProviderInterface $structureKinds;
+
     public function __construct(
         private ?CacheItemPoolInterface $psrCache = null,
+        ?FHIRStructureKindProviderInterface $structureKinds = null,
     ) {
+        $this->structureKinds = $structureKinds ?? new FHIRStructureKindProvider();
     }
 
     /**
@@ -91,7 +96,13 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
      */
     public function isFhirModelClass(string $className): bool
     {
-        return $this->getPropertyMetadata($className) !== [];
+        // Read the structural marker, not the size of the property map. The map answers the empty
+        // array for three different situations, and testing it for emptiness -- which this method
+        // used to do -- collapses exactly the distinction the interface promises callers: a FHIR
+        // model that happens to declare no properties reported as "not a FHIR model". Every
+        // generated model declares at least one property today, so the two agreed in practice; they
+        // would stop agreeing the first time one did not, and silently.
+        return $this->structureKinds->inheritedKindOf($className) !== null;
     }
 
     /**
