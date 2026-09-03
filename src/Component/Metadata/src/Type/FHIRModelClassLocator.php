@@ -57,6 +57,8 @@ final class FHIRModelClassLocator implements FHIRModelClassLocatorInterface
                 static fn (string $kind): bool => isset(self::LAYOUT[$kind]),
             ));
 
+        $fhirVersion = self::normalizeVersion($fhirVersion);
+
         $key = $fhirTypeName . '|' . ($fhirVersion ?? '*') . '|' . implode(',', $wanted);
 
         if (!isset($this->cache[$key])) {
@@ -64,6 +66,40 @@ final class FHIRModelClassLocator implements FHIRModelClassLocatorInterface
         }
 
         return $this->cache[$key] ?: null;
+    }
+
+    /**
+     * Canonicalise a caller-supplied version, rejecting anything this locator cannot place.
+     *
+     * A named version scopes the search strictly, so an unrecognised string matches no namespace and
+     * every lookup answers null — which reads downstream as "this type has no ancestors" rather than
+     * "you passed a version that does not exist". That is the wrong failure: conformance answers
+     * silently flip to false and nothing reports why. FHIR versions are also commonly written as
+     * spec numbers (`4.0.1`, `5.0.0`) — a shape this project itself uses when reading packages — so
+     * the mistake is an easy one to make from a public entry point.
+     *
+     * Case is folded rather than rejected: PHP resolves namespaces case-insensitively, so `r4`
+     * already located the same classes as `R4`. Folding keeps that working and makes it deliberate.
+     *
+     * @param string|null $fhirVersion Caller-supplied version, or null for the unscoped search
+     *
+     * @return string|null The canonical spelling, or null when the caller supplied none
+     *
+     * @throws \InvalidArgumentException when the version is not one this locator can place
+     */
+    private static function normalizeVersion(?string $fhirVersion): ?string
+    {
+        if ($fhirVersion === null) {
+            return null;
+        }
+
+        foreach (self::VERSIONS as $known) {
+            if (strcasecmp($fhirVersion, $known) === 0) {
+                return $known;
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('Unknown FHIR version "%s"; expected one of %s. Spec version numbers such as "4.0.1" are not accepted here — pass the release label instead.', $fhirVersion, implode(', ', self::VERSIONS)));
     }
 
     /**

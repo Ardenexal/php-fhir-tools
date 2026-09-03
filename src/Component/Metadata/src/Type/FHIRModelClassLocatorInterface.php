@@ -28,14 +28,20 @@ interface FHIRModelClassLocatorInterface
      * types such as `Timing.repeat` — is not reachable through this method by that dotted name.
      *
      * @param string            $fhirTypeName Bare FHIR type name, e.g. 'Patient', 'Quantity', 'uri'
-     * @param string|null       $fhirVersion  'R4', 'R4B' or 'R5'. When given, the search is scoped
-     *                                        strictly to that version and a miss answers null rather
-     *                                        than falling through to another release. When null, the
-     *                                        versions are tried in R4, R4B, R5 order.
+     * @param string|null       $fhirVersion  'R4', 'R4B' or 'R5', matched without regard to case.
+     *                                        When given, the search is scoped strictly to that
+     *                                        version and a miss answers null rather than falling
+     *                                        through to another release. When null, the versions are
+     *                                        tried in R4, R4B, R5 order. Any other string throws:
+     *                                        scoping to a version that cannot exist would answer
+     *                                        null for every type, which callers read as "no such
+     *                                        type" rather than "no such version".
      * @param FHIRStructureKind ...$kinds     Structure kinds worth searching, in the order given.
      *                                        Empty means every kind this locator knows how to place.
      *
      * @return class-string|null
+     *
+     * @throws \InvalidArgumentException when $fhirVersion is neither null nor a known release label
      */
     public function locate(string $fhirTypeName, ?string $fhirVersion = null, FHIRStructureKind ...$kinds): ?string;
 }

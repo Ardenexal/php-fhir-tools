@@ -54,14 +54,20 @@ class FHIRPathService
      * @param string                 $expression  The FHIRPath expression to evaluate
      * @param mixed                  $resource    The FHIR resource or data to evaluate against
      * @param EvaluationContext|null $context     Optional evaluation context
-     * @param string|null            $fhirVersion Optional FHIR version hint ('R4', 'R4B', 'R5').
-     *                                            Stored in the evaluation context for use by FHIRPath
-     *                                            functions that need to create typed objects.
+     * @param string|null            $fhirVersion Optional FHIR version hint ('R4', 'R4B', 'R5', matched
+     *                                            without regard to case). Stored in the evaluation
+     *                                            context for use by FHIRPath functions that need to
+     *                                            create typed objects, and used to scope type lookups
+     *                                            to one release. Any other string is rejected.
      * @param bool                   $strictMode  when true, runtime semantic validation is enabled
      *
      * @return Collection The result collection
      *
-     * @throws FHIRPathException If the expression is invalid or evaluation fails
+     * @throws FHIRPathException         If the expression is invalid or evaluation fails
+     * @throws \InvalidArgumentException When $fhirVersion names no known release. Raised lazily, by
+     *                                   the first type lookup that needs to place a class, rather
+     *                                   than up front — so an expression that never consults the type
+     *                                   hierarchy evaluates without complaint.
      */
     public function evaluate(string $expression, mixed $resource, ?EvaluationContext $context = null, ?string $fhirVersion = null, bool $strictMode = false): Collection
     {
