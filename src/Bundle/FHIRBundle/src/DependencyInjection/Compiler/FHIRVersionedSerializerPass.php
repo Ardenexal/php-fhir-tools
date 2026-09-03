@@ -12,7 +12,6 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRVersionedSerializationServic
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver;
-use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRBackboneElementJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRComplexTypeJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRLogicalModelJsonNormalizer;

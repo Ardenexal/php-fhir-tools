@@ -14,7 +14,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FhirPropertyTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeHierarchyResolverInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
@@ -875,9 +874,18 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
         $allowed = [];
 
-        // Constructor-driven, like the reflection it replaces: the value slots are this class's own
-        // constructor parameters, not every `value…` property it inherits. Reading inherited ones
-        // would answer with the base extension's union instead of this extension's own slots.
+        // Metadata-driven, and the map DOES span the hierarchy: PropertyMetadataProvider merges every
+        // ancestor's constructor parameters, child overriding parent. That is safe here only because
+        // the inherited `value…` slot is the base extension's choice, which the isChoice test below
+        // discards -- not because the walk stops at this class. A base class gaining a non-choice
+        // `value…` parameter would widen `$allowed` for every subclass, so the filter is what keeps
+        // this correct, not the lookup.
+        //
+        // Reading the map rather than the constructor also drops the old `isPromoted()` requirement.
+        // The generator forwards `value…` to `parent::__construct()` instead of promoting it, so that
+        // check had been silently skipping the entire allowed-type test on 223 of 2144 generated
+        // extension classes; those are now checked. No class lost a check, and for the 1581 already
+        // checked the allowed set is unchanged.
         //
         // A choice slot is skipped deliberately. Its declared type is a union, and a union names no
         // single type to allow -- collapsing it to one member would allow that member and reject its

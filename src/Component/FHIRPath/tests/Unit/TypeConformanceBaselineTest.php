@@ -172,7 +172,9 @@ class TypeConformanceBaselineTest extends TestCase
         // unreachable; a derived walk reaches the whole chain.
         yield 'code is Element'        => ['code', 'Element', true];
 
-        // Negative control: a type the locator cannot place answers nothing at all.
+        // A placeable type whose chain simply does not reach `string`. NOT a locator-miss control:
+        // the locator resolves `xhtml` to XhtmlPrimitive (asserted below), and that class extends
+        // Element, so the ancestry is [Element]. The answer is false on the merits of the chain.
         yield 'xhtml is string'        => ['xhtml', 'string', false];
     }
 
