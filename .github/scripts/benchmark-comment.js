@@ -413,13 +413,14 @@ if (require.main === module) {
     check('an absent payload is detected', parseRows('') === null);
     check('rows group by benchmark', groupByBenchmark(JSON.parse(FIXTURE)).length === 2);
 
+    const RUN_URL = 'https://github.com/o/r/actions/runs/1';
     const body = buildBody({
         summaryJson: FIXTURE,
         rawOutput: 'raw phpbench console output',
         baselineExists: true,
         regressionStatus: 'passed',
         regressionOutput: 'baseline comparison',
-        runUrl: 'https://github.com/o/r/actions/runs/1',
+        runUrl: RUN_URL,
     });
 
     check('the marker leads the body', body.startsWith(MARKER));
@@ -428,7 +429,9 @@ if (require.main === module) {
     check('each benchmark gets a heading', body.includes('### FHIRPathParsingBench'));
     check('the noise warning is summarised', body.includes('1 reading above ±15% RSD'));
     check('a passing baseline check is reported', body.includes('✅ Regression check passed'));
-    check('the run is linked', body.includes('https://github.com/o/r/actions/runs/1'));
+    // Compares the href the footer actually emitted rather than looking for the
+    // URL anywhere in the body -- the raw log could contain it too.
+    check('the run is linked', body.match(/\[workflow run\]\((.+?)\)/)?.[1] === RUN_URL);
     // Without this blank line GitHub renders the block as literal HTML.
     check('details blocks breathe', !/<\/summary>\n```/.test(body));
     check('markdown survives inside details', body.split('<summary>').length === 3);
