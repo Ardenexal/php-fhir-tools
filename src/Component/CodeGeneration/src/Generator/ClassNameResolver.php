@@ -43,6 +43,16 @@ class ClassNameResolver
         'http://hl7.org/fhir/StructureDefinition/event-partOf' => 'EventPartOf',
         // Collides with timezone, both named `TimezoneCode`.
         'http://hl7.org/fhir/StructureDefinition/tz-code' => 'TzCode',
+
+        // The five lipid example profiles all declare `name: "Example Lipid Profile"`, so all five
+        // resolved to `ExampleLipidProfile` and only whichever the package enumerated last survived.
+        // `lipidprofile` keeps the plain name because it is the one already published under it and
+        // the only DiagnosticReport of the group; the four Observations take their URL slug. The
+        // generator appends the `Profile` suffix, so these are the names without it.
+        'http://hl7.org/fhir/StructureDefinition/cholesterol'    => 'Cholesterol',
+        'http://hl7.org/fhir/StructureDefinition/hdlcholesterol' => 'HdlCholesterol',
+        'http://hl7.org/fhir/StructureDefinition/ldlcholesterol' => 'LdlCholesterol',
+        'http://hl7.org/fhir/StructureDefinition/triglyceride'   => 'Triglyceride',
     ];
 
     /**
