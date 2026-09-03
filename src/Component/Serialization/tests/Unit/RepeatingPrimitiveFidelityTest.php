@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
-use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,7 +13,8 @@ use PHPUnit\Framework\TestCase;
  *
  * Two defects met on `Meta.profile` and both are asserted here at the level they were observable —
  * a document in, a document out — because both were invisible to every unit-level assertion in the
- * suite while they shipped.
+ * suite while they shipped. The classification half of the second one is pinned at its own level in
+ * `FHIRMetadataExtractorStructuralPredicatesTest`; what is asserted here is the output.
  *
  * @author Ardenexal
  */
@@ -125,27 +124,6 @@ class RepeatingPrimitiveFidelityTest extends TestCase
             [self::PROFILE_A],
             json_decode($service->serializeToJson($neverAsXml), true)['meta']['profile'],
         );
-    }
-
-    /**
-     * A primitive is classified the same way whichever structural question is asked first.
-     *
-     * `CanonicalPrimitive` carries `#[FHIRPrimitive]` itself and inherits `#[FHIRComplexType]` from
-     * `Element`, so both predicates walk to a positive answer independently. They shared one cache
-     * slot, so the first question asked won it and the answers contradicted each other by call
-     * order. A primitive is never a complex type; asking in either order must say so.
-     */
-    public function testPrimitiveClassificationDoesNotDependOnQuestionOrder(): void
-    {
-        $primitive = new CanonicalPrimitive(value: self::PROFILE_A);
-
-        $primitiveFirst = new FHIRMetadataExtractor();
-        self::assertTrue($primitiveFirst->isPrimitiveType($primitive));
-        self::assertFalse($primitiveFirst->isComplexType($primitive));
-
-        $complexFirst = new FHIRMetadataExtractor();
-        self::assertFalse($complexFirst->isComplexType($primitive));
-        self::assertTrue($complexFirst->isPrimitiveType($primitive));
     }
 
     /**

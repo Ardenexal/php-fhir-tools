@@ -107,29 +107,14 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
             return $cached;
         }
 
-        try {
-            // Walk the parent chain so that profile subclasses (e.g. AUBasePatientProfile
-            // extends PatientResource) inherit the #[FhirResource] attribute from their base.
-            $refl = new \ReflectionClass($object);
+        // Walks the parent chain, so a profile subclass (e.g. AUBasePatientProfile extends
+        // PatientResource) answers as the resource it profiles. #[FHIRProfile] is not a structural
+        // kind, so the subclass itself declares none and the walk continues to its base.
+        $isResource = $this->structureKinds->nearestKindAmong($object, FHIRStructureKind::Resource) !== null;
 
-            do {
-                if (!empty($refl->getAttributes(FhirResource::class))) {
-                    $this->cache->cacheStructureKindFlag($className, 'resource', true);
+        $this->cache->cacheStructureKindFlag($className, 'resource', $isResource);
 
-                    return true;
-                }
-
-                $refl = $refl->getParentClass();
-            } while ($refl !== false);
-
-            $this->cache->cacheStructureKindFlag($className, 'resource', false);
-
-            return false;
-        } catch (\ReflectionException) {
-            $this->cache->cacheStructureKindFlag($className, 'resource', false);
-
-            return false;
-        }
+        return $isResource;
     }
 
     /**
@@ -147,42 +132,31 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
 
         // A primitive is never a complex type, and that exclusion is the whole rule here.
         //
-        // Both attributes are genuinely present on a primitive: CanonicalPrimitive carries
-        // #[FHIRPrimitive] itself and inherits #[FHIRComplexType] from Element, two classes up. So
-        // the hierarchy walk below finds #[FHIRComplexType] and, left alone, answers true.
+        // Both markers are genuinely reachable from a primitive: CanonicalPrimitive carries
+        // #[FHIRPrimitive] itself and inherits #[FHIRComplexType] from Element, two classes up. A
+        // plain walk for #[FHIRComplexType] therefore answers true for every primitive.
         //
-        // It must not. FHIRComplexTypeJsonNormalizer gates supportsNormalization() on this
-        // predicate and is registered *ahead* of FHIRPrimitiveTypeJsonNormalizer, so answering true
-        // hands it every primitive object in the model -- which it then serializes as a complex
-        // object, `{"value": "..."}` where FHIR requires the bare `"..."`.
+        // It must not. FHIRComplexTypeJsonNormalizer gates supportsNormalization() on this predicate
+        // and is registered *ahead* of FHIRPrimitiveTypeJsonNormalizer, so answering true offers it
+        // every primitive object in the model, to serialize as `{"value": "..."}` where FHIR
+        // requires the bare `"..."`.
         //
-        // Backbone elements inherit #[FHIRComplexType] the same way and are deliberately NOT
-        // excluded: the complex normalizer has always claimed them and handles them internally
-        // (search: `$isBackboneElement` in FHIRComplexTypeJsonNormalizer), so excluding them here
-        // would reroute them to FHIRBackboneElementJsonNormalizer and change working behaviour.
-        try {
-            // Walk the parent class hierarchy: profile subclasses (e.g. AUIHIProfile extends Identifier)
-            // carry #[FHIRProfile] rather than #[FHIRComplexType], so we must check parent classes.
-            $isComplexType = false;
-            $r             = $this->isPrimitiveType($object) ? false : new \ReflectionClass($object);
+        // nearestKindAmong() is the shape of this question: it walks upward like the old hand-rolled
+        // loop -- profile subclasses (e.g. AUIHIProfile extends Identifier) declare #[FHIRProfile]
+        // rather than a structural marker, so the parent chain is what carries the answer -- while
+        // stopping at whichever of the two kinds is reached first. Backbone elements are deliberately
+        // still complex types: BackboneElement is not a kind this asks for, so the walk passes
+        // through it to Element, and FHIRComplexTypeJsonNormalizer keeps claiming them and handling
+        // them internally (search: `$isBackboneElement` there) as it always has.
+        $isComplexType = $this->structureKinds->nearestKindAmong(
+            $object,
+            FHIRStructureKind::ComplexType,
+            FHIRStructureKind::PrimitiveType,
+        ) === FHIRStructureKind::ComplexType;
 
-            while ($r !== false) {
-                if (!empty($r->getAttributes(FHIRComplexType::class))) {
-                    $isComplexType = true;
-                    break;
-                }
+        $this->cache->cacheStructureKindFlag($className, 'complex-type', $isComplexType);
 
-                $r = $r->getParentClass();
-            }
-
-            $this->cache->cacheStructureKindFlag($className, 'complex-type', $isComplexType);
-
-            return $isComplexType;
-        } catch (\ReflectionException) {
-            $this->cache->cacheStructureKindFlag($className, 'complex-type', false);
-
-            return false;
-        }
+        return $isComplexType;
     }
 
     /**
@@ -198,30 +172,13 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
             return $cached;
         }
 
-        try {
-            // Walk the parent class hierarchy: generated "Type" wrappers (e.g. NarrativeStatusType)
-            // extend CodePrimitive which carries the #[FHIRPrimitive] attribute.
-            $reflection  = new \ReflectionClass($object);
-            $isPrimitive = false;
-            $r           = $reflection;
+        // Walks the parent chain, so a generated "Type" wrapper (e.g. NarrativeStatusType extends
+        // CodePrimitive) answers as the primitive it narrows.
+        $isPrimitive = $this->structureKinds->nearestKindAmong($object, FHIRStructureKind::PrimitiveType) !== null;
 
-            do {
-                if (!empty($r->getAttributes(FHIRPrimitive::class))) {
-                    $isPrimitive = true;
-                    break;
-                }
+        $this->cache->cacheStructureKindFlag($className, 'primitive-type', $isPrimitive);
 
-                $r = $r->getParentClass();
-            } while ($r !== false);
-
-            $this->cache->cacheStructureKindFlag($className, 'primitive-type', $isPrimitive);
-
-            return $isPrimitive;
-        } catch (\ReflectionException) {
-            $this->cache->cacheStructureKindFlag($className, 'primitive-type', false);
-
-            return false;
-        }
+        return $isPrimitive;
     }
 
     /**
@@ -237,19 +194,15 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
             return $cached;
         }
 
-        try {
-            $reflection = new \ReflectionClass($object);
-            $attributes = $reflection->getAttributes(FHIRBackboneElement::class);
-            $isBackbone = !empty($attributes);
+        // Declared only, deliberately: unlike the other three this does not walk the chain, because a
+        // profile of a backbone element is a different structural case rather than the same one seen
+        // through a subclass. declaredKindOf() is the reading that matches the bare getAttributes()
+        // call this replaces.
+        $isBackbone = $this->structureKinds->declaredKindOf($object) === FHIRStructureKind::BackboneElement;
 
-            $this->cache->cacheStructureKindFlag($className, 'backbone-element', $isBackbone);
+        $this->cache->cacheStructureKindFlag($className, 'backbone-element', $isBackbone);
 
-            return $isBackbone;
-        } catch (\ReflectionException) {
-            $this->cache->cacheStructureKindFlag($className, 'backbone-element', false);
-
-            return false;
-        }
+        return $isBackbone;
     }
 
     /**

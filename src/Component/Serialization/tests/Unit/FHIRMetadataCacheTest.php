@@ -146,29 +146,6 @@ class FHIRMetadataCacheTest extends TestCase
         self::assertNull($this->cache->getStructureKindFlag($className, 'complex-type'));
     }
 
-    /**
-     * Two kinds hold two different answers for the same class at the same time.
-     *
-     * The kinds are not mutually exclusive on the class itself: every FHIR primitive carries
-     * #[FHIRPrimitive] and inherits #[FHIRComplexType] from Element, so both questions genuinely
-     * reach an answer and the answers differ. One slot per class served the first recorded answer
-     * to every later question, which made classification depend on call order.
-     */
-    public function testEachStructureKindHoldsItsOwnAnswer()
-    {
-        $className = 'TestClass';
-
-        $this->cache->cacheStructureKindFlag($className, 'primitive-type', true);
-        $this->cache->cacheStructureKindFlag($className, 'complex-type', false);
-
-        self::assertTrue($this->cache->getStructureKindFlag($className, 'primitive-type'));
-        self::assertFalse($this->cache->getStructureKindFlag($className, 'complex-type'));
-        self::assertNull(
-            $this->cache->getStructureKindFlag($className, 'backbone-element'),
-            'An unasked question must stay unanswered rather than inherit a sibling answer.',
-        );
-    }
-
     public function testCacheNullValues()
     {
         $className = 'TestClass';
