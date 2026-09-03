@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
+namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -134,27 +134,21 @@ trait LogicalModelLocatorTrait
     /**
      * Find the ancestor of `$class` whose declared #[LogicalModel] carries `$url`.
      *
-     * @param \ReflectionClass<object> $class Class to search upwards from
-     * @param string                   $url   Canonical URL of the refined StructureDefinition
+     * @param class-string $class Class to search upwards from
+     * @param string       $url   Canonical URL of the refined StructureDefinition
      *
-     * @return array{0: \ReflectionClass<object>, 1: LogicalModel}|null The refined type's class and
-     *                                                                  attribute, or null when no
-     *                                                                  ancestor declares that URL
+     * @return array{0: class-string, 1: LogicalModel}|null The refined type's class name and
+     *                                                      attribute, or null when no ancestor
+     *                                                      declares that URL
      */
-    private static function ancestorDeclaring(\ReflectionClass $class, string $url): ?array
+    private static function ancestorDeclaring(string $class, string $url): ?array
     {
-        for ($parent = $class->getParentClass(); $parent !== false; $parent = $parent->getParentClass()) {
+        for ($parent = get_parent_class($class); $parent !== false; $parent = get_parent_class($parent)) {
             // Declared attributes only: an inherited one would report the grandparent's URL as this
             // parent's and stop the walk a level early.
-            $attributes = $parent->getAttributes(LogicalModel::class);
+            $model = self::declaredLogicalModel($parent);
 
-            if ($attributes === []) {
-                continue;
-            }
-
-            $model = $attributes[0]->newInstance();
-
-            if ($model->url === $url) {
+            if ($model !== null && $model->url === $url) {
                 return [$parent, $model];
             }
         }
@@ -163,38 +157,54 @@ trait LogicalModelLocatorTrait
     }
 
     /**
+     * The #[LogicalModel] declared directly on `$class`, ignoring anything inherited.
+     *
+     * This is the one place the trait touches reflection. It is kept to a single call taking a class
+     * name and returning an attribute instance, so no reflection handle is ever passed between
+     * methods or handed back to a caller — the boundary rule this consolidation exists to enforce.
+     *
+     * @param class-string $class Class to read the declared attribute from
+     *
+     * @return LogicalModel|null The attribute this class declares itself, or null when it declares none
+     */
+    private static function declaredLogicalModel(string $class): ?LogicalModel
+    {
+        try {
+            $attributes = (new \ReflectionClass($class))->getAttributes(LogicalModel::class);
+        } catch (\ReflectionException) {
+            return null;
+        }
+
+        return $attributes === [] ? null : $attributes[0]->newInstance();
+    }
+
+    /**
      * The class declaring the nearest #[LogicalModel] in the subject's hierarchy, with that
      * attribute — or null when there is none.
      *
      * @param object|class-string|string $subject An instance or fully-qualified class name
      *
-     * @return array{0: \ReflectionClass<object>, 1: LogicalModel}|null The declaring class paired with
-     *                                                                  its attribute, so callers can keep
-     *                                                                  walking the chain from where the
-     *                                                                  attribute was actually found
+     * @return array{0: class-string, 1: LogicalModel}|null The declaring class name paired with its
+     *                                                      attribute, so callers can keep walking the
+     *                                                      chain from where the attribute was actually
+     *                                                      found
      */
     private function locateLogicalModel(object|string $subject): ?array
     {
-        if (is_string($subject) && !class_exists($subject)) {
+        $class = is_object($subject) ? $subject::class : $subject;
+
+        if (!class_exists($class)) {
             return null;
         }
 
-        try {
-            $refl = new \ReflectionClass($subject);
+        for ($current = $class; $current !== false; $current = get_parent_class($current)) {
+            $model = self::declaredLogicalModel($current);
 
-            do {
-                $attributes = $refl->getAttributes(LogicalModel::class);
-
-                if ($attributes !== []) {
-                    return [$refl, $attributes[0]->newInstance()];
-                }
-
-                $refl = $refl->getParentClass();
-            } while ($refl !== false);
-
-            return null;
-        } catch (\ReflectionException) {
-            return null;
+            if ($model !== null) {
+                return [$current, $model];
+            }
         }
+
+        return null;
     }
 }

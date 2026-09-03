@@ -8,6 +8,8 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
@@ -26,6 +28,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 final class FHIRPathInvariantValidator extends ConstraintValidator
 {
+    private static ?FHIRAttributeReaderInterface $sharedAttributes = null;
+
     /**
      * @param bool $reportBestPractice Whether to evaluate constraints marked
      *                                 `elementdefinition-bestpractice`. Off by default, matching the
@@ -192,13 +196,20 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
      */
     private static function isResource(object $value): bool
     {
-        for ($class = new \ReflectionClass($value); $class !== false; $class = $class->getParentClass()) {
-            if ($class->getAttributes(FhirResource::class) !== []) {
-                return true;
-            }
-        }
+        return self::attributes()->declaresInHierarchy($value, FhirResource::class);
+    }
 
-        return false;
+    /**
+     * The shared attribute reader.
+     *
+     * This call site is static and is reached from paths that never see a constructor, so it shares
+     * one reader rather than taking an injected one — the same arrangement `AbstractFHIRNormalizer`
+     * uses for the identical reason. Its caches are derived from generated class shape, so two
+     * instances could not disagree.
+     */
+    private static function attributes(): FHIRAttributeReaderInterface
+    {
+        return self::$sharedAttributes ??= new FHIRAttributeReader();
     }
 
     /**

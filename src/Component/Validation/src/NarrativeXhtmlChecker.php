@@ -8,6 +8,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 
 /**
  * Checks every `xhtml`-typed value in a resource tree (in practice `Narrative.div`) and reports
@@ -41,6 +45,12 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
  */
 final class NarrativeXhtmlChecker
 {
+    public function __construct(
+        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
+    ) {
+    }
+
     private const string XMLNS_NS = 'http://www.w3.org/2000/xmlns/';
 
     private const string TXT_1 = "Constraint failed: txt-1: 'The narrative SHALL contain only the basic html formatting elements and attributes described in chapters 7-11 (except section 4 of chapter 9) and 15 of the HTML 4.0 standard, <a> elements (either name or href), images and internally contained style attributes'";
@@ -137,7 +147,6 @@ final class NarrativeXhtmlChecker
 
         $visited[$id] = true;
         $violations   = [];
-        $ref          = new \ReflectionClass($node);
 
         // Logical models (CDA) are not walked. Their narrative is a StrucDoc markup tree, not
         // XHTML: it carries several top-level nodes rather than one wrapping div, and its vocabulary
@@ -146,22 +155,22 @@ final class NarrativeXhtmlChecker
         // a spurious "malformed XHTML" from the extra top-level nodes, txt-1 for `paragraph`, and
         // txt-2 claiming there was no content at all. CDA narrative conformance is a separate
         // concern and is not implemented here.
-        if ($ref->getAttributes(LogicalModel::class) !== []) {
+        if ($this->attributes->classAttributes($node, LogicalModel::class) !== []) {
             return [];
         }
 
-        foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
-            if ($prop->isInitialized($node) === false) {
+        foreach ($this->models->publicPropertyNames($node) as $name) {
+            if (!$this->models->isPropertyInitialized($node, $name)) {
                 continue;
             }
 
-            $value   = $prop->getValue($node);
-            $subPath = $path === '' ? $prop->getName() : $path . '.' . $prop->getName();
+            $value   = $this->models->readInitializedValue($node, $name);
+            $subPath = $path === '' ? $name : $path . '.' . $name;
 
-            if ($this->isXhtmlProperty($prop)) {
+            if ($this->isXhtmlProperty($node, $name)) {
                 $xhtml = $this->readXhtml($value);
                 if ($xhtml !== null) {
-                    foreach ($this->checkXhtml($xhtml, $subPath, $this->fhirVersionOf($ref)) as $v) {
+                    foreach ($this->checkXhtml($xhtml, $subPath, $this->fhirVersionOf($node)) as $v) {
                         $violations[] = $v;
                     }
                 }
@@ -343,10 +352,15 @@ final class NarrativeXhtmlChecker
         return false;
     }
 
-    private function isXhtmlProperty(\ReflectionProperty $property): bool
+    /**
+     * Reads a *property* attribute, which resolves through the declaring class. That is what makes
+     * this test profile-safe without the checker knowing anything about profiles, and it is the
+     * semantics being preserved rather than an incidental detail.
+     */
+    private function isXhtmlProperty(object $owner, string $property): bool
     {
-        foreach ($property->getAttributes(FhirProperty::class) as $attribute) {
-            if ($attribute->newInstance()->fhirType === 'xhtml') {
+        foreach ($this->attributes->propertyAttributes($owner, $property, FhirProperty::class) as $attribute) {
+            if ($attribute->fhirType === 'xhtml') {
                 return true;
             }
         }
@@ -370,8 +384,10 @@ final class NarrativeXhtmlChecker
             return null;
         }
 
-        foreach ((new \ReflectionClass($value))->getAttributes(FHIRPrimitive::class) as $attribute) {
-            if ($attribute->newInstance()->primitiveType !== 'xhtml') {
+        // Concrete class only, matching the raw reflection. An ancestor walk would let a subclass of
+        // an xhtml wrapper be read as narrative markup where it currently is not.
+        foreach ($this->attributes->classAttributes($value, FHIRPrimitive::class) as $attribute) {
+            if ($attribute->primitiveType !== 'xhtml') {
                 continue;
             }
 
@@ -381,11 +397,10 @@ final class NarrativeXhtmlChecker
         return null;
     }
 
-    /** @param \ReflectionClass<object> $class */
-    private function fhirVersionOf(\ReflectionClass $class): string
+    private function fhirVersionOf(object $node): string
     {
-        foreach ($class->getAttributes(FHIRComplexType::class) as $attribute) {
-            return $attribute->newInstance()->fhirVersion;
+        foreach ($this->attributes->classAttributes($node, FHIRComplexType::class) as $attribute) {
+            return $attribute->fhirVersion;
         }
 
         return 'R4';

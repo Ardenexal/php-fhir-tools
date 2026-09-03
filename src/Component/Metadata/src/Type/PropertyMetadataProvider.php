@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
+namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Psr\Cache\CacheItemPoolInterface;
@@ -22,17 +22,35 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     /** @var array<class-string, array<string, PropertyMetadata>> */
     private array $cache = [];
 
+    /** Answers whether a class is a FHIR model at all, which the property map cannot. */
+    private FHIRStructureKindProviderInterface $structureKinds;
+
     public function __construct(
         private ?CacheItemPoolInterface $psrCache = null,
+        ?FHIRStructureKindProviderInterface $structureKinds = null,
     ) {
+        $this->structureKinds = $structureKinds ?? new FHIRStructureKindProvider();
     }
 
     /**
+     * Identifies the shape of the cached payload, not its content.
+     *
+     * A warm PSR-6 pool outlives a deployment, and the entries it holds are serialized objects whose
+     * class names are part of that payload. The read guard is a bare array check, so a pool warmed
+     * before this component moved namespaces would be served straight back as the old shape rather
+     * than rejected. Bump this whenever the cached structure changes -- a namespace move counts.
+     */
+    private const string CACHE_SCHEMA = 'metadata-type-v2';
+
+    /**
      * Returns the canonical PSR-6 cache key for a FHIR model class.
+     *
+     * The schema token is part of the key rather than part of the value, so entries written by an
+     * older shape become unreachable instead of being read back and misinterpreted.
      */
     public static function cacheKey(string $className): string
     {
-        return 'fhir.property_metadata.' . hash('sha256', $className);
+        return 'fhir.property_metadata.' . self::CACHE_SCHEMA . '.' . hash('sha256', $className);
     }
 
     /**
@@ -71,6 +89,20 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
         }
 
         return $metadata;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isFhirModelClass(string $className): bool
+    {
+        // Read the structural marker, not the size of the property map. The map answers the empty
+        // array for three different situations, and testing it for emptiness -- which this method
+        // used to do -- collapses exactly the distinction the interface promises callers: a FHIR
+        // model that happens to declare no properties reported as "not a FHIR model". Every
+        // generated model declares at least one property today, so the two agreed in practice; they
+        // would stop agreeing the first time one did not, and silently.
+        return $this->structureKinds->inheritedKindOf($className) !== null;
     }
 
     /**

@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 
 /**
  * Reports a relative `Reference.reference` that names a resource the Bundle holds, but which the
@@ -69,6 +73,12 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
  */
 final class BundleReferenceResolutionChecker
 {
+    public function __construct(
+        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
+    ) {
+    }
+
     /** Identifies the root resource we apply to, read from the class attribute. */
     private const string BUNDLE = 'Bundle';
 
@@ -133,7 +143,7 @@ final class BundleReferenceResolutionChecker
      */
     public function check(object $resource): array
     {
-        if ($this->resourceType(new \ReflectionClass($resource)) !== self::BUNDLE) {
+        if ($this->resourceType($resource) !== self::BUNDLE) {
             return [];
         }
 
@@ -175,20 +185,8 @@ final class BundleReferenceResolutionChecker
      */
     private function entries(object $bundle): array
     {
-        $ref = new \ReflectionClass($bundle);
-
-        if (!$ref->hasProperty('entry')) {
-            return [];
-        }
-
-        $property = $ref->getProperty('entry');
-
         // Deserializers bypass the constructor, so an absent field is uninitialized rather than null.
-        if (!$property->isPublic() || !$property->isInitialized($bundle)) {
-            return [];
-        }
-
-        $value = $property->getValue($bundle);
+        $value = $this->readPublic($bundle, 'entry');
 
         if (!is_array($value)) {
             return [];
@@ -206,7 +204,7 @@ final class BundleReferenceResolutionChecker
             $entries[$index] = [
                 'fullUrl'  => $this->readString($entry, 'fullUrl'),
                 'resource' => $resource,
-                'type'     => $resource === null ? null : $this->resourceType(new \ReflectionClass($resource)),
+                'type'     => $resource === null ? null : $this->resourceType($resource),
                 'id'       => $resource === null ? null : $this->readString($resource, 'id'),
             ];
         }
@@ -231,26 +229,25 @@ final class BundleReferenceResolutionChecker
         }
 
         $visited[$id] = true;
-        $ref          = new \ReflectionClass($node);
 
-        if ($this->isReference($ref)) {
+        if ($this->isReference($node)) {
             $found[$path] = $node;
 
             return $found;
         }
 
-        foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-            if ($property->isInitialized($node) === false) {
+        foreach ($this->models->publicPropertyNames($node) as $name) {
+            if (!$this->models->isPropertyInitialized($node, $name)) {
                 continue;
             }
 
             // Contained resources resolve by their own rules, never against the bundle's entries.
-            if ($property->getName() === 'contained') {
+            if ($name === 'contained') {
                 continue;
             }
 
-            $value   = $property->getValue($node);
-            $subPath = $path . '.' . $property->getName();
+            $value   = $this->models->readInitializedValue($node, $name);
+            $subPath = $path . '.' . $name;
 
             if (is_object($value)) {
                 $found = $this->references($value, $subPath, $visited, $found);
@@ -368,19 +365,7 @@ final class BundleReferenceResolutionChecker
     /** Read a string-ish property, which may be a primitive wrapper, a bare string, or absent. */
     private function readString(object $node, string $property): ?string
     {
-        $ref = new \ReflectionClass($node);
-
-        if (!$ref->hasProperty($property)) {
-            return null;
-        }
-
-        $reflected = $ref->getProperty($property);
-
-        if (!$reflected->isPublic() || !$reflected->isInitialized($node)) {
-            return null;
-        }
-
-        $value = $reflected->getValue($node);
+        $value = $this->readPublic($node, $property);
 
         if (is_string($value)) {
             return $value === '' ? null : $value;
@@ -397,60 +382,61 @@ final class BundleReferenceResolutionChecker
 
     private function readObject(object $node, string $property): ?object
     {
-        $ref = new \ReflectionClass($node);
-
-        if (!$ref->hasProperty($property)) {
-            return null;
-        }
-
-        $reflected = $ref->getProperty($property);
-
-        if (!$reflected->isPublic() || !$reflected->isInitialized($node)) {
-            return null;
-        }
-
-        $value = $reflected->getValue($node);
+        $value = $this->readPublic($node, $property);
 
         return is_object($value) ? $value : null;
     }
 
     /**
-     * @param \ReflectionClass<object> $ref
+     * A public property's value, or null when it is absent, non-public or never written.
+     *
+     * Membership of the public-name list covers both "declared" and "public"; an uninitialized
+     * property holds nothing, and reading it directly would throw rather than answer.
      */
-    private function resourceType(\ReflectionClass $ref): ?string
+    private function readPublic(object $node, string $property): mixed
     {
-        $key = $ref->getName();
+        if (!in_array($property, $this->models->publicPropertyNames($node), true)) {
+            return null;
+        }
+
+        if (!$this->models->isPropertyInitialized($node, $property)) {
+            return null;
+        }
+
+        return $this->models->readInitializedValue($node, $property);
+    }
+
+    private function resourceType(object $node): ?string
+    {
+        $key = $node::class;
 
         if (array_key_exists($key, $this->resourceTypes)) {
             return $this->resourceTypes[$key];
         }
 
         $type       = null;
-        $attributes = $ref->getAttributes(FhirResource::class);
+        $attributes = $this->attributes->classAttributes($node, FhirResource::class);
 
         if ($attributes !== []) {
-            $type = $attributes[0]->newInstance()->type;
+            $type = $attributes[0]->getResourceType();
         }
 
         return $this->resourceTypes[$key] = $type;
     }
 
-    /**
-     * @param \ReflectionClass<object> $ref
-     */
-    private function isReference(\ReflectionClass $ref): bool
+    private function isReference(object $node): bool
     {
-        $key = $ref->getName();
+        $key = $node::class;
 
         if (isset($this->isReference[$key])) {
             return $this->isReference[$key];
         }
 
         $is         = false;
-        $attributes = $ref->getAttributes(FHIRComplexType::class);
+        $attributes = $this->attributes->classAttributes($node, FHIRComplexType::class);
 
         if ($attributes !== []) {
-            $is = $attributes[0]->newInstance()->typeName === self::REFERENCE;
+            $is = $attributes[0]->typeName === self::REFERENCE;
         }
 
         return $this->isReference[$key] = $is;

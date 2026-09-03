@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json;
 
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\LogicalModelLocatorTrait;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\LogicalModelLocatorTrait;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -46,7 +46,7 @@ class FHIRLogicalModelJsonNormalizer extends AbstractFHIRNormalizer
      */
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $name = is_object($object) ? (new \ReflectionClass($object))->getShortName() : gettype($object);
+        $name = is_object($object) ? substr((string) strrchr('\\' . $object::class, '\\'), 1) : gettype($object);
 
         throw new InvalidArgumentException(sprintf('CDA logical model "%s" cannot be serialized to JSON: CDA/HL7 V3 is an XML-only format. Use serializeToXml() instead.', $name));
     }

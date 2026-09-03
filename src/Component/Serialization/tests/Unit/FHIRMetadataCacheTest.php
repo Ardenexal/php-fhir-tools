@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRBackboneElementMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRComplexTypeMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataCache;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRPrimitiveTypeMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRResourceMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRBackboneElementMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRComplexTypeMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataCache;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRPrimitiveTypeMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRResourceMetadata;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 
 /**
@@ -131,19 +131,19 @@ class FHIRMetadataCacheTest extends TestCase
         self::assertSame($fhirVersion, $this->cache->getFHIRVersionMetadata($className));
     }
 
-    public function testStructureTypeMetadataCaching()
+    public function testStructureKindFlagCaching()
     {
-        $className     = 'TestClass';
-        $structureType = 'resource';
+        $className = 'TestClass';
 
         // Initially should return null
-        self::assertNull($this->cache->getStructureTypeMetadata($className));
+        self::assertNull($this->cache->getStructureKindFlag($className, 'resource'));
 
-        // Cache the structure type
-        $this->cache->cacheStructureTypeMetadata($className, $structureType);
+        // Cache the answer for one kind
+        $this->cache->cacheStructureKindFlag($className, 'resource', true);
 
-        // Should return the cached type
-        self::assertSame($structureType, $this->cache->getStructureTypeMetadata($className));
+        // Should return the cached answer, and only for the kind that was asked
+        self::assertTrue($this->cache->getStructureKindFlag($className, 'resource'));
+        self::assertNull($this->cache->getStructureKindFlag($className, 'complex-type'));
     }
 
     public function testCacheNullValues()
@@ -154,13 +154,16 @@ class FHIRMetadataCacheTest extends TestCase
         $this->cache->cacheResourceMetadata($className, null);
         $this->cache->cacheFHIRTypeMetadata($className, null);
         $this->cache->cacheFHIRVersionMetadata($className, null);
-        $this->cache->cacheStructureTypeMetadata($className, null);
 
         // Should return null but be cached (not missing)
         self::assertNull($this->cache->getResourceMetadata($className));
         self::assertNull($this->cache->getFHIRTypeMetadata($className));
         self::assertNull($this->cache->getFHIRVersionMetadata($className));
-        self::assertNull($this->cache->getStructureTypeMetadata($className));
+
+        // Structure kinds are the exception: a recorded "no" is false rather than null, which is
+        // what makes a negative answer memoize instead of reading back as a miss.
+        $this->cache->cacheStructureKindFlag($className, 'resource', false);
+        self::assertFalse($this->cache->getStructureKindFlag($className, 'resource'));
     }
 
     public function testInvalidateCache()

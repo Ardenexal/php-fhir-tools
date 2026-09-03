@@ -26,7 +26,11 @@ Serialization component           ← reflects PHP 8 attributes to build metadat
 JSON / XML payloads               ← FHIRSerializationService encode/decode
 ```
 
-FHIRPath evaluation is orthogonal: `FHIRPathService` accepts a compiled expression and a PHP FHIR model object, walks object properties via reflection, and returns a `Collection`.
+FHIRPath evaluation is orthogonal: `FHIRPathService` accepts a compiled expression and a PHP FHIR model object, walks its properties, and returns a `Collection`.
+
+FHIRPath asks the Metadata component what a class is and what it holds rather than reflecting on it. Property maps come from `PropertyMetadataProviderInterface`, structure kinds and primitive attributes from `FHIRStructureKindProviderInterface`, class attributes from `FHIRAttributeReaderInterface`, and a FHIR type name resolves to a generated class through `FHIRModelClassLocatorInterface` — which takes the FHIR version, since the same type name exists in every release. The reflection FHIRPath still performs is confined to per-instance state probes ("has this typed slot been assigned on this object"), which no per-class registry can answer; `bin/reflection-exemptions.txt` lists them and `bin/reflection-gate.sh` counts anything else.
+
+What remains hand-written in `FHIRPath\Type\FHIRTypeResolver` is FHIRPath language semantics, not model facts: `SYSTEM_TYPE_MAP`, the operator rules, and the FHIR-primitive-to-PHP-type mapping, which deliberately disagrees with the models because `decimal` is stored as a string to preserve precision and FHIRPath wants the numeric type. Type conformance reads `FHIRTypeAncestryProviderInterface` and primitive membership reads `FHIRModelClassLocatorInterface`, so both follow the generated models. Ancestry and layout are per-version, which is why both take a FHIR version and why `FHIRVersionedSerializerPass` gives each serializer stack its own `fhir.type_resolver.{version}`.
 
 ## Operation Generation and Parameters Mapping
 

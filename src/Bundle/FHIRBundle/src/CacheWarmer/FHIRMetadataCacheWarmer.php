@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\CacheWarmer;
 
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProviderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProviderInterface;
 use Composer\Autoload\ClassLoader;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Finder\Finder;

@@ -10,8 +10,8 @@ use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRVersionedSerializationServiceLocator;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRBackboneElementJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRComplexTypeJsonNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRLogicalModelJsonNormalizer;
@@ -109,11 +109,29 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
 
         $igRegistryRef = new Reference(FHIRIGTypeRegistry::class);
 
+        // Each stack gets its own type resolver carrying its version. The shared
+        // FHIRTypeResolverInterface service is registered with no version, and an unversioned
+        // resolver falls back to an R4-first search across all installed versions -- so every stack
+        // referencing it resolved `Patient` to the R4 class, R5 stacks included.
+        $typeResolverId = "fhir.type_resolver.{$v}";
+        $container->register($typeResolverId, FHIRSerializedTypeResolver::class)
+            ->setArguments([
+                [],
+                [],
+                [],
+                [],
+                [],
+                $igRegistryRef,
+                $version->value,
+            ])
+            ->setPublic(false);
+        $typeResolverRef = new Reference($typeResolverId);
+
         $resourceJsonId = "fhir.normalizer.resource.json.{$v}";
         $container->register($resourceJsonId, FHIRResourceJsonNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
-                new Reference(FHIRTypeResolverInterface::class),
+                $typeResolverRef,
                 null,             // normalizer (wired by Serializer via SerializerAwareInterface)
                 null,             // denormalizer
                 $version->value,  // fhirVersion
@@ -125,7 +143,7 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
         $container->register($resourceXmlId, FHIRResourceXmlNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
-                new Reference(FHIRTypeResolverInterface::class),
+                $typeResolverRef,
                 null,
                 null,
                 $version->value,
@@ -137,7 +155,7 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
         $container->register($complexJsonId, FHIRComplexTypeJsonNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
-                new Reference(FHIRTypeResolverInterface::class),
+                $typeResolverRef,
                 null,
                 null,
                 $version->value,
@@ -149,7 +167,7 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
         $container->register($complexXmlId, FHIRComplexTypeXmlNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
-                new Reference(FHIRTypeResolverInterface::class),
+                $typeResolverRef,
                 null,
                 null,
                 $version->value,
@@ -207,7 +225,7 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
         $container->register($operationJsonId, FHIROperationPayloadJsonNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
-                new Reference(FHIRTypeResolverInterface::class),
+                $typeResolverRef,
                 null,
                 null,
                 $version->value,
@@ -220,7 +238,7 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
         $container->register($operationXmlId, FHIROperationPayloadXmlNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
-                new Reference(FHIRTypeResolverInterface::class),
+                $typeResolverRef,
                 null,
                 null,
                 $version->value,
@@ -233,7 +251,7 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
         $container->register($backboneXmlId, FHIRBackboneElementXmlNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
-                new Reference(FHIRTypeResolverInterface::class),
+                $typeResolverRef,
                 null,
                 null,
                 $version->value,
@@ -257,7 +275,7 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
         $container->register($logicalModelXmlId, FHIRLogicalModelXmlNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
-                new Reference(FHIRTypeResolverInterface::class),
+                $typeResolverRef,
                 null,
                 null,
                 $version->value,
@@ -295,16 +313,20 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
 
         // ---- FHIRSerializationService (public, named by version) ----
 
+        // The type resolver is the fifth argument and was previously left to its default, which
+        // constructs an unversioned resolver. The service then chose a target class R4-first while
+        // its own normalizers resolved per version, so the two disagreed for R4B and R5.
         $container->register("fhir.serialization_service.{$v}", FHIRSerializationService::class)
             ->setArguments([
                 new Reference($serializerId),
                 new Reference(FHIRSerializationContextFactory::class),
                 new Reference(FHIRSerializationDebugInfo::class),
                 new Reference(FHIRMetadataExtractorInterface::class),
+                $typeResolverRef,
             ])
             ->setPublic(true);
 
-        $this->registerApplicationSerializerNormalizers($container, $version, $serializerId, $igRegistryRef);
+        $this->registerApplicationSerializerNormalizers($container, $version, $serializerId, $igRegistryRef, $typeResolverRef);
     }
 
     /**
@@ -334,6 +356,7 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
         FhirVersion $version,
         string $fhirSerializerId,
         Reference $igRegistryRef,
+        Reference $typeResolverRef,
     ): void {
         $v = strtolower($version->value);
 
@@ -344,7 +367,7 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
             $container->register($id, $class)
                 ->setArguments([
                     new Reference(FHIRMetadataExtractorInterface::class),
-                    new Reference(FHIRTypeResolverInterface::class),
+                    $typeResolverRef,
                     null,
                     null,
                     $version->value,

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
+namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
@@ -23,10 +23,13 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
 
     private PropertyMetadataProviderInterface $propertyMetadataProvider;
 
-    public function __construct(?FHIRMetadataCache $cache = null, ?PropertyMetadataProviderInterface $propertyMetadataProvider = null)
+    private FHIRStructureKindProviderInterface $structureKinds;
+
+    public function __construct(?FHIRMetadataCache $cache = null, ?PropertyMetadataProviderInterface $propertyMetadataProvider = null, ?FHIRStructureKindProviderInterface $structureKinds = null)
     {
         $this->cache                    = $cache                    ?? new FHIRMetadataCache();
         $this->propertyMetadataProvider = $propertyMetadataProvider ?? new PropertyMetadataProvider();
+        $this->structureKinds           = $structureKinds           ?? new FHIRStructureKindProvider();
     }
 
     /**
@@ -81,65 +84,14 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
      */
     public function extractFHIRType(object $object): ?string
     {
-        $className = get_class($object);
-
-        // Check cache first
-        $cached = $this->cache->getFHIRTypeMetadata($className);
-        if ($cached !== null) {
-            return $cached;
-        }
-
-        try {
-            $reflection = new \ReflectionClass($object);
-
-            // Check for resource type
-            $resourceAttributes = $reflection->getAttributes(FhirResource::class);
-            if (!empty($resourceAttributes)) {
-                $attribute = $resourceAttributes[0]->newInstance();
-                $type      = $attribute->getResourceType();
-                $this->cache->cacheFHIRTypeMetadata($className, $type);
-
-                return $type;
-            }
-
-            // Check for complex type
-            $complexAttributes = $reflection->getAttributes(FHIRComplexType::class);
-            if (!empty($complexAttributes)) {
-                $attribute = $complexAttributes[0]->newInstance();
-                $type      = $attribute->typeName;
-                $this->cache->cacheFHIRTypeMetadata($className, $type);
-
-                return $type;
-            }
-
-            // Check for primitive type
-            $primitiveAttributes = $reflection->getAttributes(FHIRPrimitive::class);
-            if (!empty($primitiveAttributes)) {
-                $attribute = $primitiveAttributes[0]->newInstance();
-                $type      = $attribute->primitiveType;
-                $this->cache->cacheFHIRTypeMetadata($className, $type);
-
-                return $type;
-            }
-
-            // Check for backbone element - use element path directly
-            $backboneAttributes = $reflection->getAttributes(FHIRBackboneElement::class);
-            if (!empty($backboneAttributes)) {
-                $attribute = $backboneAttributes[0]->newInstance();
-                $type      = $attribute->elementPath;
-                $this->cache->cacheFHIRTypeMetadata($className, $type);
-
-                return $type;
-            }
-
-            $this->cache->cacheFHIRTypeMetadata($className, null);
-
-            return null;
-        } catch (\ReflectionException) {
-            $this->cache->cacheFHIRTypeMetadata($className, null);
-
-            return null;
-        }
+        // Delegated rather than reimplemented. This method and
+        // FHIRStructureKindProvider::declaredFhirTypeName() answered the same question from two
+        // copies of the same attribute walk, and the copies disagreed: the provider scanned argument
+        // names and returned null for everything but a resource, while this one -- with no production
+        // callers to notice it was right -- read each attribute's own field. One implementation now,
+        // and it is the provider's, because it also caches a negative answer and takes a class name
+        // as well as an instance.
+        return $this->structureKinds->declaredFhirTypeName($object);
     }
 
     /**
@@ -150,9 +102,9 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
         $className = get_class($object);
 
         // Check cache first
-        $cached = $this->cache->getStructureTypeMetadata($className);
+        $cached = $this->cache->getStructureKindFlag($className, 'resource');
         if ($cached !== null) {
-            return $cached === 'resource';
+            return $cached;
         }
 
         try {
@@ -162,7 +114,7 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
 
             do {
                 if (!empty($refl->getAttributes(FhirResource::class))) {
-                    $this->cache->cacheStructureTypeMetadata($className, 'resource');
+                    $this->cache->cacheStructureKindFlag($className, 'resource', true);
 
                     return true;
                 }
@@ -170,11 +122,11 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
                 $refl = $refl->getParentClass();
             } while ($refl !== false);
 
-            $this->cache->cacheStructureTypeMetadata($className, null);
+            $this->cache->cacheStructureKindFlag($className, 'resource', false);
 
             return false;
         } catch (\ReflectionException) {
-            $this->cache->cacheStructureTypeMetadata($className, null);
+            $this->cache->cacheStructureKindFlag($className, 'resource', false);
 
             return false;
         }
@@ -188,9 +140,9 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
         $className = get_class($object);
 
         // Check cache first
-        $cached = $this->cache->getStructureTypeMetadata($className);
+        $cached = $this->cache->getStructureKindFlag($className, 'complex-type');
         if ($cached !== null) {
-            return $cached === 'complex-type';
+            return $cached;
         }
 
         try {
@@ -209,11 +161,11 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
                 $r = $r->getParentClass();
             } while ($r !== false);
 
-            $this->cache->cacheStructureTypeMetadata($className, $isComplexType ? 'complex-type' : null);
+            $this->cache->cacheStructureKindFlag($className, 'complex-type', $isComplexType);
 
             return $isComplexType;
         } catch (\ReflectionException) {
-            $this->cache->cacheStructureTypeMetadata($className, null);
+            $this->cache->cacheStructureKindFlag($className, 'complex-type', false);
 
             return false;
         }
@@ -227,9 +179,9 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
         $className = get_class($object);
 
         // Check cache first
-        $cached = $this->cache->getStructureTypeMetadata($className);
+        $cached = $this->cache->getStructureKindFlag($className, 'primitive-type');
         if ($cached !== null) {
-            return $cached === 'primitive-type';
+            return $cached;
         }
 
         try {
@@ -248,11 +200,11 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
                 $r = $r->getParentClass();
             } while ($r !== false);
 
-            $this->cache->cacheStructureTypeMetadata($className, $isPrimitive ? 'primitive-type' : null);
+            $this->cache->cacheStructureKindFlag($className, 'primitive-type', $isPrimitive);
 
             return $isPrimitive;
         } catch (\ReflectionException) {
-            $this->cache->cacheStructureTypeMetadata($className, null);
+            $this->cache->cacheStructureKindFlag($className, 'primitive-type', false);
 
             return false;
         }
@@ -266,9 +218,9 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
         $className = get_class($object);
 
         // Check cache first
-        $cached = $this->cache->getStructureTypeMetadata($className);
+        $cached = $this->cache->getStructureKindFlag($className, 'backbone-element');
         if ($cached !== null) {
-            return $cached === 'backbone-element';
+            return $cached;
         }
 
         try {
@@ -276,11 +228,11 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
             $attributes = $reflection->getAttributes(FHIRBackboneElement::class);
             $isBackbone = !empty($attributes);
 
-            $this->cache->cacheStructureTypeMetadata($className, $isBackbone ? 'backbone-element' : null);
+            $this->cache->cacheStructureKindFlag($className, 'backbone-element', $isBackbone);
 
             return $isBackbone;
         } catch (\ReflectionException) {
-            $this->cache->cacheStructureTypeMetadata($className, null);
+            $this->cache->cacheStructureKindFlag($className, 'backbone-element', false);
 
             return false;
         }

@@ -40,6 +40,15 @@ class FhirPathTool
                 'suggestion' => $e->getSuggestion(),
                 'position'   => $e->getPosition(),
             ]);
+        } catch (\InvalidArgumentException $e) {
+            // $fhirVersion arrives as free text from the caller, and the type resolver rejects
+            // anything that is not a release label. Encoding it as a tool error keeps the failure
+            // legible; letting it escape would surface as a transport-level fault with no hint that
+            // one argument was at fault.
+            return ResponseEncoder::encode([
+                'error'      => $e->getMessage(),
+                'suggestion' => 'Pass fhirVersion as a release label — "R4", "R4B" or "R5" — or omit it to search all three.',
+            ]);
         }
 
         return ResponseEncoder::encode([

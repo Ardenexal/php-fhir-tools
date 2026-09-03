@@ -7,7 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataCache;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataCache;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\Generator;
 use Eris\TestTrait;
@@ -134,7 +134,7 @@ class SerializationPerformanceTest extends TestCase
                 $className = "TestClass{$i}";
                 $cache->cacheFHIRTypeMetadata($className, "TestType{$i}");
                 $cache->cacheFHIRVersionMetadata($className, 'R4B');
-                $cache->cacheStructureTypeMetadata($className, 'resource');
+                $cache->cacheStructureKindFlag($className, 'resource', true);
             }
 
             $writeEndTime  = microtime(true);
@@ -147,12 +147,12 @@ class SerializationPerformanceTest extends TestCase
                 $className     = "TestClass{$i}";
                 $fhirType      = $cache->getFHIRTypeMetadata($className);
                 $fhirVersion   = $cache->getFHIRVersionMetadata($className);
-                $structureType = $cache->getStructureTypeMetadata($className);
+                $structureType = $cache->getStructureKindFlag($className, 'resource');
 
                 // Verify cached values
                 self::assertSame("TestType{$i}", $fhirType);
                 self::assertSame('R4B', $fhirVersion);
-                self::assertSame('resource', $structureType);
+                self::assertTrue($structureType);
             }
 
             $readEndTime  = microtime(true);

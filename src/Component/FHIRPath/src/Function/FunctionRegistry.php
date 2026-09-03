@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
 
 /**
  * Registry for FHIRPath functions.
@@ -23,9 +27,17 @@ final class FunctionRegistry
      */
     private array $functions = [];
 
-    private function __construct()
-    {
-        // Private constructor for singleton
+    private FHIRStructureKindProviderInterface $structureKinds;
+
+    private FHIRMetadataExtractorInterface $metadata;
+
+    private function __construct(
+        ?FHIRStructureKindProviderInterface $structureKinds = null,
+        ?FHIRMetadataExtractorInterface $metadata = null,
+    ) {
+        $this->structureKinds = $structureKinds ?? new FHIRStructureKindProvider();
+        $this->metadata       = $metadata       ?? new FHIRMetadataExtractor();
+
         $this->registerBuiltInFunctions();
     }
 
@@ -113,7 +125,7 @@ final class FunctionRegistry
 
         // Type functions
         $this->registerSafe(new OfTypeFunction());
-        $this->registerSafe(new TypeFunction());
+        $this->registerSafe(new TypeFunction($this->structureKinds, $this->metadata));
         $this->registerSafe(new HasValueFunction());
 
         // Tree navigation functions
@@ -148,7 +160,7 @@ final class FunctionRegistry
 
         // FHIR R4-specific functions
         $this->registerSafe(new ExtensionFunction());
-        $this->registerSafe(new GetValueFunction());
+        $this->registerSafe(new GetValueFunction($this->structureKinds));
         $this->registerSafe(new ResolveFunction());
         $this->registerSafe(new MemberOfFunction());
         $this->registerSafe(new ConformsToFunction());
@@ -177,12 +189,18 @@ final class FunctionRegistry
     /**
      * Get the singleton registry instance.
      *
+     * The collaborators are read on first construction only. A later call with different ones returns
+     * the existing registry unchanged rather than rebuilding it, because the functions already handed
+     * out hold the originals — call `reset()` first if a test needs different ones.
+     *
      * @return self
      */
-    public static function getInstance(): self
-    {
+    public static function getInstance(
+        ?FHIRStructureKindProviderInterface $structureKinds = null,
+        ?FHIRMetadataExtractorInterface $metadata = null,
+    ): self {
         if (self::$instance === null) {
-            self::$instance = new self();
+            self::$instance = new self($structureKinds, $metadata);
         }
 
         return self::$instance;

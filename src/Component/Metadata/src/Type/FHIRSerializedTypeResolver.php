@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Serialization;
+namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 
@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
  *
  * @author Ardenexal
  */
-class FHIRTypeResolver implements FHIRTypeResolverInterface
+class FHIRSerializedTypeResolver implements FHIRTypeResolverInterface
 {
     /** @var array<string, string> */
     private array $resourceTypeMapping = [];
@@ -34,6 +34,8 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
 
     /** @var array<string, string> */
     private array $complexTypeMapping = [];
+
+    private FHIRModelClassLocatorInterface $modelClasses;
 
     /**
      * @param array<string, string> $resourceTypeMapping
@@ -54,7 +56,9 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
         array $complexTypeMapping = [],
         private ?FHIRIGTypeRegistry $igTypeRegistry = null,
         private ?string $fhirVersion = null,
+        ?FHIRModelClassLocatorInterface $modelClasses = null,
     ) {
+        $this->modelClasses          = $modelClasses ?? new FHIRModelClassLocator();
         $this->resourceTypeMapping   = $resourceTypeMapping;
         $this->choiceElementMapping  = $choiceElementMapping;
         $this->referenceTypeMapping  = $referenceTypeMapping;
@@ -149,24 +153,11 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
             return $this->resourceTypeMapping[$resourceType];
         }
 
-        // Version-scoped lookup: when a preferred version is configured, resolve strictly to that
-        // version's model namespace. Returning null on miss produces an honest deserialization
-        // failure rather than silently emitting a wrong-version object.
-        if ($this->fhirVersion !== null) {
-            $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$this->fhirVersion}\\Resource\\{$resourceType}Resource";
-
-            return class_exists($candidate) ? $candidate : null;
-        }
-
-        // Unscoped fallback (no version preference): scan all installed versions.
-        foreach (['R4', 'R4B', 'R5'] as $version) {
-            $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource\\{$resourceType}Resource";
-            if (class_exists($candidate)) {
-                return $candidate;
-            }
-        }
-
-        return null;
+        // Where the class actually lives is the locator's business, not this class's. A configured
+        // version scopes the search strictly and a miss answers null, so a wrong-version object is
+        // never emitted in place of an honest deserialization failure; an unconfigured version keeps
+        // the documented R4-first order.
+        return $this->modelClasses->locate($resourceType, $this->fhirVersion, FHIRStructureKind::Resource);
     }
 
     /**

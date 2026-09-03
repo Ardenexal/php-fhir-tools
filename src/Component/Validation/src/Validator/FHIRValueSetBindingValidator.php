@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
@@ -45,6 +49,8 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         private readonly FHIRValidationMessageRegistry $messageRegistry,
         private readonly array $enumNamespaceRoots = [],
         private readonly ?FHIRTerminologyClientInterface $terminologyClient = null,
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
+        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
     ) {
     }
 
@@ -165,14 +171,14 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
             return [];
         }
 
-        $coding = self::readPublicProperty($value, 'coding');
+        $coding = $this->readPublicProperty($value, 'coding');
         if (is_array($coding)) {
             return $this->displayCandidates($coding);
         }
 
-        $system  = self::readableString(self::readPublicProperty($value, 'system'));
-        $code    = self::readableString(self::readPublicProperty($value, 'code'));
-        $display = self::readableString(self::readPublicProperty($value, 'display'));
+        $system  = self::readableString($this->readPublicProperty($value, 'system'));
+        $code    = self::readableString($this->readPublicProperty($value, 'code'));
+        $display = self::readableString($this->readPublicProperty($value, 'display'));
 
         if ($system === null || $code === null || $display === null) {
             return [];
@@ -334,15 +340,13 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     {
         foreach ($this->enumNamespaceRoots as $root) {
             $fqcn = $root . '\\' . $className;
-            if (!class_exists($fqcn) || !enum_exists($fqcn)) {
+
+            // Folds the existence, enum and backing checks into one question: a candidate name built
+            // from a namespace root plus a class name is expected to miss most of the time.
+            if (!$this->attributes->isBackedEnum($fqcn)) {
                 continue;
             }
 
-            if (!(new \ReflectionEnum($fqcn))->isBacked()) {
-                continue;
-            }
-
-            /** @var class-string<\BackedEnum> $fqcn */
             return $fqcn;
         }
 
@@ -363,7 +367,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     {
         if ($constraint->enumClass !== null) {
             $direct = $this->qualifyEnum($constraint->enumClass);
-            if ($direct !== null && self::enumDeclaresValueSet($direct, $constraint->valueSetUrl)) {
+            if ($direct !== null && $this->enumDeclaresValueSet($direct, $constraint->valueSetUrl)) {
                 return $direct;
             }
         }
@@ -404,14 +408,14 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
      *
      * @param class-string $enumFqcn
      */
-    private static function enumDeclaresValueSet(string $enumFqcn, string $boundValueSetUrl): bool
+    private function enumDeclaresValueSet(string $enumFqcn, string $boundValueSetUrl): bool
     {
-        $attributes = (new \ReflectionClass($enumFqcn))->getAttributes(FHIRValueSetSource::class);
+        $attributes = $this->attributes->classAttributes($enumFqcn, FHIRValueSetSource::class);
         if ($attributes === []) {
             return false;
         }
 
-        $declared = $attributes[0]->newInstance()->url;
+        $declared = $attributes[0]->url;
 
         return self::bareUrl($declared) === self::bareUrl($boundValueSetUrl);
     }
@@ -425,11 +429,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     /** @phpstan-assert-if-true class-string<\BackedEnum> $fqcn */
     private function isUsableBackedEnum(string $fqcn): bool
     {
-        if (!class_exists($fqcn) || !enum_exists($fqcn)) {
-            return false;
-        }
-
-        return (new \ReflectionEnum($fqcn))->isBacked();
+        return $this->attributes->isBackedEnum($fqcn);
     }
 
     /**
@@ -491,13 +491,13 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         }
 
         // CodeableConcept: every coding it carries is a candidate for the bound code.
-        $coding = self::readPublicProperty($value, 'coding');
+        $coding = $this->readPublicProperty($value, 'coding');
         if (is_array($coding)) {
             return $this->codeValues($coding);
         }
 
         // Coding: the code sits one level down.
-        $code = self::readPublicProperty($value, 'code');
+        $code = $this->readPublicProperty($value, 'code');
 
         return self::isTestableCode($code) || $code instanceof \BackedEnum ? [$code] : [];
     }
@@ -508,21 +508,17 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
      * Deserializers bypass the constructor, so a field the document omitted is uninitialized rather
      * than null and reading it directly throws.
      */
-    private static function readPublicProperty(object $node, string $property): mixed
+    private function readPublicProperty(object $node, string $property): mixed
     {
-        $reflection = new \ReflectionClass($node);
-
-        if (!$reflection->hasProperty($property)) {
+        if (!in_array($property, $this->models->publicPropertyNames($node), true)) {
             return null;
         }
 
-        $reflected = $reflection->getProperty($property);
-
-        if (!$reflected->isPublic() || !$reflected->isInitialized($node)) {
+        if (!$this->models->isPropertyInitialized($node, $property)) {
             return null;
         }
 
-        return $reflected->getValue($node);
+        return $this->models->readInitializedValue($node, $property);
     }
 
     private function classNameFromUrl(string $valueSetUrl): string

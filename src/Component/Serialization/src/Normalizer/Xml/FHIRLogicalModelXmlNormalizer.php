@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml;
 
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\LogicalModelLocatorTrait;
+use Ardenexal\FHIRTools\Component\Metadata\Type\LogicalModelLocatorTrait;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**

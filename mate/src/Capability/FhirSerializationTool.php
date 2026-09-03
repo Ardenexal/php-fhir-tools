@@ -6,7 +6,7 @@ namespace App\Mate\Capability;
 
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Mcp\Capability\Attribute\McpTool;
 use Symfony\AI\Mate\Encoding\ResponseEncoder;
 use Symfony\Component\VarDumper\Cloner\VarCloner;

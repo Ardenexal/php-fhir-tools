@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistryFactory;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
-use Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FhirPropertyTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;

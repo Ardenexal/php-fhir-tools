@@ -29,6 +29,18 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTime;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelClassLocator;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelClassLocatorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyVariantMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProviderInterface;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypedCollection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypedScalar;
 use Psr\Http\Client\ClientInterface;
@@ -49,6 +61,14 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private EvaluationContext $context;
 
     private FHIRTypeResolver $typeResolver;
+
+    private PropertyMetadataProviderInterface $properties;
+
+    private FHIRAttributeReaderInterface $attributes;
+
+    private FHIRStructureKindProviderInterface $structureKinds;
+
+    private FHIRModelClassLocatorInterface $modelClasses;
 
     private ComparisonService $comparisonService;
 
@@ -77,15 +97,6 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private array $fhirTypePropertyCache = [];
 
-    /**
-     * Cache of class name → property map built from #[FhirProperty] attribute reflection.
-     * null = class has no FhirProperty parameters (not a typed FHIR model); array = property map.
-     * Stored separately from $fhirTypePropertyCache which is keyed by FHIR type name string.
-     *
-     * @var array<class-string, array<string, array{fhirType: string, propertyKind: string, isChoice: bool, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}>|null}>|null>
-     */
-    private array $propertyMetaCache = [];
-
     private ?LoggerInterface $logger = null;
 
     /**
@@ -112,10 +123,23 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private ?RequestFactoryInterface $requestFactory = null;
 
-    public function __construct()
-    {
+    /**
+     * Every collaborator is optional so that `new FHIRPathEvaluator()` keeps working. The defaults are
+     * the implementations the container wires, and each memoizes per class, so an evaluator built
+     * without arguments differs only in that it warms its own caches.
+     */
+    public function __construct(
+        ?PropertyMetadataProviderInterface $properties = null,
+        ?FHIRAttributeReaderInterface $attributes = null,
+        ?FHIRStructureKindProviderInterface $structureKinds = null,
+        ?FHIRModelClassLocatorInterface $modelClasses = null,
+    ) {
+        $this->properties        = $properties     ?? new PropertyMetadataProvider();
+        $this->attributes        = $attributes     ?? new FHIRAttributeReader();
+        $this->structureKinds    = $structureKinds ?? new FHIRStructureKindProvider();
+        $this->modelClasses      = $modelClasses   ?? new FHIRModelClassLocator();
         $this->context           = new EvaluationContext();
-        $this->typeResolver      = new FHIRTypeResolver();
+        $this->typeResolver      = new FHIRTypeResolver($this->attributes, $this->structureKinds);
         $this->comparisonService = new ComparisonService($this);
     }
 
@@ -669,7 +693,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 throw new EvaluationException("'is' operator requires a single-item collection", $node->getLine(), $node->getColumn());
             }
 
-            return Collection::single($this->typeResolver->isOfType($collection->first(), $node->getTypeName()));
+            return Collection::single($this->typeResolver->isOfType($collection->first(), $node->getTypeName(), false, $this->context->getFhirVersion()));
         }
 
         // Normalise namespace-qualified type names: System.Boolean → boolean, FHIR.Patient → Patient
@@ -867,72 +891,38 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return null;
         }
 
-        $reflection = new \ReflectionClass($class);
-        foreach ($reflection->getAttributes() as $attribute) {
-            if (str_ends_with($attribute->getName(), 'FhirResource')) {
-                $args = $attribute->getArguments();
-                $type = $args['type'] ?? $args[0] ?? null;
+        $attributes = $this->attributes->classAttributes($class, FhirResource::class);
 
-                return is_string($type) ? $type : null;
-            }
-        }
-
-        return null;
+        return $attributes === [] ? null : $attributes[0]->getResourceType();
     }
 
     /**
-     * Build a property map for a class from #[FhirProperty] attribute reflection.
+     * The property metadata for a class, owned by Metadata rather than read here.
      *
-     * Returns null when the class has no FhirProperty-annotated constructor parameters,
-     * indicating it is not a typed FHIR model. Result is cached in $propertyMetaCache.
+     * Answers the empty array for a class that is not a FHIR model, cannot be loaded, or declares no
+     * properties. Use {@see self::isFhirModelClass()} when those cases must be told apart.
      *
      * @param class-string $class
      *
-     * @return array<string, array{fhirType: string, propertyKind: string, isChoice: bool, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}>|null}>|null
+     * @return array<string, PropertyMetadata>
      */
-    private function getFhirPropertyMap(string $class): ?array
+    private function getFhirPropertyMap(string $class): array
     {
-        if (array_key_exists($class, $this->propertyMetaCache)) {
-            return $this->propertyMetaCache[$class];
-        }
+        return $this->properties->getPropertyMetadata($class);
+    }
 
-        try {
-            $reflection  = new \ReflectionClass($class);
-            $constructor = $reflection->getConstructor();
-
-            if ($constructor === null) {
-                $this->propertyMetaCache[$class] = null;
-
-                return null;
-            }
-
-            $map = [];
-            foreach ($constructor->getParameters() as $param) {
-                $attrs = $param->getAttributes(FhirProperty::class);
-                if ($attrs === []) {
-                    continue;
-                }
-
-                /** @var FhirProperty $attr */
-                $attr = $attrs[0]->newInstance();
-
-                $map[$param->getName()] = [
-                    'fhirType'     => $attr->fhirType,
-                    'propertyKind' => $attr->propertyKind,
-                    'isChoice'     => $attr->isChoice,
-                    'variants'     => $attr->variants,
-                ];
-            }
-
-            $result                          = $map !== [] ? $map : null;
-            $this->propertyMetaCache[$class] = $result;
-
-            return $result;
-        } catch (\ReflectionException) {
-            $this->propertyMetaCache[$class] = null;
-
-            return null;
-        }
+    /**
+     * Whether the class is a FHIR model at all.
+     *
+     * The map above answers the empty array both for "not a FHIR model" and for "a model carrying no
+     * properties", so the three strict-mode gates below cannot tell those apart from the map. They ask
+     * this instead. Testing the map for emptiness would make every gate fire on plain PHP objects.
+     *
+     * @param class-string $class
+     */
+    private function isFhirModelClass(string $class): bool
+    {
+        return $this->properties->isFhirModelClass($class);
     }
 
     /**
@@ -950,25 +940,22 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     {
         $class = get_class($node);
         $map   = $this->getFhirPropertyMap($class);
-        if ($map === null) {
-            return null;
-        }
 
         // Direct property lookup
         if (isset($map[$propertyName])) {
             $meta = $map[$propertyName];
             // Only wrap scalar properties with FHIR (not System.*) type names
-            if ($meta['propertyKind'] === 'scalar'
-                && !str_starts_with($meta['fhirType'], 'http://')
+            if ($meta->propertyKind === 'scalar'
+                && !str_starts_with($meta->fhirType, 'http://')
             ) {
-                return $meta['fhirType'];
+                return $meta->fhirType;
             }
 
             // For choice properties (value[x]), identify the active variant by matching
             // the stored PHP value's type against the available variants.
-            if (!empty($meta['variants'])) {
+            if (!empty($meta->variants)) {
                 $storedValue  = property_exists($node, $propertyName) ? $node->$propertyName : null;
-                $resolvedType = $this->resolveChoiceVariantType($storedValue, $meta['variants']);
+                $resolvedType = $this->resolveChoiceVariantType($storedValue, $meta->variants);
                 if ($resolvedType !== null) {
                     return $resolvedType;
                 }
@@ -978,16 +965,16 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Check if this property is a variant of a choice property (e.g. 'valueBoolean' as part of 'value[x]')
         // Walk all entries looking for a choice property whose variants include this prop name (via jsonKey)
         foreach ($map as $propMeta) {
-            if (empty($propMeta['variants'])) {
+            if (empty($propMeta->variants)) {
                 continue;
             }
 
-            foreach ($propMeta['variants'] as $variant) {
-                if ($variant['jsonKey']         === $propertyName
-                    && $variant['propertyKind'] === 'scalar'
-                    && !str_starts_with($variant['fhirType'], 'http://')
+            foreach ($propMeta->variants as $variant) {
+                if ($variant->jsonKey         === $propertyName
+                    && $variant->propertyKind === 'scalar'
+                    && !str_starts_with($variant->fhirType, 'http://')
                 ) {
-                    return $variant['fhirType'];
+                    return $variant->fhirType;
                 }
             }
         }
@@ -1007,7 +994,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      *
      * Returns null when the type cannot be determined unambiguously.
      *
-     * @param list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}> $variants
+     * @param list<PropertyVariantMetadata> $variants
      */
     private function resolveChoiceVariantType(mixed $value, array $variants): ?string
     {
@@ -1017,15 +1004,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         // For non-string scalar PHP types there is at most one matching phpType per variant
         foreach ($variants as $variant) {
-            if (str_starts_with($variant['fhirType'], 'http://')) {
+            if (str_starts_with($variant->fhirType, 'http://')) {
                 continue;
             }
 
-            if (($variant['phpType'] === 'bool'  && is_bool($value))
-                || ($variant['phpType'] === 'int'   && is_int($value))
-                || ($variant['phpType'] === 'float' && is_float($value))
+            if (($variant->phpType === 'bool'  && is_bool($value))
+                || ($variant->phpType === 'int'   && is_int($value))
+                || ($variant->phpType === 'float' && is_float($value))
             ) {
-                return $variant['fhirType'];
+                return $variant->fhirType;
             }
         }
 
@@ -1035,7 +1022,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // exists. Plain integer strings ('42') are excluded to avoid false-positives.
         if (is_string($value) && str_contains($value, '.') && is_numeric($value)) {
             foreach ($variants as $variant) {
-                if ($variant['fhirType'] === 'decimal') {
+                if ($variant->fhirType === 'decimal') {
                     return 'decimal';
                 }
             }
@@ -1058,9 +1045,6 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     {
         $class = get_class($node);
         $map   = $this->getFhirPropertyMap($class);
-        if ($map === null) {
-            return null;
-        }
 
         if (!isset($map[$propertyName])) {
             return null;
@@ -1068,18 +1052,18 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         $meta = $map[$propertyName];
 
-        if (!in_array($meta['propertyKind'], ['complex', 'extension'], true)) {
+        if (!in_array($meta->propertyKind, ['complex', 'extension'], true)) {
             return null;
         }
 
         if (
-            str_starts_with($meta['fhirType'], 'http://')
-            || str_starts_with($meta['fhirType'], 'https://')
+            str_starts_with($meta->fhirType, 'http://')
+            || str_starts_with($meta->fhirType, 'https://')
         ) {
             return null;
         }
 
-        return $meta['fhirType'];
+        return $meta->fhirType;
     }
 
     /**
@@ -1094,17 +1078,14 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private function isChoiceVariantAccess(string $class, string $propertyName): bool
     {
         $map = $this->getFhirPropertyMap($class);
-        if ($map === null) {
-            return false;
-        }
 
         if (array_key_exists($propertyName, $map)) {
             return false; // It's a first-class property
         }
 
         foreach ($map as $meta) {
-            foreach ($meta['variants'] ?? [] as $variant) {
-                if ($variant['jsonKey'] === $propertyName) {
+            foreach ($meta->variants ?? [] as $variant) {
+                if ($variant->jsonKey === $propertyName) {
                     return true;
                 }
             }
@@ -1116,10 +1097,13 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     /**
      * Assert that $propertyName is a valid property of the given FHIR type name in strict mode.
      *
-     * Searches loaded PHP classes for one whose #[FhirProperty] attributes match $fhirType via a
-     * #[FHIRComplexType] or #[FHIRPrimitive] attribute. If the class is found and the property
-     * is not in the map, throws FHIRPathSemanticException. If no class is found (type not loaded),
-     * silently returns to avoid false positives.
+     * Asks Metadata which generated class implements $fhirType, then checks the property against that
+     * class's metadata. When no class can be placed the check stays silent, so an unplaceable type is
+     * never reported as a missing property.
+     *
+     * This used to scan every declared PHP class and take the first match, which meant the answer
+     * depended on which version's classes a given run had loaded, and a second pass guessed at
+     * namespaces derived from whatever was already in memory. Both are gone.
      *
      * Results are cached per type name.
      *
@@ -1128,73 +1112,18 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private function assertPropertyExistsOnFhirType(string $fhirType, string $propertyName): void
     {
         if (!array_key_exists($fhirType, $this->fhirTypePropertyCache)) {
-            $this->fhirTypePropertyCache[$fhirType] = null;
+            // The version the caller is evaluating against, when they supplied one. Ancestry and
+            // layout are both per-version, so an unscoped lookup answers R4 for a type that exists in
+            // several releases — documented on the locator, and the same answer the previous
+            // load-order scan happened to give.
+            $class = $this->modelClasses->locate($fhirType, $this->context->getFhirVersion());
 
-            foreach (get_declared_classes() as $class) {
-                if ($this->getFhirPropertyMap($class) === null) {
-                    continue;
-                }
+            $map = $class === null ? [] : $this->getFhirPropertyMap($class);
 
-                // Check for #[FHIRComplexType(typeName: '...')] or similar attribute
-                if (!class_exists($class)) {
-                    continue;
-                }
-
-                $reflection = new \ReflectionClass($class);
-
-                $matched = false;
-                foreach ($reflection->getAttributes() as $attribute) {
-                    $attrName = $attribute->getName();
-                    if (!str_ends_with($attrName, 'FHIRComplexType')
-                        && !str_ends_with($attrName, 'FHIRPrimitive')
-                        && !str_ends_with($attrName, 'FhirComplexType')
-                        && !str_ends_with($attrName, 'FhirPrimitive')
-                    ) {
-                        continue;
-                    }
-
-                    $args = $attribute->getArguments();
-                    $type = $args['typeName'] ?? $args['type'] ?? $args[0] ?? null;
-                    if (is_string($type) && $type === $fhirType) {
-                        $matched = true;
-                        break;
-                    }
-                }
-
-                if ($matched) {
-                    $map                                    = $this->getFhirPropertyMap($class);
-                    $this->fhirTypePropertyCache[$fhirType] = array_keys($map);
-                    break;
-                }
-            }
-
-            // If still not found, derive candidate namespaces from already-loaded FHIR classes
-            // and attempt autoloading. This handles FHIR DataTypes that were never instantiated
-            // (e.g. Period when the test data only contains a Quantity).
-            if ($this->fhirTypePropertyCache[$fhirType] === null) {
-                $namespacesToTry = [];
-                foreach (get_declared_classes() as $declared) {
-                    if ($this->getFhirPropertyMap($declared) !== null) {
-                        $lastSlash = strrpos($declared, '\\');
-                        if ($lastSlash !== false) {
-                            $namespacesToTry[substr($declared, 0, $lastSlash)] = true;
-                        }
-                    }
-                }
-
-                foreach (array_keys($namespacesToTry) as $ns) {
-                    $candidate = $ns . '\\' . $fhirType;
-                    if (!class_exists($candidate, true)) {
-                        continue;
-                    }
-                    $candidateMap = $this->getFhirPropertyMap($candidate);
-                    if ($candidateMap === null) {
-                        continue;
-                    }
-                    $this->fhirTypePropertyCache[$fhirType] = array_keys($candidateMap);
-                    break;
-                }
-            }
+            // An unknown type caches null rather than the empty array: null means "no opinion", and
+            // the check below stays silent, which is what keeps a type this locator cannot place from
+            // turning into a false positive.
+            $this->fhirTypePropertyCache[$fhirType] = $map === [] ? null : array_keys($map);
         }
 
         $knownProperties = $this->fhirTypePropertyCache[$fhirType];
@@ -1279,7 +1208,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             // Only fires for typed FHIR model classes.
             if ($this->context->isStrictMode()) {
                 $class = get_class($node);
-                if ($this->getFhirPropertyMap($class) !== null
+                if ($this->isFhirModelClass($class)
                     && $this->isChoiceVariantAccess($class, $propertyName)
                 ) {
                     throw new FHIRPathSemanticException("Direct access to choice type variant '{$propertyName}' is not allowed in strict mode. Use 'value.ofType(Type)' or '(value as Type)' instead.");
@@ -1373,7 +1302,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             // the property is semantically invalid for this FHIR type.
             if ($this->context->isStrictMode()) {
                 $class = get_class($node);
-                if ($this->getFhirPropertyMap($class) !== null) {
+                if ($this->isFhirModelClass($class)) {
                     throw new FHIRPathSemanticException("Property '{$propertyName}' does not exist on FHIR type");
                 }
             }
@@ -1513,18 +1442,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return false;
         }
 
-        $reflection = new \ReflectionClass($class);
-        do {
-            foreach ($reflection->getAttributes() as $attribute) {
-                if (str_ends_with($attribute->getName(), 'FHIRPrimitive')) {
-                    return true;
-                }
-            }
-
-            $reflection = $reflection->getParentClass();
-        } while ($reflection !== false);
-
-        return false;
+        return $this->structureKinds->inheritedKindOf($class) === FHIRStructureKind::PrimitiveType;
     }
 
     /**

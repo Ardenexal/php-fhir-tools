@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 
 class FHIRTypeResolverProfileTest extends TestCase
@@ -18,7 +18,7 @@ class FHIRTypeResolverProfileTest extends TestCase
             ],
         );
 
-        $resolver = new FHIRTypeResolver(igTypeRegistry: $registry);
+        $resolver = new FHIRSerializedTypeResolver(igTypeRegistry: $registry);
 
         $data = [
             'resourceType' => 'Patient',
@@ -33,7 +33,7 @@ class FHIRTypeResolverProfileTest extends TestCase
     public function testResolveResourceTypeSkipsUnregisteredProfileUrls(): void
     {
         $registry = new FHIRIGTypeRegistry();
-        $resolver = new FHIRTypeResolver(igTypeRegistry: $registry);
+        $resolver = new FHIRSerializedTypeResolver(igTypeRegistry: $registry);
 
         $data = [
             'resourceType' => 'Patient',
@@ -56,7 +56,7 @@ class FHIRTypeResolverProfileTest extends TestCase
             ],
         );
 
-        $resolver = new FHIRTypeResolver(igTypeRegistry: $registry);
+        $resolver = new FHIRSerializedTypeResolver(igTypeRegistry: $registry);
 
         // Data has no meta.profile — registry must NOT be consulted
         $data = ['resourceType' => 'Patient'];
@@ -68,7 +68,7 @@ class FHIRTypeResolverProfileTest extends TestCase
 
     public function testResolveResourceTypeWithNullRegistryIgnoresMetaProfile(): void
     {
-        $resolver = new FHIRTypeResolver(); // no registry
+        $resolver = new FHIRSerializedTypeResolver(); // no registry
 
         $data = [
             'resourceType' => 'Patient',
@@ -92,7 +92,7 @@ class FHIRTypeResolverProfileTest extends TestCase
             ],
         );
 
-        $resolver = new FHIRTypeResolver(igTypeRegistry: $registry);
+        $resolver = new FHIRSerializedTypeResolver(igTypeRegistry: $registry);
 
         // profile-a listed first in meta.profile → should return stdClass
         $data = [

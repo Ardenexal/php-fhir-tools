@@ -7,6 +7,10 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
@@ -172,8 +176,22 @@ final class PrimitiveFormatChecker
 
     private const string URI_SCHEME = '/\A[a-zA-Z][a-zA-Z0-9+.\-]*:/';
 
-    /** @var array<string, bool> keyed by declaring class and property name; reflection is not free */
+    /**
+     * Memoises the decimal test per concrete class and property name.
+     *
+     * The key is the concrete class, not the declaring one, which only means a profile subclass
+     * gets its own entry. The answer cannot differ: the attribute read behind it resolves through
+     * the declaring class, so parent and child read the same `#[FhirProperty]`.
+     *
+     * @var array<string, bool>
+     */
     private array $decimalProperties = [];
+
+    public function __construct(
+        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
+    ) {
+    }
 
     /**
      * Walk a resource and report every primitive value that could not be read.
@@ -202,21 +220,20 @@ final class PrimitiveFormatChecker
 
         $visited[$id] = true;
         $violations   = $this->checkShape($node, $path);
-        $ref          = new \ReflectionClass($node);
 
-        foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
-            if ($prop->isInitialized($node) === false) {
+        foreach ($this->models->publicPropertyNames($node) as $name) {
+            if (!$this->models->isPropertyInitialized($node, $name)) {
                 continue;
             }
 
-            $value   = $prop->getValue($node);
-            $subPath = $path === '' ? $prop->getName() : $path . '.' . $prop->getName();
+            $value   = $this->models->readInitializedValue($node, $name);
+            $subPath = $path === '' ? $name : $path . '.' . $name;
 
             if ($value instanceof FHIRTemporalValue) {
                 // A temporal value object is the `value` slot of a primitive wrapper, so the wrapper's
                 // own path is the element the reference validator names — `parameter[9].value`, not
                 // `parameter[9].value.value`.
-                $violation = $this->checkTemporal($value, $prop->getName() === 'value' && $path !== '' ? $path : $subPath);
+                $violation = $this->checkTemporal($value, $name === 'value' && $path !== '' ? $path : $subPath);
 
                 if ($violation !== null) {
                     $violations[] = $violation;
@@ -225,7 +242,7 @@ final class PrimitiveFormatChecker
                 continue;
             }
 
-            if (is_string($value) && $value !== '' && $this->isDecimal($prop)) {
+            if (is_string($value) && $value !== '' && $this->isDecimal($node, $name)) {
                 $violation = $this->checkDecimal($value, $subPath);
 
                 if ($violation !== null) {
@@ -235,7 +252,7 @@ final class PrimitiveFormatChecker
                 continue;
             }
 
-            if ($value === '' && $this->isEmptyReportableScalar($prop)) {
+            if ($value === '' && $this->isEmptyReportableScalar($node, $name)) {
                 $violations[] = $this->violation($subPath, 'value cannot be empty');
 
                 continue;
@@ -310,13 +327,13 @@ final class PrimitiveFormatChecker
      */
     private function checkShape(object $node, string $path): array
     {
-        $attributes = (new \ReflectionClass($node))->getAttributes(FHIRPrimitive::class);
+        $attributes = $this->attributes->classAttributes($node, FHIRPrimitive::class);
 
         if ($attributes === [] || $path === '') {
             return [];
         }
 
-        $meta = $attributes[0]->newInstance();
+        $meta = $attributes[0];
         /** @var mixed $value */
         $value = $node->value ?? null;
 
@@ -567,25 +584,29 @@ final class PrimitiveFormatChecker
      *   exactly this. Both findings this rule is for sit on `uri` scalars — `extension[0].url` and
      *   `entry[0].fullUrl` — so nothing is lost by leaving numbers alone.
      */
-    private function isEmptyReportableScalar(\ReflectionProperty $prop): bool
+    private function isEmptyReportableScalar(object $owner, string $property): bool
     {
-        if ($prop->getDeclaringClass()->getAttributes(FHIRPrimitive::class) !== []) {
+        // The declaring class, not the concrete one: a primitive wrapper's own `value` slot is not the
+        // element being reported on, while an `id` inherited from Element still is.
+        $declaring = $this->models->owningClassOf($owner, $property);
+
+        if ($declaring !== null && $this->attributes->classAttributes($declaring, FHIRPrimitive::class) !== []) {
             return false;
         }
 
-        $attributes = $prop->getAttributes(FhirProperty::class);
+        $attributes = $this->attributes->propertyAttributes($owner, $property, FhirProperty::class);
 
         if ($attributes === []) {
             return false;
         }
 
-        $meta = $attributes[0]->newInstance();
+        $meta = $attributes[0];
 
         if (($meta->variants ?? []) !== []) {
             return false;
         }
 
-        if ($this->isDecimal($prop)) {
+        if ($this->isDecimal($owner, $property)) {
             return false;
         }
 
@@ -718,20 +739,23 @@ final class PrimitiveFormatChecker
      * case is unambiguous because `decimal` is the only variant the generator maps to a scalar
      * `string` — `boolean` maps to `bool`, `integer` to `int`, and every other variant to an object
      * — so a string sitting on a choice property with a decimal variant is that variant.
+     *
+     * Reads a *property* attribute, which resolves through the declaring class and is therefore
+     * already profile-safe. That is the semantics being preserved here, not an incidental detail.
      */
-    private function isDecimal(\ReflectionProperty $prop): bool
+    private function isDecimal(object $owner, string $property): bool
     {
-        $key = $prop->getDeclaringClass()->getName() . '::' . $prop->getName();
+        $key = $owner::class . '::' . $property;
 
         if (isset($this->decimalProperties[$key])) {
             return $this->decimalProperties[$key];
         }
 
         $isDecimal  = false;
-        $attributes = $prop->getAttributes(FhirProperty::class);
+        $attributes = $this->attributes->propertyAttributes($owner, $property, FhirProperty::class);
 
         if ($attributes !== []) {
-            $meta = $attributes[0]->newInstance();
+            $meta = $attributes[0];
 
             $isDecimal = in_array($meta->fhirType, ['decimal', 'http://hl7.org/fhirpath/System.Decimal'], true);
 

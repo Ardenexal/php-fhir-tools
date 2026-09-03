@@ -7,6 +7,8 @@ namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Validation\FHIRElementPath;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -46,6 +48,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     public function __construct(
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly SliceDiscriminatorMatcher $matcher,
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
     ) {
     }
 
@@ -107,16 +110,14 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             return;
         }
 
-        $refl = new \ReflectionClass($value);
-
         // Collect all slice constraints for this property + active group
-        $sliceConstraints = $this->collectSliceConstraints($refl, $property, $activeGroup);
+        $sliceConstraints = $this->collectSliceConstraints($value, $property, $activeGroup);
         if ($sliceConstraints === []) {
             return;
         }
 
         // Read slicing rules for this property (if any)
-        $slicingRules = $this->readSlicingRules($refl, $property, $activeGroup);
+        $slicingRules = $this->readSlicingRules($value, $property, $activeGroup);
 
         // Match items → slices
         $this->validateSlices($items, $sliceConstraints, $slicingRules, $property);
@@ -253,62 +254,52 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     }
 
     /**
-     * @param \ReflectionClass<object> $refl
-     *
      * @return list<FHIRSliceConstraint>
      */
     private function collectSliceConstraints(
-        \ReflectionClass $refl,
+        object $subject,
         string $property,
         string $activeGroup,
     ): array {
         $results = [];
-        // Walk ancestors: a derived profile inherits its parent's slices without re-declaring them.
-        // ObservationBpProfile extends ObservationVitalsignsProfile, and the VSCat slice on category
-        // lives on the parent -- but ReflectionClass::getAttributes() reports only what the class
-        // itself declares, so reading the instance class alone finds nothing and the required slice
-        // is silently never checked.
-        for ($class = $refl; $class !== false; $class = $class->getParentClass()) {
-            foreach ($class->getAttributes(FHIRSliceConstraint::class) as $attr) {
-                /** @var FHIRSliceConstraint $sc */
-                $sc = $attr->newInstance();
-                if ($sc->property !== $property) {
-                    continue;
-                }
-                $groups = $sc->groups ?? [];
-                if ($groups !== [] && !in_array($activeGroup, $groups, true)) {
-                    continue;
-                }
-                $results[] = $sc;
+        // Ancestors included: a derived profile inherits its parent's slices without re-declaring
+        // them. ObservationBpProfile extends ObservationVitalsignsProfile and the VSCat slice on
+        // category lives on the parent, so reading the instance class alone finds nothing and the
+        // required slice is silently never checked.
+        foreach ($this->attributes->classAttributesInHierarchy($subject, FHIRSliceConstraint::class) as $sc) {
+            if ($sc->property !== $property) {
+                continue;
             }
+
+            $groups = $sc->groups ?? [];
+
+            if ($groups !== [] && !in_array($activeGroup, $groups, true)) {
+                continue;
+            }
+
+            $results[] = $sc;
         }
 
         return $results;
     }
 
-    /**
-     * @param \ReflectionClass<object> $refl
-     */
     private function readSlicingRules(
-        \ReflectionClass $refl,
+        object $subject,
         string $property,
         string $activeGroup,
     ): ?FHIRSlicingRules {
         // Ancestors too, for the same reason as collectSliceConstraints(): an inherited slice brings
         // its inherited slicing rules with it, and losing them turns closed slicing into open.
-        for ($class = $refl; $class !== false; $class = $class->getParentClass()) {
-            foreach ($class->getAttributes(FHIRSlicingRules::class) as $attr) {
-                /** @var FHIRSlicingRules $rules */
-                $rules = $attr->newInstance();
-                if ($rules->property !== $property) {
-                    continue;
-                }
-                if ($rules->groups !== [] && !in_array($activeGroup, $rules->groups, true)) {
-                    continue;
-                }
-
-                return $rules;
+        foreach ($this->attributes->classAttributesInHierarchy($subject, FHIRSlicingRules::class) as $rules) {
+            if ($rules->property !== $property) {
+                continue;
             }
+
+            if ($rules->groups !== [] && !in_array($activeGroup, $rules->groups, true)) {
+                continue;
+            }
+
+            return $rules;
         }
 
         return null;

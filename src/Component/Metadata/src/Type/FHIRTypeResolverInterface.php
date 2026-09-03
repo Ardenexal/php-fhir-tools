@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Serialization;
+namespace Ardenexal\FHIRTools\Component\Metadata\Type;
 
 /**
  * Interface for resolving FHIR types from serialized data using discriminator maps
