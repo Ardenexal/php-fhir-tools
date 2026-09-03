@@ -52,7 +52,11 @@ done
 
 # Positive control: Metadata legitimately reflects, so this must stay non-zero. If it ever reads 0 the
 # pattern itself has broken and every other number this script prints is worthless.
-CONTROL_COUNT="$(grep -rnE "$PATTERN" "$CONTROL_DIR" --include='*.php' | wc -l | tr -d ' ')"
+# `|| true` is load-bearing under `set -o pipefail`: grep exits 1 when it matches nothing, which is
+# exactly the broken-pattern case this check exists to catch. Without it the pipeline fails, `set -e`
+# kills the script at this assignment, and the self-check below never runs -- so the one message that
+# says the pattern is broken is replaced by a bare exit 1 that reads as an unrelated failure.
+CONTROL_COUNT="$( { grep -rnE "$PATTERN" "$CONTROL_DIR" --include='*.php' || true; } | wc -l | tr -d ' ')"
 [ "$CONTROL_COUNT" -gt 0 ] || fail "positive control over $CONTROL_DIR returned 0; the pattern no longer matches known reflection"
 
 RAW="$(grep -rnE "$PATTERN" $TARGETS --include='*.php' || true)"
