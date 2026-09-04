@@ -454,8 +454,23 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                 return $value;
             }
 
+            // One occurrence of a repeating element is not a list. `XmlEncoder` decodes
+            // `<profile value="X"/>` to the element's own map, `['@value' => 'X', '#' => '']`, and
+            // only decodes two or more occurrences to a list of such maps. Iterating the
+            // single-occurrence map walks its *keys*, so `Meta.profile` came back holding two
+            // primitives from one element: 'X' from `@value`, then '' from `#`. Two occurrences in
+            // yielded two out, which is why this read as correct for so long.
+            //
+            // Wrapping is what every sibling branch in FHIRComplexTypeXmlNormalizer already does
+            // (search: `!array_is_list`); this one was the omission. It also restores the child
+            // extension of a lone occurrence, which the key walk dropped along with the count.
+            //
+            // JSON is unaffected: a repeating primitive is always a JSON array, so it is always a
+            // list here and takes the same path it did before.
+            $items = array_is_list($value) ? $value : [$value];
+
             $result = [];
-            foreach ($value as $item) {
+            foreach ($items as $item) {
                 $result[] = $this->denormalizer->denormalize($item, $primitiveClass, $format, $context);
             }
 
