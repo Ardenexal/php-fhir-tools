@@ -20,11 +20,44 @@
 - **`PropertyMetadata->xmlNamespace`** (plumbed from `#[FhirProperty]`) drives per-element
   namespaces; `sdtc*` property names are stripped to their bare local name at serialize time.
 
-## Trap to remember (open, deferred to M6)
+## Trap to remember (RESOLVED 2026-09-07, issue #116)
 
 `@xmlns` is a **default-namespace redefinition**: it applies to the element AND every descendant
-that doesn't redeclare. So children of a *populated* sdtc/AU extension element currently inherit the
-extension namespace. If CDA requires extension *content* to stay in `urn:hl7-org:v3`, the fix is a
-prefixed form (`<sdtc:category>` + a root `xmlns:sdtc` binding), not `@xmlns`. Unresolvable without a
-published CDA fixture — verify against M6 fixtures before trusting any populated-extension output.
-Same question applies to namespaced xmlAttrs (`CD->sdtcValueSet`).
+that doesn't redeclare. So children of a *populated* sdtc/AU extension element inherited the
+extension namespace, and the wrapped type's own `#[LogicalModel]` namespace was never consulted.
+
+**Resolved.** Extension *content* does stay in `urn:hl7-org:v3` — confirmed against real AU CDA
+usage in issue #116, where the affected subtree carried a practice group's HPI-O. The fix is neither
+a prefixed form nor unconditional redeclaration: `FHIRComplexTypeXmlNormalizer` now carries the
+in-scope default namespace on the serialization context (`XML_DEFAULT_NAMESPACE_CONTEXT_KEY`) and
+declares a namespace on a child element only where it differs from that scope. A prefixed form was
+considered and rejected — same infoset, but it needs a prefix registry and a root binding collected
+across the whole subtree.
+
+**The metadata already distinguished the two cases**, which is why no regeneration was needed.
+Content that genuinely belongs to the extension namespace carries a property-level `xmlNamespace` on
+every child (`AuAsEntityIdentifier::$id`, `AuSubstitutionPermission::$code`); content that does not
+carries none and falls back to the declaring type's namespace
+(`AuEmployerOrganization::$id`/`$name`/`$asOrganizationPartOf`). A survey of
+`src/Component/CdaModels/src` splits the surface cleanly: 241 classes declare `urn:hl7-org:v3` and 6
+declare `urn:hl7-org:sdtc` at class level; 87 AU and 82 sdtc declarations are property-level.
+
+**Consequence for sdtc, which the old note left open** — measured, not reasoned. The six class-level
+sdtc types (`INT_POS`, `IdentifiedBy`, `InFulfillmentOf1`, `InFulfillmentOf1ActReference`,
+`Precondition2`, `PreconditionBase`) come out unchanged, because their children match their own
+namespace: `Act.sdtcPrecondition2` emits `<precondition2 xmlns="urn:hl7-org:sdtc"><allTrue …/>` with
+`allTrue` inheriting sdtc and declaring nothing. The 82 property-level sdtc sites hold core CDA types
+(`CE`, `CD`, `II`) whose class namespace is `urn:hl7-org:v3`, so their element children now emit as
+CDA: `Patient.sdtcRaceCode` with a populated `originalText` gives
+`<raceCode xmlns="urn:hl7-org:sdtc" code="SDTCRACE"><originalText xmlns="urn:hl7-org:v3">`.
+
+Do not read that second result as spec-confirmed. The *mechanism* is observed and matches the AU case
+the issue settled, but no published sdtc fixture was consulted and nothing in the repo populates one —
+every pre-existing sdtc assertion in the suite covers an attribute-only element, which is precisely
+why the 82-site change moved no test.
+
+Namespaced xmlAttrs (`CD->sdtcValueSet`) are unaffected: an unprefixed attribute is in no namespace.
+
+**Evidence:** `src/Component/Serialization/tests/Unit/CdaExtensionNamespaceScopeTest.php`
+(search: `testCdaTypedChildrenOfAnExtensionElementStayInTheCdaNamespace`) — asserts through DOM
+`namespaceURI`, because the defect is invisible to `local-name()` and to prefix comparison.
