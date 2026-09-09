@@ -112,10 +112,47 @@ class SubstanceAdministration extends InfrastructureRoot
         public ?CS $statusCode = null,
         #[FhirProperty(
             fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/SXCM-TS',
-            propertyKind: 'complex',
+            propertyKind: 'polymorphic',
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\SXCMTS',
+            variants: [
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/IVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS',
+                    'jsonKey'      => 'effectiveTime',
+                    'typeName'     => 'IVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/EIVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\EIVLTS',
+                    'jsonKey'      => 'effectiveTime',
+                    'typeName'     => 'EIVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/PIVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\PIVLTS',
+                    'jsonKey'      => 'effectiveTime',
+                    'typeName'     => 'PIVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/SXPR-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\SXPRTS',
+                    'jsonKey'      => 'effectiveTime',
+                    'typeName'     => 'SXPR_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/SXCM-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\SXCMTS',
+                    'jsonKey'      => 'effectiveTime',
+                    'typeName'     => 'SXCM_TS',
+                ],
+            ],
         )]
         public array $effectiveTime = [],
         #[FhirProperty(

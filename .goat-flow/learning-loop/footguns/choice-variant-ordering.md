@@ -1,6 +1,6 @@
 ---
 category: choice-variant-ordering
-last_reviewed: 2026-08-07
+last_reviewed: 2026-09-09
 ---
 
 # Footguns: Choice Variant Ordering
@@ -44,6 +44,11 @@ compare equal — but that sorted list must not be used as the emitted variant o
 
 Directly relevant to operation code generation M02, which will build variant lists for every
 operation in three FHIR versions. `CodeSystem/$lookup` happens to be safe; do not generalise from it.
+
+The same rule governs CDA polymorphic elements, where the discriminator is an `xsi:type` attribute
+rather than the element name, and where the published definitions order supertypes FIRST — so their
+order can never be emitted as-is. Sorting them is a partial-order problem with its own trap; see
+[[cda-polymorphic-elements]].
 
 ## Footgun: building `Models\{version}\...` FQCNs by hand silently defeats profiles
 

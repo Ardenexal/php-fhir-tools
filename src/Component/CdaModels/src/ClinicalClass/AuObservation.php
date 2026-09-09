@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass;
 
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\ANY;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CD;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
@@ -66,7 +67,7 @@ class AuObservation extends Observation
      * @param list<AuInFulfillmentOf>         $inFulfillmentOf
      * @param list<II>                        $id
      * @param list<CD>                        $sdtcCategory
-     * @param list<CD>                        $value
+     * @param list<ANY>                       $value
      * @param list<CE>                        $interpretationCode
      * @param list<CE>                        $methodCode
      * @param list<CD>                        $targetSiteCode

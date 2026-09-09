@@ -31,6 +31,16 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute;
  *                         value[x] slot.
  *   'enum'              — Backed enum (CDA coded property bound to a generated enum, e.g. NullFlavor);
  *                         the property type IS the enum and its ->value is the code string
+ *   'polymorphic'       — CDA element admitting several datatypes, discriminated on the wire by an
+ *                         `xsi:type` attribute rather than by the element name (an observation's value
+ *                         admits 29). The property is typed to the nearest datatype all of them derive
+ *                         from, and each variant carries `typeName`, the published CDA type name to
+ *                         write. Unlike 'choice', isChoice stays FALSE and every variant shares one
+ *                         element name; unlike 'choiceGroup', one value occupies the slot rather than
+ *                         a list of heterogeneous children. Variants MUST be ordered
+ *                         subclass-before-superclass: a reader takes the first `instanceof` match, and
+ *                         the definitions publish the opposite order (an observation's value lists
+ *                         `CD` ahead of `CE`, `CO`, `CS`, `CV`).
  *
  * @author Ardenexal
  */
@@ -38,10 +48,12 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute;
 final class FhirProperty
 {
     /**
-     * @param list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}>|null $variants
-     *                                                                                                             Per-variant metadata. Populated when isChoice is true (one entry per value[x] type) OR
-     *                                                                                                             when propertyKind is 'choiceGroup' (one entry per allowed child element name, jsonKey =
-     *                                                                                                             element name, phpType = the item value's FQCN or 'string'). Null otherwise.
+     * @param list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, typeName?: string}>|null $variants
+     *                                                                                                                                Per-variant metadata. Populated when isChoice is true (one entry per value[x] type), when
+     *                                                                                                                                propertyKind is 'choiceGroup' (one entry per allowed child element name, jsonKey =
+     *                                                                                                                                element name, phpType = the item value's FQCN or 'string'), or when propertyKind is
+     *                                                                                                                                'polymorphic' (one entry per admitted CDA datatype, every jsonKey the same element name,
+     *                                                                                                                                typeName the published CDA type name). Null otherwise.
      */
     public function __construct(
         /** FHIR type code: 'date', 'HumanName', 'BackboneElement', 'choice', etc. */

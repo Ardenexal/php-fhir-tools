@@ -22,7 +22,7 @@ class AuAddr extends AD
     /**
      * @param list<PostalAddressUse> $use
      * @param list<ChoiceGroupItem>  $item
-     * @param list<IVLTS>            $useablePeriod
+     * @param list<SXCMTS>           $useablePeriod
      */
     public function __construct(
         ?bool $isNotOrdered = null,

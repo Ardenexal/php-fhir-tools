@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Command;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\CdaTypeHierarchy;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ClassNameResolver;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ContentModelOrderResolver;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
@@ -667,6 +668,10 @@ class FHIRModelGeneratorCommand extends Command
 
         $generator = new LogicalModelGenerator();
 
+        // Types and orders an element admitting several datatypes. Uses the same type-aware `parentOf`
+        // map as constructor forwarding, not `baseDefinition` — see CdaTypeHierarchy.
+        $hierarchy = new CdaTypeHierarchy($names, $parentOf);
+
         // Pre-compute each class's OWN constructor parameters, then memoise each class's FULL ordered
         // parameter list (own ++ parent's full, walked through `parentOf`). A child is handed its
         // parent's full list so it can re-declare those params and forward them via
@@ -677,7 +682,7 @@ class FHIRModelGeneratorCommand extends Command
             $parent          = $parentOf[$url] ?? '';
             $inheritedNames  = ($parent !== '' && isset($ownPropNames[$parent])) ? $ownPropNames[$parent] : [];
             $classXmlNs      = $this->resolveCdaXmlNamespace($url, $xmlNsDirect, $baseOf);
-            $ownParams[$url] = $generator->collectOwnParameters($sd, $urlToFqcn, $classXmlNs, $inheritedNames, $valueSetToEnumFqcn);
+            $ownParams[$url] = $generator->collectOwnParameters($sd, $urlToFqcn, $classXmlNs, $inheritedNames, $valueSetToEnumFqcn, $hierarchy);
         }
 
         /** @var array<string, list<array<string, mixed>>> $fullParams */
@@ -705,7 +710,7 @@ class FHIRModelGeneratorCommand extends Command
             $inheritedConstraintKeys = ($parent !== '' && isset($ownConstraints[$parent])) ? $ownConstraints[$parent] : [];
             $inheritedParams         = ($parent !== '' && isset($fullParams[$parent])) ? $fullParams[$parent] : [];
             try {
-                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys, $valueSetToEnumFqcn, $inheritedParams, $propertyOrders[$url] ?? []);
+                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys, $valueSetToEnumFqcn, $inheritedParams, $propertyOrders[$url] ?? [], $hierarchy);
             } catch (\Throwable $e) {
                 $this->errorCollector->addError(
                     "CDA class generation failed for {$url}: {$e->getMessage()}",

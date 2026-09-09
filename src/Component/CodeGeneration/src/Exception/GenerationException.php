@@ -200,6 +200,61 @@ class GenerationException extends \Exception
     }
 
     /**
+     * Create exception for an admitted CDA datatype whose published type name cannot be sourced.
+     *
+     * Raised instead of falling back to the URL's last segment or the generated class name. Those
+     * two guesses are wrong for nine of the thirty datatypes a CDA element can admit (`.../IVL-PQ`
+     * is published as `IVL_PQ`), and an element carrying a wrong `xsi:type` is well-formed,
+     * plausible, and rejected only by a schema-validating receiver — the exact silent failure this
+     * discriminator exists to prevent. Failing here keeps the error attached to the element that
+     * caused it.
+     *
+     * @param string $elementPath The element admitting the datatype
+     * @param string $typeUrl     The admitted datatype's canonical URL, which resolves to no name
+     *
+     * @return self
+     */
+    public static function unresolvablePolymorphicTypeName(string $elementPath, string $typeUrl): self
+    {
+        return new self(
+            "Element '{$elementPath}' admits datatype '{$typeUrl}', but no generated class or published CDA type name could be resolved for it. "
+            . 'Ensure the package providing this type is included in your --package list.',
+            [
+                'element_path' => $elementPath,
+                'type_url'     => $typeUrl,
+            ],
+        );
+    }
+
+    /**
+     * Create exception for a polymorphic element whose admitted datatypes share no ancestor.
+     *
+     * A polymorphic element is typed to the nearest datatype all of its admitted types derive from.
+     * With no shared ancestor there is no such type, and the alternative — keeping the first admitted
+     * datatype and dropping the rest — is what made these elements unable to hold their own legal
+     * values in the first place. Unreachable for the currently pinned packages, where all nine
+     * polymorphic elements resolve; kept because a future pin could add a type outside the hierarchy.
+     *
+     * @param string       $elementPath The polymorphic element
+     * @param list<string> $typeUrls    Canonical URLs of every datatype it admits
+     *
+     * @return self
+     */
+    public static function polymorphicElementWithoutCommonType(string $elementPath, array $typeUrls): self
+    {
+        return new self(
+            "Element '{$elementPath}' admits datatypes that share no common ancestor: "
+            . implode(', ', $typeUrls)
+            . '. A polymorphic CDA element must be typed to the nearest datatype all of its admitted '
+            . 'types derive from, and no such type exists here.',
+            [
+                'element_path' => $elementPath,
+                'type_urls'    => $typeUrls,
+            ],
+        );
+    }
+
+    /**
      * Create exception for unsupported FHIR version
      *
      * @param string $version The unsupported version

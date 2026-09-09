@@ -156,16 +156,24 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
 
                     // Build variants for value[x] choices (isChoice) AND for transparent
                     // xml-choice-group properties (propertyKind 'choiceGroup'), which reuse the
-                    // same per-variant shape keyed by child element name. value[x] semantics are
-                    // unchanged; choiceGroup keeps isChoice false (see FhirProperty propertyKind doc).
+                    // same per-variant shape keyed by child element name, AND for CDA 'polymorphic'
+                    // properties, whose variants share one element name and carry the published type
+                    // name instead. value[x] semantics are unchanged; choiceGroup and polymorphic both
+                    // keep isChoice false (see FhirProperty propertyKind doc).
                     $variants = null;
-                    if ($attr->variants !== null && ($attr->isChoice || $attr->propertyKind === 'choiceGroup')) {
+                    if (
+                        $attr->variants !== null
+                        && ($attr->isChoice
+                            || $attr->propertyKind === 'choiceGroup'
+                            || $attr->propertyKind === 'polymorphic')
+                    ) {
                         $variants = array_map(
                             static fn (array $v): PropertyVariantMetadata => PropertyVariantMetadata::fromArray(
                                 $v['fhirType'],
                                 $v['propertyKind'],
                                 $v['phpType'],
                                 $v['jsonKey'],
+                                $v['typeName'] ?? null,
                             ),
                             $attr->variants,
                         );

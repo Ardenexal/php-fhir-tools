@@ -25,18 +25,48 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 class TEL extends ANY
 {
     /**
-     * @param list<IVLTS>  $useablePeriod
+     * @param list<SXCMTS> $useablePeriod
      * @param list<string> $use
      */
     public function __construct(
         #[FhirProperty(fhirType: 'url', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@value')]
         public ?string $value = null,
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/IVL-TS',
-            propertyKind: 'complex',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/SXCM-TS',
+            propertyKind: 'polymorphic',
             isArray: true,
             isRequired: false,
-            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS',
+            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\SXCMTS',
+            variants: [
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/IVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS',
+                    'jsonKey'      => 'useablePeriod',
+                    'typeName'     => 'IVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/EIVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\EIVLTS',
+                    'jsonKey'      => 'useablePeriod',
+                    'typeName'     => 'EIVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/PIVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\PIVLTS',
+                    'jsonKey'      => 'useablePeriod',
+                    'typeName'     => 'PIVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/SXPR-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\SXPRTS',
+                    'jsonKey'      => 'useablePeriod',
+                    'typeName'     => 'SXPR_TS',
+                ],
+            ],
         )]
         public array $useablePeriod = [],
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: true, isRequired: false, xmlSerializedName: '@use')]

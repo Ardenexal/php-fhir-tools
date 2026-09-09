@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass;
 
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\ANY;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CD;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
@@ -63,7 +64,7 @@ class Observation extends InfrastructureRoot
     /**
      * @param list<II>                        $id
      * @param list<CD>                        $sdtcCategory
-     * @param list<CD>                        $value
+     * @param list<ANY>                       $value
      * @param list<CE>                        $interpretationCode
      * @param list<CE>                        $methodCode
      * @param list<CD>                        $targetSiteCode
@@ -162,11 +163,216 @@ class Observation extends InfrastructureRoot
         )]
         public ?CS $languageCode = null,
         #[FhirProperty(
-            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/CD',
-            propertyKind: 'complex',
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/ANY',
+            propertyKind: 'polymorphic',
             isArray: true,
             isRequired: false,
-            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\CD',
+            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ANY',
+            variants: [
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/CO',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\CO',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'CO',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/CS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\CS',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'CS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/CV',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\CV',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'CV',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/CE',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\CE',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'CE',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/CD',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\CD',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'CD',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/IVL-PQ',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLPQ',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'IVL_PQ',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/PQ',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\PQ',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'PQ',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/SC',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\SC',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'SC',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/ST',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ST',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'ST',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/AD',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\AD',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'AD',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/BL',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\BL',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'BL',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/ED',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ED',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'ED',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/ON',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\ON',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'ON',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/PN',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\PN',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'PN',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/TN',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\TN',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'TN',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/EN',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\EN',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'EN',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/II',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\II',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'II',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/INT-POS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\INTPOS',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'INT_POS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/INT',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\INTType',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'INT',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/MO',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\MO',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'MO',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/REAL',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\REAL',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'REAL',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/TEL',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\TEL',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'TEL',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/IVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'IVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/PIVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\PIVLTS',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'PIVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/EIVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\EIVLTS',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'EIVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/SXPR-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\SXPRTS',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'SXPR_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\TS',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/IVL-INT',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLINT',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'IVL_INT',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/RTO-PQ-PQ',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\RTOPQPQ',
+                    'jsonKey'      => 'value',
+                    'typeName'     => 'RTO_PQ_PQ',
+                ],
+            ],
         )]
         public array $value = [],
         #[FhirProperty(

@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class AuTelecom extends TEL
 {
     /**
-     * @param list<IVLTS>  $useablePeriod
+     * @param list<SXCMTS> $useablePeriod
      * @param list<string> $use
      */
     public function __construct(
