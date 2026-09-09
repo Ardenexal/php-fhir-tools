@@ -23,8 +23,15 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  *
  * The namespace is declared only on the outermost element: nested CDA datatypes route back through
  * this same normalizer recursively, and re-declaring xmlns on every child both bloats the output
- * and breaks byte-level round-trips against published CDA examples. Root detection uses a context
- * flag that is set on the context handed to child normalize() calls.
+ * and breaks byte-level round-trips against published CDA examples. The root is the element with no
+ * namespace yet in scope, tracked on the context handed to child normalize() calls.
+ *
+ * That scope is a namespace rather than a yes/no nesting flag because `@xmlns` is a default-namespace
+ * *redefinition*, inherited by the element's entire subtree. An sdtc or AU extension element
+ * therefore pulls everything beneath it into the extension namespace unless something declares
+ * otherwise, and knowing only that an object is nested cannot tell it whether it needs to. Nested
+ * types supply their own namespace through contentNamespace(), which normalizeForXML() applies per
+ * child element wherever it differs from the scope in force.
  *
  * The root also declares the XML Schema instance namespace, and this normalizer writes an xsi:type
  * attribute onto every element whose declared type admits several datatypes — CDA's way of saying
@@ -37,12 +44,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 class FHIRLogicalModelXmlNormalizer extends FHIRComplexTypeXmlNormalizer
 {
     use LogicalModelLocatorTrait;
-
-    /**
-     * Context key marking that the current object is nested inside an already-serialized CDA root,
-     * so its class namespace must not be re-declared.
-     */
-    private const NESTED_FLAG = '__cda_nested';
 
     /**
      * The XML Schema instance namespace, whose `type` attribute names the concrete datatype occupying
@@ -69,12 +70,23 @@ class FHIRLogicalModelXmlNormalizer extends FHIRComplexTypeXmlNormalizer
         }
 
         $xmlNamespace = $this->logicalModelXmlNamespace($object);
-        $isRoot       = !($context[self::NESTED_FLAG] ?? false);
 
-        // Mark every child (recursively serialized via the injected Serializer) as nested so they
-        // do not re-declare the namespace.
-        $childContext                    = $context;
-        $childContext[self::NESTED_FLAG] = true;
+        // No namespace in scope yet means nothing above has declared one, which only happens at the
+        // document root. Everywhere else the key holds the namespace this element actually sits in —
+        // the root's own for ordinary CDA content, or an sdtc/AU extension namespace for content
+        // nested under an extension element.
+        $inheritedNamespace = $context[self::XML_DEFAULT_NAMESPACE_CONTEXT_KEY] ?? null;
+        $isRoot             = $inheritedNamespace === null;
+
+        // The root declares its namespace below, so from its children's point of view that is what
+        // is in scope. A nested object declares nothing here: the element it occupies was already
+        // placed in a namespace by the property that named it, and re-declaring on the element would
+        // both bloat the output and contradict that placement. Its own namespace is instead applied
+        // per child element by normalizeForXML(), via contentNamespace().
+        $childContext = $context;
+        if ($isRoot && $xmlNamespace !== null) {
+            $childContext[self::XML_DEFAULT_NAMESPACE_CONTEXT_KEY] = $xmlNamespace;
+        }
 
         $data = $this->normalizeForXML($object, FHIRSerializationContext::fromSymfonyContext($childContext), $childContext);
         $data = $this->stampPolymorphicTypes($object, $data);
@@ -363,6 +375,29 @@ class FHIRLogicalModelXmlNormalizer extends FHIRComplexTypeXmlNormalizer
         // `??` already covers a null attribute — it suppresses the whole property chain — so nullsafe
         // access here would be redundant.
         return $this->findLogicalModelAttribute($object)->propertyOrder ?? [];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * A CDA type declares the namespace its own elements live in, and that declaration is what makes
+     * extension content terminate correctly. `AuEmployerOrganization` is reached through a property
+     * in the AU extension namespace, yet its `id`/`name`/`asOrganizationPartOf` are ordinary CDA
+     * elements in `urn:hl7-org:v3` — the property namespace names the wrapping element only, and
+     * says nothing about what the wrapped type's content model is.
+     *
+     * Reading it from the type rather than from the enclosing scope is the whole point: a namespace
+     * is part of element identity, so `<name>` in the AU namespace is a different element from CDA's
+     * `<name>`, and a validating consumer reading the AU one sees an organisation with no name at
+     * all. Nothing about that is visible to an assertion written with `local-name()`.
+     *
+     * @param object $object the CDA logical-model instance being serialized
+     *
+     * @return string|null the type's declared XML namespace, or null when it declares none
+     */
+    protected function contentNamespace(object $object): ?string
+    {
+        return $this->logicalModelXmlNamespace($object);
     }
 
     /**

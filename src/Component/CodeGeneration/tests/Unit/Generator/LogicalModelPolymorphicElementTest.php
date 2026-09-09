@@ -257,7 +257,7 @@ final class LogicalModelPolymorphicElementTest extends TestCase
         // The guard: a datatype the definitions do not name. Falling back to the URL segment or the
         // class name would emit a plausible, wrong discriminator that only schema validation catches.
         $this->expectException(GenerationException::class);
-        $this->expectExceptionMessageMatches('/resolves to no published type name/');
+        $this->expectExceptionMessageMatches('/no generated class or published CDA type name could be resolved/');
 
         $this->generateWithValue(
             [['code' => self::CD], ['code' => 'urn:test:Unnamed']],
@@ -269,7 +269,7 @@ final class LogicalModelPolymorphicElementTest extends TestCase
     public function testGenerationFailsWhenAnAdmittedDatatypeHasNoGeneratedClass(): void
     {
         $this->expectException(GenerationException::class);
-        $this->expectExceptionMessageMatches('/resolves to no published type name/');
+        $this->expectExceptionMessageMatches('/no generated class or published CDA type name could be resolved/');
 
         // Named in the hierarchy, but absent from the class map.
         $this->generateWithValue(

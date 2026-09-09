@@ -39,6 +39,18 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      */
     public const SOURCE_ELEMENT_CONTEXT_KEY = '__cda_source_element';
 
+    /**
+     * Context key holding the XML default namespace currently in scope — the one an element with no
+     * declaration of its own inherits. Threaded down to every child normalize() call so each element
+     * can tell whether its own namespace is already in scope or has to be declared.
+     *
+     * A boolean "am I nested?" flag cannot answer that: `@xmlns` is a default-namespace
+     * *redefinition*, so it applies to the element and its whole subtree, and knowing only that an
+     * object is nested says nothing about which namespace it is nested in. Absent from the context
+     * means no namespace is in scope yet, i.e. this is the document root.
+     */
+    protected const XML_DEFAULT_NAMESPACE_CONTEXT_KEY = '__cda_default_ns';
+
     private readonly XmlEncoder $xmlEncoder;
 
     public function __construct(
@@ -452,6 +464,11 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         $metaMap           = $this->getPropertyMetadataMap($object);
         $includeExtensions = $fhirContext->includeExtensions;
 
+        // The namespace in scope on this element, and the one its own un-overridden children belong
+        // to. Both are null for standard FHIR, which makes every namespace decision below a no-op.
+        $inheritedNamespace = $context[self::XML_DEFAULT_NAMESPACE_CONTEXT_KEY] ?? null;
+        $contentNamespace   = $this->contentNamespace($object);
+
         $propertyNames = self::orderByContentModel(
             self::modelAccessor()->publicPropertyNames($object),
             $this->contentModelOrder($object),
@@ -471,6 +488,22 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
             $meta   = $metaMap[$propertyName] ?? null;
             $xmlKey = $meta !== null ? ($meta->jsonKey ?? $propertyName) : $propertyName;
+
+            // The namespace this property's element sits in: its own override, else the namespace of
+            // the type that declares it, else whatever is already in scope. Threaded down as the
+            // scope for everything nested inside that element, so a grandchild whose namespace is
+            // already in scope stays silent instead of redundantly re-declaring it.
+            //
+            // Spelt as a ternary rather than `$meta?->xmlNamespace`: PHPStan reads the map as
+            // `array<string, PropertyMetadata>` and so believes the lookup above cannot yield null,
+            // which makes it call the nullsafe operator redundant. It is not — a property with no
+            // metadata really does land here, which is why every sibling branch guards $meta too.
+            $propertyNamespace = $meta !== null ? $meta->xmlNamespace : null;
+            $elementNamespace  = $propertyNamespace ?? $contentNamespace ?? $inheritedNamespace;
+            $childContext      = $context;
+            if ($elementNamespace !== null) {
+                $childContext[self::XML_DEFAULT_NAMESPACE_CONTEXT_KEY] = $elementNamespace;
+            }
 
             // CDA text-carrying types (ST and its subtypes ED, ADXP, ENXP, …) hold the element's
             // character data in a scalar property named `xmlText`. It must serialize as the
@@ -505,7 +538,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     [$resolvedKind, $resolvedKey] = $choiceMatch;
                     $xmlKey                       = $resolvedKey;
                     if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
-                        $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context, $includeExtensions);
+                        $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $childContext, $includeExtensions);
                         if ($normalizedValue !== null) {
                             $data[$xmlKey] = $normalizedValue;
                         }
@@ -513,8 +546,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         $data[$xmlKey] = $this->wrapScalarForXml($value);
                     } else {
                         $normalizedValue = $this->normalizer !== null
-                            ? $this->normalizer->normalize($value, 'xml', $context)
-                            : $this->normalizeBasicValue($value, 'xml', $context);
+                            ? $this->normalizer->normalize($value, 'xml', $childContext)
+                            : $this->normalizeBasicValue($value, 'xml', $childContext);
                         if ($normalizedValue !== null) {
                             $data[$xmlKey] = $normalizedValue;
                         }
@@ -523,8 +556,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 }
             } elseif ($isChoice) {
                 $normalizedValue = $this->normalizer !== null
-                    ? $this->normalizer->normalize($value, 'xml', $context)
-                    : $this->normalizeBasicValue($value, 'xml', $context);
+                    ? $this->normalizer->normalize($value, 'xml', $childContext)
+                    : $this->normalizeBasicValue($value, 'xml', $childContext);
                 if ($normalizedValue !== null) {
                     $data[$xmlKey] = $normalizedValue;
                 }
@@ -585,8 +618,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 $normalizedValue = is_scalar($value)
                     ? $this->wrapScalarForXml($value)
                     : ($this->normalizer !== null
-                        ? $this->normalizer->normalize($value, 'xml', $context)
-                        : $this->normalizeBasicValue($value, 'xml', $context));
+                        ? $this->normalizer->normalize($value, 'xml', $childContext)
+                        : $this->normalizeBasicValue($value, 'xml', $childContext));
                 $normalizedValue = $this->applyElementNamespace($normalizedValue, $meta->xmlNamespace);
                 if ($normalizedValue !== null) {
                     // Buffered rather than written straight in: the stripped local name can equal a
@@ -617,7 +650,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
             // Polymorphic resource: wrap with resource type element name
             if ($meta !== null && $meta->propertyKind === 'resource') {
-                $wrapped = $this->normalizePolymorphicResourcesXml($value, $meta, $context);
+                $wrapped = $this->normalizePolymorphicResourcesXml($value, $meta, $childContext);
                 if ($wrapped !== null) {
                     $data[$xmlKey] = $wrapped;
                 }
@@ -625,7 +658,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             }
 
             if ($this->isPrimitiveWithExtensions($value)) {
-                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context, $includeExtensions);
+                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $childContext, $includeExtensions);
                 if ($normalizedValue !== null) {
                     $data[$xmlKey] = $normalizedValue;
                 }
@@ -633,11 +666,32 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 $data[$xmlKey] = $this->wrapScalarForXml($value);
             } else {
                 $normalizedValue = $this->normalizer !== null
-                    ? $this->normalizer->normalize($value, 'xml', $context)
-                    : $this->normalizeBasicValue($value, 'xml', $context);
+                    ? $this->normalizer->normalize($value, 'xml', $childContext)
+                    : $this->normalizeBasicValue($value, 'xml', $childContext);
                 if ($normalizedValue !== null) {
                     $data[$xmlKey] = $normalizedValue;
                 }
+            }
+        }
+
+        // This type's namespace is not the one in scope — the element sits inside an sdtc or AU
+        // extension element, whose `@xmlns` is a default-namespace redefinition and so covers this
+        // whole subtree. Declare it back on each element that carries no namespace of its own, which
+        // ends the extension scope exactly where the extension element's content ends.
+        //
+        // Before the fold, not after: buffered values already carry their property's own `@xmlns`
+        // and must keep it, and a reserved slot is still null. Attribute keys (`@…`) and the text or
+        // fragment content key (`#`) belong to this element rather than to a child, so both are
+        // skipped — only named element keys are children, and every one of them holds an array
+        // (scalars arrive wrapped by wrapScalarForXml(), and the only DOMDocumentFragment lives
+        // under `#`).
+        if ($contentNamespace !== null && $contentNamespace !== $inheritedNamespace) {
+            foreach ($data as $key => $value) {
+                if ($key === '#' || str_starts_with($key, '@')) {
+                    continue;
+                }
+
+                $data[$key] = $this->declareMissingElementNamespace($value, $contentNamespace);
             }
         }
 
@@ -670,6 +724,27 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
     protected function contentModelOrder(object $object): array
     {
         return [];
+    }
+
+    /**
+     * The XML namespace this type's own elements belong to, or null when the type declares none.
+     *
+     * Null is the answer for standard FHIR: every element is in the FHIR namespace, which the root
+     * declares once and everything below inherits, so there is never a second namespace to
+     * distinguish. CDA logical models override this — see FHIRLogicalModelXmlNormalizer.
+     *
+     * This is the namespace a property inherits when it carries no `xmlNamespace` of its own, and it
+     * is deliberately read from the type rather than from whatever is in scope: an element nested
+     * inside an extension element still belongs to its own type's namespace, and reading the scope
+     * instead is exactly the defect this hook exists to fix.
+     *
+     * @param object $object the model instance being serialized, whose type carries the declaration
+     *
+     * @return string|null the type's XML namespace, or null when it declares none
+     */
+    protected function contentNamespace(object $object): ?string
+    {
+        return null;
     }
 
     /**
@@ -944,6 +1019,44 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 return array_map(fn (mixed $item): mixed => $this->applyElementNamespace($item, $namespace), $normalized);
             }
 
+            $normalized['@xmlns'] = $namespace;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Declare an element's XML namespace only where the element has not already declared one.
+     *
+     * The counterpart to {@see applyElementNamespace()}, which asserts a property's declared
+     * namespace over whatever the value carried. Here the value's own declaration wins, because this
+     * is applied in bulk to every child of a type whose namespace differs from the scope in force,
+     * and a bulk overwrite is the wrong default when a child may have been placed deliberately.
+     *
+     * No current model reaches that case — the only children that arrive pre-namespaced are FHIR
+     * xhtml properties, and FHIR types declare no content namespace, so the bulk walk never runs on
+     * them. The guard is here because the failure it prevents is silent: an element moved out of its
+     * namespace still serializes, still round-trips, and still matches on `local-name()`.
+     *
+     * @param mixed  $normalized a normalized element, a list of them, or a value that is neither
+     * @param string $namespace  the namespace to declare where none is present
+     *
+     * @return mixed the input with `@xmlns` filled in wherever it was missing
+     */
+    private function declareMissingElementNamespace(mixed $normalized, string $namespace): mixed
+    {
+        if (!is_array($normalized)) {
+            return $normalized;
+        }
+
+        if (array_is_list($normalized)) {
+            return array_map(
+                fn (mixed $item): mixed => $this->declareMissingElementNamespace($item, $namespace),
+                $normalized,
+            );
+        }
+
+        if (!array_key_exists('@xmlns', $normalized)) {
             $normalized['@xmlns'] = $namespace;
         }
 
