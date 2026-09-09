@@ -525,7 +525,16 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             // escaping, and '#' appends the fragment's children directly to the parent. Root @xmlns
             // and @attributes from M5 are sibling array keys and coexist.
             if ($meta !== null && $meta->propertyKind === 'choiceGroup' && is_array($value)) {
-                $data['#'] = $this->buildChoiceGroupFragment($value, $context);
+                // The per-child declaration walk below cannot reach these: it skips `#`, and the
+                // members are DOM nodes rather than normalized arrays, so no later pass sees them
+                // either. The same condition the walk uses is therefore applied here instead — when
+                // this type's content namespace is not the one in scope, the members are built with
+                // it declared rather than left to inherit an enclosing extension namespace.
+                $memberNamespace = ($contentNamespace !== null && $contentNamespace !== $inheritedNamespace)
+                    ? $contentNamespace
+                    : null;
+
+                $data['#'] = $this->buildChoiceGroupFragment($value, $context, $memberNamespace);
                 continue;
             }
 
@@ -1049,6 +1058,15 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             return $normalized;
         }
 
+        // An empty array is one childless element, not an empty list of them — `array_is_list([])`
+        // cannot tell the two apart and answers true, so without this the list branch below walks it
+        // for members, finds none, and returns it exactly as it arrived. That is a silent miss: an
+        // unpopulated CDA child such as `<name/>` keeps the extension namespace while its populated
+        // sibling is declared correctly, so whether the bug appears depends on the instance data.
+        if ($normalized === []) {
+            return ['@xmlns' => $namespace];
+        }
+
         if (array_is_list($normalized)) {
             return array_map(
                 fn (mixed $item): mixed => $this->declareMissingElementNamespace($item, $namespace),
@@ -1244,10 +1262,20 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      * redundantly re-declare xmlns on every child once the element is nested (the nested parent does
      * not re-declare the namespace), breaking byte-level round-trips.
      *
-     * @param array<int, mixed>    $items   The choiceGroup property value (a list of ChoiceGroupItem)
-     * @param array<string, mixed> $context Serialization context for normalizing object values
+     * $namespace is the exception to that, and non-null only where inheriting is the wrong answer:
+     * the element these members are appended into was placed in an extension namespace by the
+     * property that named it, while the members belong to this type's own content model. Inheritance
+     * cannot express that, and the per-child declaration walk in normalizeForXML() cannot reach a
+     * DOM node, so declaring here is the only place it can be said. The re-declaration the paragraph
+     * above avoids is then the required output rather than noise.
+     *
+     * @param array<int, mixed>    $items     The choiceGroup property value (a list of ChoiceGroupItem)
+     * @param array<string, mixed> $context   Serialization context for normalizing object values
+     * @param string|null          $namespace Namespace to declare on the members, or null to inherit
+     *
+     * @return \DOMDocumentFragment the group's members in list order, ready to inject under '#'
      */
-    private function buildChoiceGroupFragment(array $items, array $context): \DOMDocumentFragment
+    private function buildChoiceGroupFragment(array $items, array $context, ?string $namespace = null): \DOMDocumentFragment
     {
         $document = new \DOMDocument();
         $fragment = $document->createDocumentFragment();
@@ -1268,6 +1296,18 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             }
 
             $element = $document->createElement($item->elementName);
+
+            // A literal xmlns attribute rather than createElementNS(), which is the mechanism used
+            // everywhere else here (`@xmlns` array keys, and setAttribute in buildDomFromArray). A
+            // real DOM namespace node loses to it: libxml has to reconcile the node against the
+            // extension namespace already on the element this fragment is imported into, and
+            // resolves the clash by inventing a prefix — `<default:streetAddressLine …>`, the right
+            // namespace on a document nothing published looks like. Only the member element needs
+            // it; everything under it inherits, which is why fillChoiceGroupElement() is unchanged.
+            if ($namespace !== null) {
+                $element->setAttribute('xmlns', $namespace);
+            }
+
             $this->fillChoiceGroupElement($document, $element, $value, $context);
             $fragment->appendChild($element);
         }

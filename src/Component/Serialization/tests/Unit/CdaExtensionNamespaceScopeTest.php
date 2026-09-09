@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Act;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuAsEmployment;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuAsEntityIdentifier;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuEmployerOrganization;
+use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuEntity;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuId;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuOrganization;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Patient;
@@ -16,6 +17,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\PreconditionBase;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Section;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuSubjectOf2;
 use Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\AuSubstitutionPermission;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\AuAddress;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\AuOrganizationName;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CD;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
@@ -85,6 +87,69 @@ final class CdaExtensionNamespaceScopeTest extends TestCase
         self::assertSame(self::AU_EXTENSION_NS, $namespaces['employerOrganization']);
         self::assertSame(self::CDA_NS, $namespaces['id']);
         self::assertSame(self::CDA_NS, $namespaces['name']);
+    }
+
+    /**
+     * The same rule when the child has no content of its own.
+     *
+     * `<name/>` is what an organisation whose name is not filled in yet emits, from the same profile
+     * that produces the populated one above. Declaring the namespace works by writing `@xmlns` into
+     * each child's normalized array, and an empty child normalizes to an empty array — which
+     * `array_is_list()` reports as a list, an empty array being indistinguishable from an empty list.
+     * Treated as a list it is walked for members rather than written to, so the declaration lands
+     * nowhere and the element silently keeps the extension namespace.
+     */
+    public function testAnEmptyCdaTypedChildOfAnExtensionElementStaysInTheCdaNamespace(): void
+    {
+        $employment = new AuAsEmployment(
+            classCode: 'EMP',
+            employerOrganization: new AuEmployerOrganization(
+                id: [new II(root: '1.2.36.1.2001.1001.101', extension: 'ORG-1')],
+                name: new AuOrganizationName(),
+            ),
+        );
+
+        $namespaces = $this->namespacesByLocalName($this->service()->serializeToXml($employment));
+
+        self::assertSame(self::AU_EXTENSION_NS, $namespaces['employerOrganization']);
+        self::assertSame(self::CDA_NS, $namespaces['name'], 'an empty CDA child must not keep the extension namespace');
+        self::assertSame(self::CDA_NS, $namespaces['id']);
+    }
+
+    /**
+     * The members of a transparent `xml-choice-group` under an extension element belong to CDA too.
+     *
+     * These are the one class of child no normalizer ever revisits: `AD` and `EN` content is built as
+     * a raw `DOMDocumentFragment` and injected under the `#` key, so its members are DOM nodes rather
+     * than normalized arrays. The per-child declaration walk skips `#`, because that key holds this
+     * element's own text or fragment content rather than a child array — correct as far as arrays go,
+     * and it leaves the fragment's real child elements inheriting the extension namespace with
+     * nothing downstream able to correct them.
+     *
+     * `AuEntity.addr` is the live case: the property carries the extension namespace, while the
+     * address parts inside belong to `AuAddress`'s own CDA content model.
+     */
+    public function testChoiceGroupMembersUnderAnExtensionElementStayInTheCdaNamespace(): void
+    {
+        $entity = new AuEntity(
+            addr: [new AuAddress(item: [
+                new ChoiceGroupItem('streetAddressLine', '1 Test St'),
+                new ChoiceGroupItem('city', 'Sydney'),
+            ])],
+        );
+
+        $xml        = $this->service()->serializeToXml($entity);
+        $namespaces = $this->namespacesByLocalName($xml);
+
+        self::assertSame(self::AU_EXTENSION_NS, $namespaces['addr']);
+        self::assertSame(self::CDA_NS, $namespaces['streetAddressLine'], 'a fragment-built member must not keep the extension namespace');
+        self::assertSame(self::CDA_NS, $namespaces['city']);
+
+        // The fragment builders are what keep mixed element-and-text content in document order, so a
+        // namespace change applied there could drop the text half without any namespace assertion
+        // noticing.
+        self::assertStringContainsString('1 Test St', $xml);
+        self::assertStringContainsString('Sydney', $xml);
     }
 
     /**
