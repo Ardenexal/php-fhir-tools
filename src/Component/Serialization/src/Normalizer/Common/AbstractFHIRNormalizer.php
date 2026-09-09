@@ -1123,16 +1123,38 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      */
     protected function resolveChoiceVariant(mixed $value, array $variants): ?array
     {
+        $variant = $this->resolveVariant($value, $variants);
+
+        return $variant === null ? null : [$variant->propertyKind, $variant->jsonKey, $variant->fhirType];
+    }
+
+    /**
+     * The first variant this value satisfies, walking the list in order.
+     *
+     * Order is load-bearing and belongs to whoever built the list: the walk returns the FIRST match,
+     * so a supertype listed ahead of its subtype steals the match and the value serializes under the
+     * wrong variant — silently, with structurally valid output. Both callers depend on this, which is
+     * why the walk lives in one place: `resolveChoiceVariant()` needs the FHIR element name for a
+     * `value[x]` choice, and the CDA polymorphic path needs the published type name for an `xsi:type`
+     * attribute.
+     *
+     * @param mixed                         $value    The value occupying the polymorphic slot
+     * @param list<PropertyVariantMetadata> $variants Candidate variants, ordered subclass-before-superclass
+     *
+     * @return PropertyVariantMetadata|null The matched variant, or null when the value fits none
+     */
+    protected function resolveVariant(mixed $value, array $variants): ?PropertyVariantMetadata
+    {
         /** @var array<string, string> */
         static $phpToGettype = ['bool' => 'boolean', 'int' => 'integer', 'float' => 'double', 'string' => 'string'];
 
         foreach ($variants as $variant) {
             if ($variant->isBuiltin) {
                 if (gettype($value) === ($phpToGettype[$variant->phpType] ?? '')) {
-                    return [$variant->propertyKind, $variant->jsonKey, $variant->fhirType];
+                    return $variant;
                 }
             } elseif (is_object($value) && $value instanceof $variant->phpType) {
-                return [$variant->propertyKind, $variant->jsonKey, $variant->fhirType];
+                return $variant;
             }
         }
 

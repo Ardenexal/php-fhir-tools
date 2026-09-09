@@ -297,7 +297,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         );
                     } elseif (is_array($value) && $meta !== null && $meta->phpItemClass !== null) {
                         $phpItemClass = $meta->phpItemClass;
-                        $items        = $this->unwrapXmlValue($value, 'array');
+                        $items        = $this->prepareComplexArrayItems($meta, $value);
                         if (is_array($items) && !array_is_list($items)) {
                             $items = [$items];
                         }
@@ -318,7 +318,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                             if (isset($sourceChildren[$itemIndex])) {
                                 $itemContext[self::SOURCE_ELEMENT_CONTEXT_KEY] = $sourceChildren[$itemIndex];
                             }
-                            $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $itemContext);
+                            $itemClass           = $this->resolvePolymorphicItemClass($meta, $sourceChildren[$itemIndex] ?? null) ?? $phpItemClass;
+                            $denormalizedValue[] = $this->denormalizer->denormalize($item, $itemClass, 'xml', $itemContext);
                             ++$itemIndex;
                         }
                     } elseif (is_array($value) && $meta !== null && $meta->propertyKind === 'resource') {
@@ -347,7 +348,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                                 $childContext[self::SOURCE_ELEMENT_CONTEXT_KEY] = $sourceChild;
                             }
                             self::assertSingleValuedElement($elementName, $value, $resolvedType);
-                            $denormalizedValue = $denormalizer->denormalize($value, $propertyType, 'xml', $childContext);
+                            $targetType        = $this->resolvePolymorphicItemClass($meta, $sourceChild) ?? $propertyType;
+                            $denormalizedValue = $denormalizer->denormalize($value, $targetType, 'xml', $childContext);
                         } else {
                             $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
                             if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {
@@ -1320,9 +1322,47 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      *
      * @return bool Whether the decoded string needs re-shaping into a text-content array
      */
+    /**
+     * Reshape a repeating complex property's decoded value into its items.
+     *
+     * Defaults to the shared unwrap, which strips every `#`-prefixed key — comments, CDATA markers and
+     * the text-content key alike. That is right for FHIR, where no repeating complex element carries
+     * text of its own, and the CDA normalizer overrides it for the case where one can.
+     *
+     * @param PropertyMetadata|null $meta  Metadata for the property being filled, when known
+     * @param mixed                 $value The property's decoded value
+     *
+     * @return mixed The items to denormalize, one per occurrence
+     */
+    protected function prepareComplexArrayItems(?PropertyMetadata $meta, mixed $value): mixed
+    {
+        return $this->unwrapXmlValue($value, 'array');
+    }
+
+    /**
+     * The concrete class an element's content should deserialize into, when the declared type is not it.
+     *
+     * A no-op here: FHIR encodes a polymorphic type in the element NAME (`valueString`), so the declared
+     * property type is already concrete and returning null keeps it. CDA is the opposite — the element
+     * name is fixed and an `xsi:type` attribute names the datatype — so the CDA normalizer overrides
+     * this. An extension point rather than an inline branch, so a CDA-only question stays out of the
+     * shared FHIR path.
+     *
+     * @param PropertyMetadata|null $meta   Metadata for the property being filled, when known
+     * @param \DOMElement|null      $source This element in the source document, when one was threaded down
+     *
+     * @return string|null A class to use instead of the declared type, or null to keep the declared one
+     */
+    protected function resolvePolymorphicItemClass(?PropertyMetadata $meta, ?\DOMElement $source): ?string
+    {
+        return null;
+    }
+
     private static function expectsComplexValue(PropertyMetadata $meta): bool
     {
-        return $meta->phpItemClass !== null || $meta->propertyKind === 'complex';
+        return $meta->phpItemClass !== null
+            || $meta->propertyKind === 'complex'
+            || $meta->propertyKind === 'polymorphic';
     }
 
     /**

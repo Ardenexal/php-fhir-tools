@@ -38,6 +38,13 @@ final class CdaMixedContentTest extends TestCase
 {
     private const string V3 = 'urn:hl7-org:v3';
 
+    /**
+     * Declared on every CDA root so a polymorphic element deep in the document can name its
+     * datatype. Present even when nothing uses it: the serializer cannot know in advance, and a
+     * spare namespace declaration is legal XML and what published CDA instances carry anyway.
+     */
+    private const string XSI = ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"';
+
     private function service(): FHIRSerializationService
     {
         return FHIRSerializationService::createWithIG(version: FhirVersion::R5);
@@ -77,7 +84,7 @@ final class CdaMixedContentTest extends TestCase
         $name = new ON(item: [ChoiceGroupItem::text('Example Clinic')]);
 
         self::assertSame(
-            '<ON xmlns="' . self::V3 . '">Example Clinic</ON>',
+            '<ON xmlns="' . self::V3 . '"' . self::XSI . '>Example Clinic</ON>',
             $this->serialize($name),
         );
     }
@@ -120,7 +127,7 @@ final class CdaMixedContentTest extends TestCase
         ]);
 
         self::assertSame(
-            '<EN xmlns="' . self::V3 . '">Example <family representation="TXT" mediaType="text/plain">Clinic</family></EN>',
+            '<EN xmlns="' . self::V3 . '"' . self::XSI . '>Example <family representation="TXT" mediaType="text/plain">Clinic</family></EN>',
             $this->serialize($textFirst),
         );
 
@@ -130,7 +137,7 @@ final class CdaMixedContentTest extends TestCase
         ]);
 
         self::assertSame(
-            '<EN xmlns="' . self::V3 . '"><family representation="TXT" mediaType="text/plain">Clinic</family> Pty Ltd</EN>',
+            '<EN xmlns="' . self::V3 . '"' . self::XSI . '><family representation="TXT" mediaType="text/plain">Clinic</family> Pty Ltd</EN>',
             $this->serialize($elementFirst),
         );
     }
@@ -170,7 +177,7 @@ final class CdaMixedContentTest extends TestCase
         ]);
 
         self::assertSame(
-            '<PN xmlns="' . self::V3 . '">'
+            '<PN xmlns="' . self::V3 . '"' . self::XSI . '>'
             . '<given representation="TXT" mediaType="text/plain">Jo</given>'
             . '<family representation="TXT" mediaType="text/plain">Bloggs</family>'
             . '</PN>',
@@ -264,7 +271,7 @@ final class CdaMixedContentTest extends TestCase
 
         self::assertInstanceOf(Organization::class, $organization);
         self::assertSame(
-            '<Organization xmlns="' . self::V3 . '" classCode="ORG" determinerCode="INSTANCE">'
+            '<Organization xmlns="' . self::V3 . '"' . self::XSI . ' classCode="ORG" determinerCode="INSTANCE">'
             . '<name>Example <family representation="TXT" mediaType="text/plain">Clinic</family> Pty</name>'
             . '</Organization>',
             $this->serialize($organization),

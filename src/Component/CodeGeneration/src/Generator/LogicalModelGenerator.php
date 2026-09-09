@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Support\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
@@ -88,6 +89,11 @@ final class LogicalModelGenerator
      *                                                            puts a CDA parent's `realmCode`/`typeId`/`templateId`
      *                                                            first and can place a child's own element mid-sequence.
      *                                                            Omitted from the attribute when empty.
+     * @param CdaTypeHierarchy|null      $hierarchy               The published datatype hierarchy, used to type and
+     *                                                            order an element that admits several datatypes. When
+     *                                                            null, such an element falls back to its first
+     *                                                            admitted datatype, which is the pre-polymorphic
+     *                                                            behaviour.
      */
     public function generate(
         array $definition,
@@ -99,6 +105,7 @@ final class LogicalModelGenerator
         array $valueSetToEnumFqcn = [],
         array $inheritedParams = [],
         array $propertyOrder = [],
+        ?CdaTypeHierarchy $hierarchy = null,
     ): ClassType {
         $url  = (string) ($definition['url'] ?? '');
         $name = (string) ($definition['name'] ?? '');
@@ -171,7 +178,7 @@ final class LogicalModelGenerator
         // Own (non-inherited) properties → promoted constructor params carrying the FhirProperty
         // attribute. Inherited elements are skipped here (declared on the parent) and instead
         // forwarded to the parent constructor below.
-        $ownParams = $this->collectOwnParameters($definition, $urlToFqcn, $xmlNamespace, $inheritedNames, $valueSetToEnumFqcn);
+        $ownParams = $this->collectOwnParameters($definition, $urlToFqcn, $xmlNamespace, $inheritedNames, $valueSetToEnumFqcn, $hierarchy);
         foreach ($ownParams as $descriptor) {
             $this->promoteParameter($constructor, $descriptor);
         }
@@ -245,6 +252,9 @@ final class LogicalModelGenerator
      * @param array<string, string> $urlToFqcn
      * @param list<string>          $inheritedNames
      * @param array<string, string> $valueSetToEnumFqcn
+     * @param CdaTypeHierarchy|null $hierarchy          Published datatype hierarchy, needed to type and order an
+     *                                                  element that admits several datatypes; null keeps the
+     *                                                  pre-polymorphic single-type behaviour
      *
      * @return list<array<string, mixed>>
      */
@@ -254,6 +264,7 @@ final class LogicalModelGenerator
         string $classXmlNamespace,
         array $inheritedNames = [],
         array $valueSetToEnumFqcn = [],
+        ?CdaTypeHierarchy $hierarchy = null,
     ): array {
         $params   = [];
         $elements = $definition['snapshot']['element'] ?? [];
@@ -277,7 +288,7 @@ final class LogicalModelGenerator
             if (in_array(self::propertyNameFromPath($path), $inheritedNames, true)) {
                 continue;
             }
-            $descriptor = $this->deriveParameter($element, $urlToFqcn, $classXmlNamespace, $valueSetToEnumFqcn, $elements);
+            $descriptor = $this->deriveParameter($element, $urlToFqcn, $classXmlNamespace, $valueSetToEnumFqcn, $elements, $hierarchy);
             if ($descriptor !== null) {
                 $params[] = $descriptor;
             }
@@ -297,6 +308,9 @@ final class LogicalModelGenerator
      * @param array<string, string> $valueSetToEnumFqcn
      * @param array<mixed>          $siblings           all elements of the owning snapshot, so a transparent
      *                                                  choice group can read its own child slices
+     * @param CdaTypeHierarchy|null $hierarchy          Published datatype hierarchy; supplied so an element
+     *                                                  admitting several datatypes can be typed to their nearest
+     *                                                  shared datatype instead of only the first one listed
      *
      * @return array<string, mixed>|null
      */
@@ -306,6 +320,7 @@ final class LogicalModelGenerator
         string $classXmlNamespace,
         array $valueSetToEnumFqcn = [],
         array $siblings = [],
+        ?CdaTypeHierarchy $hierarchy = null,
     ): ?array {
         $path          = (string) ($element['path'] ?? '');
         $parameterName = self::propertyNameFromPath($path);
@@ -346,6 +361,24 @@ final class LogicalModelGenerator
                     ],
                 ];
             }
+        }
+
+        // An element admitting several datatypes is polymorphic, and CDA discriminates it on the wire
+        // with an `xsi:type` attribute rather than by changing the element name. Handled before the
+        // single-type resolution below, which would otherwise keep `$types[0]` and silently discard
+        // the rest — an observation's value lists CD first and admits 28 more, so the generated
+        // property could not hold a text or measurement value at all.
+        $polymorphic = $this->derivePolymorphicParameter(
+            path: $path,
+            parameterName: $parameterName,
+            types: $types,
+            urlToFqcn: $urlToFqcn,
+            hierarchy: $hierarchy,
+            isArray: $isArray,
+            min: $min,
+        );
+        if ($polymorphic !== null) {
+            return $polymorphic;
         }
 
         // Resolve the property's PHP type and semantic kind from the type code read above.
@@ -503,6 +536,103 @@ final class LogicalModelGenerator
         }
 
         return $variants;
+    }
+
+    /**
+     * Build the descriptor for an element that admits more than one datatype, or null when it does not.
+     *
+     * CDA polymorphism keeps the element name fixed and writes the datatype into an `xsi:type`
+     * attribute, so the property is typed to the nearest datatype all admitted types derive from and
+     * every variant shares one element name. That base type is computed per element rather than
+     * assumed: an observation's value bottoms out at `ANY`, but the effective-time and useable-period
+     * elements bottom out at `SXCM_TS`, and typing those `ANY` would admit datatypes their definitions
+     * forbid.
+     *
+     * @param string                $path          The element's definition path, used for error messages
+     * @param string                $parameterName The PHP property name, also the shared element name
+     * @param mixed                 $types         The element's raw `type` entries, as published
+     * @param array<string,string>  $urlToFqcn     Canonical SD URL → generated class FQCN
+     * @param CdaTypeHierarchy|null $hierarchy     Published hierarchy; null disables polymorphic derivation
+     * @param bool                  $isArray       Whether the element repeats
+     * @param int                   $min           The element's published minimum cardinality
+     *
+     * @return array<string, mixed>|null The parameter descriptor, or null when this element is not polymorphic
+     */
+    private function derivePolymorphicParameter(
+        string $path,
+        string $parameterName,
+        mixed $types,
+        array $urlToFqcn,
+        ?CdaTypeHierarchy $hierarchy,
+        bool $isArray,
+        int $min,
+    ): ?array {
+        if ($hierarchy === null || !is_array($types) || count($types) < 2) {
+            return null;
+        }
+
+        // Dedupe while preserving published order; a definition may repeat a type code.
+        $admitted = [];
+        foreach ($types as $type) {
+            if (!is_array($type)) {
+                continue;
+            }
+            $code = (string) ($type['code'] ?? '');
+            if ($code !== '') {
+                $admitted[$code] = true;
+            }
+        }
+        $admittedUrls = array_keys($admitted);
+        if (count($admittedUrls) < 2) {
+            return null;
+        }
+
+        // Every admitted datatype must resolve to both a generated class and a published name. A
+        // guessed name produces a well-formed element with the wrong `xsi:type`, which only a
+        // schema-validating receiver rejects — the silent failure this discriminator prevents.
+        foreach ($admittedUrls as $url) {
+            if (!isset($urlToFqcn[$url]) || $hierarchy->typeName($url) === '') {
+                throw GenerationException::unresolvablePolymorphicTypeName($path, $url);
+            }
+        }
+
+        $baseUrl = $hierarchy->leastCommonAncestor($admittedUrls);
+        if ($baseUrl === null || !isset($urlToFqcn[$baseUrl])) {
+            throw GenerationException::polymorphicElementWithoutCommonType($path, $admittedUrls);
+        }
+        $baseFqcn = $urlToFqcn[$baseUrl];
+
+        // Subclass-before-superclass: a reader takes the first `instanceof` match, and the definitions
+        // publish the opposite order.
+        $variants = [];
+        foreach ($hierarchy->sortDescendantFirst($admittedUrls) as $url) {
+            $variants[] = [
+                'fhirType'     => $url,
+                'propertyKind' => 'complex',
+                'phpType'      => $urlToFqcn[$url],
+                'jsonKey'      => $parameterName,
+                'typeName'     => $hierarchy->typeName($url),
+            ];
+        }
+
+        return [
+            'name'        => $parameterName,
+            'phpType'     => $isArray ? 'array' : $baseFqcn,
+            'isArray'     => $isArray,
+            'itemType'    => $baseFqcn,
+            'fixedScalar' => null,
+            'fhirArgs'    => array_filter([
+                'fhirType'     => $baseUrl,
+                'propertyKind' => 'polymorphic',
+                'isArray'      => $isArray,
+                'isRequired'   => $min >= 1,
+                // Only for a repeating element: `phpType` is read back as the array ITEM type, and
+                // setting it on a single-valued property makes the denormalizer treat that property
+                // as a list and build one, which then cannot be assigned.
+                'phpType'      => $isArray ? $baseFqcn : null,
+                'variants'     => $variants,
+            ], static fn (mixed $arg): bool => $arg !== null),
+        ];
     }
 
     /**

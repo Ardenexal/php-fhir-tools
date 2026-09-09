@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass;
 
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\ANY;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CD;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ED;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
-use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLINT;
 use Ardenexal\FHIRTools\Component\CdaModels\Enum\ActClassObservation;
 use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
@@ -46,7 +46,7 @@ class AuObservationRange extends ObservationRange
         string $moodCode = 'EVN.CRT',
         ?CD $code = null,
         ?ED $text = null,
-        ?IVLINT $value = null,
+        ?ANY $value = null,
         ?CE $interpretationCode = null,
         array $sdtcPrecondition1 = [],
         array $realmCode = [],
