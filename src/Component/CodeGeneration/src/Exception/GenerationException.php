@@ -217,10 +217,8 @@ class GenerationException extends \Exception
     public static function unresolvablePolymorphicTypeName(string $elementPath, string $typeUrl): self
     {
         return new self(
-            "Element '{$elementPath}' admits datatype '{$typeUrl}', which resolves to no published "
-            . 'type name. A polymorphic CDA element must name each datatype it admits, and the name '
-            . 'is read from the definition rather than derived. Ensure the package providing this '
-            . 'type is included in your --package list.',
+            "Element '{$elementPath}' admits datatype '{$typeUrl}', but no generated class or published CDA type name could be resolved for it. "
+            . 'Ensure the package providing this type is included in your --package list.',
             [
                 'element_path' => $elementPath,
                 'type_url'     => $typeUrl,
