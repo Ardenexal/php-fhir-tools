@@ -3,6 +3,44 @@ name: Main Branch
 on:
     push:
         branches: [ main ]
+        # Skip the whole run for documentation-only merges. A workflow-level filter is the right
+        # tool here and nowhere else in this repo: nothing in main.yml can be a required status
+        # check, because rulesets gate pull requests and this workflow only runs on push. So a
+        # skipped run leaves nothing pending. The equivalent in pr.yml has to be a job-level
+        # `if:` instead, and the comment on its `changes` job explains why.
+        #
+        # A deny-list, not an allow-list: an unrecognised new path runs CI. Keep it in step with
+        # is_documentation() in .github/scripts/changed-areas.sh — the duplication is unavoidable
+        # because a `paths-ignore:` filter cannot call a script.
+        #
+        # Note `*.md` rather than `**.md`: `*` does not cross a `/`, so this ignores the root
+        # markdown only, and the doc locations are then listed one by one. That is deliberate —
+        # recipe/ markdown must NOT be ignored. FlexRecipeTest::testDocumentationFiles reads
+        # recipe/fhir-bundle/1.0/README.md and asserts it is non-empty, and scripts/validate-recipe.php
+        # reads the same tree, so recipe markdown can genuinely fail the integration suite.
+        #
+        # `.gitignore` is deliberately absent below for the same kind of reason: this workflow
+        # closes with a bare `git status --porcelain`, so an ignore rule can turn that step
+        # green or red on its own.
+        paths-ignore:
+            - '*.md'
+            - 'docs/**'
+            - 'src/**/*.md'
+            - 'tests/**/*.md'
+            - '.github/**/*.md'
+            - 'LICENSE'
+            - '.goat-flow/**'
+            - '.ai/**'
+            - 'mate/**'
+            - '.vscode/**'
+            - '.devcontainer/**'
+            - '.idea/**'
+            - '.github/CODEOWNERS'
+            - '.github/ISSUE_TEMPLATE/**'
+            - '.editorconfig'
+            - '.mcp.json'
+            - '.worktreeinclude'
+            - '.gruff-php.yaml'
 
 permissions:
     contents: read

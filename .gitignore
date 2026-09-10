@@ -56,4 +56,15 @@ phpstan.neon
 /phpunit.phar
 ###< phpunit/phpunit ###
 
+###> codecov uploader ###
+# codecov/codecov-action@v5 downloads its CLI binary plus the checksum and
+# signature it verifies against into the workspace, and does not remove them.
+# The "Verify no uncommitted changes" step in .github/workflows/main.yml counts
+# untracked files, so these three failed the quality gate immediately after
+# every other step in it had passed. Coverage output itself is /coverage above.
+/codecov
+/codecov.SHA256SUM
+/codecov.SHA256SUM.sig
+###< codecov uploader ###
+
 node_modules/
