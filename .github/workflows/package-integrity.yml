@@ -25,7 +25,12 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                # Generated Models/ is intentionally excluded (regenerated, not hand-authored).
+                # Generated source is not itself a reason to skip this check: what it verifies is the
+                # hand-authored composer.json, and a generated tree drifting away from a manifest
+                # nobody regenerates is exactly the failure mode. So CdaModels IS checked even though
+                # `generate-models-cda` emits its src/ — its isolation install is cheap.
+                # Models/ is excluded only for cost: ~6,000 files across R4/R4B/R5 make an isolation
+                # install per leg disproportionate, and it declares one sibling plus brick/date-time.
                 include:
                     -   path: src/Component/Metadata
                         repo: fhir-metadata
@@ -37,6 +42,8 @@ jobs:
                         repo: fhir-code-generation
                     -   path: src/Component/Validation
                         repo: fhir-validation
+                    -   path: src/Component/CdaModels
+                        repo: cda-sd-models
                     -   path: src/Bundle/FHIRBundle
                         repo: fhir-bundle
         steps:

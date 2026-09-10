@@ -39,6 +39,47 @@ jobs:
             -   name: Run PHPStan static analysis - All Components
                 run: composer run phpstan
 
+            # OperationFixturesMatchPackagesTest holds the ONLY drift detectors for the ~14,700 lines
+            # of committed fixtures under CodeGeneration/tests/Fixtures/{OperationManifests,TypeIndex}.
+            # Without the FHIR packages on disk all 9 of its cases used to skip, and because
+            # phpunit.dist.xml sets failOnDeprecation/Notice/Warning but NOT failOnSkipped, the
+            # test-coverage run reported pass with 9 skips — so the fixtures could go stale after a
+            # package bump with no signal at all. Only the three CORE packages are needed (the
+            # extractor reads exactly hl7.fhir.{r4,r4b,r5}.core); extensions and terminology are not.
+            -   name: Cache FHIR core packages
+                id: fhir-package-cache
+                uses: actions/cache@v4
+                with:
+                    path: demo/var/cache/dev/.fhir
+                    # Keyed on the extractor, which is where the pinned package versions live, so a
+                    # version bump there invalidates the cache instead of silently reusing old packages.
+                    key: ${{ runner.os }}-fhir-core-${{ hashFiles('src/Component/CodeGeneration/tests/Fixtures/OperationFixtureExtractor.php') }}
+
+            -   name: Prime the FHIR package cache
+                if: steps.fhir-package-cache.outputs.cache-hit != 'true'
+                # Fetched straight from the registry rather than by running `fhir:generate`: the
+                # generator would also rewrite src/Component/Models, which a test job must not do
+                # (the "Verify no uncommitted changes" step below would fail on it).
+                # The tarballs extract to `<name>_<version>/package/`, which is the layout
+                # OperationFixtureExtractor::packageDirectory() expects.
+                run: |
+                    set -euo pipefail
+                    mkdir -p demo/var/cache/dev/.fhir
+                    for spec in \
+                        "hl7.fhir.r4.core|4.0.1" \
+                        "hl7.fhir.r4b.core|4.3.0" \
+                        "hl7.fhir.r5.core|5.0.0"; do
+                      name="${spec%%|*}"
+                      version="${spec##*|}"
+                      target="demo/var/cache/dev/.fhir/${name}_${version}"
+                      echo "Fetching ${name}#${version}"
+                      mkdir -p "$target"
+                      curl -sSfL --retry 3 --retry-delay 5 --max-time 180 \
+                        "https://packages.fhir.org/${name}/${version}" -o "${target}.tgz"
+                      tar -xzf "${target}.tgz" -C "$target"
+                    done
+                    echo "Primed: $(ls -1 demo/var/cache/dev/.fhir | grep -c '^hl7\.' || true) entries"
+
             -   name: Run PHPUnit tests with coverage
                 run: composer run test-coverage
 

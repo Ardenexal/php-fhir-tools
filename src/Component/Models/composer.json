@@ -44,10 +44,10 @@
         "r4b",
         "r5"
     ],
-    "homepage": "https://github.com/ardenexal/fhir-tools",
+    "homepage": "https://github.com/Ardenexal/php-fhir-tools",
     "support": {
-        "issues": "https://github.com/ardenexal/fhir-tools/issues",
-        "source": "https://github.com/ardenexal/fhir-tools"
+        "issues": "https://github.com/Ardenexal/php-fhir-tools/issues",
+        "source": "https://github.com/Ardenexal/php-fhir-tools"
     },
     "extra": {
         "branch-alias": {

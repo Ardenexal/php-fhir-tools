@@ -1,8 +1,17 @@
-# Lesson — CDA logical-model XML serialization (M5)
+---
+category: cda-xml-namespace-serialization
+last_reviewed: 2026-09-10
+---
+
+# Lessons: CDA Logical-Model XML Serialization
 
 **Context:** Wiring CDA `#[LogicalModel]` classes through the Symfony-serializer-based pipeline.
 
-## What worked
+## Lesson: Reach a new structure kind by reflection rather than by widening the metadata-extractor interface
+
+**Status:** active | **Created:** 2026-08-20 | **Evidence:** OBSERVED
+**Decision changed:** A new structure kind gets a dedicated normalizer that detects its attribute through a shared locator trait; do not add predicates to `FHIRMetadataExtractorInterface` to make room for it.
+**Trigger phase:** ACT
 
 - **Route by reflection, not the metadata-extractor interface.** CDA classes carry only
   `#[LogicalModel]` (not `#[FhirResource]`/`#[FHIRComplexType]`), so `isComplexType`/`isResource`
@@ -20,7 +29,11 @@
 - **`PropertyMetadata->xmlNamespace`** (plumbed from `#[FhirProperty]`) drives per-element
   namespaces; `sdtc*` property names are stripped to their bare local name at serialize time.
 
-## Trap to remember (RESOLVED 2026-09-07, issue #116)
+## Lesson: `@xmlns` redefines the default namespace for every descendant, so an extension element silently reparents the CDA content nested inside it
+
+**Status:** resolved | **Created:** 2026-08-20 | **Resolved:** 2026-09-07 | **Evidence:** OBSERVED
+**Decision changed:** Carry the in-scope default namespace on the serialization context and declare a namespace on a child only where it differs; when a change moves many namespace sites, measure the consequence against a published fixture instead of generalising from the one case that was settled.
+**Trigger phase:** ACT
 
 `@xmlns` is a **default-namespace redefinition**: it applies to the element AND every descendant
 that doesn't redeclare. So children of a *populated* sdtc/AU extension element inherited the

@@ -7,6 +7,7 @@ status: accepted
 
 **Status:** accepted
 **Date:** 2026-06-19
+**Updated:** 2026-09-10
 **Milestone:** CDA M2 (prerequisite — fixes the output path/namespace before any class is emitted)
 
 ## Context
@@ -46,7 +47,7 @@ hundreds of generated files plus serializer reference updates.
 
 ## Decision
 
-**Option B — CDA models ship as a separate package `ardenexal/fhir-cda-models`.**
+**Option B — CDA models ship as a separate package `ardenexal/cda-sd-models`.**
 
 - New monorepo component: `src/Component/CdaModels/` with its own `composer.json`.
 - Namespace: `Ardenexal\FHIRTools\Component\CdaModels\` with sub-namespaces `DataType\`,
@@ -86,3 +87,22 @@ hundreds of generated files plus serializer reference updates.
   modest, one-time infrastructure cost.
 - Supersedes the `Models/src/CDA/` and `…\Component\Models\CDA\` layout described in earlier
   drafts of `cda.md`.
+
+## Correction (2026-09-10): the package shipped as `ardenexal/cda-sd-models`
+
+**The Decision above stands.** CDA models ship as a separate Composer package, as their own
+monorepo component under `src/Component/CdaModels/`, in the namespace
+`Ardenexal\FHIRTools\Component\CdaModels\`. Only the package *name* differs from the one this
+ADR originally recorded.
+
+The published name is `ardenexal/cda-sd-models`, not the `ardenexal/fhir-cda-models` written here
+on 2026-06-19. Checkable source: `jq -r .name src/Component/CdaModels/composer.json`.
+
+Two changes were made to this file for that reason, ahead of tagging 0.5.0, which makes the
+published name permanent:
+
+- The **Decision** statement now names `ardenexal/cda-sd-models`, so the line describing what the
+  project ships matches what it ships.
+- The **Options Considered** entry for Option B deliberately keeps `ardenexal/fhir-cda-models`,
+  because it records the option as it was proposed at the time. A grep of this file therefore still
+  finds the old name in that one place, by intent.
