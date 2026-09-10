@@ -379,5 +379,107 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
                 ->addTag('serializer.normalizer', ['priority' => self::APPLICATION_NORMALIZER_PRIORITY])
                 ->setPublic(false);
         }
+
+        $this->registerApplicationSubResourceNormalizers($container, $version, $igRegistryRef, $typeResolverRef);
+    }
+
+    /**
+     * Tag the complex-type, primitive and backbone JSON normalizers into the application serializer.
+     *
+     * Operation payloads were only half the problem. An application that nests a FHIR model inside one
+     * of its own classes — the common case being a generated resource carried in `DomainResource.contained`
+     * — hands that subtree to the *framework* serializer, which has no FHIR normalizers in it. What
+     * `ObjectNormalizer` then does to it is worse than the payload case, because two of the three failures
+     * are silent:
+     *
+     *  - `Quantity::$value` is a `numeric-string`, and FHIR `decimal` is a JSON number. A perfectly valid
+     *    `{"value": 100}` throws `NotNormalizableValueException` — the only loud one.
+     *  - Every `*Primitive` wrapper (`UriPrimitive`, `CodePrimitive`, `StringPrimitive`) is constructed
+     *    with `value = null`: `Coding.system`, `Coding.code`, `CodeableConcept.text` and friends all
+     *    arrive as objects that have lost their contents. No exception, no warning.
+     *  - Choice elements resolve to null. `MedicationIngredient::$item` is declared once but reaches the
+     *    wire as `itemCodeableConcept` / `itemReference`; `ObjectNormalizer` has no `#[FhirProperty]`
+     *    metadata, so it treats the JSON key as unknown and discards it.
+     *
+     * Only the JSON normalizers are registered. XML has no equivalent entry point here — the framework
+     * serializer is reached through JSON request/response handling — and the XML pair stays scoped to the
+     * FHIR serializer where `FHIRResourceXmlNormalizer` sits alongside it.
+     *
+     * `FHIRResourceJsonNormalizer` is deliberately NOT registered. Its `denormalizeFromJSON()` guards
+     * `$resolvedType !== $type && !is_subclass_of($resolvedType, $type)`, and an application that
+     * subclasses a generated resource to attach its own framework metadata inverts that relation: the
+     * resolver returns the generated class while the caller asked for the subclass, which *extends* it.
+     * Registering it here would make every such class throw. Leaving it out lets the application's own
+     * normalizers keep building the outer object while the three below fix its FHIR internals — which is
+     * the split that actually works.
+     *
+     * Unlike the payload normalizers above, these take no inner serializer reference. Their nested legs
+     * must resolve through the *application* chain, because a mixed tree alternates between application
+     * classes and FHIR ones; `SerializerAwareInterface` wires that automatically.
+     *
+     * Default version only. `FHIRComplexTypeJsonNormalizer::supportsDenormalization()` and its two
+     * siblings match on the presence of `#[FHIRComplexType]` / `#[FHIRPrimitive]` / `#[FHIRBackboneElement]`
+     * and do **not** compare `fhirVersion`, so registering all three stacks would put three normalizers in
+     * one chain all claiming the same class, with order deciding the winner and the losing versions
+     * resolving the wrong base Extension FQCN. The payload normalizers can be registered per version
+     * precisely because their payload classes are version-scoped; these are not. Applications needing a
+     * non-default version on this path should use `fhir.serialization_service.{version}` directly.
+     */
+    private function registerApplicationSubResourceNormalizers(
+        ContainerBuilder $container,
+        FhirVersion $version,
+        Reference $igRegistryRef,
+        Reference $typeResolverRef,
+    ): void {
+        /** @var string $defaultVersion */
+        $defaultVersion = $container->getParameter('fhir.default_version');
+
+        if (strtolower($version->value) !== strtolower($defaultVersion)) {
+            return;
+        }
+
+        $v = strtolower($version->value);
+
+        // Argument lists differ: only the complex-type normalizer takes a type resolver.
+        $definitions = [
+            "fhir.normalizer.complex_type.json.{$v}.app" => [
+                FHIRComplexTypeJsonNormalizer::class,
+                [
+                    new Reference(FHIRMetadataExtractorInterface::class),
+                    $typeResolverRef,
+                    null,
+                    null,
+                    $version->value,
+                    $igRegistryRef,
+                ],
+            ],
+            "fhir.normalizer.primitive.json.{$v}.app" => [
+                FHIRPrimitiveTypeJsonNormalizer::class,
+                [
+                    new Reference(FHIRMetadataExtractorInterface::class),
+                    null,
+                    null,
+                    $version->value,
+                    $igRegistryRef,
+                ],
+            ],
+            "fhir.normalizer.backbone.json.{$v}.app" => [
+                FHIRBackboneElementJsonNormalizer::class,
+                [
+                    new Reference(FHIRMetadataExtractorInterface::class),
+                    null,
+                    null,
+                    $version->value,
+                    $igRegistryRef,
+                ],
+            ],
+        ];
+
+        foreach ($definitions as $id => [$class, $arguments]) {
+            $container->register($id, $class)
+                ->setArguments($arguments)
+                ->addTag('serializer.normalizer', ['priority' => self::APPLICATION_NORMALIZER_PRIORITY])
+                ->setPublic(false);
+        }
     }
 }
