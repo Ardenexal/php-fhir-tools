@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [Bundle] Every normalizer the bundle tags `serializer.normalizer` now actually reaches the application's `serializer` service. `FHIRBundle::build()` registered `FHIRVersionedSerializerPass` with the default pass type and priority, and FrameworkBundle — built first, registering Symfony's `SerializerPass` at the same type and priority — had already collected every `serializer.normalizer` tag by the time the FHIR pass added its own; a tag added by a later pass is never seen. `debug:container --tag=serializer.normalizer` listed all five `…app` normalizers while the runtime serializer held none of them, so a FHIR model nested inside an application class (a generated resource in `contained`, typically) was denormalized by `ObjectNormalizer`: a JSON number for a FHIR `decimal` threw, and — silently — every `*Primitive` wrapper came back with `value = null` and every choice element as `null`. The pre-existing operation-payload `…app` pair was absent for the same reason, so API Platform `input:` / `output:` support had never worked in a real application either
+
 ## [0.5.0] - 2026-09-10
 
 ### Added
