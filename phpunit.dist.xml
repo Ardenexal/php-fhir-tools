@@ -42,7 +42,16 @@
             <exclude>src/Component/Validation/tests/Integration/FHIRBrianposConformanceTest.php</exclude>
         </testsuite>
         <!-- Per-module integration suites: CI runs these in parallel matrix legs.
-             Together they must cover exactly the same tests as the "integration" suite above. -->
+             Together they must cover exactly the same tests as the "integration" suite above.
+
+             Because they deliberately re-cover it, ANY invocation that loads every suite at once
+             (paratest or phpunit run without a testsuite filter) adds each integration file twice
+             and emits one "Cannot add file ... as it was already added to test suite" PHPUnit
+             *runner* warning per file. PHPUnit fails on runner warnings by default, and the failOn
+             attributes on the root element above do not control that, so such a run exits non-zero
+             with zero test failures and a yellow "OK, but there were issues!" summary. That kept the
+             Main Branch workflow red for 15+ runs. Callers must therefore name a non-overlapping
+             set of suites: see the test-coverage script in composer.json. -->
         <testsuite name="integration-root">
             <directory>tests/Integration</directory>
         </testsuite>
