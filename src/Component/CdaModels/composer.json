@@ -9,8 +9,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-metadata": "^0.5",
-        "brick/date-time": "^0.9.0"
+        "ardenexal/fhir-metadata": "^0.5"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5"
@@ -38,10 +37,10 @@
         "myhealthrecord",
         "php"
     ],
-    "homepage": "https://github.com/ardenexal/fhir-tools",
+    "homepage": "https://github.com/Ardenexal/php-fhir-tools",
     "support": {
-        "issues": "https://github.com/ardenexal/fhir-tools/issues",
-        "source": "https://github.com/ardenexal/fhir-tools"
+        "issues": "https://github.com/Ardenexal/php-fhir-tools/issues",
+        "source": "https://github.com/Ardenexal/php-fhir-tools"
     },
     "extra": {
         "branch-alias": {

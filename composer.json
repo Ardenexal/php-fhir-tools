@@ -75,7 +75,10 @@
             "symfony/ai-mate-composer-plugin": true
         },
         "bump-after-update": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "audit": {
+            "abandoned": "ignore"
+        }
     },
     "autoload": {
         "psr-4": {
