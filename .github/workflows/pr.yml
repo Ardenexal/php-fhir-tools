@@ -7,8 +7,72 @@ permissions:
     contents: read
     pull-requests: write
 jobs:
+    # Change detection for every job below. Deliberately a JOB rather than a workflow-level
+    # `paths:` filter, and it has to stay one. The "Protect Main" ruleset requires the individual
+    # `tests (...)`, `static-analysis (...)`, `style` and `recipe-validation` checks by name, and a
+    # required check belonging to a workflow that never ran stays *pending* forever — which blocks
+    # the pull request with nothing to click. A job skipped by an `if:` inside a workflow that DID
+    # run reports its status as success instead, which satisfies the requirement. GitHub documents
+    # exactly this split under "Handling skipped but required checks"; the whole design rests on it.
+    #
+    # Note that the two surfaces disagree on purpose: the check run reports success, while
+    # `needs.<job>.result` inside an expression reads `skipped`. That is why the fan-in gates below
+    # test for both 'success' and 'skipped' — they are reading the latter.
+    #
+    # For the same reason, never add, remove or rename a `matrix` key in this file: check names are
+    # the job id plus its matrix values, so `tests (unit)` would silently become `tests (unit, ...)`
+    # and all fourteen required checks would go missing at once.
+    changes:
+        # Named because package-integrity.yml has a `changes` job too, and two check runs
+        # sharing a name would be ambiguous if either were ever required.
+        name: Detect changed areas
+        runs-on: ubuntu-latest
+        outputs:
+            code: ${{ steps.classify.outputs.code }}
+            codegen: ${{ steps.classify.outputs.codegen }}
+            deps: ${{ steps.classify.outputs.deps }}
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Classify the changed paths
+                id: classify
+                env:
+                    GH_TOKEN: ${{ github.token }}
+                # An empty path list means "every area changed", and every failure here produces
+                # one. changed-paths.sh refuses to return a list it cannot prove complete, so a
+                # truncated page or the endpoint's silent 3000-file cap lands on running
+                # everything rather than on a list that is short by the one file that mattered.
+                #
+                # The classifier's fallback is written inline rather than by calling the script
+                # with --all, because a script that just failed is not a credible fallback for
+                # itself: the ways it dies (missing, not executable, CRLF, a syntax error) take
+                # both invocations with them. The consumers' `if:` conditions are the third layer
+                # — they test `!= 'false'`, so empty outputs run the job.
+                run: |
+                    if [ "${{ github.event_name }}" = 'pull_request' ]; then
+                      .github/scripts/changed-paths.sh \
+                        '${{ github.repository }}' '${{ github.event.number }}' \
+                        > changed-paths.txt || : > changed-paths.txt
+                      echo 'Changed paths:'
+                      sed 's/^/  /' changed-paths.txt
+                    else
+                      : > changed-paths.txt
+                    fi
+
+                    if ! .github/scripts/changed-areas.sh < changed-paths.txt > areas.txt; then
+                      echo 'change detection failed; treating every area as changed' >&2
+                      printf 'code=true\ncodegen=true\ndeps=true\npackages=true\n' > areas.txt
+                    fi
+
+                    tee -a "$GITHUB_OUTPUT" < areas.txt
+
     checks:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # composer audit reads the manifests and the advisory database, nothing else.
+        # `!= 'false'` rather than `== 'true'`: when the changes job fails its outputs are
+        # empty, and this has to run anyway. Every unknown resolves to running.
+        if: ${{ !cancelled() && needs.changes.outputs.deps != 'false' }}
         steps:
             -   uses: actions/checkout@v4
                 with:
@@ -36,6 +100,11 @@ jobs:
                 run: composer audit --abandoned=report
     style:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # Pint plus `composer validate --strict`.
+        # `!= 'false'` rather than `== 'true'`: when the changes job fails its outputs are
+        # empty, and this has to run anyway. Every unknown resolves to running.
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
         env:
             XDEBUG_MODE: off
             COMPOSER_NO_INTERACTION: 1
@@ -70,11 +139,37 @@ jobs:
             -   name: Check code style (Pint)
                 run: composer run lint -- --test
 
+            # Runs here rather than in the `changes` job on purpose. A failure in that job would
+            # skip everything downstream, and a skipped required check reads as success — so the
+            # one place these tests must not run is the job whose logic they cover.
+            -   name: Test the CI change detection
+                run: .github/scripts/changed-areas-test.sh
+
     static-analysis:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # This job MUST run even when it has nothing to do, which is why there is no
+        # `outputs.code` test here and why the work is gated per step instead.
+        #
+        # `tests` and `static-analysis` are the two jobs whose individual matrix legs the
+        # "Protect Main" ruleset requires by name (7 suites + 5 components = 12 of the 14
+        # required checks). GitHub skips a matrixed job at the top level, BEFORE the matrix is
+        # expanded, so a skipped `tests` publishes exactly one check run called `tests` and
+        # `tests (unit)` and its siblings are never created at all — they sit at "Expected"
+        # forever and the pull request cannot be merged. Verified on this repository:
+        # commit 0682460f skipped `fhir-generation-test` and produced a single bare
+        # `fhir-generation-test` check run, no `(R4)`/`(R4B)`/`(R5)`.
+        #
+        # The documented "a skipped job reports success" behaviour holds only for a job with no
+        # matrix. So the job runs, publishes its legs, and does nothing inside them.
+        if: ${{ !cancelled() }}
         env:
             XDEBUG_MODE: off
             COMPOSER_NO_INTERACTION: 1
+            # Every step below tests this. Gated as a whole rather than per component because
+            # phpstan:bundle analyses code that imports the other components, so a per-leg
+            # filter would report green over an unanalysed break.
+            RUN_WORK: ${{ needs.changes.outputs.code != 'false' }}
         strategy:
             fail-fast: false
             matrix:
@@ -82,17 +177,20 @@ jobs:
 
         steps:
             -   uses: actions/checkout@v4
+                if: env.RUN_WORK == 'true'
                 with:
                     # Fetch full history for better diff analysis
                     fetch-depth: 0
 
             -   name: Setup PHP
+                if: env.RUN_WORK == 'true'
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.3'
                     extensions: ctype, iconv, zip
 
             -   name: Cache Composer packages
+                if: env.RUN_WORK == 'true'
                 id: composer-cache
                 uses: actions/cache@v4
                 with:
@@ -102,16 +200,38 @@ jobs:
                         ${{ runner.os }}-php-8.3-
 
             -   name: Install dependencies
+                if: env.RUN_WORK == 'true'
                 run: composer install --prefer-dist --no-progress --no-suggest
 
             -   name: Run PHPStan static analysis
+                if: env.RUN_WORK == 'true'
                 run: composer run phpstan:${{ matrix.component }}
 
     tests:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # This job MUST run even when it has nothing to do, which is why there is no
+        # `outputs.code` test here and why the work is gated per step instead.
+        #
+        # `tests` and `static-analysis` are the two jobs whose individual matrix legs the
+        # "Protect Main" ruleset requires by name (7 suites + 5 components = 12 of the 14
+        # required checks). GitHub skips a matrixed job at the top level, BEFORE the matrix is
+        # expanded, so a skipped `tests` publishes exactly one check run called `tests` and
+        # `tests (unit)` and its siblings are never created at all — they sit at "Expected"
+        # forever and the pull request cannot be merged. Verified on this repository:
+        # commit 0682460f skipped `fhir-generation-test` and produced a single bare
+        # `fhir-generation-test` check run, no `(R4)`/`(R4B)`/`(R5)`.
+        #
+        # The documented "a skipped job reports success" behaviour holds only for a job with no
+        # matrix. So the job runs, publishes its legs, and does nothing inside them.
+        if: ${{ !cancelled() }}
         env:
             XDEBUG_MODE: coverage
             COMPOSER_NO_INTERACTION: 1
+            # Every step below tests this. Gated as a whole rather than per suite because the
+            # components are interdependent: a change in one suite's component can fail
+            # another's suite.
+            RUN_WORK: ${{ needs.changes.outputs.code != 'false' }}
         strategy:
             fail-fast: false
             matrix:
@@ -126,17 +246,20 @@ jobs:
                         extra: --functional --max-batch-size=50
         steps:
             -   uses: actions/checkout@v4
+                if: env.RUN_WORK == 'true'
                 with:
                     # Fetch full history for better diff analysis
                     fetch-depth: 0
 
             -   name: Setup PHP
+                if: env.RUN_WORK == 'true'
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.3'
                     extensions: ctype, iconv, zip
 
             -   name: Cache Composer packages
+                if: env.RUN_WORK == 'true'
                 id: composer-cache
                 uses: actions/cache@v4
                 with:
@@ -146,6 +269,7 @@ jobs:
                         ${{ runner.os }}-php-8.3-
 
             -   name: Install dependencies
+                if: env.RUN_WORK == 'true'
                 run: composer install --prefer-dist --no-progress --no-suggest
 
             # The integration-codegen suite contains the ONLY drift detectors for the ~14,700 lines
@@ -156,7 +280,7 @@ jobs:
             # signal at all. Only the three CORE packages are needed (the extractor reads exactly
             # hl7.fhir.{r4,r4b,r5}.core); the extensions and terminology packages are not.
             -   name: Cache FHIR core packages
-                if: matrix.suite == 'integration-codegen'
+                if: ${{ env.RUN_WORK == 'true' && (matrix.suite == 'integration-codegen') }}
                 id: fhir-package-cache
                 uses: actions/cache@v4
                 with:
@@ -166,7 +290,7 @@ jobs:
                     key: ${{ runner.os }}-fhir-core-${{ hashFiles('src/Component/CodeGeneration/tests/Fixtures/OperationFixtureExtractor.php') }}
 
             -   name: Prime the FHIR package cache
-                if: matrix.suite == 'integration-codegen' && steps.fhir-package-cache.outputs.cache-hit != 'true'
+                if: ${{ env.RUN_WORK == 'true' && (matrix.suite == 'integration-codegen' && steps.fhir-package-cache.outputs.cache-hit != 'true') }}
                 # Fetched straight from the registry rather than by running `fhir:generate`: the
                 # generator would also rewrite src/Component/Models, which a test job must not do.
                 # The tarballs extract to `<name>_<version>/package/`, which is the layout
@@ -190,10 +314,11 @@ jobs:
                     echo "Primed: $(ls -1 demo/var/cache/dev/.fhir | grep -c '^hl7\.' || true) entries"
 
             -   name: Run ${{ matrix.suite }} tests
+                if: env.RUN_WORK == 'true'
                 run: php ./vendor/bin/paratest --testsuite=${{ matrix.suite }} ${{ matrix.extra }} --log-junit=./results/${{ matrix.suite }}-tests.xml --coverage-clover ./results/${{ matrix.suite }}-coverage.xml
 
             -   name: Upload test results to Codecov
-                if: ${{ !cancelled() }}
+                if: ${{ env.RUN_WORK == 'true' && (!cancelled()) }}
                 uses: codecov/codecov-action@v5
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
@@ -208,9 +333,13 @@ jobs:
         if: ${{ always() }}
         steps:
             -   name: Check test matrix result
+                # Strict again. `tests` is no longer gated at job level — it always runs and
+                # skips its own steps — so a skip here is not change detection doing its job,
+                # it is the matrix never having started.
                 run: |
-                    if [ "${{ needs.tests.result }}" != "success" ]; then
-                      echo "Test matrix result: ${{ needs.tests.result }}"
+                    result='${{ needs.tests.result }}'
+                    if [ "$result" != 'success' ]; then
+                      echo "Test matrix result: $result"
                       exit 1
                     fi
 
@@ -234,6 +363,10 @@ jobs:
     # the standalone consumer install under tests/Compat/symfony-6.4.
     symfony-lower-bound:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # `!= 'false'` rather than `== 'true'`: when the changes job fails its outputs are
+        # empty, and this has to run anyway. Every unknown resolves to running.
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
         env:
             COMPOSER_NO_INTERACTION: 1
         steps:
@@ -276,6 +409,13 @@ jobs:
 
     recipe-validation:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # `code`, not a recipe/-only filter: test-recipe installs the bundle and runs a test
+        # suite against it, so any source change can fail it. recipe/ markdown counts as a
+        # source change — scripts/validate-recipe.php reads the recipe's own README.md.
+        # `!= 'false'` rather than `== 'true'`: when the changes job fails its outputs are
+        # empty, and this has to run anyway. Every unknown resolves to running.
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
         env:
             XDEBUG_MODE: coverage
         steps:
@@ -304,7 +444,14 @@ jobs:
 
     fhir-generation-test:
         runs-on: ubuntu-latest
-        needs: [ tests ]
+        needs: [ changes, tests ]
+        # Three full R4/R4B/R5 generations plus a drift check — by far the most expensive job here,
+        # and only reachable by changes to what `fhir:generate` consumes. See changed-areas.sh for
+        # how that set is derived; it is not "the CodeGeneration component" alone.
+        #
+        # Safe to gate at job level, unlike `tests` and `static-analysis`: none of this job's
+        # matrix legs is a required check, so nobody is waiting on a context it will not publish.
+        if: ${{ !cancelled() && needs.changes.outputs.codegen != 'false' }}
         permissions:
             pull-requests: write
             contents: read
@@ -549,19 +696,37 @@ jobs:
     # survives future changes to the version matrix.
     fhir-generation-passed:
         runs-on: ubuntu-latest
-        needs: [ fhir-generation-test ]
+        needs: [ changes, fhir-generation-test ]
         if: ${{ always() }}
         steps:
             -   name: Check FHIR generation matrix result
+                # A skip only passes when change detection is what turned the matrix off. The job
+                # also skips when its `needs: tests` fails, which says nothing about generation —
+                # accepting that unconditionally would turn this gate green on a red run.
                 run: |
-                    if [ "${{ needs.fhir-generation-test.result }}" != "success" ]; then
-                      echo "FHIR generation matrix result: ${{ needs.fhir-generation-test.result }}"
-                      exit 1
+                    result='${{ needs.fhir-generation-test.result }}'
+                    codegen='${{ needs.changes.outputs.codegen }}'
+                    echo "result: $result, codegen changed: ${codegen:-unknown}"
+
+                    if [ "$result" = 'success' ]; then
+                      exit 0
                     fi
+
+                    if [ "$result" = 'skipped' ] && [ "$codegen" = 'false' ]; then
+                      echo 'Generation inputs unchanged; nothing to verify.'
+                      exit 0
+                    fi
+
+                    echo "FHIR generation matrix result: $result"
+                    exit 1
 
     benchmarks:
         runs-on: ubuntu-latest
-        needs: [ tests ]
+        needs: [ changes, tests ]
+        # Needs its own gate now. It used to inherit one by depending on `tests`, but `tests` is
+        # no longer skippable — it always runs so its required legs get published — so without
+        # this a documentation-only pull request would run a full phpbench pass.
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
         permissions:
             pull-requests: write
             contents: read

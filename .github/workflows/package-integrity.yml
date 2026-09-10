@@ -17,9 +17,59 @@ permissions:
     contents: read
 
 jobs:
+    # See the long note on the identical job in pr.yml for why this is a job and not a
+    # workflow-level `paths:` filter. No check here is required by the "Protect Main" ruleset
+    # today, but package-integrity-passed below exists to be required, and a `paths:` filter
+    # would quietly make that impossible.
+    changes:
+        # Distinct from pr.yml's `changes` so the two check runs are not ambiguous by name.
+        name: Detect changed areas (package integrity)
+        runs-on: ubuntu-latest
+        outputs:
+            code: ${{ steps.classify.outputs.code }}
+            packages: ${{ steps.classify.outputs.packages }}
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Classify the changed paths
+                id: classify
+                env:
+                    GH_TOKEN: ${{ github.token }}
+                # Push events fall through to "every area": this workflow also runs on pushes to
+                # main, where there is no pull request to ask for a file list and the
+                # belt-and-braces re-run is the point. See the longer note on the same job in
+                # pr.yml for why each failure path here resolves to running everything.
+                run: |
+                    if [ "${{ github.event_name }}" = 'pull_request' ]; then
+                      .github/scripts/changed-paths.sh \
+                        '${{ github.repository }}' '${{ github.event.number }}' \
+                        > changed-paths.txt || : > changed-paths.txt
+                      echo 'Changed paths:'
+                      sed 's/^/  /' changed-paths.txt
+                    else
+                      : > changed-paths.txt
+                    fi
+
+                    if ! .github/scripts/changed-areas.sh < changed-paths.txt > areas.txt; then
+                      echo 'change detection failed; treating every area as changed' >&2
+                      printf 'code=true\ncodegen=true\ndeps=true\npackages=true\n' > areas.txt
+                    fi
+
+                    tee -a "$GITHUB_OUTPUT" < areas.txt
+
     undeclared-deps:
         name: Undeclared deps (${{ matrix.repo }})
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # Seven isolation installs, and what they check is a manifest against its own source.
+        # Gated together rather than per leg because a job-level `if:` cannot see `matrix`;
+        # splitting them would mean generating the matrix dynamically, which is not worth it.
+        #
+        # Gating a matrix job at job level is safe HERE and not in pr.yml: no leg of this
+        # workflow is a required check, so no context is left pending when the matrix never
+        # expands. If `package-integrity-passed` is ever added to the ruleset, this stays fine —
+        # it is not matrixed — but these two jobs must not be required leg by leg.
+        if: ${{ !cancelled() && needs.changes.outputs.packages != 'false' }}
         env:
             COMPOSER_NO_INTERACTION: 1
         strategy:
@@ -91,6 +141,8 @@ jobs:
     php-matrix:
         name: PHP ${{ matrix.php }}
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
         env:
             XDEBUG_MODE: off
             COMPOSER_NO_INTERACTION: 1
@@ -126,8 +178,16 @@ jobs:
         if: ${{ always() }}
         steps:
             -   name: Check matrix results
+                # `skipped` passes: change detection found nothing either matrix could react to.
                 run: |
-                    if [ "${{ needs.undeclared-deps.result }}" != "success" ] || [ "${{ needs.php-matrix.result }}" != "success" ]; then
-                      echo "undeclared-deps: ${{ needs.undeclared-deps.result }}, php-matrix: ${{ needs.php-matrix.result }}"
-                      exit 1
-                    fi
+                    status=0
+                    for pair in "undeclared-deps:${{ needs.undeclared-deps.result }}" \
+                                "php-matrix:${{ needs.php-matrix.result }}"; do
+                      job=${pair%%:*}
+                      result=${pair#*:}
+                      echo "$job: $result"
+                      if [ "$result" != 'success' ] && [ "$result" != 'skipped' ]; then
+                        status=1
+                      fi
+                    done
+                    exit "$status"

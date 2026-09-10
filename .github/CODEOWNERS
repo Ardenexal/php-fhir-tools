@@ -13,3 +13,10 @@
 # Decides which .goat-flow/ paths are publishable at all. Loosening it can
 # expose local session logs, plan contents, or the scratchpad.
 /.goat-flow/.gitignore @Ardenexal
+
+# CI configuration decides which checks run and therefore which of them can
+# block a merge. The change-detection scripts in particular: a single path
+# added to is_documentation() in changed-areas.sh, or one `if:` edited in
+# pr.yml, can turn off up to fourteen required status checks, and in review it
+# reads as a harmless one-line addition. Same scrutiny as the hooks above.
+/.github/ @Ardenexal
