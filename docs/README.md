@@ -10,7 +10,8 @@ PHP FHIR Tools is a PHP 8.3+ library monorepo for working with
 standard for exchanging healthcare data as structured resources such as `Patient`, `Observation`,
 and `Questionnaire`. This toolkit generates PHP model classes from FHIR Structure Definitions,
 serializes resources to and from JSON and XML, validates resources against the specification and
-Implementation Guides, and evaluates FHIRPath 2.0 expressions.
+Implementation Guides, and evaluates FHIRPath 2.0 expressions. It also generates and serializes
+CDA R2 logical models, including the AU Digital Health extensions.
 
 {% hint style="info" %}
 The packages can be used independently or together. If you only need serialization, install
@@ -48,6 +49,11 @@ wires everything for you.
       <td>FHIRPath expression evaluation</td>
       <td><code>ardenexal/fhir-path</code></td>
       <td><a href="fhirpath/overview.md">FHIRPath</a></td>
+    </tr>
+    <tr>
+      <td>CDA R2 & AU CDA logical models</td>
+      <td><code>ardenexal/cda-sd-models</code></td>
+      <td><a href="code-generation/cda.md">CDA Logical Models</a></td>
     </tr>
     <tr>
       <td>Symfony integration</td>
