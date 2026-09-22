@@ -38,8 +38,8 @@ class Participant2 extends InfrastructureRoot
      * @param list<II> $templateId
      */
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: true, xmlSerializedName: '@typeCode')]
-        public ?ParticipationType $typeCode = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'openEnum', isArray: false, isRequired: true, xmlSerializedName: '@typeCode')]
+        public ParticipationType|string|null $typeCode = null,
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@contextControlCode')]
         public string $contextControlCode = 'OP',
         #[FhirProperty(

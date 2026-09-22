@@ -31,6 +31,9 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute;
  *                         value[x] slot.
  *   'enum'              — Backed enum (CDA coded property bound to a generated enum, e.g. NullFlavor);
  *                         the property type IS the enum and its ->value is the code string
+ *   'openEnum'          — Like 'enum', but a CDA profile rebinds the element to a wider ValueSet, so the
+ *                         property is typed `Enum|string` (list items likewise) and a code the enum
+ *                         lacks is held as the bare string. phpType on a list stays the enum FQCN
  *   'polymorphic'       — CDA element admitting several datatypes, discriminated on the wire by an
  *                         `xsi:type` attribute rather than by the element name (an observation's value
  *                         admits 29). The property is typed to the nearest datatype all of them derive

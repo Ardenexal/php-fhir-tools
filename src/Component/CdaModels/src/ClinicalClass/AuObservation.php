@@ -95,7 +95,7 @@ class AuObservation extends Observation
             xmlNamespace: 'http://ns.electronichealth.net.au/Ci/Cda/Extensions/3.0',
         )]
         public array $inFulfillmentOf = [],
-        ?ActClassObservation $classCode = null,
+        ActClassObservation|string|null $classCode = null,
         ?string $moodCode = null,
         ?bool $negationInd = null,
         array $id = [],

@@ -20,13 +20,13 @@ use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
 class EN extends ANY
 {
     /**
-     * @param list<EntityNameUse>   $use
-     * @param list<ChoiceGroupItem> $item
+     * @param list<EntityNameUse|string> $use
+     * @param list<ChoiceGroupItem>      $item
      */
     public function __construct(
         #[FhirProperty(
             fhirType: 'code',
-            propertyKind: 'enum',
+            propertyKind: 'openEnum',
             isArray: true,
             isRequired: false,
             xmlSerializedName: '@use',

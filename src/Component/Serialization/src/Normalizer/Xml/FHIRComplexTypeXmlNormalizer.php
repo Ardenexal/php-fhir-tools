@@ -185,7 +185,13 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                                 $attrName,
                                 $this->denormalizeXmlAttribute(
                                     (string) $value,
-                                    self::modelAccessor()->declaredTypeOf($resolvedType, $attrName),
+                                    // A single-valued open coded property is typed `Enum|string`, a
+                                    // union that declaredTypeOf() reports as null; its enum member is
+                                    // the target. A list stays `array` and reads its enum from meta.
+                                    self::modelAccessor()->declaredTypeOf($resolvedType, $attrName)
+                                        ?? (($metaMap[$attrName] ?? null)?->propertyKind === 'openEnum'
+                                            ? self::modelAccessor()->declaredClassOf($resolvedType, $attrName)
+                                            : null),
                                     $metaMap[$attrName] ?? null,
                                 ),
                             );
@@ -951,9 +957,14 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      * Only enum-typed and array-typed properties need conversion; every other property keeps the
      * historical plain-string assignment, so FHIR R4/R4B/R5 attribute handling is untouched - no
      * generated FHIR property is enum- or array-typed on an xmlAttr, CDA is the only consumer.
+     *
+     * An `openEnum` property (a coded element a CDA profile rebinds more widely than its parent)
+     * keeps a code its enum lacks as the bare string instead of rejecting it.
      */
     private function denormalizeXmlAttribute(string $value, ?string $typeName, ?PropertyMetadata $meta): mixed
     {
+        $open = $meta?->propertyKind === 'openEnum';
+
         if ($typeName === 'array') {
             $codes     = preg_split('/\s+/', trim($value), -1, PREG_SPLIT_NO_EMPTY);
             $codes     = $codes === false ? [] : $codes;
@@ -961,7 +972,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
             if ($itemClass !== null && is_a($itemClass, \BackedEnum::class, true)) {
                 /** @var class-string<\BackedEnum> $itemClass */
-                return array_map(fn (string $code): \BackedEnum => $this->enumCase($itemClass, $code), $codes);
+                return array_map(fn (string $code): \BackedEnum|string => $open ? ($itemClass::tryFrom($code) ?? $code) : $this->enumCase($itemClass, $code), $codes);
             }
 
             return $codes;
@@ -969,7 +980,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
         if ($typeName !== null && is_a($typeName, \BackedEnum::class, true)) {
             /** @var class-string<\BackedEnum> $typeName */
-            return $this->enumCase($typeName, $value);
+            return $open ? ($typeName::tryFrom($value) ?? $value) : $this->enumCase($typeName, $value);
         }
 
         return $value;
