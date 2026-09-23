@@ -917,7 +917,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 $maxSuffix        = $rangeMax !== null ? $rangeMax['type'] : null;
                 $suffix           = $minSuffix ?? $maxSuffix;
 
-                if ($suffix !== null && in_array($suffix, $temporalSuffixes, true)) {
+                if (in_array($suffix, $temporalSuffixes, true)) {
                     $temporalTypeMap = [
                         'Date'     => 'date',
                         'DateTime' => 'dateTime',
