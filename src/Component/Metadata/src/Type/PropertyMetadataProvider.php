@@ -38,9 +38,12 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
      * A warm PSR-6 pool outlives a deployment, and the entries it holds are serialized objects whose
      * class names are part of that payload. The read guard is a bare array check, so a pool warmed
      * before this component moved namespaces would be served straight back as the old shape rather
-     * than rejected. Bump this whenever the cached structure changes -- a namespace move counts.
+     * than rejected. Bump this whenever the cached structure changes -- a namespace move counts --
+     * and whenever generated metadata gains a value consumers branch on, such as a new
+     * propertyKind: the key carries only the class name, so a regenerated class would otherwise be
+     * served its pre-upgrade metadata (v3: `openEnum`).
      */
-    private const string CACHE_SCHEMA = 'metadata-type-v2';
+    private const string CACHE_SCHEMA = 'metadata-type-v3';
 
     /**
      * Returns the canonical PSR-6 cache key for a FHIR model class.

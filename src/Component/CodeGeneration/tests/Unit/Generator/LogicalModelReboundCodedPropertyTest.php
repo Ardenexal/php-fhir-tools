@@ -111,6 +111,26 @@ final class LogicalModelReboundCodedPropertyTest extends TestCase
         self::assertSame([self::CORE => ['typeCode']], $rebound);
     }
 
+    public function testUnboundRootAlreadyDeclaresAStringSoNothingWidens(): void
+    {
+        // The PHP property belongs to the farthest ancestor whose snapshot has the element, since
+        // every descendant skips inherited names. An unbound root therefore declares it as a plain
+        // string, and the middle class's binding never produces a strict property to widen.
+        $middle  = 'http://example.org/StructureDefinition/middle';
+        $root    = $this->participant(self::CORE, 'Participant2', null);
+        $rebound = $this->generator->findReboundCodedProperties(
+            [
+                self::CORE => $root,
+                $middle    => $this->participant($middle, 'middle', self::CDA_VS),
+                self::AU   => $this->participant(self::AU, 'au-Participant2', self::V3_VS),
+            ],
+            [$middle => self::CORE, self::AU => $middle],
+        );
+
+        self::assertSame([], $rebound);
+        self::assertSame('string', (string) $this->parameter($this->generate($root, []), 'typeCode')->getType());
+    }
+
     public function testOpenCodedScalarIsTypedEnumOrString(): void
     {
         $class = $this->generate($this->participant(self::CORE, 'Participant2', self::CDA_VS), ['typeCode']);
