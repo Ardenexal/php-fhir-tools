@@ -67,7 +67,7 @@ Hence a separate install. The two components are consumed through `path` reposit
   must not touch.
 
 The `options.versions` pins in `composer.json` exist because `ardenexal/fhir-code-generation`
-requires `ardenexal/fhir-metadata: ^0.5`, and a path repository on a feature branch would
+requires `ardenexal/fhir-metadata: ^0.6.1`, and a path repository on a feature branch would
 otherwise resolve to `dev-<branch>`, which that constraint cannot match.
 
 ## Running it

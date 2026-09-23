@@ -55,7 +55,7 @@ jobs:
   # Fan-in gate: the split legs run with fail-fast: false and each push is an
   # independent write to a separate downstream repo, so a transient GitHub error on
   # one leg (seen: "! [remote rejected] main -> main (Internal Server Error)") leaves
-  # some packages published and others not. Every cross-pin is ^0.5, so a partial
+  # some packages published and others not. Every cross-pin is ^0.6.1, so a partial
   # publish leaves consumers with unresolvable constraints.
   #
   # NOTE: this gate DETECTS partial publication, it does not PREVENT it. GitHub Actions
@@ -72,6 +72,6 @@ jobs:
         run: |
           if [ "${{ needs.split.result }}" != "success" ]; then
             echo "discover: ${{ needs.discover.result }}, split: ${{ needs.split.result }}"
-            echo "::error::Split publication did not fully succeed. On a tag push this means SOME packages were tagged and others were not: the release is PARTIALLY PUBLISHED. Consumers pinning ^0.5 across packages will hit unresolvable constraints until every package is published. Re-run this workflow and confirm every 'Split <package>' leg is green."
+            echo "::error::Split publication did not fully succeed. On a tag push this means SOME packages were tagged and others were not: the release is PARTIALLY PUBLISHED. Consumers pinning ^0.6.1 across packages will hit unresolvable constraints until every package is published. Re-run this workflow and confirm every 'Split <package>' leg is green."
             exit 1
           fi

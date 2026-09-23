@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-09-23
+
+### Fixed
+- [Core] `ardenexal/*` cross-package constraints are raised from `^0.5` to `^0.6.1`, and every component's `dev-main` branch-alias moves to `0.6.x-dev`. `0.6.0` was published with its manifests still at `^0.5`, and under 0.x caret rules `^0.5` excludes `0.6.0`, so each `0.6.0` package resolved its siblings at `0.5.x`. That paired the new CDA models with a serializer that cannot read them. The floor is `^0.6.1` rather than `^0.6` so that no package can resolve a sibling from the mis-pinned `0.6.0` set
+- [CdaModels] `ardenexal/cda-sd-models` declares a conflict with `ardenexal/fhir-serialization` below `0.6`, so Composer refuses to install the new models with an older serializer. The models package requires only `fhir-metadata`, so before this nothing enforced the pairing. With the new models and an older serializer, a code outside the enum fails to deserialize, and a single-valued open property reads even a known code back as a string instead of its enum case
+
+### Infrastructure
+- [CI] `package-integrity` stamps sibling path repositories with `0.6.x-dev` to match the new branch aliases, and the Symfony 6.4 compat harness pins its path repositories at `0.6.999`. Left at `0.5`, either one would override the declared alias and fail the new cross-constraints
+
+## [0.6.0] - 2026-09-23
+
+**Known issue:** every `0.6.0` package requires its `ardenexal/*` siblings at `^0.5`, so it installs alongside `0.5.x` siblings, including a serializer that cannot read the `0.6.0` CDA models. Use `0.6.1`.
+
 ### Changed
 - **BREAKING** [CdaModels] `Participant1::$typeCode`, `Participant2::$typeCode`, `ExternalAct::$classCode` and `Observation::$classCode` are now `Enum|string|null`, and `EN::$use` (inherited by `PN`, `ON`, `TN` and the AU name types) is `list<EntityNameUse|string>`. Code reading `->value` on these properties must handle a string. Pass an out-of-enum code as the plain string, e.g. `new AuParticipant2(typeCode: 'CAGNT')`; `ParticipationType` itself still has no `CAGNT` case
 - [CdaModels] Upgrade `ardenexal/cda-sd-models` and `ardenexal/fhir-serialization` together. The models package requires only `fhir-metadata`, so nothing enforces the pairing: with the new models and an older serializer, a code outside the enum still fails to deserialize, and a single-valued open property reads even a known code back as a string instead of its enum case
@@ -193,7 +206,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Infrastructure] Demo `composer.lock` constrained to PHP 8.3 compatible packages
 - [FHIRPath] PHPDoc type hints improved in `FHIRPathEvaluator`
 
-[Unreleased]: https://github.com/Ardenexal/php-fhir-tools/compare/0.5.0...HEAD
+[Unreleased]: https://github.com/Ardenexal/php-fhir-tools/compare/0.6.1...HEAD
+[0.6.1]: https://github.com/Ardenexal/php-fhir-tools/compare/0.6.0...0.6.1
+[0.6.0]: https://github.com/Ardenexal/php-fhir-tools/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/Ardenexal/php-fhir-tools/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/Ardenexal/php-fhir-tools/compare/0.3.1...0.4.0
 [0.3.1]: https://github.com/Ardenexal/php-fhir-tools/compare/0.3.0...0.3.1
