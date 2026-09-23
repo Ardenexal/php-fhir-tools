@@ -12,7 +12,7 @@
             "options": {
                 "symlink": false,
                 "versions": {
-                    "ardenexal/fhir-code-generation": "0.5.999"
+                    "ardenexal/fhir-code-generation": "0.6.999"
                 }
             }
         },
@@ -22,7 +22,7 @@
             "options": {
                 "symlink": false,
                 "versions": {
-                    "ardenexal/fhir-metadata": "0.5.999"
+                    "ardenexal/fhir-metadata": "0.6.999"
                 }
             }
         }
@@ -37,7 +37,7 @@
     ],
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-code-generation": "0.5.999",
+        "ardenexal/fhir-code-generation": "0.6.999",
         "symfony/console": "6.4.*",
         "symfony/dependency-injection": "6.4.*",
         "symfony/filesystem": "6.4.*",
