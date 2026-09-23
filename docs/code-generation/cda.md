@@ -256,6 +256,25 @@ because both CDA and FHIR R5 report `fhirVersion: 5.0.0`. Routing is by package 
 CDA packages do not require FHIR terminology packages (`hl7.terminology.*`). CDA ValueSets
 (NullFlavor, ActClass, ActMood, etc.) are bundled in the CDA package itself.
 
+### Open coded properties
+
+A coded property bound to a bundled ValueSet is typed to its enum. The exception is an element
+that an AU profile rebinds to a different ValueSet. For example, `au-Participant2` binds `typeCode`
+to the full v3 ParticipationType, which includes `CAGNT`, but core CDA binds it to a subset. PHP
+does not let a subclass change an inherited property's type, so the generator widens the property
+on the class that declares it:
+
+```php
+#[FhirProperty(fhirType: 'code', propertyKind: 'openEnum', ...)]
+public ParticipationType|string|null $typeCode = null,
+```
+
+Seven properties are open today: `typeCode` on `Participant1` and `Participant2`, `classCode` on
+`ExternalAct` and `Observation`, and `use` on `EN` and every name type derived from it
+(`list<EntityNameUse|string>`). Pass a code the enum lacks as a plain string
+(`new AuParticipant2(typeCode: 'CAGNT')`). On deserialize, a code the enum knows comes back as the
+case and any other code as the string. The string is not checked against the AU ValueSet.
+
 ---
 
 ## Implementation Status

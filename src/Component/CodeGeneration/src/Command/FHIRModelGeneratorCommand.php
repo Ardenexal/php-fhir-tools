@@ -672,6 +672,10 @@ class FHIRModelGeneratorCommand extends Command
         // map as constructor forwarding, not `baseDefinition` — see CdaTypeHierarchy.
         $hierarchy = new CdaTypeHierarchy($names, $parentOf);
 
+        // Coded properties a descendant rebinds (au-Participant2.typeCode → full v3 set) are typed
+        // `Enum|string` on the declaring class, since the subclass cannot retype them itself.
+        $openCoded = $generator->findReboundCodedProperties($definitions, array_filter($parentOf, 'is_string'));
+
         // Pre-compute each class's OWN constructor parameters, then memoise each class's FULL ordered
         // parameter list (own ++ parent's full, walked through `parentOf`). A child is handed its
         // parent's full list so it can re-declare those params and forward them via
@@ -682,7 +686,7 @@ class FHIRModelGeneratorCommand extends Command
             $parent          = $parentOf[$url] ?? '';
             $inheritedNames  = ($parent !== '' && isset($ownPropNames[$parent])) ? $ownPropNames[$parent] : [];
             $classXmlNs      = $this->resolveCdaXmlNamespace($url, $xmlNsDirect, $baseOf);
-            $ownParams[$url] = $generator->collectOwnParameters($sd, $urlToFqcn, $classXmlNs, $inheritedNames, $valueSetToEnumFqcn, $hierarchy);
+            $ownParams[$url] = $generator->collectOwnParameters($sd, $urlToFqcn, $classXmlNs, $inheritedNames, $valueSetToEnumFqcn, $hierarchy, $openCoded[$url] ?? []);
         }
 
         /** @var array<string, list<array<string, mixed>>> $fullParams */
@@ -710,7 +714,7 @@ class FHIRModelGeneratorCommand extends Command
             $inheritedConstraintKeys = ($parent !== '' && isset($ownConstraints[$parent])) ? $ownConstraints[$parent] : [];
             $inheritedParams         = ($parent !== '' && isset($fullParams[$parent])) ? $fullParams[$parent] : [];
             try {
-                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys, $valueSetToEnumFqcn, $inheritedParams, $propertyOrders[$url] ?? [], $hierarchy);
+                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys, $valueSetToEnumFqcn, $inheritedParams, $propertyOrders[$url] ?? [], $hierarchy, $openCoded[$url] ?? []);
             } catch (\Throwable $e) {
                 $this->errorCollector->addError(
                     "CDA class generation failed for {$url}: {$e->getMessage()}",

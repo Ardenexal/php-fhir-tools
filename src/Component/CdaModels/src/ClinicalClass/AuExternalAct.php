@@ -40,7 +40,7 @@ class AuExternalAct extends ExternalAct
      * @param list<II>     $templateId
      */
     public function __construct(
-        ?ActClass $classCode = null,
+        ActClass|string|null $classCode = null,
         string $moodCode = 'EVN',
         array $id = [],
         ?CD $code = null,

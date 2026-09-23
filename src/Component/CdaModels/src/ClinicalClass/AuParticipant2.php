@@ -38,7 +38,7 @@ class AuParticipant2 extends Participant2
      * @param list<II> $templateId
      */
     public function __construct(
-        ?ParticipationType $typeCode = null,
+        ParticipationType|string|null $typeCode = null,
         string $contextControlCode = 'OP',
         ?CE $sdtcFunctionCode = null,
         ?IVLTS $time = null,

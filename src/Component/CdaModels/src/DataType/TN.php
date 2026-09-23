@@ -19,8 +19,8 @@ use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
 class TN extends EN
 {
     /**
-     * @param list<EntityNameUse>   $use
-     * @param list<ChoiceGroupItem> $item
+     * @param list<EntityNameUse|string> $use
+     * @param list<ChoiceGroupItem>      $item
      */
     public function __construct(
         array $use = [],

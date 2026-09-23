@@ -40,8 +40,8 @@ class ExternalAct extends InfrastructureRoot
      * @param list<II>     $templateId
      */
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
-        public ?ActClass $classCode = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'openEnum', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
+        public ActClass|string|null $classCode = null,
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@moodCode')]
         public string $moodCode = 'EVN',
         #[FhirProperty(

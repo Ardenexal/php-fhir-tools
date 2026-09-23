@@ -83,8 +83,8 @@ class Observation extends InfrastructureRoot
      * @param list<II>                        $templateId
      */
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
-        public ?ActClassObservation $classCode = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'openEnum', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
+        public ActClassObservation|string|null $classCode = null,
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: true, xmlSerializedName: '@moodCode')]
         public ?string $moodCode = null,
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@negationInd')]
