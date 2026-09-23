@@ -8,8 +8,17 @@ Thumbs.db
 
 # Internal tool configs
 .kiro/
-.claude/
 .gruff-cache/
+
+# .claude/ stays local (settings, hooks, worktrees, other skills) except the
+# goat-* skills, which CLAUDE.md and the goat-flow docs route to by name.
+# Ignoring contents (/*) rather than the directory itself is what lets the
+# negations below re-include anything: git never descends into an excluded dir.
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/goat/
+!.claude/skills/goat-*/
 
 # goat-flow is deliberately NOT ignored here: the .goat-flow/ pointers in
 # CLAUDE.md and AGENTS.md have to resolve for anyone who clones the repo.
