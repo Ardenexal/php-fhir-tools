@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Infrastructure
-- [CI] `Main Branch` downloads the FHIR core packages in every job whose tests reach `OperationFixturesMatchPackagesTest`, and caches them, so the gate can go green. Only the quality gate fetched them, which left `component-tests (codegen)` and `cross-version-test` failing its nine cases on every push to `main` by design: without the packages the test fails in CI instead of skipping. `integration-test` needed them too but never ran, because it waits on `component-tests`. The cache and download steps now live in one composite action, `.github/actions/fhir-core-packages`, which `main.yml` and `pr.yml` share. It keeps the existing cache key, so entries already saved still hit
+- [CI] `Main Branch` downloads the FHIR core packages in every job whose tests reach `OperationFixturesMatchPackagesTest`, and caches them, so the gate can go green. Only the quality gate fetched them, which left `component-tests (codegen)` and `cross-version-test` failing its nine cases on every push to `main` by design: without the packages the test fails in CI instead of skipping. `integration-test` needed them too but never ran, because it waits on `component-tests`. The cache and download steps now live in one composite action, `.github/actions/fhir-core-packages`, which `main.yml` and `pr.yml` share. It keeps the existing cache key, so entries already saved still hit the cache.
 
 ## [0.6.1] - 2026-09-23
 
