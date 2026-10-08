@@ -126,6 +126,10 @@ class FHIRProfileGenerator
      * Skipped elements:
      *  - Root element (path has no '.' — it's the resource or type itself, not a property)
      *  - Elements with contentReference (constraint lives on the referenced type)
+     *  - Slice elements and their children (see differentialPropertyPath()) — their `path` is
+     *    unsliced, so a plain constraint would apply to every item of the sliced element. Slice
+     *    rules are emitted by emitDifferentialSliceConstraints() instead. Choice type slices
+     *    ("value[x]:valueQuantity") are kept, on the variant's path ("valueQuantity").
      *
      * @param array<string, mixed> $structureDefinition
      */
@@ -151,9 +155,11 @@ class FHIRProfileGenerator
                 continue;
             }
 
-            // Extract the property path: strip the resource/type prefix ("Patient.name" → "name")
-            $dotPos        = strpos($path, '.');
-            $propertyPath  = $dotPos !== false ? substr($path, $dotPos + 1) : $path;
+            // Skip slices — their rules hold per slice, not for every item on the unsliced path
+            $propertyPath = self::differentialPropertyPath($element);
+            if ($propertyPath === null) {
+                continue;
+            }
 
             // Cardinality constraint (Count) — emitted when min > 0 or max is a bounded number
             $min = (int) ($element['min'] ?? 0);
@@ -235,8 +241,11 @@ class FHIRProfileGenerator
                 continue;
             }
 
-            $dotPos       = strpos($path, '.');
-            $propertyPath = $dotPos !== false ? substr($path, $dotPos + 1) : $path;
+            // Skip slices — must-support on one slice does not make the unsliced path must-support
+            $propertyPath = self::differentialPropertyPath($element);
+            if ($propertyPath === null) {
+                continue;
+            }
 
             $namespace->addUse(FHIRProfileMustSupport::class);
             $class->addAttribute(FHIRProfileMustSupport::class, [
@@ -397,7 +406,7 @@ class FHIRProfileGenerator
      * path tail matches the discriminator path, e.g.:
      *   Parent: "Patient.identifier" discriminator path="system"
      *   Slice header: "Patient.identifier" sliceName="ihiNumber"
-     *   Child: "Patient.identifier.system" (sliceName="ihiNumber") with fixedUri
+     *   Child: "Patient.identifier.system" (id "Patient.identifier:ihiNumber.system") with fixedUri
      *
      * For 'value' discriminator on 'url' (extension slicing), the value is usually the
      * extension profile URL from the slice element's type[0].profile[0].
@@ -424,18 +433,28 @@ class FHIRProfileGenerator
         // For 'value' or 'pattern' discriminators: look for a child element at the discriminator path
         if (in_array($discType, ['value', 'pattern'], true) && $discPath !== '' && $discPath !== '$this') {
             $targetPath = "{$resourceType}.{$propertyPath}.{$discPath}";
+            $sliceId    = (string) ($sliceElement['id'] ?? '');
 
             foreach ($allElements as $element) {
-                $path      = (string) ($element['path'] ?? '');
-                $elemSlice = (string) ($element['sliceName'] ?? '');
+                $path = (string) ($element['path'] ?? '');
 
                 if ($path !== $targetPath) {
                     continue;
                 }
 
-                // Must belong to the same slice
-                if ($elemSlice !== $sliceName && $elemSlice !== '') {
-                    continue;
+                // Must belong to the same slice. Slice children name their slice only in `id`
+                // ("Composition.section:overview.code"), so match on the slice header's id when
+                // both carry one; the trailing '.' keeps reslices ("section:overview/sub") out.
+                $elemId = (string) ($element['id'] ?? '');
+                if ($sliceId !== '' && $elemId !== '') {
+                    if (!str_starts_with($elemId, $sliceId . '.')) {
+                        continue;
+                    }
+                } else {
+                    $elemSlice = (string) ($element['sliceName'] ?? '');
+                    if ($elemSlice !== $sliceName && $elemSlice !== '') {
+                        continue;
+                    }
                 }
 
                 // Extract fixed[x] value
@@ -465,6 +484,50 @@ class FHIRProfileGenerator
         // (not standard practice to put it in the differential, so return null for resolution)
 
         return null;
+    }
+
+    /**
+     * The property path a plain profile rule on this differential element applies to, without the
+     * resource/type prefix ("Patient.name" → "name"), or null when the element is a slice or lies
+     * beneath one.
+     *
+     * A slice element keeps the unsliced `path` ("Composition.section.code") and names its slice
+     * only in `sliceName` (on the slice header) or in `id` ("Composition.section:overview.code"),
+     * so a rule emitted on its `path` would bind every item of the sliced element. The slicing
+     * header itself ("Composition.section" with `slicing`) is not a slice.
+     *
+     * A type slice on a choice element ("Observation.value[x]:valueQuantity") is the exception: it
+     * selects one variant rather than a subset of items, so it maps to that variant's JSON key
+     * ("valueQuantity"), which the validator resolves to the choice property when it holds that type.
+     *
+     * @param array<string, mixed> $element
+     */
+    private static function differentialPropertyPath(array $element): ?string
+    {
+        $id = (string) ($element['id'] ?? '');
+
+        if ($id !== '') {
+            // "value[x]:valueQuantity" → "valueQuantity"; a slice not named for a variant keeps its ':'
+            $path = (string) preg_replace('/(?<=\.)(\w+)\[x\]:(\1[A-Z]\w*)(?=\.|$)/', '$2', $id);
+            if (str_contains($path, ':')) {
+                return null;
+            }
+        } else {
+            $path      = (string) ($element['path'] ?? '');
+            $sliceName = (string) ($element['sliceName'] ?? '');
+
+            if ($sliceName !== '') {
+                $stem = (string) preg_replace('/^.*\.(\w+)\[x\]$/', '$1', $path);
+                if ($stem === $path || !preg_match('/^' . preg_quote($stem, '/') . '[A-Z]/', $sliceName)) {
+                    return null;
+                }
+                $path = substr($path, 0, (int) strrpos($path, '.') + 1) . $sliceName;
+            }
+        }
+
+        $dotPos = strpos($path, '.');
+
+        return $dotPos !== false ? substr($path, $dotPos + 1) : $path;
     }
 
     /**

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [CodeGeneration] A generated profile that slices an element no longer rejects resources that conform to it ([#139](https://github.com/Ardenexal/php-fhir-tools/issues/139)). A slice element keeps the unsliced `path` and names its slice only in `sliceName` or `id`, so each slice's cardinality, fixed/pattern and must-support rules were also emitted as plain `#[FHIRProfileConstraint]`/`#[FHIRProfileMustSupport]` on the unsliced path: a `0..0` slice emptied the whole list, and every item had to match every slice's pattern. Slice elements now reach only `#[FHIRSliceConstraint]`. A choice type slice such as `value[x]:valueQuantity` still emits plain rules, now on the variant path (`valueQuantity`, `valueQuantity.system`) rather than on `value[x]`, so they apply only when the element holds that type. Regenerate IG profile classes to pick this up
+- [CodeGeneration] Each `#[FHIRSliceConstraint]` takes its `discriminatorValue` from its own slice's child element. Slice children written by SUSHI or the IG publisher carry no `sliceName`, so every slice took the first slice's value, and a `0..0` slice matched the required one
+
 ## [0.6.1] - 2026-09-23
 
 ### Fixed
