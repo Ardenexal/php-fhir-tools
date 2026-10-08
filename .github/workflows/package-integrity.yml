@@ -110,7 +110,7 @@ jobs:
             # not on Packagist yet, so resolve them from the in-repo source via path repositories.
             # Each sibling carries a dev-main -> 0.6.x-dev branch-alias, so relax stability for this
             # isolation install only (the edits below land on the ephemeral CI checkout, never the
-            # committed manifest). Once 0.6.1 is tagged, siblings resolve as stable and these are no-ops.
+            # committed manifest). Once 0.6.2 is tagged, siblings resolve as stable and these are no-ops.
             -   name: Wire sibling path repositories
                 working-directory: ${{ matrix.path }}
                 run: |
@@ -126,7 +126,7 @@ jobs:
                         composer config "repositories.$key" path "$dir"
                         # Pin an explicit dev version on the sibling so detached-HEAD CI checkouts
                         # don't fall back to dev-<sha> (which the dev-main branch-alias can't match)
-                        # and the ^0.6.1 sibling constraints resolve. No-op once 0.6.1 is tagged.
+                        # and the ^0.6.2 sibling constraints resolve. No-op once 0.6.2 is tagged.
                         composer config version 0.6.x-dev --working-dir="$dir"
                     done
 

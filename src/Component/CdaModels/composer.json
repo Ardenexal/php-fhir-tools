@@ -9,7 +9,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-metadata": "^0.6.1"
+        "ardenexal/fhir-metadata": "^0.6.2"
     },
     "conflict": {
         "ardenexal/fhir-serialization": "<0.6"
