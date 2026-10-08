@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
@@ -279,8 +281,8 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
 
     /**
      * Shaped like the R5 core `bp` profile: the discriminator path `code.coding.code` is reached
-     * through a re-slice of `coding`. The discriminator looks through it, but the re-slice's own
-     * rules stay off the slice, where they would bind every coding of the component.
+     * through a nested slice of `coding`. The discriminator looks through it, and the nested slice
+     * travels in the component slice's rules, where it binds only that component's codings.
      */
     public function testDiscriminatorIsFoundThroughANestedSlice(): void
     {
@@ -319,10 +321,179 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
 
         self::assertCount(1, $slices);
         self::assertSame('8480-6', $slices[0]['discriminatorValue'] ?? null);
-        self::assertSame(
-            [['path' => 'valueQuantity.code', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => 'mm[Hg]']]],
-            $slices[0]['rules'] ?? null,
+        self::assertSame([
+            ['path' => 'valueQuantity.code', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => 'mm[Hg]']],
+            ['path' => 'code.coding', 'constraint' => FHIRSlicingRules::class, 'options' => ['property' => 'code.coding', 'rules' => 'open']],
+            [
+                'path'       => 'code.coding',
+                'constraint' => FHIRSliceConstraint::class,
+                'options'    => [
+                    'property'           => 'code.coding',
+                    'sliceName'          => 'SBPCode',
+                    'min'                => 1,
+                    'max'                => 1,
+                    'discriminatorType'  => 'value',
+                    'discriminatorPath'  => 'code',
+                    'discriminatorValue' => '8480-6',
+                    'orderedIndex'       => 0,
+                    'rules'              => [
+                        ['path' => 'code', 'constraint' => Count::class, 'options' => ['min' => 1]],
+                        ['path' => 'code', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => '8480-6']],
+                    ],
+                ],
+            ],
+        ], $slices[0]['rules'] ?? null);
+    }
+
+    /**
+     * Shaped like AU Core's blood pressure, which declares no slicing of its own: it adds a slice to
+     * the parent's `code.coding` slicing, and narrows the parent's SystolicBP slice only through a
+     * nested slice beneath it. Both slicings come from the snapshot.
+     */
+    public function testSlicesOnInheritedSlicingTakeTheirSlicingFromTheSnapshot(): void
+    {
+        $class = $this->generateFrom($this->inheritedSlicingProfile());
+
+        self::assertSame([], $this->attributeArguments($class, FHIRSlicingRules::class), 'Inherited slicing rules stay with the parent');
+
+        $slices = [];
+        foreach ($this->attributeArguments($class, FHIRSliceConstraint::class) as $slice) {
+            self::assertIsString($slice['property']);
+            self::assertIsString($slice['sliceName']);
+            $slices[$slice['property'] . ':' . $slice['sliceName']] = $slice;
+        }
+
+        self::assertSame(['code.coding:snomedBPCode', 'component:SystolicBP'], array_keys($slices));
+        self::assertSame([1, 1, '75367002'], [$slices['code.coding:snomedBPCode']['min'], $slices['code.coding:snomedBPCode']['max'], $slices['code.coding:snomedBPCode']['discriminatorValue'] ?? null]);
+
+        // Touched only through its children: no cardinality restated, and the parent's LOINC code,
+        // not the SNOMED code added beneath it, still decides which component is systolic
+        $systolic = $slices['component:SystolicBP'];
+        self::assertSame([0, '*', '8480-6'], [$systolic['min'], $systolic['max'], $systolic['discriminatorValue'] ?? null]);
+        self::assertIsArray($systolic['rules'] ?? null);
+        self::assertCount(1, $systolic['rules']);
+        self::assertSame(FHIRSliceConstraint::class, $systolic['rules'][0]['constraint']);
+        self::assertSame('code.coding', $systolic['rules'][0]['path']);
+        self::assertSame(['snomedSBP', 1, '271649006'], [
+            $systolic['rules'][0]['options']['sliceName'],
+            $systolic['rules'][0]['options']['min'],
+            $systolic['rules'][0]['options']['discriminatorValue'] ?? null,
+        ]);
+    }
+
+    /** Without a snapshot, inherited slicing cannot be found; the gap is reported, not swallowed. */
+    public function testSlicesOnUnfindableSlicingAreReportedAsWarnings(): void
+    {
+        $sd = $this->inheritedSlicingProfile();
+        unset($sd['snapshot']);
+
+        $context = new BuilderContext();
+        $context->addResource(
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+            'Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource',
+            new ClassType('ObservationResource', new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource')),
         );
+        $errors = new ErrorCollector();
+        $class  = (new FHIRProfileGenerator())->generate($sd, 'R4', $context, new PhpNamespace(self::EVAL_NAMESPACE), $errors);
+
+        self::assertSame([], $this->attributeArguments($class, FHIRSliceConstraint::class));
+        self::assertSame(
+            ['Observation.code.coding', 'Observation.component', 'Observation.component:SystolicBP.code.coding'],
+            array_column($errors->getWarnings(), 'path'),
+        );
+    }
+
+    public function testNestedSliceOnInheritedSlicingBindsOnlyItsComponent(): void
+    {
+        $profileClass = $this->evalClass($this->generateFrom($this->inheritedSlicingProfile()));
+        $profileUrl   = 'http://example.org/StructureDefinition/inherited-slicing-bp';
+        $code         = fn (string ...$codes): CodeableConcept => new CodeableConcept(coding: array_map(
+            static fn (string $code): Coding => new Coding(
+                system: new UriPrimitive(value: str_contains($code, '-') ? 'http://loinc.org' : 'http://snomed.info/sct'),
+                code: new CodePrimitive(value: $code),
+            ),
+            $codes,
+        ));
+
+        self::assertSame([], $this->validateAgainstProfile(new $profileClass(
+            code: $code('85354-9', '75367002'),
+            component: [
+                new ObservationComponent(code: $code('8480-6', '271649006')),
+                new ObservationComponent(code: $code('8462-4')),
+            ],
+        ), $profileUrl));
+
+        self::assertSame([
+            'component[0].code.coding: Slice "snomedSBP" on "component[0].code.coding" requires at least 1 item(s), but 0 matched.',
+        ], $this->validateAgainstProfile(new $profileClass(
+            code: $code('85354-9', '75367002'),
+            component: [new ObservationComponent(code: $code('8480-6'))],
+        ), $profileUrl));
+    }
+
+    /**
+     * Without ids, a slice's children carry neither an id nor a sliceName, so only their position
+     * ties them to the slice; they must not fall back to plain rules on the unsliced path.
+     */
+    public function testWithoutIdsSliceChildrenEmitNoPlainRules(): void
+    {
+        $sd = $this->loadFixture(self::FIXTURE);
+        self::assertIsArray($sd['differential']);
+        self::assertIsArray($sd['differential']['element']);
+        foreach (array_keys($sd['differential']['element']) as $i) {
+            unset($sd['differential']['element'][$i]['id']);
+        }
+
+        $class = $this->generateFrom($sd);
+
+        self::assertSame(
+            [['path' => 'section', 'constraint' => Count::class, 'options' => ['min' => 1], 'groups' => [self::PROFILE_URL]]],
+            $this->attributeArguments($class, FHIRProfileConstraint::class),
+        );
+        self::assertSame([['path' => 'section', 'groups' => [self::PROFILE_URL]]], $this->attributeArguments($class, FHIRProfileMustSupport::class));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function inheritedSlicingProfile(): array
+    {
+        $loinc  = 'http://loinc.org';
+        $snomed = 'http://snomed.info/sct';
+
+        return [
+            'resourceType'   => 'StructureDefinition',
+            'url'            => 'http://example.org/StructureDefinition/inherited-slicing-bp',
+            'name'           => 'InheritedSlicingBp',
+            'type'           => 'Observation',
+            'kind'           => 'resource',
+            'derivation'     => 'constraint',
+            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/Observation',
+            'differential'   => [
+                'element' => [
+                    ['id' => 'Observation.code.coding', 'path' => 'Observation.code.coding', 'min' => 2],
+                    ['id' => 'Observation.code.coding:snomedBPCode', 'path' => 'Observation.code.coding', 'sliceName' => 'snomedBPCode', 'min' => 1, 'max' => '1'],
+                    ['id' => 'Observation.code.coding:snomedBPCode.system', 'path' => 'Observation.code.coding.system', 'min' => 1, 'fixedUri' => $snomed],
+                    ['id' => 'Observation.code.coding:snomedBPCode.code', 'path' => 'Observation.code.coding.code', 'min' => 1, 'fixedCode' => '75367002'],
+                    ['id' => 'Observation.component:SystolicBP', 'path' => 'Observation.component', 'sliceName' => 'SystolicBP'],
+                    ['id' => 'Observation.component:SystolicBP.code.coding:snomedSBP', 'path' => 'Observation.component.code.coding', 'sliceName' => 'snomedSBP', 'min' => 1, 'max' => '1'],
+                    ['id' => 'Observation.component:SystolicBP.code.coding:snomedSBP.code', 'path' => 'Observation.component.code.coding.code', 'min' => 1, 'fixedCode' => '271649006'],
+                ],
+            ],
+            'snapshot' => [
+                'element' => [
+                    ['id' => 'Observation.code.coding', 'path' => 'Observation.code.coding', 'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'code']], 'rules' => 'open']],
+                    ['id' => 'Observation.code.coding:BPCode.code', 'path' => 'Observation.code.coding.code', 'fixedCode' => '85354-9'],
+                    ['id' => 'Observation.code.coding:snomedBPCode.code', 'path' => 'Observation.code.coding.code', 'fixedCode' => '75367002'],
+                    ['id' => 'Observation.component', 'path' => 'Observation.component', 'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'code.coding.code']], 'rules' => 'open']],
+                    ['id' => 'Observation.component:SystolicBP', 'path' => 'Observation.component', 'sliceName' => 'SystolicBP', 'min' => 1, 'max' => '1'],
+                    ['id' => 'Observation.component:SystolicBP.code.coding', 'path' => 'Observation.component.code.coding', 'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'code']], 'rules' => 'open']],
+                    ['id' => 'Observation.component:SystolicBP.code.coding:SBPCode.system', 'path' => 'Observation.component.code.coding.system', 'fixedUri' => $loinc],
+                    ['id' => 'Observation.component:SystolicBP.code.coding:SBPCode.code', 'path' => 'Observation.component.code.coding.code', 'fixedCode' => '8480-6'],
+                    ['id' => 'Observation.component:SystolicBP.code.coding:snomedSBP.code', 'path' => 'Observation.component.code.coding.code', 'fixedCode' => '271649006'],
+                ],
+            ],
+        ];
     }
 
     public function testGeneratedProfileAcceptsAConformingBloodPressure(): void

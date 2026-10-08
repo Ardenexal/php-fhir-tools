@@ -50,18 +50,19 @@ use Symfony\Component\Validator\Constraint;
 final class FHIRSliceConstraint extends Constraint
 {
     /**
-     * @param string                                                                                         $property           Property path on the target class (e.g. 'identifier')
-     * @param string                                                                                         $sliceName          FHIR slice name (e.g. 'ihiNumber'); '@default' for the default slice
-     * @param int                                                                                            $min                Minimum number of items matching this slice (0 = optional)
-     * @param int|string                                                                                     $max                Maximum items ('*' = unbounded, or a positive integer)
-     * @param string                                                                                         $discriminatorType  'value', 'pattern', or 'exists'
-     * @param string                                                                                         $discriminatorPath  Element path within a slice item (e.g. 'system', 'type.coding')
-     * @param mixed                                                                                          $discriminatorValue Value to match at the discriminator path
-     * @param list<string>                                                                                   $groups             Profile URL groups under which this slice constraint is active
-     * @param bool                                                                                           $isDefault          True for the special '@default' slice in closed slicing
-     * @param int                                                                                            $orderedIndex       Slice declaration order (reserved for future ordered-slicing enforcement)
-     * @param list<array{path: string, constraint: class-string<Constraint>, options: array<string, mixed>}> $rules
-     *                                                                                                                           Rules each item matching this slice must meet; `path` is relative to the item
+     * @param string                                                                                                          $property           Property path on the target class (e.g. 'identifier')
+     * @param string                                                                                                          $sliceName          FHIR slice name (e.g. 'ihiNumber'); '@default' for the default slice
+     * @param int                                                                                                             $min                Minimum number of items matching this slice (0 = optional)
+     * @param int|string                                                                                                      $max                Maximum items ('*' = unbounded, or a positive integer)
+     * @param string                                                                                                          $discriminatorType  'value', 'pattern', or 'exists'
+     * @param string                                                                                                          $discriminatorPath  Element path within a slice item (e.g. 'system', 'type.coding')
+     * @param mixed                                                                                                           $discriminatorValue Value to match at the discriminator path
+     * @param list<string>                                                                                                    $groups             Profile URL groups under which this slice constraint is active
+     * @param bool                                                                                                            $isDefault          True for the special '@default' slice in closed slicing
+     * @param int                                                                                                             $orderedIndex       Slice declaration order (reserved for future ordered-slicing enforcement)
+     * @param list<array{path: string, constraint: class-string<Constraint|FHIRSlicingRules>, options: array<string, mixed>}> $rules
+     *                                                                                                                                            Rules each item matching this slice must meet; `path` is relative to the item.
+     *                                                                                                                                            A FHIRSliceConstraint or FHIRSlicingRules rule describes slicing beneath the slice
      */
     public function __construct(
         public readonly string $property,

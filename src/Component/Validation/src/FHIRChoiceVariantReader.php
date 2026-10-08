@@ -193,24 +193,17 @@ final class FHIRChoiceVariantReader
     /**
      * Whether $held is a value of the variant's PHP type.
      *
-     * Boolean, integer and decimal variants are held as bare scalars with a builtin phpType, which
-     * `instanceof` never matches. A decimal also accepts an int, because JSON decodes a whole-number
-     * decimal to one. Variants sharing a builtin type (e.g. integer and positiveInt) cannot be told
-     * apart this way, so each reads the held value as its own.
+     * Boolean, integer and decimal variants are held as bare scalars with a builtin phpType ('bool',
+     * 'int', and 'string' for a decimal, which keeps its lexical form), and `instanceof` never
+     * matches a builtin. No choice element has two builtin variants of one PHP type, so the type alone
+     * identifies the variant.
      *
      * @param mixed  $held      Value the choice property holds
-     * @param string $phpType   Variant's PHP type: an FQCN, or 'bool'/'int'/'float'/'string'
+     * @param string $phpType   Variant's PHP type: an FQCN, or a builtin such as 'bool'
      * @param bool   $isBuiltin Whether $phpType is a builtin scalar type
      */
     private static function holdsVariantType(mixed $held, string $phpType, bool $isBuiltin): bool
     {
-        if (!$isBuiltin) {
-            return $held instanceof $phpType;
-        }
-
-        return match ($phpType) {
-            'float' => is_float($held) || is_int($held),
-            default => get_debug_type($held) === $phpType,
-        };
+        return $isBuiltin ? get_debug_type($held) === $phpType : $held instanceof $phpType;
     }
 }

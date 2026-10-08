@@ -219,6 +219,11 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             $this->validateSliceRules($sc, $matchedItems[$sliceIdx] ?? [], $property);
         }
 
+        // The default slice holds the items no named slice matched, so its rules bind those
+        if ($defaultSlice !== null && $unmatchedItems !== []) {
+            $this->validateSliceRules($defaultSlice, array_intersect_key($items, array_flip($unmatchedItems)), $property);
+        }
+
         // Closed slicing: unmatched items must go to @default or be rejected
         if ($rules === 'closed' && $unmatchedItems !== []) {
             if ($defaultSlice !== null) {
@@ -271,12 +276,46 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
      * this rule's violation, a Count sizes the occurrence list, and every other rule inspects the
      * element itself. Violations are reported at the item, e.g. `component[1].valueQuantity.system`.
      *
+     * Rules carrying a FHIRSliceConstraint or FHIRSlicingRules describe slicing beneath the slice
+     * (AU Core's `component:SystolicBP.code.coding:snomedSBP`). They are grouped by path, and each
+     * item's elements at that path are matched against them as a slicing of their own, recursively.
+     *
      * @param array<int|string, object|array<mixed>> $items    Items that matched the slice, keyed by their index
      * @param string                                 $property Sliced property, e.g. 'component'
      */
     private function validateSliceRules(FHIRSliceConstraint $slice, array $items, string $property): void
     {
-        foreach ($slice->rules as $rule) {
+        /** @var array<string, array{slices: list<FHIRSliceConstraint>, rules: FHIRSlicingRules|null}> $nested */
+        $nested = [];
+        $plain  = [];
+
+        foreach (self::rulesOf($slice) as $rule) {
+            if ($rule['constraint'] === FHIRSliceConstraint::class) {
+                $nested[$rule['path']]['slices'][] = new FHIRSliceConstraint(...$rule['options']);
+                $nested[$rule['path']]['rules'] ??= null;
+            } elseif ($rule['constraint'] === FHIRSlicingRules::class) {
+                $nested[$rule['path']]['slices'] ??= [];
+                $nested[$rule['path']]['rules'] = new FHIRSlicingRules(...$rule['options']);
+            } elseif (is_a($rule['constraint'], Constraint::class, true)) {
+                $plain[] = ['path' => $rule['path'], 'constraint' => $rule['constraint'], 'options' => $rule['options']];
+            }
+        }
+
+        // Slicing beneath the slice: match each item's own elements against the nested slices
+        foreach ($nested as $path => $definition) {
+            foreach ($items as $itemIndex => $item) {
+                foreach ($this->reader->readGroups($item, $path) as $group) {
+                    $this->validateSlices(
+                        $group['occurrences'],
+                        $definition['slices'],
+                        $definition['rules'],
+                        "{$property}[{$itemIndex}].{$path}",
+                    );
+                }
+            }
+        }
+
+        foreach ($plain as $rule) {
             $innerConstraint = new ($rule['constraint'])(...$rule['options']);
 
             foreach ($items as $itemIndex => $item) {
@@ -300,6 +339,22 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                 }
             }
         }
+    }
+
+    /**
+     * The slice's `rules`, or none when the installed fhir-metadata predates them.
+     *
+     * fhir-metadata before 0.6.2 has no `rules` property, and reading an unknown property on a
+     * Constraint throws, so a direct read would fail every sliced profile in a mixed install rather
+     * than skip what it cannot see. The property is read from the object's public state instead.
+     *
+     * @return list<array{path: string, constraint: class-string, options: array<string, mixed>}>
+     */
+    private static function rulesOf(FHIRSliceConstraint $slice): array
+    {
+        $rules = get_object_vars($slice)['rules'] ?? [];
+
+        return is_array($rules) ? array_values($rules) : [];
     }
 
     /**
