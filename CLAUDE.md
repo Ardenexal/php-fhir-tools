@@ -59,6 +59,7 @@ Full system context: `.goat-flow/architecture.md` · File layout: `.goat-flow/co
 | Lessons from past incidents | `.goat-flow/learning-loop/lessons/` |
 | Architecture decisions | `.goat-flow/learning-loop/decisions/` |
 | Skill playbooks (tools) | `.goat-flow/skill-docs/playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
+| Cutting a release, version bump, tag, or `gh release` | `.goat-flow/skill-docs/playbooks/release.md` (read BEFORE any bump; publish is irreversible) |
 
 ## Essential Commands
 

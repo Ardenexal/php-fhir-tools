@@ -1,0 +1,55 @@
+name: FHIR core packages
+description: >-
+    Restore hl7.fhir.{r4,r4b,r5}.core into demo/var/cache/dev/.fhir from the Actions cache,
+    downloading them from packages.fhir.org on a miss.
+
+# OperationFixturesMatchPackagesTest (CodeGeneration integration suite) holds the ONLY drift
+# detectors for the ~14,700 lines of committed fixtures under
+# CodeGeneration/tests/Fixtures/{OperationManifests,TypeIndex}. Without these packages on disk
+# it hard-fails in CI by design (a skip would report pass while detecting nothing), so every
+# job whose test run reaches that suite needs this action first: `test-coverage`,
+# `test-integration`, `test:codegen` and `test:components` all do. Only the three CORE packages
+# are needed (the extractor reads exactly hl7.fhir.{r4,r4b,r5}.core); extensions and terminology
+# are not.
+#
+# Requires actions/checkout to have run: the cache key hashes a file from the working tree.
+
+runs:
+    using: composite
+    steps:
+        -   name: Cache FHIR core packages
+            id: fhir-package-cache
+            uses: actions/cache@v4
+            with:
+                path: demo/var/cache/dev/.fhir
+                # Keyed on the extractor, which is where the pinned package versions live, so a
+                # version bump there invalidates the cache instead of silently reusing old packages.
+                # The key is unchanged from the per-workflow steps this action replaced, so their
+                # existing cache entries keep hitting.
+                key: ${{ runner.os }}-fhir-core-${{ hashFiles('src/Component/CodeGeneration/tests/Fixtures/OperationFixtureExtractor.php') }}
+
+        -   name: Download FHIR core packages
+            if: steps.fhir-package-cache.outputs.cache-hit != 'true'
+            shell: bash
+            # Fetched straight from the registry rather than by running `fhir:generate`: the
+            # generator would also rewrite src/Component/Models, which a test job must not do
+            # (main.yml's "Verify no uncommitted changes" step would fail on it).
+            # The tarballs extract to `<name>_<version>/package/`, which is the layout
+            # OperationFixtureExtractor::packageDirectory() expects.
+            run: |
+                set -euo pipefail
+                mkdir -p demo/var/cache/dev/.fhir
+                for spec in \
+                    "hl7.fhir.r4.core|4.0.1" \
+                    "hl7.fhir.r4b.core|4.3.0" \
+                    "hl7.fhir.r5.core|5.0.0"; do
+                  name="${spec%%|*}"
+                  version="${spec##*|}"
+                  target="demo/var/cache/dev/.fhir/${name}_${version}"
+                  echo "Fetching ${name}#${version}"
+                  mkdir -p "$target"
+                  curl -sSfL --retry 3 --retry-delay 5 --max-time 180 \
+                    "https://packages.fhir.org/${name}/${version}" -o "${target}.tgz"
+                  tar -xzf "${target}.tgz" -C "$target"
+                done
+                echo "Primed: $(ls -1 demo/var/cache/dev/.fhir | grep -c '^hl7\.' || true) entries"
