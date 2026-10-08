@@ -161,55 +161,57 @@ class FHIRProfileGenerator
                 continue;
             }
 
-            // Cardinality constraint (Count) — emitted when min > 0 or max is a bounded number
-            $min = (int) ($element['min'] ?? 0);
-            $max = (string) ($element['max'] ?? '*');
-
-            $countOptions = [];
-            if ($min > 0) {
-                $countOptions['min'] = $min;
-            }
-            if (is_numeric($max)) {
-                $countOptions['max'] = (int) $max;
-            }
-
-            if ($countOptions !== []) {
-                $namespace->addUse(Count::class);
+            foreach (self::elementRules($element) as $rule) {
+                $namespace->addUse($rule['constraint']);
                 $namespace->addUse(FHIRProfileConstraint::class);
                 $class->addAttribute(FHIRProfileConstraint::class, [
                     'path'       => $propertyPath,
-                    'constraint' => Count::class,
-                    'options'    => $countOptions,
-                    'groups'     => [$profileUrl],
-                ]);
-            }
-
-            // Fixed value constraint (scalar values only — complex fixed[x] require profile resolution)
-            $fixedField = ElementDefinitionHelper::extractPolymorphicField($element, 'fixed');
-            if ($fixedField !== null && is_scalar($fixedField['value'])) {
-                $namespace->addUse(FHIRFixedValue::class);
-                $namespace->addUse(FHIRProfileConstraint::class);
-                $class->addAttribute(FHIRProfileConstraint::class, [
-                    'path'       => $propertyPath,
-                    'constraint' => FHIRFixedValue::class,
-                    'options'    => ['value' => $fixedField['value']],
-                    'groups'     => [$profileUrl],
-                ]);
-            }
-
-            // Pattern value constraint (array values only — scalar patterns use value matching)
-            $patternField = ElementDefinitionHelper::extractPolymorphicField($element, 'pattern');
-            if ($patternField !== null && is_array($patternField['value'])) {
-                $namespace->addUse(FHIRPatternValue::class);
-                $namespace->addUse(FHIRProfileConstraint::class);
-                $class->addAttribute(FHIRProfileConstraint::class, [
-                    'path'       => $propertyPath,
-                    'constraint' => FHIRPatternValue::class,
-                    'options'    => ['pattern' => $patternField['value']],
+                    'constraint' => $rule['constraint'],
+                    'options'    => $rule['options'],
                     'groups'     => [$profileUrl],
                 ]);
             }
         }
+    }
+
+    /**
+     * The constraints one differential element places on its own path: cardinality (Count) when
+     * min > 0 or max is bounded, a scalar fixed[x] (complex fixed[x] needs profile resolution), and
+     * an array pattern[x] (scalar patterns use value matching).
+     *
+     * @param array<string, mixed> $element
+     *
+     * @return list<array{constraint: class-string<Count|FHIRFixedValue|FHIRPatternValue>, options: array<string, mixed>}>
+     */
+    private static function elementRules(array $element): array
+    {
+        $rules = [];
+
+        $min = (int) ($element['min'] ?? 0);
+        $max = (string) ($element['max'] ?? '*');
+
+        $countOptions = [];
+        if ($min > 0) {
+            $countOptions['min'] = $min;
+        }
+        if (is_numeric($max)) {
+            $countOptions['max'] = (int) $max;
+        }
+        if ($countOptions !== []) {
+            $rules[] = ['constraint' => Count::class, 'options' => $countOptions];
+        }
+
+        $fixedField = ElementDefinitionHelper::extractPolymorphicField($element, 'fixed');
+        if ($fixedField !== null && is_scalar($fixedField['value'])) {
+            $rules[] = ['constraint' => FHIRFixedValue::class, 'options' => ['value' => $fixedField['value']]];
+        }
+
+        $patternField = ElementDefinitionHelper::extractPolymorphicField($element, 'pattern');
+        if ($patternField !== null && is_array($patternField['value'])) {
+            $rules[] = ['constraint' => FHIRPatternValue::class, 'options' => ['pattern' => $patternField['value']]];
+        }
+
+        return $rules;
     }
 
     /**
@@ -368,7 +370,6 @@ class FHIRProfileGenerator
                     $elements,
                     $resourceType,
                     $propertyPath,
-                    $sliceName,
                     $discType,
                     $discPath,
                     $sliceElement,
@@ -394,6 +395,25 @@ class FHIRProfileGenerator
                     $attrArgs['isDefault'] = true;
                 }
 
+                // Rules beneath the slice bind only the items that match it
+                $sliceRules = [];
+                foreach (self::sliceChildren($elements, "{$resourceType}.{$propertyPath}", $sliceElement) as $child) {
+                    // A rule beneath a nested slice binds only that slice's items, so flattening it
+                    // would make every coding carry the systolic code. Not yet enforced.
+                    if (str_contains($child['path'], ':')
+                        || ElementDefinitionHelper::hasContentReference($child['element'])) {
+                        continue;
+                    }
+
+                    foreach (self::elementRules($child['element']) as $rule) {
+                        $sliceRules[] = ['path' => $child['path'], ...$rule];
+                    }
+                }
+
+                if ($sliceRules !== []) {
+                    $attrArgs['rules'] = $sliceRules;
+                }
+
                 $class->addAttribute(FHIRSliceConstraint::class, $attrArgs);
             }
         }
@@ -416,7 +436,6 @@ class FHIRProfileGenerator
      * @param array<int, array<string, mixed>> $allElements  All differential elements
      * @param string                           $resourceType Resource or complex type (e.g. 'Patient')
      * @param string                           $propertyPath Sliced property path (e.g. 'identifier')
-     * @param string                           $sliceName    Named slice (e.g. 'ihiNumber')
      * @param string                           $discType     Discriminator type
      * @param string                           $discPath     Discriminator path (e.g. 'system', 'url')
      * @param array<string, mixed>             $sliceElement The slice header element
@@ -425,37 +444,18 @@ class FHIRProfileGenerator
         array $allElements,
         string $resourceType,
         string $propertyPath,
-        string $sliceName,
         string $discType,
         string $discPath,
         array $sliceElement,
     ): mixed {
         // For 'value' or 'pattern' discriminators: look for a child element at the discriminator path
         if (in_array($discType, ['value', 'pattern'], true) && $discPath !== '' && $discPath !== '$this') {
-            $targetPath = "{$resourceType}.{$propertyPath}.{$discPath}";
-            $sliceId    = (string) ($sliceElement['id'] ?? '');
-
-            foreach ($allElements as $element) {
-                $path = (string) ($element['path'] ?? '');
-
-                if ($path !== $targetPath) {
+            foreach (self::sliceChildren($allElements, "{$resourceType}.{$propertyPath}", $sliceElement) as $child) {
+                if ($child['unsliced'] !== $discPath) {
                     continue;
                 }
 
-                // Must belong to the same slice. Slice children name their slice only in `id`
-                // ("Composition.section:overview.code"), so match on the slice header's id when
-                // both carry one; the trailing '.' keeps reslices ("section:overview/sub") out.
-                $elemId = (string) ($element['id'] ?? '');
-                if ($sliceId !== '' && $elemId !== '') {
-                    if (!str_starts_with($elemId, $sliceId . '.')) {
-                        continue;
-                    }
-                } else {
-                    $elemSlice = (string) ($element['sliceName'] ?? '');
-                    if ($elemSlice !== $sliceName && $elemSlice !== '') {
-                        continue;
-                    }
-                }
+                $element = $child['element'];
 
                 // Extract fixed[x] value
                 $fixed = ElementDefinitionHelper::extractPolymorphicField($element, 'fixed');
@@ -507,8 +507,7 @@ class FHIRProfileGenerator
         $id = (string) ($element['id'] ?? '');
 
         if ($id !== '') {
-            // "value[x]:valueQuantity" → "valueQuantity"; a slice not named for a variant keeps its ':'
-            $path = (string) preg_replace('/(?<=\.)(\w+)\[x\]:(\1[A-Z]\w*)(?=\.|$)/', '$2', $id);
+            $path = self::rewriteChoiceTypeSlices($id);
             if (str_contains($path, ':')) {
                 return null;
             }
@@ -528,6 +527,82 @@ class FHIRProfileGenerator
         $dotPos = strpos($path, '.');
 
         return $dotPos !== false ? substr($path, $dotPos + 1) : $path;
+    }
+
+    /**
+     * Rewrites each choice type slice in an element id or path to its variant's JSON key:
+     * "Observation.value[x]:valueQuantity.system" → "Observation.valueQuantity.system". A slice not
+     * named for a variant of its choice element keeps its ':'.
+     */
+    private static function rewriteChoiceTypeSlices(string $id): string
+    {
+        return (string) preg_replace('/(^|\.)(\w+)\[x\]:(\2[A-Z]\w*)(?=\.|$)/', '$1$3', $id);
+    }
+
+    /**
+     * The differential elements beneath one slice, each with its path relative to a slice item
+     * ("Observation.component:SystolicBP.value[x]:valueQuantity.system" → "valueQuantity.system").
+     *
+     * Slice children name their slice only in `id`, so membership is decided by the slice header's
+     * id when both carry one; the trailing '.' keeps reslices ("component:a/b") out. Without ids, a
+     * child belongs to the slice header that precedes it, since the differential lists each slice's
+     * children right after the slice.
+     *
+     * An element beneath a nested slice keeps its slice name in `path`
+     * ("code.coding:SBPCode.code"); `unsliced` drops it ("code.coding.code") for matching a
+     * discriminator path, which looks through nested slices.
+     *
+     * @param array<int, array<string, mixed>> $allElements  All differential elements
+     * @param string                           $basePath     Sliced element path (e.g. 'Observation.component')
+     * @param array<string, mixed>             $sliceElement The slice header element
+     *
+     * @return list<array{path: string, unsliced: string, element: array<string, mixed>}>
+     */
+    private static function sliceChildren(array $allElements, string $basePath, array $sliceElement): array
+    {
+        $sliceId   = (string) ($sliceElement['id'] ?? '');
+        $sliceName = (string) ($sliceElement['sliceName'] ?? '');
+        // Slice whose children the walk is currently inside, tracked for elements without ids
+        $currentSlice = '';
+        $children     = [];
+
+        foreach ($allElements as $element) {
+            $path = (string) ($element['path'] ?? '');
+
+            if ($path === $basePath) {
+                $currentSlice = (string) ($element['sliceName'] ?? '');
+
+                continue;
+            }
+
+            if (!str_starts_with($path, $basePath . '.')) {
+                continue;
+            }
+
+            $elemId = (string) ($element['id'] ?? '');
+            if ($sliceId !== '' && $elemId !== '') {
+                if (!str_starts_with($elemId, $sliceId . '.')) {
+                    continue;
+                }
+
+                $relative = self::rewriteChoiceTypeSlices(substr($elemId, strlen($sliceId) + 1));
+            } else {
+                $elemSlice = (string) ($element['sliceName'] ?? '');
+                if (($elemSlice !== '' ? $elemSlice : $currentSlice) !== $sliceName) {
+                    continue;
+                }
+
+                $relative = substr($path, strlen($basePath) + 1);
+            }
+
+            $children[] = [
+                'path'     => $relative,
+                'unsliced' => (string) preg_replace('/:[^.]+/', '', $relative),
+                'element'  => $element,
+            ];
+        }
+
+        return $children;
     }
 
     /**

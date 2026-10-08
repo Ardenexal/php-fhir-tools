@@ -63,6 +63,26 @@ final class ReaderObservationStub
     }
 }
 
+/** A choice whose boolean, integer and decimal variants are held as bare PHP scalars, as the models hold them. */
+final class ReaderScalarChoiceStub
+{
+    public function __construct(
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                ['fhirType' => 'Quantity', 'propertyKind' => 'complex', 'phpType' => ReaderQuantityStub::class, 'jsonKey' => 'valueQuantity'],
+                ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
+                ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'valueInteger'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'valueDecimal'],
+            ],
+        )]
+        public ReaderQuantityStub|bool|int|float|null $value = null,
+    ) {
+    }
+}
+
 /**
  * Covers reading element paths that name a choice variant, and the per-parent grouping that keeps
  * cardinality on a repeating element from being judged against the flattened total.
@@ -127,5 +147,26 @@ final class FHIRChoiceVariantReaderTest extends TestCase
         $observation = new ReaderObservationStub(value: new ReaderQuantityStub('120'));
 
         self::assertSame([$observation->value], $this->reader->readGroups($observation, 'value[x]')[0]['occurrences']);
+    }
+
+    /**
+     * Scalar variants carry a builtin phpType ('bool', 'int', 'float'), which `instanceof` never
+     * matches. A profile constraint on `valueBoolean` would read a held boolean as absent.
+     */
+    public function testAScalarVariantResolvesToTheScalarItHolds(): void
+    {
+        $choice = new ReaderScalarChoiceStub(value: true);
+
+        self::assertSame([true], $this->reader->readGroups($choice, 'valueBoolean')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups($choice, 'valueInteger')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups($choice, 'valueQuantity')[0]['occurrences']);
+    }
+
+    /** JSON decodes a whole-number decimal ("value": 1) to an int, and it is still the decimal variant's value. */
+    public function testADecimalVariantAcceptsAWholeNumber(): void
+    {
+        self::assertSame([1.5], $this->reader->readGroups(new ReaderScalarChoiceStub(value: 1.5), 'valueDecimal')[0]['occurrences']);
+        self::assertSame([1], $this->reader->readGroups(new ReaderScalarChoiceStub(value: 1), 'valueDecimal')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups(new ReaderScalarChoiceStub(value: 1.5), 'valueInteger')[0]['occurrences']);
     }
 }

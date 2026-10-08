@@ -13,12 +13,15 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Composition\CompositionSection;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Observation\ObservationComponent;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPatternValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator;
@@ -52,6 +55,10 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
 
     private const string CODE_SYSTEM = 'http://example.org/cs';
 
+    private const string BP_FIXTURE = __DIR__ . '/../../Fixtures/StructureDefinitions/ObservationWithComponentSlicing.json';
+
+    private const string BP_PROFILE_URL = 'http://example.org/StructureDefinition/sliced-bp';
+
     public function testSliceElementsEmitNoProfileConstraintOnUnslicedPath(): void
     {
         $constraints = $this->attributeArguments($this->generate(), FHIRProfileConstraint::class);
@@ -76,6 +83,33 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
 
         $codesBySlice = [];
         foreach ($slices as $slice) {
+            self::assertIsString($slice['sliceName']);
+            self::assertIsArray($slice['discriminatorValue'] ?? null);
+            $codesBySlice[$slice['sliceName']] = $slice['discriminatorValue']['coding'][0]['code'] ?? null;
+        }
+
+        self::assertSame(
+            ['overview' => 'overview', 'forbidden' => 'forbidden', 'optional' => 'optional'],
+            $codesBySlice,
+        );
+    }
+
+    /**
+     * Without ids, a child carrying no sliceName belongs to the slice header that precedes it: the
+     * differential lists each slice's children right after the slice.
+     */
+    public function testWithoutIdsEachSliceTakesTheChildThatFollowsIt(): void
+    {
+        $json = file_get_contents(self::FIXTURE);
+        self::assertIsString($json);
+        /** @var array{differential: array{element: list<array<string, mixed>>}} $sd */
+        $sd = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        foreach ($sd['differential']['element'] as $i => $element) {
+            unset($sd['differential']['element'][$i]['id']);
+        }
+
+        $codesBySlice = [];
+        foreach ($this->attributeArguments($this->generateFrom($sd), FHIRSliceConstraint::class) as $slice) {
             self::assertIsString($slice['sliceName']);
             self::assertIsArray($slice['discriminatorValue'] ?? null);
             $codesBySlice[$slice['sliceName']] = $slice['discriminatorValue']['coding'][0]['code'] ?? null;
@@ -145,13 +179,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
             ],
         ];
 
-        $context = new BuilderContext();
-        $context->addResource(
-            'http://hl7.org/fhir/StructureDefinition/Observation',
-            'Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource',
-            new ClassType('ObservationResource', new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource')),
-        );
-        $class = (new FHIRProfileGenerator())->generate($sd, 'R4', $context, new PhpNamespace(self::EVAL_NAMESPACE));
+        $class = $this->generateFrom($sd);
 
         $paths = array_map(
             static fn (array $args): string => $args['path'] . ' ' . $args['constraint'],
@@ -165,32 +193,238 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         );
     }
 
-    private function generate(): ClassType
+    /**
+     * A scalar type slice reaches a bare-PHP-scalar variant (valueBoolean holds a `bool`), which the
+     * validator must still read as present, or `1..1` rejects every conforming resource.
+     */
+    public function testScalarChoiceTypeSliceValidatesAgainstTheHeldScalar(): void
     {
-        $context = new BuilderContext();
-        $context->addResource(
-            'http://hl7.org/fhir/StructureDefinition/Composition',
-            'Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource',
-            new ClassType('CompositionResource', new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource')),
+        $profileUrl = 'http://example.org/StructureDefinition/boolean-observation';
+        $class      = $this->generateFrom([
+            'resourceType'   => 'StructureDefinition',
+            'url'            => $profileUrl,
+            'name'           => 'BooleanObservation',
+            'type'           => 'Observation',
+            'kind'           => 'resource',
+            'derivation'     => 'constraint',
+            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/Observation',
+            'differential'   => [
+                'element' => [
+                    [
+                        'id'      => 'Observation.value[x]',
+                        'path'    => 'Observation.value[x]',
+                        'slicing' => ['discriminator' => [['type' => 'type', 'path' => '$this']], 'rules' => 'open'],
+                    ],
+                    [
+                        'id'        => 'Observation.value[x]:valueBoolean',
+                        'path'      => 'Observation.value[x]',
+                        'sliceName' => 'valueBoolean',
+                        'min'       => 1,
+                        'max'       => '1',
+                    ],
+                ],
+            ],
+        ]);
+
+        $profileClass = $this->evalClass($class);
+
+        self::assertSame([], $this->validateAgainstProfile(new $profileClass(value: true), $profileUrl));
+        self::assertSame([], $this->validateAgainstProfile(new $profileClass(value: false), $profileUrl));
+        self::assertSame(
+            ['valueBoolean: This collection should contain exactly 1 element.|This collection should contain exactly 1 elements.'],
+            $this->validateAgainstProfile(new $profileClass(value: 5), $profileUrl),
+        );
+    }
+
+    /**
+     * Rules beneath a slice travel on its FHIRSliceConstraint, relative to a slice item, instead of
+     * being dropped or flattened onto `component`. The diastolic slice names its value through a
+     * type slice (`value[x]:valueQuantity`), which lands on the variant key.
+     */
+    public function testRulesBeneathASliceTravelOnItsSliceConstraint(): void
+    {
+        $class = $this->generateFrom($this->loadFixture(self::BP_FIXTURE));
+
+        self::assertSame(
+            [['path' => 'component', 'constraint' => Count::class, 'options' => ['min' => 2], 'groups' => [self::BP_PROFILE_URL]]],
+            $this->attributeArguments($class, FHIRProfileConstraint::class),
         );
 
+        $rulesBySlice = [];
+        foreach ($this->attributeArguments($class, FHIRSliceConstraint::class) as $slice) {
+            self::assertIsString($slice['sliceName']);
+            self::assertIsArray($slice['rules'] ?? null);
+            $rulesBySlice[$slice['sliceName']] = array_map(
+                static fn (array $rule): string => $rule['path'] . ' ' . $rule['constraint'],
+                $slice['rules'],
+            );
+        }
+
+        self::assertSame([
+            'SystolicBP' => [
+                'code ' . FHIRPatternValue::class,
+                'value[x].system ' . Count::class,
+                'value[x].system ' . FHIRFixedValue::class,
+                'value[x].code ' . Count::class,
+                'value[x].code ' . FHIRFixedValue::class,
+            ],
+            'DiastolicBP' => [
+                'code ' . FHIRPatternValue::class,
+                'valueQuantity ' . Count::class,
+                'valueQuantity.system ' . Count::class,
+                'valueQuantity.system ' . FHIRFixedValue::class,
+            ],
+        ], $rulesBySlice);
+    }
+
+    /**
+     * Shaped like the R5 core `bp` profile: the discriminator path `code.coding.code` is reached
+     * through a re-slice of `coding`. The discriminator looks through it, but the re-slice's own
+     * rules stay off the slice, where they would bind every coding of the component.
+     */
+    public function testDiscriminatorIsFoundThroughANestedSlice(): void
+    {
+        $class = $this->generateFrom([
+            'resourceType'   => 'StructureDefinition',
+            'url'            => 'http://example.org/StructureDefinition/resliced-bp',
+            'name'           => 'ReslicedBloodPressure',
+            'type'           => 'Observation',
+            'kind'           => 'resource',
+            'derivation'     => 'constraint',
+            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/Observation',
+            'differential'   => [
+                'element' => [
+                    [
+                        'id'      => 'Observation.component',
+                        'path'    => 'Observation.component',
+                        'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'code.coding.code']], 'rules' => 'open'],
+                    ],
+                    ['id' => 'Observation.component:SystolicBP', 'path' => 'Observation.component', 'sliceName' => 'SystolicBP', 'min' => 1, 'max' => '1'],
+                    [
+                        'id'      => 'Observation.component:SystolicBP.code.coding',
+                        'path'    => 'Observation.component.code.coding',
+                        'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'code']], 'rules' => 'open'],
+                    ],
+                    ['id' => 'Observation.component:SystolicBP.code.coding:SBPCode', 'path' => 'Observation.component.code.coding', 'sliceName' => 'SBPCode', 'min' => 1, 'max' => '1'],
+                    ['id' => 'Observation.component:SystolicBP.code.coding:SBPCode.code', 'path' => 'Observation.component.code.coding.code', 'min' => 1, 'fixedCode' => '8480-6'],
+                    ['id' => 'Observation.component:SystolicBP.valueQuantity.code', 'path' => 'Observation.component.valueQuantity.code', 'fixedCode' => 'mm[Hg]'],
+                ],
+            ],
+        ]);
+
+        $slices = array_values(array_filter(
+            $this->attributeArguments($class, FHIRSliceConstraint::class),
+            static fn (array $slice): bool => $slice['property'] === 'component',
+        ));
+
+        self::assertCount(1, $slices);
+        self::assertSame('8480-6', $slices[0]['discriminatorValue'] ?? null);
+        self::assertSame(
+            [['path' => 'valueQuantity.code', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => 'mm[Hg]']]],
+            $slices[0]['rules'] ?? null,
+        );
+    }
+
+    public function testGeneratedProfileAcceptsAConformingBloodPressure(): void
+    {
+        $profileClass = $this->evalClass($this->generateFrom($this->loadFixture(self::BP_FIXTURE)));
+
+        $observation = new $profileClass(component: [
+            $this->component('8480-6', 'http://unitsofmeasure.org', 'mm[Hg]'),
+            $this->component('8462-4', 'http://unitsofmeasure.org', 'mm[Hg]'),
+        ]);
+
+        self::assertSame([], $this->validateAgainstProfile($observation, self::BP_PROFILE_URL));
+    }
+
+    /** Each slice's rules reach only its own item, reported at that item's index. */
+    public function testRulesBeneathASliceBindOnlyItsMatchingItems(): void
+    {
+        $profileClass = $this->evalClass($this->generateFrom($this->loadFixture(self::BP_FIXTURE)));
+
+        $observation = new $profileClass(component: [
+            $this->component('8462-4', 'http://example.org/units', 'mm[Hg]'),
+            $this->component('8480-6', 'http://unitsofmeasure.org', 'mmHg'),
+        ]);
+
+        self::assertSame([
+            'component[1].value[x].code: The value mmHg does not match the required fixed value mm[Hg].',
+            'component[0].valueQuantity.system: The value http://example.org/units does not match the required fixed value http://unitsofmeasure.org.',
+        ], $this->validateAgainstProfile($observation, self::BP_PROFILE_URL));
+    }
+
+    private function component(string $loinc, string $unitSystem, string $unitCode): ObservationComponent
+    {
+        return new ObservationComponent(
+            code: new CodeableConcept(coding: [
+                new Coding(system: new UriPrimitive(value: 'http://loinc.org'), code: new CodePrimitive(value: $loinc)),
+            ]),
+            value: new Quantity(
+                value: '120',
+                system: new UriPrimitive(value: $unitSystem),
+                code: new CodePrimitive(value: $unitCode),
+            ),
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function loadFixture(string $file): array
+    {
+        $json = file_get_contents($file);
+        self::assertIsString($json);
+        /** @var array<string, mixed> $sd */
+        $sd = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+
+        return $sd;
+    }
+
+    private function generate(): ClassType
+    {
         $json = file_get_contents(self::FIXTURE);
         self::assertIsString($json);
         /** @var array<string, mixed> $sd */
         $sd = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
+        return $this->generateFrom($sd);
+    }
+
+    /**
+     * @param array<string, mixed> $sd Profile StructureDefinition constraining an R4 resource
+     */
+    private function generateFrom(array $sd): ClassType
+    {
+        $type    = (string) $sd['type'];
+        $context = new BuilderContext();
+        $context->addResource(
+            'http://hl7.org/fhir/StructureDefinition/' . $type,
+            'Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource',
+            new ClassType($type . 'Resource', new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource')),
+        );
+
         return (new FHIRProfileGenerator())->generate($sd, 'R4', $context, new PhpNamespace(self::EVAL_NAMESPACE));
     }
 
     /**
-     * Prints and evals the generated profile class once per process.
+     * Prints and evals the generated Composition profile class once per process.
      *
      * @return class-string<CompositionResource>
      */
     private function evalGeneratedProfile(): string
     {
-        $class = $this->generate();
-        /** @var class-string<CompositionResource> $fqcn */
+        /** @var class-string<CompositionResource> */
+        return $this->evalClass($this->generate());
+    }
+
+    /**
+     * Prints and evals a generated profile class once per process.
+     *
+     * @return class-string
+     */
+    private function evalClass(ClassType $class): string
+    {
+        /** @var class-string $fqcn */
         $fqcn = self::EVAL_NAMESPACE . '\\' . $class->getName();
 
         if (!class_exists($fqcn, false)) {
@@ -202,11 +436,11 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
     }
 
     /**
-     * Runs only the profile's validation group, so base-model rules on Composition stay out of it.
+     * Runs only the profile's validation group, so base-model rules on the resource stay out of it.
      *
      * @return list<string> "path: message" per violation
      */
-    private function validateAgainstProfile(object $resource): array
+    private function validateAgainstProfile(object $resource, string $profileUrl = self::PROFILE_URL): array
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $registry = new FHIRValidationMessageRegistry();
@@ -229,6 +463,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
                         new SliceDiscriminatorMatcher($this->accessor),
                     ),
                     $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->registry),
+                    $constraint instanceof FHIRFixedValue        => new FHIRFixedValueValidator($this->registry),
                     default                                      => $this->default->getInstance($constraint),
                 };
             }
@@ -240,7 +475,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
             ->getValidator();
 
         $messages = [];
-        foreach ($validator->validate($resource, null, [self::PROFILE_URL]) as $violation) {
+        foreach ($validator->validate($resource, null, [$profileUrl]) as $violation) {
             $messages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
         }
 
