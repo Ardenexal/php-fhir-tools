@@ -1310,7 +1310,6 @@ class FHIRModelGeneratorCommand extends Command
         $baseNamespace  = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
         $profileNs      = new PhpNamespace("{$baseNamespace}\\Profile");
         $generator      = new FHIRProfileGenerator();
-        $errorCollector = new ErrorCollector();
         $count          = 0;
 
         foreach ($this->context[$version]->getDefinitions() as $def) {
@@ -1339,7 +1338,7 @@ class FHIRModelGeneratorCommand extends Command
             }
 
             try {
-                $class = $generator->generate($def, $version, $this->context[$version], $profileNs, $errorCollector);
+                $class = $generator->generate($def, $version, $this->context[$version], $profileNs, $this->errorCollector);
                 $this->context[$version]->addType($url, $profileNs->getName(), $class);
 
                 $outputPath = Path::canonicalize(
@@ -1388,7 +1387,15 @@ class FHIRModelGeneratorCommand extends Command
     {
         $output->writeln('Generating Enums for value sets');
 
-        foreach ($this->context[$version]->getPendingEnums() as $key => $pendingEnum) {
+        // Two ValueSets can resolve to one enum class name (R4's medication-status and
+        // medication-statement-status are both "Medication Status Codes"). Each is written to the
+        // same file, so the one generated last keeps it. Generating in ascending URL order makes
+        // that choice independent of the order definitions were loaded in, and it matches every
+        // collision the committed models hold.
+        $pendingEnums = $this->context[$version]->getPendingEnums();
+        ksort($pendingEnums, SORT_STRING);
+
+        foreach ($pendingEnums as $key => $pendingEnum) {
             $valueset = $this->context[$version]->getDefinition($key);
 
             if ($valueset === null) {

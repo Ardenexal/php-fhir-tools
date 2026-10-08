@@ -32,42 +32,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
 )]
 #[FHIRProfileConstraint(
-    path: 'category',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
-)]
-#[FHIRProfileConstraint(
-    path: 'category.coding',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
-)]
-#[FHIRProfileConstraint(
-    path: 'category.coding.system',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
-)]
-#[FHIRProfileConstraint(
-    path: 'category.coding.system',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => 'http://terminology.hl7.org/CodeSystem/observation-category'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
-)]
-#[FHIRProfileConstraint(
-    path: 'category.coding.code',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
-)]
-#[FHIRProfileConstraint(
-    path: 'category.coding.code',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => 'vital-signs'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
-)]
-#[FHIRProfileConstraint(
     path: 'code',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
@@ -117,10 +81,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
 )]
 #[FHIRProfileMustSupport(path: 'status', groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'])]
 #[FHIRProfileMustSupport(path: 'category', groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'])]
-#[FHIRProfileMustSupport(path: 'category', groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'])]
-#[FHIRProfileMustSupport(path: 'category.coding', groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'])]
-#[FHIRProfileMustSupport(path: 'category.coding.system', groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'])]
-#[FHIRProfileMustSupport(path: 'category.coding.code', groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'])]
 #[FHIRProfileMustSupport(path: 'code', groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'])]
 #[FHIRProfileMustSupport(path: 'subject', groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'])]
 #[FHIRProfileMustSupport(path: 'effective[x]', groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'])]
@@ -138,9 +98,32 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'coding.code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
-    orderedIndex: 0,
     discriminatorValue: 'vital-signs',
+    orderedIndex: 0,
+    rules: [
+        ['path' => 'coding', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        [
+            'path'       => 'coding.system',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+        [
+            'path'       => 'coding.system',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => 'http://terminology.hl7.org/CodeSystem/observation-category'],
+        ],
+        [
+            'path'       => 'coding.code',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+        [
+            'path'       => 'coding.code',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => 'vital-signs'],
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
 )]
 class ObservationVitalsignsProfile extends ObservationResource
 {

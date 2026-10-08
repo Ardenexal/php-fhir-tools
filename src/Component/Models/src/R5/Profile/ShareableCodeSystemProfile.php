@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\CodeSystemResource;
 
 /**
@@ -59,7 +60,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CodeSystemResource;
     options: ['min' => 1, 'max' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/shareablecodesystem'],
 )]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/shareablecodesystem'])]
 #[FHIRProfileMustSupport(path: 'url', groups: ['http://hl7.org/fhir/StructureDefinition/shareablecodesystem'])]
 #[FHIRProfileMustSupport(path: 'version', groups: ['http://hl7.org/fhir/StructureDefinition/shareablecodesystem'])]
 #[FHIRProfileMustSupport(path: 'versionAlgorithm[x]', groups: ['http://hl7.org/fhir/StructureDefinition/shareablecodesystem'])]
@@ -77,6 +77,17 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CodeSystemResource;
 #[FHIRProfileMustSupport(path: 'concept.display', groups: ['http://hl7.org/fhir/StructureDefinition/shareablecodesystem'])]
 #[FHIRProfileMustSupport(path: 'concept.definition', groups: ['http://hl7.org/fhir/StructureDefinition/shareablecodesystem'])]
 #[FHIRProfileMustSupport(path: 'concept.concept', groups: ['http://hl7.org/fhir/StructureDefinition/shareablecodesystem'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'knowledgeRepresentationLevel',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeRepresentationLevel',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareablecodesystem'],
+)]
 class ShareableCodeSystemProfile extends CodeSystemResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

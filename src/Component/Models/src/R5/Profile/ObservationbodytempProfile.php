@@ -19,36 +19,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/bodytemp', baseType: 'Observation', fhirVersion: 'R5')]
 #[FHIRProfileConstraint(
-    path: 'code.coding',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodytemp'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.system',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodytemp'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.system',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => 'http://loinc.org'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodytemp'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.code',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodytemp'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.code',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => '8310-5'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodytemp'],
-)]
-#[FHIRProfileConstraint(
     path: 'valueQuantity.value',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
@@ -90,9 +60,31 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodytemp'],
-    orderedIndex: 0,
     discriminatorValue: '8310-5',
+    orderedIndex: 0,
+    rules: [
+        [
+            'path'       => 'system',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+        [
+            'path'       => 'system',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => 'http://loinc.org'],
+        ],
+        [
+            'path'       => 'code',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+        [
+            'path'       => 'code',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => '8310-5'],
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/bodytemp'],
 )]
 class ObservationbodytempProfile extends ObservationvitalsignsProfile
 {

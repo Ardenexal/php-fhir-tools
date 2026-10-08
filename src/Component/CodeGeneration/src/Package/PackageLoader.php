@@ -360,7 +360,9 @@ class PackageLoader
             throw PackageException::packageNotFound($packageMetadata->getName(), $packageMetadata->getVersion());
         }
 
-        $jsonFiles = (new Finder())->files()->in($packagePath)->filter(function(\SplFileInfo $file) {
+        // Sorted, so what generation sees does not depend on the filesystem's directory order:
+        // CI runners and local checkouts list the same package differently.
+        $jsonFiles = (new Finder())->files()->in($packagePath)->sortByName()->filter(function(\SplFileInfo $file) {
             return $file->getExtension() === 'json';
         });
 

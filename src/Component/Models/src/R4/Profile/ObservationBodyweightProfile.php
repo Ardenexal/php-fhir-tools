@@ -19,36 +19,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/bodyweight', baseType: 'Observation', fhirVersion: 'R4')]
 #[FHIRProfileConstraint(
-    path: 'code.coding',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyweight'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.system',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyweight'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.system',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => 'http://loinc.org'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyweight'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.code',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyweight'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.code',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => '29463-7'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyweight'],
-)]
-#[FHIRProfileConstraint(
     path: 'valueQuantity.value',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
@@ -90,9 +60,31 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyweight'],
-    orderedIndex: 0,
     discriminatorValue: '29463-7',
+    orderedIndex: 0,
+    rules: [
+        [
+            'path'       => 'system',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+        [
+            'path'       => 'system',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => 'http://loinc.org'],
+        ],
+        [
+            'path'       => 'code',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+        [
+            'path'       => 'code',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => '29463-7'],
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/bodyweight'],
 )]
 class ObservationBodyweightProfile extends ObservationVitalsignsProfile
 {

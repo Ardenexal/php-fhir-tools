@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Validation\FHIRChoiceVariantReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -59,6 +60,26 @@ final class ReaderObservationStub
         public ReaderQuantityStub|ReaderConceptStub|null $value = null,
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'complex', isArray: true)]
         public array $component = [],
+    ) {
+    }
+}
+
+/** A choice whose boolean, integer and decimal variants are held as bare PHP scalars, as the models hold them. */
+final class ReaderScalarChoiceStub
+{
+    public function __construct(
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                ['fhirType' => 'Quantity', 'propertyKind' => 'complex', 'phpType' => ReaderQuantityStub::class, 'jsonKey' => 'valueQuantity'],
+                ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
+                ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'valueInteger'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
+            ],
+        )]
+        public ReaderQuantityStub|bool|int|string|null $value = null,
     ) {
     }
 }
@@ -127,5 +148,34 @@ final class FHIRChoiceVariantReaderTest extends TestCase
         $observation = new ReaderObservationStub(value: new ReaderQuantityStub('120'));
 
         self::assertSame([$observation->value], $this->reader->readGroups($observation, 'value[x]')[0]['occurrences']);
+    }
+
+    /**
+     * Scalar variants carry a builtin phpType ('bool', 'int', and 'string' for a decimal), which `instanceof` never
+     * matches. A profile constraint on `valueBoolean` would read a held boolean as absent.
+     */
+    public function testAScalarVariantResolvesToTheScalarItHolds(): void
+    {
+        $choice = new ReaderScalarChoiceStub(value: true);
+
+        self::assertSame([true], $this->reader->readGroups($choice, 'valueBoolean')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups($choice, 'valueInteger')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups($choice, 'valueQuantity')[0]['occurrences']);
+    }
+
+    /** A decimal keeps its lexical form, so the models hold it as a string. */
+    public function testADecimalVariantResolvesToTheStringItHolds(): void
+    {
+        self::assertSame(['1.50'], $this->reader->readGroups(new ReaderScalarChoiceStub(value: '1.50'), 'valueDecimal')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups(new ReaderScalarChoiceStub(value: '1.50'), 'valueInteger')[0]['occurrences']);
+    }
+
+    /** The same reads against a generated model, so the stub cannot drift from the metadata the generator emits. */
+    public function testScalarVariantsResolveOnAGeneratedModel(): void
+    {
+        self::assertSame([true], $this->reader->readGroups(new Extension(url: 'http://example.org/b', value: true), 'valueBoolean')[0]['occurrences']);
+        self::assertSame([3], $this->reader->readGroups(new Extension(url: 'http://example.org/i', value: 3), 'valueInteger')[0]['occurrences']);
+        self::assertSame(['2'], $this->reader->readGroups(new Extension(url: 'http://example.org/d', value: '2'), 'valueDecimal')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups(new Extension(url: 'http://example.org/d', value: '2'), 'valueInteger')[0]['occurrences']);
     }
 }

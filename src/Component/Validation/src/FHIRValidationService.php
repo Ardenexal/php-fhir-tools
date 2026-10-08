@@ -22,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
@@ -252,7 +253,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         $constraintClass = $constraint !== null ? $constraint::class : '';
 
         $profileGroup = null;
-        if ($constraint instanceof FHIRProfileConstraint
+        if (($constraint instanceof FHIRProfileConstraint || $constraint instanceof FHIRSliceConstraint)
             && $constraint->groups !== null
             && $constraint->groups !== []) {
             $profileGroup = $constraint->groups[0];

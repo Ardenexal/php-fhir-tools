@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMapResource;
 
 /**
@@ -47,7 +48,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMapResource;
     options: ['min' => 1, 'max' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/shareableconceptmap'],
 )]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/shareableconceptmap'])]
 #[FHIRProfileMustSupport(path: 'url', groups: ['http://hl7.org/fhir/StructureDefinition/shareableconceptmap'])]
 #[FHIRProfileMustSupport(path: 'version', groups: ['http://hl7.org/fhir/StructureDefinition/shareableconceptmap'])]
 #[FHIRProfileMustSupport(path: 'versionAlgorithm[x]', groups: ['http://hl7.org/fhir/StructureDefinition/shareableconceptmap'])]
@@ -57,6 +57,17 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMapResource;
 #[FHIRProfileMustSupport(path: 'experimental', groups: ['http://hl7.org/fhir/StructureDefinition/shareableconceptmap'])]
 #[FHIRProfileMustSupport(path: 'publisher', groups: ['http://hl7.org/fhir/StructureDefinition/shareableconceptmap'])]
 #[FHIRProfileMustSupport(path: 'description', groups: ['http://hl7.org/fhir/StructureDefinition/shareableconceptmap'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'knowledgeRepresentationLevel',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeRepresentationLevel',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableconceptmap'],
+)]
 class ShareableConceptMapProfile extends ConceptMapResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

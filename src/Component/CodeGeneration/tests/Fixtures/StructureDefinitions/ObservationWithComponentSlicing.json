@@ -1,0 +1,80 @@
+{
+  "resourceType": "StructureDefinition",
+  "url": "http://example.org/StructureDefinition/sliced-bp",
+  "name": "SlicedBloodPressure",
+  "type": "Observation",
+  "kind": "resource",
+  "abstract": false,
+  "derivation": "constraint",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+  "differential": {
+    "element": [
+      {
+        "id": "Observation.component",
+        "path": "Observation.component",
+        "slicing": {
+          "discriminator": [{"type": "pattern", "path": "code"}],
+          "rules": "open"
+        },
+        "min": 2
+      },
+      {
+        "id": "Observation.component:SystolicBP",
+        "path": "Observation.component",
+        "sliceName": "SystolicBP",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Observation.component:SystolicBP.code",
+        "path": "Observation.component.code",
+        "patternCodeableConcept": {
+          "coding": [{"system": "http://loinc.org", "code": "8480-6"}]
+        }
+      },
+      {
+        "id": "Observation.component:SystolicBP.value[x]",
+        "path": "Observation.component.value[x]",
+        "type": [{"code": "Quantity"}]
+      },
+      {
+        "id": "Observation.component:SystolicBP.value[x].system",
+        "path": "Observation.component.value[x].system",
+        "min": 1,
+        "fixedUri": "http://unitsofmeasure.org"
+      },
+      {
+        "id": "Observation.component:SystolicBP.value[x].code",
+        "path": "Observation.component.value[x].code",
+        "min": 1,
+        "fixedCode": "mm[Hg]"
+      },
+      {
+        "id": "Observation.component:DiastolicBP",
+        "path": "Observation.component",
+        "sliceName": "DiastolicBP",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Observation.component:DiastolicBP.code",
+        "path": "Observation.component.code",
+        "patternCodeableConcept": {
+          "coding": [{"system": "http://loinc.org", "code": "8462-4"}]
+        }
+      },
+      {
+        "id": "Observation.component:DiastolicBP.value[x]:valueQuantity",
+        "path": "Observation.component.value[x]",
+        "sliceName": "valueQuantity",
+        "min": 1
+      },
+      {
+        "id": "Observation.component:DiastolicBP.value[x]:valueQuantity.system",
+        "path": "Observation.component.value[x].system",
+        "min": 1,
+        "fixedUri": "http://unitsofmeasure.org"
+      }
+    ]
+  }
+}

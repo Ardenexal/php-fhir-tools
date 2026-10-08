@@ -179,7 +179,7 @@ final class FHIRChoiceVariantReader
 
                 // The property holds whichever variant the document used. Counting it for a
                 // different variant's rule would report a Quantity as a CodeableConcept.
-                if ($held === null || !$held instanceof $phpType) {
+                if ($held === null || !self::holdsVariantType($held, $phpType, $variant->isBuiltin)) {
                     return [];
                 }
 
@@ -188,5 +188,22 @@ final class FHIRChoiceVariantReader
         }
 
         return [];
+    }
+
+    /**
+     * Whether $held is a value of the variant's PHP type.
+     *
+     * Boolean, integer and decimal variants are held as bare scalars with a builtin phpType ('bool',
+     * 'int', and 'string' for a decimal, which keeps its lexical form), and `instanceof` never
+     * matches a builtin. No choice element has two builtin variants of one PHP type, so the type alone
+     * identifies the variant.
+     *
+     * @param mixed  $held      Value the choice property holds
+     * @param string $phpType   Variant's PHP type: an FQCN, or a builtin such as 'bool'
+     * @param bool   $isBuiltin Whether $phpType is a builtin scalar type
+     */
+    private static function holdsVariantType(mixed $held, string $phpType, bool $isBuiltin): bool
+    {
+        return $isBuiltin ? get_debug_type($held) === $phpType : $held instanceof $phpType;
     }
 }
