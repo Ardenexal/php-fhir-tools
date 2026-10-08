@@ -1048,12 +1048,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return (float) $value;
         }
 
-        if ($propertyType === 'array' && !is_array($value)) {
-            $value = [$value];
-        }
-
-        if ($propertyType === 'array' && is_array($value)) {
-            $value = $this->stripXmlMetaKeys($value);
+        if ($propertyType === 'array') {
+            $value = $this->stripXmlMetaKeys(is_array($value) ? $value : [$value]);
         }
 
         return $value;
