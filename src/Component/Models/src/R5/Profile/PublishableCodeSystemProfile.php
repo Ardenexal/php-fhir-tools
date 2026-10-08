@@ -17,12 +17,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/publishablecodesystem', baseType: 'CodeSystem', fhirVersion: 'R5')]
 #[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/publishablecodesystem'],
-)]
-#[FHIRProfileConstraint(
     path: 'date',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],

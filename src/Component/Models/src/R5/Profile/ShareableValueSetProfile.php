@@ -18,12 +18,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ValueSetResource;
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/shareablevalueset', baseType: 'ValueSet', fhirVersion: 'R5')]
 #[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/shareablevalueset'],
-)]
-#[FHIRProfileConstraint(
     path: 'url',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
@@ -53,8 +47,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ValueSetResource;
     options: ['min' => 1, 'max' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/shareablevalueset'],
 )]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/shareablevalueset'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/shareablevalueset'])]
 #[FHIRProfileMustSupport(path: 'url', groups: ['http://hl7.org/fhir/StructureDefinition/shareablevalueset'])]
 #[FHIRProfileMustSupport(path: 'version', groups: ['http://hl7.org/fhir/StructureDefinition/shareablevalueset'])]
 #[FHIRProfileMustSupport(path: 'versionAlgorithm[x]', groups: ['http://hl7.org/fhir/StructureDefinition/shareablevalueset'])]

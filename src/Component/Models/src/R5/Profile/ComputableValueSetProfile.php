@@ -17,24 +17,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/computablevalueset', baseType: 'ValueSet', fhirVersion: 'R5')]
 #[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
-)]
-#[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
-)]
-#[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
-)]
-#[FHIRProfileConstraint(
     path: 'compose.include.filter.property',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
@@ -52,9 +34,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
     options: ['min' => 1, 'max' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
 )]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
 #[FHIRProfileMustSupport(path: 'immutable', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
 #[FHIRProfileMustSupport(path: 'compose', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
 #[FHIRProfileMustSupport(path: 'compose.lockedDate', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]

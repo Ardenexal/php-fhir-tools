@@ -20,9 +20,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\FamilyMemberHistoryResource
     baseType: 'FamilyMemberHistory',
     fhirVersion: 'R5',
 )]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
 #[FHIRProfileMustSupport(path: 'relationship', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
 #[FHIRProfileMustSupport(path: 'sex', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
 #[FHIRProfileMustSupport(path: 'born[x]', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]

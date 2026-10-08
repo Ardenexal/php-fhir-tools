@@ -22,180 +22,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     options: ['max' => 0],
     groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
 )]
-#[FHIRProfileConstraint(
-    path: 'entry.fullUrl',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.resource',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.search',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.request',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.response',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.resource',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.search',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.request',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.response',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.fullUrl',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.resource',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.search',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.request',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.response',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.fullUrl',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.resource',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.search',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.request',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.response',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.fullUrl',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.resource',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.search',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.request',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.response',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.fullUrl',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.resource',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.search',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.request',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.response',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
-)]
 #[FHIRSlicingRules(property: 'entry', rules: 'closed', groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'])]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -207,6 +33,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
     orderedIndex: 0,
     discriminatorValue: 'PUT',
+    rules: [
+        ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'search', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+        ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+    ],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -217,7 +50,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     discriminatorPath: 'request.method',
     groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
     orderedIndex: 1,
-    discriminatorValue: 'PUT',
+    discriminatorValue: 'POST',
+    rules: [
+        ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'search', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+        ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+    ],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -228,7 +67,14 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     discriminatorPath: 'request.method',
     groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
     orderedIndex: 2,
-    discriminatorValue: 'PUT',
+    discriminatorValue: 'GET',
+    rules: [
+        ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+        ['path' => 'search', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+        ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+    ],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -239,7 +85,14 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     discriminatorPath: 'request.method',
     groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
     orderedIndex: 3,
-    discriminatorValue: 'PUT',
+    discriminatorValue: 'DELETE',
+    rules: [
+        ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+        ['path' => 'search', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+        ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+    ],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -250,7 +103,14 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     discriminatorPath: 'request.method',
     groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
     orderedIndex: 4,
-    discriminatorValue: 'PUT',
+    discriminatorValue: 'PATCH',
+    rules: [
+        ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'search', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+        ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+    ],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -261,7 +121,14 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     discriminatorPath: 'request.method',
     groups: ['http://hl7.org/fhir/StructureDefinition/batch-bundle'],
     orderedIndex: 5,
-    discriminatorValue: 'PUT',
+    discriminatorValue: 'HEAD',
+    rules: [
+        ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+        ['path' => 'search', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+        ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
+    ],
 )]
 class BatchBundleProfile extends BundleResource
 {

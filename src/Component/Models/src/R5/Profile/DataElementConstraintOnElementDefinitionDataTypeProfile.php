@@ -21,12 +21,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinition;
     fhirVersion: 'R5',
 )]
 #[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/elementdefinition-de'],
-)]
-#[FHIRProfileConstraint(
     path: 'representation',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],

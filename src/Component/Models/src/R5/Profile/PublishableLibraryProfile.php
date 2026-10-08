@@ -28,7 +28,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
     options: ['min' => 1, 'max' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'],
 )]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'])]
 #[FHIRProfileMustSupport(path: 'identifier', groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'])]
 #[FHIRProfileMustSupport(path: 'type', groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'])]
 #[FHIRProfileMustSupport(path: 'date', groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'])]

@@ -17,12 +17,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/catalog', baseType: 'Composition', fhirVersion: 'R4')]
 #[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
-)]
-#[FHIRProfileConstraint(
     path: 'type',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
@@ -38,12 +32,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
     path: 'subject',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
-    groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
-)]
-#[FHIRProfileConstraint(
-    path: 'date',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]
 #[FHIRProfileConstraint(

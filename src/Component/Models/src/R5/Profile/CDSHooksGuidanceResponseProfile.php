@@ -22,12 +22,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\GuidanceResponseResource;
     fhirVersion: 'R5',
 )]
 #[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksguidanceresponse'],
-)]
-#[FHIRProfileConstraint(
     path: 'requestIdentifier',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],

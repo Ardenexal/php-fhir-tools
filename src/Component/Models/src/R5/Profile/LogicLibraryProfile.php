@@ -34,24 +34,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     ],
     groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'],
 )]
-#[FHIRProfileConstraint(
-    path: 'relatedArtifact.type',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => 'depends-on'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'],
-)]
-#[FHIRProfileConstraint(
-    path: 'relatedArtifact.resource',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'],
-)]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
 #[FHIRProfileMustSupport(path: 'subject[x]', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
 #[FHIRProfileMustSupport(path: 'relatedArtifact', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
-#[FHIRProfileMustSupport(path: 'relatedArtifact', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
-#[FHIRProfileMustSupport(path: 'relatedArtifact.type', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
-#[FHIRProfileMustSupport(path: 'relatedArtifact.resource', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
 #[FHIRProfileMustSupport(path: 'parameter', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
 #[FHIRProfileMustSupport(path: 'dataRequirement', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
 #[FHIRProfileMustSupport(path: 'content', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
@@ -68,6 +52,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'],
     orderedIndex: 0,
     discriminatorValue: 'depends-on',
+    rules: [
+        [
+            'path'       => 'type',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => 'depends-on'],
+        ],
+        [
+            'path'       => 'resource',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+    ],
 )]
 class LogicLibraryProfile extends ShareableLibraryProfile
 {
