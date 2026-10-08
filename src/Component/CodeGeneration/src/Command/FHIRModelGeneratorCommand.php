@@ -1310,7 +1310,6 @@ class FHIRModelGeneratorCommand extends Command
         $baseNamespace  = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
         $profileNs      = new PhpNamespace("{$baseNamespace}\\Profile");
         $generator      = new FHIRProfileGenerator();
-        $errorCollector = new ErrorCollector();
         $count          = 0;
 
         foreach ($this->context[$version]->getDefinitions() as $def) {
@@ -1339,7 +1338,7 @@ class FHIRModelGeneratorCommand extends Command
             }
 
             try {
-                $class = $generator->generate($def, $version, $this->context[$version], $profileNs, $errorCollector);
+                $class = $generator->generate($def, $version, $this->context[$version], $profileNs, $this->errorCollector);
                 $this->context[$version]->addType($url, $profileNs->getName(), $class);
 
                 $outputPath = Path::canonicalize(

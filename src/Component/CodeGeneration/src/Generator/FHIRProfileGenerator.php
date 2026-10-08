@@ -318,7 +318,7 @@ class FHIRProfileGenerator
                 continue;
             }
 
-            $slices = self::sliceDefinitions($slicedId, $slicing['definition'], $diff, $snapshot);
+            $slices = self::sliceDefinitions($slicedId, $slicing, $diff, $snapshot);
             if ($slices === []) {
                 continue;
             }
@@ -350,22 +350,33 @@ class FHIRProfileGenerator
      * Arguments for one #[FHIRSliceConstraint] per slice of a sliced element, without `property`
      * and `groups`.
      *
-     * @param string                              $slicedId Id of the sliced element, e.g. 'Observation.component'
-     * @param array<string, mixed>                $slicing  Its slicing definition
-     * @param array<string, array<string, mixed>> $diff     Differential elements by id
-     * @param array<string, array<string, mixed>> $snapshot Snapshot elements by id
+     * The slices are those this differential declares or reaches into. When the profile restates
+     * the slicing as closed or openAtEnd, the snapshot's slices join them as bare 0..* members: the
+     * FHIRSlicingRules emitted in this profile's group judges every item against the slices in that
+     * group, so an item matching only a parent's slice would otherwise be rejected.
+     *
+     * @param string                                                      $slicedId Id of the sliced element, e.g. 'Observation.component'
+     * @param array{definition: array<string, mixed>, declaredHere: bool} $slicing  Its slicing, from slicingFor()
+     * @param array<string, array<string, mixed>>                         $diff     Differential elements by id
+     * @param array<string, array<string, mixed>>                         $snapshot Snapshot elements by id
      *
      * @return list<array<string, mixed>>
      */
     private static function sliceDefinitions(string $slicedId, array $slicing, array $diff, array $snapshot): array
     {
-        $discriminators = is_array($slicing['discriminator'] ?? null) ? array_values($slicing['discriminator']) : [];
+        $definition     = $slicing['definition'];
+        $discriminators = is_array($definition['discriminator'] ?? null) ? array_values($definition['discriminator']) : [];
         $first          = is_array($discriminators[0] ?? null) ? $discriminators[0] : [];
         $discType       = (string) ($first['type'] ?? 'value');
         $discPath       = (string) ($first['path'] ?? '');
 
+        $names = self::sliceNames($slicedId, $diff);
+        if ($names !== [] && $slicing['declaredHere'] && ($definition['rules'] ?? 'open') !== 'open') {
+            $names = array_values(array_unique([...$names, ...self::sliceNames($slicedId, $snapshot)]));
+        }
+
         $definitions = [];
-        foreach (self::sliceNames($slicedId, $diff) as $orderedIndex => $sliceName) {
+        foreach ($names as $orderedIndex => $sliceName) {
             $sliceId   = "{$slicedId}:{$sliceName}";
             $header    = $diff[$sliceId] ?? [];
             $isDefault = $sliceName === '@default';
@@ -447,6 +458,13 @@ class FHIRProfileGenerator
                 continue;
             }
 
+            // As at the top level, a slicing with no slices to check emits nothing: closed rules
+            // with no slice beside them would reject every item
+            $definitions = self::sliceDefinitions($nestedId, $slicing, $diff, $snapshot);
+            if ($definitions === []) {
+                continue;
+            }
+
             $relative = self::rewriteChoiceTypeSlices(substr($nestedId, strlen($prefix)));
 
             if ($slicing['declaredHere']) {
@@ -457,7 +475,7 @@ class FHIRProfileGenerator
                 ];
             }
 
-            foreach (self::sliceDefinitions($nestedId, $slicing['definition'], $diff, $snapshot) as $nested) {
+            foreach ($definitions as $nested) {
                 $rules[] = [
                     'path'       => $relative,
                     'constraint' => FHIRSliceConstraint::class,
@@ -630,10 +648,10 @@ class FHIRProfileGenerator
     }
 
     /**
-     * Names of the slices on a sliced element that the differential declares or reaches into, in
-     * differential order. Reslices ("a/b") and choice type slices are left out.
+     * Names of the slices on a sliced element that a set of elements declares or reaches into, in
+     * their order. Reslices ("a/b") and choice type slices are left out.
      *
-     * @param array<string, array<string, mixed>> $diff Differential elements by id
+     * @param array<string, array<string, mixed>> $diff Differential (or snapshot) elements by id
      *
      * @return list<string>
      */

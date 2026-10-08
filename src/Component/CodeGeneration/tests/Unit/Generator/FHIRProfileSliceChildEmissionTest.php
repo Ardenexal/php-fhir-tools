@@ -381,6 +381,57 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         ]);
     }
 
+    /**
+     * A profile restating its parent's slicing as closed is checked in its own group against every
+     * slice in that group, so the parent's slices must be there too; and a closed slicing with no
+     * slices at all must not be emitted, since it would reject every item.
+     */
+    public function testRestatedClosedSlicingCarriesTheParentsSlices(): void
+    {
+        $closed = ['discriminator' => [['type' => 'value', 'path' => 'code']], 'rules' => 'closed'];
+        $class  = $this->generateFrom([
+            'resourceType'   => 'StructureDefinition',
+            'url'            => 'http://example.org/StructureDefinition/restated-closed',
+            'name'           => 'RestatedClosed',
+            'type'           => 'Observation',
+            'kind'           => 'resource',
+            'derivation'     => 'constraint',
+            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/Observation',
+            'differential'   => [
+                'element' => [
+                    ['id' => 'Observation.code.coding', 'path' => 'Observation.code.coding', 'slicing' => $closed],
+                    ['id' => 'Observation.code.coding:snomed', 'path' => 'Observation.code.coding', 'sliceName' => 'snomed', 'min' => 1, 'max' => '1'],
+                    ['id' => 'Observation.code.coding:snomed.code', 'path' => 'Observation.code.coding.code', 'fixedCode' => '75367002'],
+                    ['id' => 'Observation.component:SystolicBP.code.coding', 'path' => 'Observation.component.code.coding', 'slicing' => $closed],
+                    ['id' => 'Observation.component:SystolicBP.valueQuantity.code', 'path' => 'Observation.component.valueQuantity.code', 'fixedCode' => 'mm[Hg]'],
+                ],
+            ],
+            'snapshot' => [
+                'element' => [
+                    ['id' => 'Observation.code.coding:loinc.code', 'path' => 'Observation.code.coding.code', 'fixedCode' => '85354-9'],
+                    ['id' => 'Observation.code.coding:snomed.code', 'path' => 'Observation.code.coding.code', 'fixedCode' => '75367002'],
+                    ['id' => 'Observation.component', 'path' => 'Observation.component', 'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'code.coding.code']], 'rules' => 'open']],
+                    ['id' => 'Observation.component:SystolicBP.code.coding:SBPCode.code', 'path' => 'Observation.component.code.coding.code', 'fixedCode' => '8480-6'],
+                ],
+            ],
+        ]);
+
+        $slices = [];
+        foreach ($this->attributeArguments($class, FHIRSliceConstraint::class) as $slice) {
+            self::assertIsString($slice['property']);
+            self::assertIsString($slice['sliceName']);
+            $slices[$slice['property'] . ':' . $slice['sliceName']] = $slice;
+        }
+
+        self::assertSame(['code.coding:snomed', 'code.coding:loinc', 'component:SystolicBP'], array_keys($slices));
+        self::assertSame([0, '*', '85354-9'], [$slices['code.coding:loinc']['min'], $slices['code.coding:loinc']['max'], $slices['code.coding:loinc']['discriminatorValue'] ?? null]);
+        self::assertSame(
+            [['path' => 'valueQuantity.code', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => 'mm[Hg]']]],
+            $slices['component:SystolicBP']['rules'] ?? null,
+            'A closed nested slicing with no slices emits no rules for it',
+        );
+    }
+
     /** Without a snapshot, inherited slicing cannot be found; the gap is reported, not swallowed. */
     public function testSlicesOnUnfindableSlicingAreReportedAsWarnings(): void
     {

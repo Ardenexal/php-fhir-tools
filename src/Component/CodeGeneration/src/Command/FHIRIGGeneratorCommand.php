@@ -551,7 +551,6 @@ class FHIRIGGeneratorCommand extends Command
 
         $profileNs        = new PhpNamespace(self::MODELS_BASE_NAMESPACE . "\\{$version}\\Profile");
         $profileGenerator = new FHIRProfileGenerator();
-        $errorCollector   = new ErrorCollector();
 
         $count = 0;
         foreach ($this->context[$version]->getDefinitions() as $def) {
@@ -579,7 +578,7 @@ class FHIRIGGeneratorCommand extends Command
             }
 
             try {
-                $class = $profileGenerator->generate($def, $version, $this->context[$version], $profileNs, $errorCollector);
+                $class = $profileGenerator->generate($def, $version, $this->context[$version], $profileNs, $this->errorCollector);
                 $this->context[$version]->addType($url, $profileNs->getName(), $class);
                 $this->writeBaseProfileClass($output, $class, $profileNs, $version);
                 ++$count;
