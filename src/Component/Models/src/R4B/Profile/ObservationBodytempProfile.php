@@ -60,9 +60,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodytemp'],
-    orderedIndex: 0,
     discriminatorValue: '8310-5',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'system',
@@ -85,6 +84,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['value' => '8310-5'],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/bodytemp'],
 )]
 class ObservationBodytempProfile extends ObservationVitalsignsProfile
 {

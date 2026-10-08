@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ServiceRequestResource;
 
 /**
@@ -18,6 +19,17 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ServiceRequestResource;
     profileUrl: 'http://hl7.org/fhir/StructureDefinition/servicerequest-genetics',
     baseType: 'ServiceRequest',
     fhirVersion: 'R4B',
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'Item',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/servicerequest-geneticsItem',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/servicerequest-genetics'],
 )]
 class ServiceRequestGeneticsProfile extends ServiceRequestResource
 {

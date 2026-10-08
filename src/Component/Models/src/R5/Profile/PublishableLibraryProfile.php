@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 
 /**
  * @author HL7
@@ -51,6 +52,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
 #[FHIRProfileMustSupport(path: 'relatedArtifact.document', groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'])]
 #[FHIRProfileMustSupport(path: 'relatedArtifact.resource', groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'])]
 #[FHIRProfileMustSupport(path: 'relatedArtifact.resourceReference', groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'logicDefinition',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'],
+)]
 class PublishableLibraryProfile extends ShareableLibraryProfile
 {
     /** Canonical URL of this profile's StructureDefinition. */

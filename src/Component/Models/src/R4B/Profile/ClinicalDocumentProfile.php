@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\CompositionResource;
 
 /**
@@ -17,6 +18,17 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\CompositionResource;
  * The base Composition is a general resource for compositions or documents about any kind of subject that might be encountered in healthcare including such things as guidelines, medicines, etc. A clinical document is focused on documents related to the provision of care process, where the subject is a patient, a group of patients, or a closely related concept. A clinical document has additional requirements around confidentiality that do not apply in the same way to other kinds of documents.
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/clinicaldocument', baseType: 'Composition', fhirVersion: 'R4B')]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'versionNumber',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/composition-clinicaldocument-versionNumber',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/clinicaldocument'],
+)]
 class ClinicalDocumentProfile extends CompositionResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

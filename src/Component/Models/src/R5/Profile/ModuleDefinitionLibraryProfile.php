@@ -44,6 +44,39 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
 #[FHIRProfileMustSupport(path: 'relatedArtifact', groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'])]
 #[FHIRProfileMustSupport(path: 'parameter', groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'])]
 #[FHIRProfileMustSupport(path: 'dataRequirement', groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'inputParameters',
+    min: 0,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-inputParameters',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'directReferenceCode',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-directReferenceCode',
+    orderedIndex: 1,
+    groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'logicDefinition',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition',
+    orderedIndex: 2,
+    groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
+)]
 #[FHIRSlicingRules(property: 'relatedArtifact', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'])]
 #[FHIRSliceConstraint(
     property: 'relatedArtifact',
@@ -52,9 +85,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'type',
-    groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
-    orderedIndex: 0,
     discriminatorValue: 'depends-on',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'type',
@@ -67,6 +99,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['min' => 1, 'max' => 1],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]
 class ModuleDefinitionLibraryProfile extends ShareableLibraryProfile
 {

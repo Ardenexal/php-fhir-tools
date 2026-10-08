@@ -39,9 +39,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalspanel'],
-    orderedIndex: 0,
     discriminatorValue: '85353-1',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'system',
@@ -54,6 +53,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['value' => '85353-1'],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalspanel'],
 )]
 class ObservationVitalspanelProfile extends ObservationVitalsignsProfile
 {

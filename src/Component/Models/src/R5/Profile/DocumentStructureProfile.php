@@ -19,22 +19,22 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
 #[FHIRSliceConstraint(
     property: 'section',
     sliceName: 'procedure',
-    min: 1,
+    min: 0,
     max: '*',
     discriminatorType: 'pattern',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'],
     orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'],
 )]
 #[FHIRSliceConstraint(
     property: 'section',
     sliceName: 'medications',
-    min: 1,
+    min: 0,
     max: '*',
     discriminatorType: 'pattern',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'],
     orderedIndex: 1,
+    groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'],
 )]
 #[FHIRSliceConstraint(
     property: 'section',
@@ -43,8 +43,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
     max: '*',
     discriminatorType: 'pattern',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'],
     orderedIndex: 2,
+    groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'],
 )]
 class DocumentStructureProfile extends CompositionResource
 {

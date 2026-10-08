@@ -60,9 +60,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyweight'],
-    orderedIndex: 0,
     discriminatorValue: '29463-7',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'system',
@@ -85,6 +84,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['value' => '29463-7'],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/bodyweight'],
 )]
 class ObservationBodyweightProfile extends ObservationVitalsignsProfile
 {

@@ -23,9 +23,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'search.mode',
-    groups: ['http://hl7.org/fhir/StructureDefinition/search-set-bundle'],
-    orderedIndex: 0,
     discriminatorValue: 'outcome',
+    orderedIndex: 0,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
@@ -37,6 +36,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
         ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
         ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/search-set-bundle'],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -45,7 +45,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'search.mode',
-    groups: ['http://hl7.org/fhir/StructureDefinition/search-set-bundle'],
     orderedIndex: 1,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
@@ -53,6 +52,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
         ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
         ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/search-set-bundle'],
 )]
 class SearchSetBundleProfile extends BundleResource
 {

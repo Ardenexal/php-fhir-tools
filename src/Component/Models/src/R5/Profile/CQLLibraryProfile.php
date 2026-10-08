@@ -26,9 +26,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'contentType',
-    groups: ['http://hl7.org/fhir/StructureDefinition/cqllibrary'],
-    orderedIndex: 0,
     discriminatorValue: 'text/cql',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'contentType',
@@ -46,6 +45,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['min' => 1, 'max' => 1],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/cqllibrary'],
 )]
 class CQLLibraryProfile extends LogicLibraryProfile
 {

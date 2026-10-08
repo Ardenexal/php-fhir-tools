@@ -26,9 +26,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'contentType',
-    groups: ['http://hl7.org/fhir/StructureDefinition/elmlibrary'],
-    orderedIndex: 0,
     discriminatorValue: 'application/elm+xml',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'contentType',
@@ -46,6 +45,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['min' => 1, 'max' => 1],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/elmlibrary'],
 )]
 #[FHIRSliceConstraint(
     property: 'content',
@@ -54,9 +54,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'contentType',
-    groups: ['http://hl7.org/fhir/StructureDefinition/elmlibrary'],
-    orderedIndex: 1,
     discriminatorValue: 'application/elm+json',
+    orderedIndex: 1,
     rules: [
         [
             'path'       => 'contentType',
@@ -74,6 +73,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['min' => 1, 'max' => 1],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/elmlibrary'],
 )]
 class ELMLibraryProfile extends LogicLibraryProfile
 {

@@ -105,9 +105,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationResource;
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'coding.code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
-    orderedIndex: 0,
     discriminatorValue: 'vital-signs',
+    orderedIndex: 0,
     rules: [
         ['path' => 'coding', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         [
@@ -131,6 +130,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationResource;
             'options'    => ['value' => 'vital-signs'],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
 )]
 class ObservationvitalsignsProfile extends ObservationResource
 {

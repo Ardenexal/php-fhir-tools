@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PlanDefinitionResource;
 
 /**
@@ -30,6 +31,17 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\PlanDefinitionResource;
 #[FHIRProfileMustSupport(path: 'action.type', groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksserviceplandefinition'])]
 #[FHIRProfileMustSupport(path: 'action.selectionBehavior', groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksserviceplandefinition'])]
 #[FHIRProfileMustSupport(path: 'action.definition[x]', groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksserviceplandefinition'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'cdsHooksEndpoint',
+    min: 1,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-cdsHooksEndpoint',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksserviceplandefinition'],
+)]
 class CDShooksServicePlanDefinitionProfile extends PlanDefinitionResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

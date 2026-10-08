@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ElementDefinition;
 
 /**
@@ -78,6 +79,28 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ElementDefinition;
     path: 'isSummary',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
+    groups: ['http://hl7.org/fhir/StructureDefinition/elementdefinition-de'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'Question',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-question',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/elementdefinition-de'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'AllowedUnits',
+    min: 0,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-allowedUnits',
+    orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/elementdefinition-de'],
 )]
 class DataElementConstraintOnElementDefinitionDataTypeProfile extends ElementDefinition

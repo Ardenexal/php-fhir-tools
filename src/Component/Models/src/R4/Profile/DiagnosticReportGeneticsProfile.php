@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
 
 /**
@@ -24,6 +25,50 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
     path: 'conclusionCode',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
+    groups: ['http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'AssessedCondition',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsAssessedCondition',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'FamilyMemberHistory',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsFamilyMemberHistory',
+    orderedIndex: 1,
+    groups: ['http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'Analysis',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsAnalysis',
+    orderedIndex: 2,
+    groups: ['http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'References',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsReferences',
+    orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics'],
 )]
 class DiagnosticReportGeneticsProfile extends DiagnosticReportResource

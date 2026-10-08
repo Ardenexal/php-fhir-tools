@@ -27,11 +27,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
     max: '*',
     discriminatorType: 'pattern',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/example-section-library'],
-    orderedIndex: 0,
     discriminatorValue: [
         'coding' => [['code' => '29554-3', 'display' => 'Procedure Narrative', 'system' => 'http://loinc.org']],
     ],
+    orderedIndex: 0,
     rules: [
         ['path' => 'title', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         [
@@ -50,6 +49,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
             ],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/example-section-library'],
 )]
 #[FHIRSliceConstraint(
     property: 'section',
@@ -58,13 +58,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
     max: '*',
     discriminatorType: 'pattern',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/example-section-library'],
-    orderedIndex: 1,
     discriminatorValue: [
         'coding' => [
             ['code' => '29549-3', 'display' => 'Medication administered Narrative', 'system' => 'http://loinc.org'],
         ],
     ],
+    orderedIndex: 1,
     rules: [
         ['path' => 'title', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         [
@@ -89,6 +88,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
             ],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/example-section-library'],
 )]
 #[FHIRSliceConstraint(
     property: 'section',
@@ -97,11 +97,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
     max: '*',
     discriminatorType: 'pattern',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/example-section-library'],
-    orderedIndex: 2,
     discriminatorValue: [
         'coding' => [['code' => '18776-5', 'display' => 'Plan of treatment (narrative)', 'system' => 'http://loinc.org']],
     ],
+    orderedIndex: 2,
     rules: [
         ['path' => 'title', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         [
@@ -122,6 +121,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
             ],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/example-section-library'],
 )]
 class DocumentSectionLibraryProfile extends CompositionResource
 {

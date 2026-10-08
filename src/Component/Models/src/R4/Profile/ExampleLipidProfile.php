@@ -48,32 +48,32 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
 #[FHIRSliceConstraint(
     property: 'result',
     sliceName: 'Cholesterol',
-    min: 1,
+    min: 0,
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'resolve().code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
     orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
 #[FHIRSliceConstraint(
     property: 'result',
     sliceName: 'Triglyceride',
-    min: 1,
+    min: 0,
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'resolve().code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
     orderedIndex: 1,
+    groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
 #[FHIRSliceConstraint(
     property: 'result',
     sliceName: 'HDLCholesterol',
-    min: 1,
+    min: 0,
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'resolve().code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
     orderedIndex: 2,
+    groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
 #[FHIRSliceConstraint(
     property: 'result',
@@ -82,8 +82,8 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'resolve().code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
     orderedIndex: 3,
+    groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
 class ExampleLipidProfile extends DiagnosticReportResource
 {

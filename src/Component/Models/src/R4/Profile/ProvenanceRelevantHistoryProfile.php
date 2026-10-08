@@ -55,11 +55,10 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ProvenanceResource;
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'type',
-    groups: ['http://hl7.org/fhir/StructureDefinition/provenance-relevant-history'],
-    orderedIndex: 0,
     discriminatorValue: [
         'coding' => [['system' => 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType', 'code' => 'AUT']],
     ],
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'type',
@@ -83,6 +82,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ProvenanceResource;
             'options'    => ['min' => 1, 'max' => 1],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/provenance-relevant-history'],
 )]
 class ProvenanceRelevantHistoryProfile extends ProvenanceResource
 {

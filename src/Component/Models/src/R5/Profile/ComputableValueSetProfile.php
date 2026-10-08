@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 
 /**
  * @author HL7
@@ -48,6 +49,39 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
 #[FHIRProfileMustSupport(path: 'compose.include.filter.value', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
 #[FHIRProfileMustSupport(path: 'compose.include.valueSet', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
 #[FHIRProfileMustSupport(path: 'compose.exclude', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'rulesText',
+    min: 0,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/valueset-rules-text',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'expression',
+    min: 0,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/valueset-expression',
+    orderedIndex: 1,
+    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'supplement',
+    min: 0,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/valueset-supplement',
+    orderedIndex: 2,
+    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
+)]
 class ComputableValueSetProfile extends ShareableValueSetProfile
 {
     /** Canonical URL of this profile's StructureDefinition. */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FamilyMemberHistoryResource;
 
 /**
@@ -18,6 +19,39 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FamilyMemberHistoryResourc
     profileUrl: 'http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic',
     baseType: 'FamilyMemberHistory',
     fhirVersion: 'R4B',
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'Parent',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-parent',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'Sibling',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-sibling',
+    orderedIndex: 1,
+    groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'Observation',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation',
+    orderedIndex: 2,
+    groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'],
 )]
 class FamilyMemberHistoryForGeneticsAnalysisProfile extends FamilyMemberHistoryResource
 {

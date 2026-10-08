@@ -23,9 +23,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'request.method',
-    groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'],
-    orderedIndex: 0,
     discriminatorValue: 'PUT',
+    orderedIndex: 0,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
@@ -33,6 +32,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
         ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -41,15 +41,15 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     max: 0,
     discriminatorType: 'value',
     discriminatorPath: 'request.method',
-    groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'],
-    orderedIndex: 1,
     discriminatorValue: 'POST',
+    orderedIndex: 1,
     rules: [
         ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'search', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
         ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -58,9 +58,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'request.method',
-    groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'],
-    orderedIndex: 2,
     discriminatorValue: 'GET',
+    orderedIndex: 2,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
@@ -68,6 +67,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
         ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -76,9 +76,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'request.method',
-    groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'],
-    orderedIndex: 3,
     discriminatorValue: 'DELETE',
+    orderedIndex: 3,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
@@ -86,6 +85,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
         ['path' => 'request', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -94,11 +94,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     max: 0,
     discriminatorType: 'value',
     discriminatorPath: 'request.method',
-    groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'],
     orderedIndex: 4,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'],
 )]
 class HistoryBundleProfile extends BundleResource
 {

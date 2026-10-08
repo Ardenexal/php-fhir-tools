@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
 
 /**
@@ -38,6 +39,17 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
     path: 'section.entry',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'ValidityPeriod',
+    min: 1,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqm-ValidityPeriod',
+    orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]
 class ProfileForCatalogProfile extends CompositionResource

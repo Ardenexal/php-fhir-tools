@@ -43,9 +43,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'contentType',
-    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
-    orderedIndex: 0,
     discriminatorValue: 'application/xml',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'contentType',
@@ -63,6 +62,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['min' => 1, 'max' => 1],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
 )]
 #[FHIRSliceConstraint(
     property: 'content',
@@ -71,9 +71,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'contentType',
-    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
-    orderedIndex: 1,
     discriminatorValue: 'application/json',
+    orderedIndex: 1,
     rules: [
         [
             'path'       => 'contentType',
@@ -91,6 +90,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['min' => 1, 'max' => 1],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
 )]
 class ModelInfoLibraryProfile extends ShareableLibraryProfile
 {

@@ -26,9 +26,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'contentType',
-    groups: ['http://hl7.org/fhir/StructureDefinition/fhirpathlibrary'],
-    orderedIndex: 0,
     discriminatorValue: 'text/fhirpath',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'id',
@@ -51,6 +50,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['min' => 1, 'max' => 1],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/fhirpathlibrary'],
 )]
 class FHIRPathLibraryProfile extends LogicLibraryProfile
 {

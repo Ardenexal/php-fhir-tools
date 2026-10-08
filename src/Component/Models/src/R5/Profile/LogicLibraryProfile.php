@@ -41,6 +41,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
 #[FHIRProfileMustSupport(path: 'content', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
 #[FHIRProfileMustSupport(path: 'content.contentType', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
 #[FHIRProfileMustSupport(path: 'content.data', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'directReferenceCode',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-directReferenceCode',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'],
+)]
 #[FHIRSlicingRules(property: 'relatedArtifact', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]
 #[FHIRSliceConstraint(
     property: 'relatedArtifact',
@@ -49,9 +60,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'type',
-    groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'],
-    orderedIndex: 0,
     discriminatorValue: 'depends-on',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'type',
@@ -64,6 +74,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['min' => 1, 'max' => 1],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'],
 )]
 class LogicLibraryProfile extends ShareableLibraryProfile
 {

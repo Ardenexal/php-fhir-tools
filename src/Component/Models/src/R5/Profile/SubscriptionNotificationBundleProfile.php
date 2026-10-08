@@ -44,7 +44,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     max: 1,
     discriminatorType: 'exists',
     discriminatorPath: 'entry',
-    groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'],
     orderedIndex: 0,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
@@ -52,6 +51,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
         ['path' => 'search', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
         ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'],
 )]
 #[FHIRSliceConstraint(
     property: 'entry',
@@ -60,13 +60,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     max: '*',
     discriminatorType: 'exists',
     discriminatorPath: 'entry',
-    groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'],
     orderedIndex: 1,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'search', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
         ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'],
 )]
 class SubscriptionNotificationBundleProfile extends BundleResource
 {

@@ -72,9 +72,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/bmi'],
-    orderedIndex: 0,
     discriminatorValue: '39156-5',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'system',
@@ -97,6 +96,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['value' => '39156-5'],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/bmi'],
 )]
 class ObservationBmiProfile extends ObservationVitalsignsProfile
 {

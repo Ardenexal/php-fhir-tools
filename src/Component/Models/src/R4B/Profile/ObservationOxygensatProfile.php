@@ -66,9 +66,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/oxygensat'],
-    orderedIndex: 0,
     discriminatorValue: '2708-6',
+    orderedIndex: 0,
     rules: [
         [
             'path'       => 'system',
@@ -91,6 +90,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['value' => '2708-6'],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/oxygensat'],
 )]
 class ObservationOxygensatProfile extends ObservationVitalsignsProfile
 {
