@@ -1387,7 +1387,15 @@ class FHIRModelGeneratorCommand extends Command
     {
         $output->writeln('Generating Enums for value sets');
 
-        foreach ($this->context[$version]->getPendingEnums() as $key => $pendingEnum) {
+        // Two ValueSets can resolve to one enum class name (R4's medication-status and
+        // medication-statement-status are both "Medication Status Codes"). Each is written to the
+        // same file, so the one generated last keeps it. Generating in ascending URL order makes
+        // that choice independent of the order definitions were loaded in, and it matches every
+        // collision the committed models hold.
+        $pendingEnums = $this->context[$version]->getPendingEnums();
+        ksort($pendingEnums, SORT_STRING);
+
+        foreach ($pendingEnums as $key => $pendingEnum) {
             $valueset = $this->context[$version]->getDefinition($key);
 
             if ($valueset === null) {
