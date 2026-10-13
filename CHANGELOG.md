@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [Serialization] A typed complex extension now writes only its `url`, `id` and sub-extensions. Its generated class keeps each sub-extension's value twice, as a typed constructor property (`AlternateHashExtension::$algorithm`, `$hash`) and as the sub-extension the constructor builds from it, and the JSON and XML complex-type normalizers wrote every public property, so each value also appeared as a stray key (`"algorithm": {...}`) or element (`<algorithm>`) that is not part of Extension. Properties the complex extension class itself declares are now left out; reading one back is unchanged
+
 ## [0.6.2] - 2026-10-08
 
 ### Fixed
