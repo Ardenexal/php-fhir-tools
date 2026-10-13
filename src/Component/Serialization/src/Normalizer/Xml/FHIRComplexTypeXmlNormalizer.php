@@ -476,7 +476,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         $contentNamespace   = $this->contentNamespace($object);
 
         $propertyNames = self::orderByContentModel(
-            self::modelAccessor()->publicPropertyNames($object),
+            self::serializedPropertyNames($object),
             $this->contentModelOrder($object),
         );
 

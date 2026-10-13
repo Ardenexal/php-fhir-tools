@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common;
 
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
@@ -73,6 +74,31 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     protected static function modelAccessor(): FHIRModelAccessorInterface
     {
         return self::$sharedModelAccessor ??= new FHIRModelAccessor();
+    }
+
+    /**
+     * The public properties a normalizer writes as FHIR elements.
+     *
+     * A typed complex extension declares one constructor property per sub-extension, and its
+     * constructor also builds that sub-extension from it. Only the sub-extension is FHIR - the typed
+     * property is not an element of Extension - so the properties the complex extension class itself
+     * declares are left out, and the sub-extensions carry their values.
+     *
+     * @param object $object The model being written
+     *
+     * @return list<string> Property names, in declaration order
+     */
+    protected static function serializedPropertyNames(object $object): array
+    {
+        $names = self::modelAccessor()->publicPropertyNames($object);
+        if (!$object instanceof FHIRComplexExtensionInterface) {
+            return $names;
+        }
+
+        return array_values(array_filter(
+            $names,
+            static fn (string $name): bool => !is_a((string) self::modelAccessor()->owningClassOf($object, $name), FHIRComplexExtensionInterface::class, true),
+        ));
     }
 
     /**

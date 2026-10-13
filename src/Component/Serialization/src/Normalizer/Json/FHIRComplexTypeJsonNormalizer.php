@@ -254,7 +254,7 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
         $metaMap           = $this->getPropertyMetadataMap($object);
         $includeExtensions = $fhirContext->includeExtensions;
 
-        foreach (self::modelAccessor()->publicPropertyNames($object) as $propertyName) {
+        foreach (self::serializedPropertyNames($object) as $propertyName) {
             // Unwritten and explicitly null both read as null here, and the skip below catches both.
             $value = self::modelAccessor()->readInitializedValue($object, $propertyName);
 
