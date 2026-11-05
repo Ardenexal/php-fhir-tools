@@ -73,6 +73,27 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private ComparisonService $comparisonService;
 
     /**
+     * Functions returning what an expression evaluates to rather than something derived from their
+     * input. That expression carries its own origin, so one it does not have must not come from the input.
+     */
+    private const PROJECTIONS = ['iif', 'select', 'repeat', 'aggregate'];
+
+    /**
+     * The index of each Bundle met by the evaluation in progress, so that every resolve() call shares
+     * one scan of it and its id stays the same. Cleared when the outermost evaluate() returns.
+     *
+     * @var list<BundleIndex>
+     */
+    private array $bundleIndexes = [];
+
+    private int $nextBundleId = 0;
+
+    /**
+     * How many evaluate() and evaluateWithContext() calls are in progress; functions call both.
+     */
+    private int $evaluationDepth = 0;
+
+    /**
      * Cache of FHIR class name → resolved resource type string (or null if not a resource).
      * Avoids repeated reflection over the class hierarchy within a single evaluator instance.
      *
@@ -321,7 +342,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             $this->context->setCurrentNode($resource);
         }
 
-        $result = $expression->accept($this);
+        $result = $this->acceptInEvaluation($expression);
 
         // Normalize FHIR primitive wrapper objects to their scalar values in the final
         // output collection. Internal evaluation keeps wrappers for sub-element navigation
@@ -339,6 +360,39 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
+     * Get the index of the root resource when it is a Bundle. Values with no known Bundle entry are
+     * looked up here.
+     */
+    public function getRootBundleIndex(mixed $root): ?BundleIndex
+    {
+        return $this->matchesResourceType($root, 'Bundle') ? $this->getBundleIndex($root) : null;
+    }
+
+    /**
+     * Get the index of a Bundle, shared across the evaluation in progress.
+     *
+     * Bundles with equal values share one, because they give equal answers. Outside an evaluation the
+     * index is not kept, because nothing would clear it and the Bundle could change before its next use.
+     */
+    public function getBundleIndex(mixed $bundle): BundleIndex
+    {
+        if ($this->evaluationDepth > 0) {
+            foreach ($this->bundleIndexes as $index) {
+                if ($index->bundle === $bundle) {
+                    return $index;
+                }
+            }
+        }
+
+        $index = new BundleIndex($bundle, (string) $this->nextBundleId++);
+        if ($this->evaluationDepth > 0) {
+            $this->bundleIndexes[] = $index;
+        }
+
+        return $index;
+    }
+
+    /**
      * Evaluate an expression with a specific context, saving and restoring the current context.
      *
      * Used by functions that need per-item context evaluation (e.g. repeat(), select()).
@@ -353,9 +407,25 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         $this->context = $context;
 
         try {
-            return $expression->accept($this);
+            return $this->acceptInEvaluation($expression);
         } finally {
             $this->context = $savedContext;
+        }
+    }
+
+    /**
+     * Evaluate an expression, keeping each Bundle's index for as long as the outermost call lasts.
+     */
+    private function acceptInEvaluation(ExpressionNode $expression): Collection
+    {
+        ++$this->evaluationDepth;
+
+        try {
+            return $expression->accept($this);
+        } finally {
+            if (--$this->evaluationDepth === 0) {
+                $this->bundleIndexes = [];
+            }
         }
     }
 
@@ -412,7 +482,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 // Return the value as-is, including null: a variable explicitly set to null
                 // (e.g. $this for a null FHIR primitive element in select()) is still a valid
                 // node that hasValue() should evaluate to false for.
-                return Collection::single($value);
+                $variable = Collection::single($value);
+
+                // The scope describes the current node, which is what $this names. It says nothing
+                // about $total, which can hold a value from an earlier item in another entry.
+                return $variableName === 'this' ? $variable->withScope($this->context->getBundleEntryScope()) : $variable;
             }
 
             return Collection::empty();
@@ -430,7 +504,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // through to property navigation so that `Patient.name.given` does not mistakenly
         // look for a property key named "Patient".
         if ($this->matchesResourceType($currentNode, $name)) {
-            return Collection::single($currentNode);
+            return Collection::single($currentNode)->withScope($this->context->getBundleEntryScope());
         }
 
         // Strict mode: if the identifier starts with an uppercase letter (indicating a
@@ -444,7 +518,21 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             throw new FHIRPathSemanticException("Type filter '{$name}' does not match the context resource type");
         }
 
-        return $this->navigateProperty($currentNode, $name);
+        $result = $this->navigateProperty($currentNode, $name);
+
+        // Navigating into Bundle.entry is where a value's Bundle entry starts; a nested Bundle
+        // replaces the outer one. Everything navigated from there inherits it.
+        if ($name === 'entry' && $this->matchesResourceType($currentNode, 'Bundle')) {
+            $bundleIndex = $this->getBundleIndex($currentNode);
+            $scopes      = [];
+            foreach ($result as $index => $entry) {
+                $scopes[$index] = $bundleIndex->scopeFor($index, $entry);
+            }
+
+            return $result->withScopes($scopes);
+        }
+
+        return $result->withScope($this->context->getBundleEntryScope());
     }
 
     /**
@@ -491,17 +579,21 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         // Property navigation: iterate per-item and flatten results
         $results = [];
-        foreach ($objectResult as $item) {
+        $scopes  = [];
+        foreach ($objectResult as $index => $item) {
             $oldContext    = $this->context;
-            $this->context = $this->context->withCurrentNode($item);
+            $this->context = $this->context->withCurrentNode($item)->withBundleEntryScope($objectResult->scopeAt($index));
 
             $memberResult = $node->getMember()->accept($this);
-            $results      = [...$results, ...$memberResult->toArray()];
+            foreach ($memberResult->getScopes() as $position => $scope) {
+                $scopes[count($results) + $position] = $scope;
+            }
+            $results = [...$results, ...$memberResult->toArray()];
 
             $this->context = $oldContext;
         }
 
-        return Collection::from($results);
+        return Collection::from($results)->withScopes($scopes);
     }
 
     /**
@@ -518,7 +610,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         } else {
             // Called directly (not via member access) — use the current node
             $input           = $this->context->getCurrentNode();
-            $inputCollection = $input !== null ? $this->wrapValue($input) : Collection::empty();
+            $inputCollection = $input !== null ? $this->wrapValue($input)->withScope($this->context->getBundleEntryScope()) : Collection::empty();
         }
 
         // Get the function from the registry
@@ -539,7 +631,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         // Execute the function
-        return $function->execute($inputCollection, $evaluatedParams, $this->context);
+        $result = $function->execute($inputCollection, $evaluatedParams, $this->context);
+
+        // Whatever a function derives from values of one Bundle entry belongs to that entry, which
+        // covers the functions that know nothing of scopes, such as toString() and replace().
+        if ($result->getScopes() !== [] || $result->isEmpty() || in_array($node->getName(), self::PROJECTIONS, true)) {
+            return $result;
+        }
+
+        return $result->withScope($inputCollection->soleScope());
     }
 
     /**
@@ -664,9 +764,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return Collection::empty();
         }
 
-        $item = $collection->get($index);
-
-        return $item !== null ? Collection::single($item) : Collection::empty();
+        return $collection->get($index) !== null ? $collection->only([$index]) : Collection::empty();
     }
 
     /**
@@ -724,7 +822,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             $item = $collection->first();
 
             if ($this->typeResolver->isOfType($item, $typeName, strict: true)) {
-                return Collection::single($item);
+                return $collection->only([0]);
             }
 
             return $this->context->isStrictMode()
@@ -848,7 +946,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      * with getResourceType()/resourceType, and typed model classes annotated
      * with a #[FhirResource(type: '...')] PHP attribute.
      */
-    private function matchesResourceType(mixed $node, string $typeName): bool
+    public function matchesResourceType(mixed $node, string $typeName): bool
     {
         if (is_array($node)) {
             return isset($node['resourceType']) && $node['resourceType'] === $typeName;

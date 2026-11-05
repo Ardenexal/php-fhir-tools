@@ -76,11 +76,11 @@ class OfTypeFunction extends AbstractFunction
         // Filter input items by type using the type resolver
         $typeResolver = $evaluator?->getTypeResolver();
 
-        $items = [];
-        foreach ($input as $item) {
+        $indexes = [];
+        foreach ($input as $index => $item) {
             if ($typeResolver !== null) {
                 if ($typeResolver->isOfType($item, $typeName, strict: true)) {
-                    $items[] = $item;
+                    $indexes[] = $index;
                 }
             } else {
                 // Fallback: object class name matching only
@@ -88,13 +88,13 @@ class OfTypeFunction extends AbstractFunction
                     $className = get_class($item);
                     $shortName = substr($className, strrpos($className, '\\') + 1);
                     if ($shortName === $typeName || $className === $typeName) {
-                        $items[] = $item;
+                        $indexes[] = $index;
                     }
                 }
             }
         }
 
-        return Collection::from($items);
+        return $input->only($indexes);
     }
 
     /**

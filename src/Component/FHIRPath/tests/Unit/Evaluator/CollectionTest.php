@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit\Evaluator;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleIndex;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use PHPUnit\Framework\TestCase;
 
@@ -181,5 +183,119 @@ final class CollectionTest extends TestCase
         }
 
         self::assertSame(['a', 'b', 'c'], $items);
+    }
+
+    public function testItemsHaveNoScopeByDefault(): void
+    {
+        $collection = Collection::from(['a', 'b']);
+
+        self::assertNull($collection->scopeAt(0));
+        self::assertSame([], $collection->getScopes());
+    }
+
+    public function testWithScopeAppliesToEveryItem(): void
+    {
+        $scope      = new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0');
+        $collection = Collection::from(['a', 'b'])->withScope($scope);
+
+        self::assertSame($scope, $collection->scopeAt(0));
+        self::assertSame($scope, $collection->scopeAt(1));
+        self::assertSame(['a', 'b'], $collection->toArray());
+    }
+
+    public function testWithNullScopeLeavesTheCollectionAsItIs(): void
+    {
+        $collection = Collection::from(['a']);
+
+        self::assertSame($collection, $collection->withScope(null));
+    }
+
+    public function testWithScopeOnAnEmptyCollectionAddsNothing(): void
+    {
+        self::assertSame([], Collection::empty()->withScope(new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0'))->getScopes());
+    }
+
+    public function testOnlySelectsItemsAndRekeysTheirScopes(): void
+    {
+        $first      = new BundleEntryScope(new BundleIndex('bundle'), 'first', '0');
+        $last       = new BundleEntryScope(new BundleIndex('bundle'), 'last', '0');
+        $collection = Collection::from(['a', 'b', 'c'])->withScopes([0 => $first, 2 => $last]);
+
+        $selected = $collection->only([2, 1, 0]);
+
+        self::assertSame(['c', 'b', 'a'], $selected->toArray());
+        self::assertSame($last, $selected->scopeAt(0));
+        self::assertNull($selected->scopeAt(1));
+        self::assertSame($first, $selected->scopeAt(2));
+    }
+
+    public function testOnlyReturnsAnOrderedCollection(): void
+    {
+        // where() and friends have always handed back an ordered collection from Collection::from(),
+        // which is what the strict-mode ordering guards on skip(), tail() and take() see.
+        self::assertTrue(Collection::unordered(['a', 'b'])->only([0])->isOrdered());
+    }
+
+    public function testMappingAndFilteringDropScopes(): void
+    {
+        $collection = Collection::from(['a', 'b'])->withScope(new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0'));
+
+        self::assertSame([], $collection->map(static fn (mixed $item): mixed => $item)->getScopes());
+        self::assertSame([], $collection->filter(static fn (mixed $item): bool => true)->getScopes());
+    }
+
+    public function testConcatKeepsTheScopesOfBothSides(): void
+    {
+        $left  = new BundleEntryScope(new BundleIndex('bundle'), 'left', '0');
+        $right = new BundleEntryScope(new BundleIndex('bundle'), 'right', '1');
+
+        $combined = Collection::single('a')->withScope($left)->concat(Collection::single('b')->withScope($right));
+
+        self::assertSame($left, $combined->scopeAt(0));
+        self::assertSame($right, $combined->scopeAt(1));
+    }
+
+    public function testUnionKeepsAScopeOnItemsFromOneOrigin(): void
+    {
+        $scope = new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0');
+
+        $union = Collection::from(['a', 'a'])->withScope($scope)->union(Collection::single('b'));
+
+        self::assertSame(['a', 'b'], $union->toArray());
+        self::assertSame($scope, $union->scopeAt(0));
+        self::assertNull($union->scopeAt(1));
+    }
+
+    public function testUnionMergesTheOriginsOfEqualItems(): void
+    {
+        $left  = new BundleEntryScope(new BundleIndex('bundle'), 'left', '0');
+        $right = new BundleEntryScope(new BundleIndex('bundle'), 'right', '1');
+
+        $union = Collection::single('a')->withScope($left)->union(Collection::single('a')->withScope($right));
+
+        self::assertCount(1, $union);
+        self::assertSame([$left, $right], $union->scopeAt(0)?->origins);
+    }
+
+    public function testIntersectMergesTheOriginsOfEqualItems(): void
+    {
+        $left  = new BundleEntryScope(new BundleIndex('bundle'), 'left', '0');
+        $right = new BundleEntryScope(new BundleIndex('bundle'), 'right', '1');
+
+        $both = Collection::from(['a', 'c'])->withScope($left)->intersect(Collection::from(['a', 'b'])->withScope($right));
+
+        self::assertSame(['a'], $both->toArray());
+        self::assertSame([$left, $right], $both->scopeAt(0)?->origins);
+    }
+
+    public function testSoleScopeIsOnlyAnsweredWhenEveryItemSharesOne(): void
+    {
+        $first  = new BundleEntryScope(new BundleIndex('bundle'), 'first', '0');
+        $second = new BundleEntryScope(new BundleIndex('bundle'), 'second', '1');
+
+        self::assertSame($first, Collection::from(['a', 'b'])->withScope($first)->soleScope());
+        self::assertNull(Collection::from(['a', 'b'])->withScopes([0 => $first, 1 => $second])->soleScope());
+        self::assertNull(Collection::from(['a', 'b'])->withScopes([0 => $first])->soleScope());
+        self::assertNull(Collection::from(['a'])->soleScope());
     }
 }

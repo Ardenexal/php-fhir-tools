@@ -15,22 +15,23 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 final class EvaluationContext
 {
     /**
-     * @param array<string, mixed> $variables         Variable storage ($this, $index, $total)
-     * @param array<string, mixed> $externalConstants External constants (%)
-     * @param string|null          $fhirVersion       Optional FHIR version hint, e.g. 'R4', 'R4B', 'R5'
-     * @param Collection|null      $collectionInput   set by visitMemberAccess when calling a function so that
-     *                                                visitFunctionCall receives the full collection as input
-     *                                                instead of a per-item single-item collection
-     * @param bool                 $strictMode        When true, runtime semantic validation is enabled
-     * @param mixed                $containerResource The resource that CONTAINS $rootResource, set only when
-     *                                                $rootResource is a contained resource. FHIR defines
-     *                                                `%rootResource` as "the container resource for the resource
-     *                                                that contains the original node", which differs from
-     *                                                `%resource` exactly one level: inside `Patient.contained[0]`,
-     *                                                `%resource` is the contained resource and `%rootResource` is
-     *                                                the Patient. Leave null and `%rootResource` falls back to
-     *                                                $rootResource, which is correct whenever the node is not
-     *                                                inside a contained resource.
+     * @param array<string, mixed>  $variables         Variable storage ($this, $index, $total)
+     * @param array<string, mixed>  $externalConstants External constants (%)
+     * @param string|null           $fhirVersion       Optional FHIR version hint, e.g. 'R4', 'R4B', 'R5'
+     * @param Collection|null       $collectionInput   set by visitMemberAccess when calling a function so that
+     *                                                 visitFunctionCall receives the full collection as input
+     *                                                 instead of a per-item single-item collection
+     * @param bool                  $strictMode        When true, runtime semantic validation is enabled
+     * @param mixed                 $containerResource The resource that CONTAINS $rootResource, set only when
+     *                                                 $rootResource is a contained resource. FHIR defines
+     *                                                 `%rootResource` as "the container resource for the resource
+     *                                                 that contains the original node", which differs from
+     *                                                 `%resource` exactly one level: inside `Patient.contained[0]`,
+     *                                                 `%resource` is the contained resource and `%rootResource` is
+     *                                                 the Patient. Leave null and `%rootResource` falls back to
+     *                                                 $rootResource, which is correct whenever the node is not
+     *                                                 inside a contained resource.
+     * @param BundleEntryScope|null $bundleEntryScope  The Bundle entry the current node was navigated out of
      */
     public function __construct(
         private mixed $rootResource = null,
@@ -42,6 +43,7 @@ final class EvaluationContext
         private ?Collection $collectionInput = null,
         private bool $strictMode = false,
         private mixed $containerResource = null,
+        private ?BundleEntryScope $bundleEntryScope = null,
     ) {
     }
 
@@ -132,6 +134,7 @@ final class EvaluationContext
             $this->fhirVersion,
             $input,
             $this->strictMode,
+            bundleEntryScope: $this->bundleEntryScope,
         );
     }
 
@@ -166,6 +169,30 @@ final class EvaluationContext
     }
 
     /**
+     * Get the Bundle entry the current node was navigated out of, if any.
+     */
+    public function getBundleEntryScope(): ?BundleEntryScope
+    {
+        return $this->bundleEntryScope;
+    }
+
+    /**
+     * Return an immutable copy of this context whose current node belongs to the given Bundle entry.
+     */
+    public function withBundleEntryScope(?BundleEntryScope $scope): self
+    {
+        // Runs for every item the evaluator iterates, and outside a Bundle nothing ever changes.
+        if ($scope === $this->bundleEntryScope) {
+            return $this;
+        }
+
+        $clone                   = clone $this;
+        $clone->bundleEntryScope = $scope;
+
+        return $clone;
+    }
+
+    /**
      * Get the current evaluation node
      */
     public function getCurrentNode(): mixed
@@ -187,6 +214,7 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
+            bundleEntryScope: $this->bundleEntryScope,
         );
     }
 
@@ -239,6 +267,7 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
+            bundleEntryScope: $this->bundleEntryScope,
         );
     }
 
@@ -283,6 +312,7 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
+            bundleEntryScope: $this->bundleEntryScope,
         );
     }
 
@@ -305,6 +335,7 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
+            bundleEntryScope: $this->bundleEntryScope,
         );
     }
 }

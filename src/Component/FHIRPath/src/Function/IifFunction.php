@@ -41,7 +41,7 @@ class IifFunction extends AbstractFunction
         // When input has a single item, expose it as $this and as the current node so that
         // condition/branches can reference $this to mean the iif's focus (e.g. $this = 'context').
         $evalContext = !$input->isEmpty()
-            ? $context->withCurrentNode($input->first())->withVariable('this', $input->first())
+            ? $context->withCurrentNode($input->first())->withBundleEntryScope($input->scopeAt(0))->withVariable('this', $input->first())
             : $context;
 
         // Evaluate condition

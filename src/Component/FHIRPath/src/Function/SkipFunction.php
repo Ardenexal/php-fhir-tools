@@ -52,16 +52,13 @@ final class SkipFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $items = [];
-        $count = 0;
-        foreach ($input as $item) {
-            if ($count < $num) {
-                ++$count;
-                continue;
+        $indexes = [];
+        foreach ($input as $index => $item) {
+            if ($index >= $num) {
+                $indexes[] = $index;
             }
-            $items[] = $item;
         }
 
-        return Collection::from($items);
+        return $input->only($indexes);
     }
 }

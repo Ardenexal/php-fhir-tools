@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit\Evaluator;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleIndex;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use PHPUnit\Framework\TestCase;
 
@@ -101,5 +104,34 @@ final class EvaluationContextTest extends TestCase
         self::assertSame($item, $newContext->getVariable('this'));
         self::assertSame(0, $newContext->getVariable('index'));
         self::assertSame(5, $newContext->getVariable('total'));
+    }
+
+    public function testBundleEntryScopeIsAbsentByDefault(): void
+    {
+        self::assertNull((new EvaluationContext())->getBundleEntryScope());
+    }
+
+    public function testWithBundleEntryScopeDoesNotChangeTheOriginal(): void
+    {
+        $scope   = new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0');
+        $context = new EvaluationContext();
+
+        self::assertSame($scope, $context->withBundleEntryScope($scope)->getBundleEntryScope());
+        self::assertNull($context->getBundleEntryScope());
+    }
+
+    public function testEveryDerivedContextKeepsTheBundleEntryScope(): void
+    {
+        // Most of these rebuild the context field by field, so a missed argument loses it silently.
+        $scope   = new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0');
+        $context = (new EvaluationContext())->withBundleEntryScope($scope);
+
+        self::assertSame($scope, $context->withCollectionInput(Collection::empty())->getBundleEntryScope());
+        self::assertSame($scope, $context->withFhirVersion('R4')->getBundleEntryScope());
+        self::assertSame($scope, $context->withStrictMode(true)->getBundleEntryScope());
+        self::assertSame($scope, $context->withCurrentNode('node')->getBundleEntryScope());
+        self::assertSame($scope, $context->withVariable('name', 'value')->getBundleEntryScope());
+        self::assertSame($scope, $context->withExternalConstant('name', 'value')->getBundleEntryScope());
+        self::assertSame($scope, $context->withIterationVariables('item', 0, 1)->getBundleEntryScope());
     }
 }

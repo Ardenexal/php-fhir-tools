@@ -39,16 +39,6 @@ class CombineFunction extends AbstractFunction
         $otherResult = $evaluator->evaluateWithContext($otherExpr, $context);
 
         // Combine keeps all items including duplicates
-        $items = [];
-
-        foreach ($input as $item) {
-            $items[] = $item;
-        }
-
-        foreach ($otherResult as $item) {
-            $items[] = $item;
-        }
-
-        return Collection::from($items);
+        return $input->concat($otherResult);
     }
 }

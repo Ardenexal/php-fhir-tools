@@ -62,9 +62,10 @@ final class SortFunction extends AbstractFunction
         }
 
         // Sort using compareValues for consistent type handling
-        usort($items, fn ($a, $b) => $this->compareValues($a, $b));
+        $indices = array_keys($items);
+        usort($indices, fn (int $a, int $b): int => $this->compareValues($items[$a], $items[$b]));
 
-        return Collection::from($items);
+        return $input->only($indices);
     }
 
     /**
@@ -104,6 +105,7 @@ final class SortFunction extends AbstractFunction
         foreach ($items as $index => $item) {
             $itemContext = $context
                 ->withCurrentNode($item)
+                ->withBundleEntryScope($input->scopeAt($index))
                 ->withIterationVariables($item, $index, $input->count());
 
             $keyValues[$index] = [];
@@ -157,13 +159,7 @@ final class SortFunction extends AbstractFunction
         $indices = array_keys($items);
         usort($indices, $comparator);
 
-        // Build sorted array
-        $sorted = [];
-        foreach ($indices as $index) {
-            $sorted[] = $items[$index];
-        }
-
-        return Collection::from($sorted);
+        return $input->only($indices);
     }
 
     /**

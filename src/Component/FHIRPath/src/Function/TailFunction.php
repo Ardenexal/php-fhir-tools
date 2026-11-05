@@ -32,16 +32,13 @@ final class TailFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $items = [];
-        $first = true;
-        foreach ($input as $item) {
-            if ($first) {
-                $first = false;
-                continue;
+        $indexes = [];
+        foreach ($input as $index => $item) {
+            if ($index > 0) {
+                $indexes[] = $index;
             }
-            $items[] = $item;
         }
 
-        return Collection::from($items);
+        return $input->only($indexes);
     }
 }

@@ -17,15 +17,18 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 final readonly class Collection implements \IteratorAggregate, \Countable
 {
     /**
-     * @param array<int, mixed> $items
-     * @param bool              $ordered      Whether items have a defined order (false for children(), descendants(), etc.)
-     * @param string|null       $declaredType FHIR type name declared by an `as` cast (e.g. 'Period'),
-     *                                        carried on empty collections so strict-mode property checks work.
+     * @param array<int, mixed>            $items
+     * @param bool                         $ordered      Whether items have a defined order (false for children(), descendants(), etc.)
+     * @param string|null                  $declaredType FHIR type name declared by an `as` cast (e.g. 'Period'),
+     *                                                   carried on empty collections so strict-mode property checks work.
+     * @param array<int, BundleEntryScope> $scopes       The Bundle entry each item was navigated out of, keyed by
+     *                                                   item index. map() and filter() drop these, because they can change an item's meaning.
      */
     private function __construct(
         private array $items,
         private bool $ordered = true,
         private ?string $declaredType = null,
+        private array $scopes = [],
     ) {
     }
 
@@ -142,6 +145,99 @@ final readonly class Collection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Get the Bundle entry the item at the given index was navigated out of.
+     */
+    public function scopeAt(int $index): ?BundleEntryScope
+    {
+        return $this->scopes[$index] ?? null;
+    }
+
+    /**
+     * Get the Bundle entries of the items that have one, keyed by item index.
+     *
+     * @return array<int, BundleEntryScope>
+     */
+    public function getScopes(): array
+    {
+        return $this->scopes;
+    }
+
+    /**
+     * Return a copy with the given Bundle entries, keyed by item index.
+     *
+     * @param array<int, BundleEntryScope> $scopes
+     */
+    public function withScopes(array $scopes): self
+    {
+        // Runs on every member access, and outside a Bundle there is nothing to add.
+        if ($scopes === [] && $this->scopes === []) {
+            return $this;
+        }
+
+        return new self($this->items, $this->ordered, $this->declaredType, $scopes);
+    }
+
+    /**
+     * Return a copy with every item in the given Bundle entry. Null leaves the collection as it is.
+     */
+    public function withScope(?BundleEntryScope $scope): self
+    {
+        if ($scope === null || $this->items === []) {
+            return $this;
+        }
+
+        return $this->withScopes(array_fill(0, count($this->items), $scope));
+    }
+
+    /**
+     * Get the one Bundle entry every item came from, if they all came from the same one.
+     */
+    public function soleScope(): ?BundleEntryScope
+    {
+        if ($this->items === [] || count($this->scopes) !== count($this->items)) {
+            return null;
+        }
+
+        $sole = $this->scopes[0] ?? null;
+        foreach ($this->scopes as $scope) {
+            if ($scope !== $sole && $scope->path !== $sole?->path) {
+                return null;
+            }
+        }
+
+        return $sole;
+    }
+
+    /**
+     * Return the items at the given indexes, each keeping its Bundle entry.
+     *
+     * The result is ordered, as it is from Collection::from(), which this stands in for in the
+     * functions that select from their input.
+     *
+     * @param list<int> $indexes
+     */
+    public function only(array $indexes): self
+    {
+        $items = [];
+        foreach ($indexes as $index) {
+            $items[] = $this->items[$index];
+        }
+
+        if ($this->scopes === []) {
+            return new self($items);
+        }
+
+        $scopes = [];
+        foreach ($indexes as $position => $index) {
+            if (isset($this->scopes[$index])) {
+                $scopes[$position] = $this->scopes[$index];
+            }
+        }
+
+        return new self($items, true, null, $scopes);
+    }
+
+    /**
      * Get an item by index, or null if out of bounds
      */
     public function get(int $index): mixed
@@ -191,22 +287,24 @@ final readonly class Collection implements \IteratorAggregate, \Countable
         // Per FHIRPath spec: union returns the combined collection with ALL duplicates removed
         // (not just cross-collection duplicates). Start with an empty result and add items
         // from both sides, skipping any that are already present.
-        $result = [];
+        $result  = [];
+        $origins = [];
+        $tracked = $this->scopes !== [] || $other->scopes !== [];
 
-        foreach (array_merge($this->items, $other->items) as $item) {
-            $isDuplicate = false;
-            foreach ($result as $existing) {
-                if ($existing === $item) {
-                    $isDuplicate = true;
-                    break;
+        foreach ([$this, $other] as $side) {
+            foreach ($side->items as $index => $item) {
+                $position = array_search($item, $result, true);
+                if ($position === false) {
+                    $position = count($result);
+                    $result[] = $item;
                 }
-            }
-            if (!$isDuplicate) {
-                $result[] = $item;
+                if ($tracked) {
+                    $origins[$position][] = $side->scopes[$index] ?? null;
+                }
             }
         }
 
-        return new self($result);
+        return new self($result, true, null, self::mergeOrigins($origins));
     }
 
     /**
@@ -214,35 +312,51 @@ final readonly class Collection implements \IteratorAggregate, \Countable
      */
     public function intersect(self $other): self
     {
-        $result = [];
+        $result  = [];
+        $origins = [];
+        $tracked = $this->scopes !== [] || $other->scopes !== [];
 
-        foreach ($this->items as $item) {
-            $inOther = false;
-            foreach ($other->items as $otherItem) {
-                if ($item === $otherItem) {
-                    $inOther = true;
-                    break;
-                }
-            }
-
-            if (!$inOther) {
+        foreach ($this->items as $index => $item) {
+            $matches = array_keys($other->items, $item, true);
+            if ($matches === []) {
                 continue;
             }
 
-            $alreadyIn = false;
-            foreach ($result as $existing) {
-                if ($item === $existing) {
-                    $alreadyIn = true;
-                    break;
-                }
+            $position = array_search($item, $result, true);
+            if ($position === false) {
+                $position = count($result);
+                $result[] = $item;
             }
 
-            if (!$alreadyIn) {
-                $result[] = $item;
+            if ($tracked) {
+                $origins[$position][] = $this->scopes[$index] ?? null;
+                foreach ($matches as $match) {
+                    $origins[$position][] = $other->scopes[$match] ?? null;
+                }
             }
         }
 
-        return new self($result);
+        return new self($result, true, null, self::mergeOrigins($origins));
+    }
+
+    /**
+     * Merge the origins gathered for each item of a deduplicated collection.
+     *
+     * @param array<int, list<BundleEntryScope|null>> $origins
+     *
+     * @return array<int, BundleEntryScope>
+     */
+    public static function mergeOrigins(array $origins): array
+    {
+        $scopes = [];
+        foreach ($origins as $position => $itemOrigins) {
+            $scope = BundleEntryScope::merge($itemOrigins);
+            if ($scope !== null) {
+                $scopes[$position] = $scope;
+            }
+        }
+
+        return $scopes;
     }
 
     /**
@@ -250,7 +364,12 @@ final readonly class Collection implements \IteratorAggregate, \Countable
      */
     public function concat(self $other): self
     {
-        return new self([...$this->items, ...$other->items]);
+        $scopes = $this->scopes;
+        foreach ($other->scopes as $index => $scope) {
+            $scopes[count($this->items) + $index] = $scope;
+        }
+
+        return new self([...$this->items, ...$other->items], true, null, $scopes);
     }
 
     /**
