@@ -80,14 +80,14 @@ $fhirPath->evaluate('Bundle.entry[1].resource.subject.resolve().name.family', $b
   gives it no meaning.
 * **Knowing the referring entry.** It travels with each value through navigation, indexers and
   every function that returns its input or something derived from it, including `where()`,
-  `select()`, `distinct()`, `union()`, `children()` and `descendants()`.
+  `distinct()`, `union()`, `children()`, `descendants()` and `toString()`.
 * **Equal values merged from different entries**, for example by `distinct()`, resolve only if every
   entry reaches the same resource. So `Bundle.entry.resource.subject.distinct().resolve()` works when
   they all mean one patient, and omits the value when the same `Patient/1` means different patients.
-* **The result of `aggregate()`** over values from a Bundle does not resolve, because it may be its
-  `init` value or come from any item.
-* **Values with no known entry** are literals, `$total`, descendants of a root Bundle, and anything in
-  an evaluation that starts inside an entry with the Bundle supplied as its root. A relative or fragment reference among them resolves only if every entry holding that value
+* **Values with no known entry** are literals, `$total`, the result of `aggregate()`, descendants of a
+  root Bundle, and anything in an evaluation that starts inside an entry with the Bundle supplied as
+  its root. `iif()`, `select()` and `repeat()` keep whatever origin their expression's value has, so a
+  literal they return has none. A relative or fragment reference among them resolves only if every entry holding that value
   agrees on the target. If the root Bundle holds a nested Bundle anywhere, none of them is looked up,
   because they may belong to that Bundle, and no HTTP request is made.
 * **Chained references.** A resolved resource keeps the entry it was found in, so
