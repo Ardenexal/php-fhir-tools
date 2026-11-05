@@ -1210,4 +1210,60 @@ final class ResolveBundleReferenceTest extends TestCase
 
         self::assertSame([], $this->evaluate($expression, $this->twoBaseBundle($asModel))->toArray());
     }
+
+    /**
+     * Two Bundles at the same position, because neither sits in a Bundle entry.
+     *
+     * @param list<array<string, mixed>> $first
+     * @param list<array<string, mixed>> $second
+     */
+    private function parameters(array $first, array $second, bool $asModel): object|array
+    {
+        $bundle     = static fn (array $entries): array => ['resourceType' => 'Bundle', 'type' => 'collection', 'entry' => $entries];
+        $parameters = ['resourceType' => 'Parameters', 'parameter' => [
+            ['name' => 'first', 'resource' => $bundle($first)],
+            ['name' => 'second', 'resource' => $bundle($second)],
+        ]];
+
+        return $asModel ? FHIRSerializationService::createDefault(FhirVersion::R4)->deserialize((string) json_encode($parameters)) : $parameters;
+    }
+
+    #[DataProvider('shapes')]
+    public function testBundlesAtTheSamePositionAreDifferentOrigins(bool $asModel): void
+    {
+        // Two origins, so no one entry can be claimed for what getValue() derives from them.
+        $parameters = $this->parameters(
+            [$this->patientEntry(self::URN_PATIENT, 'One'), $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT)],
+            [$this->patientEntry(self::URN_PATIENT, 'Two'), $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT)],
+            $asModel,
+        );
+        $path = 'Parameters.parameter.resource.entry.resource.subject';
+
+        self::assertSame(['One', 'Two'], $this->evaluate("{$path}.resolve().name.family", $parameters)->toArray());
+        self::assertSame([], $this->evaluate("{$path}.reference.getValue().resolve().name.family", $parameters)->toArray());
+    }
+
+    public function testMergedValueIsAskedInEachBundleAtTheSamePosition(): void
+    {
+        $parameters = $this->parameters(
+            [$this->patientEntry('http://a.example/fhir/Patient/p1', 'FromA'), $this->requestEntry('http://a.example/fhir/ServiceRequest/s', 'Patient/p1')],
+            [$this->patientEntry('http://b.example/fhir/Patient/p1', 'FromB'), $this->requestEntry('http://b.example/fhir/ServiceRequest/s', 'Patient/p1')],
+            false,
+        );
+
+        $family = $this->evaluate('Parameters.parameter.resource.entry.resource.subject.distinct().resolve().name.family', $parameters);
+
+        self::assertSame([], $family->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testResolveInsideWhereCanNavigateBackIntoTheBundle(bool $asModel): void
+    {
+        // Each pass navigates back into the same Bundle, which needs scanning only once.
+        $bundle = $this->twoBaseBundle($asModel);
+
+        $found = $this->evaluate("Bundle.entry.resource.where(%resource.entry[3].resource.subject.resolve().name.family = 'FromB').count()", $bundle);
+
+        self::assertSame([4], $found->toArray());
+    }
 }

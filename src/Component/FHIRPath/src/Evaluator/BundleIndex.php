@@ -7,10 +7,10 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 /**
  * A Bundle and its lazily built lookups, so resolving many references scans the entries only once.
  *
- * Every {@see BundleEntryScope} from one navigation into `Bundle.entry` shares one of these, and
- * {@see FHIRPathEvaluator::getRootBundleIndex()} holds one for a root Bundle, both only until the
- * evaluation ends. Nothing may hold it longer, because model properties are mutable and a Bundle changed
- * between evaluations would then be answered from a stale index.
+ * {@see FHIRPathEvaluator::getBundleIndex()} keeps one per Bundle until the evaluation ends, so its id
+ * tells Bundles apart however often evaluation navigates back into one. Nothing may hold it longer,
+ * because model properties are mutable and a Bundle changed between evaluations would then be answered
+ * from a stale index.
  *
  * @author FHIR Tools Contributors
  */
@@ -26,11 +26,11 @@ final class BundleIndex
     public bool $containsNestedBundle = false;
 
     /**
-     * @param string $path Position of the entry holding this Bundle, empty when it is not in one
+     * @param string $id Tells this Bundle apart from the others in the evaluation
      */
     public function __construct(
         public readonly mixed $bundle,
-        private readonly string $path = '',
+        private readonly string $id = '',
     ) {
     }
 
@@ -39,6 +39,6 @@ final class BundleIndex
      */
     public function scopeFor(int $position, mixed $entry): BundleEntryScope
     {
-        return new BundleEntryScope($this, $entry, $this->path === '' ? (string) $position : $this->path . '.' . $position);
+        return new BundleEntryScope($this, $entry, $this->id . '/' . $position);
     }
 }

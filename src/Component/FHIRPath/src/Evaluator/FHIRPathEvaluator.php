@@ -73,10 +73,14 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private ComparisonService $comparisonService;
 
     /**
-     * The root resource's index for the evaluation in progress, so that every resolve() call in it
-     * shares one scan of the Bundle. Cleared when the outermost evaluate() returns.
+     * The index of each Bundle met by the evaluation in progress, so that every resolve() call shares
+     * one scan of it and its id stays the same. Cleared when the outermost evaluate() returns.
+     *
+     * @var list<BundleIndex>
      */
-    private ?BundleIndex $rootBundleIndex = null;
+    private array $bundleIndexes = [];
+
+    private int $nextBundleId = 0;
 
     /**
      * How many evaluate() calls are in progress; functions such as skip() call it re-entrantly.
@@ -338,7 +342,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             $result = $expression->accept($this);
         } finally {
             if (--$this->evaluationDepth === 0) {
-                $this->rootBundleIndex = null;
+                $this->bundleIndexes = [];
             }
         }
 
@@ -358,26 +362,36 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
-     * Get the index of the root resource when it is a Bundle, shared across the evaluation in progress.
-     *
-     * Values that evaluation lost the Bundle entry of are looked up here. Outside an evaluation the
-     * index is not kept, because nothing would clear it and the Bundle could change before its next use.
+     * Get the index of the root resource when it is a Bundle. Values with no known Bundle entry are
+     * looked up here.
      */
     public function getRootBundleIndex(mixed $root): ?BundleIndex
     {
-        if (!$this->matchesResourceType($root, 'Bundle')) {
-            return null;
+        return $this->matchesResourceType($root, 'Bundle') ? $this->getBundleIndex($root) : null;
+    }
+
+    /**
+     * Get the index of a Bundle, shared across the evaluation in progress.
+     *
+     * Bundles with equal values share one, because they give equal answers. Outside an evaluation the
+     * index is not kept, because nothing would clear it and the Bundle could change before its next use.
+     */
+    public function getBundleIndex(mixed $bundle): BundleIndex
+    {
+        if ($this->evaluationDepth > 0) {
+            foreach ($this->bundleIndexes as $index) {
+                if ($index->bundle === $bundle) {
+                    return $index;
+                }
+            }
         }
 
-        if ($this->evaluationDepth === 0) {
-            return new BundleIndex($root);
+        $index = new BundleIndex($bundle, (string) $this->nextBundleId++);
+        if ($this->evaluationDepth > 0) {
+            $this->bundleIndexes[] = $index;
         }
 
-        if ($this->rootBundleIndex === null || $this->rootBundleIndex->bundle !== $root) {
-            $this->rootBundleIndex = new BundleIndex($root);
-        }
-
-        return $this->rootBundleIndex;
+        return $index;
     }
 
     /**
@@ -495,7 +509,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Navigating into Bundle.entry is where a value's Bundle entry starts; a nested Bundle
         // replaces the outer one. Everything navigated from there inherits it.
         if ($name === 'entry' && $this->matchesResourceType($currentNode, 'Bundle')) {
-            $bundleIndex = new BundleIndex($currentNode, $this->context->getBundleEntryScope()->path ?? '');
+            $bundleIndex = $this->getBundleIndex($currentNode);
             $scopes      = [];
             foreach ($result as $index => $entry) {
                 $scopes[$index] = $bundleIndex->scopeFor($index, $entry);

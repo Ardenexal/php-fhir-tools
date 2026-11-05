@@ -13,9 +13,9 @@ use PHPUnit\Framework\TestCase;
  */
 final class BundleEntryScopeTest extends TestCase
 {
-    private function scope(string $path, string $bundle = 'bundle'): BundleEntryScope
+    private function scope(string $path): BundleEntryScope
     {
-        return new BundleEntryScope(new BundleIndex($bundle), 'entry', $path);
+        return new BundleEntryScope(new BundleIndex('bundle'), 'entry', $path);
     }
 
     public function testMergingOneOriginGivesThatOrigin(): void
@@ -43,14 +43,6 @@ final class BundleEntryScopeTest extends TestCase
         $scope = $this->scope('0');
 
         self::assertSame([$scope, null], BundleEntryScope::merge([$scope, null])?->origins);
-    }
-
-    public function testTheSamePathInADifferentBundleIsADifferentOrigin(): void
-    {
-        $first  = $this->scope('0', 'one');
-        $second = $this->scope('0', 'two');
-
-        self::assertSame([$first, $second], BundleEntryScope::merge([$first, $second])?->origins);
     }
 
     public function testMergingFlattensEarlierMerges(): void

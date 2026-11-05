@@ -12,8 +12,8 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
  * from, because PHP arrays have no identity and two entries can hold identical references, so
  * {@see Collection} carries this alongside its items and resolve() reads it from there.
  *
- * $path names the entry by position, such as `1.0` for the first entry of the Bundle in entry 1. It
- * stays the same however often evaluation navigates back to that entry, and costs nothing to compare.
+ * $path names the entry by its Bundle's id and its position. It stays the same however often evaluation
+ * navigates back to that entry, and costs nothing to compare.
  *
  * Equal values from different entries can merge into one item, for example in distinct(). A merged
  * scope remembers every origin in $origins, because the item means something in each of them.
@@ -56,12 +56,7 @@ final readonly class BundleEntryScope
             }
 
             foreach ($scope === null ? [null] : ($scope->origins ?? [$scope]) as $origin) {
-                $key = $origin->path ?? '';
-                // A path is only unique within one root, and Parameters can hold several Bundles.
-                while (array_key_exists($key, $origins) && !self::isSameOrigin($origins[$key], $origin)) {
-                    $key .= '~';
-                }
-                $origins[$key] = $origin;
+                $origins[$origin->path ?? ''] = $origin;
             }
         }
 
@@ -70,14 +65,5 @@ final readonly class BundleEntryScope
         }
 
         return new self(new BundleIndex([]), null, 'merged:' . md5(implode('|', array_keys($origins))), array_values($origins));
-    }
-
-    private static function isSameOrigin(?self $first, ?self $second): bool
-    {
-        if ($first === null || $second === null) {
-            return $first === $second;
-        }
-
-        return $first->path === $second->path && $first->index->bundle === $second->index->bundle;
     }
 }
