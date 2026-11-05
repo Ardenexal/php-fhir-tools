@@ -682,4 +682,24 @@ final class ResolveBundleReferenceTest extends TestCase
         self::assertSame([false], $this->evaluate('(1|9).all((1|2|3) contains $this)', $patient)->toArray());
         self::assertSame(['A', 'B'], $this->evaluate('name.repeat($this.family)', $patient)->toArray());
     }
+
+    #[DataProvider('shapes')]
+    public function testAccumulatorIsNotResolvedAgainstTheCurrentEntry(bool $asModel): void
+    {
+        // $total holds entry 1's reference while entry 3 is the focus. Its origin is not tracked, so
+        // the entries disagreeing must omit it rather than answer with entry 3's base.
+        $expression = 'Bundle.entry.resource.subject.aggregate(iif($index = 0, $this, $total.resolve().name.family))';
+
+        self::assertSame([], $this->evaluate($expression, $this->twoBaseBundle($asModel))->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testThisResolvesInTheEntryOfTheItemItNames(bool $asModel): void
+    {
+        $bundle = $this->twoBaseBundle($asModel);
+
+        self::assertSame([true], $this->evaluate("Bundle.entry.resource.subject.exists(\$this.resolve().name.family = 'FromB')", $bundle)->toArray());
+        self::assertSame([false], $this->evaluate("Bundle.entry.resource.subject.first().exists(\$this.resolve().name.family = 'FromB')", $bundle)->toArray());
+        self::assertSame([true], $this->evaluate('Bundle.entry.resource.subject.all($this.resolve().exists())', $bundle)->toArray());
+    }
 }

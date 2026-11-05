@@ -454,7 +454,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 // Return the value as-is, including null: a variable explicitly set to null
                 // (e.g. $this for a null FHIR primitive element in select()) is still a valid
                 // node that hasValue() should evaluate to false for.
-                return Collection::single($value)->withScope($this->context->getBundleEntryScope());
+                $variable = Collection::single($value);
+
+                // The scope describes the current node, which is what $this names. It says nothing
+                // about $total, which can hold a value from an earlier item in another entry.
+                return $variableName === 'this' ? $variable->withScope($this->context->getBundleEntryScope()) : $variable;
             }
 
             return Collection::empty();
