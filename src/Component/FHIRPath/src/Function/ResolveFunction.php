@@ -26,9 +26,21 @@ use Psr\Http\Message\RequestFactoryInterface;
  *  - Either of those behind a FHIR wrapper (StringPrimitive, FHIRTypedCollection, ...)
  *
  * A resolved resource keeps the shape it was found in: a model object when it came from a model's
- * `contained`, a decoded array when it came from an array or over HTTP.
+ * `contained` or `Bundle.entry.resource`, a decoded array when it came from an array or over HTTP.
  *
- * Resolution strategies (in order, mirroring the reference JavaScript engine):
+ * When the root resource is a Bundle, its entries are consulted first, as the spec requires
+ * (https://hl7.org/fhir/R4/bundle.html#references):
+ *
+ *  - Absolute reference (any URI scheme, including `urn:uuid:`): the entry with that `fullUrl`.
+ *  - Relative `Type/id`: applied to the root of the referring entry's RESTful `fullUrl`, then matched
+ *    the same way. Under a non-RESTful `fullUrl` the Bundle gives it no meaning.
+ *  - Version-specific (`.../_history/v`): matched without the version, then on `meta.versionId`.
+ *  - Fragment-only (`#id`): the referring entry's own `contained`; never another entry's.
+ *
+ * Several matches are ambiguous, so the reference is omitted rather than guessed at or fetched. No
+ * match falls through to the strategies below.
+ *
+ * Remaining resolution strategies (in order, mirroring the reference JavaScript engine):
  *
  *  1. Fragment-only (`#id`):
  *       Looks in `rootResource['contained']` for an item with matching `id`.
@@ -65,6 +77,15 @@ use Psr\Http\Message\RequestFactoryInterface;
  */
 final class ResolveFunction extends AbstractFunction
 {
+    /**
+     * The RESTful URL regex from https://hl7.org/fhir/R4/references.html#regex, capturing the root.
+     * The resource type is a shape rather than the spec's per-release list of names, so one
+     * expression serves every FHIR version.
+     */
+    private const RESTFUL_FULL_URL = '#^(https?://(?:[A-Za-z0-9\-\\\\.:%$]*/)+)[A-Z][A-Za-z]+/[A-Za-z0-9\-.]{1,64}(?:/_history/[A-Za-z0-9\-.]{1,64})?$#';
+
+    private const RELATIVE_REFERENCE = '#^[A-Z][A-Za-z]+/[A-Za-z0-9\-.]{1,64}(?:/_history/[A-Za-z0-9\-.]{1,64})?$#';
+
     public function __construct()
     {
         parent::__construct('resolve');
@@ -90,7 +111,8 @@ final class ResolveFunction extends AbstractFunction
         $resolved = [];
         foreach ($input as $item) {
             $resource = $this->resolveItem($item, $context, $fhirServerUrl, $httpClient, $requestFactory);
-            // Model objects are only ever read from `contained`, which holds nothing but resources.
+            // Model objects are only ever read from `contained` and `Bundle.entry.resource`, which
+            // hold nothing but resources.
             if (is_object($resource) || isset($resource['resourceType'])) {
                 $resolved[] = $resource;
             }
@@ -166,6 +188,18 @@ final class ResolveFunction extends AbstractFunction
         $baseUrl  = $hashPos !== false ? substr($url, 0, $hashPos) : $url;
         $fragment = $hashPos !== false ? substr($url, $hashPos + 1) : '';
 
+        $root = $context->getRootResource();
+        if ($context->getEvaluator()?->matchesResourceType($root, 'Bundle') === true) {
+            $matches = $this->resolveInBundle($url, $baseUrl, $fragment, $root, $context);
+            if ($matches !== null) {
+                if (count($matches) !== 1) {
+                    return null;
+                }
+
+                return $baseUrl !== '' && $fragment !== '' ? $this->getContainedResource($matches[0], $fragment, $context) : $matches[0];
+            }
+        }
+
         $resource = null;
 
         if (preg_match('/^https?:\/\//', $baseUrl) === 1) {
@@ -198,7 +232,7 @@ final class ResolveFunction extends AbstractFunction
 
         if ($resource === null && $baseUrl === '' && $fragment !== '') {
             // Fragment-only reference (#id) → search rootResource.contained
-            return $this->getContainedResource($context->getRootResource(), $fragment, $context);
+            return $this->getContainedResource($root, $fragment, $context);
         }
 
         if ($resource !== null && $fragment !== '') {
@@ -207,6 +241,181 @@ final class ResolveFunction extends AbstractFunction
         }
 
         return $resource;
+    }
+
+    /**
+     * Look a reference up among the entries of a Bundle.
+     *
+     * Returns null when the Bundle has no answer, so the other strategies should run. Otherwise
+     * returns what it found, and only a single match is a resolution: an empty or longer list means
+     * the Bundle decided the reference and no other strategy should try.
+     *
+     * @return list<array<array-key,mixed>|object>|null
+     */
+    private function resolveInBundle(string $url, string $baseUrl, string $fragment, mixed $bundle, EvaluationContext $context): ?array
+    {
+        if ($baseUrl === '') {
+            $found = [];
+            foreach ($this->referringEntries($bundle, $url, $context) as $entry) {
+                $contained = $this->getContainedResource($this->readProperty($entry, 'resource'), $fragment, $context);
+                if ($contained !== null && !in_array($contained, $found, true)) {
+                    $found[] = $contained;
+                }
+            }
+
+            return $found;
+        }
+
+        $target = $baseUrl;
+        if (preg_match('/^[A-Za-z][A-Za-z0-9+.\-]*:/', $baseUrl) !== 1) {
+            if (preg_match(self::RELATIVE_REFERENCE, $baseUrl) !== 1) {
+                return null;
+            }
+
+            $targets = [];
+            foreach ($this->referringEntries($bundle, $url, $context) as $entry) {
+                $targets[] = $this->absoluteTarget($baseUrl, $entry, $context);
+            }
+            $targets = array_values(array_unique($targets, SORT_REGULAR));
+
+            if (count($targets) > 1) {
+                return [];
+            }
+
+            $target = $targets[0] ?? null;
+            if ($target === null) {
+                return null;
+            }
+        }
+
+        $matches = $this->entriesWithFullUrl($bundle, $target, $context);
+
+        return $matches === [] ? null : $matches;
+    }
+
+    /**
+     * Make a relative reference absolute against the referring entry's `fullUrl`.
+     *
+     * @return string|null Absolute URL, or null when the `fullUrl` is absent or not RESTful
+     */
+    private function absoluteTarget(string $relative, mixed $entry, EvaluationContext $context): ?string
+    {
+        $fullUrl = $this->readValue($entry, 'fullUrl', $context);
+        if (!is_string($fullUrl) || preg_match(self::RESTFUL_FULL_URL, $fullUrl, $matches) !== 1) {
+            return null;
+        }
+
+        return $matches[1] . $relative;
+    }
+
+    /**
+     * Find the resources of the entries whose `fullUrl` matches, honouring a version in the URL.
+     *
+     * @return list<array<array-key,mixed>|object>
+     */
+    private function entriesWithFullUrl(mixed $bundle, string $target, EvaluationContext $context): array
+    {
+        $version = null;
+        if (preg_match('#^(.+)/_history/([^/]+)$#', $target, $parts) === 1) {
+            [, $target, $version] = $parts;
+        }
+
+        $matches = [];
+        foreach ($this->entries($bundle) as $entry) {
+            $resource = $this->readProperty($entry, 'resource');
+            if ((!is_array($resource) && !is_object($resource)) || $this->readValue($entry, 'fullUrl', $context) !== $target) {
+                continue;
+            }
+
+            if ($version === null || $this->readValue($this->readProperty($resource, 'meta'), 'versionId', $context) === $version) {
+                $matches[] = $resource;
+            }
+        }
+
+        return $matches;
+    }
+
+    /**
+     * Find the entries whose resource holds a Reference with the given value.
+     *
+     * The input to resolve() does not say where it came from, so this is the only way to the
+     * entry that referred. A nested Bundle is skipped, because its references belong to its own entries.
+     *
+     * @return list<mixed>
+     */
+    private function referringEntries(mixed $bundle, string $reference, EvaluationContext $context): array
+    {
+        $found = [];
+        foreach ($this->entries($bundle) as $entry) {
+            $resource = $this->readProperty($entry, 'resource');
+            if ($context->getEvaluator()?->matchesResourceType($resource, 'Bundle') !== true && $this->holdsReference($resource, $reference, $context)) {
+                $found[] = $entry;
+            }
+        }
+
+        return $found;
+    }
+
+    /**
+     * Search a node for a Reference with the given value.
+     */
+    private function holdsReference(mixed $node, string $reference, EvaluationContext $context): bool
+    {
+        if (!is_array($node) && !is_object($node)) {
+            return false;
+        }
+
+        if ($this->readValue($node, 'reference', $context) === $reference) {
+            return true;
+        }
+
+        foreach (is_array($node) ? $node : get_object_vars($node) as $child) {
+            if ($this->holdsReference($child, $reference, $context)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Read `Bundle.entry` as a list, whether or not a lone entry was stored as a list.
+     *
+     * @return array<array-key,mixed>
+     */
+    private function entries(mixed $bundle): array
+    {
+        $entries = $this->readProperty($bundle, 'entry');
+        if (!is_array($entries)) {
+            return [];
+        }
+
+        return array_is_list($entries) ? $entries : [$entries];
+    }
+
+    /**
+     * Read a primitive element as its scalar value, through any FHIR wrapper around it.
+     */
+    private function readValue(mixed $node, string $property, EvaluationContext $context): mixed
+    {
+        $value = $this->readProperty($node, $property);
+        if (is_array($value) && array_key_exists('@value', $value)) {
+            $value = $value['@value'];
+        }
+
+        return $context->normalizeValue($value);
+    }
+
+    /**
+     * Read a named element from an array or an object.
+     */
+    private function readProperty(mixed $node, string $property): mixed
+    {
+        if (is_array($node)) {
+            return $node[$property] ?? null;
+        }
+
+        return is_object($node) ? $this->getObjectProperty($node, $property) : null;
     }
 
     /**

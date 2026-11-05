@@ -96,6 +96,42 @@ final class NestedInvariantCascadeTest extends TestCase
     }
 
     /**
+     * An invariant's resolve() sees the nearest enclosing resource, not the Bundle around it.
+     *
+     * R5 `ctm-1` is `onBehalfOf.exists() implies (member.resolve() is Practitioner)`. The contained
+     * case proves the validator reached the entry and that resolve() works on its model. The sibling
+     * case proves the invariant is bound to the CareTeam: an unresolved member leaves the check
+     * unknown, whereas a root of Bundle would find the Organization and report a violation.
+     */
+    public function testInvariantResolvesContainedResourcesButNotSiblingBundleEntries(): void
+    {
+        $member    = ['resourceType' => 'Organization', 'id' => 'm1'];
+        $careTeam  = static fn (string $reference, array $contained): array => [
+            'resourceType' => 'CareTeam',
+            'contained'    => $contained,
+            'participant'  => [['member' => ['reference' => $reference], 'onBehalfOf' => ['reference' => 'Organization/other']]],
+        ];
+        $bundleKeys = static function(array $entries): array {
+            $json     = json_encode(['resourceType' => 'Bundle', 'type' => 'collection', 'entry' => $entries], JSON_THROW_ON_ERROR);
+            $resource = FHIRSerializationService::createDefault(FhirVersion::R5)->deserialize($json);
+
+            return array_map(
+                static fn (FHIRValidationViolation $v): ?string => $v->invariantKey,
+                OracleValidationServiceFactory::create(FhirVersion::R5)->validate($resource)->errors(),
+            );
+        };
+
+        self::assertContains('ctm-1', $bundleKeys([
+            ['fullUrl' => 'urn:uuid:team', 'resource' => $careTeam('#m1', [$member])],
+        ]));
+
+        self::assertNotContains('ctm-1', $bundleKeys([
+            ['fullUrl' => 'urn:uuid:member', 'resource' => $member],
+            ['fullUrl' => 'urn:uuid:team', 'resource' => $careTeam('urn:uuid:member', [])],
+        ]));
+    }
+
+    /**
      * Reading a declared-but-uninitialized typed property is an Error, not a null.
      *
      * Generated models back choice elements with typed properties carrying no default, so

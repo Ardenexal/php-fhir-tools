@@ -848,7 +848,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      * with getResourceType()/resourceType, and typed model classes annotated
      * with a #[FhirResource(type: '...')] PHP attribute.
      */
-    private function matchesResourceType(mixed $node, string $typeName): bool
+    public function matchesResourceType(mixed $node, string $typeName): bool
     {
         if (is_array($node)) {
             return isset($node['resourceType']) && $node['resourceType'] === $typeName;
