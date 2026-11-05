@@ -82,7 +82,7 @@ final class RepeatFunction extends AbstractFunction
             $nextFrontier = [];
 
             foreach ($frontier as [$item, $scope]) {
-                $itemContext = $context->withCurrentNode($item)->withBundleEntryScope($scope);
+                $itemContext = $context->withCurrentNode($item)->withBundleEntryScope($scope)->withVariable('this', $item);
                 $projected   = $evaluator->evaluateWithContext($projection, $itemContext);
 
                 foreach ($projected as $position => $projectedItem) {

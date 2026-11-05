@@ -669,4 +669,17 @@ final class ResolveBundleReferenceTest extends TestCase
 
         self::assertSame(['Contained'], $this->evaluate('Bundle.entry.resource.subject.distinct().resolve().name.family', $bundle)->toArray());
     }
+
+    public function testExistsAllAndRepeatMoveThisToTheCurrentItem(): void
+    {
+        $patient = ['resourceType' => 'Patient', 'name' => [['family' => 'A'], ['family' => 'B']]];
+
+        self::assertSame([true], $this->evaluate('(1|2).exists($this = 2)', $patient)->toArray());
+        self::assertSame([false], $this->evaluate('(1|2).exists($this = 3)', $patient)->toArray());
+        self::assertSame([true], $this->evaluate('(1|2).all($this > 0)', $patient)->toArray());
+        // The shape of the generated `ig-` invariants, which rely on it.
+        self::assertSame([true], $this->evaluate('(1|2).all((1|2|3) contains $this)', $patient)->toArray());
+        self::assertSame([false], $this->evaluate('(1|9).all((1|2|3) contains $this)', $patient)->toArray());
+        self::assertSame(['A', 'B'], $this->evaluate('name.repeat($this.family)', $patient)->toArray());
+    }
 }

@@ -39,7 +39,7 @@ final class AllFunction extends AbstractFunction
         }
 
         foreach ($input as $index => $item) {
-            $itemContext = $context->withCurrentNode($item)->withBundleEntryScope($input->scopeAt($index));
+            $itemContext = $context->withCurrentNode($item)->withBundleEntryScope($input->scopeAt($index))->withVariable('this', $item);
             $result      = $evaluator->evaluateWithContext($criteriaExpr, $itemContext);
 
             // If any item doesn't match (false or empty), return false

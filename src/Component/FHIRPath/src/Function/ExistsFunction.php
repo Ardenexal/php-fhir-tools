@@ -40,7 +40,7 @@ final class ExistsFunction extends AbstractFunction
         }
 
         foreach ($input as $index => $item) {
-            $itemContext = $context->withCurrentNode($item)->withBundleEntryScope($input->scopeAt($index));
+            $itemContext = $context->withCurrentNode($item)->withBundleEntryScope($input->scopeAt($index))->withVariable('this', $item);
             $result      = $evaluator->evaluateWithContext($criteriaExpr, $itemContext);
 
             if (!$result->isEmpty() && $result->first() === true) {
