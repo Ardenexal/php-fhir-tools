@@ -269,7 +269,7 @@ final class ResolveFunction extends AbstractFunction
 
         // A fetched resource is not part of any Bundle in play, so its own references must not be
         // answered from one: an empty index makes it its own context, with the URL as its `fullUrl`.
-        $fetchedScope = new BundleEntryScope(new BundleIndex([]), ['fullUrl' => $baseUrl, 'resource' => $resource]);
+        $fetchedScope = new BundleEntryScope(new BundleIndex([]), ['fullUrl' => $baseUrl, 'resource' => $resource], 'fetched:' . $baseUrl);
 
         if ($fragment === '') {
             return [$resource, $fetchedScope];
@@ -305,11 +305,11 @@ final class ResolveFunction extends AbstractFunction
             $holders = $this->referringEntries($bundleIndex, $url, $scope, $context);
             // With several holders agreeing on the target, there is still no saying which entry it
             // is in, so it gets no scope.
-            $containedScope = count($holders) === 1 ? ($scope ?? new BundleEntryScope($bundleIndex, $holders[0])) : null;
+            $containedScope = count($holders) === 1 ? $holders[0] : null;
 
             $found = [];
-            foreach ($holders as $entry) {
-                $contained = $this->getContainedResource($this->readProperty($entry, 'resource'), $fragment, $context);
+            foreach ($holders as $holder) {
+                $contained = $this->getContainedResource($this->readProperty($holder->entry, 'resource'), $fragment, $context);
 
                 // Any of these entries could be the one that referred, so one that cannot answer
                 // means the reference is unresolved, not that the others win.
@@ -332,8 +332,8 @@ final class ResolveFunction extends AbstractFunction
             }
 
             $targets = [];
-            foreach ($this->referringEntries($bundleIndex, $url, $scope, $context) as $entry) {
-                $targets[] = $this->absoluteTarget($baseUrl, $entry, $context);
+            foreach ($this->referringEntries($bundleIndex, $url, $scope, $context) as $holder) {
+                $targets[] = $this->absoluteTarget($baseUrl, $holder->entry, $context);
             }
             $targets = array_values(array_unique($targets, SORT_REGULAR));
 
@@ -381,19 +381,19 @@ final class ResolveFunction extends AbstractFunction
 
         if ($bundleIndex->entriesByFullUrl === null) {
             $bundleIndex->entriesByFullUrl = [];
-            foreach ($this->entries($bundleIndex->bundle) as $entry) {
+            foreach ($this->entries($bundleIndex->bundle) as $position => $entry) {
                 $resource = $this->readProperty($entry, 'resource');
                 $fullUrl  = $this->readValue($entry, 'fullUrl', $context);
                 if ((is_array($resource) || is_object($resource)) && is_string($fullUrl)) {
-                    $bundleIndex->entriesByFullUrl[$fullUrl][] = [$resource, $entry];
+                    $bundleIndex->entriesByFullUrl[$fullUrl][] = [$resource, $bundleIndex->scopeFor($position, $entry)];
                 }
             }
         }
 
         $matches = [];
-        foreach ($bundleIndex->entriesByFullUrl[$target] ?? [] as [$resource, $entry]) {
-            if ($version === null || $this->readValue($this->readProperty($resource, 'meta'), 'versionId', $context) === $version) {
-                $matches[] = [$resource, new BundleEntryScope($bundleIndex, $entry)];
+        foreach ($bundleIndex->entriesByFullUrl[$target] ?? [] as $match) {
+            if ($version === null || $this->readValue($this->readProperty($match[0], 'meta'), 'versionId', $context) === $version) {
+                $matches[] = $match;
             }
         }
 
@@ -406,12 +406,12 @@ final class ResolveFunction extends AbstractFunction
      * With no scope, evaluation lost track of it, so the entries whose resource holds a Reference with
      * the given value stand in.
      *
-     * @return list<mixed>
+     * @return list<BundleEntryScope>
      */
     private function referringEntries(BundleIndex $bundleIndex, string $reference, ?BundleEntryScope $scope, EvaluationContext $context): array
     {
         if ($scope !== null) {
-            return [$scope->entry];
+            return [$scope];
         }
 
         $this->indexReferences($bundleIndex, $context);
@@ -429,11 +429,11 @@ final class ResolveFunction extends AbstractFunction
         }
 
         $bundleIndex->entriesByReference = [];
-        foreach ($this->entries($bundleIndex->bundle) as $entry) {
+        foreach ($this->entries($bundleIndex->bundle) as $position => $entry) {
             $held = [];
             $this->collectReferences($this->readProperty($entry, 'resource'), $held, $bundleIndex->referencesInNestedBundles, $context);
             foreach (array_keys($held) as $value) {
-                $bundleIndex->entriesByReference[$value][] = $entry;
+                $bundleIndex->entriesByReference[$value][] = $bundleIndex->scopeFor($position, $entry);
             }
         }
     }
@@ -472,7 +472,7 @@ final class ResolveFunction extends AbstractFunction
     /**
      * Read `Bundle.entry` as a list, whether or not a lone entry was stored as a list.
      *
-     * @return array<array-key,mixed>
+     * @return list<mixed>
      */
     private function entries(mixed $bundle): array
     {

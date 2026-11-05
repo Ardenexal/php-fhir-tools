@@ -125,12 +125,12 @@ final class RepeatFunction extends AbstractFunction
     }
 
     /**
-     * Key a Bundle entry by its value rather than its scope object. A projection that navigates into
-     * `Bundle.entry` makes new scopes on each pass, so keying on those would never terminate.
+     * Key a Bundle entry by its position rather than its scope object. A projection that navigates
+     * into `Bundle.entry` makes new scopes on each pass, so keying on those would never terminate.
      */
     private function originKey(?BundleEntryScope $scope): string
     {
-        return $scope === null ? '' : '|' . $this->itemKey($scope->entry);
+        return $scope === null ? '' : '|' . $scope->path;
     }
 
     private function isSameOrigin(?BundleEntryScope $first, ?BundleEntryScope $second): bool
@@ -139,7 +139,7 @@ final class RepeatFunction extends AbstractFunction
             return $first === $second;
         }
 
-        return $first->entry === $second->entry && $first->index->bundle === $second->index->bundle;
+        return $first->path === $second->path && $first->index->bundle === $second->index->bundle;
     }
 
     /**

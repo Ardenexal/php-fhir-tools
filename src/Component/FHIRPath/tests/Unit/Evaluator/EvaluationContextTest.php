@@ -113,7 +113,7 @@ final class EvaluationContextTest extends TestCase
 
     public function testWithBundleEntryScopeDoesNotChangeTheOriginal(): void
     {
-        $scope   = new BundleEntryScope(new BundleIndex('bundle'), 'entry');
+        $scope   = new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0');
         $context = new EvaluationContext();
 
         self::assertSame($scope, $context->withBundleEntryScope($scope)->getBundleEntryScope());
@@ -123,7 +123,7 @@ final class EvaluationContextTest extends TestCase
     public function testEveryDerivedContextKeepsTheBundleEntryScope(): void
     {
         // Most of these rebuild the context field by field, so a missed argument loses it silently.
-        $scope   = new BundleEntryScope(new BundleIndex('bundle'), 'entry');
+        $scope   = new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0');
         $context = (new EvaluationContext())->withBundleEntryScope($scope);
 
         self::assertSame($scope, $context->withCollectionInput(Collection::empty())->getBundleEntryScope());

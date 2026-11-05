@@ -195,7 +195,7 @@ final class CollectionTest extends TestCase
 
     public function testWithScopeAppliesToEveryItem(): void
     {
-        $scope      = new BundleEntryScope(new BundleIndex('bundle'), 'entry');
+        $scope      = new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0');
         $collection = Collection::from(['a', 'b'])->withScope($scope);
 
         self::assertSame($scope, $collection->scopeAt(0));
@@ -212,13 +212,13 @@ final class CollectionTest extends TestCase
 
     public function testWithScopeOnAnEmptyCollectionAddsNothing(): void
     {
-        self::assertSame([], Collection::empty()->withScope(new BundleEntryScope(new BundleIndex('bundle'), 'entry'))->getScopes());
+        self::assertSame([], Collection::empty()->withScope(new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0'))->getScopes());
     }
 
     public function testOnlySelectsItemsAndRekeysTheirScopes(): void
     {
-        $first      = new BundleEntryScope(new BundleIndex('bundle'), 'first');
-        $last       = new BundleEntryScope(new BundleIndex('bundle'), 'last');
+        $first      = new BundleEntryScope(new BundleIndex('bundle'), 'first', '0');
+        $last       = new BundleEntryScope(new BundleIndex('bundle'), 'last', '0');
         $collection = Collection::from(['a', 'b', 'c'])->withScopes([0 => $first, 2 => $last]);
 
         $selected = $collection->only([2, 1, 0]);
@@ -238,7 +238,7 @@ final class CollectionTest extends TestCase
 
     public function testBuildingANewCollectionDropsScopes(): void
     {
-        $collection = Collection::from(['a', 'b'])->withScope(new BundleEntryScope(new BundleIndex('bundle'), 'entry'));
+        $collection = Collection::from(['a', 'b'])->withScope(new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0'));
 
         self::assertSame([], $collection->map(static fn (mixed $item): mixed => $item)->getScopes());
         self::assertSame([], $collection->filter(static fn (mixed $item): bool => true)->getScopes());

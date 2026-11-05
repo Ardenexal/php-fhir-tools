@@ -495,10 +495,10 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Navigating into Bundle.entry is where a value's Bundle entry starts; a nested Bundle
         // replaces the outer one. Everything navigated from there inherits it.
         if ($name === 'entry' && $this->matchesResourceType($currentNode, 'Bundle')) {
-            $bundleIndex = new BundleIndex($currentNode);
+            $bundleIndex = new BundleIndex($currentNode, $this->context->getBundleEntryScope()->path ?? '');
             $scopes      = [];
             foreach ($result as $index => $entry) {
-                $scopes[$index] = new BundleEntryScope($bundleIndex, $entry);
+                $scopes[$index] = $bundleIndex->scopeFor($index, $entry);
             }
 
             return $result->withScopes($scopes);

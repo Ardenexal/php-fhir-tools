@@ -1010,4 +1010,42 @@ final class ResolveBundleReferenceTest extends TestCase
 
         self::assertSame(['InTheFetched'], $this->evaluate('ServiceRequest.subject.resolve().managingOrganization.resolve().name', $root)->toArray());
     }
+
+    #[DataProvider('shapes')]
+    public function testRepeatTellsIdenticalEntriesInDifferentBundlesApart(bool $asModel): void
+    {
+        $inner = fn (string $family): array => ['fullUrl' => "urn:uuid:bundle-{$family}", 'resource' => [
+            'resourceType' => 'Bundle',
+            'type'         => 'collection',
+            'entry'        => [
+                $this->patientEntry(self::URN_PATIENT, $family),
+                $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT),
+            ],
+        ]];
+        $bundle = $this->bundle([$inner('One'), $inner('Two')], $asModel);
+
+        $family = $this->evaluate('Bundle.entry.resource.entry.resource.subject.repeat(resolve()).name.family', $bundle);
+
+        self::assertSame(['One', 'Two'], $family->toArray());
+    }
+
+    public function testRepeatDoesNotCopyTheEntryForEveryItem(): void
+    {
+        // An origin key holding the entry's value made this quadratic: 4,000 sections took 3.3GB.
+        $sections = [];
+        for ($i = 0; $i < 2000; ++$i) {
+            $sections[] = ['title' => "section {$i}", 'text' => ['status' => 'generated', 'div' => '<div>' . str_repeat('x', 100) . '</div>']];
+        }
+        $entry                        = $this->patientSummary();
+        $entry['resource']['section'] = $sections;
+        $bundle                       = $this->bundle([$entry], false);
+
+        memory_reset_peak_usage();
+        $before = memory_get_peak_usage();
+        $count  = $this->evaluate('Bundle.entry[0].resource.repeat(section).count()', $bundle);
+        $growth = memory_get_peak_usage() - $before;
+
+        self::assertSame([2000], $count->toArray());
+        self::assertLessThan(32 * 1024 * 1024, $growth, 'repeat() retained far more memory than its items');
+    }
 }
