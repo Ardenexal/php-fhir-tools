@@ -89,7 +89,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private int $nextBundleId = 0;
 
     /**
-     * How many evaluate() calls are in progress; functions such as skip() call it re-entrantly.
+     * How many evaluate() and evaluateWithContext() calls are in progress; functions call both.
      */
     private int $evaluationDepth = 0;
 
@@ -342,15 +342,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             $this->context->setCurrentNode($resource);
         }
 
-        ++$this->evaluationDepth;
-
-        try {
-            $result = $expression->accept($this);
-        } finally {
-            if (--$this->evaluationDepth === 0) {
-                $this->bundleIndexes = [];
-            }
-        }
+        $result = $this->acceptInEvaluation($expression);
 
         // Normalize FHIR primitive wrapper objects to their scalar values in the final
         // output collection. Internal evaluation keeps wrappers for sub-element navigation
@@ -415,9 +407,25 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         $this->context = $context;
 
         try {
-            return $expression->accept($this);
+            return $this->acceptInEvaluation($expression);
         } finally {
             $this->context = $savedContext;
+        }
+    }
+
+    /**
+     * Evaluate an expression, keeping each Bundle's index for as long as the outermost call lasts.
+     */
+    private function acceptInEvaluation(ExpressionNode $expression): Collection
+    {
+        ++$this->evaluationDepth;
+
+        try {
+            return $expression->accept($this);
+        } finally {
+            if (--$this->evaluationDepth === 0) {
+                $this->bundleIndexes = [];
+            }
         }
     }
 

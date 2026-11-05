@@ -1318,4 +1318,14 @@ final class ResolveBundleReferenceTest extends TestCase
 
         self::assertSame([], $family->toArray());
     }
+
+    public function testRepeatTerminatesThroughEvaluateWithContext(): void
+    {
+        // A public way in that skips evaluate(), where a Bundle's id must stay stable all the same.
+        $bundle  = $this->twoBaseBundle(false);
+        $ast     = (new FHIRPathParser())->parse((new FHIRPathLexer())->tokenize('Bundle.repeat(%resource.entry).count()'));
+        $context = new EvaluationContext($bundle, $bundle, [], [], $this->evaluator);
+
+        self::assertSame([4], $this->evaluator->evaluateWithContext($ast, $context)->toArray());
+    }
 }
