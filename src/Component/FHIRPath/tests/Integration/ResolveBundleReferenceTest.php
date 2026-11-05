@@ -774,21 +774,69 @@ final class ResolveBundleReferenceTest extends TestCase
         self::assertSame([], $this->evaluate('subject.resolve().name.family', $focus, new EvaluationContext($bundle))->toArray());
     }
 
-    #[DataProvider('shapes')]
-    public function testANestedBundleOnlyBlocksTheReferencesItHolds(bool $asModel): void
+    /**
+     * Outer and inner Questionnaires sharing a `fullUrl`, referred to by a canonical rather than a
+     * Reference, so nothing named `reference` says the inner Bundle holds the value.
+     *
+     * @return array<string, mixed>|BundleResource
+     */
+    private function nestedQuestionnaires(bool $asModel): array|BundleResource
     {
-        $bundle = $this->bundle([
-            $this->patientEntry(self::URN_PATIENT, 'Outer'),
+        $questionnaire = static fn (string $title): array => ['fullUrl' => 'urn:uuid:q', 'resource' => ['resourceType' => 'Questionnaire', 'status' => 'active', 'title' => $title]];
+
+        return $this->bundle([
+            $questionnaire('OuterTitle'),
             ['fullUrl' => 'urn:uuid:inner-bundle', 'resource' => [
                 'resourceType' => 'Bundle',
                 'type'         => 'collection',
-                'entry'        => [$this->requestEntry(self::URN_REQUEST, 'urn:uuid:something-else')],
+                'entry'        => [
+                    $questionnaire('InnerTitle'),
+                    ['fullUrl' => 'urn:uuid:qr', 'resource' => ['resourceType' => 'QuestionnaireResponse', 'status' => 'completed', 'questionnaire' => 'urn:uuid:q']],
+                ],
             ]],
         ], $asModel);
+    }
 
-        // A literal has no origin, but no nested Bundle holds this value, so the root still answers.
-        self::assertSame(['Outer'], $this->evaluate("'" . self::URN_PATIENT . "'.resolve().name.family", $bundle)->toArray());
-        self::assertSame([], $this->evaluate("'urn:uuid:something-else'.resolve()", $bundle)->toArray());
+    #[DataProvider('shapes')]
+    public function testACanonicalKeepsItsOriginInANestedBundle(bool $asModel): void
+    {
+        $bundle = $this->nestedQuestionnaires($asModel);
+        $inner  = 'Bundle.entry[1].resource.entry[1].resource.questionnaire';
+
+        self::assertSame(['InnerTitle'], $this->evaluate("{$inner}.resolve().title", $bundle)->toArray());
+        self::assertSame(['InnerTitle'], $this->evaluate("{$inner}.distinct().resolve().title", $bundle)->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testAValueWithNoOriginIsNotLookedUpInARootHoldingANestedBundle(bool $asModel): void
+    {
+        $bundle = $this->nestedQuestionnaires($asModel);
+        $focus  = is_array($bundle) ? $bundle['entry'][1]['resource']['entry'][1]['resource'] : $bundle->entry[1]->resource->entry[1]->resource;
+
+        self::assertSame([], $this->evaluate('questionnaire.resolve().title', $focus, new EvaluationContext($bundle))->toArray());
+        self::assertSame([], $this->evaluate("'urn:uuid:q'.resolve().title", $bundle)->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testAValueWithNoOriginIsLookedUpInAFlatRoot(bool $asModel): void
+    {
+        $bundle = $this->bundle([$this->patientEntry(self::URN_PATIENT, 'Flat')], $asModel);
+
+        self::assertSame(['Flat'], $this->evaluate("'" . self::URN_PATIENT . "'.resolve().name.family", $bundle)->toArray());
+    }
+
+    public function testAValueWithNoOriginStopsAtABundleNestedBelowAnEntry(): void
+    {
+        // A Bundle anywhere inside an entry counts, not only one directly at `entry.resource`.
+        $bundle = $this->bundle([
+            $this->patientEntry(self::URN_PATIENT, 'Outer'),
+            ['fullUrl' => 'urn:uuid:parameters', 'resource' => [
+                'resourceType' => 'Parameters',
+                'parameter'    => [['name' => 'held', 'resource' => ['resourceType' => 'Bundle', 'type' => 'collection']]],
+            ]],
+        ], false);
+
+        self::assertSame([], $this->evaluate("'" . self::URN_PATIENT . "'.resolve()", $bundle)->toArray());
     }
 
     /**

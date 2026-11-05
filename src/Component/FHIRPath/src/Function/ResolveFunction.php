@@ -45,7 +45,7 @@ use Psr\Http\Message\RequestFactoryInterface;
  * The referring entry comes from {@see BundleEntryScope}. A value merged from several entries resolves
  * only if they all reach one resource. A value with no origin (a literal, $total, an evaluation started
  * inside the entry) has the entries holding that reference value stand in for the referring entry, and
- * resolves only if they all agree.
+ * resolves only if they all agree and the root holds no nested Bundle.
  *
  * Remaining resolution strategies (in order, mirroring the reference JavaScript engine):
  *
@@ -335,11 +335,11 @@ final class ResolveFunction extends AbstractFunction
      */
     private function resolveInBundle(string $url, string $baseUrl, string $fragment, BundleIndex $bundleIndex, ?BundleEntryScope $scope, EvaluationContext $context): ?array
     {
-        // With its origin unknown, a reference a nested Bundle holds may belong to that Bundle, and
-        // nothing stops the two from using the same `fullUrl` for different resources.
+        // A value with no origin may belong to a nested Bundle, and nothing stops two Bundles using
+        // one `fullUrl` for different resources, so a root holding one cannot answer for it.
         if ($scope === null) {
             $this->indexReferences($bundleIndex, $context);
-            if (isset($bundleIndex->referencesInNestedBundles[$url])) {
+            if ($bundleIndex->containsNestedBundle) {
                 return [];
             }
         }
@@ -461,7 +461,7 @@ final class ResolveFunction extends AbstractFunction
     }
 
     /**
-     * Record which entries hold each Reference value, and which values nested Bundles hold.
+     * Record which entries hold each Reference value, and whether any of them holds a Bundle.
      */
     private function indexReferences(BundleIndex $bundleIndex, EvaluationContext $context): void
     {
@@ -472,7 +472,7 @@ final class ResolveFunction extends AbstractFunction
         $bundleIndex->entriesByReference = [];
         foreach ($this->entries($bundleIndex->bundle) as $position => $entry) {
             $held = [];
-            $this->collectReferences($this->readProperty($entry, 'resource'), $held, $bundleIndex->referencesInNestedBundles, $context);
+            $this->collectReferences($this->readProperty($entry, 'resource'), $held, $bundleIndex->containsNestedBundle, $context);
             foreach (array_keys($held) as $value) {
                 $bundleIndex->entriesByReference[$value][] = $bundleIndex->scopeFor($position, $entry);
             }
@@ -480,22 +480,19 @@ final class ResolveFunction extends AbstractFunction
     }
 
     /**
-     * Collect the values of every Reference under a node, as the keys of $held, or of $nested once
-     * inside a Bundle, because those belong to that Bundle's entries.
+     * Collect the values of every Reference under a node, as the keys of $held, stopping at a Bundle
+     * because what it holds belongs to its own entries.
      *
      * @param array<array-key, true> $held
-     * @param array<array-key, true> $nested
      */
-    private function collectReferences(mixed $node, array &$held, array &$nested, EvaluationContext $context): void
+    private function collectReferences(mixed $node, array &$held, bool &$foundBundle, EvaluationContext $context): void
     {
         if (!is_array($node) && !is_object($node)) {
             return;
         }
 
         if ($context->getEvaluator()?->matchesResourceType($node, 'Bundle') === true) {
-            foreach (is_array($node) ? $node : get_object_vars($node) as $child) {
-                $this->collectReferences($child, $nested, $nested, $context);
-            }
+            $foundBundle = true;
 
             return;
         }
@@ -506,7 +503,7 @@ final class ResolveFunction extends AbstractFunction
         }
 
         foreach (is_array($node) ? $node : get_object_vars($node) as $child) {
-            $this->collectReferences($child, $held, $nested, $context);
+            $this->collectReferences($child, $held, $foundBundle, $context);
         }
     }
 

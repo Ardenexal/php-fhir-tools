@@ -22,8 +22,8 @@ final class BundleIndex
     /** @var array<array-key, list<BundleEntryScope>>|null Entries by the Reference values their resource holds, built on first use */
     public ?array $entriesByReference = null;
 
-    /** @var array<array-key, true> Reference values held inside nested Bundles, built with */
-    public array $referencesInNestedBundles = [];
+    /** Whether a Bundle is held anywhere inside an entry, worked out along with the reference lookup */
+    public bool $containsNestedBundle = false;
 
     /**
      * @param string $path Position of the entry holding this Bundle, empty when it is not in one
