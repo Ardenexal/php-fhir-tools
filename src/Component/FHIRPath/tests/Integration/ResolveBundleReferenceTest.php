@@ -1201,4 +1201,13 @@ final class ResolveBundleReferenceTest extends TestCase
 
         self::assertSame([], $family->toArray());
     }
+
+    #[DataProvider('shapes')]
+    public function testAggregateResultDoesNotClaimTheOriginOfItsInput(bool $asModel): void
+    {
+        // The result is the `init` value, from entry 1, though every input item is from entry 3.
+        $expression = 'Bundle.entry[3].resource.subject.aggregate($total, %resource.entry[1].resource.subject).resolve().name.family';
+
+        self::assertSame([], $this->evaluate($expression, $this->twoBaseBundle($asModel))->toArray());
+    }
 }

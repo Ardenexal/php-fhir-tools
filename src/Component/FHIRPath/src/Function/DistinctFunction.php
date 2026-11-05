@@ -30,6 +30,7 @@ class DistinctFunction extends AbstractFunction
         $distinct = [];
         $seen     = [];
         $origins  = [];
+        $tracked  = $input->getScopes() !== [];
 
         foreach ($input as $index => $item) {
             $key = $this->getItemKey($item, $context);
@@ -37,7 +38,9 @@ class DistinctFunction extends AbstractFunction
                 $seen[$key] = count($distinct);
                 $distinct[] = $item;
             }
-            $origins[$seen[$key]][] = $input->scopeAt($index);
+            if ($tracked) {
+                $origins[$seen[$key]][] = $input->scopeAt($index);
+            }
         }
 
         return Collection::from($distinct)->withScopes(Collection::mergeOrigins($origins));

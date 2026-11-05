@@ -289,6 +289,7 @@ final readonly class Collection implements \IteratorAggregate, \Countable
         // from both sides, skipping any that are already present.
         $result  = [];
         $origins = [];
+        $tracked = $this->scopes !== [] || $other->scopes !== [];
 
         foreach ([$this, $other] as $side) {
             foreach ($side->items as $index => $item) {
@@ -297,7 +298,9 @@ final readonly class Collection implements \IteratorAggregate, \Countable
                     $position = count($result);
                     $result[] = $item;
                 }
-                $origins[$position][] = $side->scopes[$index] ?? null;
+                if ($tracked) {
+                    $origins[$position][] = $side->scopes[$index] ?? null;
+                }
             }
         }
 
@@ -311,6 +314,7 @@ final readonly class Collection implements \IteratorAggregate, \Countable
     {
         $result  = [];
         $origins = [];
+        $tracked = $this->scopes !== [] || $other->scopes !== [];
 
         foreach ($this->items as $index => $item) {
             $matches = array_keys($other->items, $item, true);
@@ -324,9 +328,11 @@ final readonly class Collection implements \IteratorAggregate, \Countable
                 $result[] = $item;
             }
 
-            $origins[$position][] = $this->scopes[$index] ?? null;
-            foreach ($matches as $match) {
-                $origins[$position][] = $other->scopes[$match] ?? null;
+            if ($tracked) {
+                $origins[$position][] = $this->scopes[$index] ?? null;
+                foreach ($matches as $match) {
+                    $origins[$position][] = $other->scopes[$match] ?? null;
+                }
             }
         }
 

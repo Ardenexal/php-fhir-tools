@@ -74,6 +74,7 @@ final class RepeatFunction extends AbstractFunction
         $positions = [];
         $frontier  = [];
         $origins   = [];
+        $tracked   = false;
 
         foreach ($input as $index => $item) {
             $key   = $this->itemKey($item);
@@ -94,6 +95,8 @@ final class RepeatFunction extends AbstractFunction
                 $itemContext = $context->withCurrentNode($item)->withBundleEntryScope($scope)->withVariable('this', $item);
                 $projected   = $evaluator->evaluateWithContext($projection, $itemContext);
 
+                $tracked = $tracked || $projected->getScopes() !== [];
+
                 foreach ($projected as $position => $projectedItem) {
                     $key            = $this->itemKey($projectedItem);
                     $projectedScope = $projected->scopeAt($position);
@@ -105,7 +108,7 @@ final class RepeatFunction extends AbstractFunction
                         $result[]        = $projectedItem;
                     }
 
-                    if (isset($positions[$key])) {
+                    if ($tracked && isset($positions[$key])) {
                         $origins[$positions[$key]][] = $projectedScope;
                     }
 
