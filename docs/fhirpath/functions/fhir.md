@@ -81,8 +81,15 @@ $fhirPath->evaluate('Bundle.entry[1].resource.subject.resolve().name.family', $b
 * **Knowing the referring entry.** Navigation, indexers and the functions that filter or iterate
   (`where()`, `select()`, `first()`, `ofType()` and so on) keep track of it. `union()`, `combine()`,
   `distinct()`, `intersect()`, `exclude()`, `children()` and `descendants()` lose it, as does an
-  evaluation that starts inside an entry with the Bundle supplied as its root. A relative or
-  fragment reference then resolves only if every entry holding that value agrees on the target.
+  evaluation that starts inside an entry with the Bundle supplied as its root, and `$total`, which
+  can hold a value from an earlier item. With the entry unknown, a relative or fragment reference
+  resolves only if every entry holding that value agrees on the target, and any reference held
+  inside a nested Bundle is omitted, because it may belong to that Bundle. `repeat()` merges equal
+  values, so one merged from different entries counts as unknown too.
+* **Chained references.** A resolved resource keeps the entry it was found in, so
+  `subject.resolve().managingOrganization.resolve()` follows the target's own base and `contained`.
+  A resource fetched over HTTP is not treated as part of the Bundle: its `#id` references look in
+  itself, and its relative references go to the configured server.
 * **Invariants** are bound to the nearest enclosing resource, so an invariant's `resolve()` finds
   contained resources but not other entries of the Bundle.
 
