@@ -51,6 +51,18 @@ run() {
     php console.php "$@" 2>&1 || true
 }
 
+# Counts the generated files. find fails when generation never created the directory, and under
+# pipefail that would end the script here, before it could report the failure it is checking for.
+count_generated_files() {
+    find vendor/ardenexal/Models -name '*.php' 2>/dev/null | wc -l || true
+}
+
+# Prints the end of a command's output, which is the only record of why a generation failed: run()
+# swallows the exit status, and a registry outage cannot be reproduced after the fact.
+show_tail() {
+    tail -n 15 <<<"$1" | sed 's/^/        /'
+}
+
 installed_version() {
     php -r '
         $packages = json_decode(file_get_contents("vendor/composer/installed.json"), true)["packages"];
@@ -184,15 +196,18 @@ if [[ "$WITH_GENERATION" -eq 1 ]]; then
     echo
     echo "a real generation completes (writes into vendor/ardenexal/Models)"
     rm -rf vendor/ardenexal/Models
-    if run fhir:generate --package=hl7.fhir.r4b.core | grep -q "generation completed successfully"; then
-        generated="$(find vendor/ardenexal/Models -name '*.php' | wc -l)"
+    generate_output="$(run fhir:generate --package=hl7.fhir.r4b.core)"
+    if grep -q "generation completed successfully" <<<"$generate_output"; then
+        generated="$(count_generated_files)"
         if [[ "$generated" -gt 0 ]]; then
             pass "generated ${generated} PHP files with symfony/console ${console_version}"
         else
             fail "generation reported success but wrote no files"
+            show_tail "$generate_output"
         fi
     else
         fail "fhir:generate did not complete successfully"
+        show_tail "$generate_output"
     fi
 
     # fhir:generate-ig runs the profile and extension generators, which the R4B run above never
@@ -216,11 +231,12 @@ if [[ "$WITH_GENERATION" -eq 1 ]]; then
         grep -m3 "IG_GENERATION_ERROR" <<<"$ig_output" | sed 's/^/        /'
     fi
 
-    ig_generated="$(find vendor/ardenexal/Models -name '*.php' 2>/dev/null | wc -l)"
+    ig_generated="$(count_generated_files)"
     if [[ "$ig_generated" -gt 0 ]]; then
         pass "generated ${ig_generated} IG PHP files with symfony/string ${string_version}"
     else
         fail "the IG output directory was never created or is empty"
+        show_tail "$ig_output"
     fi
 
     # Spot-checks the reason hl7.fhir.au.base is generated at all: au-ihi must come out as a
