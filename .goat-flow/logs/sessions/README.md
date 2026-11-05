@@ -11,10 +11,12 @@ Session logs remain optional. Write a handoff receipt only when context compacti
 Run the scrubber first in the write pipeline. Before starting it, confirm `goat-flow --version` matches the version in `.goat-flow/config.yaml`; a missing or mismatched CLI is unavailable, so do not save the receipt. Paste the receipt into the compatible scrubber's stdin and send EOF. Only the redacted result reaches the output file:
 
 ```bash
-goat-flow redact --output .goat-flow/logs/sessions/YYYY-MM-DD-handoff.md
+goat-flow redact --output .goat-flow/logs/sessions/YYYY-MM-DD-HHMM-handoff-rand5.md
 ```
 
-Review the saved receipt before sharing it. Never include raw environment dumps, credentials, tokens, cookies, private keys, or secret-file contents.
+Use a fresh filename for every receipt; the scrubber refuses to replace an existing file. Review the saved receipt before sharing it. Never include raw environment dumps, credentials, tokens, cookies, private keys, or secret-file contents.
+
+Prefer available plan, milestone and run identifiers when naming newly created general plan evidence. Leave existing evidence paths and specialized quality/review naming unchanged.
 
 ## Handoff Receipt
 
@@ -40,6 +42,8 @@ Copy this placeholder-only schema into the scrubber input:
 - Known blockers: <blocker plus required decision/state change, or none>
 - Redaction applied: <yes, via `goat-flow redact` | no - do not save this receipt>
 ```
+
+When useful, record failed approaches and their observed results in `Decisions compressed`, and name the next useful check in `Pending tasks`. Include only approaches that were actually tried.
 
 `Repo`, `Worktree`, and `Target project` are separate because the controlling goat-flow workspace may operate on another checkout. A resumed agent must re-run every live recheck before relying on a stale result; the receipt is orientation, not fresh verification.
 
