@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit\Evaluator;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleIndex;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use PHPUnit\Framework\TestCase;
@@ -112,7 +113,7 @@ final class EvaluationContextTest extends TestCase
 
     public function testWithBundleEntryScopeDoesNotChangeTheOriginal(): void
     {
-        $scope   = new BundleEntryScope('bundle', 'entry');
+        $scope   = new BundleEntryScope(new BundleIndex('bundle'), 'entry');
         $context = new EvaluationContext();
 
         self::assertSame($scope, $context->withBundleEntryScope($scope)->getBundleEntryScope());
@@ -122,7 +123,7 @@ final class EvaluationContextTest extends TestCase
     public function testEveryDerivedContextKeepsTheBundleEntryScope(): void
     {
         // Most of these rebuild the context field by field, so a missed argument loses it silently.
-        $scope   = new BundleEntryScope('bundle', 'entry');
+        $scope   = new BundleEntryScope(new BundleIndex('bundle'), 'entry');
         $context = (new EvaluationContext())->withBundleEntryScope($scope);
 
         self::assertSame($scope, $context->withCollectionInput(Collection::empty())->getBundleEntryScope());

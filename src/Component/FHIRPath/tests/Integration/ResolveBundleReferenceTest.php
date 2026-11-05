@@ -509,4 +509,62 @@ final class ResolveBundleReferenceTest extends TestCase
 
         self::assertSame(['Example'], $this->evaluate('subject.resolve().name.family', $focus, new EvaluationContext($bundle))->toArray());
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function patientSummary(): array
+    {
+        return [
+            'fullUrl'  => 'urn:uuid:composition',
+            'resource' => [
+                'resourceType' => 'Composition',
+                'status'       => 'final',
+                'type'         => ['text' => 'Patient summary'],
+                'subject'      => ['reference' => self::URN_PATIENT],
+                'date'         => '2026-01-01',
+                'author'       => [['display' => 'Author']],
+                'title'        => 'Summary',
+                'section'      => [
+                    ['title' => 'Problems', 'entry' => [['reference' => 'urn:uuid:problem'], ['reference' => 'urn:uuid:not-in-bundle']]],
+                    ['title' => 'Results', 'section' => [['title' => 'Labs', 'entry' => [['reference' => 'urn:uuid:lab']]]]],
+                ],
+            ],
+        ];
+    }
+
+    #[DataProvider('shapes')]
+    public function testPatientSummarySectionsResolveToTheirEntries(bool $asModel): void
+    {
+        $bundle = $this->bundle([
+            $this->patientSummary(),
+            $this->patientEntry(self::URN_PATIENT, 'Example'),
+            ['fullUrl' => 'urn:uuid:problem', 'resource' => ['resourceType' => 'Condition', 'id' => 'problem', 'subject' => ['reference' => self::URN_PATIENT]]],
+            ['fullUrl' => 'urn:uuid:lab', 'resource' => ['resourceType' => 'Observation', 'id' => 'lab', 'status' => 'final', 'code' => ['text' => 'Lab'], 'subject' => ['reference' => self::URN_PATIENT]]],
+        ], $asModel);
+
+        self::assertSame(['Example'], $this->evaluate('Bundle.entry[0].resource.subject.resolve().name.family', $bundle)->toArray());
+        // The reference with no entry is omitted, and the ones either side of it keep their place.
+        self::assertSame(['problem'], $this->evaluate('Bundle.entry[0].resource.section.entry.resolve().id', $bundle)->toArray());
+        self::assertSame(['lab'], $this->evaluate('Bundle.entry[0].resource.section.section.entry.resolve().id', $bundle)->toArray());
+        self::assertSame(['problem', 'lab'], $this->evaluate('Bundle.entry[0].resource.repeat(section).entry.resolve().id', $bundle)->toArray());
+        // The way back: from a resolved entry, through its own reference.
+        self::assertSame(['Example'], $this->evaluate("Bundle.entry.resource.where(id = 'lab').subject.resolve().name.family", $bundle)->toArray());
+    }
+
+    public function testAChangedBundleIsNotAnsweredFromAnEarlierEvaluation(): void
+    {
+        $bundle = $this->bundle([
+            $this->patientEntry(self::URN_PATIENT, 'Example'),
+            $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT),
+        ], true);
+        self::assertInstanceOf(BundleResource::class, $bundle);
+        $expression = 'Bundle.entry[1].resource.subject.resolve().name.family';
+
+        self::assertSame(['Example'], $this->evaluate($expression, $bundle)->toArray());
+
+        $bundle->entry[0]->fullUrl = $bundle->entry[1]->fullUrl;
+
+        self::assertSame([], $this->evaluate($expression, $bundle)->toArray());
+    }
 }

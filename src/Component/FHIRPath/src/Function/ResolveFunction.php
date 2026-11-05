@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleIndex;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
@@ -113,9 +114,13 @@ final class ResolveFunction extends AbstractFunction
         $httpClient     = $evaluator->getHttpClient();
         $requestFactory = $evaluator->getRequestFactory();
 
+        // Items whose entry evaluation lost track of share this, so they scan the Bundle only once.
+        $root      = $context->getRootResource();
+        $rootIndex = $evaluator->matchesResourceType($root, 'Bundle') ? new BundleIndex($root) : null;
+
         $resolved = [];
         foreach ($input as $index => $item) {
-            $resource = $this->resolveItem($item, $input->scopeAt($index), $context, $fhirServerUrl, $httpClient, $requestFactory);
+            $resource = $this->resolveItem($item, $input->scopeAt($index), $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
             // Model objects are only ever read from `contained` and `Bundle.entry.resource`, which
             // hold nothing but resources.
             if (is_object($resource) || isset($resource['resourceType'])) {
@@ -134,6 +139,7 @@ final class ResolveFunction extends AbstractFunction
      *  - String (uri, canonical, FHIR.string) → use as URL directly
      *
      * @param BundleEntryScope|null        $scope          The Bundle entry the item was navigated out of
+     * @param BundleIndex|null             $rootIndex      The root resource, when that is a Bundle
      * @param EvaluationContext            $context        Evaluation context (root resource, value normalisation)
      * @param string|null                  $fhirServerUrl  Base FHIR server URL (may be null)
      * @param ClientInterface|null         $httpClient     PSR-18 HTTP client (may be null)
@@ -141,7 +147,7 @@ final class ResolveFunction extends AbstractFunction
      *
      * @return array<string,mixed>|object|null FHIR resource, or null if unresolvable
      */
-    private function resolveItem(mixed $item, ?BundleEntryScope $scope, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): array|object|null
+    private function resolveItem(mixed $item, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): array|object|null
     {
         // Sees through StringPrimitive/UriPrimitive (a plain reference string on a model) and
         // FHIRTypedCollection (a raw Reference reached through a polymorphic `value`).
@@ -151,7 +157,7 @@ final class ResolveFunction extends AbstractFunction
         if (is_array($item) && isset($item['reference']) && is_string($item['reference'])) {
             $refType = isset($item['type']) && is_string($item['type']) ? $item['type'] : null;
 
-            return $this->resolveUrl($item['reference'], false, $refType, $scope, $context, $fhirServerUrl, $httpClient, $requestFactory);
+            return $this->resolveUrl($item['reference'], false, $refType, $scope, $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
         }
 
         if (is_object($item)) {
@@ -160,13 +166,13 @@ final class ResolveFunction extends AbstractFunction
                 $refType = $context->normalizeValue($this->getObjectProperty($item, 'type'));
                 $refType = is_string($refType) ? $refType : null;
 
-                return $this->resolveUrl($ref, false, $refType, $scope, $context, $fhirServerUrl, $httpClient, $requestFactory);
+                return $this->resolveUrl($ref, false, $refType, $scope, $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
             }
         }
 
         // Plain string: uri, canonical, or System.String
         if (is_string($item)) {
-            return $this->resolveUrl($item, false, null, $scope, $context, $fhirServerUrl, $httpClient, $requestFactory);
+            return $this->resolveUrl($item, false, null, $scope, $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
         }
 
         return null;
@@ -181,6 +187,7 @@ final class ResolveFunction extends AbstractFunction
      * @param bool                         $isCanonical    True when the URL is a canonical reference
      * @param string|null                  $refType        FHIR resource type hint (e.g. 'Patient')
      * @param BundleEntryScope|null        $scope          The Bundle entry the reference was navigated out of
+     * @param BundleIndex|null             $rootIndex      The root resource, when that is a Bundle
      * @param EvaluationContext            $context        Evaluation context (root resource, value normalisation)
      * @param string|null                  $fhirServerUrl  Base FHIR server URL
      * @param ClientInterface|null         $httpClient     PSR-18 HTTP client
@@ -188,16 +195,16 @@ final class ResolveFunction extends AbstractFunction
      *
      * @return array<string,mixed>|object|null
      */
-    private function resolveUrl(string $url, bool $isCanonical, ?string $refType, ?BundleEntryScope $scope, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): array|object|null
+    private function resolveUrl(string $url, bool $isCanonical, ?string $refType, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): array|object|null
     {
         // Split on first '#' to separate base URL from fragment (contained resource ID)
         $hashPos  = strpos($url, '#');
         $baseUrl  = $hashPos !== false ? substr($url, 0, $hashPos) : $url;
         $fragment = $hashPos !== false ? substr($url, $hashPos + 1) : '';
 
-        $root = $context->getRootResource();
-        if ($scope !== null || $context->getEvaluator()?->matchesResourceType($root, 'Bundle') === true) {
-            $matches = $this->resolveInBundle($url, $baseUrl, $fragment, $scope->bundle ?? $root, $scope, $context);
+        $bundleIndex = $scope->index ?? $rootIndex;
+        if ($bundleIndex !== null) {
+            $matches = $this->resolveInBundle($url, $baseUrl, $fragment, $bundleIndex, $scope, $context);
             if ($matches !== null) {
                 if (count($matches) !== 1) {
                     return null;
@@ -239,7 +246,7 @@ final class ResolveFunction extends AbstractFunction
 
         if ($resource === null && $baseUrl === '' && $fragment !== '') {
             // Fragment-only reference (#id) → search rootResource.contained
-            return $this->getContainedResource($root, $fragment, $context);
+            return $this->getContainedResource($context->getRootResource(), $fragment, $context);
         }
 
         if ($resource !== null && $fragment !== '') {
@@ -259,11 +266,11 @@ final class ResolveFunction extends AbstractFunction
      *
      * @return list<array<array-key,mixed>|object>|null
      */
-    private function resolveInBundle(string $url, string $baseUrl, string $fragment, mixed $bundle, ?BundleEntryScope $scope, EvaluationContext $context): ?array
+    private function resolveInBundle(string $url, string $baseUrl, string $fragment, BundleIndex $bundleIndex, ?BundleEntryScope $scope, EvaluationContext $context): ?array
     {
         if ($baseUrl === '') {
             $found = [];
-            foreach ($this->referringEntries($bundle, $url, $scope, $context) as $entry) {
+            foreach ($this->referringEntries($bundleIndex, $url, $scope, $context) as $entry) {
                 $contained = $this->getContainedResource($this->readProperty($entry, 'resource'), $fragment, $context);
                 if ($contained !== null && !in_array($contained, $found, true)) {
                     $found[] = $contained;
@@ -280,7 +287,7 @@ final class ResolveFunction extends AbstractFunction
             }
 
             $targets = [];
-            foreach ($this->referringEntries($bundle, $url, $scope, $context) as $entry) {
+            foreach ($this->referringEntries($bundleIndex, $url, $scope, $context) as $entry) {
                 $targets[] = $this->absoluteTarget($baseUrl, $entry, $context);
             }
             $targets = array_values(array_unique($targets, SORT_REGULAR));
@@ -295,7 +302,7 @@ final class ResolveFunction extends AbstractFunction
             }
         }
 
-        $matches = $this->entriesWithFullUrl($bundle, $target, $context);
+        $matches = $this->entriesWithFullUrl($bundleIndex, $target, $context);
 
         return $matches === [] ? null : $matches;
     }
@@ -320,20 +327,26 @@ final class ResolveFunction extends AbstractFunction
      *
      * @return list<array<array-key,mixed>|object>
      */
-    private function entriesWithFullUrl(mixed $bundle, string $target, EvaluationContext $context): array
+    private function entriesWithFullUrl(BundleIndex $bundleIndex, string $target, EvaluationContext $context): array
     {
         $version = null;
         if (preg_match('#^(.+)/_history/([^/]+)$#', $target, $parts) === 1) {
             [, $target, $version] = $parts;
         }
 
-        $matches = [];
-        foreach ($this->entries($bundle) as $entry) {
-            $resource = $this->readProperty($entry, 'resource');
-            if ((!is_array($resource) && !is_object($resource)) || $this->readValue($entry, 'fullUrl', $context) !== $target) {
-                continue;
+        if ($bundleIndex->resourcesByFullUrl === null) {
+            $bundleIndex->resourcesByFullUrl = [];
+            foreach ($this->entries($bundleIndex->bundle) as $entry) {
+                $resource = $this->readProperty($entry, 'resource');
+                $fullUrl  = $this->readValue($entry, 'fullUrl', $context);
+                if ((is_array($resource) || is_object($resource)) && is_string($fullUrl)) {
+                    $bundleIndex->resourcesByFullUrl[$fullUrl][] = $resource;
+                }
             }
+        }
 
+        $matches = [];
+        foreach ($bundleIndex->resourcesByFullUrl[$target] ?? [] as $resource) {
             if ($version === null || $this->readValue($this->readProperty($resource, 'meta'), 'versionId', $context) === $version) {
                 $matches[] = $resource;
             }
@@ -351,43 +364,50 @@ final class ResolveFunction extends AbstractFunction
      *
      * @return list<mixed>
      */
-    private function referringEntries(mixed $bundle, string $reference, ?BundleEntryScope $scope, EvaluationContext $context): array
+    private function referringEntries(BundleIndex $bundleIndex, string $reference, ?BundleEntryScope $scope, EvaluationContext $context): array
     {
         if ($scope !== null) {
             return [$scope->entry];
         }
 
-        $found = [];
-        foreach ($this->entries($bundle) as $entry) {
-            $resource = $this->readProperty($entry, 'resource');
-            if ($context->getEvaluator()?->matchesResourceType($resource, 'Bundle') !== true && $this->holdsReference($resource, $reference, $context)) {
-                $found[] = $entry;
+        if ($bundleIndex->entriesByReference === null) {
+            $bundleIndex->entriesByReference = [];
+            foreach ($this->entries($bundleIndex->bundle) as $entry) {
+                $resource = $this->readProperty($entry, 'resource');
+                if ($context->getEvaluator()?->matchesResourceType($resource, 'Bundle') === true) {
+                    continue;
+                }
+
+                $held = [];
+                $this->collectReferences($resource, $held, $context);
+                foreach (array_keys($held) as $value) {
+                    $bundleIndex->entriesByReference[$value][] = $entry;
+                }
             }
         }
 
-        return $found;
+        return $bundleIndex->entriesByReference[$reference] ?? [];
     }
 
     /**
-     * Search a node for a Reference with the given value.
+     * Collect the values of every Reference under a node, as the keys of $held.
+     *
+     * @param array<array-key, true> $held
      */
-    private function holdsReference(mixed $node, string $reference, EvaluationContext $context): bool
+    private function collectReferences(mixed $node, array &$held, EvaluationContext $context): void
     {
         if (!is_array($node) && !is_object($node)) {
-            return false;
+            return;
         }
 
-        if ($this->readValue($node, 'reference', $context) === $reference) {
-            return true;
+        $reference = $this->readValue($node, 'reference', $context);
+        if (is_string($reference)) {
+            $held[$reference] = true;
         }
 
         foreach (is_array($node) ? $node : get_object_vars($node) as $child) {
-            if ($this->holdsReference($child, $reference, $context)) {
-                return true;
-            }
+            $this->collectReferences($child, $held, $context);
         }
-
-        return false;
     }
 
     /**

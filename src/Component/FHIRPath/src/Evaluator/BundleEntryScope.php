@@ -17,7 +17,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 final readonly class BundleEntryScope
 {
     public function __construct(
-        public mixed $bundle,
+        public BundleIndex $index,
         public mixed $entry,
     ) {
     }
