@@ -78,14 +78,17 @@ $fhirPath->evaluate('Bundle.entry[1].resource.subject.resolve().name.family', $b
 * **No matching entry** falls through to the HTTP strategies. A relative reference goes to the
   configured FHIR server, including one under a `urn:uuid:` `fullUrl`, where the Bundle itself
   gives it no meaning.
-* **Knowing the referring entry.** Navigation, indexers and the functions that filter or iterate
-  (`where()`, `select()`, `first()`, `ofType()` and so on) keep track of it. `union()`, `combine()`,
-  `distinct()`, `intersect()`, `exclude()`, `children()` and `descendants()` lose it, as does an
-  evaluation that starts inside an entry with the Bundle supplied as its root, and `$total`, which
-  can hold a value from an earlier item. With the entry unknown, a relative or fragment reference
-  resolves only if every entry holding that value agrees on the target, and any reference held
-  inside a nested Bundle is omitted, because it may belong to that Bundle. `repeat()` merges equal
-  values, so one merged from different entries counts as unknown too.
+* **Knowing the referring entry.** It travels with each value through navigation, indexers and
+  every function that returns its input or something derived from it, including `where()`,
+  `select()`, `distinct()`, `union()`, `children()` and `descendants()`.
+* **Equal values merged from different entries**, for example by `distinct()`, resolve only if every
+  entry reaches the same resource. So `Bundle.entry.resource.subject.distinct().resolve()` works when
+  they all mean one patient, and omits the value when the same `Patient/1` means different patients.
+* **Values with no known entry** are literals, `$total`, the result of `aggregate()`, descendants of a
+  root Bundle, and anything in an evaluation that starts inside an entry with the Bundle supplied as
+  its root. A relative or fragment reference among them resolves only if every entry holding that value
+  agrees on the target. If the root Bundle holds a nested Bundle anywhere, none of them is looked up,
+  because they may belong to that Bundle, and no HTTP request is made.
 * **Chained references.** A resolved resource keeps the entry it was found in, so
   `subject.resolve().managingOrganization.resolve()` follows the target's own base and `contained`.
   A resource fetched over HTTP is not treated as part of the Bundle: its `#id` references look in
