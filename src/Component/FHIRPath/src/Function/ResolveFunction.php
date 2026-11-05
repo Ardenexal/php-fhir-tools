@@ -79,6 +79,8 @@ use Psr\Http\Message\RequestFactoryInterface;
  *
  * Spec reference: FHIR R4 FHIRPath supplement §2.3
  *
+ * @phpstan-type ResolvedResource array{array<array-key, mixed>|object, BundleEntryScope|null}
+ *
  * @author FHIR Tools Contributors
  */
 final class ResolveFunction extends AbstractFunction
@@ -117,16 +119,21 @@ final class ResolveFunction extends AbstractFunction
         $rootIndex = $evaluator->getRootBundleIndex($context->getRootResource());
 
         $resolved = [];
+        $scopes   = [];
         foreach ($input as $index => $item) {
-            $resource = $this->resolveItem($item, $input->scopeAt($index), $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
+            $match = $this->resolveItem($item, $input->scopeAt($index), $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
             // Model objects are only ever read from `contained` and `Bundle.entry.resource`, which
             // hold nothing but resources.
-            if (is_object($resource) || isset($resource['resourceType'])) {
-                $resolved[] = $resource;
+            if ($match !== null && (is_object($match[0]) || isset($match[0]['resourceType']))) {
+                // A reference on the resolved resource belongs to the entry it was found in.
+                if ($match[1] !== null) {
+                    $scopes[count($resolved)] = $match[1];
+                }
+                $resolved[] = $match[0];
             }
         }
 
-        return Collection::from($resolved);
+        return Collection::from($resolved)->withScopes($scopes);
     }
 
     /**
@@ -143,9 +150,9 @@ final class ResolveFunction extends AbstractFunction
      * @param ClientInterface|null         $httpClient     PSR-18 HTTP client (may be null)
      * @param RequestFactoryInterface|null $requestFactory PSR-17 request factory (may be null)
      *
-     * @return array<string,mixed>|object|null FHIR resource, or null if unresolvable
+     * @return ResolvedResource|null FHIR resource and the Bundle entry it was found in, or null if unresolvable
      */
-    private function resolveItem(mixed $item, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): array|object|null
+    private function resolveItem(mixed $item, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
     {
         // Sees through StringPrimitive/UriPrimitive (a plain reference string on a model) and
         // FHIRTypedCollection (a raw Reference reached through a polymorphic `value`).
@@ -191,9 +198,9 @@ final class ResolveFunction extends AbstractFunction
      * @param ClientInterface|null         $httpClient     PSR-18 HTTP client
      * @param RequestFactoryInterface|null $requestFactory PSR-17 request factory
      *
-     * @return array<string,mixed>|object|null
+     * @return ResolvedResource|null
      */
-    private function resolveUrl(string $url, bool $isCanonical, ?string $refType, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): array|object|null
+    private function resolveUrl(string $url, bool $isCanonical, ?string $refType, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
     {
         // Split on first '#' to separate base URL from fragment (contained resource ID)
         $hashPos  = strpos($url, '#');
@@ -208,7 +215,14 @@ final class ResolveFunction extends AbstractFunction
                     return null;
                 }
 
-                return $baseUrl !== '' && $fragment !== '' ? $this->getContainedResource($matches[0], $fragment, $context) : $matches[0];
+                [$resource, $targetScope] = $matches[0];
+                if ($baseUrl === '' || $fragment === '') {
+                    return $matches[0];
+                }
+
+                $contained = $this->getContainedResource($resource, $fragment, $context);
+
+                return $contained === null ? null : [$contained, $targetScope];
             }
         }
 
@@ -244,15 +258,13 @@ final class ResolveFunction extends AbstractFunction
 
         if ($resource === null && $baseUrl === '' && $fragment !== '') {
             // Fragment-only reference (#id) → search rootResource.contained
-            return $this->getContainedResource($context->getRootResource(), $fragment, $context);
-        }
-
-        if ($resource !== null && $fragment !== '') {
+            $resource = $this->getContainedResource($context->getRootResource(), $fragment, $context);
+        } elseif ($resource !== null && $fragment !== '') {
             // URL + fragment → fetch resource, then find contained by ID
-            return $this->getContainedResource($resource, $fragment, $context);
+            $resource = $this->getContainedResource($resource, $fragment, $context);
         }
 
-        return $resource;
+        return $resource === null ? null : [$resource, null];
     }
 
     /**
@@ -262,7 +274,7 @@ final class ResolveFunction extends AbstractFunction
      * returns what it found, and only a single match is a resolution: an empty or longer list means
      * the Bundle decided the reference and no other strategy should try.
      *
-     * @return list<array<array-key,mixed>|object>|null
+     * @return list<ResolvedResource>|null
      */
     private function resolveInBundle(string $url, string $baseUrl, string $fragment, BundleIndex $bundleIndex, ?BundleEntryScope $scope, EvaluationContext $context): ?array
     {
@@ -276,8 +288,13 @@ final class ResolveFunction extends AbstractFunction
         }
 
         if ($baseUrl === '') {
+            $holders = $this->referringEntries($bundleIndex, $url, $scope, $context);
+            // With several holders agreeing on the target, there is still no saying which entry it
+            // is in, so it gets no scope.
+            $containedScope = count($holders) === 1 ? ($scope ?? new BundleEntryScope($bundleIndex, $holders[0])) : null;
+
             $found = [];
-            foreach ($this->referringEntries($bundleIndex, $url, $scope, $context) as $entry) {
+            foreach ($holders as $entry) {
                 $contained = $this->getContainedResource($this->readProperty($entry, 'resource'), $fragment, $context);
 
                 // Any of these entries could be the one that referred, so one that cannot answer
@@ -291,7 +308,7 @@ final class ResolveFunction extends AbstractFunction
                 }
             }
 
-            return $found;
+            return array_map(static fn (array|object $contained): array => [$contained, $containedScope], $found);
         }
 
         $target = $baseUrl;
@@ -337,9 +354,9 @@ final class ResolveFunction extends AbstractFunction
     }
 
     /**
-     * Find the resources of the entries whose `fullUrl` matches, honouring a version in the URL.
+     * Find the entries whose `fullUrl` matches, honouring a version in the URL.
      *
-     * @return list<array<array-key,mixed>|object>
+     * @return list<ResolvedResource>
      */
     private function entriesWithFullUrl(BundleIndex $bundleIndex, string $target, EvaluationContext $context): array
     {
@@ -348,21 +365,21 @@ final class ResolveFunction extends AbstractFunction
             [, $target, $version] = $parts;
         }
 
-        if ($bundleIndex->resourcesByFullUrl === null) {
-            $bundleIndex->resourcesByFullUrl = [];
+        if ($bundleIndex->entriesByFullUrl === null) {
+            $bundleIndex->entriesByFullUrl = [];
             foreach ($this->entries($bundleIndex->bundle) as $entry) {
                 $resource = $this->readProperty($entry, 'resource');
                 $fullUrl  = $this->readValue($entry, 'fullUrl', $context);
                 if ((is_array($resource) || is_object($resource)) && is_string($fullUrl)) {
-                    $bundleIndex->resourcesByFullUrl[$fullUrl][] = $resource;
+                    $bundleIndex->entriesByFullUrl[$fullUrl][] = [$resource, $entry];
                 }
             }
         }
 
         $matches = [];
-        foreach ($bundleIndex->resourcesByFullUrl[$target] ?? [] as $resource) {
+        foreach ($bundleIndex->entriesByFullUrl[$target] ?? [] as [$resource, $entry]) {
             if ($version === null || $this->readValue($this->readProperty($resource, 'meta'), 'versionId', $context) === $version) {
-                $matches[] = $resource;
+                $matches[] = [$resource, new BundleEntryScope($bundleIndex, $entry)];
             }
         }
 

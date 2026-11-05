@@ -16,8 +16,8 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
  */
 final class BundleIndex
 {
-    /** @var array<array-key, list<array<array-key, mixed>|object>>|null Entry resources by `fullUrl`, built on first use */
-    public ?array $resourcesByFullUrl = null;
+    /** @var array<array-key, list<array{array<array-key, mixed>|object, mixed}>>|null Each entry's resource and the entry itself by `fullUrl`, built on first use */
+    public ?array $entriesByFullUrl = null;
 
     /** @var array<array-key, list<mixed>>|null Entries by the Reference values their resource holds, built on first use */
     public ?array $entriesByReference = null;

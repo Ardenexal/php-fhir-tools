@@ -775,13 +775,123 @@ final class ResolveBundleReferenceTest extends TestCase
     #[DataProvider('shapes')]
     public function testANestedBundleOnlyBlocksTheReferencesItHolds(bool $asModel): void
     {
-        $bundle = $this->nestedBundle($asModel);
-        $string = "'urn:uuid:not-held-by-the-inner-bundle'.resolve()";
-
-        self::assertSame([], $this->evaluate($string, $bundle)->toArray());
-        self::assertSame(['Outer'], $this->evaluate('Bundle.entry[0].fullUrl.resolve().name.family.where($this = \'Outer\')', $this->bundle([
+        $bundle = $this->bundle([
             $this->patientEntry(self::URN_PATIENT, 'Outer'),
-            ['fullUrl' => 'urn:uuid:inner-bundle', 'resource' => ['resourceType' => 'Bundle', 'type' => 'collection']],
-        ], $asModel))->toArray());
+            ['fullUrl' => 'urn:uuid:inner-bundle', 'resource' => [
+                'resourceType' => 'Bundle',
+                'type'         => 'collection',
+                'entry'        => [$this->requestEntry(self::URN_REQUEST, 'urn:uuid:something-else')],
+            ]],
+        ], $asModel);
+
+        // A literal has no origin, but no nested Bundle holds this value, so the root still answers.
+        self::assertSame(['Outer'], $this->evaluate("'" . self::URN_PATIENT . "'.resolve().name.family", $bundle)->toArray());
+        self::assertSame([], $this->evaluate("'urn:uuid:something-else'.resolve()", $bundle)->toArray());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function organizationEntry(string $fullUrl, string $name): array
+    {
+        return ['fullUrl' => $fullUrl, 'resource' => ['resourceType' => 'Organization', 'id' => 'o1', 'name' => $name]];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $contained
+     *
+     * @return array<string, mixed>
+     */
+    private function managedPatientEntry(string $fullUrl, string $family, string $organization, array $contained = []): array
+    {
+        $entry                                     = $this->patientEntry($fullUrl, $family);
+        $entry['resource']['managingOrganization'] = ['reference' => $organization];
+        if ($contained !== []) {
+            $entry['resource']['contained'] = $contained;
+        }
+
+        return $entry;
+    }
+
+    #[DataProvider('shapes')]
+    public function testChainedResolveStaysInTheBundleOfTheTarget(bool $asModel): void
+    {
+        $bundle = $this->bundle([
+            $this->organizationEntry('urn:uuid:org', 'OuterOrg'),
+            ['fullUrl' => 'urn:uuid:inner-bundle', 'resource' => [
+                'resourceType' => 'Bundle',
+                'type'         => 'collection',
+                'entry'        => [
+                    $this->organizationEntry('urn:uuid:org', 'InnerOrg'),
+                    $this->managedPatientEntry(self::URN_PATIENT, 'Inner', 'urn:uuid:org'),
+                    $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT),
+                ],
+            ]],
+        ], $asModel);
+
+        $name = $this->evaluate('Bundle.entry[1].resource.entry[2].resource.subject.resolve().managingOrganization.resolve().name', $bundle);
+
+        self::assertSame(['InnerOrg'], $name->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testChainedRelativeReferenceUsesTheBaseOfTheTarget(bool $asModel): void
+    {
+        $bundle = $this->bundle([
+            $this->organizationEntry('http://a.example/fhir/Organization/o1', 'OrgA'),
+            $this->managedPatientEntry('http://a.example/fhir/Patient/p1', 'FromA', 'Organization/o1'),
+            $this->requestEntry('http://a.example/fhir/ServiceRequest/s1', 'Patient/p1'),
+            $this->organizationEntry('http://b.example/fhir/Organization/o1', 'OrgB'),
+            $this->managedPatientEntry('http://b.example/fhir/Patient/p1', 'FromB', 'Organization/o1'),
+            $this->requestEntry('http://b.example/fhir/ServiceRequest/s2', 'Patient/p1'),
+        ], $asModel);
+        $expression = 'Bundle.entry[%d].resource.subject.resolve().managingOrganization.resolve().name';
+
+        self::assertSame(['OrgA'], $this->evaluate(sprintf($expression, 2), $bundle)->toArray());
+        self::assertSame(['OrgB'], $this->evaluate(sprintf($expression, 5), $bundle)->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testChainedFragmentResolvesInTheEntryOfTheTarget(bool $asModel): void
+    {
+        $organization = static fn (string $name): array => ['resourceType' => 'Organization', 'id' => 'gp', 'name' => $name];
+        $bundle       = $this->bundle([
+            $this->managedPatientEntry(self::URN_PATIENT, 'Target', '#gp', [$organization('TargetGp')]),
+            $this->managedPatientEntry('urn:uuid:other', 'Other', '#gp', [$organization('OtherGp')]),
+            $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT),
+        ], $asModel);
+
+        $name = $this->evaluate('Bundle.entry[2].resource.subject.resolve().managingOrganization.resolve().name', $bundle);
+
+        self::assertSame(['TargetGp'], $name->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testChainFromAContainedResourceStaysInItsEntry(bool $asModel): void
+    {
+        // A contained resource resolves references as its container does.
+        $contained = [
+            ['resourceType' => 'Patient', 'id' => 'p2', 'managingOrganization' => ['reference' => '#org']],
+            ['resourceType' => 'Organization', 'id' => 'org', 'name' => 'SiblingOrg'],
+        ];
+        $bundle = $this->bundle([$this->requestEntry(self::URN_REQUEST, '#p2', $contained)], $asModel);
+
+        $name = $this->evaluate('Bundle.entry[0].resource.subject.resolve().managingOrganization.resolve().name', $bundle);
+
+        self::assertSame(['SiblingOrg'], $name->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testChainOverAFlatBundleOfUrnReferences(bool $asModel): void
+    {
+        $bundle = $this->bundle([
+            $this->organizationEntry('urn:uuid:org', 'OnlyOrg'),
+            $this->managedPatientEntry(self::URN_PATIENT, 'Only', 'urn:uuid:org'),
+            $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT),
+        ], $asModel);
+
+        $name = $this->evaluate('Bundle.entry[2].resource.subject.resolve().managingOrganization.resolve().name', $bundle);
+
+        self::assertSame(['OnlyOrg'], $name->toArray());
     }
 }
