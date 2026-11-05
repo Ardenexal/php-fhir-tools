@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
@@ -64,17 +65,25 @@ final class RepeatFunction extends AbstractFunction
 
         // Per spec: repeat(expr) returns only items produced by applying the projection,
         // NOT the original input. Start with empty result and use input as the first frontier.
-        $result   = [];
-        $seen     = [];
-        $frontier = [];
-
-        $scopes   = [];
+        //
+        // Output is deduplicated by value, as the spec requires. Traversal also tells origins apart:
+        // two equal references in different Bundle entries can lead to different resources.
+        $result    = [];
+        $seen      = [];
+        $visited   = [];
+        $positions = [];
+        $frontier  = [];
+        $scopes    = [];
 
         foreach ($input as $index => $item) {
-            $key = $this->itemKey($item);
-            if (!isset($seen[$key])) {
-                $seen[$key] = true;
-                $frontier[] = [$item, $input->scopeAt($index)];
+            $key   = $this->itemKey($item);
+            $scope = $input->scopeAt($index);
+            $visit = $key . $this->originKey($scope);
+
+            $seen[$key] = true;
+            if (!isset($visited[$visit])) {
+                $visited[$visit] = true;
+                $frontier[]      = [$item, $scope];
             }
         }
 
@@ -86,16 +95,25 @@ final class RepeatFunction extends AbstractFunction
                 $projected   = $evaluator->evaluateWithContext($projection, $itemContext);
 
                 foreach ($projected as $position => $projectedItem) {
-                    $key = $this->itemKey($projectedItem);
+                    $key            = $this->itemKey($projectedItem);
+                    $projectedScope = $projected->scopeAt($position);
+                    $visit          = $key . $this->originKey($projectedScope);
 
                     if (!isset($seen[$key])) {
-                        $seen[$key]     = true;
-                        $projectedScope = $projected->scopeAt($position);
+                        $seen[$key]      = true;
+                        $positions[$key] = count($result);
                         if ($projectedScope !== null) {
                             $scopes[count($result)] = $projectedScope;
                         }
-                        $result[]       = $projectedItem;
-                        $nextFrontier[] = [$projectedItem, $projectedScope];
+                        $result[] = $projectedItem;
+                    } elseif (isset($positions[$key]) && !$this->isSameOrigin($scopes[$positions[$key]] ?? null, $projectedScope)) {
+                        // The one output item now stands for several origins, so it cannot claim any.
+                        unset($scopes[$positions[$key]]);
+                    }
+
+                    if (!isset($visited[$visit])) {
+                        $visited[$visit] = true;
+                        $nextFrontier[]  = [$projectedItem, $projectedScope];
                     }
                 }
             }
@@ -104,6 +122,24 @@ final class RepeatFunction extends AbstractFunction
         }
 
         return Collection::from($result)->withScopes($scopes);
+    }
+
+    /**
+     * Key a Bundle entry by its value rather than its scope object. A projection that navigates into
+     * `Bundle.entry` makes new scopes on each pass, so keying on those would never terminate.
+     */
+    private function originKey(?BundleEntryScope $scope): string
+    {
+        return $scope === null ? '' : '|' . $this->itemKey($scope->entry);
+    }
+
+    private function isSameOrigin(?BundleEntryScope $first, ?BundleEntryScope $second): bool
+    {
+        if ($first === null || $second === null) {
+            return $first === $second;
+        }
+
+        return $first->entry === $second->entry && $first->index->bundle === $second->index->bundle;
     }
 
     /**

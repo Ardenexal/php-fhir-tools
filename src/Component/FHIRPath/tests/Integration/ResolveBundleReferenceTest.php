@@ -702,4 +702,32 @@ final class ResolveBundleReferenceTest extends TestCase
         self::assertSame([false], $this->evaluate("Bundle.entry.resource.subject.first().exists(\$this.resolve().name.family = 'FromB')", $bundle)->toArray());
         self::assertSame([true], $this->evaluate('Bundle.entry.resource.subject.all($this.resolve().exists())', $bundle)->toArray());
     }
+
+    public function testRepeatOutputWithConflictingOriginsIsNotLabelledWithTheFirst(): void
+    {
+        // Equal arrays merge into one output item, and it could mean either patient.
+        self::assertSame([], $this->evaluate('Bundle.entry.resource.repeat(subject).resolve().name.family', $this->twoBaseBundle(false))->toArray());
+    }
+
+    public function testRepeatOutputKeepsAnOriginThatDoesNotConflict(): void
+    {
+        $expression = "Bundle.entry.resource.where(id = 's1' or id = 's2').where(id = 's2').repeat(subject).resolve().name.family";
+
+        self::assertSame(['FromB'], $this->evaluate($expression, $this->twoBaseBundle(false))->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testRepeatTraversesIdenticalValuesFromEachEntry(bool $asModel): void
+    {
+        $family = $this->evaluate('Bundle.entry.resource.subject.repeat(resolve()).name.family', $this->twoBaseBundle($asModel));
+
+        self::assertSame(['FromA', 'FromB'], $family->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testRepeatTerminatesWhenItsProjectionNavigatesIntoEntryAgain(bool $asModel): void
+    {
+        // Each pass makes new scopes for the same entries, so scopes cannot be what stops it.
+        self::assertSame([4], $this->evaluate('Bundle.repeat(%resource.entry).count()', $this->twoBaseBundle($asModel))->toArray());
+    }
 }
