@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Integration;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
@@ -85,11 +86,11 @@ final class ResolveBundleReferenceTest extends TestCase
      *
      * @return array<string, mixed>
      */
-    private function requestEntry(string $fullUrl, string $reference, array $contained = []): array
+    private function requestEntry(string $fullUrl, string $reference, array $contained = [], string $id = 'sr1'): array
     {
         $resource = [
             'resourceType' => 'ServiceRequest',
-            'id'           => 'sr1',
+            'id'           => $id,
             'status'       => 'active',
             'intent'       => 'order',
             'subject'      => ['reference' => $reference],
@@ -140,11 +141,27 @@ final class ResolveBundleReferenceTest extends TestCase
         $this->evaluator->setHttpClient($client, $factory);
     }
 
-    private function evaluate(string $expression, mixed $resource): Collection
+    private function evaluate(string $expression, mixed $resource, ?EvaluationContext $context = null): Collection
     {
         $ast = (new FHIRPathParser())->parse((new FHIRPathLexer())->tokenize($expression));
 
-        return $this->evaluator->evaluate($ast, $resource);
+        return $this->evaluator->evaluate($ast, $resource, $context);
+    }
+
+    /**
+     * Two requests holding the identical reference `Patient/p1` under different bases, so only the
+     * entry each one came from can say which patient it means.
+     *
+     * @return array<string, mixed>|BundleResource
+     */
+    private function twoBaseBundle(bool $asModel): array|BundleResource
+    {
+        return $this->bundle([
+            $this->patientEntry('http://a.example/fhir/Patient/p1', 'FromA'),
+            $this->requestEntry('http://a.example/fhir/ServiceRequest/s1', 'Patient/p1', [], 's1'),
+            $this->patientEntry('http://b.example/fhir/Patient/p1', 'FromB'),
+            $this->requestEntry('http://b.example/fhir/ServiceRequest/s2', 'Patient/p1', [], 's2'),
+        ], $asModel);
     }
 
     #[DataProvider('shapes')]
@@ -361,5 +378,135 @@ final class ResolveBundleReferenceTest extends TestCase
 
         // union() only merges the raw strings; two equal StringPrimitive objects stay as two items.
         self::assertSame(['FromA'], array_values(array_unique($family->toArray())));
+    }
+
+    /**
+     * @return iterable<string, array{string, list<string>}>
+     */
+    public static function trackedExpressions(): iterable
+    {
+        yield 'indexer' => ['Bundle.entry[3].resource.subject.resolve().name.family', ['FromB']];
+        yield 'no type prefix' => ['entry[1].resource.subject.resolve().name.family', ['FromA']];
+        yield '%resource' => ['%resource.entry[3].resource.subject.resolve().name.family', ['FromB']];
+        yield 'reference element' => ['Bundle.entry[3].resource.subject.reference.resolve().name.family', ['FromB']];
+        yield 'every entry, in order' => ['Bundle.entry.resource.subject.resolve().name.family', ['FromA', 'FromB']];
+        yield 'first' => ['Bundle.entry.resource.subject.first().resolve().name.family', ['FromA']];
+        yield 'last' => ['Bundle.entry.resource.subject.last().resolve().name.family', ['FromB']];
+        yield 'tail' => ['Bundle.entry.resource.subject.tail().resolve().name.family', ['FromB']];
+        yield 'skip' => ['Bundle.entry.resource.subject.skip(1).resolve().name.family', ['FromB']];
+        yield 'take' => ['Bundle.entry.resource.subject.take(1).resolve().name.family', ['FromA']];
+        yield 'single' => ['Bundle.entry[3].resource.subject.single().resolve().name.family', ['FromB']];
+        yield 'trace' => ['Bundle.entry[3].resource.subject.trace(\'t\').resolve().name.family', ['FromB']];
+        yield 'where on the resource' => ["Bundle.entry.resource.where(id = 's2').subject.resolve().name.family", ['FromB']];
+        yield 'where on the entry' => ["Bundle.entry.where(resource.id = 's2').resource.subject.resolve().name.family", ['FromB']];
+        yield 'resolve inside where' => ["Bundle.entry.resource.where(subject.resolve().name.family = 'FromB').id", ['s2']];
+        yield 'select from the entry' => ['Bundle.entry.select(resource.subject).resolve().name.family', ['FromA', 'FromB']];
+        yield 'select from the resource' => ['Bundle.entry.resource.select(subject).resolve().name.family', ['FromA', 'FromB']];
+        yield 'resolve inside select' => ['Bundle.entry.resource.subject.select($this.resolve().name.family)', ['FromA', 'FromB']];
+        yield 'iif branch' => ['Bundle.entry[3].resource.subject.iif(true, resolve().name.family)', ['FromB']];
+        yield 'aggregate' => ["Bundle.entry.resource.subject.aggregate(\$this.resolve().name.family, '')", ['FromB']];
+        yield 'sort by expression' => ['Bundle.entry.resource.sort(-id).subject.resolve().name.family', ['FromB', 'FromA']];
+        yield 'repeat' => ['Bundle.entry.resource.where(id = \'s2\').repeat(subject).resolve().name.family', ['FromB']];
+    }
+
+    /**
+     * @param list<string> $expected
+     */
+    #[DataProvider('trackedExpressions')]
+    public function testTheReferringEntryIsTrackedAsAnArray(string $expression, array $expected): void
+    {
+        self::assertSame($expected, $this->evaluate($expression, $this->twoBaseBundle(false))->toArray());
+    }
+
+    /**
+     * @param list<string> $expected
+     */
+    #[DataProvider('trackedExpressions')]
+    public function testTheReferringEntryIsTrackedAsAModel(string $expression, array $expected): void
+    {
+        self::assertSame($expected, $this->evaluate($expression, $this->twoBaseBundle(true))->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testExistsAndAllEvaluateEachItemInItsOwnEntry(bool $asModel): void
+    {
+        $bundle = $this->twoBaseBundle($asModel);
+
+        self::assertSame([true], $this->evaluate("Bundle.entry.resource.subject.exists(resolve().name.family = 'FromB')", $bundle)->toArray());
+        self::assertSame([true], $this->evaluate('Bundle.entry.resource.subject.all(resolve().exists())', $bundle)->toArray());
+    }
+
+    public function testOfTypeKeepsTheEntryOnAModel(): void
+    {
+        $family = $this->evaluate('Bundle.entry.resource.ofType(ServiceRequest).last().subject.resolve().name.family', $this->twoBaseBundle(true));
+
+        self::assertSame(['FromB'], $family->toArray());
+    }
+
+    public function testAsKeepsTheEntryOnAModel(): void
+    {
+        $family = $this->evaluate('(Bundle.entry[3].resource as ServiceRequest).subject.resolve().name.family', $this->twoBaseBundle(true));
+
+        self::assertSame(['FromB'], $family->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testIdenticalFragmentsResolveInTheirOwnEntries(bool $asModel): void
+    {
+        $contained = static fn (string $family): array => [['resourceType' => 'Patient', 'id' => 'p2', 'name' => [['family' => $family]]]];
+        $bundle    = $this->bundle([
+            $this->requestEntry(self::URN_PATIENT, '#p2', $contained('First')),
+            $this->requestEntry(self::URN_REQUEST, '#p2', $contained('Second')),
+        ], $asModel);
+
+        self::assertSame(['First', 'Second'], $this->evaluate('Bundle.entry.resource.subject.resolve().name.family', $bundle)->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testIdenticalRelativeReferenceUnderAUrnEntryStaysUnresolved(bool $asModel): void
+    {
+        // A relative reference gets its meaning from its own entry, not from a sibling with a base.
+        $bundle = $this->bundle([
+            $this->patientEntry('http://a.example/fhir/Patient/p1', 'FromA'),
+            $this->requestEntry('http://a.example/fhir/ServiceRequest/s1', 'Patient/p1'),
+            $this->requestEntry(self::URN_REQUEST, 'Patient/p1'),
+        ], $asModel);
+
+        self::assertSame(['FromA'], $this->evaluate('Bundle.entry[1].resource.subject.resolve().name.family', $bundle)->toArray());
+        self::assertTrue($this->evaluate('Bundle.entry[2].resource.subject.resolve()', $bundle)->isEmpty());
+    }
+
+    #[DataProvider('shapes')]
+    public function testNestedBundleResolvesInTheInnermostBundle(bool $asModel): void
+    {
+        $inner = [
+            'resourceType' => 'Bundle',
+            'type'         => 'collection',
+            'entry'        => [
+                $this->patientEntry(self::URN_PATIENT, 'Inner'),
+                $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT),
+            ],
+        ];
+        $bundle = $this->bundle([
+            $this->patientEntry(self::URN_PATIENT, 'Outer'),
+            ['fullUrl' => 'urn:uuid:inner-bundle', 'resource' => $inner],
+            $this->requestEntry('urn:uuid:outer-request', self::URN_PATIENT),
+        ], $asModel);
+
+        self::assertSame(['Inner'], $this->evaluate('Bundle.entry[1].resource.entry[1].resource.subject.resolve().name.family', $bundle)->toArray());
+        self::assertSame(['Outer'], $this->evaluate('Bundle.entry[2].resource.subject.resolve().name.family', $bundle)->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testBundleSuppliedAsRootWithAnEntryResourceAsFocus(bool $asModel): void
+    {
+        // The evaluation starts inside the entry, so nothing tracked it: the fallback still applies.
+        $bundle = $this->bundle([
+            $this->patientEntry(self::URN_PATIENT, 'Example'),
+            $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT),
+        ], $asModel);
+        $focus = is_array($bundle) ? $bundle['entry'][1]['resource'] : $bundle->entry[1]->resource;
+
+        self::assertSame(['Example'], $this->evaluate('subject.resolve().name.family', $focus, new EvaluationContext($bundle))->toArray());
     }
 }

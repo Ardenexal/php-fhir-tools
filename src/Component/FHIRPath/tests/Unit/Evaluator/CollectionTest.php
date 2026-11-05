@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit\Evaluator;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use PHPUnit\Framework\TestCase;
 
@@ -181,5 +182,66 @@ final class CollectionTest extends TestCase
         }
 
         self::assertSame(['a', 'b', 'c'], $items);
+    }
+
+    public function testItemsHaveNoScopeByDefault(): void
+    {
+        $collection = Collection::from(['a', 'b']);
+
+        self::assertNull($collection->scopeAt(0));
+        self::assertSame([], $collection->getScopes());
+    }
+
+    public function testWithScopeAppliesToEveryItem(): void
+    {
+        $scope      = new BundleEntryScope('bundle', 'entry');
+        $collection = Collection::from(['a', 'b'])->withScope($scope);
+
+        self::assertSame($scope, $collection->scopeAt(0));
+        self::assertSame($scope, $collection->scopeAt(1));
+        self::assertSame(['a', 'b'], $collection->toArray());
+    }
+
+    public function testWithNullScopeLeavesTheCollectionAsItIs(): void
+    {
+        $collection = Collection::from(['a']);
+
+        self::assertSame($collection, $collection->withScope(null));
+    }
+
+    public function testWithScopeOnAnEmptyCollectionAddsNothing(): void
+    {
+        self::assertSame([], Collection::empty()->withScope(new BundleEntryScope('bundle', 'entry'))->getScopes());
+    }
+
+    public function testOnlySelectsItemsAndRekeysTheirScopes(): void
+    {
+        $first      = new BundleEntryScope('bundle', 'first');
+        $last       = new BundleEntryScope('bundle', 'last');
+        $collection = Collection::from(['a', 'b', 'c'])->withScopes([0 => $first, 2 => $last]);
+
+        $selected = $collection->only([2, 1, 0]);
+
+        self::assertSame(['c', 'b', 'a'], $selected->toArray());
+        self::assertSame($last, $selected->scopeAt(0));
+        self::assertNull($selected->scopeAt(1));
+        self::assertSame($first, $selected->scopeAt(2));
+    }
+
+    public function testOnlyReturnsAnOrderedCollection(): void
+    {
+        // where() and friends have always handed back an ordered collection from Collection::from(),
+        // which is what the strict-mode ordering guards on skip(), tail() and take() see.
+        self::assertTrue(Collection::unordered(['a', 'b'])->only([0])->isOrdered());
+    }
+
+    public function testBuildingANewCollectionDropsScopes(): void
+    {
+        $collection = Collection::from(['a', 'b'])->withScope(new BundleEntryScope('bundle', 'entry'));
+
+        self::assertSame([], $collection->map(static fn (mixed $item): mixed => $item)->getScopes());
+        self::assertSame([], $collection->filter(static fn (mixed $item): bool => true)->getScopes());
+        self::assertSame([], $collection->union(Collection::single('c'))->getScopes());
+        self::assertSame([], $collection->concat(Collection::single('c'))->getScopes());
     }
 }

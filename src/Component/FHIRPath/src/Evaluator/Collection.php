@@ -17,15 +17,19 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 final readonly class Collection implements \IteratorAggregate, \Countable
 {
     /**
-     * @param array<int, mixed> $items
-     * @param bool              $ordered      Whether items have a defined order (false for children(), descendants(), etc.)
-     * @param string|null       $declaredType FHIR type name declared by an `as` cast (e.g. 'Period'),
-     *                                        carried on empty collections so strict-mode property checks work.
+     * @param array<int, mixed>            $items
+     * @param bool                         $ordered      Whether items have a defined order (false for children(), descendants(), etc.)
+     * @param string|null                  $declaredType FHIR type name declared by an `as` cast (e.g. 'Period'),
+     *                                                   carried on empty collections so strict-mode property checks work.
+     * @param array<int, BundleEntryScope> $scopes       The Bundle entry each item was navigated out of, keyed by
+     *                                                   item index. Operations that build a new collection drop
+     *                                                   these, and resolve() then falls back to searching the Bundle.
      */
     private function __construct(
         private array $items,
         private bool $ordered = true,
         private ?string $declaredType = null,
+        private array $scopes = [],
     ) {
     }
 
@@ -139,6 +143,80 @@ final readonly class Collection implements \IteratorAggregate, \Countable
         $count = count($this->items);
 
         return $count > 0 ? $this->items[$count - 1] : null;
+    }
+
+    /**
+     * Get the Bundle entry the item at the given index was navigated out of.
+     */
+    public function scopeAt(int $index): ?BundleEntryScope
+    {
+        return $this->scopes[$index] ?? null;
+    }
+
+    /**
+     * Get the Bundle entries of the items that have one, keyed by item index.
+     *
+     * @return array<int, BundleEntryScope>
+     */
+    public function getScopes(): array
+    {
+        return $this->scopes;
+    }
+
+    /**
+     * Return a copy with the given Bundle entries, keyed by item index.
+     *
+     * @param array<int, BundleEntryScope> $scopes
+     */
+    public function withScopes(array $scopes): self
+    {
+        // Runs on every member access, and outside a Bundle there is nothing to add.
+        if ($scopes === [] && $this->scopes === []) {
+            return $this;
+        }
+
+        return new self($this->items, $this->ordered, $this->declaredType, $scopes);
+    }
+
+    /**
+     * Return a copy with every item in the given Bundle entry. Null leaves the collection as it is.
+     */
+    public function withScope(?BundleEntryScope $scope): self
+    {
+        if ($scope === null || $this->items === []) {
+            return $this;
+        }
+
+        return $this->withScopes(array_fill(0, count($this->items), $scope));
+    }
+
+    /**
+     * Return the items at the given indexes, each keeping its Bundle entry.
+     *
+     * The result is ordered, as it is from Collection::from(), which this stands in for in the
+     * functions that select from their input.
+     *
+     * @param list<int> $indexes
+     */
+    public function only(array $indexes): self
+    {
+        $items = [];
+        foreach ($indexes as $index) {
+            $items[] = $this->items[$index];
+        }
+
+        if ($this->scopes === []) {
+            return new self($items);
+        }
+
+        $scopes = [];
+        foreach ($indexes as $position => $index) {
+            if (isset($this->scopes[$index])) {
+                $scopes[$position] = $this->scopes[$index];
+            }
+        }
+
+        return new self($items, true, null, $scopes);
     }
 
     /**

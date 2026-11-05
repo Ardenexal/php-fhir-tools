@@ -78,6 +78,7 @@ final class AggregateFunction extends AbstractFunction
             // so that $total.empty() evaluates to true per the FHIRPath spec.
             $iterContext = $context
                 ->withCurrentNode($item)
+                ->withBundleEntryScope($input->scopeAt($index))
                 ->withVariable('this', $item)
                 ->withVariable('index', $index);
 

@@ -412,7 +412,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 // Return the value as-is, including null: a variable explicitly set to null
                 // (e.g. $this for a null FHIR primitive element in select()) is still a valid
                 // node that hasValue() should evaluate to false for.
-                return Collection::single($value);
+                return Collection::single($value)->withScope($this->context->getBundleEntryScope());
             }
 
             return Collection::empty();
@@ -430,7 +430,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // through to property navigation so that `Patient.name.given` does not mistakenly
         // look for a property key named "Patient".
         if ($this->matchesResourceType($currentNode, $name)) {
-            return Collection::single($currentNode);
+            return Collection::single($currentNode)->withScope($this->context->getBundleEntryScope());
         }
 
         // Strict mode: if the identifier starts with an uppercase letter (indicating a
@@ -444,7 +444,20 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             throw new FHIRPathSemanticException("Type filter '{$name}' does not match the context resource type");
         }
 
-        return $this->navigateProperty($currentNode, $name);
+        $result = $this->navigateProperty($currentNode, $name);
+
+        // Navigating into Bundle.entry is where a value's Bundle entry starts; a nested Bundle
+        // replaces the outer one. Everything navigated from there inherits it.
+        if ($name === 'entry' && $this->matchesResourceType($currentNode, 'Bundle')) {
+            $scopes = [];
+            foreach ($result as $index => $entry) {
+                $scopes[$index] = new BundleEntryScope($currentNode, $entry);
+            }
+
+            return $result->withScopes($scopes);
+        }
+
+        return $result->withScope($this->context->getBundleEntryScope());
     }
 
     /**
@@ -491,17 +504,21 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         // Property navigation: iterate per-item and flatten results
         $results = [];
-        foreach ($objectResult as $item) {
+        $scopes  = [];
+        foreach ($objectResult as $index => $item) {
             $oldContext    = $this->context;
-            $this->context = $this->context->withCurrentNode($item);
+            $this->context = $this->context->withCurrentNode($item)->withBundleEntryScope($objectResult->scopeAt($index));
 
             $memberResult = $node->getMember()->accept($this);
-            $results      = [...$results, ...$memberResult->toArray()];
+            foreach ($memberResult->getScopes() as $position => $scope) {
+                $scopes[count($results) + $position] = $scope;
+            }
+            $results = [...$results, ...$memberResult->toArray()];
 
             $this->context = $oldContext;
         }
 
-        return Collection::from($results);
+        return Collection::from($results)->withScopes($scopes);
     }
 
     /**
@@ -518,7 +535,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         } else {
             // Called directly (not via member access) — use the current node
             $input           = $this->context->getCurrentNode();
-            $inputCollection = $input !== null ? $this->wrapValue($input) : Collection::empty();
+            $inputCollection = $input !== null ? $this->wrapValue($input)->withScope($this->context->getBundleEntryScope()) : Collection::empty();
         }
 
         // Get the function from the registry
@@ -664,9 +681,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return Collection::empty();
         }
 
-        $item = $collection->get($index);
-
-        return $item !== null ? Collection::single($item) : Collection::empty();
+        return $collection->get($index) !== null ? $collection->only([$index]) : Collection::empty();
     }
 
     /**
@@ -724,7 +739,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             $item = $collection->first();
 
             if ($this->typeResolver->isOfType($item, $typeName, strict: true)) {
-                return Collection::single($item);
+                return $collection->only([0]);
             }
 
             return $this->context->isStrictMode()

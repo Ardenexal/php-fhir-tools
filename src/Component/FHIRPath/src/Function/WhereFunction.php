@@ -38,15 +38,16 @@ final class WhereFunction extends AbstractFunction
         foreach ($input as $index => $item) {
             $itemContext = $context
                 ->withCurrentNode($item)
+                ->withBundleEntryScope($input->scopeAt($index))
                 ->withIterationVariables($item, $index, $input->count());
 
             $result = $evaluator->evaluateWithContext($criteriaExpr, $itemContext);
 
             if (!$result->isEmpty() && $result->first() === true) {
-                $filtered[] = $item;
+                $filtered[] = $index;
             }
         }
 
-        return Collection::from($filtered);
+        return $input->only($filtered);
     }
 }

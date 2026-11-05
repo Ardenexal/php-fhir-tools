@@ -68,28 +68,34 @@ final class RepeatFunction extends AbstractFunction
         $seen     = [];
         $frontier = [];
 
-        foreach ($input as $item) {
+        $scopes   = [];
+
+        foreach ($input as $index => $item) {
             $key = $this->itemKey($item);
             if (!isset($seen[$key])) {
                 $seen[$key] = true;
-                $frontier[] = $item;
+                $frontier[] = [$item, $input->scopeAt($index)];
             }
         }
 
         while (!empty($frontier)) {
             $nextFrontier = [];
 
-            foreach ($frontier as $item) {
-                $itemContext = $context->withCurrentNode($item);
+            foreach ($frontier as [$item, $scope]) {
+                $itemContext = $context->withCurrentNode($item)->withBundleEntryScope($scope);
                 $projected   = $evaluator->evaluateWithContext($projection, $itemContext);
 
-                foreach ($projected as $projectedItem) {
+                foreach ($projected as $position => $projectedItem) {
                     $key = $this->itemKey($projectedItem);
 
                     if (!isset($seen[$key])) {
                         $seen[$key]     = true;
+                        $projectedScope = $projected->scopeAt($position);
+                        if ($projectedScope !== null) {
+                            $scopes[count($result)] = $projectedScope;
+                        }
                         $result[]       = $projectedItem;
-                        $nextFrontier[] = $projectedItem;
+                        $nextFrontier[] = [$projectedItem, $projectedScope];
                     }
                 }
             }
@@ -97,7 +103,7 @@ final class RepeatFunction extends AbstractFunction
             $frontier = $nextFrontier;
         }
 
-        return Collection::from($result);
+        return Collection::from($result)->withScopes($scopes);
     }
 
     /**

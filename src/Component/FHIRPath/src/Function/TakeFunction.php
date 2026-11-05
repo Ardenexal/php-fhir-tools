@@ -48,16 +48,14 @@ final class TakeFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $items = [];
-        $count = 0;
-        foreach ($input as $item) {
-            if ($count >= $num) {
+        $indexes = [];
+        foreach ($input as $index => $item) {
+            if ($index >= $num) {
                 break;
             }
-            $items[] = $item;
-            ++$count;
+            $indexes[] = $index;
         }
 
-        return Collection::from($items);
+        return $input->only($indexes);
     }
 }
