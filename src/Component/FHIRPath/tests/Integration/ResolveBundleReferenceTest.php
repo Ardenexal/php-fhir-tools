@@ -1305,4 +1305,17 @@ final class ResolveBundleReferenceTest extends TestCase
 
         self::assertSame(['FromA'], $this->evaluate('Bundle.entry[1].resource.subject.aggregate($this).resolve().name.family', $bundle)->toArray());
     }
+
+    public function testRepeatRemembersAnUnscopedItemFromBeforeAnyScopeAppears(): void
+    {
+        // The first subject comes through an external constant, so it has no entry; the second does.
+        // They merge into one value that could mean either patient.
+        $bundle  = $this->twoBaseBundle(false);
+        $context = new EvaluationContext($bundle);
+        $context->setExternalConstant('untracked', $bundle['entry'][1]['resource']);
+
+        $family = $this->evaluate('(%untracked | Bundle.entry[3].resource).repeat(subject).resolve().name.family', $bundle, $context);
+
+        self::assertSame([], $family->toArray());
+    }
 }
