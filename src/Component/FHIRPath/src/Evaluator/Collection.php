@@ -22,8 +22,7 @@ final readonly class Collection implements \IteratorAggregate, \Countable
      * @param string|null                  $declaredType FHIR type name declared by an `as` cast (e.g. 'Period'),
      *                                                   carried on empty collections so strict-mode property checks work.
      * @param array<int, BundleEntryScope> $scopes       The Bundle entry each item was navigated out of, keyed by
-     *                                                   item index. Operations that build a new collection drop
-     *                                                   these, and resolve() then falls back to searching the Bundle.
+     *                                                   item index. map() and filter() drop these, because they can change an item's meaning.
      */
     private function __construct(
         private array $items,
@@ -191,6 +190,25 @@ final readonly class Collection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Get the one Bundle entry every item came from, if they all came from the same one.
+     */
+    public function soleScope(): ?BundleEntryScope
+    {
+        if ($this->items === [] || count($this->scopes) !== count($this->items)) {
+            return null;
+        }
+
+        $sole = $this->scopes[0] ?? null;
+        foreach ($this->scopes as $scope) {
+            if ($scope !== $sole && $scope->path !== $sole?->path) {
+                return null;
+            }
+        }
+
+        return $sole;
+    }
+
+    /**
      * Return the items at the given indexes, each keeping its Bundle entry.
      *
      * The result is ordered, as it is from Collection::from(), which this stands in for in the
@@ -269,22 +287,21 @@ final readonly class Collection implements \IteratorAggregate, \Countable
         // Per FHIRPath spec: union returns the combined collection with ALL duplicates removed
         // (not just cross-collection duplicates). Start with an empty result and add items
         // from both sides, skipping any that are already present.
-        $result = [];
+        $result  = [];
+        $origins = [];
 
-        foreach (array_merge($this->items, $other->items) as $item) {
-            $isDuplicate = false;
-            foreach ($result as $existing) {
-                if ($existing === $item) {
-                    $isDuplicate = true;
-                    break;
+        foreach ([$this, $other] as $side) {
+            foreach ($side->items as $index => $item) {
+                $position = array_search($item, $result, true);
+                if ($position === false) {
+                    $position = count($result);
+                    $result[] = $item;
                 }
-            }
-            if (!$isDuplicate) {
-                $result[] = $item;
+                $origins[$position][] = $side->scopes[$index] ?? null;
             }
         }
 
-        return new self($result);
+        return new self($result, true, null, self::mergeOrigins($origins));
     }
 
     /**
@@ -292,35 +309,48 @@ final readonly class Collection implements \IteratorAggregate, \Countable
      */
     public function intersect(self $other): self
     {
-        $result = [];
+        $result  = [];
+        $origins = [];
 
-        foreach ($this->items as $item) {
-            $inOther = false;
-            foreach ($other->items as $otherItem) {
-                if ($item === $otherItem) {
-                    $inOther = true;
-                    break;
-                }
-            }
-
-            if (!$inOther) {
+        foreach ($this->items as $index => $item) {
+            $matches = array_keys($other->items, $item, true);
+            if ($matches === []) {
                 continue;
             }
 
-            $alreadyIn = false;
-            foreach ($result as $existing) {
-                if ($item === $existing) {
-                    $alreadyIn = true;
-                    break;
-                }
+            $position = array_search($item, $result, true);
+            if ($position === false) {
+                $position = count($result);
+                $result[] = $item;
             }
 
-            if (!$alreadyIn) {
-                $result[] = $item;
+            $origins[$position][] = $this->scopes[$index] ?? null;
+            foreach ($matches as $match) {
+                $origins[$position][] = $other->scopes[$match] ?? null;
             }
         }
 
-        return new self($result);
+        return new self($result, true, null, self::mergeOrigins($origins));
+    }
+
+    /**
+     * Merge the origins gathered for each item of a deduplicated collection.
+     *
+     * @param array<int, list<BundleEntryScope|null>> $origins
+     *
+     * @return array<int, BundleEntryScope>
+     */
+    public static function mergeOrigins(array $origins): array
+    {
+        $scopes = [];
+        foreach ($origins as $position => $itemOrigins) {
+            $scope = BundleEntryScope::merge($itemOrigins);
+            if ($scope !== null) {
+                $scopes[$position] = $scope;
+            }
+        }
+
+        return $scopes;
     }
 
     /**
@@ -328,7 +358,12 @@ final readonly class Collection implements \IteratorAggregate, \Countable
      */
     public function concat(self $other): self
     {
-        return new self([...$this->items, ...$other->items]);
+        $scopes = $this->scopes;
+        foreach ($other->scopes as $index => $scope) {
+            $scopes[count($this->items) + $index] = $scope;
+        }
+
+        return new self([...$this->items, ...$other->items], true, null, $scopes);
     }
 
     /**

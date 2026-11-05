@@ -348,10 +348,10 @@ final class ResolveBundleReferenceTest extends TestCase
     }
 
     #[DataProvider('shapes')]
-    public function testRelativeReferenceThatEntriesDisagreeOnIsNotGuessed(bool $asModel): void
+    public function testValuesMergedFromEntriesThatDisagreeAreNotGuessed(bool $asModel): void
     {
-        // union() merges two identical values, so nothing says which entry the survivor came from.
-        // The bases give different targets, and picking either could return the wrong patient.
+        // union() merges two equal strings into one item that means two different patients. Models
+        // hold separate primitive objects, which union() keeps apart, so each resolves on its own.
         $this->configureServer();
         $bundle = $this->bundle([
             $this->patientEntry('http://a.example/fhir/Patient/p1', 'FromA'),
@@ -360,9 +360,9 @@ final class ResolveBundleReferenceTest extends TestCase
             $this->requestEntry('http://b.example/fhir/ServiceRequest/sr2', 'Patient/p1'),
         ], $asModel);
 
-        $resolved = $this->evaluate('(Bundle.entry[1].resource.subject.reference | Bundle.entry[3].resource.subject.reference).resolve()', $bundle);
+        $resolved = $this->evaluate('(Bundle.entry[1].resource.subject.reference | Bundle.entry[3].resource.subject.reference).resolve().name.family', $bundle);
 
-        self::assertTrue($resolved->isEmpty());
+        self::assertSame($asModel ? ['FromA', 'FromB'] : [], $resolved->toArray());
         self::assertSame([], $this->requested);
     }
 
@@ -644,13 +644,14 @@ final class ResolveBundleReferenceTest extends TestCase
     #[DataProvider('shapes')]
     public function testFragmentIsNotMatchedWhenAnotherHolderLacksTheTarget(bool $asModel): void
     {
-        // distinct() loses the entry, and only one of the entries holding `#p2` could answer it.
+        // The evaluation starts inside the entry, so only one of the entries holding `#p2` can answer.
         $bundle = $this->bundle([
             $this->requestEntry(self::URN_PATIENT, '#p2', [['resourceType' => 'Patient', 'id' => 'p2', 'name' => [['family' => 'Contained']]]]),
             $this->requestEntry(self::URN_REQUEST, '#p2'),
         ], $asModel);
+        $focus = is_array($bundle) ? $bundle['entry'][1]['resource'] : $bundle->entry[1]->resource;
 
-        self::assertSame([], $this->evaluate('Bundle.entry[1].resource.subject.distinct().resolve().name.family', $bundle)->toArray());
+        self::assertSame([], $this->evaluate('subject.resolve().name.family', $focus, new EvaluationContext($bundle))->toArray());
     }
 
     #[DataProvider('shapes')]
@@ -754,14 +755,14 @@ final class ResolveBundleReferenceTest extends TestCase
     }
 
     #[DataProvider('shapes')]
-    public function testLostScopeDoesNotSwitchToTheOuterBundle(bool $asModel): void
+    public function testCollectionFunctionsStayInTheInnerBundle(bool $asModel): void
     {
         $bundle = $this->nestedBundle($asModel);
         $inner  = 'Bundle.entry[1].resource.entry[1].resource.subject';
 
         self::assertSame(['Inner'], $this->evaluate("{$inner}.resolve().name.family", $bundle)->toArray());
-        self::assertSame([], $this->evaluate("{$inner}.distinct().resolve().name.family", $bundle)->toArray());
-        self::assertSame([], $this->evaluate("({$inner} | {}).resolve().name.family", $bundle)->toArray());
+        self::assertSame(['Inner'], $this->evaluate("{$inner}.distinct().resolve().name.family", $bundle)->toArray());
+        self::assertSame(['Inner'], $this->evaluate("({$inner} | {}).resolve().name.family", $bundle)->toArray());
     }
 
     #[DataProvider('shapes')]
@@ -1047,5 +1048,109 @@ final class ResolveBundleReferenceTest extends TestCase
 
         self::assertSame([2000], $count->toArray());
         self::assertLessThan(32 * 1024 * 1024, $growth, 'repeat() retained far more memory than its items');
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function functionsKeepingAnOrigin(): iterable
+    {
+        yield 'distinct' => ['Bundle.entry[3].resource.subject.distinct().resolve().name.family'];
+        yield 'union operator' => ['(Bundle.entry[3].resource.subject | {}).resolve().name.family'];
+        yield 'union function' => ['Bundle.entry[3].resource.subject.union({}).resolve().name.family'];
+        yield 'combine' => ['Bundle.entry[3].resource.subject.combine({}).resolve().name.family'];
+        yield 'exclude' => ["Bundle.entry[3].resource.subject.exclude('other').resolve().name.family"];
+        yield 'intersect' => ['Bundle.entry[3].resource.subject.reference.intersect(Bundle.entry[3].resource.subject.reference).resolve().name.family'];
+        yield 'children' => ['Bundle.entry[3].resource.children().where(reference.exists()).resolve().name.family'];
+        yield 'descendants' => ['Bundle.entry[3].resource.descendants().where(reference.exists()).resolve().name.family'];
+        yield 'natural sort' => ['Bundle.entry[3].resource.subject.reference.sort().resolve().name.family'];
+        yield 'value derived by a function' => ['Bundle.entry[3].resource.subject.reference.toString().resolve().name.family'];
+        yield 'replace' => ["Bundle.entry[3].resource.subject.reference.replace('p1', 'p1').resolve().name.family"];
+    }
+
+    #[DataProvider('functionsKeepingAnOrigin')]
+    public function testFunctionsKeepAnOriginOnArrays(string $expression): void
+    {
+        self::assertSame(['FromB'], $this->evaluate($expression, $this->twoBaseBundle(false))->toArray());
+    }
+
+    #[DataProvider('functionsKeepingAnOrigin')]
+    public function testFunctionsKeepAnOriginOnModels(string $expression): void
+    {
+        self::assertSame(['FromB'], $this->evaluate($expression, $this->twoBaseBundle(true))->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testChildrenAndDescendantsKeepEachItemsOwnOrigin(bool $asModel): void
+    {
+        $bundle = $this->twoBaseBundle($asModel);
+
+        self::assertSame(['FromA', 'FromB'], $this->evaluate('Bundle.entry.resource.children().where(reference.exists()).resolve().name.family', $bundle)->toArray());
+        self::assertSame(['FromA', 'FromB'], $this->evaluate('Bundle.entry.resource.descendants().where(reference.exists()).resolve().name.family', $bundle)->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testDistinctOverASharedReferenceStillResolves(bool $asModel): void
+    {
+        // Every entry refers to one patient, the commonest shape there is.
+        $this->configureServer();
+        $bundle = $this->bundle([
+            $this->patientEntry(self::URN_PATIENT, 'Shared'),
+            $this->requestEntry('urn:uuid:one', self::URN_PATIENT, [], 'one'),
+            $this->requestEntry('urn:uuid:two', self::URN_PATIENT, [], 'two'),
+            $this->requestEntry('urn:uuid:three', self::URN_PATIENT, [], 'three'),
+        ], $asModel);
+
+        $family = $this->evaluate('Bundle.entry.resource.subject.distinct().resolve().name.family', $bundle);
+
+        self::assertSame(['Shared'], array_values(array_unique($family->toArray())));
+        self::assertSame([], $this->requested);
+    }
+
+    public function testMergedAbsoluteReferenceIsFetchedOnlyOnce(): void
+    {
+        $this->configureServer();
+        $bundle = $this->bundle([
+            $this->requestEntry('urn:uuid:one', 'http://elsewhere.example/fhir/Patient/x', [], 'one'),
+            $this->requestEntry('urn:uuid:two', 'http://elsewhere.example/fhir/Patient/x', [], 'two'),
+            $this->requestEntry('urn:uuid:three', 'http://elsewhere.example/fhir/Patient/x', [], 'three'),
+        ], false);
+
+        $this->evaluate('Bundle.entry.resource.subject.distinct().resolve()', $bundle);
+
+        self::assertSame(['http://elsewhere.example/fhir/Patient/x'], $this->requested);
+    }
+
+    public function testDistinctOverReferencesThatMeanDifferentPatientsIsNotGuessed(): void
+    {
+        self::assertSame([], $this->evaluate('Bundle.entry.resource.subject.distinct().resolve().name.family', $this->twoBaseBundle(false))->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testFetchedResourceKeepsItsContextThroughDistinct(bool $asModel): void
+    {
+        $this->configureServerAnswering([
+            'http://elsewhere.example/fhir/Patient/x'     => ['resourceType' => 'Patient', 'id' => 'x', 'managingOrganization' => ['reference' => 'Organization/o1']],
+            'https://server.example/fhir/Organization/o1' => ['resourceType' => 'Organization', 'id' => 'o1', 'name' => 'FromServer'],
+        ]);
+        $bundle = $this->bundle([
+            $this->organizationEntry('http://a.example/fhir/Organization/o1', 'InTheBundle'),
+            $this->managedPatientEntry('http://a.example/fhir/Patient/p1', 'InTheBundle', 'Organization/o1'),
+            $this->requestEntry('http://a.example/fhir/ServiceRequest/s1', 'http://elsewhere.example/fhir/Patient/x'),
+        ], $asModel);
+
+        $name = $this->evaluate('Bundle.entry[2].resource.subject.resolve().managingOrganization.distinct().resolve().name', $bundle);
+
+        self::assertSame(['FromServer'], $name->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testDescendantsOfANestedBundleDoNotClaimTheOuterEntry(bool $asModel): void
+    {
+        $bundle = $this->nestedBundle($asModel);
+
+        $family = $this->evaluate('Bundle.entry[1].resource.descendants().where(reference.exists()).resolve().name.family', $bundle);
+
+        self::assertSame([], $family->toArray());
     }
 }

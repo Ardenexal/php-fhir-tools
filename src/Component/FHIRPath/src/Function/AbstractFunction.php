@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
@@ -89,6 +91,21 @@ abstract class AbstractFunction implements FunctionInterface
         }
 
         return null;
+    }
+
+    /**
+     * Get the Bundle entry that a node's children belong to.
+     *
+     * A node's children stay in its entry, except a Bundle's, which belong to that Bundle's own entries
+     * rather than the one around it. Which of those is not known here, so they claim none.
+     */
+    protected function getChildScope(mixed $node, ?BundleEntryScope $scope, EvaluationContext $context): ?BundleEntryScope
+    {
+        if ($scope !== null && $context->getEvaluator()?->matchesResourceType($node, 'Bundle') === true) {
+            return BundleEntryScope::unknowable();
+        }
+
+        return $scope;
     }
 
     /**

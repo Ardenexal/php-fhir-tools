@@ -603,7 +603,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         // Execute the function
-        return $function->execute($inputCollection, $evaluatedParams, $this->context);
+        $result = $function->execute($inputCollection, $evaluatedParams, $this->context);
+
+        // Whatever a function derives from values of one Bundle entry belongs to that entry, which
+        // covers the functions that know nothing of scopes, such as toString() and replace().
+        return $result->getScopes() === [] && !$result->isEmpty() ? $result->withScope($inputCollection->soleScope()) : $result;
     }
 
     /**

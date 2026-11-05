@@ -47,13 +47,13 @@ class ExcludeFunction extends AbstractFunction
             $otherResult->toArray(),
         );
 
-        $result = [];
-        foreach ($input as $item) {
+        $indexes = [];
+        foreach ($input as $index => $item) {
             if (!in_array($context->normalizeValue($item), $normalizedOtherItems, true)) {
-                $result[] = $item;
+                $indexes[] = $index;
             }
         }
 
-        return Collection::from($result);
+        return $input->only($indexes);
     }
 }

@@ -73,7 +73,7 @@ final class RepeatFunction extends AbstractFunction
         $visited   = [];
         $positions = [];
         $frontier  = [];
-        $scopes    = [];
+        $origins   = [];
 
         foreach ($input as $index => $item) {
             $key   = $this->itemKey($item);
@@ -102,13 +102,11 @@ final class RepeatFunction extends AbstractFunction
                     if (!isset($seen[$key])) {
                         $seen[$key]      = true;
                         $positions[$key] = count($result);
-                        if ($projectedScope !== null) {
-                            $scopes[count($result)] = $projectedScope;
-                        }
-                        $result[] = $projectedItem;
-                    } elseif (isset($positions[$key]) && !$this->isSameOrigin($scopes[$positions[$key]] ?? null, $projectedScope)) {
-                        // The one output item now stands for several origins, so it cannot claim any.
-                        unset($scopes[$positions[$key]]);
+                        $result[]        = $projectedItem;
+                    }
+
+                    if (isset($positions[$key])) {
+                        $origins[$positions[$key]][] = $projectedScope;
                     }
 
                     if (!isset($visited[$visit])) {
@@ -121,7 +119,7 @@ final class RepeatFunction extends AbstractFunction
             $frontier = $nextFrontier;
         }
 
-        return Collection::from($result)->withScopes($scopes);
+        return Collection::from($result)->withScopes(Collection::mergeOrigins($origins));
     }
 
     /**
@@ -131,15 +129,6 @@ final class RepeatFunction extends AbstractFunction
     private function originKey(?BundleEntryScope $scope): string
     {
         return $scope === null ? '' : '|' . $scope->path;
-    }
-
-    private function isSameOrigin(?BundleEntryScope $first, ?BundleEntryScope $second): bool
-    {
-        if ($first === null || $second === null) {
-            return $first === $second;
-        }
-
-        return $first->path === $second->path && $first->index->bundle === $second->index->bundle;
     }
 
     /**

@@ -42,9 +42,10 @@ use Psr\Http\Message\RequestFactoryInterface;
  * Several matches are ambiguous, so the reference is omitted rather than guessed at or fetched. No
  * match falls through to the strategies below.
  *
- * The referring entry comes from {@see BundleEntryScope}. Where evaluation lost it (union(),
- * descendants(), an evaluation started inside the entry), the entries holding that reference value
- * stand in for it, and the reference resolves only if they all agree.
+ * The referring entry comes from {@see BundleEntryScope}. A value merged from several entries resolves
+ * only if they all reach one resource. A value with no origin (a literal, $total, an evaluation started
+ * inside the entry) has the entries holding that reference value stand in for the referring entry, and
+ * resolves only if they all agree.
  *
  * Remaining resolution strategies (in order, mirroring the reference JavaScript engine):
  *
@@ -91,6 +92,8 @@ final class ResolveFunction extends AbstractFunction
      * expression serves every FHIR version.
      */
     private const RESTFUL_FULL_URL = '#^(https?://(?:[A-Za-z0-9\-\\\\.:%$]*/)+)[A-Z][A-Za-z]+/[A-Za-z0-9\-.]{1,64}(?:/_history/[A-Za-z0-9\-.]{1,64})?$#';
+
+    private const ABSOLUTE_REFERENCE = '/^[A-Za-z][A-Za-z0-9+.\-]*:/';
 
     private const RELATIVE_REFERENCE = '#^[A-Z][A-Za-z]+/[A-Za-z0-9\-.]{1,64}(?:/_history/[A-Za-z0-9\-.]{1,64})?$#';
 
@@ -202,6 +205,10 @@ final class ResolveFunction extends AbstractFunction
      */
     private function resolveUrl(string $url, bool $isCanonical, ?string $refType, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
     {
+        if ($scope?->origins !== null) {
+            return $this->resolveInEveryOrigin($url, $isCanonical, $refType, $scope->origins, $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
+        }
+
         // Split on first '#' to separate base URL from fragment (contained resource ID)
         $hashPos  = strpos($url, '#');
         $baseUrl  = $hashPos !== false ? substr($url, 0, $hashPos) : $url;
@@ -282,6 +289,42 @@ final class ResolveFunction extends AbstractFunction
     }
 
     /**
+     * Resolve a value that was merged from several origins.
+     *
+     * The value means something in each of them, so it only resolves if they all reach one resource.
+     * An absolute reference means the same throughout a Bundle, so one Bundle needs asking only once.
+     *
+     * @param list<BundleEntryScope|null> $origins
+     *
+     * @return ResolvedResource|null
+     */
+    private function resolveInEveryOrigin(string $url, bool $isCanonical, ?string $refType, array $origins, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
+    {
+        $isAbsolute = preg_match(self::ABSOLUTE_REFERENCE, $url) === 1;
+        $asked      = [];
+        $resource   = null;
+        $scopes     = [];
+
+        foreach ($origins as $origin) {
+            $key = $isAbsolute && $origin !== null ? spl_object_id($origin->index) : ($origin->path ?? '');
+            if (isset($asked[$key])) {
+                continue;
+            }
+            $asked[$key] = true;
+
+            $match = $this->resolveUrl($url, $isCanonical, $refType, $origin, $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
+            if ($match === null || ($resource !== null && $match[0] !== $resource)) {
+                return null;
+            }
+
+            $resource = $match[0];
+            $scopes[] = $match[1];
+        }
+
+        return $resource === null ? null : [$resource, BundleEntryScope::merge($scopes)];
+    }
+
+    /**
      * Look a reference up among the entries of a Bundle.
      *
      * Returns null when the Bundle has no answer, so the other strategies should run. Otherwise
@@ -302,10 +345,8 @@ final class ResolveFunction extends AbstractFunction
         }
 
         if ($baseUrl === '') {
-            $holders = $this->referringEntries($bundleIndex, $url, $scope, $context);
-            // With several holders agreeing on the target, there is still no saying which entry it
-            // is in, so it gets no scope.
-            $containedScope = count($holders) === 1 ? $holders[0] : null;
+            $holders        = $this->referringEntries($bundleIndex, $url, $scope, $context);
+            $containedScope = BundleEntryScope::merge($holders);
 
             $found = [];
             foreach ($holders as $holder) {
@@ -326,7 +367,7 @@ final class ResolveFunction extends AbstractFunction
         }
 
         $target = $baseUrl;
-        if (preg_match('/^[A-Za-z][A-Za-z0-9+.\-]*:/', $baseUrl) !== 1) {
+        if (preg_match(self::ABSOLUTE_REFERENCE, $baseUrl) !== 1) {
             if (preg_match(self::RELATIVE_REFERENCE, $baseUrl) !== 1) {
                 return null;
             }
