@@ -16,6 +16,11 @@ Code > `.goat-flow/` docs > CLAUDE.md. When sources conflict, trust code first.
 - **Confirm:** delete files, push to remote, open or merge PRs, modify CI/CD
 - **Deny:** skip pre-commit hooks, bypass PHPStan, commit with `--no-verify`
 
+No hook gates ordinary git or `gh` commands: `deny-git-mutations` is disabled in `.goat-flow/config.yaml`
+so remote sessions can commit and push, and the Confirm tier above is enforced by instruction only.
+Destructive git (force push, `--no-verify`, `reset --hard`, `clean -f`, `--admin`) is blocked by the
+permission denies in `.claude/settings.json`. Never work around them.
+
 ## Workspace Boundary
 
 Act only within this repository root. Do not write to parent directories, system paths,
@@ -59,6 +64,7 @@ Full system context: `.goat-flow/architecture.md` · File layout: `.goat-flow/co
 | Lessons from past incidents | `.goat-flow/learning-loop/lessons/` |
 | Architecture decisions | `.goat-flow/learning-loop/decisions/` |
 | Skill playbooks (tools) | `.goat-flow/skill-docs/playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
+| Security policy | `.goat-flow/security-policy.md` |
 | Cutting a release, version bump, tag, or `gh release` | `.goat-flow/skill-docs/playbooks/release.md` (read BEFORE any bump; publish is irreversible) |
 
 ## Essential Commands

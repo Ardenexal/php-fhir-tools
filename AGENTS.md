@@ -242,6 +242,7 @@ Full rationalisations table: `.goat-flow/skill-docs/skill-preamble.md` (search: 
 | Lessons from past incidents | `.goat-flow/learning-loop/lessons/` |
 | Architecture decisions | `.goat-flow/learning-loop/decisions/` |
 | Skill playbooks (tools) | `.goat-flow/skill-docs/playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
+| Security policy | `.goat-flow/security-policy.md` |
 
 ---
 

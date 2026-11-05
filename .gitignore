@@ -10,11 +10,14 @@ Thumbs.db
 .kiro/
 .gruff-cache/
 
-# .claude/ stays local (settings, hooks, worktrees, other skills) except the
-# goat-* skills, which CLAUDE.md and the goat-flow docs route to by name.
+# .claude/ stays local (settings.local.json, worktrees, other skills) except the
+# goat-* skills, which CLAUDE.md and the goat-flow docs route to by name, and the
+# shared settings and hooks, which a remote session only gets from the clone.
 # Ignoring contents (/*) rather than the directory itself is what lets the
 # negations below re-include anything: git never descends into an excluded dir.
 .claude/*
+!.claude/settings.json
+!.claude/hooks/
 !.claude/skills/
 .claude/skills/*
 !.claude/skills/goat/

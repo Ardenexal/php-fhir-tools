@@ -67,6 +67,10 @@
 ├── tests/                                    = top-level integration tests (FlexRecipeTest, etc.)
 ├── mate/                                     = AI Mate MCP configuration (extensions.php, config.php, AGENT_INSTRUCTIONS.md)
 ├── .goat-flow/                               = GOAT Flow workflow state (architecture, decisions, lessons, etc.)
+│   └── security-policy.md                    = optional repo-local policy read by goat-security (`.goat-flow/security-policy.md`)
+├── .claude/
+│   ├── settings.json                         = shared hook registrations and permission denies
+│   └── hooks/session-start.sh                = installs a missing vendor/, plus the goat-flow CLI in remote sessions
 ├── vendor/                                   = Composer dependencies — never edit
 ├── composer.json                             = package manifest + all composer scripts
 ├── phpstan.neon                              = PHPStan level 8 config
