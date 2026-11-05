@@ -638,4 +638,35 @@ final class ResolveBundleReferenceTest extends TestCase
         self::assertNull($this->evaluator->getRootBundleIndex(['resourceType' => 'Patient']));
         self::assertNotSame($this->evaluator->getRootBundleIndex($bundle), $this->evaluator->getRootBundleIndex($bundle));
     }
+
+    #[DataProvider('shapes')]
+    public function testFragmentIsNotMatchedWhenAnotherHolderLacksTheTarget(bool $asModel): void
+    {
+        // distinct() loses the entry, and only one of the entries holding `#p2` could answer it.
+        $bundle = $this->bundle([
+            $this->requestEntry(self::URN_PATIENT, '#p2', [['resourceType' => 'Patient', 'id' => 'p2', 'name' => [['family' => 'Contained']]]]),
+            $this->requestEntry(self::URN_REQUEST, '#p2'),
+        ], $asModel);
+
+        self::assertSame([], $this->evaluate('Bundle.entry[1].resource.subject.distinct().resolve().name.family', $bundle)->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testFragmentIsMatchedWhenEveryHolderHasAnIdenticalTarget(bool $asModel): void
+    {
+        $contained = [['resourceType' => 'Patient', 'id' => 'p2', 'name' => [['family' => 'Contained']]]];
+        $bundle    = $this->bundle([
+            $this->requestEntry(self::URN_PATIENT, '#p2', $contained),
+            $this->requestEntry(self::URN_REQUEST, '#p2', $contained),
+        ], $asModel);
+
+        if ($asModel) {
+            // Two models are different objects however alike they are, so they do not count as agreeing.
+            self::assertSame([], $this->evaluate('(Bundle.entry[0].resource.subject.reference | Bundle.entry[1].resource.subject.reference).distinct().resolve().name.family', $bundle)->toArray());
+
+            return;
+        }
+
+        self::assertSame(['Contained'], $this->evaluate('Bundle.entry.resource.subject.distinct().resolve().name.family', $bundle)->toArray());
+    }
 }

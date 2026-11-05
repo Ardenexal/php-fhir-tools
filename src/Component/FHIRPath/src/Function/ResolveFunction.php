@@ -270,7 +270,14 @@ final class ResolveFunction extends AbstractFunction
             $found = [];
             foreach ($this->referringEntries($bundleIndex, $url, $scope, $context) as $entry) {
                 $contained = $this->getContainedResource($this->readProperty($entry, 'resource'), $fragment, $context);
-                if ($contained !== null && !in_array($contained, $found, true)) {
+
+                // Any of these entries could be the one that referred, so one that cannot answer
+                // means the reference is unresolved, not that the others win.
+                if ($contained === null) {
+                    return [];
+                }
+
+                if (!in_array($contained, $found, true)) {
                     $found[] = $contained;
                 }
             }
