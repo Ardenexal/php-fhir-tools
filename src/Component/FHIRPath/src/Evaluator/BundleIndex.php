@@ -7,9 +7,9 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 /**
  * A Bundle and its lazily built lookups, so resolving many references scans the entries only once.
  *
- * Every {@see BundleEntryScope} from one navigation into `Bundle.entry` shares one of these, which ties
- * its lifetime to the evaluation: it is freed when the last scope goes, and the next evaluation builds
- * its own. Nothing longer lived may hold it, because model properties are mutable and a Bundle changed
+ * Every {@see BundleEntryScope} from one navigation into `Bundle.entry` shares one of these, and
+ * {@see FHIRPathEvaluator::getRootBundleIndex()} holds one for a root Bundle, both only until the
+ * evaluation ends. Nothing may hold it longer, because model properties are mutable and a Bundle changed
  * between evaluations would then be answered from a stale index.
  *
  * @author FHIR Tools Contributors

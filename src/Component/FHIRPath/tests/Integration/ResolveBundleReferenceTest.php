@@ -567,4 +567,75 @@ final class ResolveBundleReferenceTest extends TestCase
 
         self::assertSame([], $this->evaluate($expression, $bundle)->toArray());
     }
+
+    #[DataProvider('shapes')]
+    public function testResolvePerItemFromInsideAnEntry(bool $asModel): void
+    {
+        $bundle = $this->bundle([
+            $this->patientSummary(),
+            ['fullUrl' => 'urn:uuid:problem', 'resource' => ['resourceType' => 'Condition', 'id' => 'problem', 'subject' => ['reference' => self::URN_PATIENT]]],
+        ], $asModel);
+        $composition = is_array($bundle) ? $bundle['entry'][0]['resource'] : $bundle->entry[0]->resource;
+
+        $found = $this->evaluate('section.entry.where(resolve().exists()).reference', $composition, new EvaluationContext($bundle));
+
+        self::assertSame(['urn:uuid:problem'], $found->toArray());
+    }
+
+    public function testEvaluationsSharingAContextDoNotShareAnIndex(): void
+    {
+        $bundle = $this->bundle([
+            $this->patientEntry(self::URN_PATIENT, 'Example'),
+            $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT),
+        ], true);
+        self::assertInstanceOf(BundleResource::class, $bundle);
+        $focus   = $bundle->entry[1]->resource;
+        $context = new EvaluationContext($bundle);
+
+        self::assertSame(['Example'], $this->evaluate('subject.resolve().name.family', $focus, $context)->toArray());
+
+        $bundle->entry[0]->fullUrl = $bundle->entry[1]->fullUrl;
+
+        self::assertSame([], $this->evaluate('subject.resolve().name.family', $focus, $context)->toArray());
+    }
+
+    public function testAnEvaluationScansTheRootBundleOnceHoweverManyTimesResolveRuns(): void
+    {
+        // Without a scope, each resolve() call used to build its own index, which made this quadratic.
+        $bundle = new class () {
+            public int $reads = 0;
+
+            public function getResourceType(): string
+            {
+                return 'Bundle';
+            }
+
+            /**
+             * @return list<array<string, mixed>>
+             */
+            public function getEntry(): array
+            {
+                ++$this->reads;
+
+                return [
+                    ['fullUrl' => 'urn:uuid:one', 'resource' => ['resourceType' => 'Patient', 'id' => 'one']],
+                    ['fullUrl' => 'urn:uuid:two', 'resource' => ['resourceType' => 'Patient', 'id' => 'two']],
+                ];
+            }
+        };
+        $focus = ['section' => [['entry' => [['reference' => 'urn:uuid:one'], ['reference' => 'urn:uuid:two'], ['reference' => 'urn:uuid:three']]]]];
+
+        $found = $this->evaluate('section.entry.where(resolve().exists()).reference', $focus, new EvaluationContext($bundle));
+
+        self::assertSame(['urn:uuid:one', 'urn:uuid:two'], $found->toArray());
+        self::assertSame(1, $bundle->reads);
+    }
+
+    public function testRootBundleIndexIsNotKeptOutsideAnEvaluation(): void
+    {
+        $bundle = ['resourceType' => 'Bundle', 'type' => 'collection'];
+
+        self::assertNull($this->evaluator->getRootBundleIndex(['resourceType' => 'Patient']));
+        self::assertNotSame($this->evaluator->getRootBundleIndex($bundle), $this->evaluator->getRootBundleIndex($bundle));
+    }
 }

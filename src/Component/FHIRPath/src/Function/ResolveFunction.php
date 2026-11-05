@@ -114,9 +114,7 @@ final class ResolveFunction extends AbstractFunction
         $httpClient     = $evaluator->getHttpClient();
         $requestFactory = $evaluator->getRequestFactory();
 
-        // Items whose entry evaluation lost track of share this, so they scan the Bundle only once.
-        $root      = $context->getRootResource();
-        $rootIndex = $evaluator->matchesResourceType($root, 'Bundle') ? new BundleIndex($root) : null;
+        $rootIndex = $evaluator->getRootBundleIndex($context->getRootResource());
 
         $resolved = [];
         foreach ($input as $index => $item) {

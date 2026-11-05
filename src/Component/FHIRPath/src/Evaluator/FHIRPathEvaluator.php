@@ -73,6 +73,17 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private ComparisonService $comparisonService;
 
     /**
+     * The root resource's index for the evaluation in progress, so that every resolve() call in it
+     * shares one scan of the Bundle. Cleared when the outermost evaluate() returns.
+     */
+    private ?BundleIndex $rootBundleIndex = null;
+
+    /**
+     * How many evaluate() calls are in progress; functions such as skip() call it re-entrantly.
+     */
+    private int $evaluationDepth = 0;
+
+    /**
      * Cache of FHIR class name → resolved resource type string (or null if not a resource).
      * Avoids repeated reflection over the class hierarchy within a single evaluator instance.
      *
@@ -321,7 +332,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             $this->context->setCurrentNode($resource);
         }
 
-        $result = $expression->accept($this);
+        ++$this->evaluationDepth;
+
+        try {
+            $result = $expression->accept($this);
+        } finally {
+            if (--$this->evaluationDepth === 0) {
+                $this->rootBundleIndex = null;
+            }
+        }
 
         // Normalize FHIR primitive wrapper objects to their scalar values in the final
         // output collection. Internal evaluation keeps wrappers for sub-element navigation
@@ -336,6 +355,29 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         return Collection::from($normalized);
+    }
+
+    /**
+     * Get the index of the root resource when it is a Bundle, shared across the evaluation in progress.
+     *
+     * Values that evaluation lost the Bundle entry of are looked up here. Outside an evaluation the
+     * index is not kept, because nothing would clear it and the Bundle could change before its next use.
+     */
+    public function getRootBundleIndex(mixed $root): ?BundleIndex
+    {
+        if (!$this->matchesResourceType($root, 'Bundle')) {
+            return null;
+        }
+
+        if ($this->evaluationDepth === 0) {
+            return new BundleIndex($root);
+        }
+
+        if ($this->rootBundleIndex === null || $this->rootBundleIndex->bundle !== $root) {
+            $this->rootBundleIndex = new BundleIndex($root);
+        }
+
+        return $this->rootBundleIndex;
     }
 
     /**
