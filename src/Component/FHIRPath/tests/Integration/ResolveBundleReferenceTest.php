@@ -1266,4 +1266,43 @@ final class ResolveBundleReferenceTest extends TestCase
 
         self::assertSame([4], $found->toArray());
     }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function projectionsOfAnotherValue(): iterable
+    {
+        yield 'iif returning $total' => ['Bundle.entry.resource.subject.aggregate(iif($index = 0, $this, iif(true, $total).resolve().name.family))'];
+        yield 'iif returning a literal' => ["Bundle.entry[3].resource.subject.iif(true, 'Patient/p1').resolve().name.family"];
+        yield 'select returning a literal' => ["Bundle.entry[3].resource.subject.select('Patient/p1').resolve().name.family"];
+        yield 'repeat returning a literal' => ["Bundle.entry[3].resource.subject.repeat('Patient/p1').resolve().name.family"];
+    }
+
+    /**
+     * A projection returns what its expression evaluates to, which need not come from its input.
+     */
+    #[DataProvider('projectionsOfAnotherValue')]
+    public function testAProjectionDoesNotLendItsInputsOrigin(string $expression): void
+    {
+        self::assertSame([], $this->evaluate($expression, $this->twoBaseBundle(false))->toArray());
+    }
+
+    public function testAProjectionOfAnEntrysOwnValuesKeepsItsOrigin(): void
+    {
+        $bundle = $this->twoBaseBundle(false);
+
+        self::assertSame(['FromB'], $this->evaluate('Bundle.entry[3].resource.select(subject.reference.toString()).resolve().name.family', $bundle)->toArray());
+        self::assertSame(['FromB'], $this->evaluate('Bundle.entry[3].resource.subject.iif(true, $this).resolve().name.family', $bundle)->toArray());
+    }
+
+    public function testAggregateResolvesWhenTheEntriesAgree(): void
+    {
+        // Its result has no known entry, like any other value, rather than never resolving.
+        $bundle = $this->bundle([
+            $this->patientEntry('http://a.example/fhir/Patient/p1', 'FromA'),
+            $this->requestEntry('http://a.example/fhir/ServiceRequest/s1', 'Patient/p1'),
+        ], false);
+
+        self::assertSame(['FromA'], $this->evaluate('Bundle.entry[1].resource.subject.aggregate($this).resolve().name.family', $bundle)->toArray());
+    }
 }

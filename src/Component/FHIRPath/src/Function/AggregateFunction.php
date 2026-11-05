@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
-use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
@@ -91,14 +90,6 @@ final class AggregateFunction extends AbstractFunction
             $accumulator = $result->isEmpty() ? null : $result->first();
         }
 
-        if ($accumulator === null) {
-            return Collection::empty();
-        }
-
-        // The result can come from the `init` value or from any item, so it has no one entry to claim,
-        // and must not inherit one from its input.
-        $result = Collection::single($accumulator);
-
-        return $input->getScopes() === [] ? $result : $result->withScope(BundleEntryScope::unknowable());
+        return $accumulator !== null ? Collection::single($accumulator) : Collection::empty();
     }
 }

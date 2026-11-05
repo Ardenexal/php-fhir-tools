@@ -73,6 +73,12 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private ComparisonService $comparisonService;
 
     /**
+     * Functions returning what an expression evaluates to rather than something derived from their
+     * input. That expression carries its own origin, so one it does not have must not come from the input.
+     */
+    private const PROJECTIONS = ['iif', 'select', 'repeat', 'aggregate'];
+
+    /**
      * The index of each Bundle met by the evaluation in progress, so that every resolve() call shares
      * one scan of it and its id stays the same. Cleared when the outermost evaluate() returns.
      *
@@ -621,7 +627,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         // Whatever a function derives from values of one Bundle entry belongs to that entry, which
         // covers the functions that know nothing of scopes, such as toString() and replace().
-        return $result->getScopes() === [] && !$result->isEmpty() ? $result->withScope($inputCollection->soleScope()) : $result;
+        if ($result->getScopes() !== [] || $result->isEmpty() || in_array($node->getName(), self::PROJECTIONS, true)) {
+            return $result;
+        }
+
+        return $result->withScope($inputCollection->soleScope());
     }
 
     /**
