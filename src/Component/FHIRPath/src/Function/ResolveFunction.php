@@ -23,6 +23,10 @@ use Psr\Http\Message\RequestFactoryInterface;
  * Input item types handled:
  *  - FHIR Reference object/array (has a `reference` property)
  *  - Plain string (URI, canonical, or relative reference)
+ *  - Either of those behind a FHIR wrapper (StringPrimitive, FHIRTypedCollection, ...)
+ *
+ * A resolved resource keeps the shape it was found in: a model object when it came from a model's
+ * `contained`, a decoded array when it came from an array or over HTTP.
  *
  * Resolution strategies (in order, mirroring the reference JavaScript engine):
  *
@@ -82,12 +86,12 @@ final class ResolveFunction extends AbstractFunction
         $fhirServerUrl  = $evaluator->getFhirServerUrl();
         $httpClient     = $evaluator->getHttpClient();
         $requestFactory = $evaluator->getRequestFactory();
-        $rootResource   = $context->getRootResource();
 
         $resolved = [];
         foreach ($input as $item) {
-            $resource = $this->resolveItem($item, $rootResource, $fhirServerUrl, $httpClient, $requestFactory);
-            if ($resource !== null && isset($resource['resourceType'])) {
+            $resource = $this->resolveItem($item, $context, $fhirServerUrl, $httpClient, $requestFactory);
+            // Model objects are only ever read from `contained`, which holds nothing but resources.
+            if (is_object($resource) || isset($resource['resourceType'])) {
                 $resolved[] = $resource;
             }
         }
@@ -102,35 +106,39 @@ final class ResolveFunction extends AbstractFunction
      *  - FHIR.Reference (array/object with `reference` key) → use reference URL
      *  - String (uri, canonical, FHIR.string) → use as URL directly
      *
-     * @param mixed                        $rootResource   Root resource of the evaluation (for contained lookup)
+     * @param EvaluationContext            $context        Evaluation context (root resource, value normalisation)
      * @param string|null                  $fhirServerUrl  Base FHIR server URL (may be null)
      * @param ClientInterface|null         $httpClient     PSR-18 HTTP client (may be null)
      * @param RequestFactoryInterface|null $requestFactory PSR-17 request factory (may be null)
      *
-     * @return array<string,mixed>|null Decoded FHIR resource array, or null if unresolvable
+     * @return array<string,mixed>|object|null FHIR resource, or null if unresolvable
      */
-    private function resolveItem(mixed $item, mixed $rootResource, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
+    private function resolveItem(mixed $item, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): array|object|null
     {
+        // Sees through StringPrimitive/UriPrimitive (a plain reference string on a model) and
+        // FHIRTypedCollection (a raw Reference reached through a polymorphic `value`).
+        $item = $context->normalizeValue($item);
+
         // FHIR.Reference: array or object with a 'reference' property
         if (is_array($item) && isset($item['reference']) && is_string($item['reference'])) {
             $refType = isset($item['type']) && is_string($item['type']) ? $item['type'] : null;
 
-            return $this->resolveUrl($item['reference'], false, $refType, $rootResource, $fhirServerUrl, $httpClient, $requestFactory);
+            return $this->resolveUrl($item['reference'], false, $refType, $context, $fhirServerUrl, $httpClient, $requestFactory);
         }
 
         if (is_object($item)) {
-            $ref = $this->getObjectProperty($item, 'reference');
+            $ref = $context->normalizeValue($this->getObjectProperty($item, 'reference'));
             if (is_string($ref)) {
-                $refType = $this->getObjectProperty($item, 'type');
+                $refType = $context->normalizeValue($this->getObjectProperty($item, 'type'));
                 $refType = is_string($refType) ? $refType : null;
 
-                return $this->resolveUrl($ref, false, $refType, $rootResource, $fhirServerUrl, $httpClient, $requestFactory);
+                return $this->resolveUrl($ref, false, $refType, $context, $fhirServerUrl, $httpClient, $requestFactory);
             }
         }
 
         // Plain string: uri, canonical, or System.String
         if (is_string($item)) {
-            return $this->resolveUrl($item, false, null, $rootResource, $fhirServerUrl, $httpClient, $requestFactory);
+            return $this->resolveUrl($item, false, null, $context, $fhirServerUrl, $httpClient, $requestFactory);
         }
 
         return null;
@@ -144,14 +152,14 @@ final class ResolveFunction extends AbstractFunction
      * @param string                       $url            The reference URL (may contain `#` fragment)
      * @param bool                         $isCanonical    True when the URL is a canonical reference
      * @param string|null                  $refType        FHIR resource type hint (e.g. 'Patient')
-     * @param mixed                        $rootResource   Root resource for contained resolution
+     * @param EvaluationContext            $context        Evaluation context (root resource, value normalisation)
      * @param string|null                  $fhirServerUrl  Base FHIR server URL
      * @param ClientInterface|null         $httpClient     PSR-18 HTTP client
      * @param RequestFactoryInterface|null $requestFactory PSR-17 request factory
      *
-     * @return array<string,mixed>|null
+     * @return array<string,mixed>|object|null
      */
-    private function resolveUrl(string $url, bool $isCanonical, ?string $refType, mixed $rootResource, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
+    private function resolveUrl(string $url, bool $isCanonical, ?string $refType, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): array|object|null
     {
         // Split on first '#' to separate base URL from fragment (contained resource ID)
         $hashPos  = strpos($url, '#');
@@ -190,12 +198,12 @@ final class ResolveFunction extends AbstractFunction
 
         if ($resource === null && $baseUrl === '' && $fragment !== '') {
             // Fragment-only reference (#id) → search rootResource.contained
-            return $this->getContainedResource($rootResource, $fragment);
+            return $this->getContainedResource($context->getRootResource(), $fragment, $context);
         }
 
         if ($resource !== null && $fragment !== '') {
             // URL + fragment → fetch resource, then find contained by ID
-            return $this->getContainedResource($resource, $fragment);
+            return $this->getContainedResource($resource, $fragment, $context);
         }
 
         return $resource;
@@ -252,12 +260,13 @@ final class ResolveFunction extends AbstractFunction
      *
      * Mirrors the JS `getContainedResource()` function.
      *
-     * @param mixed  $resource       FHIR resource that may have a `contained` array
-     * @param string $containedResId The `id` value to search for
+     * @param mixed             $resource       FHIR resource that may have a `contained` array
+     * @param string            $containedResId The `id` value to search for
+     * @param EvaluationContext $context        Evaluation context (value normalisation)
      *
-     * @return array<string,mixed>|null
+     * @return array<string,mixed>|object|null
      */
-    private function getContainedResource(mixed $resource, string $containedResId): ?array
+    private function getContainedResource(mixed $resource, string $containedResId, EvaluationContext $context): array|object|null
     {
         if ($containedResId === '') {
             return null;
@@ -277,6 +286,10 @@ final class ResolveFunction extends AbstractFunction
 
         foreach ($contained as $item) {
             if (is_array($item) && ($item['id'] ?? null) === $containedResId) {
+                return $item;
+            }
+
+            if (is_object($item) && $context->normalizeValue($this->getObjectProperty($item, 'id')) === $containedResId) {
                 return $item;
             }
         }
