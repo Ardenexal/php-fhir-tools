@@ -19,6 +19,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * resolve() between the entries of a Bundle, following
@@ -893,5 +894,120 @@ final class ResolveBundleReferenceTest extends TestCase
         $name = $this->evaluate('Bundle.entry[2].resource.subject.resolve().managingOrganization.resolve().name', $bundle);
 
         self::assertSame(['OnlyOrg'], $name->toArray());
+    }
+
+    /**
+     * Configure a server and an HTTP client that answers from a URL to JSON body map, and 404s otherwise.
+     *
+     * @param array<string, array<string, mixed>> $bodies
+     */
+    private function configureServerAnswering(array $bodies): void
+    {
+        $requested = &$this->requested;
+        $found     = $this->createStub(ResponseInterface::class);
+        $found->method('getStatusCode')->willReturn(200);
+        $missing = $this->createStub(ResponseInterface::class);
+        $missing->method('getStatusCode')->willReturn(404);
+
+        $responses = [];
+        foreach ($bodies as $url => $body) {
+            $stream = $this->createStub(StreamInterface::class);
+            $stream->method('__toString')->willReturn((string) json_encode($body));
+            $response = $this->createStub(ResponseInterface::class);
+            $response->method('getStatusCode')->willReturn(200);
+            $response->method('getBody')->willReturn($stream);
+            $responses[$url] = $response;
+        }
+
+        $client = new class ($responses, $missing, $requested) implements ClientInterface {
+            /**
+             * @param array<string, ResponseInterface> $responses
+             * @param list<string>                     $requested
+             */
+            public function __construct(private readonly array $responses, private readonly ResponseInterface $missing, private array &$requested)
+            {
+            }
+
+            public function sendRequest(RequestInterface $request): ResponseInterface
+            {
+                return $this->responses[(string) end($this->requested)] ?? $this->missing;
+            }
+        };
+        $request = $this->createStub(RequestInterface::class);
+        $factory = new class ($request, $requested) implements RequestFactoryInterface {
+            /**
+             * @param list<string> $requested
+             */
+            public function __construct(private readonly RequestInterface $request, private array &$requested)
+            {
+            }
+
+            public function createRequest(string $method, $uri): RequestInterface
+            {
+                $this->requested[] = (string) $uri;
+
+                return $this->request;
+            }
+        };
+
+        $this->evaluator->setFhirServerUrl('https://server.example/fhir');
+        $this->evaluator->setHttpClient($client, $factory);
+    }
+
+    #[DataProvider('shapes')]
+    public function testFetchedResourceDoesNotResolveAgainstTheBundleItWasNotIn(bool $asModel): void
+    {
+        $this->configureServerAnswering([
+            'http://elsewhere.example/fhir/Patient/x'     => ['resourceType' => 'Patient', 'id' => 'x', 'managingOrganization' => ['reference' => 'Organization/o1']],
+            'https://server.example/fhir/Organization/o1' => ['resourceType' => 'Organization', 'id' => 'o1', 'name' => 'FromServer'],
+        ]);
+        $bundle = $this->bundle([
+            $this->organizationEntry('http://a.example/fhir/Organization/o1', 'InTheBundle'),
+            $this->managedPatientEntry('http://a.example/fhir/Patient/p1', 'InTheBundle', 'Organization/o1'),
+            $this->requestEntry('http://a.example/fhir/ServiceRequest/s1', 'http://elsewhere.example/fhir/Patient/x'),
+        ], $asModel);
+
+        $name = $this->evaluate('Bundle.entry[2].resource.subject.resolve().managingOrganization.resolve().name', $bundle);
+
+        self::assertSame(['FromServer'], $name->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testFetchedResourceResolvesFragmentsInItself(bool $asModel): void
+    {
+        $this->configureServerAnswering([
+            'http://elsewhere.example/fhir/Patient/x' => [
+                'resourceType'         => 'Patient',
+                'id'                   => 'x',
+                'contained'            => [['resourceType' => 'Organization', 'id' => 'gp', 'name' => 'InTheFetched']],
+                'managingOrganization' => ['reference' => '#gp'],
+            ],
+        ]);
+        $bundle = $this->bundle([
+            $this->managedPatientEntry(self::URN_PATIENT, 'Local', '#gp', [['resourceType' => 'Organization', 'id' => 'gp', 'name' => 'InTheBundle']]),
+            $this->requestEntry(self::URN_REQUEST, 'http://elsewhere.example/fhir/Patient/x'),
+        ], $asModel);
+
+        $name = $this->evaluate('Bundle.entry[1].resource.subject.resolve().managingOrganization.resolve().name', $bundle);
+
+        self::assertSame(['InTheFetched'], $name->toArray());
+    }
+
+    public function testFetchedResourceResolvesFragmentsInItselfOutsideABundle(): void
+    {
+        $this->configureServerAnswering([
+            'http://elsewhere.example/fhir/Patient/x' => [
+                'resourceType'         => 'Patient',
+                'contained'            => [['resourceType' => 'Organization', 'id' => 'gp', 'name' => 'InTheFetched']],
+                'managingOrganization' => ['reference' => '#gp'],
+            ],
+        ]);
+        $root = [
+            'resourceType' => 'ServiceRequest',
+            'contained'    => [['resourceType' => 'Organization', 'id' => 'gp', 'name' => 'InTheRoot']],
+            'subject'      => ['reference' => 'http://elsewhere.example/fhir/Patient/x'],
+        ];
+
+        self::assertSame(['InTheFetched'], $this->evaluate('ServiceRequest.subject.resolve().managingOrganization.resolve().name', $root)->toArray());
     }
 }

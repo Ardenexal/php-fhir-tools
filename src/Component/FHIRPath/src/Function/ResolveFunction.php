@@ -258,13 +258,27 @@ final class ResolveFunction extends AbstractFunction
 
         if ($resource === null && $baseUrl === '' && $fragment !== '') {
             // Fragment-only reference (#id) → search rootResource.contained
-            $resource = $this->getContainedResource($context->getRootResource(), $fragment, $context);
-        } elseif ($resource !== null && $fragment !== '') {
-            // URL + fragment → fetch resource, then find contained by ID
-            $resource = $this->getContainedResource($resource, $fragment, $context);
+            $contained = $this->getContainedResource($context->getRootResource(), $fragment, $context);
+
+            return $contained === null ? null : [$contained, null];
         }
 
-        return $resource === null ? null : [$resource, null];
+        if ($resource === null) {
+            return null;
+        }
+
+        // A fetched resource is not part of any Bundle in play, so its own references must not be
+        // answered from one: an empty index makes it its own context, with the URL as its `fullUrl`.
+        $fetchedScope = new BundleEntryScope(new BundleIndex([]), ['fullUrl' => $baseUrl, 'resource' => $resource]);
+
+        if ($fragment === '') {
+            return [$resource, $fetchedScope];
+        }
+
+        // URL + fragment → fetch resource, then find contained by ID
+        $contained = $this->getContainedResource($resource, $fragment, $context);
+
+        return $contained === null ? null : [$contained, $fetchedScope];
     }
 
     /**
