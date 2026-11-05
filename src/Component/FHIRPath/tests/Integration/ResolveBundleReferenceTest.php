@@ -628,7 +628,8 @@ final class ResolveBundleReferenceTest extends TestCase
         $found = $this->evaluate('section.entry.where(resolve().exists()).reference', $focus, new EvaluationContext($bundle));
 
         self::assertSame(['urn:uuid:one', 'urn:uuid:two'], $found->toArray());
-        self::assertSame(1, $bundle->reads);
+        // Once for each lookup table, whatever the number of resolve() calls.
+        self::assertSame(2, $bundle->reads);
     }
 
     public function testRootBundleIndexIsNotKeptOutsideAnEvaluation(): void
@@ -729,5 +730,58 @@ final class ResolveBundleReferenceTest extends TestCase
     {
         // Each pass makes new scopes for the same entries, so scopes cannot be what stops it.
         self::assertSame([4], $this->evaluate('Bundle.repeat(%resource.entry).count()', $this->twoBaseBundle($asModel))->toArray());
+    }
+
+    /**
+     * An outer and an inner Bundle reusing the same `fullUrl` for different patients.
+     *
+     * @return array<string, mixed>|BundleResource
+     */
+    private function nestedBundle(bool $asModel): array|BundleResource
+    {
+        return $this->bundle([
+            $this->patientEntry(self::URN_PATIENT, 'Outer'),
+            ['fullUrl' => 'urn:uuid:inner-bundle', 'resource' => [
+                'resourceType' => 'Bundle',
+                'type'         => 'collection',
+                'entry'        => [
+                    $this->patientEntry(self::URN_PATIENT, 'Inner'),
+                    $this->requestEntry(self::URN_REQUEST, self::URN_PATIENT),
+                ],
+            ]],
+        ], $asModel);
+    }
+
+    #[DataProvider('shapes')]
+    public function testLostScopeDoesNotSwitchToTheOuterBundle(bool $asModel): void
+    {
+        $bundle = $this->nestedBundle($asModel);
+        $inner  = 'Bundle.entry[1].resource.entry[1].resource.subject';
+
+        self::assertSame(['Inner'], $this->evaluate("{$inner}.resolve().name.family", $bundle)->toArray());
+        self::assertSame([], $this->evaluate("{$inner}.distinct().resolve().name.family", $bundle)->toArray());
+        self::assertSame([], $this->evaluate("({$inner} | {}).resolve().name.family", $bundle)->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testEvaluationStartedInsideANestedBundleDoesNotUseTheRoot(bool $asModel): void
+    {
+        $bundle = $this->nestedBundle($asModel);
+        $focus  = is_array($bundle) ? $bundle['entry'][1]['resource']['entry'][1]['resource'] : $bundle->entry[1]->resource->entry[1]->resource;
+
+        self::assertSame([], $this->evaluate('subject.resolve().name.family', $focus, new EvaluationContext($bundle))->toArray());
+    }
+
+    #[DataProvider('shapes')]
+    public function testANestedBundleOnlyBlocksTheReferencesItHolds(bool $asModel): void
+    {
+        $bundle = $this->nestedBundle($asModel);
+        $string = "'urn:uuid:not-held-by-the-inner-bundle'.resolve()";
+
+        self::assertSame([], $this->evaluate($string, $bundle)->toArray());
+        self::assertSame(['Outer'], $this->evaluate('Bundle.entry[0].fullUrl.resolve().name.family.where($this = \'Outer\')', $this->bundle([
+            $this->patientEntry(self::URN_PATIENT, 'Outer'),
+            ['fullUrl' => 'urn:uuid:inner-bundle', 'resource' => ['resourceType' => 'Bundle', 'type' => 'collection']],
+        ], $asModel))->toArray());
     }
 }

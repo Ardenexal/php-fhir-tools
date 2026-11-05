@@ -266,6 +266,15 @@ final class ResolveFunction extends AbstractFunction
      */
     private function resolveInBundle(string $url, string $baseUrl, string $fragment, BundleIndex $bundleIndex, ?BundleEntryScope $scope, EvaluationContext $context): ?array
     {
+        // With its origin unknown, a reference a nested Bundle holds may belong to that Bundle, and
+        // nothing stops the two from using the same `fullUrl` for different resources.
+        if ($scope === null) {
+            $this->indexReferences($bundleIndex, $context);
+            if (isset($bundleIndex->referencesInNestedBundles[$url])) {
+                return [];
+            }
+        }
+
         if ($baseUrl === '') {
             $found = [];
             foreach ($this->referringEntries($bundleIndex, $url, $scope, $context) as $entry) {
@@ -364,8 +373,7 @@ final class ResolveFunction extends AbstractFunction
      * Find the entry a reference came from.
      *
      * With no scope, evaluation lost track of it, so the entries whose resource holds a Reference with
-     * the given value stand in. A nested Bundle is skipped, because its references belong to its own
-     * entries.
+     * the given value stand in.
      *
      * @return list<mixed>
      */
@@ -375,33 +383,48 @@ final class ResolveFunction extends AbstractFunction
             return [$scope->entry];
         }
 
-        if ($bundleIndex->entriesByReference === null) {
-            $bundleIndex->entriesByReference = [];
-            foreach ($this->entries($bundleIndex->bundle) as $entry) {
-                $resource = $this->readProperty($entry, 'resource');
-                if ($context->getEvaluator()?->matchesResourceType($resource, 'Bundle') === true) {
-                    continue;
-                }
-
-                $held = [];
-                $this->collectReferences($resource, $held, $context);
-                foreach (array_keys($held) as $value) {
-                    $bundleIndex->entriesByReference[$value][] = $entry;
-                }
-            }
-        }
+        $this->indexReferences($bundleIndex, $context);
 
         return $bundleIndex->entriesByReference[$reference] ?? [];
     }
 
     /**
-     * Collect the values of every Reference under a node, as the keys of $held.
+     * Record which entries hold each Reference value, and which values nested Bundles hold.
+     */
+    private function indexReferences(BundleIndex $bundleIndex, EvaluationContext $context): void
+    {
+        if ($bundleIndex->entriesByReference !== null) {
+            return;
+        }
+
+        $bundleIndex->entriesByReference = [];
+        foreach ($this->entries($bundleIndex->bundle) as $entry) {
+            $held = [];
+            $this->collectReferences($this->readProperty($entry, 'resource'), $held, $bundleIndex->referencesInNestedBundles, $context);
+            foreach (array_keys($held) as $value) {
+                $bundleIndex->entriesByReference[$value][] = $entry;
+            }
+        }
+    }
+
+    /**
+     * Collect the values of every Reference under a node, as the keys of $held, or of $nested once
+     * inside a Bundle, because those belong to that Bundle's entries.
      *
      * @param array<array-key, true> $held
+     * @param array<array-key, true> $nested
      */
-    private function collectReferences(mixed $node, array &$held, EvaluationContext $context): void
+    private function collectReferences(mixed $node, array &$held, array &$nested, EvaluationContext $context): void
     {
         if (!is_array($node) && !is_object($node)) {
+            return;
+        }
+
+        if ($context->getEvaluator()?->matchesResourceType($node, 'Bundle') === true) {
+            foreach (is_array($node) ? $node : get_object_vars($node) as $child) {
+                $this->collectReferences($child, $nested, $nested, $context);
+            }
+
             return;
         }
 
@@ -411,7 +434,7 @@ final class ResolveFunction extends AbstractFunction
         }
 
         foreach (is_array($node) ? $node : get_object_vars($node) as $child) {
-            $this->collectReferences($child, $held, $context);
+            $this->collectReferences($child, $held, $nested, $context);
         }
     }
 

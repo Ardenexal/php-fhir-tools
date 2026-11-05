@@ -22,6 +22,9 @@ final class BundleIndex
     /** @var array<array-key, list<mixed>>|null Entries by the Reference values their resource holds, built on first use */
     public ?array $entriesByReference = null;
 
+    /** @var array<array-key, true> Reference values held inside nested Bundles, built with */
+    public array $referencesInNestedBundles = [];
+
     public function __construct(
         public readonly mixed $bundle,
     ) {
