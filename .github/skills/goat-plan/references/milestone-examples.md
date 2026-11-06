@@ -1,0 +1,342 @@
+---
+goat-flow-reference-version: "1.18.0"
+---
+# Milestone Formats
+
+Small preserves execution, proof and recovery; Standard adds cold-start context; high-risk adds protections for named failures.
+
+## Compact Small rendering
+
+Use one file: at most 500 words and 40 nonblank lines; omit untriggered sections.
+
+```markdown
+# <Outcome>
+
+**Status:** not-started
+**Effort estimate:** ~<total> min agent-time (<product> product / <proof> proof / <other> other)
+**Forecast basis:** <units/rates/source; use Effort Estimates grammar>
+**Forecast range:** <derived low/likely/high; use Effort Estimates grammar>
+**Plan/admin overhead:** <n> min other
+**Scope:** <included result>; not included: <one tempting exclusion>
+
+## Tasks
+- [ ] [CORE] <action and done condition> (est: <n min product>)
+
+## Proof
+- [ ] <claim> → <evidence and the unique command when needed> [RUNTIME] [automated] (est: <n min proof>)
+
+- [ ] [HUMAN] Accept the changes and evidence. [manual] (est: 0 min proof)
+
+## Exit
+- <binary completion condition>
+- Stop/rescope if <failed premise or boundary>.
+```
+
+Add only material assumptions, dependencies, drift context, manual proof, or rollback.
+
+## Handoff-grade milestone template
+
+Use Standard for multi-milestone or cold-start work: at most 900 words and ten H2 headings unless a named risk requires more.
+
+```markdown
+# M01: <outcome>
+
+**Status:** not-started
+**Planned at:** `<sha>`, YYYY-MM-DD
+**Depends on:** <local milestone IDs or none>
+**Lane:** <optional lowercase lane token>
+**Effort estimate:** ~<total> min agent-time (<product> product / <proof> proof / <other> other)
+**Forecast basis:** <units/rates/source; use Effort Estimates grammar>
+**Forecast range:** <derived low/likely/high; use Effort Estimates grammar>
+**Actual:** _
+**Plan/admin overhead:** <n> min other
+
+## Objective
+<Binary outcome this milestone proves or delivers.>
+
+## What problem are we solving
+<One sentence, 70-120 characters: what stays broken.>
+
+## Who benefits and how
+<One sentence, 70-120 characters: what you can now do.>
+
+## Context
+- Read first: `<file>` (search: `<semantic anchor>`) — <non-obvious convention or reference>.
+- Investigation: link relevant topic notes and semantic anchors; keep tasks/proof here. Read other notes only when needed.
+- Drift: `git diff --stat <sha> -- <paths>` and `git status --short -- <paths>`.
+
+## Scope
+- In: <local result and paths>.
+- Out: <tempting, ambiguous, or costly adjacent work>.
+
+## Tasks
+- [ ] [RISKY] <uncertainty-first action and done condition> (est: <n min product>)
+- [ ] [CORE] <implementation action and done condition> (est: <n min product>)
+
+## Commands
+| Purpose | Command | Expected result |
+|---|---|---|
+| <focused proof> | `<literal command>` | <observable pass condition> |
+
+## Proof
+- [ ] C1: <claim> → <evidence from Commands § focused proof> [RUNTIME] [automated] (est: <n min proof>)
+- [ ] C2: <observable behaviour> → <action and expected result> [RUNTIME] [manual] (est: <n min proof>)
+
+- [ ] [HUMAN] Accept the changes and evidence. [manual] (est: 0 min proof)
+
+## Exit
+- C1-C2 have fresh evidence and human acceptance is recorded.
+
+## Stop / rescope
+- Stop if <a premise fails, scope changes, or evidence conflicts>.
+```
+
+Commands owns each invocation: a literal command appears once per milestone; other sections reference its purpose. The Objective is one plain sentence; ids/paths belong in Context/Scope. Done conditions state claims; cases belong in tests/Commands.
+
+### Concise narrative and specific tasks
+
+Apply `.goat-flow/skill-docs/playbooks/writing-human-facing-prose.md` to non-checkbox explanation. Keep the facts needed to act; remove repeated background and place supporting evidence in its named owner. Short paragraphs and flat lists help readers find scope, uncertainty and the next decision.
+
+Each task must name the operation, its technical target and an observable done condition. Use a verified file, function, command, field or behavior when it identifies the work. Verbs such as "fix", "update" or "verify" need that target and result. Split distinct deliverables into separate checkboxes; keep rationale and detailed cases beneath the task or in Commands. Preserve exact requirements and proof criteria when shortening prose.
+
+Write from the incident in Context, not by shortening the Objective - that sentence is for the implementer. One sentence each. `goat-flow plans check --strict` enforces current-heading length and internal identifiers. Name commands with their tool; visible user surfaces are not internal. The problem sentence names who hits it. The benefit sentence names what they can now do, never what ships. Neither restates the other. A spike that ships nothing says so.
+
+- BAD: "Runtime proof executing target-controlled launchers needs a trusted-target choice."
+- GOOD: "Reviewing a stranger's repository cannot run its code on your machine without your approval."
+- BAD: "Ships as a registered hook, default-on for verified agents, gated elsewhere."
+- GOOD: "Your agent starts each session knowing the project's rules, so you do not have to repeat them."
+
+## Short task example
+
+Illustrative placeholders for shape only; paths and estimates are not repository evidence. Keep estimates before indented details so the parser counts the task. Each path supports its parent; it adds no work unit.
+
+```markdown
+- [ ] [CORE] Validate assessment metadata when parsing reports. (est: 1 min product)
+  - `<validation-file>` (`<validation-symbol>`).
+- [ ] [CORE] Preserve assessment metadata when saving reports. (est: 1 min product)
+  - `<save-file>` (`<save-symbol>`).
+- [ ] [CORE] Preserve assessment metadata when loading report history. (est: 1 min product)
+  - `<history-file>` (`<history-symbol>`).
+- [ ] [CORE] Add regression cases for metadata validation, saving and history loading. (est: 1 min product)
+  - `<test-file>`.
+```
+
+Name observable checks in Proof and exact invocations once in Commands. Shared checks may cover several tasks; count each required execution without repeating it mechanically. For a bug, reproduce the failing observable before changing it. For new work, check prerequisites first.
+
+## Status reason
+
+Supported statuses: `not-started`, `in-progress`, `testing-gate`, `human-verification-pending`, `blocked`, `abandoned`, `superseded`, `deferred`, `complete`.
+
+Add one current `**Status reason:**` after Status for these exceptional states:
+
+| State | Required reason |
+|---|---|
+| blocked | Condition and evidence/action needed to resume. |
+| abandoned | Preserve the human decision and why work stops. |
+| superseded | Name a resolvable non-self successor milestone. |
+| deferred | Name the later release or record owning the scope. |
+
+Remove stale reasons on ordinary states; reopening invalidates proof.
+
+## High-risk additions
+
+Add only sections that prevent a named failure:
+
+- **Boundary Notes:** authorization, irreversibility, recovery ownership, rollback.
+- **Current-state evidence:** observations determining design.
+- **Assumptions:** unresolved premises, dependent work, and required evidence.
+- **Verification baseline:** pre-change results by command purpose.
+- **Proof:** keep distinct compatibility, rollback, security, migration and behavioural claims under `## Proof`.
+- **Maintenance notes:** non-obvious maintenance traps.
+
+Before switching modules or after a bounded edit batch, add:
+
+```markdown
+## Mid-implementation proof
+- [ ] P1: <claim> → <evidence from Commands § focused proof> [RUNTIME] [automated] (est: <n min proof>)
+```
+
+Proof classes (RUNTIME, STATIC, etc.) follow the preamble; automated/manual labels describe execution. Only leading `[HUMAN]` marks human ownership.
+
+### Verification baseline
+
+Record pre-change results by command purpose; never repeat commands.
+
+### Maintenance notes
+
+Include only real, non-obvious maintenance traps.
+
+High-risk detail has no safety-reducing cap; above 1,200 words, name the safety reason. Never delegate commit, push, or implementation authority.
+
+## Field guide
+
+| Field | Rule |
+|---|---|
+| Outcome | Name the outcome; add Objective only for clarification. |
+| What problem are we solving | What stays broken. |
+| Who benefits and how | What you can now do. |
+| Tasks | Order `[RISKY]`, `[CORE]`, `[SAFE]`; one action and done condition per checkbox. |
+| Proof | Plain claim → tagged evidence; human sign-off stays gated. |
+| Exit | Binary transition condition referencing proof claims. |
+| Stop | Name failed premise/boundary; preserve evidence; block dependent work. |
+| Context | Non-obvious files and semantic anchors. |
+| Depends on | `none` or comma-separated local IDs; cross-plan prerequisites stay in Context. |
+| Lane | Optional `^[a-z0-9][a-z0-9-]{0,39}$` token; omitted/empty means `default`; scheduling metadata, never writer ownership. |
+
+## Lane lifecycle
+
+Read `../SKILL.md`: Phase 2 Mode 0 owns cap provenance and session selection; Phase 3 owns activation, gates, writer ownership, and the final dependency join. Omitted or empty Lane means `default`; all three active statuses consume their lane and the global cap.
+
+### Downgrade recovery
+
+Before using an older checker, stop every extra open receipt. Keep one milestone active; block the others with a `Status reason:` preserving prior state, downgrade pause, and cap-compatible resume condition. Rerun strict validation before downgrade. Restore each prior state only after lane-cap support returns; preserve every task and receipt history.
+
+## Effort Estimates
+
+- Count positive Task/Proof/Mid-proof/admin entries; `[HUMAN]`/zero-minute items are excluded from agent work units.
+- Below three matching measured bases use cold `1.0-2.5-6 min/unit`; otherwise use `plans check` low-median-high rates.
+- Units × rates: floor low (minimum one), round likely/headline, ceil high. Reforecast all estimates before implementation after scope change or `reforecast required`.
+- Agent-time excludes human waits; exact minutes inform calibration, never promises.
+- Tasks/Proof/Mid-implementation proof plus `Plan/admin overhead: n min other` must reproduce product/proof/other categories and headline.
+- Roughly 70/20/10 is diagnostic, never a quota/gate. Remove duplicate proof; never pad product; retain risk-justified deviations.
+- Recalibrate after completion.
+- Run `goat-flow plans check .goat-flow/plans/<active> --strict` before implementation and after transitions.
+
+### Forecast bases and ranges
+
+```markdown
+**Forecast basis:** <units> agent work units; <low>-<likely>-<high> min/unit low-likely-high; source: <cold-start prior or local pLow/pHigh receipt history>
+**Forecast range:** <low>-<high> agent-time minutes on one recorded-unpaused milestone timeline; likely <n>; <confidence and why>
+```
+
+A basis requires its derived range/headline in both modes, excluding `[HUMAN]`/zero-minute units. Legacy points and range-only estimates remain valid.
+
+### Count work before allocating minutes
+
+Split independently verifiable product changes into separate tasks. Count each required foreground proof execution, including baseline, post-change and repeated stability runs. Multiple commands beneath one proof checkbox still represent separate executions; give each a counted item. Reusing existing output adds no run. Record the admin item once, then derive the headline before distributing product/proof/other minutes. Planned allocations are not measured execution costs.
+
+For new saved forecasts, identify this decomposition as `observable-change-v1`. Preserve historical `legacy-checkbox-v1` counts and labels. Do not make an implementation forecast smaller by bundling changes or removing required proof.
+
+### Choose and explain history
+
+State whether the forecast covers `fresh-implementation`, `reconciliation`, `verification-only` or `unknown` work, and whether it predicts `whole` or `remaining` scope. Missing historical context stays unknown. Show one primary forecast with its selected source, sample count, percentile pair and limitations.
+
+The default remains `legacy`. Explicit `**Forecast method:** contextual-v1` opts into experimental matching and requires saved Forecast records. Matching needs at least three earlier, complete measured samples with registered snapshots and the same known work state, scope kind and rubric. History sources must also opt in. When matching is insufficient, retain the selected-plan numerical fallback, including its cold-start prior below three eligible selected-plan bases. Broad history is diagnostic, not an alternative chosen for a preferred estimate.
+
+Use the checker's published low/median/high rates and identify the actual percentile pair in `source:`. Historical percentile spans do not guarantee future coverage. When the checker's advice says `likely floored at 1.00 min/unit`, copy that rate and name the measured rate in `source:`. If rates still cannot produce valid positive integer allocations, retain issued values and report the incompatibility; never clamp or invent any other rate.
+
+### Establish the fast case
+
+Before describing the lower bound as feasible, cite comparable measured costs and include required commands, repetitions and integration work. A small diff, planned allocation or short closure receipt alone does not establish implementation speed.
+
+If evidence is missing, label the lower bound provisional. Put a bounded investigation before dependent implementation; name the uncertainty, evidence to collect, stop condition and reforecast checkpoint. Preserve valid positive short receipts, including minutes rounded to zero. Explain their limited comparability without imposing a minimum duration or inventing a late timer.
+
+### Preserve originals and revise remaining work
+
+Before predicted work begins, save the whole-work estimate, basis, range, category split and item identities. Revisions append to exactly one `## Forecast records` JSON section; never overwrite the original to make it agree with later scope or Actual.
+
+When scope changes, stop the timer and identify the last closed segment and cumulative recorded seconds. Append a linked `remaining` snapshot before the next segment starts. Keep stable IDs for unchanged items; record added/removed IDs and only the unfinished scope. Reconcile current task allocations with the remaining snapshot, while preserving the issued whole forecast separately. Compare remaining predictions with work after their cutoff, never with whole-milestone Actual.
+
+If the original issue-time evidence or receipt cutoff is unavailable, disclose the gap and withhold a validated residual record. Do not backdate a snapshot or reconstruct missing timing from the desired total.
+
+### Register provenance and validate
+
+Before creating saved records or registrations, read the installed goat-flow package's `docs/cli.md` → Forecast context and history for the complete field schema, canonical JSON hashing and history exclusions. Each plan's `evaluation/prospective-registration.json` freezes forecast IDs, complete snapshots, hashes and actual registration times before their predicted work. Missing or mismatching registration leaves that history diagnostic-only and preserves the numerical fallback. Hash consistency cannot independently prove when a file existed.
+
+Run strict validation after authoring or revision, then reconcile ISSUE totals separately using `issue-format.md` → Forecast presentation. The checker never rewrites a plan. Context matching remains opt-in until prospective evaluation qualifies a default change; structural validity and application trials do not prove forecast accuracy.
+
+## Timing receipts
+
+Use absolute milestone paths under `.goat-flow/plans/`; retain repository cwd for source-loader resolution. CLI stamps UTC/epoch seconds.
+
+1. **Begin:** resolve authorization, prerequisites, lane and cap; set exactly one rendered Status to `in-progress` or `testing-gate`, then start and inspect the category receipt before work. Pending consumes capacity but cannot Start.
+2. **Change category:** stop, inspect, then start the next category at the work boundary. Tests count as proof; never invent a mixed span's split.
+3. **Pause:** Stop before every human wait, interruption, unrelated task or inactive transition; inspect, then validate. Inactive: blocked, abandoned, deferred, superseded, human-verification-pending, complete.
+4. **Rejected Start:** preserve unchanged bytes/error; correct authorized state, retry prospectively. Never backfill or bypass gates.
+5. **Handoff:** finish Tasks/agent proof and verification; finalize timing and inspect truthful Actual before `human-verification-pending`. Only leading zero-minute `[HUMAN]` proof stays open; acceptance never reopens timing.
+6. **Requested changes:** obtain approval, invalidate affected proof, restore execution state, start a fresh segment. Reuse only current evidence.
+7. **Authorized reset:** stop timing; fence exact historical receipts and Actual under `## Reset history`; remove their live representations. Reopen scoped Tasks/Proof/Mid-implementation proof/Exit checkboxes; clear current Actual and stale Status reason; set `not-started`; validate. Fenced history supplies no live metadata. Never erase inconvenient measurements.
+
+```bash
+goat-flow plans time start <milestone-file> --category <product|proof|other>
+goat-flow plans time stop <milestone-file>             # pause; resume with another start
+goat-flow plans time status <milestone-file>           # inspect receipt totals
+goat-flow plans time stop <milestone-file> --finalize  # finalize after verification
+```
+
+Each milestone owns its receipt; separate valid lanes can hold simultaneous spans. Manual pauses miss suspend and forgotten waits. `stop --discard-open` drops an unmeasurable open span, permanently marking the receipt incomplete; never invent its end. Delegated or parallel-agent effort is disclosed separately, never folded into this timeline.
+
+### Actual states
+
+| State | Use when |
+|---|---|
+| `measured: ~N min agent-time (...) - receipt <n> recorded-unpaused seconds` | Finalized receipt and allocation back every minute. |
+| `retrospective: <numbers> - <reason>` | After-the-fact estimates, including untagged legacy numbers; prose never promotes them to measured. |
+| `unavailable: <reason>` | No trustworthy total or category allocation exists. |
+| `incomplete: <reason>` | Discarded spans leave elapsed time under-recorded. |
+
+### Calibration
+
+`plans check` reports estimate/Actual ratios and raw seconds per matching work unit. Only complete/measured milestones calibrate; pending never qualifies. Below three bases keep the cold-start prior; otherwise use local low-median-high rates. Unfinished `reforecast required` blocks implementation. The CLI advises, never rewrites.
+
+Positive raw receipts remain valid when minutes round to zero; eligibility does not establish comparability.
+
+Retrospective self-reports cannot calibrate. One ratio cannot size later milestones.
+
+## Deferred and Backlog Routing
+
+Record each cut item and destination once; route to `backlog.md` under Next, Later, or Maybe. ISSUE.md names expected exclusions only. Omit empty Deferred, backlog, and maintenance sections.
+
+> **Illustrative scenario - input/output shape only; never evidence.** All paths, commands, measurements, and outcomes below are placeholders for the installed project.
+
+## Assumption Tracking
+
+Assumptions are beliefs, not tasks. Tick each with evidence; an invalidated assumption stops dependent work and preserves the failure for human review.
+
+```markdown
+## Assumptions
+- [x] Provider rotates refresh tokens — observed during the spike.
+- [ ] Session storage replaces tokens atomically — unverified; blocks concurrent refresh work.
+```
+
+## Path-only intake
+
+User message: `.goat-flow/plans/oauth-refresh/`
+
+Evidence read: `.active` points elsewhere; a strict check passes at default cap one; metadata shows M01 complete and M02 as the sole in-progress milestone depending on M01, so M02 is the unique final join; the bounded follow-up read returns only its first unchecked task line.
+
+```markdown
+Mode: Path-Only Intake. Plan pointer: `.active` points elsewhere; unchanged. Active set: M02 in-progress; M01 dependency complete. Cap provenance: default one; no configured cap or session override. Session milestone: M02. Next item: `[CORE] Implement refresh callback`. Next action needed: summary, status check, plan update, or start this milestone?
+```
+
+Expected outcome: no writes to `.active`, milestone status, checkboxes, or code.
+
+## Human verification gate
+
+Successful AI proof records structured Actual and sets `human-verification-pending` before this output:
+
+```markdown
+M01 evidence ready — HUMAN VERIFICATION GATE (BLOCKING)
+
+Files changed: `src/auth/refresh.ts`, `src/auth/session-store.ts`, `test/auth/refresh.test.ts`.
+Effort: estimated 25 minutes; actual 35 minutes because the spike needed another proof cycle.
+Evidence: token rotation and stale-token rejection pass; browser session remains signed in.
+Assumption INVALIDATED: concurrent refreshes can restore stale data.
+Proposed M02 amendment: add a per-session lock. No plan file changed yet.
+
+Approve M01 completion and the proposed amendment, or adjust?
+```
+
+The agent stops. After the human approves, it applies the M02 amendment before changing statuses, sets M01 complete, starts the selected M02 only when dependencies and lane capacity allow, preserves other lanes, and reruns strict validation.
+
+## Kill-criteria stop
+
+```markdown
+KILL CRITERION TRIGGERED — M01 (BLOCKING)
+
+Evidence: the provider returned the same token after refresh, invalidating the rotation premise.
+Impact: dependent rotation work remains blocked; the requirement is not silently weakened.
+Options: change provider, rescope with explicit approval, or abandon while preserving evidence.
+```
+
+`/goat-plan` never runs `/goat-critique` automatically. A requested critique remains separate report-only work until the user asks to apply it.
