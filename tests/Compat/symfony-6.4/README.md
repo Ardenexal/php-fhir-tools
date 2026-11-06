@@ -107,3 +107,10 @@ is a transcription of upstream's `camel()->title()` rather than a reimplementati
 strings become generated class names, so a divergence between framework versions would
 silently rename classes instead of failing loudly. All 800 `hl7.fhir.au.base` files hash
 identically across `pascal()` on 7.4 and the shim on 6.4.
+
+## The Symfony 8.1 harness
+
+`tests/Compat/symfony-8.1` is the same install at the other end of the declared range, on PHP 8.4
+or later. It holds only its `composer.json` and an `acceptance.sh` that runs the checks here against
+its own `vendor/`, so both ends are held to the same assertions. To drive it by hand from this
+directory, set `COMPAT_HARNESS_DIR` to the absolute path of that harness before `php console.php`.

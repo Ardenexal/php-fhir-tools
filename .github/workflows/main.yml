@@ -176,18 +176,30 @@ jobs:
             -   name: Validate recipe configuration
                 run: composer run validate-recipe
 
-    # NOTE: this matrix does NOT pin symfony/console. framework-bundle 6.4 permits console ^7, and
-    # brianium/paratest (a root dev dependency) requires ^7.4.7, so the "6.4.*" leg has always
-    # installed console 7.x. That is why nothing here caught the generator commands being written
-    # in Symfony's 7.3-only invokable style. The console lower bound is covered by the
-    # symfony-lower-bound job below, which installs the component standalone.
+    # Pinning framework-bundle alone does not hold a leg to its version: 7.4 allows
+    # symfony/http-kernel ^8.0, so every other component floats to the newest line the manifests
+    # allow. SYMFONY_REQUIRE restricts them all through Flex, and the assertion step proves it.
+    # Flex stays out of the way otherwise: recipes are disabled when the root does not require it.
+    #
+    # NOTE: the "6.4.*" leg is not a pure 6.4 tree. framework-bundle 6.4 permits console ^7, and
+    # brianium/paratest (a root dev dependency) requires ^7.4.7, so this leg has always installed
+    # console 7.x, which is why SYMFONY_REQUIRE lets 7.4 in. That is why nothing here caught the
+    # generator commands being written in Symfony's 7.3-only invokable style. The console lower
+    # bound is covered by the symfony-lower-bound job below, which installs the component standalone.
     cross-version-test:
         runs-on: ubuntu-latest
         needs: quality-gate
         strategy:
+            fail-fast: false
             matrix:
                 php-version: [ '8.3', '8.4', '8.5' ]
-                symfony-version: [ '6.4.*', '7.4.*' ]
+                symfony-version: [ '6.4.*', '7.4.*', '8.1.*' ]
+                exclude:
+                    # Symfony 8 requires PHP 8.4.
+                    -   php-version: '8.3'
+                        symfony-version: '8.1.*'
+        env:
+            SYMFONY_REQUIRE: ${{ matrix.symfony-version == '6.4.*' && '6.4.*||7.4.*' || matrix.symfony-version }}
 
         steps:
             -   uses: actions/checkout@v4
@@ -200,8 +212,14 @@ jobs:
 
             -   name: Install dependencies with Symfony ${{ matrix.symfony-version }}
                 run: |
+                    composer global config --no-plugins allow-plugins.symfony/flex true
+                    composer global require --no-progress --no-scripts --no-plugins symfony/flex
+                    composer config --no-plugins allow-plugins.symfony/flex true
                     composer require --dev symfony/framework-bundle:${{ matrix.symfony-version }} --no-update
                     composer install --prefer-dist --no-progress --no-suggest
+
+            -   name: Assert the leg installed the Symfony version it names
+                run: php .github/scripts/assert-symfony-version.php "$SYMFONY_REQUIRE"
 
             -   name: FHIR core packages
                 uses: ./.github/actions/fhir-core-packages
@@ -250,3 +268,36 @@ jobs:
 
             -   name: Run the Symfony 6.4 acceptance checks
                 run: tests/Compat/symfony-6.4/acceptance.sh --with-generation
+
+    # The same checks against the newest line declared. See the identical job in pr.yml.
+    symfony-upper-bound:
+        runs-on: ubuntu-latest
+        needs: quality-gate
+        env:
+            COMPOSER_NO_INTERACTION: 1
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.4'
+                    extensions: ctype, iconv, zip, curl
+
+            -   name: Install the Symfony 8.1 consumer harness
+                run: composer install --working-dir=tests/Compat/symfony-8.1 --prefer-dist --no-progress
+
+            -   name: Assert Symfony 8.1 was actually installed
+                run: |
+                    status=0
+                    for package in console dependency-injection filesystem finder http-client intl string validator; do
+                      version="$(composer show --working-dir=tests/Compat/symfony-8.1 --format=json "symfony/${package}" | php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];')"
+                      case "$version" in
+                        v8.1.*) echo "ok   symfony/${package} ${version}" ;;
+                        *) echo "FAIL symfony/${package} ${version} — expected an 8.1 release"; status=1 ;;
+                      esac
+                    done
+                    exit "$status"
+
+            -   name: Run the Symfony 8.1 acceptance checks
+                run: tests/Compat/symfony-8.1/acceptance.sh --with-generation

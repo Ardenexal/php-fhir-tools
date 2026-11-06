@@ -50,12 +50,12 @@ Thumbs.db
 /demo/.env.*.local
 ###< demo app ###
 
-###> symfony lower-bound compatibility harness ###
-# Standalone consumer install used by the Symfony 6.4 CI leg; see
+###> symfony compatibility harnesses ###
+# Standalone consumer installs used by the Symfony 6.4 and 8.1 CI jobs; see
 # tests/Compat/symfony-6.4/README.md.
-/tests/Compat/symfony-6.4/vendor/
-/tests/Compat/symfony-6.4/var/
-###< symfony lower-bound compatibility harness ###
+/tests/Compat/symfony-*/vendor/
+/tests/Compat/symfony-*/var/
+###< symfony compatibility harnesses ###
 
 ###> phpstan/phpstan ###
 phpstan.neon

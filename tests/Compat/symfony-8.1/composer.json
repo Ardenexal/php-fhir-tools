@@ -1,0 +1,45 @@
+{
+    "name": "ardenexal/fhir-tools-symfony-81-compat",
+    "description": "Consumer harness that installs ardenexal/fhir-code-generation against the newest Symfony line it declares. See ../symfony-6.4/README.md for why these harnesses exist.",
+    "type": "project",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../../src/Component/CodeGeneration",
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "ardenexal/fhir-code-generation": "0.6.999"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../../../src/Component/Metadata",
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "ardenexal/fhir-metadata": "0.6.999"
+                }
+            }
+        }
+    ],
+    "require": {
+        "php": ">=8.4",
+        "ardenexal/fhir-code-generation": "0.6.999",
+        "symfony/console": "8.1.*",
+        "symfony/dependency-injection": "8.1.*",
+        "symfony/filesystem": "8.1.*",
+        "symfony/finder": "8.1.*",
+        "symfony/http-client": "8.1.*",
+        "symfony/intl": "8.1.*",
+        "symfony/string": "8.1.*",
+        "symfony/validator": "8.1.*"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
