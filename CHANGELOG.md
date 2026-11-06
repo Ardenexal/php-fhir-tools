@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [Metadata] `StructureDefinitionCompiler` translates a constraint StructureDefinition into the profile attributes that enforce it (`FHIRProfileConstraint`, `FHIRProfileMustSupport`, `FHIRSlicingRules`, `FHIRSliceConstraint`, `FHIRProfileObligation`), returned as `CompiledAttribute` values that can be rendered or instantiated. `fhir:generate` and `fhir:generate-ig` now emit profile classes from it, with unchanged output, so validation against StructureDefinitions loaded at runtime (#170) will enforce the same rules as generated profile classes. `fhir-code-generation` needs the `fhir-metadata` release that ships `Metadata\Profile`, so its cross-pin must be floored at that release
+
 ### Infrastructure
 - [CI] `package-integrity` and `cross-version-test` now run on PHP 8.5, which the declared `>=8.3` constraint already allowed but nothing exercised.
 
