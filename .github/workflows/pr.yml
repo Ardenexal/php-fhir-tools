@@ -429,15 +429,17 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                # Versions must match the `script` named on each leg. Unpinned, a leg generates from
+                # the package's latest release and reports drift against models built from the pin.
                 include:
                     -   version: R4
-                        packages: --package=hl7.fhir.r4.core --package=hl7.fhir.uv.extensions.r4
+                        packages: --package=hl7.fhir.r4.core#4.0.1 --package=hl7.fhir.uv.extensions.r4#5.3.0
                         script: generate-models-r4
                     -   version: R4B
-                        packages: --package=hl7.fhir.r4b.core --package=hl7.fhir.uv.extensions.r4b
+                        packages: --package=hl7.fhir.r4b.core#4.3.0 --package=hl7.fhir.uv.extensions.r4b#5.3.0
                         script: generate-models-r4b
                     -   version: R5
-                        packages: --package=hl7.fhir.r5.core --package=hl7.fhir.uv.extensions.r5
+                        packages: --package=hl7.fhir.r5.core#5.0.0 --package=hl7.fhir.uv.extensions.r5#5.3.0
                         script: generate-models-r5
 
         steps:
