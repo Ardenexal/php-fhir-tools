@@ -7,10 +7,12 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\BareTypeElementExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\ExtensionContextOnlyExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\FhirpathBooleanContextExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\ForeignRootAndExtensionContextExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\NestableParentExtensionFixture;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\PatientExtensionPathOnlyExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\PatientExtensionResourceFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\PatientNameOnlyExtensionFixture;
 use PHPUnit\Framework\TestCase;
@@ -112,14 +114,15 @@ final class FHIRExtensionContextNestedExtensionTest extends TestCase
 
     public function testSiblingDeferringElementContextMasksExtensionArmDenial(): void
     {
-        // Footgun extension-context-or-semantics: the foreign-root element context defers
-        // inside a Patient tree, and OR aggregation (anyDeferred) masks the extension arm's
-        // DENY — a multi-context extension nested in the wrong parent must NOT be denied.
+        // Footgun extension-context-or-semantics: OR aggregation (anyDeferred) masks the
+        // extension arm's DENY. Two levels down the carrier's path is not known for certain,
+        // so the foreign-root element context defers there and the extension must NOT be denied.
         $parent = new NestableParentExtensionFixture(
             'http://example.org/ext/some-other-parent',
             [new ForeignRootAndExtensionContextExtensionFixture()],
         );
-        $resource = new PatientExtensionResourceFixture([$parent]);
+        $grandparent = new NestableParentExtensionFixture('http://example.org/ext/outer', [$parent]);
+        $resource    = new PatientExtensionResourceFixture([$grandparent]);
 
         $report = $this->service->validate($resource);
 
@@ -144,11 +147,13 @@ final class FHIRExtensionContextNestedExtensionTest extends TestCase
         self::assertSame('extension[0].extension', $report->errors()[0]->path);
     }
 
-    public function testElementContextMismatchOnNestedExtensionDefersNotDenies(): void
+    /**
+     * The reference validator places a sub-extension at `[Extension, Patient.extension]`, so an
+     * element context naming anything else denies it, as `bodySite` inside `patient-animal` is
+     * denied in `patient-extension-complex-bad1`.
+     */
+    public function testElementContextMismatchOnNestedExtensionDenies(): void
     {
-        // PatientNameOnlyExtensionFixture's context is "Patient.name" (same-root element
-        // path). Borne by an extension instead of an element, the mismatch must defer:
-        // M11's only new confident denials come from the type=extension arm.
         $parent = new NestableParentExtensionFixture(
             'http://example.org/ext/some-other-parent',
             [new PatientNameOnlyExtensionFixture()],
@@ -157,6 +162,42 @@ final class FHIRExtensionContextNestedExtensionTest extends TestCase
 
         $report = $this->service->validate($resource);
 
-        self::assertCount(0, $report->errors(), 'Element-context mismatch on an extension-borne extension must defer, not deny');
+        self::assertCount(1, $report->errors(), 'An element context that names neither Extension nor the carrier path must deny');
+        self::assertSame('extension[0].extension', $report->errors()[0]->path);
+    }
+
+    public function testElementContextNamingTheCarrierPathPermitsNestedExtension(): void
+    {
+        $parent = new NestableParentExtensionFixture(
+            'http://example.org/ext/some-other-parent',
+            [new PatientExtensionPathOnlyExtensionFixture()],
+        );
+
+        $report = $this->service->validate(new PatientExtensionResourceFixture([$parent]));
+
+        self::assertCount(0, $report->errors(), 'Patient.extension is where a sub-extension of a Patient extension sits');
+    }
+
+    public function testElementContextNamingAnExtensionSupertypePermitsNestedExtension(): void
+    {
+        $parent = new NestableParentExtensionFixture(
+            'http://example.org/ext/some-other-parent',
+            [new BareTypeElementExtensionFixture()],
+        );
+
+        $report = $this->service->validate(new PatientExtensionResourceFixture([$parent]));
+
+        self::assertCount(0, $report->errors(), 'Extension is an Element, so an Element context permits it');
+    }
+
+    public function testElementContextMismatchTwoLevelsDownDefers(): void
+    {
+        $inner    = new NestableParentExtensionFixture('http://example.org/ext/inner', [new PatientNameOnlyExtensionFixture()]);
+        $outer    = new NestableParentExtensionFixture('http://example.org/ext/outer', [$inner]);
+        $resource = new PatientExtensionResourceFixture([$outer]);
+
+        $report = $this->service->validate($resource);
+
+        self::assertCount(0, $report->errors(), 'Below the first level the carrier path is not known for certain, so a mismatch defers');
     }
 }
