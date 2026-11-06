@@ -1,0 +1,22 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "logical",
+  "url": "http://example.org/fhir/StructureDefinition/logical",
+  "version": "1.0.0",
+  "name": "logical",
+  "status": "active",
+  "fhirVersion": "4.0.1",
+  "kind": "logical",
+  "abstract": false,
+  "type": "http://example.org/fhir/StructureDefinition/logical",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Base",
+  "derivation": "specialization",
+  "snapshot": {
+    "element": [
+      {
+        "id": "logical",
+        "path": "logical"
+      }
+    ]
+  }
+}

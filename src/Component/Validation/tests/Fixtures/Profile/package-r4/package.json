@@ -1,0 +1,10 @@
+{
+  "name": "example.runtime.profiles",
+  "version": "0.1.0",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "dependencies": {
+    "hl7.fhir.r4.core": "4.0.1"
+  }
+}
