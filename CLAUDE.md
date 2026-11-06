@@ -63,6 +63,7 @@ Full system context: `.goat-flow/architecture.md` · File layout: `.goat-flow/co
 | Known traps and footguns | `.goat-flow/learning-loop/footguns/` |
 | Lessons from past incidents | `.goat-flow/learning-loop/lessons/` |
 | Architecture decisions | `.goat-flow/learning-loop/decisions/` |
+| Reusable approaches | `.goat-flow/learning-loop/patterns/` |
 | Skill playbooks (tools) | `.goat-flow/skill-docs/playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
 | Security policy | `.goat-flow/security-policy.md` |
 | Cutting a release, version bump, tag, or `gh release` | `.goat-flow/skill-docs/playbooks/release.md` (read BEFORE any bump; publish is irreversible) |
@@ -85,23 +86,21 @@ See `.goat-flow/skill-docs/testing.md` for full flag reference and per-component
 
 PHP 8.3+, strict types, PSR-12, PHPStan level 8, Symfony DI, PHPUnit 11+/12+.
 Tests: `src/Component/[Package]/tests/`; fixtures: `tests/Fixtures/`.
-Metadata component: any interface or attribute visible to more than one component belongs
-in `src/Component/Metadata/src/`, not in the component that first needs it.
+Metadata component: any interface or attribute visible to more than one component belongs in `src/Component/Metadata/src/`, not in the component that first needs it.
 
-## Commit Guidelines
+## Commit Messages
 
 Conventional commits: `feat:`, `fix:`, `chore:`, `test:`. No AI mentions in commits or PRs.
-GPG-sign when possible. Full rules: `.github/git-commit-instructions.md`.
+GPG-sign when possible. Full rules: `.github/git-commit-instructions.md` and `docs/coding-standards/git-commit-message.md`.
 
 ## Execution Loop
 
 ### READ
 
 Before starting: read `.goat-flow/architecture.md` and `.goat-flow/code-map.md`.
-Before declaring any tool or capability unavailable, read the matching playbook in
-`.goat-flow/skill-docs/playbooks/` (e.g. `browser-use.md`, `page-capture.md`) and run that
-doc's "Availability Check" section verbatim — project-local CLI tools at `~/.local/bin/`
-are valid; do not conflate "no harness/MCP tool" with "no tool".
+Before declaring any tool or capability unavailable, read the matching playbook in `.goat-flow/skill-docs/playbooks/` (e.g. `browser-use.md`, `page-capture.md`) and run that doc's "Availability Check" section verbatim — project-local CLI tools at `~/.local/bin/` are valid; do not conflate "no harness/MCP tool" with "no tool".
+Before creating, changing, reviewing, consolidating, moving, or pruning tests, read `.goat-flow/skill-docs/playbooks/test-selection.md`.
+Prose surfaces route the same way before writing: `CHANGELOG.md` needs `changelog.md`; release notes need `release-notes.md`; ordinary README prose, `docs/`, PR/issue text, and learning-loop entry bodies need `writing-human-facing-prose.md`; skills, playbooks, instruction files, and hook messages need `writing-agent-facing-instructions.md`.
 
 ### SCOPE
 
@@ -125,6 +124,8 @@ No hand-edits to generated model files. All exit criteria met with proof, not re
 3. **Fix verification.** Do not claim a fix works without running the reproduction steps that originally demonstrated the bug. "Looks correct" is not verification.
 4. **Hedged claims.** Do not use "should work", "probably fine", "looks good" as verification. These are guesses, not evidence.
 
+**Stop-the-line:** When tests break, builds fail, or behaviour regresses - stop expanding scope, preserve evidence, return to diagnosis. Two corrections on the same approach = MUST rewind.
+
 Full rationalisations table: `.goat-flow/skill-docs/skill-preamble.md` (search: `Rationalisations to reject`).
 
 ## Artifact Routing
@@ -137,8 +138,7 @@ Full rationalisations table: `.goat-flow/skill-docs/skill-preamble.md` (search: 
 
 ## Definition of Done
 
-All pass: `composer test-ai`, `composer phpstan-ai`, `composer lint`. FHIR models
-regenerated if StructureDefinitions changed. No hand-edits to generated files.
+All pass: `composer test-ai`, `composer phpstan-ai`, `composer lint`. FHIR models regenerated if StructureDefinitions changed. No hand-edits to generated files.
 
 <!-- BEGIN AI_MATE_INSTRUCTIONS -->
 AI Mate Summary:
