@@ -44,6 +44,8 @@ enum CodingBindingStatus: string
  */
 final class FHIRValueSetBindingValidatorCodingTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     private const string TEST_VALUE_SET_URL = 'http://test.example/ValueSet/coding-binding-status';
 
     protected function createValidator(): FHIRValueSetBindingValidator
@@ -159,7 +161,7 @@ final class FHIRValueSetBindingValidatorCodingTest extends ConstraintValidatorTe
             [__NAMESPACE__],
             new NullFHIRTerminologyClient(),
         );
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $value = new CodeableConcept(coding: [$this->coding('not-a-valid-case')]);
 
