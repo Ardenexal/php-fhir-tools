@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [Core] Every `ardenexal/*` package now accepts Symfony 8.1 alongside 6.4 and 7.4. Symfony 8 needs PHP 8.4 or later, and Symfony 8.0 is not supported.
+
 ### Infrastructure
 - [CI] `package-integrity` and `cross-version-test` now run on PHP 8.5, which the declared `>=8.3` constraint already allowed but nothing exercised.
+- [CI] `cross-version-test` gains a Symfony 8.1 leg and now restricts every Symfony component to the version a leg names, then asserts it. Pinning only `symfony/framework-bundle` would have let the 7.4 leg install 8.1 components once `^8.1` was allowed.
+- [CI] New `symfony-upper-bound` job invokes both generator commands against Symfony 8.1 through a standalone consumer install, as `symfony-lower-bound` does for 6.4.
 
 ## [0.6.3] - 2026-11-06
 

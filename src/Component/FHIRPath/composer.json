@@ -17,8 +17,8 @@
         "psr/http-factory": "^1.0",
         "psr/http-message": "^2.0",
         "psr/log": "^1|^2|^3",
-        "symfony/string": "^6.4|^7.4",
-        "symfony/property-access": "^6.4|^7.4",
+        "symfony/string": "^6.4|^7.4|^8.1",
+        "symfony/property-access": "^6.4|^7.4|^8.1",
         "ardenexal/fhir-metadata": "^0.6.2"
     },
     "require-dev": {
