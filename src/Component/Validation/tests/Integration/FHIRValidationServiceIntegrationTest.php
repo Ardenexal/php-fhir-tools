@@ -9,7 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionCon
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
-use Ardenexal\FHIRTools\Component\Validation\IncompleteComplexExtensionChecker;
+use Ardenexal\FHIRTools\Component\Validation\ComplexExtensionChecker;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\OracleValidationServiceFactory;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Fixture\CountConstraintFixture;
@@ -73,7 +73,7 @@ final class FHIRValidationServiceIntegrationTest extends TestCase
 
         $classes = array_map(static fn ($v): string => $v->constraintClass, $report->errors());
 
-        self::assertContains(IncompleteComplexExtensionChecker::class, $classes);
+        self::assertContains(ComplexExtensionChecker::class, $classes);
         self::assertContains(FHIRExtensionContext::class, $classes);
     }
 

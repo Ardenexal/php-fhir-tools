@@ -115,6 +115,31 @@ final class ComplexExtensionSerializationTest extends TestCase
     }
 
     /**
+     * The typed constructor rebuilds the list from its declared slices only, which used to drop
+     * everything else. An undeclared slice and a nested extension are both kept, and written back.
+     */
+    public function testSubExtensionsTheTypedClassDoesNotDeclareAreKept(): void
+    {
+        $json = '{"url":"http://hl7.org/fhir/StructureDefinition/patient-animal","extension":['
+            . '{"url":"species","valueCodeableConcept":{"text":"Dog"}},'
+            . '{"url":"species-x","valueString":"unknown"},'
+            . '{"url":"http://hl7.org/fhir/StructureDefinition/bodySite","valueReference":{"display":"tail"}}]}';
+
+        $read = $this->service->deserializeFromJson($json, PatAnimalExtension::class);
+
+        self::assertInstanceOf(PatAnimalExtension::class, $read);
+        self::assertSame(
+            ['species', 'species-x', 'http://hl7.org/fhir/StructureDefinition/bodySite'],
+            array_map(static fn (Extension $sub): ?string => $sub->url, $read->extension),
+        );
+        // Equal, not identical: key order within an object is not part of the contract.
+        self::assertEquals(
+            json_decode($json, true, 512, JSON_THROW_ON_ERROR),
+            json_decode($this->service->serializeToJson($read), true, 512, JSON_THROW_ON_ERROR),
+        );
+    }
+
+    /**
      * Each level is read once. Re-reading the raw sub-extensions after the typed build failed
      * doubled the work per level, so twenty nested levels took about a million reads.
      */

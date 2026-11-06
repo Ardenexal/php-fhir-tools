@@ -24,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtensionRecorder;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
@@ -61,7 +62,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
         private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
         private readonly PropertyMetadataProviderInterface $properties = new PropertyMetadataProvider(),
-        private readonly IncompleteComplexExtensionChecker $incompleteExtensionChecker = new IncompleteComplexExtensionChecker(),
+        private readonly ComplexExtensionChecker $complexExtensionChecker = new ComplexExtensionChecker(),
     ) {
     }
 
@@ -143,8 +144,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // Complex extensions read as plain Extension because a required sub-extension was missing.
         // Unconditional, and read from what deserialization recorded, for the same reasons as the
         // pass above: the plain object no longer says it was meant to be the typed class.
-        foreach ($this->incompleteExtensionChecker->check($resource) as $incompleteExtensionViolation) {
-            $violations[] = $incompleteExtensionViolation;
+        foreach ($this->complexExtensionChecker->check($resource) as $complexExtensionViolation) {
+            $violations[] = $complexExtensionViolation;
         }
 
         // Bundle.entry.fullUrl must be absolute. Unconditional for the same reason again, and a shape
@@ -391,7 +392,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                         message: sprintf(
                             'Extension "%s" is not permitted on element "%s".',
                             $url,
-                            $fhirPath,
+                            // A sub-extension sits on the carrying extension, not on the element.
+                            $resource instanceof FHIRExtensionInterface ? $fhirPath . '.extension' : $fhirPath,
                         ),
                         constraintClass: FHIRExtensionContext::class,
                         profileGroup: null,
@@ -550,7 +552,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * fully-known ancestor-extension chain that excludes a type=extension context's declared
      * parent URL. Bare and foreign-root contexts that do not match are deferred (never denied),
      * so wiring a resolver cannot create a false positive; it can only clear one. Element
-     * contexts on extension-borne nested extensions always defer on mismatch.
+     * contexts on an extension nested one level inside another deny on mismatch, because the
+     * carrier's path is then known (see classifyNestedElementContext()); deeper levels defer.
      *
      * @param list<string>      $typeCandidates        type-rooted dotted addresses for this element
      * @param list<string>      $ownSupertypes         FHIR type name of this element plus its supertypes
@@ -584,13 +587,11 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             return self::CONTEXT_PERMIT; // unknown context types are permitted (pre-M11 behaviour)
         }
 
-        // Element contexts address element paths, which a nested extension does not sit on.
-        // For an extension borne by another extension, a non-matching element context defers
-        // rather than denies: nested element-path semantics are out of scope (M11). At nested
-        // sites confident denials come only from the type=extension arm above or from a
-        // fhirpath expression evaluating to a single false against the parent extension —
-        // legitimate, since the parent extension IS the bearing element there.
         $bearingIsExtension = $bearingElement instanceof FHIRExtensionInterface;
+
+        if ($bearingIsExtension) {
+            return $this->classifyNestedElementContext($ctx->expression, $fhirPath, $ownSupertypes, $ancestorExtensionUrls);
+        }
 
         $expr   = $ctx->expression;
         $isRoot = !str_contains($fhirPath, '.');
@@ -604,7 +605,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             // At the resource root the type is definitively known (resolver-independent), so a
             // non-matching bare context is a confident denial. At nested elements the type may be
             // abstract or unresolvable, so defer rather than risk a false positive.
-            return ($isRoot && !$bearingIsExtension) ? self::CONTEXT_DENY : self::CONTEXT_DEFER;
+            return $isRoot ? self::CONTEXT_DENY : self::CONTEXT_DEFER;
         }
 
         $exprRoot = substr($expr, 0, (int) strpos($expr, '.'));
@@ -616,7 +617,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 return self::CONTEXT_PERMIT;
             }
 
-            return $bearingIsExtension ? self::CONTEXT_DEFER : self::CONTEXT_DENY;
+            return self::CONTEXT_DENY;
         }
 
         // Foreign root (e.g. "ElementDefinition.binding" inside StructureDefinition): permitted
@@ -630,6 +631,48 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return self::CONTEXT_DEFER;
+    }
+
+    /**
+     * Classify an element context for an extension that sits inside another extension.
+     *
+     * The reference validator places such an extension at two addresses: the type `Extension`
+     * and the path of the extension that carries it, e.g. `[Extension, Patient.extension]` for a
+     * sub-extension of an extension on Patient. An element context permits it only when it names
+     * one of those. So `bodySite` (contexts `Condition.bodySite`, `Dosage.site`, ...) nested in
+     * `patient-animal` on Patient is denied, as the reference validator denies it.
+     *
+     * Denial needs the carrying extension's path to be known for certain, which holds one level
+     * down from an element: the carrier is `<element>.extension`. Deeper levels, and a chain that
+     * could not be assembled, defer unless the context names the type.
+     *
+     * @param string            $expr                  the element context expression
+     * @param string            $fhirPath              resource-rooted path of the element bearing the carrier
+     * @param list<string>      $ownSupertypes         FHIR type name of the carrier plus its supertypes
+     * @param list<string>|null $ancestorExtensionUrls enclosing extension-URL chain, carrier last
+     *
+     * @return self::CONTEXT_*
+     */
+    private function classifyNestedElementContext(string $expr, string $fhirPath, array $ownSupertypes, ?array $ancestorExtensionUrls): int
+    {
+        // Extension and its supertypes, whether or not a type resolver supplied them.
+        if (in_array($expr, ['Extension', 'Element', 'DataType', 'Base', ...$ownSupertypes], true)) {
+            return self::CONTEXT_PERMIT;
+        }
+
+        if ($ancestorExtensionUrls === null || count($ancestorExtensionUrls) !== 1) {
+            return self::CONTEXT_DEFER;
+        }
+
+        // The carrier is either an extension or a modifierExtension of the element; which one is
+        // not known here, so both addresses permit.
+        foreach (['extension', 'modifierExtension'] as $carrierProperty) {
+            if ($expr === $fhirPath . '.' . $carrierProperty) {
+                return self::CONTEXT_PERMIT;
+            }
+        }
+
+        return self::CONTEXT_DENY;
     }
 
     /**
@@ -804,9 +847,17 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
             $extPath = $path !== '' ? $path . '.' . $property : $property;
 
-            foreach ($resource->$property as $ext) {
+            foreach ($resource->$property as $extIndex => $ext) {
                 if (!is_object($ext)) {
                     continue;
+                }
+
+                // Sub-extensions a typed complex extension does not declare. Checked on this walk
+                // because it already visits every extension, so clean documents pay nothing extra.
+                if ($ext instanceof FHIRComplexExtensionInterface) {
+                    foreach ($this->complexExtensionChecker->checkUndeclaredSubExtensions($ext, $extPath . '[' . $extIndex . ']') as $undeclared) {
+                        $violations[] = $undeclared;
+                    }
                 }
 
                 $url = $this->readExtensionUrl($ext);

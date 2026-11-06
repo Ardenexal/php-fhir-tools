@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Metadata\ComplexExtensionSubExtensions;
 use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtension;
 use Ardenexal\FHIRTools\Component\Metadata\UnknownInput;
 use Ardenexal\FHIRTools\Component\Metadata\UnknownInputRecorder;
@@ -925,6 +926,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * the reference validator reads `patient-extension-complex-bad1.xml` and reports the missing
      * slice. Throwing here lost every other finding in the document.
      *
+     * Sub-extensions the typed class does not declare are kept on it, after its own.
+     *
      * @param class-string<FHIRComplexExtensionInterface> $class         the typed class the element resolved to
      * @param array<FHIRExtensionInterface>               $subExtensions the element's sub-extensions, already read
      * @param string|null                                 $id            the element's id
@@ -937,7 +940,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     protected function buildComplexExtension(string $class, array $subExtensions, ?string $id): FHIRComplexExtensionInterface|IncompleteComplexExtension
     {
         try {
-            return $class::fromSubExtensions($subExtensions, $id);
+            $built = $class::fromSubExtensions($subExtensions, $id);
         } catch (\InvalidArgumentException $e) {
             // The generated guard names the slice in a fixed form (FHIRExtensionGenerator,
             // buildFromSubExtensionsMethod). Any other refusal is still recorded, without a slice.
@@ -945,6 +948,18 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
 
             return new IncompleteComplexExtension($class, $sliceName, $e->getMessage());
         }
+
+        // The constructor rebuilt the extension list from the slices it declares. Put back what it
+        // did not take, so it is written out again and validation can see it.
+        /** @var list<FHIRExtensionInterface> $declared */
+        $declared = self::modelAccessor()->readInitializedValue($built, 'extension') ?? [];
+        $leftOver = ComplexExtensionSubExtensions::undeclared(array_values($subExtensions), $declared);
+
+        if ($leftOver !== []) {
+            self::modelAccessor()->writeValue($built, 'extension', [...$declared, ...$leftOver]);
+        }
+
+        return $built;
     }
 
     /**

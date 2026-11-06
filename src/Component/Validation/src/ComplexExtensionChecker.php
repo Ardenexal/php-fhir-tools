@@ -4,22 +4,31 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
+use Ardenexal\FHIRTools\Component\Metadata\ComplexExtensionSubExtensions;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtension;
 use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtensionRecorder;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 
 /**
- * Report complex extensions the deserializer had to read as plain `Extension`.
+ * Report complex extensions whose sub-extensions do not fit their definition.
  *
- * A complex extension missing a required sub-extension cannot become its typed class, so the reader
- * keeps it as a plain `Extension` and records why (see {@see IncompleteComplexExtension}). Nothing on
- * the plain object says it was meant to be more, so without this pass the document validates clean.
+ * Two shapes, both of which used to be invisible:
  *
- * The slice finding uses the reference validator's wording, less the package version it appends
- * to the canonical (`patient-animal|5.3.0-ballot`): the generated models do not carry it.
+ * - **A required sub-extension is missing.** The typed class cannot be built, so the reader keeps the
+ *   element as a plain `Extension` and records why (see {@see IncompleteComplexExtension}). Nothing on
+ *   the plain object says it was meant to be more; {@see check()} reports it from the record.
+ * - **A sub-extension the definition does not declare.** The reader keeps it on the typed object after
+ *   the declared ones (see {@see ComplexExtensionSubExtensions}); {@see checkUndeclaredSubExtensions()}
+ *   reports one with a slice-style relative url. An absolute url names another extension, which open
+ *   slicing allows, so it is left to the extension-context check.
+ *
+ * Findings use the reference validator's wording, less the package version it appends to the
+ * canonical (`patient-animal|5.3.0-ballot`): the generated models do not carry it.
  */
-final class IncompleteComplexExtensionChecker
+final class ComplexExtensionChecker
 {
     public function __construct(
         private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
@@ -43,6 +52,64 @@ final class IncompleteComplexExtensionChecker
         $visited = [];
 
         return $this->walk($resource, '', $visited);
+    }
+
+    /**
+     * Report the sub-extensions of a typed complex extension that its definition does not declare.
+     *
+     * The declared ones are found by building the class again from the same sub-extensions: its
+     * constructor keeps exactly the slices it declares.
+     *
+     * @param FHIRComplexExtensionInterface $extension the typed extension
+     * @param string                        $path      root-relative path to $extension
+     *
+     * @return list<FHIRValidationViolation> one error per undeclared slice-style sub-extension
+     */
+    public function checkUndeclaredSubExtensions(FHIRComplexExtensionInterface $extension, string $path): array
+    {
+        $read = $this->models->readInitializedValue($extension, 'extension');
+
+        if (!is_array($read) || $read === []) {
+            return [];
+        }
+
+        /** @var list<FHIRExtensionInterface> $read */
+        $read = array_values(array_filter($read, static fn (mixed $sub): bool => $sub instanceof FHIRExtensionInterface));
+
+        try {
+            $rebuilt = $extension::fromSubExtensions($read);
+        } catch (\InvalidArgumentException) {
+            // Built by hand without a required slice; the reader never produces this shape.
+            return [];
+        }
+
+        /** @var list<FHIRExtensionInterface> $declared */
+        $declared   = $this->models->readInitializedValue($rebuilt, 'extension') ?? [];
+        $url        = $extension->getExtensionUrl()                              ?? '';
+        $violations = [];
+
+        foreach (ComplexExtensionSubExtensions::undeclared($read, $declared) as $undeclared) {
+            $subUrl = $undeclared->getExtensionUrl();
+
+            // An absolute url is another extension, which open slicing allows. A declared slice
+            // left over holds a value type the model did not capture, which is not this finding.
+            if (!ComplexExtensionSubExtensions::isSliceUrl($subUrl)
+                || ComplexExtensionSubExtensions::declaresSlice($extension::class, (string) $subUrl)
+            ) {
+                continue;
+            }
+
+            $violations[] = new FHIRValidationViolation(
+                severity: 'error',
+                path: sprintf('%s.extension[%d]', $path, (int) array_search($undeclared, $read, true)),
+                message: sprintf("Sub-extension url '%s' is not defined by the Extension %s", (string) $subUrl, $url),
+                constraintClass: self::class,
+                profileGroup: null,
+                invariantKey: null,
+            );
+        }
+
+        return $violations;
     }
 
     /**
