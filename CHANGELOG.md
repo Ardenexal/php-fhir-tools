@@ -7,12 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-11-06
+
 ### Fixed
 - [FHIRPath] `resolve()` now tracks which Bundle entry a value was navigated out of, through indexers and the functions that filter or iterate, so identical `Type/id` or `#id` references in different entries each resolve against their own entry. A resolved resource keeps the entry it was found in, so chained references follow the target's own base and `contained`. It also survives `distinct()`, `union()`, `children()`, `descendants()` and values derived by other functions. Equal values merged from different entries resolve only if every entry reaches the same resource. A value with no known entry (a literal, `$total`, an evaluation started inside an entry) resolves only if every entry holding it agrees and the root holds no nested Bundle. A nested Bundle resolves in the innermost Bundle. A resource fetched over HTTP resolves its own `#id` references in itself rather than in the root resource. (#145)
 - [FHIRPath] `$this` inside `exists()`, `all()` and `repeat()` is now the current item, as it already was in `where()` and `select()`. It stayed on the enclosing focus, so `(1|2).exists($this = 2)` was `false` and `(1|2).all($this > 0)` threw. Invariants relying on it, such as `resource.groupingId.all(%context.grouping.id contains $this)`, can change result. (#145)
 - [FHIRPath] `resolve()` now finds resources that are entries of the Bundle being evaluated, on arrays and on models, following the FHIR rules for [resolving references in Bundles](https://hl7.org/fhir/R4/bundle.html#references). `urn:uuid:` and other absolute references match `fullUrl`, relative `Type/id` references use the base of the referring entry's RESTful `fullUrl`, version-specific references match `meta.versionId`, and `#id` looks in the referring entry's own `contained`. Entries are checked before any HTTP request, so a reference that matches an entry no longer reaches the configured server, and one with several matches is omitted without a request. The entries are indexed once per evaluation, so resolving every reference in a large Bundle, such as a Composition's `section.entry` on a patient summary, scales linearly. Invariants are unaffected: they are bound to the nearest enclosing resource, not the Bundle. (#145)
 - [FHIRPath] `resolve()` now works on deserialised models. It returned nothing for every reference on a model, including contained `#id` references, because it expected a plain string and arrays where models hold a `StringPrimitive` and resource objects. A resolved resource comes back as the model object. Invariants that call `resolve()` now see the contained resource on a model, so their results can change: `ctm-1` no longer fails for a contained `Practitioner`, and checks such as `member.resolve() is Practitioner` can now report a real violation. A raw `Reference` reached through a polymorphic `value` also resolves now. (#145)
-- [Serialization] A typed complex extension now writes only its `url`, `id` and sub-extensions. Its generated class keeps each sub-extension's value twice, as a typed constructor property (`AlternateHashExtension::$algorithm`, `$hash`) and as the sub-extension the constructor builds from it, and the JSON and XML complex-type normalizers wrote every public property, so each value also appeared as a stray key (`"algorithm": {...}`) or element (`<algorithm>`) that is not part of Extension. Properties the complex extension class itself declares are now left out; reading one back is unchanged
+- [Serialization] A typed complex extension now writes only its `url`, `id` and sub-extensions. Its generated class keeps each sub-extension's value twice, as a typed constructor property (`AlternateHashExtension::$algorithm`, `$hash`) and as the sub-extension the constructor builds from it, and the JSON and XML complex-type normalizers wrote every public property, so each value also appeared as a stray key (`"algorithm": {...}`) or element (`<algorithm>`) that is not part of Extension. Properties the complex extension class itself declares are now left out; reading one back is unchanged.
 
 ## [0.6.2] - 2026-10-08
 
@@ -232,7 +234,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Infrastructure] Demo `composer.lock` constrained to PHP 8.3 compatible packages
 - [FHIRPath] PHPDoc type hints improved in `FHIRPathEvaluator`
 
-[Unreleased]: https://github.com/Ardenexal/php-fhir-tools/compare/0.6.2...HEAD
+[Unreleased]: https://github.com/Ardenexal/php-fhir-tools/compare/0.6.3...HEAD
+[0.6.3]: https://github.com/Ardenexal/php-fhir-tools/compare/0.6.2...0.6.3
 [0.6.2]: https://github.com/Ardenexal/php-fhir-tools/compare/0.6.1...0.6.2
 [0.6.1]: https://github.com/Ardenexal/php-fhir-tools/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/Ardenexal/php-fhir-tools/compare/0.5.0...0.6.0
