@@ -24,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
+use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtensionRecorder;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
@@ -377,7 +378,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $extensions = $resource->getExtensions();
 
             foreach ($extensions as $extIndex => $extension) {
-                $contextAttrs = $this->attributes->classAttributes($extension, FHIRExtensionContext::class);
+                $definition   = $this->extensionDefinitionOf($extension);
+                $contextAttrs = $this->attributes->classAttributes($definition, FHIRExtensionContext::class);
 
                 if ($contextAttrs !== []
                     && $this->classifyExtensionContexts($contextAttrs, $resource, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes, $ancestorExtensionUrls) === self::CONTEXT_DENY
@@ -403,7 +405,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 // same defer-not-deny property as context classification.
                 $invariantAttrs = $resource instanceof FHIRExtensionInterface
                     ? []
-                    : $this->attributes->classAttributes($extension, FHIRContextInvariant::class);
+                    : $this->attributes->classAttributes($definition, FHIRContextInvariant::class);
 
                 foreach ($invariantAttrs as $invariant) {
                     try {
@@ -659,6 +661,24 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return self::CONTEXT_PERMIT;
+    }
+
+    /**
+     * Where an extension's context rules are declared: its own class, or the typed class it could not become.
+     *
+     * A complex extension missing a required sub-extension is read as plain `Extension`, which
+     * declares no contexts. Its typed class still says where it may appear, so placement is checked
+     * against that rather than silently passing.
+     *
+     * @param object $extension the extension as read
+     *
+     * @return object|class-string the object, or the typed class recorded for it
+     */
+    private function extensionDefinitionOf(object $extension): object|string
+    {
+        $records = IncompleteComplexExtensionRecorder::forObject($extension);
+
+        return $records !== [] ? $records[0]->extensionClass : $extension;
     }
 
     /**

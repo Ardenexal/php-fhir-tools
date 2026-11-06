@@ -115,6 +115,32 @@ final class ComplexExtensionSerializationTest extends TestCase
     }
 
     /**
+     * Each level is read once. Re-reading the raw sub-extensions after the typed build failed
+     * doubled the work per level, so twenty nested levels took about a million reads.
+     */
+    public function testNestedIncompleteComplexExtensionsAreEachReadOnce(): void
+    {
+        $depth = 20;
+        $inner = ['url' => 'breed', 'valueCodeableConcept' => ['text' => 'Poodle']];
+        for ($i = 0; $i < $depth; ++$i) {
+            $inner = ['url' => 'http://hl7.org/fhir/StructureDefinition/patient-animal', 'extension' => [$inner]];
+        }
+        $json = json_encode(['resourceType' => 'Patient', 'extension' => [$inner]], JSON_THROW_ON_ERROR);
+
+        $started = microtime(true);
+        $patient = $this->service->deserializeFromJson($json, PatientResource::class);
+        self::assertLessThan(5.0, microtime(true) - $started);
+
+        self::assertInstanceOf(PatientResource::class, $patient);
+        $level = $patient->extension[0];
+        for ($i = 1; $i < $depth; ++$i) {
+            self::assertSame(Extension::class, $level::class);
+            self::assertCount(1, IncompleteComplexExtensionRecorder::forObject($level));
+            $level = $level->extension[0];
+        }
+    }
+
+    /**
      * Asking for the typed class itself cannot be answered with a plain Extension, so the read
      * still refuses, naming the missing slice.
      */

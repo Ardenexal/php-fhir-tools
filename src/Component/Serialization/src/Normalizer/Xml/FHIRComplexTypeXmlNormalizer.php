@@ -166,6 +166,11 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 // of the document is read and validation reports the gap.
                 $incomplete   = $built;
                 $resolvedType = self::plainExtensionClassOf($resolvedType, $type, $isExtensionEntry, $built);
+
+                // Hand the generic read the sub-extensions already built: denormalizeExtensionArray()
+                // passes objects through. Re-reading the raw array would repeat the work at every
+                // level of nested incomplete extensions, doubling it per level.
+                $data['extension'] = $subExtensions;
             }
 
             // Instantiate the RESOLVED type, not the declared one. Every gate below asks
