@@ -16,8 +16,9 @@ proven correct.
 
 ## Availability Check
 
-Run these before starting. The agent prepares and verifies; a human runs every commit and every
-`gh` write, because the policy hook blocks both for agents.
+Run these before starting. Commit, push, PR and publish are Confirm-tier in `CLAUDE.md`, and that
+rule is the only gate, because `deny-git-mutations` is disabled in `.goat-flow/config.yaml`. Run each
+one only after the user has approved that step, and get separate approval for publish (Step 8).
 
 ```bash
 gh auth status                      # must show a logged-in account
@@ -25,7 +26,8 @@ command -v jq composer goat-flow    # all three must resolve
 git config --get user.signingkey    # empty = do NOT use `git commit -S` (it fails here)
 ```
 
-Prefix every `composer` call with `COMPOSER_ALLOW_SUPERUSER=1` when running as root.
+`goat-flow` in `~/.local/bin` counts even when that directory is not on `PATH`. Prefix every
+`composer` call with `COMPOSER_ALLOW_SUPERUSER=1` when running as root.
 
 ## Hard Rules
 
@@ -108,9 +110,9 @@ stamped. Save it to the scratchpad, not the repo:
 
 ```bash
 #!/usr/bin/env bash
-# usage: STAMP=0.6.x-dev bash iso.sh   (STAMP = the new branch alias)
+# usage: SRC=<checkout root> STAMP=0.6.x-dev bash iso.sh   (STAMP = the new branch alias)
 set -u; export COMPOSER_ALLOW_SUPERUSER=1
-W="$PWD/iso"; SRC=/srv/php-fhir-tools; mkdir -p "$W"
+W="$PWD/iso"; mkdir -p "$W"
 for d in "$SRC"/src/Component/* "$SRC"/src/Bundle/*; do
   [ -f "$d/composer.json" ] || continue
   mkdir -p "$W/$(basename "$d")"; cp "$d/composer.json" "$W/$(basename "$d")/"
@@ -129,14 +131,19 @@ for pkg in "$W"/*; do
 done; exit $fail
 ```
 
-- Run it with the new alias, e.g. `STAMP=0.6.x-dev`. Expect 7 `OK` lines; `fhir-metadata` has no
-  siblings and is skipped.
+- Run it with `SRC` set to the checkout root and the new alias, e.g. `STAMP=0.6.x-dev`. Expect 7
+  `OK` lines; `fhir-metadata` has no siblings and is skipped. Filter the output with
+  `grep -v 'could not detect the root package'`, because each `composer config` call prints that line.
 - **Negative control:** re-run it with the previous alias, e.g. `STAMP=0.5.x-dev`, and expect
   `FAIL` with `requires ardenexal/fhir-metadata ^0.6, found ...[0.5.x-dev]`. Unless it fails, the
   passing run proves nothing.
 
 **Declared conflicts.** For each `conflict`, resolve a scratch consumer that requires both
-packages. It must succeed with the new version and be refused with the old one.
+packages. It must succeed with the new version and be refused with the old one. Read the refusal,
+because it has to name the conflict. A published old version usually fails first on its own sibling
+pins (`fhir-serialization 0.5.0` requires `fhir-metadata ^0.5`), which proves nothing about the rule.
+To isolate it, use a scratch copy of the old package, stamped below the constraint with its
+`ardenexal/*` requires removed. Expect `conflicts with`, and expect that copy to resolve on its own.
 
 **Symfony 6.4 harness.** Its `composer.lock` is gitignored and survives the bump. A stale one fails
 locally with "is in the lock file as 0.5.999 but that does not satisfy 0.6.999", while CI, which
@@ -171,6 +178,10 @@ Then stop and wait for the user.
 `Undeclared deps` job except `fhir-metadata`'s, which has no siblings; a single green job among
 red ones is the sign of that. Merging needs an approving review (`REVIEW_REQUIRED`).
 
+A PR that changes only documentation, such as a CHANGELOG-only patch release, skips those jobs.
+`gh pr checks` lists them as `skipping`, and that is not a pass. As of 0.6.3, `Package Integrity` still
+runs `Undeclared deps` on the push to `main`, so Step 7 reads the result there.
+
 ## Step 7: Verify the merge before tagging
 
 ```bash
@@ -186,9 +197,16 @@ gh run list --branch main --workflow "Split Monorepo" --limit 1                 
 Wait for the main-branch split run on the merge commit to finish, so the tag's split doesn't push
 to the same repos at the same time.
 
-Check `Main Branch` on `main`. As of 0.6.1, `component-tests (codegen)` and `cross-version-test`
-fail on every run because they never download the FHIR core packages. That is pre-existing and not
-caused by the release. Any other red job blocks the tag.
+Check `Main Branch` and `Package Integrity` on `main`. Any red job blocks the tag.
+
+`Main Branch` ignores documentation paths, so a CHANGELOG-only merge has no run of its own. Read the
+run on the last commit that has one, and prove that only documentation changed since:
+
+```bash
+gh run list --branch main --workflow "Main Branch" --limit 1 --json headSha,conclusion  # success
+git diff --name-only <that-sha> <merge-commit-sha>        # documentation only, e.g. CHANGELOG.md
+gh run list --commit <merge-commit-sha>                   # Package Integrity: completed success
+```
 
 ## Step 8: Handoff Block B (publish)
 
