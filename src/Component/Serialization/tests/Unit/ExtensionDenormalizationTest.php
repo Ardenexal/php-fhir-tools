@@ -72,7 +72,9 @@ class ExtensionDenormalizationTest extends TestCase
                 ['url' => 'http://example.com/some-extension', 'valueString' => 'hello'],
                 'Ardenexal\\FHIRTools\\Component\\Models\\R4B\\DataType\\Extension',
                 'json',
-                [],
+                // Each entry is marked as filling an extension list, which lets an incomplete
+                // complex extension fall back to plain Extension there.
+                ['__fhir_extension_list_entry' => true],
             )
             ->willReturn(new \stdClass());
 
@@ -107,7 +109,9 @@ class ExtensionDenormalizationTest extends TestCase
                 self::anything(),
                 $typedClass,
                 'json',
-                [],
+                // Each entry is marked as filling an extension list, which lets an incomplete
+                // complex extension fall back to plain Extension there.
+                ['__fhir_extension_list_entry' => true],
             )
             ->willReturn(new \stdClass());
 
@@ -140,7 +144,9 @@ class ExtensionDenormalizationTest extends TestCase
                 self::anything(),
                 'Ardenexal\\FHIRTools\\Component\\Models\\R4B\\DataType\\Extension',
                 'json',
-                [],
+                // Each entry is marked as filling an extension list, which lets an incomplete
+                // complex extension fall back to plain Extension there.
+                ['__fhir_extension_list_entry' => true],
             )
             ->willReturn(new \stdClass());
 
