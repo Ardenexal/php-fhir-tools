@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Infrastructure
+- [CI] `package-integrity` and `cross-version-test` now run on PHP 8.5, which the declared `>=8.3` constraint already allowed but nothing exercised.
+
 ## [0.6.3] - 2026-11-06
 
 ### Fixed

@@ -37,12 +37,9 @@ class OutputPathGenerationTest extends TestCase
         $this->command    = new FHIRModelGeneratorCommand($filesystem, $packageLoader);
         $reflection       = new \ReflectionClass($this->command);
 
-        // Make private methods accessible for testing
-        $this->getOutputPathMethod = $reflection->getMethod('getOutputPath');
-        $this->getOutputPathMethod->setAccessible(true);
-
+        // Private methods under test, invoked through reflection
+        $this->getOutputPathMethod             = $reflection->getMethod('getOutputPath');
         $this->getBackboneParentResourceMethod = $reflection->getMethod('getBackboneParentResource');
-        $this->getBackboneParentResourceMethod->setAccessible(true);
     }
 
     /**

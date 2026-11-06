@@ -34,7 +34,6 @@ final class CdaPackageRoutingTest extends TestCase
     private function callPrivate(string $method, mixed ...$args): mixed
     {
         $m = $this->reflection->getMethod($method);
-        $m->setAccessible(true);
 
         return $m->invoke($this->command, ...$args);
     }
@@ -43,7 +42,6 @@ final class CdaPackageRoutingTest extends TestCase
     private function getContext(): array
     {
         $property = $this->reflection->getProperty('context');
-        $property->setAccessible(true);
 
         /** @var array<string, BuilderContext> $context */
         $context = $property->getValue($this->command);

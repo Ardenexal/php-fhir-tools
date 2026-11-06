@@ -38,7 +38,6 @@ final class ValueSetBindingEnumResolutionTest extends TestCase
         );
 
         $method = (new \ReflectionClass(FHIRValueSetBindingValidator::class))->getMethod('resolveBoundEnum');
-        $method->setAccessible(true);
 
         /** @var class-string<\BackedEnum>|null $resolved */
         $resolved = $method->invoke($validator, $binding);

@@ -355,7 +355,8 @@ class BuilderContext implements BuilderContextInterface
      */
     public function addPendingType(string $url, string $typeClassName): void
     {
-        $url                      = preg_replace('/\|.*$/', '', $url);
+        // Canonical references may carry a version (`url|4.0.1`); pending types are keyed by the bare URL
+        $url                      = explode('|', $url, 2)[0];
         $this->pendingTypes[$url] = $typeClassName;
     }
 
