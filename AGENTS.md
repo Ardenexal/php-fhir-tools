@@ -199,6 +199,15 @@ Before submitting changes, confirm:
 - **FHIRPath Guide**: `docs/component-guides/fhir-path.md` - FHIRPath evaluator
 - **Serialization Guide**: `docs/component-guides/serialization.md` - JSON/XML serialization
 
+## Key Resources
+
+| What | Where |
+|------|-------|
+| Footguns | `.goat-flow/learning-loop/footguns/` |
+| Lessons | `.goat-flow/learning-loop/lessons/` |
+| Decisions | `.goat-flow/learning-loop/decisions/` |
+| Skill playbooks (tools) | `.goat-flow/skill-docs/playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
+
 ## Execution Loop
 
 ### READ
@@ -208,6 +217,8 @@ Before starting any task, orient with these sources:
 - Read `.goat-flow/architecture.md` for system context.
 - Read `.goat-flow/code-map.md` for file layout.
 - Before declaring any tool or capability unavailable, read the matching playbook in `.goat-flow/skill-docs/playbooks/` (e.g. `browser-use.md`, `page-capture.md`) and run that doc's "Availability Check" section verbatim — project-local CLI tools at `~/.local/bin/` are valid; do not conflate "no harness/MCP tool" with "no tool".
+- Before creating, changing, reviewing, consolidating, moving, or pruning tests, read `.goat-flow/skill-docs/playbooks/test-selection.md`.
+- Prose surfaces route the same way before writing: `CHANGELOG.md` needs `changelog.md`; release notes need `release-notes.md`; ordinary README prose, `docs/`, PR/issue text, and learning-loop entry bodies need `writing-human-facing-prose.md`; skills, playbooks, instruction files, and hook messages need `writing-agent-facing-instructions.md`.
 
 ### SCOPE
 
@@ -221,13 +232,13 @@ Edit minimal files. Run `phpunit-run` (MCP) after each logical unit; fall back t
 
 `phpstan-analyse` (MCP) clean · `phpunit-run` (MCP) passes · `composer lint` passes. No hand-edits to generated model files. All exit criteria met with proof, not recollection.
 
-#### Hallucination red-flags
+**Hallucination red-flags:**
+1. **Checks passed.** Do not claim tests pass or any check passed without showing the literal pass/fail line from this session's run. Paraphrase, cached output, or prior-session results do not count.
+2. **Completion.** Do not claim completion without listing the specific files changed in this turn. If no files were changed, say so explicitly.
+3. **Fix verification.** Do not claim a fix works without running the reproduction steps that originally demonstrated the bug. "Looks correct" is not verification.
+4. **Hedged claims.** Do not use "should work", "probably fine", "looks good" as verification. These are guesses, not evidence.
 
-1. "Should work now" / "Probably fixed" → re-run the original failing reproduction.
-2. "I'm confident" → confidence ≠ evidence.
-3. "Linter / typecheck passed" → linter ≠ compiler ≠ test suite.
-4. "Sub-agent said success" → re-read the diff yourself.
-5. "Looks correct to me" → structural inspection ≠ verification.
+**Stop-the-line:** When tests break, builds fail, or behaviour regresses - stop expanding scope, preserve evidence, return to diagnosis. Two corrections on the same approach = MUST rewind.
 
 Full rationalisations table: `.goat-flow/skill-docs/skill-preamble.md` (search: `Rationalisations to reject`).
 
@@ -241,7 +252,9 @@ Full rationalisations table: `.goat-flow/skill-docs/skill-preamble.md` (search: 
 | Known traps and footguns | `.goat-flow/learning-loop/footguns/` |
 | Lessons from past incidents | `.goat-flow/learning-loop/lessons/` |
 | Architecture decisions | `.goat-flow/learning-loop/decisions/` |
+| Reusable approaches | `.goat-flow/learning-loop/patterns/` |
 | Skill playbooks (tools) | `.goat-flow/skill-docs/playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
+| Security policy | `.goat-flow/security-policy.md` |
 
 ---
 

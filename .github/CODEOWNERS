@@ -9,6 +9,8 @@
 # code that executes on a reviewer's machine as soon as they check the branch
 # out, so it needs the same scrutiny as a release script.
 /.goat-flow/hooks/ @Ardenexal
+/.claude/hooks/ @Ardenexal
+/.claude/settings.json @Ardenexal
 
 # Decides which .goat-flow/ paths are publishable at all. Loosening it can
 # expose local session logs, plan contents, or the scratchpad.

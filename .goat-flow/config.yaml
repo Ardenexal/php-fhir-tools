@@ -1,4 +1,4 @@
-version: "1.16.0"
+version: "1.18.0"
 
 skills:
   install: all
@@ -8,6 +8,8 @@ skills:
 hooks:
   deny-dangerous:
     enabled: true
+  deny-git-mutations:
+    enabled: false
   gruff-code-quality:
     enabled: true
   post-turn-safety:
