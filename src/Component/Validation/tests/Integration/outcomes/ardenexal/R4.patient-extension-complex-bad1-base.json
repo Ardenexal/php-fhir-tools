@@ -1,12 +1,7 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
-    "unread": {
-        "javaErrorCount": 2,
-        "javaWarningCount": 0,
-        "failure": "Failed to deserialize XML to FHIR object: Format error (xml): Required sub-extension \"species\" not found or type mismatch in Ardenexal\\FHIRTools\\Component\\Models\\R4\\Extension\\PatAnimalExtension::fromSubExtensions()"
-    },
     "java": {
         "errorCount": 2,
         "warningCount": 0,
@@ -20,8 +15,8 @@
     },
     "outcome": {
         "errors": {
-            "deserialization": [
-                "(root) — Failed to deserialize XML to FHIR object: Format error (xml): Required sub-extension \"species\" not found or type mismatch in Ardenexal\\FHIRTools\\Component\\Models\\R4\\Extension\\PatAnimalExtension::fromSubExtensions()"
+            "constraint:IncompleteComplexExtensionChecker": [
+                "extension[0] — Slice 'Extension.extension:species': a matching slice is required, but not found (from http://hl7.org/fhir/StructureDefinition/patient-animal). Note that other slices are allowed in addition to this required slice"
             ]
         },
         "warnings": {}

@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtension;
 use Ardenexal\FHIRTools\Component\Metadata\UnknownInput;
 use Ardenexal\FHIRTools\Component\Metadata\UnknownInputRecorder;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
@@ -631,6 +632,16 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Context flag: the object being read fills one entry of an `extension` list.
+     *
+     * Such a slot holds any `Extension`, so a typed complex extension that cannot be built may be
+     * read there as plain `Extension` instead. The declared type cannot say this on its own, because
+     * the list resolves each entry to its typed class before denormalizing it. Each denormalize()
+     * consumes the flag, so it never reaches the element's children.
+     */
+    protected const EXTENSION_LIST_ENTRY_CONTEXT_KEY = '__fhir_extension_list_entry';
+
+    /**
      * Denormalize an extension array, using the IG registry for typed extension resolution.
      *
      * @param array<mixed>         $extensionData
@@ -660,7 +671,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                 $targetClass = $this->igTypeRegistry->resolveExtensionClass($url, $this->fhirVersion) ?? $this->baseExtensionClass;
             }
 
-            $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $targetClass, $format, $context);
+            $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $targetClass, $format, [...$context, self::EXTENSION_LIST_ENTRY_CONTEXT_KEY => true]);
         }
 
         return $denormalizedExtensions;
@@ -904,6 +915,75 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         throw new NotNormalizableValueException(sprintf('Expected %s value, got %s', $class, gettype($value)));
+    }
+
+    /**
+     * Build a typed complex extension, or say why it cannot be built so the caller can read it plain.
+     *
+     * A typed complex extension needs every required sub-extension, so `fromSubExtensions()` refuses
+     * a document that omits one. That is a validation finding, not a reason to refuse the document:
+     * the reference validator reads `patient-extension-complex-bad1.xml` and reports the missing
+     * slice. Throwing here lost every other finding in the document.
+     *
+     * @param class-string<FHIRComplexExtensionInterface> $class         the typed class the element resolved to
+     * @param array<FHIRExtensionInterface>               $subExtensions the element's sub-extensions, already read
+     * @param string|null                                 $id            the element's id
+     *
+     * @return FHIRComplexExtensionInterface|IncompleteComplexExtension the typed extension, or the
+     *                                                                  record of why the caller must
+     *                                                                  read the element as plain
+     *                                                                  `Extension` instead
+     */
+    protected function buildComplexExtension(string $class, array $subExtensions, ?string $id): FHIRComplexExtensionInterface|IncompleteComplexExtension
+    {
+        try {
+            return $class::fromSubExtensions($subExtensions, $id);
+        } catch (\InvalidArgumentException $e) {
+            // The generated guard names the slice in a fixed form (FHIRExtensionGenerator,
+            // buildFromSubExtensionsMethod). Any other refusal is still recorded, without a slice.
+            $sliceName = preg_match('/^Required sub-extension "([^"]+)"/', $e->getMessage(), $m) === 1 ? $m[1] : null;
+
+            return new IncompleteComplexExtension($class, $sliceName, $e->getMessage());
+        }
+    }
+
+    /**
+     * The nearest ancestor of a typed complex extension that is not itself one: the version's `Extension`.
+     *
+     * Reading the element as this class keeps its url, id and sub-extensions exactly as written. It
+     * is only a valid substitute where the slot takes any extension: an entry of an `extension` list,
+     * or a caller that asked for `Extension` or `FHIRExtensionInterface`. A caller that asked for the
+     * typed class itself gets the original refusal instead of an object of the wrong class.
+     *
+     * @param class-string               $class            the typed complex extension class
+     * @param string                     $declaredType     the type the caller asked to denormalize into
+     * @param bool                       $isExtensionEntry whether the object fills an `extension` list
+     *                                                     entry ({@see self::EXTENSION_LIST_ENTRY_CONTEXT_KEY})
+     * @param IncompleteComplexExtension $why              why the typed class could not be built
+     *
+     * @return class-string the plain extension class to read the element as instead
+     *
+     * @throws NotNormalizableValueException when the slot cannot hold the plain class
+     */
+    protected static function plainExtensionClassOf(string $class, string $declaredType, bool $isExtensionEntry, IncompleteComplexExtension $why): string
+    {
+        $plain = $class;
+
+        while (is_a($plain, FHIRComplexExtensionInterface::class, true)) {
+            $parent = get_parent_class($plain);
+
+            if ($parent === false) {
+                break;
+            }
+
+            $plain = $parent;
+        }
+
+        if (is_a($plain, FHIRComplexExtensionInterface::class, true) || (!$isExtensionEntry && !is_a($plain, $declaredType, true))) {
+            throw new NotNormalizableValueException($why->reason);
+        }
+
+        return $plain;
     }
 
     // -------------------------------------------------------------------------

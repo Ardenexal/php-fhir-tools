@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Integration;
 
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
+use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtensionRecorder;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Extension\AlternateHashExtension;
+use Ardenexal\FHIRTools\Component\Models\R4\Extension\PatAnimalExtension;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -66,6 +72,81 @@ final class ComplexExtensionSerializationTest extends TestCase
         self::assertInstanceOf(AlternateHashExtension::class, $read);
         self::assertSame('sha-256', (string) $read->algorithm->code);
         self::assertSame('abc123', (string) $read->hash);
+    }
+
+    public function testXmlMissingRequiredSubExtensionReadsAsAPlainExtension(): void
+    {
+        $xml = <<<'XML'
+            <Patient xmlns="http://hl7.org/fhir">
+              <extension url="http://hl7.org/fhir/StructureDefinition/patient-animal">
+                <extension url="breed">
+                  <valueCodeableConcept><text value="Poodle"/></valueCodeableConcept>
+                </extension>
+              </extension>
+              <active value="true"/>
+            </Patient>
+            XML;
+
+        $patient = $this->service->deserializeFromXml($xml, PatientResource::class);
+
+        self::assertInstanceOf(PatientResource::class, $patient);
+        $this->assertReadAsPlainPatientAnimal($patient);
+        self::assertTrue($patient->active);
+    }
+
+    public function testJsonMissingRequiredSubExtensionReadsAsAPlainExtension(): void
+    {
+        $json = <<<'JSON'
+            {
+              "resourceType": "Patient",
+              "extension": [{
+                "url": "http://hl7.org/fhir/StructureDefinition/patient-animal",
+                "extension": [{"url": "breed", "valueCodeableConcept": {"text": "Poodle"}}]
+              }],
+              "active": true
+            }
+            JSON;
+
+        $patient = $this->service->deserializeFromJson($json, PatientResource::class);
+
+        self::assertInstanceOf(PatientResource::class, $patient);
+        $this->assertReadAsPlainPatientAnimal($patient);
+        self::assertTrue($patient->active);
+    }
+
+    /**
+     * Asking for the typed class itself cannot be answered with a plain Extension, so the read
+     * still refuses, naming the missing slice.
+     */
+    public function testAskingForTheTypedClassStillRefusesAMissingRequiredSubExtension(): void
+    {
+        $json = '{"url":"http://hl7.org/fhir/StructureDefinition/patient-animal","extension":[{"url":"breed","valueCodeableConcept":{"text":"Poodle"}}]}';
+
+        $this->expectException(FHIRSerializationException::class);
+        $this->expectExceptionMessage('Required sub-extension "species" not found');
+
+        $this->service->deserializeFromJson($json, PatAnimalExtension::class);
+    }
+
+    /**
+     * The extension is kept, as the plain Extension it still is, with nothing dropped, and the
+     * typed class it could not become is recorded against it for validation to report.
+     */
+    private function assertReadAsPlainPatientAnimal(PatientResource $patient): void
+    {
+        self::assertCount(1, $patient->extension);
+        $extension = $patient->extension[0];
+
+        self::assertSame(Extension::class, $extension::class);
+        self::assertNotInstanceOf(FHIRComplexExtensionInterface::class, $extension);
+        self::assertSame('http://hl7.org/fhir/StructureDefinition/patient-animal', $extension->url);
+        self::assertCount(1, $extension->extension);
+        self::assertSame('breed', $extension->extension[0]->url);
+
+        $records = IncompleteComplexExtensionRecorder::forObject($extension);
+        self::assertCount(1, $records);
+        self::assertSame(PatAnimalExtension::class, $records[0]->extensionClass);
+        self::assertSame('species', $records[0]->sliceName);
     }
 
     private function extension(): AlternateHashExtension

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [Serialization] [Validation] A typed complex extension missing a required sub-extension is reported instead of aborting the read. `fromSubExtensions()` threw, so the whole document was rejected and none of its other findings were produced. The extension is now read as a plain `Extension`, keeping its url, id and sub-extensions, and validation reports `Slice 'Extension.extension:species': a matching slice is required, but not found` in the reference validator's wording. JSON and XML both. (#167)
+
 ### Infrastructure
 - [CI] `package-integrity` and `cross-version-test` now run on PHP 8.5, which the declared `>=8.3` constraint already allowed but nothing exercised.
 

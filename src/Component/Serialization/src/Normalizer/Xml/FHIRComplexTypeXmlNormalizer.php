@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml;
 
 use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
+use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtension;
+use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtensionRecorder;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
@@ -124,6 +126,9 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             unset($context[self::SOURCE_ELEMENT_CONTEXT_KEY]);
         }
 
+        $isExtensionEntry = ($context[self::EXTENSION_LIST_ENTRY_CONTEXT_KEY] ?? false) === true;
+        unset($context[self::EXTENSION_LIST_ENTRY_CONTEXT_KEY]);
+
         $resolvedType = $this->typeResolver->resolveComplexType($data, $context) ?? $type;
 
         if ($resolvedType !== $type && !is_subclass_of($resolvedType, $type)) {
@@ -138,6 +143,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             }
         }
 
+        $incomplete = null;
+
         try {
             if (is_a($resolvedType, FHIRComplexExtensionInterface::class, true)
                 && isset($data['extension'])
@@ -148,7 +155,17 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 $subExtensions = $this->denormalizeExtensionArray($items, 'xml', $context);
                 $id            = isset($data['@id']) && is_string($data['@id']) ? $data['@id'] : null;
 
-                return $resolvedType::fromSubExtensions($subExtensions, $id);
+                $built = $this->buildComplexExtension($resolvedType, $subExtensions, $id);
+
+                if (!$built instanceof IncompleteComplexExtension) {
+                    return $built;
+                }
+
+                // The typed class refused these sub-extensions (a required one is absent or has the
+                // wrong value type). Read the element as the plain Extension it still is, so the rest
+                // of the document is read and validation reports the gap.
+                $incomplete   = $built;
+                $resolvedType = self::plainExtensionClassOf($resolvedType, $type, $isExtensionEntry, $built);
             }
 
             // Instantiate the RESOLVED type, not the declared one. Every gate below asks
@@ -161,6 +178,10 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             $object            = $isBackboneElement
                 ? $this->instantiateWithConstructorDefaults($resolvedType)
                 : $this->instantiateWithDefaults($resolvedType);
+
+            if ($incomplete !== null) {
+                IncompleteComplexExtensionRecorder::record($object, $incomplete);
+            }
 
             $metaMap = $this->getPropertyMetadataMap($object);
             $data    = $this->remapNamespacedElements($data, $metaMap, $object, $sourceElement);

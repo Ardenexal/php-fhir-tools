@@ -60,6 +60,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
         private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
         private readonly PropertyMetadataProviderInterface $properties = new PropertyMetadataProvider(),
+        private readonly IncompleteComplexExtensionChecker $incompleteExtensionChecker = new IncompleteComplexExtensionChecker(),
     ) {
     }
 
@@ -136,6 +137,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // model holds only the names it could place, so the dropped ones are gone from it.
         foreach ($this->unknownInputChecker->check($resource) as $unknownInputViolation) {
             $violations[] = $unknownInputViolation;
+        }
+
+        // Complex extensions read as plain Extension because a required sub-extension was missing.
+        // Unconditional, and read from what deserialization recorded, for the same reasons as the
+        // pass above: the plain object no longer says it was meant to be the typed class.
+        foreach ($this->incompleteExtensionChecker->check($resource) as $incompleteExtensionViolation) {
+            $violations[] = $incompleteExtensionViolation;
         }
 
         // Bundle.entry.fullUrl must be absolute. Unconditional for the same reason again, and a shape
