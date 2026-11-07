@@ -19,8 +19,8 @@
         "brick/date-time": "^0.9.0",
         "psr/cache": "^3.0",
         "symfony/http-client-contracts": "^3.4",
-        "symfony/property-access": "^6.4|^7.4",
-        "symfony/validator": "^6.4|^7.4"
+        "symfony/property-access": "^6.4|^7.4|^8.1",
+        "symfony/validator": "^6.4|^7.4|^8.1"
     },
     "autoload": {
         "psr-4": {

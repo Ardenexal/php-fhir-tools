@@ -24,6 +24,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     private const string VS_URL     = 'http://hl7.org/fhir/ValueSet/languages';
 
     private const string MAX_VS_URL = 'http://hl7.org/fhir/ValueSet/all-languages';
@@ -51,7 +53,7 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
         $this->mockClient->method('validateCode')->willReturn(false);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('bad-code', new FHIRValueSetBinding(self::VS_URL, 'extensible', strict: true));
 
@@ -67,7 +69,7 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
         $this->mockClient->method('validateCode')->willReturn(false);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('bad-code', new FHIRValueSetBinding(self::VS_URL, 'preferred', strict: true));
 
@@ -83,7 +85,7 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
         $this->mockClient->method('validateCode')->willReturn(true);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('en', new FHIRValueSetBinding(self::VS_URL, 'extensible', strict: true));
 
@@ -102,7 +104,7 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
             ->willReturnCallback(fn (string $url) => $url === self::VS_URL);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $constraint = new FHIRValueSetBinding(self::VS_URL, 'extensible', maxValueSetUrl: self::MAX_VS_URL);
         $validator->validate('some-extension-code', $constraint);
@@ -119,7 +121,7 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
         $this->mockClient->method('validateCode')->willReturn(true);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $constraint = new FHIRValueSetBinding(self::VS_URL, 'extensible', maxValueSetUrl: self::MAX_VS_URL);
         $validator->validate('en', $constraint);
@@ -137,7 +139,7 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
         $this->mockClient->method('validateCode')->willReturn(false);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $constraint = new FHIRValueSetBinding(self::VS_URL, 'extensible', maxValueSetUrl: self::MAX_VS_URL);
         $validator->validate('completely-invalid', $constraint);
@@ -159,7 +161,7 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
         $this->mockClient->method('validateCode')->willReturn(false);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $constraint = new FHIRValueSetBinding(self::VS_URL, 'extensible', strict: true, maxValueSetUrl: self::MAX_VS_URL);
         $validator->validate('completely-invalid', $constraint);
@@ -182,7 +184,7 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
     public function testNullClientSkipsStrictCheckWithUncheckedBindingInfo(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'extensible', strict: true));
 
@@ -195,7 +197,7 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
     public function testNullClientSkipsMaxValueSetCheckWithUncheckedBindingInfo(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $constraint = new FHIRValueSetBinding(self::VS_URL, 'extensible', maxValueSetUrl: self::MAX_VS_URL);
         $validator->validate('anything', $constraint);

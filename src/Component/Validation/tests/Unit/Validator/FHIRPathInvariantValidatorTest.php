@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 final class FHIRPathInvariantValidatorTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     protected function createValidator(): FHIRPathInvariantValidator
     {
         return new FHIRPathInvariantValidator(new FHIRPathService(), new FHIRValidationMessageRegistry());
@@ -62,7 +64,7 @@ final class FHIRPathInvariantValidatorTest extends ConstraintValidatorTestCase
         $stub->method('evaluate')->willThrowException(new EvaluationException('unsupported function'));
 
         $validator = new FHIRPathInvariantValidator($stub, new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate(new \stdClass(), $this->makeConstraint('bad-expr', 'error', 'inv-3', 'Invariant failed.'));
 
@@ -79,7 +81,7 @@ final class FHIRPathInvariantValidatorTest extends ConstraintValidatorTestCase
         $stub->method('evaluate')->willThrowException(new \TypeError('genuine bug'));
 
         $validator = new FHIRPathInvariantValidator($stub, new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         // A non-FHIRPath throwable is a real bug, not a tooling limitation: it must surface
         // loudly rather than be downgraded to an info eval-error that hides the failure.
@@ -94,7 +96,7 @@ final class FHIRPathInvariantValidatorTest extends ConstraintValidatorTestCase
         $registry->setOverride('FHIRPathInvariant', 'Custom invariant message.');
 
         $validator = new FHIRPathInvariantValidator(new FHIRPathService(), $registry);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate(new \stdClass(), $this->makeConstraint('1 = 2', 'error'));
 

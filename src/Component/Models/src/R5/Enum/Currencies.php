@@ -213,9 +213,6 @@ enum Currencies: string
     /** Chinese Yuan (offshore) */
     case chineseyuanoffshore = 'CNH';
 
-    /** Chinese People’s Bank Dollar */
-    case chinesepeopl_es_bankdollar = 'CNX';
-
     /** Chinese Yuan */
     case chineseyuan = 'CNY';
 

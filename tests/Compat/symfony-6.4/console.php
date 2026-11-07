@@ -24,12 +24,15 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\HttpClient;
 
-require __DIR__ . '/vendor/autoload.php';
+// A sibling harness runs this application against its own install; see tests/Compat/symfony-8.1.
+$harnessDir = getenv('COMPAT_HARNESS_DIR') ?: __DIR__;
+
+require $harnessDir . '/vendor/autoload.php';
 
 $filesystem    = new Filesystem();
 $packageLoader = new PackageLoader(
     httpClient: HttpClient::create(),
-    cacheDir: __DIR__ . '/var/cache/.fhir',
+    cacheDir: $harnessDir . '/var/cache/.fhir',
     contextBuilder: new BuilderContext(),
     filesystem: $filesystem,
 );
