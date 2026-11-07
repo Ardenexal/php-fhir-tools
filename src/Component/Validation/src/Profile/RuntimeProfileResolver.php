@@ -38,6 +38,18 @@ final class RuntimeProfileResolver
      */
     private array $compiled = [];
 
+    /**
+     * Every profile a successful resolution has handed out, by release, then root type, then URL.
+     *
+     * The slice validator finds a profile's sibling slices by reading attributes off the validated
+     * object's class. A base instance has none, so {@see RuntimeProfileAttributeReader} looks them up
+     * here instead. A later resolution of the same URL replaces the entry, so one URL never
+     * contributes two sets of slices.
+     *
+     * @var array<string, array<string, array<string, CompiledProfile>>>
+     */
+    private array $resolvedByRootType = [];
+
     public function __construct(
         private readonly StructureDefinitionRegistryInterface $registry,
         private readonly StructureDefinitionCompiler $compiler = new StructureDefinitionCompiler(),
@@ -129,7 +141,26 @@ final class RuntimeProfileResolver
             $currentUrl = $parentUrl;
         }
 
+        foreach ($chain as $profile) {
+            $this->resolvedByRootType[$release][$rootType][$profile->profileUrl] = $profile;
+        }
+
         return RuntimeProfileResolution::resolved($url, $release, array_reverse($chain), $rootType, $kind);
+    }
+
+    /**
+     * Profiles resolved so far that constrain one type, in the order they were first resolved.
+     *
+     * @param string $fhirVersion 'R4', 'R4B' or 'R5'
+     * @param string $rootType    FHIR type name, e.g. 'Observation'
+     *
+     * @return list<CompiledProfile>
+     */
+    public function resolvedProfilesFor(string $fhirVersion, string $rootType): array
+    {
+        $release = FhirReleaseLabel::normalize($fhirVersion);
+
+        return $release === null ? [] : array_values($this->resolvedByRootType[$release][$rootType] ?? []);
     }
 
     /**

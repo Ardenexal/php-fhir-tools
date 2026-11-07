@@ -123,7 +123,6 @@ final class DeclaredLimitations
             'observation-cholesterol-good'           => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'observation-triglyceride-good'          => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'observation-triglyceride-good2'         => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
-            'observation-triglyceride-bad-wrongcode' => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'demo-example-2'                         => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'contained-canonical'                    => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
         ],
