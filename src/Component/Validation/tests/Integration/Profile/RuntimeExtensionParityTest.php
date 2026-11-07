@@ -92,6 +92,18 @@ final class RuntimeExtensionParityTest extends TestCase
                     ['url' => 'id', 'valueString' => 'a parameter name'],
                 ])],
             ], 2],
+            'repeated single slice with equal values' => [[
+                'resourceType' => 'Patient',
+                'address'      => [['extension' => [[
+                    'url'       => self::SD . 'geolocation',
+                    'extension' => [
+                        ['url' => 'latitude', 'valueDecimal' => 1],
+                        ['url' => 'colour', 'valueString' => 'brown'],
+                        ['url' => 'latitude', 'valueDecimal' => 1],
+                        ['url' => 'longitude', 'valueDecimal' => 2],
+                    ],
+                ]]]],
+            ], 1],
             'value of another type' => [[
                 'resourceType' => 'Patient',
                 'extension'    => [

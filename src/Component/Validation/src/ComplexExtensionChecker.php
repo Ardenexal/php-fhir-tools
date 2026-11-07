@@ -161,7 +161,7 @@ final class ComplexExtensionChecker
 
             $filled = false;
             foreach ($read as $sub) {
-                if ($this->urlOf($sub) === $slice->sliceName && self::holds(property_exists($sub, 'value') ? ($sub->value ?? null) : null, $slice->valueType, $release)) {
+                if ($this->urlOf($sub) === $slice->sliceName && self::holds(self::valueOf($sub), $slice->valueType, $release)) {
                     $filled = true;
 
                     break;
@@ -176,23 +176,41 @@ final class ComplexExtensionChecker
         // The generated class rebuilds its sub-extension list as the ones its slices took, then the
         // ones left over in document order, and an undeclared one is named by its place in that
         // list. Each slice takes every matching sub-extension when it repeats, and the last one when
-        // it does not, as the generated fromSubExtensions() assigns them.
+        // it does not, as the generated fromSubExtensions() assigns them. The reader then accounts
+        // for each value taken by the first sub-extension with the same url and value
+        // (ComplexExtensionSubExtensions::undeclared()), which for equal scalars is not the one taken.
         $taken = [];
         foreach ($definition->subExtensions as $slice) {
             $matches = [];
             foreach ($read as $index => $sub) {
-                if ($this->urlOf($sub) === $slice->sliceName && self::holds(property_exists($sub, 'value') ? ($sub->value ?? null) : null, $slice->valueType, $release)) {
+                if ($this->urlOf($sub) === $slice->sliceName && self::holds(self::valueOf($sub), $slice->valueType, $release)) {
                     $matches[] = $index;
                 }
             }
-            foreach ($slice->repeats() ? $matches : array_slice($matches, -1) as $index) {
-                $taken[$index] = true;
+            foreach ($slice->repeats() ? $matches : array_slice($matches, -1) as $match) {
+                foreach ($read as $index => $sub) {
+                    if (!isset($taken[$index]) && $this->urlOf($sub) === $slice->sliceName && self::valueOf($sub) === self::valueOf($read[$match])) {
+                        $taken[$index] = true;
+
+                        break;
+                    }
+                }
             }
         }
 
-        // A slice-style url is declared when a constructor parameter has its name, which includes
-        // `id`, as ComplexExtensionSubExtensions::declaresSlice() reads the generated constructor
-        $declared   = [...array_map(static fn ($slice): string => self::comparable($slice->sliceName), $definition->subExtensions), 'id'];
+        // A slice-style url is declared when ComplexExtensionSubExtensions::declaresSlice() would
+        // find a generated constructor parameter for it: the slice's own name, the name with `Slice`
+        // appended where it is reserved (`valueSlice`), either with `Slice` removed, and `id`
+        $declared = ['id'];
+        foreach ($definition->subExtensions as $slice) {
+            $name       = self::comparable($slice->sliceName);
+            $parameter  = in_array($name, ['value', 'url', 'id', 'extension'], true) ? $name . 'slice' : $name;
+            $declared[] = $parameter;
+            if (str_ends_with($parameter, 'slice')) {
+                $declared[] = substr($parameter, 0, -5);
+            }
+        }
+
         $position   = count($taken);
         $violations = [];
         foreach ($read as $index => $sub) {
@@ -216,6 +234,11 @@ final class ComplexExtensionChecker
         }
 
         return $violations;
+    }
+
+    private static function valueOf(FHIRExtensionInterface $sub): mixed
+    {
+        return property_exists($sub, 'value') ? ($sub->value ?? null) : null;
     }
 
     /**

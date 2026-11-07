@@ -53,6 +53,7 @@ final class RuntimeExtensionTest extends TestCase
                 ['id' => 'Extension.extension:species', 'path' => 'Extension.extension', 'sliceName' => 'species', 'min' => 1, 'max' => '1'],
                 ['id' => 'Extension.extension:species.value[x]', 'path' => 'Extension.extension.value[x]', 'min' => 1, 'max' => '1', 'type' => [['code' => 'CodeableConcept']]],
                 ['id' => 'Extension.extension:name', 'path' => 'Extension.extension', 'sliceName' => 'name', 'min' => 0, 'max' => '1'],
+                ['id' => 'Extension.extension:value', 'path' => 'Extension.extension', 'sliceName' => 'value', 'min' => 0, 'max' => '1'],
                 ['id' => 'Extension.extension:name.value[x]', 'path' => 'Extension.extension.value[x]', 'min' => 1, 'max' => '1', 'type' => [['code' => 'string']]],
                 ['id' => 'Extension.value[x]', 'path' => 'Extension.value[x]', 'min' => 0, 'max' => '0'],
             ]),
@@ -129,6 +130,22 @@ final class RuntimeExtensionTest extends TestCase
             $this->findings($patient, 'Sub-extension url'),
         );
         self::assertSame([], $this->findings($patient, 'Extension.extension:'));
+    }
+
+    /**
+     * The generated class names a slice called `value` `$valueSlice`, and treats both urls as declared.
+     */
+    public function testAReservedSliceNameIsDeclaredUnderItsParameterNameToo(): void
+    {
+        $patient            = new PatientResource();
+        $patient->extension = [new Extension(url: self::PET, extension: [
+            new Extension(url: 'species', value: new CodeableConcept()),
+            new Extension(url: 'value', value: new StringPrimitive(value: 'a')),
+            new Extension(url: 'valueSlice', value: new StringPrimitive(value: 'b')),
+            new Extension(url: 'id', value: new StringPrimitive(value: 'c')),
+        ])];
+
+        self::assertSame([], $this->findings($patient, 'Sub-extension url'));
     }
 
     public function testAKnownModifierExtensionIsNotUnknown(): void
