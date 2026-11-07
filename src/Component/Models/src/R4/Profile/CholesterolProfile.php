@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
 
@@ -144,6 +145,14 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
     path: 'referenceRange.high.comparator',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
+    groups: ['http://hl7.org/fhir/StructureDefinition/cholesterol'],
+)]
+#[FHIRProfileInvariant(
+    path: 'referenceRange.high',
+    key: 'sqty-1',
+    severity: 'error',
+    expression: 'comparator.empty()',
+    human: 'The comparator is not used on a SimpleQuantity',
     groups: ['http://hl7.org/fhir/StructureDefinition/cholesterol'],
 )]
 class CholesterolProfile extends ObservationResource

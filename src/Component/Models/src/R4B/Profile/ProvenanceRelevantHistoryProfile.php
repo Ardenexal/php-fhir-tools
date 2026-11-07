@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
@@ -82,6 +83,18 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ProvenanceResource;
             'options'    => ['min' => 1, 'max' => 1],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/provenance-relevant-history'],
+)]
+#[FHIRProfileBinding(
+    path: 'activity',
+    valueSetUrl: 'http://hl7.org/fhir/ValueSet/provenance-history-record-activity',
+    strength: 'extensible',
+    groups: ['http://hl7.org/fhir/StructureDefinition/provenance-relevant-history'],
+)]
+#[FHIRProfileBinding(
+    path: 'agent.type',
+    valueSetUrl: 'http://hl7.org/fhir/ValueSet/provenance-history-agent-type',
+    strength: 'extensible',
     groups: ['http://hl7.org/fhir/StructureDefinition/provenance-relevant-history'],
 )]
 class ProvenanceRelevantHistoryProfile extends ProvenanceResource

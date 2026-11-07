@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\ComplexExtensionChecker;
@@ -29,9 +31,10 @@ use PHPUnit\Framework\TestCase;
  * a plain `Extension` in document order and only the runtime definition can say anything about it.
  * With the alias put back, the two reports must match finding for finding.
  *
- * Findings inside a complex extension's sub-extension values are left out: a typed class also
- * exposes each value as a property, which the walk reaches first, so the same finding has another
- * path there. That is a difference in the objects, not in what is checked.
+ * Findings inside an extension's value are left out: a typed class also exposes each value as a
+ * property, which the walk reaches first, so the same finding has another path there. That is a
+ * difference in the objects, not in what is checked. A finding about the value itself, such as a
+ * binding or an invariant on `Extension.value[x]`, is kept: both report it at `.value`.
  *
  * The definitions are committed fixtures copied from the extensions package the classes were built
  * from, by `tests/Fixtures/Profile/seed-core-profiles.php`.
@@ -49,7 +52,7 @@ final class RuntimeExtensionParityTest extends TestCase
     /** The extensions the documents use, each seeded into the fixtures. */
     private const array EXTENSIONS = [
         'patient-animal', 'geolocation', 'patient-birthPlace', 'patient-mothersMaidenName', 'data-absent-reason',
-        'allergyintolerance-substanceExposureRisk',
+        'allergyintolerance-substanceExposureRisk', 'resource-instance-description', 'servicerequest-order-callback-phone-number',
     ];
 
     /**
@@ -137,6 +140,23 @@ final class RuntimeExtensionParityTest extends TestCase
                 'resourceType' => 'Patient',
                 '_gender'      => ['extension' => [['url' => self::SD . 'data-absent-reason', 'valueCode' => 'unknown']]],
             ], 0],
+            'invariant using the resource around the extension' => [[
+                'resourceType' => 'Questionnaire',
+                'status'       => 'draft',
+                'description'  => 'A questionnaire',
+                'extension'    => [['url' => self::SD . 'resource-instance-description', 'valueMarkdown' => 'Another description']],
+            ], 1],
+            'invariant on the value' => [[
+                'resourceType' => 'ServiceRequest',
+                'status'       => 'active',
+                'intent'       => 'order',
+                'subject'      => ['reference' => 'Patient/1'],
+                'extension'    => [['url' => self::SD . 'servicerequest-order-callback-phone-number', 'valueContactPoint' => ['system' => 'email', 'value' => 'a@example.org']]],
+            ], 1],
+            'binding on the value' => [[
+                'resourceType' => 'Patient',
+                '_gender'      => ['extension' => [['url' => self::SD . 'data-absent-reason', 'valueCode' => 'unicorn']]],
+            ], 1],
         ];
 
         foreach (['R4' => FhirVersion::R4, 'R4B' => FhirVersion::R4B, 'R5' => FhirVersion::R5] as $label => $release) {
@@ -195,10 +215,14 @@ final class RuntimeExtensionParityTest extends TestCase
         $lines = [];
         foreach ($violations as $violation) {
             $path = $violation->path;
-            if (preg_match('/xtension\[\d+\]\.extension\[\d+\]\./', $path) === 1 || preg_match('/xtension\[\d+\]\.(?!extension)[a-z]/', $path) === 1) {
+            if (preg_match('/xtension\[\d+\]\.extension\[\d+\]\./', $path) === 1 || preg_match('/xtension\[\d+\]\.(?!extension)(?!value$)[a-z]/', $path) === 1) {
                 continue;
             }
             if (str_contains($path, 'xtension') || str_contains($violation->message, 'xtension')) {
+                // An extension's own invariants and bindings run in the default group, which is no profile
+                if (in_array($violation->constraintClass, [FHIRProfileInvariant::class, FHIRProfileBinding::class], true)) {
+                    self::assertNull($violation->profileGroup, "{$path}: {$violation->message}");
+                }
                 $lines[] = str_replace(self::ALIAS, self::SD, "{$violation->severity} {$path}: {$violation->message}");
             }
         }

@@ -158,6 +158,17 @@ services:
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraintValidator' }
 
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileInvariantValidator:
+        arguments:
+            $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariantValidator' }
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileBindingValidator:
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBindingValidator' }
+
     Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher: ~
 
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator:

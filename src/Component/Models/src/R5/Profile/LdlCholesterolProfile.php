@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationResource;
 
@@ -88,10 +90,24 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationResource;
 #[FHIRProfileMustSupport(path: 'interpretation', groups: ['http://hl7.org/fhir/StructureDefinition/ldlcholesterol'])]
 #[FHIRProfileMustSupport(path: 'note', groups: ['http://hl7.org/fhir/StructureDefinition/ldlcholesterol'])]
 #[FHIRProfileMustSupport(path: 'referenceRange', groups: ['http://hl7.org/fhir/StructureDefinition/ldlcholesterol'])]
+#[FHIRProfileBinding(
+    path: 'code',
+    valueSetUrl: 'http://hl7.org/fhir/ValueSet/lipid-ldl-codes',
+    strength: 'required',
+    groups: ['http://hl7.org/fhir/StructureDefinition/ldlcholesterol'],
+)]
 #[FHIRProfileConstraint(
     path: 'referenceRange.high.comparator',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
+    groups: ['http://hl7.org/fhir/StructureDefinition/ldlcholesterol'],
+)]
+#[FHIRProfileInvariant(
+    path: 'referenceRange.high',
+    key: 'sqty-1',
+    severity: 'error',
+    expression: 'comparator.empty()',
+    human: 'The comparator is not used on a SimpleQuantity',
     groups: ['http://hl7.org/fhir/StructureDefinition/ldlcholesterol'],
 )]
 class LdlCholesterolProfile extends ObservationResource

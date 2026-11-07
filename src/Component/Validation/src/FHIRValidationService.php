@@ -20,6 +20,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionCon
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
@@ -63,6 +65,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     /** @var \WeakMap<CompiledExtension, list<object>> Context attributes per runtime extension definition */
     private \WeakMap $runtimeExtensionContexts;
 
+    /** @var \WeakMap<CompiledExtension, list<Constraint>> Invariants and bindings per runtime extension definition */
+    private \WeakMap $runtimeExtensionConstraints;
+
     /** @var array<class-string, bool> Whether each class seen by the runtime walk is a resource */
     private array $resourceClasses = [];
 
@@ -84,9 +89,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly ComplexExtensionChecker $complexExtensionChecker = new ComplexExtensionChecker(),
         private readonly ?RuntimeProfileResolver $runtimeProfiles = null,
     ) {
-        $this->runtimeConstraints       = new \WeakMap();
-        $this->runtimeExtensionContexts = new \WeakMap();
-        $this->runtimeExtensionOfObject = new \WeakMap();
+        $this->runtimeConstraints          = new \WeakMap();
+        $this->runtimeExtensionConstraints = new \WeakMap();
+        $this->runtimeExtensionContexts    = new \WeakMap();
+        $this->runtimeExtensionOfObject    = new \WeakMap();
     }
 
     /**
@@ -336,6 +342,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * @param array{visited: array<int, true>, reached: array<string, true>, mismatched: array<string, FHIRValidationViolation>} $walk
      *                                                                                                                                       resources already walked by spl_object_id; requested canonicals a
      *                                                                                                                                       nested resource took up; top-level type mismatches held back by canonical
+     * @param object|null                                                                                                        $root       The object validation started at; null at the start
      */
     private function collectRuntimeProfileViolations(
         object $resource,
@@ -344,7 +351,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         FHIRValidationOptions $options,
         array &$violations,
         array &$walk,
+        ?object $root = null,
     ): void {
+        $root ??= $resource;
         if (isset($walk['visited'][spl_object_id($resource)])) {
             return;
         }
@@ -385,6 +394,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 $resourceAttributes[0]->fhirVersion,
                 $wanted,
                 $violations,
+                $root,
             );
             if ($topLevel) {
                 $walk['mismatched'] += $mismatches;
@@ -394,13 +404,14 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         foreach ($this->nestedResources($resource, $walk['visited']) as $nestedPath => $nested) {
-            $this->collectRuntimeProfileViolations($nested, $prefix . $nestedPath . '.', [], $options, $violations, $walk);
+            $this->collectRuntimeProfileViolations($nested, $prefix . $nestedPath . '.', [], $options, $violations, $walk, $root);
         }
     }
 
     /**
      * @param array<string, bool>           $wanted     URL as written => whether its constraint ancestors apply
      * @param list<FHIRValidationViolation> $violations appended to
+     * @param object                        $root       The object validation started at, which $prefix is relative to
      *
      * @return array<string, FHIRValidationViolation> one error per wanted profile that constrains another type, by canonical
      */
@@ -410,6 +421,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         string $fhirVersion,
         array $wanted,
         array &$violations,
+        object $root,
     ): array {
         $mismatches = [];
         if ($wanted === [] || $this->runtimeProfiles === null) {
@@ -541,7 +553,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // The slice reader must serve the versions whose constraints run here.
         $this->runtimeProfiles->activate($fhirVersion, $resourceType, array_values($selected));
 
-        $raw = $this->validator->validate($resource, array_merge(...array_values($constraintsByGroup)), array_keys($constraintsByGroup));
+        // A nested resource is validated on its own, but its invariants see the resources around it,
+        // as on a generated class reached from the root: a contained resource's %rootResource is its container
+        $validate = fn () => $this->validator->validate($resource, array_merge(...array_values($constraintsByGroup)), array_keys($constraintsByGroup));
+        $raw      = $prefix === '' ? $validate() : FHIRPathResourceContext::within($resource, $root, rtrim($prefix, '.'), $validate);
         foreach ($raw as $rawViolation) {
             $violation    = $this->mapViolation($rawViolation);
             $violations[] = $prefix === '' ? $violation : new FHIRValidationViolation(
@@ -579,6 +594,41 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return $this->runtimeConstraints[$profile] = $constraints;
+    }
+
+    /**
+     * The invariants and bindings a typed extension class carries, in the order its generator wrote them.
+     *
+     * @return list<Constraint>
+     */
+    private function extensionRuleAttributes(object $extension): array
+    {
+        return [
+            ...$this->attributes->classAttributes($extension, FHIRProfileInvariant::class),
+            ...$this->attributes->classAttributes($extension, FHIRProfileBinding::class),
+        ];
+    }
+
+    /**
+     * A runtime extension definition's invariants and bindings as instances, built once per definition.
+     *
+     * @return list<Constraint>
+     */
+    private function runtimeExtensionConstraintsOf(CompiledExtension $extension): array
+    {
+        if (isset($this->runtimeExtensionConstraints[$extension])) {
+            return $this->runtimeExtensionConstraints[$extension];
+        }
+
+        $constraints = [];
+        foreach ($extension->constraints as $attribute) {
+            $constraint = $attribute->instantiate();
+            if ($constraint instanceof Constraint) {
+                $constraints[] = $constraint;
+            }
+        }
+
+        return $this->runtimeExtensionConstraints[$extension] = $constraints;
     }
 
     /**
@@ -676,14 +726,17 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         $constraintClass = $constraint !== null ? $constraint::class : '';
 
         $profileGroup = null;
-        if (($constraint instanceof FHIRProfileConstraint || $constraint instanceof FHIRSliceConstraint)
+        if (($constraint instanceof FHIRProfileConstraint || $constraint instanceof FHIRSliceConstraint
+                                                          || $constraint instanceof FHIRProfileInvariant || $constraint instanceof FHIRProfileBinding)
             && $constraint->groups !== null
-            && $constraint->groups !== []) {
+            && $constraint->groups !== []
+            && $constraint->groups !== [Constraint::DEFAULT_GROUP]) {
+            // An extension's invariants and bindings apply everywhere, in the default group, not a profile's
             $profileGroup = $constraint->groups[0];
         }
 
         $invariantKey = null;
-        if ($constraint instanceof FHIRPathInvariant) {
+        if ($constraint instanceof FHIRPathInvariant || $constraint instanceof FHIRProfileInvariant) {
             $invariantKey = $constraint->key;
         }
 
@@ -1322,6 +1375,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      *
      * A plain extension whose definition was loaded at runtime is also checked for a missing required
      * sub-extension and for undeclared ones here, as {@see ComplexExtensionChecker} checks a typed one.
+     * Every extension is held to its definition's invariants and bindings here: a typed class's
+     * attributes, or a plain extension's runtime definition. Symfony does not cascade into extensions,
+     * so nothing else runs them. They run as if from $root at the extension's path, so `%resource` is
+     * the resource around the extension.
      *
      * The absoluteness rule deliberately stops at the first level. A *sub*-extension's url is a slice
      * name rather than a canonical (`x-breed`, `species-x`), so requiring absoluteness there would
@@ -1332,11 +1389,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * extension whose url never deserialized has no url to validate against.
      *
      * @param array<int, true> $visited spl_object_id keys of already-visited objects (cycle guard)
+     * @param object|null      $root    The object validation started at, which $path is relative to; null at the start
      *
      * @return list<FHIRValidationViolation>
      */
-    private function validateExtensionStructure(object $resource, string $path, array &$visited, bool $insideExtension): array
+    private function validateExtensionStructure(object $resource, string $path, array &$visited, bool $insideExtension, ?object $root = null): array
     {
+        $root ??= $resource;
         $id = spl_object_id($resource);
 
         if (isset($visited[$id])) {
@@ -1398,6 +1457,33 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     }
                 }
 
+                // Invariants and bindings from the extension's definition. Symfony does not cascade into
+                // extensions, so a typed class's attributes are run here too, the same way as a plain
+                // extension's runtime definition
+                $rules = $runtime !== null ? $this->runtimeExtensionConstraintsOf($runtime) : $this->extensionRuleAttributes($ext);
+                if ($rules !== []) {
+                    $at  = $extPath . '[' . $extIndex . ']';
+                    $raw = FHIRPathResourceContext::within(
+                        $ext,
+                        $root,
+                        $at,
+                        fn () => $this->validator->validate($ext, $rules, ['Default']),
+                    );
+                    foreach ($raw as $rawViolation) {
+                        $violation    = $this->mapViolation($rawViolation);
+                        $violations[] = new FHIRValidationViolation(
+                            severity: $violation->severity,
+                            path: $violation->path === '' ? $at : $at . '.' . $violation->path,
+                            message: $violation->message,
+                            constraintClass: $violation->constraintClass,
+                            profileGroup: $violation->profileGroup,
+                            invariantKey: $violation->invariantKey,
+                            parameters: $violation->parameters,
+                            code: $violation->code,
+                        );
+                    }
+                }
+
                 $typeMismatch = $this->extensionValueTypeMismatch($ext, $url);
 
                 if ($typeMismatch !== null) {
@@ -1424,13 +1510,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $propPath   = $path !== '' ? $path . '.' . $name : $name;
 
             if (is_object($value)) {
-                foreach ($this->validateExtensionStructure($value, $propPath, $visited, $childInExt) as $v) {
+                foreach ($this->validateExtensionStructure($value, $propPath, $visited, $childInExt, $root) as $v) {
                     $violations[] = $v;
                 }
             } elseif (is_array($value)) {
                 foreach ($value as $i => $item) {
                     if (is_object($item)) {
-                        foreach ($this->validateExtensionStructure($item, $propPath . '[' . $i . ']', $visited, $childInExt) as $v) {
+                        foreach ($this->validateExtensionStructure($item, $propPath . '[' . $i . ']', $visited, $childInExt, $root) as $v) {
                             $violations[] = $v;
                         }
                     }

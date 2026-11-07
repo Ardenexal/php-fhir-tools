@@ -399,6 +399,13 @@
             "version": "4.3.0"
         },
         {
+            "filename": "StructureDefinition-resource-instance-description.json",
+            "resourceType": "StructureDefinition",
+            "id": "resource-instance-description",
+            "url": "http://hl7.org/fhir/StructureDefinition/resource-instance-description",
+            "version": "5.3.0"
+        },
+        {
             "filename": "StructureDefinition-resprate.json",
             "resourceType": "StructureDefinition",
             "id": "resprate",
@@ -411,6 +418,13 @@
             "id": "servicerequest-genetics",
             "url": "http://hl7.org/fhir/StructureDefinition/servicerequest-genetics",
             "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-servicerequest-order-callback-phone-number.json",
+            "resourceType": "StructureDefinition",
+            "id": "servicerequest-order-callback-phone-number",
+            "url": "http://hl7.org/fhir/StructureDefinition/servicerequest-order-callback-phone-number",
+            "version": "5.3.0"
         },
         {
             "filename": "StructureDefinition-shareableactivitydefinition.json",

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 
@@ -69,6 +70,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
             ],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/executablevalueset'],
+)]
+#[FHIRProfileInvariant(
+    path: 'expansion',
+    key: 'evs-1',
+    severity: 'error',
+    expression: 'contains.version.exists() xor  parameter.where(name = \'system-version\').exists()',
+    human: 'For contains, a version SHALL be provided unless the parameters element has a "system-version" parameter corresponding to the system of the entry and the version matches the system-version parameter.',
     groups: ['http://hl7.org/fhir/StructureDefinition/executablevalueset'],
 )]
 class ExecutableValueSetProfile extends ShareableValueSetProfile

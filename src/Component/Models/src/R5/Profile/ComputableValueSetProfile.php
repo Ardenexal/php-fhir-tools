@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 
@@ -80,6 +81,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
     discriminatorPath: 'url',
     discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/valueset-supplement',
     orderedIndex: 2,
+    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
+)]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'cvs-1',
+    severity: 'error',
+    expression: 'extension(\'http://hl7.org/fhir/StructureDefinition/valueset-rules-text\').exists() xor extension(\'http://hl7.org/fhir/StructureDefinition/valueset-expression\').exists() xor compose.exists()',
+    human: 'Only one of rulesText, expression, or a compose definition SHALL be provided',
     groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
 )]
 class ComputableValueSetProfile extends ShareableValueSetProfile
