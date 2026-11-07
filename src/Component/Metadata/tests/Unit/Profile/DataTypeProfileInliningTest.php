@@ -104,7 +104,8 @@ final class DataTypeProfileInliningTest extends TestCase
         );
 
         self::assertCount(1, $compiled->diagnostics);
-        self::assertStringContainsString('that profile contains itself', $compiled->diagnostics[0]->message);
+        self::assertStringContainsString(self::BASE . 'a is already being inlined on this path', $compiled->diagnostics[0]->message);
+        self::assertStringContainsString('inlined at identifier.assigner.identifier', $compiled->diagnostics[0]->message);
         self::assertSame('Identifier.assigner.identifier', $compiled->diagnostics[0]->elementId);
     }
 
@@ -167,7 +168,7 @@ final class DataTypeProfileInliningTest extends TestCase
         ];
         yield 'not a data-type profile' => [
             self::element('Observation.section', ['code' => 'BackboneElement', 'profile' => [self::BASE . 'resource']]),
-            'not a data-type profile',
+            'not a constraint on a data type',
         ];
         yield 'inside a slice' => [
             ['id' => 'Observation.component:a.valueQuantity', 'path' => 'Observation.component.valueQuantity', 'type' => [
@@ -175,6 +176,39 @@ final class DataTypeProfileInliningTest extends TestCase
             ]],
             'inside a slice',
         ];
+    }
+
+    public function testAMissingAncestorOfADataTypeProfileIsReported(): void
+    {
+        $compiled = self::compile(
+            [self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty']])],
+            [self::BASE . 'qty' => self::profile(self::BASE . 'qty', 'complex-type', 'Quantity', [
+                ['id' => 'Quantity.comparator', 'path' => 'Quantity.comparator', 'max' => '0'],
+            ], self::BASE . 'absent-parent')],
+        );
+
+        self::assertSame([[FHIRProfileConstraint::class, 'valueQuantity.comparator', [self::OBSERVATION]]], self::summary($compiled));
+        self::assertCount(1, self::inliningDiagnostics($compiled));
+        self::assertStringContainsString('derives from ' . self::BASE . 'absent-parent, which is not available', self::inliningDiagnostics($compiled)[0]);
+    }
+
+    /**
+     * A child that restates the data-type profile its parent already gave the element adds nothing:
+     * the parent's group enforces it, and a second copy would report each violation twice.
+     */
+    public function testATypeRestatedFromTheParentIsNotInlinedAgain(): void
+    {
+        $element            = self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty|2.0']]);
+        $parent             = self::profile(self::BASE . 'parent', 'resource', 'Observation', [$element]);
+        $parent['snapshot'] = $parent['differential'];
+        $child              = self::profile(self::OBSERVATION, 'resource', 'Observation', [$element], self::BASE . 'parent');
+        $lookup             = static fn (string $url): ?array => [
+            self::BASE . 'qty'    => self::quantityProfile(self::BASE . 'qty', []),
+            self::BASE . 'parent' => $parent,
+        ][$url] ?? null;
+
+        self::assertSame([], (new StructureDefinitionCompiler())->compile($child, $lookup)->attributes);
+        self::assertNotSame([], (new StructureDefinitionCompiler())->compile($parent, $lookup)->attributes);
     }
 
     public function testExtensionProfilesAreLeftToExtensionValidation(): void
@@ -197,7 +231,7 @@ final class DataTypeProfileInliningTest extends TestCase
     {
         $messages = [];
         foreach ($compiled->diagnostics as $diagnostic) {
-            if (str_contains($diagnostic->message, ' to conform to ')) {
+            if (str_contains($diagnostic->message, ' must conform to ')) {
                 $messages[] = $diagnostic->message;
             }
         }

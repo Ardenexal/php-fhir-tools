@@ -123,10 +123,13 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         // Read slicing rules for this property (if any)
         $slicingRules = $this->readSlicingRules($value, $property, $activeGroup);
 
-        // Match items → slices, per parent
+        // Match items → slices, per parent. A finding names the parent's occurrence
+        // ("identifier[1].type.coding") only when the path crosses a repeating element; a path that
+        // does not keeps the property as declared, as it always has.
+        $repeats = count($groups) > 1 || str_contains($groups[0]['path'], '[');
         foreach ($groups as $group) {
             if (is_array($group['value'])) {
-                $this->validateSlices($group['value'], $sliceConstraints, $slicingRules, $property);
+                $this->validateSlices($group['value'], $sliceConstraints, $slicingRules, $repeats ? $group['path'] : $property);
             }
         }
     }

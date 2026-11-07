@@ -83,11 +83,42 @@ final class RuntimeDataTypeProfileTest extends TestCase
         $observation             = new ObservationResource();
         $observation->identifier = [self::identifier('http://example.org/kinds'), self::identifier('http://example.org/other')];
 
-        $slices = $this->profileFindings($observation, 'identifier.type.coding');
-
         // The first identifier has its kind coding; only the second one is short of it
+        self::assertSame([], $this->profileFindings($observation, 'identifier[0].type.coding'));
+        $slices = $this->profileFindings($observation, 'identifier[1].type.coding');
         self::assertCount(1, $slices);
-        self::assertStringContainsString('Slice "kind" on "identifier.type.coding" requires at least 1', $slices[0]->message);
+        self::assertStringContainsString('Slice "kind" on "identifier[1].type.coding" requires at least 1', $slices[0]->message);
+    }
+
+    public function testEachRepetitionThatBreaksASliceIsNamed(): void
+    {
+        $observation             = new ObservationResource();
+        $observation->identifier = [self::identifier('http://example.org/other'), self::identifier('http://example.org/other')];
+
+        self::assertCount(1, $this->profileFindings($observation, 'identifier[0].type.coding'));
+        self::assertCount(1, $this->profileFindings($observation, 'identifier[1].type.coding'));
+    }
+
+    /**
+     * A compiled profile inlines other definitions, so it is compiled again when one of them changes.
+     */
+    public function testAddingAnInlinedProfileLaterIsPickedUp(): void
+    {
+        $registry = new InMemoryStructureDefinitionRegistry([
+            self::definition(self::CORE . 'Observation', 'resource', 'Observation', 'specialization', []),
+            self::definition(self::PROFILE, 'resource', 'Observation', 'constraint', [
+                self::typed('Observation.value[x]:valueQuantity', 'Quantity', self::BASE . 'plain-quantity', 'Observation.value[x]'),
+            ]),
+        ]);
+        $resolver = new RuntimeProfileResolver($registry);
+
+        self::assertSame([], $resolver->resolve(self::PROFILE, 'R4')->chain[0]->attributes);
+
+        $registry->add(self::definition(self::BASE . 'plain-quantity', 'complex-type', 'Quantity', 'constraint', [
+            ['id' => 'Quantity.comparator', 'path' => 'Quantity.comparator', 'max' => '0'],
+        ]));
+
+        self::assertCount(1, $resolver->resolve(self::PROFILE, 'R4')->chain[0]->attributes);
     }
 
     public function testRulesApplyOnAChoiceVariant(): void
@@ -120,7 +151,7 @@ final class RuntimeDataTypeProfileTest extends TestCase
 
         self::assertTrue($resolution->isResolved(), (string) $resolution->message);
         $messages = array_map(static fn ($d): string => $d->message, $resolution->chain[0]->diagnostics);
-        self::assertCount(1, array_filter($messages, static fn (string $m): bool => str_contains($m, 'that profile contains itself')));
+        self::assertCount(1, array_filter($messages, static fn (string $m): bool => str_contains($m, 'is already being inlined on this path')));
     }
 
     /**

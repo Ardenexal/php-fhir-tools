@@ -24,6 +24,9 @@ use Symfony\Component\Validator\Constraints\Count;
  * requested. Only this StructureDefinition's own rules are compiled: a parent profile's rules come
  * from compiling the parent under its own URL, never from restating them here, which would report
  * each violation twice.
+ * Data-type profiles this profile names on its elements are the exception: they have no group of
+ * their own on the resource, so their rules are compiled into this profile's group (see
+ * inlinedDataTypeProfiles()), unless the parent already names the same profile on that element.
  *
  * Output order is part of the contract: generated classes must stay byte-identical, so attributes
  * come out as differential constraints, then must-support, then slices, then snapshot obligations,
@@ -33,6 +36,9 @@ use Symfony\Component\Validator\Constraints\Count;
  */
 final class StructureDefinitionCompiler
 {
+    /** Canonical URL prefix of the core definitions, base types included. */
+    private const string CORE_BASE = 'http://hl7.org/fhir/StructureDefinition/';
+
     /** How deep data-type profiles may nest inside each other before inlining stops. */
     public const int MAX_INLINE_DEPTH = 8;
 
@@ -82,9 +88,11 @@ final class StructureDefinitionCompiler
      *
      * Only an element that allows one type with one profile is inlined. Several types or several
      * profiles mean the value must match any one of them, which these rules cannot express, so such an
-     * element, a profile no lookup finds, one that is not a data-type profile, a cycle and nesting past
-     * the limit are reported as diagnostics and not enforced. Extension profiles are left to extension
-     * validation, and an element inside a slice is reported as not enforced.
+     * element, a profile no lookup finds, one that is not a constraint on a data type, a cycle, nesting
+     * past the limit, an element inside a slice and a data-type profile ancestor no lookup finds are
+     * reported as diagnostics and not enforced. Extension profiles are left to extension validation.
+     *
+     * A `|version` on the referenced URL is dropped: the lookup decides which version it returns.
      *
      * @param array<string, mixed>                          $structureDefinition Definition whose differential is read
      * @param string                                        $groupUrl            URL of the profile being compiled; every rule goes in its group
@@ -101,8 +109,10 @@ final class StructureDefinitionCompiler
         array $visited,
         int $depth,
         array &$diagnostics,
+        string $trail = '',
     ): array {
         $attributes = [];
+        $sourceUrl  = (string) ($structureDefinition['url'] ?? '');
 
         foreach (self::differentialElements($structureDefinition) as $id => $element) {
             $path = (string) ($element['path'] ?? '');
@@ -122,10 +132,13 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
+            // Where the element sits: its own id, and inside a data-type profile also where that
+            // profile is inlined, so a nested diagnostic can be traced back
+            $where       = $trail === '' ? $id : "{$id} in {$sourceUrl}, inlined at {$trail}";
             $named       = implode(', ', array_merge(...$profiled));
-            $notEnforced = static function(string $reason) use (&$diagnostics, $groupUrl, $id, $named): void {
+            $notEnforced = static function(string $reason) use (&$diagnostics, $groupUrl, $id, $where, $named): void {
                 $diagnostics[] = new CompilerDiagnostic(
-                    "Profile {$groupUrl} requires {$id} to conform to {$named}, but {$reason}; that profile's rules are not enforced",
+                    "Profile {$groupUrl}: {$where} must conform to {$named}, but {$reason}; those rules are not enforced",
                     $id,
                     ['profileUrl' => $groupUrl, 'typeProfile' => $named],
                 );
@@ -143,11 +156,17 @@ final class StructureDefinitionCompiler
 
             $url = self::canonicalWithoutVersion($profiled[0][0]);
             if (isset($visited[$url])) {
-                $notEnforced('that profile contains itself');
+                $notEnforced("{$url} is already being inlined on this path, so the profiles refer to each other");
                 continue;
             }
             if ($depth > self::MAX_INLINE_DEPTH) {
                 $notEnforced('data-type profiles nest more than ' . self::MAX_INLINE_DEPTH . ' deep');
+                continue;
+            }
+
+            // A profile that restates the type its parent already gave the element would report each
+            // violation twice, once in each group; the parent's group already enforces it
+            if ($depth === 1 && self::parentTypesElementTheSame($structureDefinition, $id, $profiled[0], $lookup)) {
                 continue;
             }
 
@@ -157,9 +176,11 @@ final class StructureDefinitionCompiler
                 continue;
             }
             if (($definition['kind'] ?? null) !== 'complex-type' || ($definition['derivation'] ?? null) !== 'constraint') {
-                $notEnforced('it is not a data-type profile');
+                $notEnforced('it is not a constraint on a data type');
                 continue;
             }
+
+            $at = $trail === '' ? $propertyPath : "{$trail}.{$propertyPath}";
 
             // The data-type profile and each constraint ancestor, up to the base data type
             $current = $definition;
@@ -171,18 +192,55 @@ final class StructureDefinitionCompiler
                 $rules = [
                     ...self::differentialConstraints($current, $groupUrl),
                     ...self::differentialSliceConstraints($current, $groupUrl, $diagnostics),
-                    ...self::inlinedDataTypeProfiles($current, $groupUrl, $lookup, $seen, $depth + 1, $diagnostics),
+                    ...self::inlinedDataTypeProfiles($current, $groupUrl, $lookup, $seen, $depth + 1, $diagnostics, $at),
                 ];
                 foreach ($rules as $rule) {
                     $attributes[] = self::underPath($rule, $propertyPath);
                 }
 
-                $parent  = is_string($current['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($current['baseDefinition']) : '';
-                $current = $parent === '' || isset($seen[$parent]) ? null : $lookup($parent);
+                $parent = is_string($current['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($current['baseDefinition']) : '';
+                if ($parent === '' || isset($seen[$parent])) {
+                    break;
+                }
+                $current = $lookup($parent);
+                if ($current === null && $parent !== self::CORE_BASE . ($definition['type'] ?? '')) {
+                    $notEnforced("{$currentUrl} derives from {$parent}, which is not available, so its rules are missing");
+                }
             }
         }
 
         return $attributes;
+    }
+
+    /**
+     * Whether the parent profile's snapshot already types this element with the same profiles.
+     *
+     * @param array<string, mixed>                          $structureDefinition
+     * @param list<string>                                  $profiles
+     * @param \Closure(string): (array<string, mixed>|null) $lookup
+     */
+    private static function parentTypesElementTheSame(array $structureDefinition, string $id, array $profiles, \Closure $lookup): bool
+    {
+        $base = is_string($structureDefinition['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($structureDefinition['baseDefinition']) : '';
+        if ($base === '') {
+            return false;
+        }
+
+        $parent = $lookup($base);
+        // A base resource or data type types no element with a profile
+        if ($parent === null || ($parent['derivation'] ?? null) !== 'constraint') {
+            return false;
+        }
+
+        $element = self::snapshotElements($parent)[$id] ?? null;
+        foreach (is_array($element['type'] ?? null) ? $element['type'] : [] as $type) {
+            $inherited = is_array($type['profile'] ?? null) ? array_map(self::canonicalWithoutVersion(...), array_filter($type['profile'], 'is_string')) : [];
+            if ($inherited !== [] && $inherited === array_map(self::canonicalWithoutVersion(...), $profiles)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
