@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [Metadata] `StructureDefinitionCompiler` translates a constraint StructureDefinition into the profile attributes that enforce it (`FHIRProfileConstraint`, `FHIRProfileMustSupport`, `FHIRSlicingRules`, `FHIRSliceConstraint`, `FHIRProfileObligation`), returned as `CompiledAttribute` values that can be rendered or instantiated. `fhir:generate` and `fhir:generate-ig` now emit profile classes from it, with unchanged output, so validation against StructureDefinitions loaded at runtime (#170) will enforce the same rules as generated profile classes. `fhir-code-generation` needs the `fhir-metadata` release that ships `Metadata\Profile`, so its cross-pin must be floored at that release
+
 ### Fixed
 - [Serialization] [Validation] A typed complex extension missing a required sub-extension is reported instead of aborting the read. `fromSubExtensions()` threw, so the whole document was rejected and none of its other findings were produced. The extension is now read as a plain `Extension`, keeping its url, id and sub-extensions, and validation reports `Slice 'Extension.extension:species': a matching slice is required, but not found` in the reference validator's wording. JSON and XML both. (#167)
 - [Serialization] [Validation] A typed complex extension no longer drops sub-extensions it does not declare. Its constructor rebuilt the list from its own slices, so `species-x` in `patient-animal`, a nested `bodySite`, or a slice value of a type the model did not capture disappeared on read and was never written back. They are kept after the declared ones, and an undeclared relative-url slice is reported as `Sub-extension url 'species-x' is not defined by the Extension <url>`. (#167)
