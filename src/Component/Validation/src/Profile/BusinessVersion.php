@@ -18,12 +18,16 @@ final class BusinessVersion
      *
      * An unversioned entry ('') sorts below any version. Ties keep the earlier entry.
      *
-     * @param non-empty-list<string> $versions
+     * Callers pass array keys, and PHP turns a numeric-string key such as '1' into an int,
+     * so each version is cast back to a string before it is compared.
+     *
+     * @param non-empty-list<int|string> $versions
      */
     public static function latest(array $versions): string
     {
-        $latest = $versions[0];
-        foreach ($versions as $candidate) {
+        $latest = (string) $versions[0];
+        foreach ($versions as $version) {
+            $candidate = (string) $version;
             if (version_compare($candidate, $latest, '>')) {
                 $latest = $candidate;
             }

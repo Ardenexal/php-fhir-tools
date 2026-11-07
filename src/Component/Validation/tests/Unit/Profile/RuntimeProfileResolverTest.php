@@ -68,6 +68,34 @@ final class RuntimeProfileResolverTest extends TestCase
         self::assertSame($first->chain[0], $second->chain[0]);
     }
 
+    public function testReplacedDefinitionIsCompiledAgain(): void
+    {
+        $definition = static fn (string $path): array => [
+            'resourceType'   => 'StructureDefinition',
+            'url'            => self::EXAMPLE . 'replaced',
+            'version'        => '1.0.0',
+            'fhirVersion'    => '4.0.1',
+            'kind'           => 'resource',
+            'type'           => 'Observation',
+            'derivation'     => 'constraint',
+            'baseDefinition' => self::CORE . 'Observation',
+            'snapshot'       => ['element' => [['id' => 'Observation', 'path' => 'Observation']]],
+            'differential'   => ['element' => [['id' => 'Observation.' . $path, 'path' => 'Observation.' . $path, 'min' => 1]]],
+        ];
+        $registry = new InMemoryStructureDefinitionRegistry([$definition('subject')]);
+        $resolver = new RuntimeProfileResolver(new CompositeStructureDefinitionRegistry([
+            $registry,
+            new PackageDirectoryStructureDefinitionLoader(self::PACKAGE),
+        ]));
+
+        $before = $resolver->resolve(self::EXAMPLE . 'replaced', 'R4');
+        $registry->add($definition('component'));
+        $after = $resolver->resolve(self::EXAMPLE . 'replaced', 'R4');
+
+        self::assertSame('subject', $before->chain[0]->constraints()[0]->arguments['path'] ?? null);
+        self::assertSame('component', $after->chain[0]->constraints()[0]->arguments['path'] ?? null);
+    }
+
     public function testResolvesExtensionDefinition(): void
     {
         $resolution = $this->resolver->resolve(self::EXAMPLE . 'example-extension', 'R4');

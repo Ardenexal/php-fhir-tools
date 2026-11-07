@@ -20,7 +20,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Profile\StructureDefinitionCompiler;
  * Every StructureDefinition in the chain must carry a snapshot: snapshots are never generated.
  *
  * Compiled profiles are memoised by FHIR release, URL and business version, so validating many
- * resources against one profile compiles it once. Resolutions themselves are not cached, so a
+ * resources against one profile compiles it once; a definition replaced in its registry is
+ * compiled again. Resolutions themselves are not cached, so a
  * failure caused by a definition that is added to the registry later does not stick.
  *
  * @author Ardenexal
@@ -30,7 +31,11 @@ final class RuntimeProfileResolver
     /** StructureDefinition kinds runtime validation supports: resources, data types and extensions. */
     private const array SUPPORTED_KINDS = ['resource', 'complex-type'];
 
-    /** @var array<string, CompiledProfile> Compiled profiles by "release|url|version" */
+    /**
+     * Compiled profiles by "release|url|version", each with the definition it was compiled from.
+     *
+     * @var array<string, array{definition: array<string, mixed>, profile: CompiledProfile}>
+     */
     private array $compiled = [];
 
     public function __construct(
@@ -136,7 +141,18 @@ final class RuntimeProfileResolver
     {
         $key = $release . '|' . (string) ($structureDefinition['url'] ?? '') . '|' . self::businessVersion($structureDefinition);
 
-        return $this->compiled[$key] ??= $this->compiler->compile($structureDefinition);
+        // A registry may replace a definition under the same URL and version, so the cached
+        // copy is reused only while the definition is unchanged. Registries hand back the
+        // array they hold, which PHP compares by reference before comparing contents.
+        $cached = $this->compiled[$key] ?? null;
+        if ($cached !== null && $cached['definition'] === $structureDefinition) {
+            return $cached['profile'];
+        }
+
+        $profile              = $this->compiler->compile($structureDefinition);
+        $this->compiled[$key] = ['definition' => $structureDefinition, 'profile' => $profile];
+
+        return $profile;
     }
 
     private function notFound(string $url, string $release, string $canonical, ?string $version): RuntimeProfileResolution

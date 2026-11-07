@@ -13,7 +13,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Profile;
  *
  * The index comes from the package's `.index.json` when it has one. Packages from
  * packages.fhir.org do; npm mirrors of the same packages often do not, and then the directory is
- * scanned instead: each `*.json` file whose opening bytes name another resource type is skipped,
+ * scanned instead: each `*.json` file whose first member names another resource type is skipped,
  * and the rest are decoded once to read their URL. A file that names StructureDefinition but is
  * not valid JSON fails the scan with a \RuntimeException rather than vanishing from the index. Decoded files are not kept from the scan.
  *
@@ -199,7 +199,7 @@ final class PackageDirectoryStructureDefinitionLoader implements StructureDefini
     /**
      * Read a file's resourceType from its opening bytes, without decoding the whole file.
      *
-     * @return string|false|null The resourceType; null when it is not near the start; false when unreadable
+     * @return string|false|null The resourceType; null when it is not the first member; false when unreadable
      */
     private function headResourceType(string $path): string|false|null
     {
@@ -210,7 +210,9 @@ final class PackageDirectoryStructureDefinitionLoader implements StructureDefini
         $head = (string) fread($handle, self::HEAD_BYTES);
         fclose($handle);
 
-        return preg_match('/"resourceType"\s*:\s*"([^"]*)"/', $head, $match) === 1 ? $match[1] : null;
+        // Only a resourceType that is the object's first member is trusted: one further in may
+        // belong to a contained resource, since JSON member order is not significant.
+        return preg_match('/^(?:\xEF\xBB\xBF)?\s*\{\s*"resourceType"\s*:\s*"([^"]*)"/', $head, $match) === 1 ? $match[1] : null;
     }
 
     /**

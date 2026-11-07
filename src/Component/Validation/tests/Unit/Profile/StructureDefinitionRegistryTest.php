@@ -60,6 +60,18 @@ final class StructureDefinitionRegistryTest extends TestCase
         self::assertNull($registry->find('R4', self::VERSIONED, '9.9.9'));
     }
 
+    public function testNumericBusinessVersionsSurviveArrayKeyConversion(): void
+    {
+        // PHP stores the key '2' as int 2; an unpinned lookup must still compare it as a version.
+        $registry = new InMemoryStructureDefinitionRegistry();
+        foreach (['1', '2'] as $version) {
+            $registry->add(['url' => self::VERSIONED, 'version' => $version], 'R4');
+        }
+
+        self::assertSame('2', $registry->find('R4', self::VERSIONED)['version'] ?? null);
+        self::assertSame('1', $registry->find('R4', self::VERSIONED, '1')['version'] ?? null);
+    }
+
     public function testInMemoryRejectsDefinitionWithoutFhirRelease(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -89,6 +101,21 @@ final class StructureDefinitionRegistryTest extends TestCase
         self::assertSame('bp', $loader->find('R4', self::BP)['id'] ?? null);
         self::assertSame('1.10.0', $loader->find('R4', self::VERSIONED)['version'] ?? null);
         self::assertSame(['R4'], $loader->fhirVersionsFor(self::BP));
+    }
+
+    public function testScanFindsStructureDefinitionWhoseContainedResourceComesFirst(): void
+    {
+        $dir = $this->copyPackage(withIndex: false);
+        file_put_contents($dir . '/StructureDefinition-contained-first.json', json_encode([
+            'contained'    => [['resourceType' => 'ValueSet', 'id' => 'local']],
+            'resourceType' => 'StructureDefinition',
+            'url'          => 'http://example.org/fhir/StructureDefinition/contained-first',
+            'fhirVersion'  => '4.0.1',
+        ], JSON_THROW_ON_ERROR));
+
+        $loader = new PackageDirectoryStructureDefinitionLoader($dir);
+
+        self::assertNotNull($loader->find('R4', 'http://example.org/fhir/StructureDefinition/contained-first'));
     }
 
     public function testPackageLoaderTakesReleaseFromEachDefinitionWhenManifestIsMissing(): void
