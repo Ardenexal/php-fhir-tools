@@ -37,9 +37,10 @@ use PHPUnit\Framework\TestCase;
  * ({@see ProfileRulePathMaterialiser}), so the profile's rules have something to fail on. The two
  * reports must match finding for finding, with and without `deriveProfilesFromClass`.
  *
- * StructureDefinitions come from the core package of each release. R5's ships in vendor with the
- * FHIR test cases. R4 and R4B are read from the project's package cache when it holds them, and the
- * case is skipped otherwise.
+ * StructureDefinitions come from committed fixtures: each release's generated profiles and their
+ * ancestors, trimmed from the core package by `tests/Fixtures/Profile/seed-core-profiles.php`. A
+ * release without fixtures is skipped with the command that seeds it. Re-seed after regenerating
+ * models, so a new profile class has its definition.
  */
 #[CoversClass(FHIRValidationService::class)]
 #[CoversClass(RuntimeProfileResolver::class)]
@@ -232,9 +233,13 @@ final class RuntimeProfileParityTest extends TestCase
             return self::$services[$version->value];
         }
 
-        $directory = CoreStructureDefinitionPackages::directory($version);
+        $directory = CoreStructureDefinitionPackages::parityFixtures($version);
         if ($directory === null) {
-            self::markTestSkipped(sprintf('No %s core package: expected %s.', $version->value, CoreStructureDefinitionPackages::CACHED[$version->value]));
+            self::markTestSkipped(sprintf(
+                'No %s parity fixtures. Seed them from the core package: php src/Component/Validation/tests/Fixtures/Profile/seed-core-profiles.php %s <package-dir>',
+                $version->value,
+                $version->value,
+            ));
         }
 
         $runtimeResolver = new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionLoader($directory, $version->value));

@@ -47,7 +47,7 @@ use Symfony\Component\Validator\Validation;
 final class OracleValidationServiceFactory
 {
     /**
-     * @param RuntimeProfileResolver|null $runtimeProfiles Resolves profiles no generated class declares from
+     * @param RuntimeProfileResolver|null $runtimeProfiles Resolves profiles the resource's class does not declare from
      *                                                     StructureDefinitions at runtime; null uses the one
      *                                                     collaborators() builds over the release's core package
      */

@@ -55,6 +55,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     /** @var \WeakMap<CompiledProfile, list<Constraint>> Runtime constraints per compiled profile */
     private \WeakMap $runtimeConstraints;
 
+    /** @var array<class-string, bool> Whether each class seen by the runtime walk is a resource */
+    private array $resourceClasses = [];
+
     public function __construct(
         private readonly ValidatorInterface $validator,
         private readonly FHIRPathService $pathService,
@@ -139,10 +142,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $violations[] = $this->mapViolation($rawViolation);
         }
 
-        // Profiles no generated class declares, checked against StructureDefinitions resolved at
-        // runtime. A separate pass because their rules are not attributes on any class: they are
-        // handed to the validator explicitly, under the same group names a generated class uses.
-        if ($this->runtimeProfiles !== null) {
+        // Profiles the resource's class does not declare, checked against StructureDefinitions
+        // resolved at runtime. A separate pass because their rules are not attributes on any class:
+        // they are handed to the validator explicitly, under the same group names a generated class uses.
+        if ($this->runtimeProfiles !== null && ($profileUrls !== [] || $options->profilesFromMeta)) {
             $walk = ['visited' => [], 'reached' => [], 'mismatched' => []];
             $this->collectRuntimeProfileViolations($resource, '', $profileUrls, $options, $violations, $walk);
 
@@ -314,7 +317,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * profiles and nothing nested. A `meta.profile` URL always brings its ancestors, because a
      * resource that claims a profile claims all of it.
      *
-     * @param list<string>                                                                                                       $requested  URLs asked for at this level
+     * @param list<string>                                                                                                       $requested  URLs asked for at the top level; a nested resource works out its own
      * @param list<FHIRValidationViolation>                                                                                      $violations appended to
      * @param array{visited: array<int, true>, reached: array<string, true>, mismatched: array<string, FHIRValidationViolation>} $walk
      *                                                                                                                                       resources already walked by spl_object_id; requested canonicals a
@@ -338,10 +341,14 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         if ($resourceAttributes !== []) {
             $metaProfiles = $this->metaProfileUrls($resource);
 
+            // A nested resource takes up a requested URL when it claims that profile, through its
+            // meta.profile or its class, ignoring any |version on either side.
             if (!$topLevel) {
-                $claimed = [...$this->declaredProfileUrls($resource), ...array_map(self::canonicalWithoutVersion(...), $metaProfiles)];
+                $claimed   = [...$this->declaredProfileUrls($resource), ...array_map(self::canonicalWithoutVersion(...), $metaProfiles)];
+                $requested = [];
                 foreach ($options->profileUrls as $url) {
                     if (in_array(self::canonicalWithoutVersion($url), $claimed, true)) {
+                        $requested[]                                          = $url;
                         $walk['reached'][self::canonicalWithoutVersion($url)] = true;
                     }
                 }
@@ -372,10 +379,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             }
         }
 
-        // Nested resources: each gets the requested URLs its own meta.profile names.
-        foreach ($this->nestedResources($resource) as $nestedPath => $nested) {
-            $nestedRequested = array_values(array_intersect($options->profileUrls, $this->metaProfileUrls($nested)));
-            $this->collectRuntimeProfileViolations($nested, $prefix . $nestedPath . '.', $nestedRequested, $options, $violations, $walk);
+        foreach ($this->nestedResources($resource, $walk['visited']) as $nestedPath => $nested) {
+            $this->collectRuntimeProfileViolations($nested, $prefix . $nestedPath . '.', [], $options, $violations, $walk);
         }
     }
 
@@ -403,10 +408,36 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         /** @var array<string, list<Constraint>> $constraintsByGroup */
         $constraintsByGroup = [];
 
+        /** @var array<string, string> $checked canonical => the URL as written that is checked */
+        $checked = [];
+
         foreach ($wanted as $url => $withAncestors) {
-            if (in_array(self::canonicalWithoutVersion($url), $declared, true)) {
+            $canonical = self::canonicalWithoutVersion($url);
+            if (in_array($canonical, $declared, true)) {
                 continue;
             }
+
+            // Both versions would share one validation group, so their rules would mix: check the
+            // first and say the second was not checked.
+            if (isset($checked[$canonical]) && $checked[$canonical] !== $url) {
+                $violations[] = new FHIRValidationViolation(
+                    severity: 'warning',
+                    path: rtrim($prefix, '.'),
+                    message: sprintf(
+                        "Profile reference '%s' has not been checked: '%s' is already checked on this resource, and two versions of one profile cannot be checked together",
+                        $url,
+                        $checked[$canonical],
+                    ),
+                    constraintClass: RuntimeProfileResolver::class,
+                    profileGroup: $canonical,
+                    invariantKey: null,
+                    parameters: ['reason' => 'version-conflict'],
+                    code: FHIRViolationCode::WARNING,
+                );
+
+                continue;
+            }
+            $checked[$canonical] = $url;
 
             $resolution = $this->runtimeProfiles->resolve($url, $fhirVersion);
 
@@ -521,24 +552,41 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * Resources held inside this one: Bundle entries and contained resources, by property path.
+     * The resources held inside this one, by property path, wherever they sit.
+     *
+     * Walks every public property down to the first resource on each branch: Bundle entries,
+     * contained resources, `Parameters.parameter.resource`, `Bundle.entry.response.outcome`. Each
+     * resource found walks its own children in turn, so nothing is visited twice.
+     *
+     * @param array<int, true> $visited spl_object_id of objects already walked, added to
      *
      * @return iterable<string, object>
      */
-    private function nestedResources(object $resource): iterable
+    private function nestedResources(object $subject, array &$visited, string $path = ''): iterable
     {
-        foreach ((array) self::readPublic($resource, 'entry') as $index => $entry) {
-            $nested = is_object($entry) ? self::readPublic($entry, 'resource') : null;
-            if (is_object($nested)) {
-                yield "entry[{$index}].resource" => $nested;
-            }
-        }
+        foreach (get_object_vars($subject) as $property => $value) {
+            $items = is_array($value) ? $value : ['' => $value];
+            foreach ($items as $index => $item) {
+                if (!is_object($item) || $item instanceof \UnitEnum || isset($visited[spl_object_id($item)])) {
+                    continue;
+                }
 
-        foreach ((array) self::readPublic($resource, 'contained') as $index => $contained) {
-            if (is_object($contained)) {
-                yield "contained[{$index}]" => $contained;
+                $itemPath = $path . $property . ($index === '' ? '' : "[{$index}]");
+                if ($this->isResource($item)) {
+                    yield $itemPath => $item;
+
+                    continue;
+                }
+
+                $visited[spl_object_id($item)] = true;
+                yield from $this->nestedResources($item, $visited, $itemPath . '.');
             }
         }
+    }
+
+    private function isResource(object $subject): bool
+    {
+        return $this->resourceClasses[$subject::class] ??= $this->attributes->classAttributesInHierarchy($subject, FhirResource::class) !== [];
     }
 
     /**

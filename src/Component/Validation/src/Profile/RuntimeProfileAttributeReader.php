@@ -18,8 +18,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
  * `FHIRSliceConstraintValidator` checks one slice against its siblings: it reads every
  * `FHIRSliceConstraint` and `FHIRSlicingRules` declared on the validated object's class hierarchy
  * and keeps those in the active group. A generated profile class carries them as attributes; a base
- * resource validated against a runtime profile carries none, so the validator would see a single
- * slice with no siblings and no slicing rules. This decorator adds the compiled slice attributes of
+ * resource validated against a runtime profile carries none, so the validator would find no slices
+ * and enforce nothing. This decorator adds the compiled slice attributes of
  * every profile {@see RuntimeProfileResolver} has resolved for the object's FHIR release and type.
  * The validator's own group filter then keeps only the profile being checked.
  *

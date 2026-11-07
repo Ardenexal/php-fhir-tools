@@ -1,0 +1,430 @@
+{
+    "index-version": 1,
+    "files": [
+        {
+            "filename": "StructureDefinition-ActivityDefinition.json",
+            "resourceType": "StructureDefinition",
+            "id": "ActivityDefinition",
+            "url": "http://hl7.org/fhir/StructureDefinition/ActivityDefinition",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-CodeSystem.json",
+            "resourceType": "StructureDefinition",
+            "id": "CodeSystem",
+            "url": "http://hl7.org/fhir/StructureDefinition/CodeSystem",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-Composition.json",
+            "resourceType": "StructureDefinition",
+            "id": "Composition",
+            "url": "http://hl7.org/fhir/StructureDefinition/Composition",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-DiagnosticReport.json",
+            "resourceType": "StructureDefinition",
+            "id": "DiagnosticReport",
+            "url": "http://hl7.org/fhir/StructureDefinition/DiagnosticReport",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-ElementDefinition.json",
+            "resourceType": "StructureDefinition",
+            "id": "ElementDefinition",
+            "url": "http://hl7.org/fhir/StructureDefinition/ElementDefinition",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-FamilyMemberHistory.json",
+            "resourceType": "StructureDefinition",
+            "id": "FamilyMemberHistory",
+            "url": "http://hl7.org/fhir/StructureDefinition/FamilyMemberHistory",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-Group.json",
+            "resourceType": "StructureDefinition",
+            "id": "Group",
+            "url": "http://hl7.org/fhir/StructureDefinition/Group",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-GuidanceResponse.json",
+            "resourceType": "StructureDefinition",
+            "id": "GuidanceResponse",
+            "url": "http://hl7.org/fhir/StructureDefinition/GuidanceResponse",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-Library.json",
+            "resourceType": "StructureDefinition",
+            "id": "Library",
+            "url": "http://hl7.org/fhir/StructureDefinition/Library",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-Measure.json",
+            "resourceType": "StructureDefinition",
+            "id": "Measure",
+            "url": "http://hl7.org/fhir/StructureDefinition/Measure",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-MoneyQuantity.json",
+            "resourceType": "StructureDefinition",
+            "id": "MoneyQuantity",
+            "url": "http://hl7.org/fhir/StructureDefinition/MoneyQuantity",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-Observation.json",
+            "resourceType": "StructureDefinition",
+            "id": "Observation",
+            "url": "http://hl7.org/fhir/StructureDefinition/Observation",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-PlanDefinition.json",
+            "resourceType": "StructureDefinition",
+            "id": "PlanDefinition",
+            "url": "http://hl7.org/fhir/StructureDefinition/PlanDefinition",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-Provenance.json",
+            "resourceType": "StructureDefinition",
+            "id": "Provenance",
+            "url": "http://hl7.org/fhir/StructureDefinition/Provenance",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-Quantity.json",
+            "resourceType": "StructureDefinition",
+            "id": "Quantity",
+            "url": "http://hl7.org/fhir/StructureDefinition/Quantity",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-Questionnaire.json",
+            "resourceType": "StructureDefinition",
+            "id": "Questionnaire",
+            "url": "http://hl7.org/fhir/StructureDefinition/Questionnaire",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-RequestGroup.json",
+            "resourceType": "StructureDefinition",
+            "id": "RequestGroup",
+            "url": "http://hl7.org/fhir/StructureDefinition/RequestGroup",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-ServiceRequest.json",
+            "resourceType": "StructureDefinition",
+            "id": "ServiceRequest",
+            "url": "http://hl7.org/fhir/StructureDefinition/ServiceRequest",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-SimpleQuantity.json",
+            "resourceType": "StructureDefinition",
+            "id": "SimpleQuantity",
+            "url": "http://hl7.org/fhir/StructureDefinition/SimpleQuantity",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-ValueSet.json",
+            "resourceType": "StructureDefinition",
+            "id": "ValueSet",
+            "url": "http://hl7.org/fhir/StructureDefinition/ValueSet",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-actualgroup.json",
+            "resourceType": "StructureDefinition",
+            "id": "actualgroup",
+            "url": "http://hl7.org/fhir/StructureDefinition/actualgroup",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-bmi.json",
+            "resourceType": "StructureDefinition",
+            "id": "bmi",
+            "url": "http://hl7.org/fhir/StructureDefinition/bmi",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-bodyheight.json",
+            "resourceType": "StructureDefinition",
+            "id": "bodyheight",
+            "url": "http://hl7.org/fhir/StructureDefinition/bodyheight",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-bodytemp.json",
+            "resourceType": "StructureDefinition",
+            "id": "bodytemp",
+            "url": "http://hl7.org/fhir/StructureDefinition/bodytemp",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-bodyweight.json",
+            "resourceType": "StructureDefinition",
+            "id": "bodyweight",
+            "url": "http://hl7.org/fhir/StructureDefinition/bodyweight",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-bp.json",
+            "resourceType": "StructureDefinition",
+            "id": "bp",
+            "url": "http://hl7.org/fhir/StructureDefinition/bp",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-catalog.json",
+            "resourceType": "StructureDefinition",
+            "id": "catalog",
+            "url": "http://hl7.org/fhir/StructureDefinition/catalog",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-cdshooksguidanceresponse.json",
+            "resourceType": "StructureDefinition",
+            "id": "cdshooksguidanceresponse",
+            "url": "http://hl7.org/fhir/StructureDefinition/cdshooksguidanceresponse",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-cdshooksrequestgroup.json",
+            "resourceType": "StructureDefinition",
+            "id": "cdshooksrequestgroup",
+            "url": "http://hl7.org/fhir/StructureDefinition/cdshooksrequestgroup",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-cdshooksserviceplandefinition.json",
+            "resourceType": "StructureDefinition",
+            "id": "cdshooksserviceplandefinition",
+            "url": "http://hl7.org/fhir/StructureDefinition/cdshooksserviceplandefinition",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-cholesterol.json",
+            "resourceType": "StructureDefinition",
+            "id": "cholesterol",
+            "url": "http://hl7.org/fhir/StructureDefinition/cholesterol",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-clinicaldocument.json",
+            "resourceType": "StructureDefinition",
+            "id": "clinicaldocument",
+            "url": "http://hl7.org/fhir/StructureDefinition/clinicaldocument",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-computableplandefinition.json",
+            "resourceType": "StructureDefinition",
+            "id": "computableplandefinition",
+            "url": "http://hl7.org/fhir/StructureDefinition/computableplandefinition",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-cqf-questionnaire.json",
+            "resourceType": "StructureDefinition",
+            "id": "cqf-questionnaire",
+            "url": "http://hl7.org/fhir/StructureDefinition/cqf-questionnaire",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-cqllibrary.json",
+            "resourceType": "StructureDefinition",
+            "id": "cqllibrary",
+            "url": "http://hl7.org/fhir/StructureDefinition/cqllibrary",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-devicemetricobservation.json",
+            "resourceType": "StructureDefinition",
+            "id": "devicemetricobservation",
+            "url": "http://hl7.org/fhir/StructureDefinition/devicemetricobservation",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-diagnosticreport-genetics.json",
+            "resourceType": "StructureDefinition",
+            "id": "diagnosticreport-genetics",
+            "url": "http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-elementdefinition-de.json",
+            "resourceType": "StructureDefinition",
+            "id": "elementdefinition-de",
+            "url": "http://hl7.org/fhir/StructureDefinition/elementdefinition-de",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-example-composition.json",
+            "resourceType": "StructureDefinition",
+            "id": "example-composition",
+            "url": "http://hl7.org/fhir/StructureDefinition/example-composition"
+        },
+        {
+            "filename": "StructureDefinition-example-section-library.json",
+            "resourceType": "StructureDefinition",
+            "id": "example-section-library",
+            "url": "http://hl7.org/fhir/StructureDefinition/example-section-library"
+        },
+        {
+            "filename": "StructureDefinition-familymemberhistory-genetic.json",
+            "resourceType": "StructureDefinition",
+            "id": "familymemberhistory-genetic",
+            "url": "http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-groupdefinition.json",
+            "resourceType": "StructureDefinition",
+            "id": "groupdefinition",
+            "url": "http://hl7.org/fhir/StructureDefinition/groupdefinition",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-hdlcholesterol.json",
+            "resourceType": "StructureDefinition",
+            "id": "hdlcholesterol",
+            "url": "http://hl7.org/fhir/StructureDefinition/hdlcholesterol",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-headcircum.json",
+            "resourceType": "StructureDefinition",
+            "id": "headcircum",
+            "url": "http://hl7.org/fhir/StructureDefinition/headcircum",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-heartrate.json",
+            "resourceType": "StructureDefinition",
+            "id": "heartrate",
+            "url": "http://hl7.org/fhir/StructureDefinition/heartrate",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-hlaresult.json",
+            "resourceType": "StructureDefinition",
+            "id": "hlaresult",
+            "url": "http://hl7.org/fhir/StructureDefinition/hlaresult",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-ldlcholesterol.json",
+            "resourceType": "StructureDefinition",
+            "id": "ldlcholesterol",
+            "url": "http://hl7.org/fhir/StructureDefinition/ldlcholesterol",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-lipidprofile.json",
+            "resourceType": "StructureDefinition",
+            "id": "lipidprofile",
+            "url": "http://hl7.org/fhir/StructureDefinition/lipidprofile",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-observation-genetics.json",
+            "resourceType": "StructureDefinition",
+            "id": "observation-genetics",
+            "url": "http://hl7.org/fhir/StructureDefinition/observation-genetics",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-oxygensat.json",
+            "resourceType": "StructureDefinition",
+            "id": "oxygensat",
+            "url": "http://hl7.org/fhir/StructureDefinition/oxygensat",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-provenance-relevant-history.json",
+            "resourceType": "StructureDefinition",
+            "id": "provenance-relevant-history",
+            "url": "http://hl7.org/fhir/StructureDefinition/provenance-relevant-history",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-resprate.json",
+            "resourceType": "StructureDefinition",
+            "id": "resprate",
+            "url": "http://hl7.org/fhir/StructureDefinition/resprate",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-servicerequest-genetics.json",
+            "resourceType": "StructureDefinition",
+            "id": "servicerequest-genetics",
+            "url": "http://hl7.org/fhir/StructureDefinition/servicerequest-genetics",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-shareableactivitydefinition.json",
+            "resourceType": "StructureDefinition",
+            "id": "shareableactivitydefinition",
+            "url": "http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-shareablecodesystem.json",
+            "resourceType": "StructureDefinition",
+            "id": "shareablecodesystem",
+            "url": "http://hl7.org/fhir/StructureDefinition/shareablecodesystem",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-shareablelibrary.json",
+            "resourceType": "StructureDefinition",
+            "id": "shareablelibrary",
+            "url": "http://hl7.org/fhir/StructureDefinition/shareablelibrary",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-shareablemeasure.json",
+            "resourceType": "StructureDefinition",
+            "id": "shareablemeasure",
+            "url": "http://hl7.org/fhir/StructureDefinition/shareablemeasure",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-shareablevalueset.json",
+            "resourceType": "StructureDefinition",
+            "id": "shareablevalueset",
+            "url": "http://hl7.org/fhir/StructureDefinition/shareablevalueset",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-triglyceride.json",
+            "resourceType": "StructureDefinition",
+            "id": "triglyceride",
+            "url": "http://hl7.org/fhir/StructureDefinition/triglyceride",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-vitalsigns.json",
+            "resourceType": "StructureDefinition",
+            "id": "vitalsigns",
+            "url": "http://hl7.org/fhir/StructureDefinition/vitalsigns",
+            "version": "4.3.0"
+        },
+        {
+            "filename": "StructureDefinition-vitalspanel.json",
+            "resourceType": "StructureDefinition",
+            "id": "vitalspanel",
+            "url": "http://hl7.org/fhir/StructureDefinition/vitalspanel",
+            "version": "4.3.0"
+        }
+    ]
+}

@@ -34,6 +34,19 @@ final class CoreStructureDefinitionPackages
     private static array $directories = [];
 
     /**
+     * The committed, trimmed core definitions the parity test reads, or null until they are seeded.
+     *
+     * They hold each generated profile's StructureDefinition and its ancestors, written by
+     * `tests/Fixtures/Profile/seed-core-profiles.php`, so the parity test runs the same everywhere.
+     */
+    public static function parityFixtures(FhirVersion $version): ?string
+    {
+        $directory = dirname(__DIR__, 2) . '/Fixtures/Profile/core-' . strtolower($version->value);
+
+        return is_file($directory . '/package.json') ? $directory : null;
+    }
+
+    /**
      * The release's core package directory, or null when this machine has none.
      *
      * @param bool $projectCache false ignores the project's package cache, so the answer is the same

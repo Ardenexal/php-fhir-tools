@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Quantity","url":"http://hl7.org/fhir/StructureDefinition/Quantity","version":"4.3.0","name":"Quantity","status":"active","fhirVersion":"4.3.0","kind":"complex-type","abstract":false,"type":"Quantity","baseDefinition":"http://hl7.org/fhir/StructureDefinition/Element","derivation":"specialization"}

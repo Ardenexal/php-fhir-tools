@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeRead
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\OracleValidationServiceFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -179,6 +180,57 @@ final class RuntimeProfileValidationTest extends TestCase
         );
     }
 
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function versionSpellings(): iterable
+    {
+        yield 'versioned request, unversioned claim' => [self::NEED_SUBJECT . '|1.0', self::NEED_SUBJECT];
+        yield 'unversioned request, versioned claim' => [self::NEED_SUBJECT, self::NEED_SUBJECT . '|1.0'];
+    }
+
+    #[DataProvider('versionSpellings')]
+    public function testBundleEntryClaimIgnoresTheVersionSuffix(string $requested, string $claimed): void
+    {
+        $bundle = $this->serializer->deserialize((string) json_encode([
+            'resourceType' => 'Bundle',
+            'type'         => 'collection',
+            'entry'        => [['fullUrl' => 'urn:uuid:1', 'resource' => self::observationJson(['meta' => ['profile' => [$claimed]]])]],
+        ]));
+
+        self::assertSame(
+            [[self::NEED_SUBJECT, 'entry[0].resource.subject', self::MISSING_SUBJECT]],
+            $this->profileFindings($bundle, [$requested]),
+        );
+    }
+
+    public function testResourceInsideParametersIsCheckedAgainstItsMetaProfiles(): void
+    {
+        $parameters = $this->serializer->deserialize((string) json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [['name' => 'obs', 'resource' => self::observationJson(['meta' => ['profile' => [self::NEED_SUBJECT]]])]],
+        ]));
+
+        self::assertSame(
+            [[self::NEED_SUBJECT, 'parameter[0].resource.subject', self::MISSING_SUBJECT]],
+            $this->profileFindings($parameters, [], profilesFromMeta: true),
+        );
+    }
+
+    public function testTwoVersionsOfOneProfileAreNotCheckedTogether(): void
+    {
+        $observation = $this->observation(['meta' => ['profile' => [self::NEED_SUBJECT . '|2.0']]]);
+        $violations  = $this->profileViolations($observation, [self::NEED_SUBJECT . '|1.0'], profilesFromMeta: true);
+
+        self::assertSame(
+            [
+                ['warning', '', "Profile reference '" . self::NEED_SUBJECT . "|2.0' has not been checked: '" . self::NEED_SUBJECT . "|1.0' is already checked on this resource, and two versions of one profile cannot be checked together"],
+                ['error', 'subject', self::MISSING_SUBJECT],
+            ],
+            array_map(static fn (FHIRValidationViolation $v): array => [$v->severity, $v->path, $v->message], $violations),
+        );
+    }
+
     public function testProfileForAnotherTypeThatReachesNothingIsAnError(): void
     {
         $bundle = $this->serializer->deserialize((string) json_encode([
@@ -304,6 +356,7 @@ final class RuntimeProfileValidationTest extends TestCase
         return [
             'resourceType'   => 'StructureDefinition',
             'url'            => $url,
+            'version'        => '1.0',
             'fhirVersion'    => '4.0.1',
             'kind'           => 'resource',
             'type'           => 'Observation',

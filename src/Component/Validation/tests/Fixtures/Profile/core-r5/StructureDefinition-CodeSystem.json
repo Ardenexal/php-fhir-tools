@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"CodeSystem","url":"http://hl7.org/fhir/StructureDefinition/CodeSystem","version":"5.0.0","name":"CodeSystem","status":"active","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"CodeSystem","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

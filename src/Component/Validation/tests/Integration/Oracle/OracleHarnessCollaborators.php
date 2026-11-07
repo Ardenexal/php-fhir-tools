@@ -71,10 +71,11 @@ final readonly class OracleHarnessCollaborators
      * @param FHIRTerminologyClientInterface|null $terminologyClient reaches FHIRValueSetBindingValidator
      * @param FHIRIGTypeRegistry|null             $igTypeRegistry    gates FHIRValidationService's extension pass
      * @param RuntimeProfileResolver|null         $runtimeProfiles   gates the runtime profile pass, which checks
-     *                                                               `meta.profile` URLs no generated class declares.
-     *                                                               It resolves only what the release's core package
-     *                                                               holds; R4 and R4B have one only when the project's
-     *                                                               package cache does, see CoreStructureDefinitionPackages
+     *                                                               `meta.profile` URLs the resource's class does not
+     *                                                               declare. It reads the R5 core package from vendor;
+     *                                                               R4 and R4B get an empty registry, so there it only
+     *                                                               reports profiles as unchecked and every R4/R4B
+     *                                                               runtime-profile finding still reads as a gap
      */
     public function __construct(
         public FHIRReferenceResolverInterface $referenceResolver,

@@ -20,7 +20,8 @@ final readonly class FHIRValidationOptions
      * @param bool                       $includeMustSupportInfo  Emit info-level violations for null/empty must-support properties
      * @param FHIRObligationContext|null $obligationContext       When set, population-class obligations matching the actor produce violations
      * @param bool                       $deriveProfilesFromClass Also evaluate every profile the resource's own class declares, inherited ones
-     *                                                            included; for a profile resolved at runtime, also its constraint ancestors
+     *                                                            included; for a profile resolved at runtime, also its constraint ancestors, on the
+     *                                                            top-level resource only, as a generated class's inherited profiles are
      * @param bool                       $profilesFromMeta        Also validate each resource, nested ones included, against the profiles its own
      *                                                            `meta.profile` names, as the reference validator does. Needs a runtime profile
      *                                                            resolver on the service; generated profile classes are covered by

@@ -306,7 +306,7 @@ final class ComparisonHarness
                 ? ($this->validationWithoutExtensionResolution ?? $this->validation)
                 : $this->validation;
 
-            // profilesFromMeta covers the rest of meta.profile: a URL no generated class declares is
+            // profilesFromMeta covers the rest of meta.profile: a URL the resource's class does not declare is
             // checked against the StructureDefinition the runtime resolver finds for it, and one it
             // cannot find is reported unchecked, as the reference validator reports it.
             $report = $service->validateWithOptions($resource, new FHIRValidationOptions(
