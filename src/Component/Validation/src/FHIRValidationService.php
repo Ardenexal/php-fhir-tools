@@ -30,6 +30,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledExtension;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledProfile;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileFailure;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
@@ -55,6 +57,12 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     /** @var \WeakMap<CompiledProfile, list<Constraint>> Runtime constraints per compiled profile */
     private \WeakMap $runtimeConstraints;
 
+    /** @var \WeakMap<object, CompiledExtension|false> The runtime definition of each extension seen, false for none */
+    private \WeakMap $runtimeExtensionOfObject;
+
+    /** @var \WeakMap<CompiledExtension, list<object>> Context attributes per runtime extension definition */
+    private \WeakMap $runtimeExtensionContexts;
+
     /** @var array<class-string, bool> Whether each class seen by the runtime walk is a resource */
     private array $resourceClasses = [];
 
@@ -76,7 +84,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly ComplexExtensionChecker $complexExtensionChecker = new ComplexExtensionChecker(),
         private readonly ?RuntimeProfileResolver $runtimeProfiles = null,
     ) {
-        $this->runtimeConstraints = new \WeakMap();
+        $this->runtimeConstraints       = new \WeakMap();
+        $this->runtimeExtensionContexts = new \WeakMap();
+        $this->runtimeExtensionOfObject = new \WeakMap();
     }
 
     /**
@@ -126,6 +136,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         $deriveProfilesFromClass = $options->deriveProfilesFromClass;
 
         $groups = ['Default', ...$profileUrls];
+
+        // Each pass asks for an extension's runtime definition; they share one answer per validation,
+        // and a later validation sees definitions added to the registry since
+        $this->runtimeExtensionOfObject = new \WeakMap();
 
         if ($deriveProfilesFromClass) {
             foreach ($this->declaredProfileUrls($resource) as $derived) {
@@ -779,7 +793,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
             foreach ($extensions as $extIndex => $extension) {
                 $definition   = $this->extensionDefinitionOf($extension);
-                $contextAttrs = $this->attributes->classAttributes($definition, FHIRExtensionContext::class);
+                $contextAttrs = $this->extensionAttributes($extension, $definition, FHIRExtensionContext::class);
 
                 if ($contextAttrs !== []
                     && $this->classifyExtensionContexts($contextAttrs, $resource, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes, $ancestorExtensionUrls) === self::CONTEXT_DENY
@@ -806,7 +820,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 // same defer-not-deny property as context classification.
                 $invariantAttrs = $resource instanceof FHIRExtensionInterface
                     ? []
-                    : $this->attributes->classAttributes($definition, FHIRContextInvariant::class);
+                    : $this->extensionAttributes($extension, $definition, FHIRContextInvariant::class);
 
                 foreach ($invariantAttrs as $invariant) {
                     try {
@@ -1124,6 +1138,96 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
+     * An extension's context attributes: its class's own, or those of the definition its url names at runtime.
+     *
+     * @template T of object
+     *
+     * @param object              $extension      the extension as read
+     * @param object|class-string $definition     where its rules are declared, from {@see extensionDefinitionOf()}
+     * @param class-string<T>     $attributeClass FHIRExtensionContext or FHIRContextInvariant
+     *
+     * @return list<T>
+     */
+    private function extensionAttributes(object $extension, object|string $definition, string $attributeClass): array
+    {
+        $declared = $this->attributes->classAttributes($definition, $attributeClass);
+        if ($declared !== [] || $definition !== $extension) {
+            return $declared;
+        }
+
+        $runtime = $this->runtimeExtensionOf($extension);
+        if ($runtime === null) {
+            return [];
+        }
+
+        if (!isset($this->runtimeExtensionContexts[$runtime])) {
+            $this->runtimeExtensionContexts[$runtime] = array_map(
+                static fn ($attribute): object => $attribute->instantiate(),
+                $runtime->contexts,
+            );
+        }
+
+        $matching = [];
+        foreach ($this->runtimeExtensionContexts[$runtime] as $attribute) {
+            if ($attribute instanceof $attributeClass) {
+                $matching[] = $attribute;
+            }
+        }
+
+        return $matching;
+    }
+
+    /**
+     * The definition loaded at runtime for a plain `Extension`, when its url names one.
+     *
+     * A typed extension class, or a plain one read in place of a typed class (see
+     * {@see extensionDefinitionOf()}), already has its rules, so it gets none from here: a definition
+     * is never applied twice.
+     */
+    private function runtimeExtensionOf(object $extension): ?CompiledExtension
+    {
+        if (isset($this->runtimeExtensionOfObject[$extension])) {
+            $known = $this->runtimeExtensionOfObject[$extension];
+
+            return $known === false ? null : $known;
+        }
+
+        $resolved                                   = $this->resolveRuntimeExtension($extension);
+        $this->runtimeExtensionOfObject[$extension] = $resolved ?? false;
+
+        return $resolved;
+    }
+
+    private function resolveRuntimeExtension(object $extension): ?CompiledExtension
+    {
+        if ($this->runtimeProfiles === null
+            || !$extension instanceof FHIRExtensionInterface
+            || $this->attributes->declaresInHierarchy($extension, FHIRExtensionDefinition::class)
+            || IncompleteComplexExtensionRecorder::forObject($extension) !== []
+        ) {
+            return null;
+        }
+
+        $url     = $this->readExtensionUrl($extension);
+        $release = $this->releaseOf($extension);
+        if ($url === '' || $release === null || !$this->isAbsoluteUrl($url)) {
+            return null;
+        }
+
+        return $this->runtimeProfiles->resolveExtension($url, $release);
+    }
+
+    /**
+     * The FHIR release a model object belongs to, from its class's type attribute.
+     */
+    private function releaseOf(object $element): ?string
+    {
+        $types = $this->attributes->classAttributesInHierarchy($element, FHIRComplexType::class);
+
+        return $types !== [] ? $types[0]->fhirVersion : null;
+    }
+
+    /**
      * Read an extension's canonical URL, tolerating partially-constructed objects.
      *
      * Deserializers may instantiate Extension without running its constructor, leaving the
@@ -1214,7 +1318,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      *   validate the extension`;
      * - a top-level extension whose `url` is not absolute — `Extension.url must be an absolute URL`;
      * - a value whose type the extension's own definition does not allow, reported by
-     *   {@see extensionValueTypeMismatch()}, which also explains why only a typed class can answer it.
+     *   {@see extensionValueTypeMismatch()} from a typed class or from a definition loaded at runtime.
+     *
+     * A plain extension whose definition was loaded at runtime is also checked for a missing required
+     * sub-extension and for undeclared ones here, as {@see ComplexExtensionChecker} checks a typed one.
      *
      * The absoluteness rule deliberately stops at the first level. A *sub*-extension's url is a slice
      * name rather than a canonical (`x-breed`, `species-x`), so requiring absoluteness there would
@@ -1281,6 +1388,16 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     );
                 }
 
+                // A plain extension whose definition was loaded at runtime is held to that
+                // definition's sub-extensions, as its generated class would be
+                $runtime = $this->runtimeExtensionOf($ext);
+                $release = $this->releaseOf($ext);
+                if ($runtime !== null && $release !== null && $ext instanceof FHIRExtensionInterface) {
+                    foreach ($this->complexExtensionChecker->checkAgainstDefinition($ext, $runtime, $release, $extPath . '[' . $extIndex . ']') as $subViolation) {
+                        $violations[] = $subViolation;
+                    }
+                }
+
                 $typeMismatch = $this->extensionValueTypeMismatch($ext, $url);
 
                 if ($typeMismatch !== null) {
@@ -1327,11 +1444,12 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     /**
      * The reference validator's sentence when an extension's value is not a type its definition allows.
      *
-     * Only typed extension classes can answer this. A generated class carries
+     * A typed extension class, or a plain one whose definition was loaded at runtime
+     * ({@see runtimeAllowedValueTypes()}), can answer this. A generated class carries
      * `#[FHIRExtensionDefinition]` and narrows the value in its constructor, as in
      * `NarrativeLinkExtension::__construct(public ?UrlPrimitive $valueUrl = null)`, so the allowed
      * types are its `value*` promoted parameters and nothing else has to be looked up. An extension
-     * that deserialized as the base `Extension`, or one we hold no class for, yields null: with no
+     * that deserialized as the base `Extension` with no runtime definition either yields null: with no
      * definition in hand there is no allowed set to compare against, and guessing one would invent
      * findings the reference validator does not report.
      *
@@ -1344,11 +1462,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     private function extensionValueTypeMismatch(object $extension, string $url): ?string
     {
         if ($this->attributes->classAttributes($extension, FHIRExtensionDefinition::class) === []) {
-            return null;
-        }
+            $runtime = $this->runtimeExtensionOf($extension);
 
-        if (!isset($extension->value) || !is_object($extension->value)) {
-            return null;
+            return $runtime === null ? null : $this->valueTypeMismatch($extension, $url, $this->runtimeAllowedValueTypes($runtime));
         }
 
         $allowed = [];
@@ -1383,7 +1499,34 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             }
         }
 
-        if ($allowed === []) {
+        return $this->valueTypeMismatch($extension, $url, $allowed);
+    }
+
+    /**
+     * The value types a generated class of this definition would allow, as {@see extensionValueTypeMismatch()} reads them.
+     *
+     * The generator gives a simple extension with one value type a `value<Type>` parameter, which
+     * names its type, and one with several a choice parameter, which the check skips. A complex
+     * extension has no value parameter at all. So only a simple extension with one type has an
+     * allowed set, and not when that type is a `System.*` url, which names no FHIR type.
+     *
+     * @return list<string>
+     */
+    private function runtimeAllowedValueTypes(CompiledExtension $definition): array
+    {
+        if ($definition->isComplex() || count($definition->valueTypes) !== 1 || str_contains($definition->valueTypes[0], '://')) {
+            return [];
+        }
+
+        return $definition->valueTypes;
+    }
+
+    /**
+     * @param list<string> $allowed FHIR type names the value may have; empty when nothing can be decided
+     */
+    private function valueTypeMismatch(object $extension, string $url, array $allowed): ?string
+    {
+        if ($allowed === [] || !isset($extension->value) || !is_object($extension->value)) {
             return null;
         }
 
@@ -1479,7 +1622,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 /** @var FHIRIGTypeRegistry $registry */
                 $registry = $this->registry;
 
-                if ($registry->resolveExtensionClass($url) === null) {
+                if ($registry->resolveExtensionClass($url) === null && $this->runtimeExtensionOf($ext) === null) {
                     $violations[] = new FHIRValidationViolation(
                         severity: 'error',
                         path: $extPath,

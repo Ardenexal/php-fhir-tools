@@ -170,6 +170,13 @@
             "version": "4.0.1"
         },
         {
+            "filename": "StructureDefinition-allergyintolerance-substanceExposureRisk.json",
+            "resourceType": "StructureDefinition",
+            "id": "allergyintolerance-substanceExposureRisk",
+            "url": "http://hl7.org/fhir/StructureDefinition/allergyintolerance-substanceExposureRisk",
+            "version": "5.3.0"
+        },
+        {
             "filename": "StructureDefinition-bmi.json",
             "resourceType": "StructureDefinition",
             "id": "bmi",
@@ -268,6 +275,13 @@
             "version": "4.0.1"
         },
         {
+            "filename": "StructureDefinition-data-absent-reason.json",
+            "resourceType": "StructureDefinition",
+            "id": "data-absent-reason",
+            "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+            "version": "5.3.0"
+        },
+        {
             "filename": "StructureDefinition-devicemetricobservation.json",
             "resourceType": "StructureDefinition",
             "id": "devicemetricobservation",
@@ -320,6 +334,13 @@
             "id": "familymemberhistory-genetic",
             "url": "http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic",
             "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-geolocation.json",
+            "resourceType": "StructureDefinition",
+            "id": "geolocation",
+            "url": "http://hl7.org/fhir/StructureDefinition/geolocation",
+            "version": "5.3.0"
         },
         {
             "filename": "StructureDefinition-groupdefinition.json",
@@ -383,6 +404,27 @@
             "id": "oxygensat",
             "url": "http://hl7.org/fhir/StructureDefinition/oxygensat",
             "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-patient-animal.json",
+            "resourceType": "StructureDefinition",
+            "id": "patient-animal",
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-animal",
+            "version": "5.3.0"
+        },
+        {
+            "filename": "StructureDefinition-patient-birthPlace.json",
+            "resourceType": "StructureDefinition",
+            "id": "patient-birthPlace",
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-birthPlace",
+            "version": "5.3.0"
+        },
+        {
+            "filename": "StructureDefinition-patient-mothersMaidenName.json",
+            "resourceType": "StructureDefinition",
+            "id": "patient-mothersMaidenName",
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName",
+            "version": "5.3.0"
         },
         {
             "filename": "StructureDefinition-picoelement.json",
