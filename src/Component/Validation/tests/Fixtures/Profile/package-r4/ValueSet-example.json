@@ -1,0 +1,6 @@
+{
+  "resourceType": "ValueSet",
+  "id": "example",
+  "url": "http://example.org/fhir/ValueSet/example",
+  "status": "active"
+}
