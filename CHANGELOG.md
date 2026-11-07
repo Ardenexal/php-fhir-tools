@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Serialization] [Validation] A typed complex extension no longer drops sub-extensions it does not declare. Its constructor rebuilt the list from its own slices, so `species-x` in `patient-animal`, a nested `bodySite`, or a slice value of a type the model did not capture disappeared on read and was never written back. They are kept after the declared ones, and an undeclared relative-url slice is reported as `Sub-extension url 'species-x' is not defined by the Extension <url>`. (#167)
 - [Validation] An extension nested one level inside another extension is now checked against its element contexts. The reference validator places it at `Extension` and at the carrying extension's path (`Patient.extension`), so `bodySite` inside `patient-animal` is reported as not permitted. Such contexts were previously never denied. Deeper nesting still defers. (#167)
 
+### Removed
+- **BREAKING: [Models] The `CNX` case (`chinesepeopl_es_bankdollar`) is removed from the R4, R4B and R5 `Currencies` enums.** The enum is generated from `symfony/intl` currency data, and 7.4.22 no longer lists CNX. `Currencies::from('CNX')` now throws and `tryFrom('CNX')` returns `null`. There is no replacement.
+
 ### Infrastructure
 - [CI] `package-integrity` and `cross-version-test` now run on PHP 8.5, which the declared `>=8.3` constraint already allowed but nothing exercised.
 - [CI] `cross-version-test` gains a Symfony 8.1 leg and now restricts every Symfony component to the version a leg names, then asserts it. Pinning only `symfony/framework-bundle` would have let the 7.4 leg install 8.1 components once `^8.1` was allowed.
