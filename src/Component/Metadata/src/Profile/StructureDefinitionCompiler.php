@@ -26,18 +26,27 @@ use Symfony\Component\Validator\Constraints\Count;
  * each violation twice.
  *
  * Output order is part of the contract: generated classes must stay byte-identical, so attributes
- * come out as differential constraints, then must-support, then slices, then snapshot obligations.
+ * come out as differential constraints, then must-support, then slices, then snapshot obligations,
+ * then the rules of data-type profiles the differential names on its elements.
  *
  * @author Ardenexal
  */
 final class StructureDefinitionCompiler
 {
+    /** How deep data-type profiles may nest inside each other before inlining stops. */
+    public const int MAX_INLINE_DEPTH = 8;
+
     /**
      * Compile one StructureDefinition into its attributes and any diagnostics.
      *
-     * @param array<string, mixed> $structureDefinition StructureDefinition with derivation=constraint
+     * With $lookup, a data-type profile the differential names in an element's `type.profile` is
+     * compiled too and its rules are added under that element's path, in this profile's group (see
+     * inlinedDataTypeProfiles()). Without it, those references are left alone, as before.
+     *
+     * @param array<string, mixed>                                 $structureDefinition StructureDefinition with derivation=constraint
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup              Finds a StructureDefinition by canonical URL, without a version
      */
-    public function compile(array $structureDefinition): CompiledProfile
+    public function compile(array $structureDefinition, ?\Closure $lookup = null): CompiledProfile
     {
         $profileUrl  = (string) ($structureDefinition['url'] ?? '');
         $diagnostics = [];
@@ -49,7 +58,155 @@ final class StructureDefinitionCompiler
             ...self::snapshotObligations($structureDefinition, $profileUrl),
         ];
 
+        if ($lookup !== null) {
+            $visited = [self::canonicalWithoutVersion($profileUrl) => true];
+            foreach (self::inlinedDataTypeProfiles($structureDefinition, $profileUrl, $lookup, $visited, 1, $diagnostics) as $attribute) {
+                $attributes[] = $attribute;
+            }
+        }
+
         return new CompiledProfile($profileUrl, $attributes, $diagnostics);
+    }
+
+    /**
+     * The rules of each data-type profile this differential names in an element's `type.profile`,
+     * moved under that element's path and into the group of the profile being compiled.
+     *
+     * A profile that types `Observation.referenceRange.high` as SimpleQuantity requires every
+     * `referenceRange.high` to be a SimpleQuantity, so SimpleQuantity's `comparator` max 0 becomes
+     * `referenceRange.high.comparator` max 0 in the referencing profile. The data-type profile's own
+     * constraint ancestors come along, and so do the data-type profiles it names in turn, until
+     * MAX_INLINE_DEPTH. Its cardinality, fixed and pattern rules and its slices are inlined; its
+     * must-support and obligations are not, since they describe the data type, not the referencing
+     * profile, and no validator reads them.
+     *
+     * Only an element that allows one type with one profile is inlined. Several types or several
+     * profiles mean the value must match any one of them, which these rules cannot express, so such an
+     * element, a profile no lookup finds, one that is not a data-type profile, a cycle and nesting past
+     * the limit are reported as diagnostics and not enforced. Extension profiles are left to extension
+     * validation, and an element inside a slice is reported as not enforced.
+     *
+     * @param array<string, mixed>                          $structureDefinition Definition whose differential is read
+     * @param string                                        $groupUrl            URL of the profile being compiled; every rule goes in its group
+     * @param \Closure(string): (array<string, mixed>|null) $lookup
+     * @param array<string, true>                           $visited             Canonical URLs on the current inlining path
+     * @param list<CompilerDiagnostic>                      $diagnostics
+     *
+     * @return list<CompiledAttribute> Rules with paths relative to $structureDefinition's root type
+     */
+    private static function inlinedDataTypeProfiles(
+        array $structureDefinition,
+        string $groupUrl,
+        \Closure $lookup,
+        array $visited,
+        int $depth,
+        array &$diagnostics,
+    ): array {
+        $attributes = [];
+
+        foreach (self::differentialElements($structureDefinition) as $id => $element) {
+            $path = (string) ($element['path'] ?? '');
+            if (!str_contains($path, '.') || ElementDefinitionReader::hasContentReference($element)) {
+                continue;
+            }
+
+            $types    = is_array($element['type'] ?? null) ? array_values($element['type']) : [];
+            $profiled = [];
+            foreach ($types as $type) {
+                $profiles = is_array($type['profile'] ?? null) ? array_values(array_filter($type['profile'], 'is_string')) : [];
+                if ($profiles !== [] && ($type['code'] ?? null) !== 'Extension') {
+                    $profiled[] = $profiles;
+                }
+            }
+            if ($profiled === []) {
+                continue;
+            }
+
+            $named       = implode(', ', array_merge(...$profiled));
+            $notEnforced = static function(string $reason) use (&$diagnostics, $groupUrl, $id, $named): void {
+                $diagnostics[] = new CompilerDiagnostic(
+                    "Profile {$groupUrl} requires {$id} to conform to {$named}, but {$reason}; that profile's rules are not enforced",
+                    $id,
+                    ['profileUrl' => $groupUrl, 'typeProfile' => $named],
+                );
+            };
+
+            $propertyPath = self::differentialPropertyPath($element);
+            if ($propertyPath === null) {
+                $notEnforced('the element is inside a slice');
+                continue;
+            }
+            if (count($types) > 1 || count($profiled[0]) > 1) {
+                $notEnforced('the element allows several types or profiles, so a value may match any one of them');
+                continue;
+            }
+
+            $url = self::canonicalWithoutVersion($profiled[0][0]);
+            if (isset($visited[$url])) {
+                $notEnforced('that profile contains itself');
+                continue;
+            }
+            if ($depth > self::MAX_INLINE_DEPTH) {
+                $notEnforced('data-type profiles nest more than ' . self::MAX_INLINE_DEPTH . ' deep');
+                continue;
+            }
+
+            $definition = $lookup($url);
+            if ($definition === null) {
+                $notEnforced('no StructureDefinition with that URL is available');
+                continue;
+            }
+            if (($definition['kind'] ?? null) !== 'complex-type' || ($definition['derivation'] ?? null) !== 'constraint') {
+                $notEnforced('it is not a data-type profile');
+                continue;
+            }
+
+            // The data-type profile and each constraint ancestor, up to the base data type
+            $current = $definition;
+            $seen    = $visited;
+            while (is_array($current) && ($current['derivation'] ?? null) === 'constraint') {
+                $currentUrl        = self::canonicalWithoutVersion((string) ($current['url'] ?? ''));
+                $seen[$currentUrl] = true;
+
+                $rules = [
+                    ...self::differentialConstraints($current, $groupUrl),
+                    ...self::differentialSliceConstraints($current, $groupUrl, $diagnostics),
+                    ...self::inlinedDataTypeProfiles($current, $groupUrl, $lookup, $seen, $depth + 1, $diagnostics),
+                ];
+                foreach ($rules as $rule) {
+                    $attributes[] = self::underPath($rule, $propertyPath);
+                }
+
+                $parent  = is_string($current['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($current['baseDefinition']) : '';
+                $current = $parent === '' || isset($seen[$parent]) ? null : $lookup($parent);
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * The same rule, applied to the element at $prefix instead of the data type's root.
+     */
+    private static function underPath(CompiledAttribute $attribute, string $prefix): CompiledAttribute
+    {
+        $arguments = $attribute->arguments;
+        $key       = array_key_exists('path', $arguments) ? 'path' : 'property';
+        if (is_string($arguments[$key] ?? null)) {
+            $arguments[$key] = $prefix . '.' . $arguments[$key];
+        }
+
+        return new CompiledAttribute($attribute->class, $arguments);
+    }
+
+    /**
+     * "http://x/StructureDefinition/a|1.0" → "http://x/StructureDefinition/a".
+     */
+    private static function canonicalWithoutVersion(string $url): string
+    {
+        $pipe = strpos($url, '|');
+
+        return $pipe === false ? $url : substr($url, 0, $pipe);
     }
 
     /**

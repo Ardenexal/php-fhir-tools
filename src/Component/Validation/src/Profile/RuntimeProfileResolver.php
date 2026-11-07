@@ -199,7 +199,11 @@ final class RuntimeProfileResolver
             return $cached['profile'];
         }
 
-        $profile              = $this->compiler->compile($structureDefinition);
+        // Data-type profiles named on elements come from the same registry, at their latest version
+        $profile = $this->compiler->compile(
+            $structureDefinition,
+            fn (string $url): ?array => $this->registry->find($release, $url),
+        );
         $this->compiled[$key] = ['definition' => $structureDefinition, 'profile' => $profile];
 
         return $profile;

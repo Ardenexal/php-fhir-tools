@@ -13,7 +13,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRSliceDiscriminator;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * Unit tests for FHIRConstrainedComplexTypeGenerator.
@@ -331,6 +334,55 @@ class FHIRConstrainedComplexTypeGeneratorTest extends TestCase
             array_filter($class->getConstants(), fn ($c) => str_starts_with($c->getName(), 'FIXED_')),
             'Thin profile should not have any FIXED_ constants',
         );
+    }
+
+    // -----------------------------------------------------------------
+    // Compiled validation rules
+    // -----------------------------------------------------------------
+
+    /**
+     * IG data-type profile classes carry the profile's compiled rules, as core data-type profile
+     * classes from FHIRProfileGenerator do, so runtime validation and the generated class agree.
+     */
+    public function testCompiledRulesAreRenderedAlongsideBakedValues(): void
+    {
+        $sd = [
+            'resourceType'   => 'StructureDefinition',
+            'url'            => 'http://example.org/StructureDefinition/valued',
+            'name'           => 'ValuedIdentifier',
+            'kind'           => 'complex-type',
+            'type'           => 'Identifier',
+            'derivation'     => 'constraint',
+            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/Identifier',
+            'snapshot'       => [
+                'element' => [
+                    ['id' => 'Identifier', 'path' => 'Identifier'],
+                    ['id' => 'Identifier.system', 'path' => 'Identifier.system', 'fixedUri' => 'http://example.org/ids', 'type' => [['code' => 'uri']]],
+                    ['id' => 'Identifier.value', 'path' => 'Identifier.value', 'min' => 1, 'max' => '1', 'type' => [['code' => 'string']]],
+                ],
+            ],
+            'differential' => [
+                'element' => [
+                    ['id' => 'Identifier', 'path' => 'Identifier'],
+                    ['id' => 'Identifier.system', 'path' => 'Identifier.system', 'fixedUri' => 'http://example.org/ids'],
+                    ['id' => 'Identifier.value', 'path' => 'Identifier.value', 'min' => 1],
+                ],
+            ],
+        ];
+
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+
+        $rules = [];
+        foreach ($class->getAttributes() as $attribute) {
+            if ($attribute->getName() === FHIRProfileConstraint::class) {
+                $arguments = $attribute->getArguments();
+                $rules[]   = $arguments['path'] . ' ' . $arguments['constraint'];
+                self::assertSame(['http://example.org/StructureDefinition/valued'], $arguments['groups']);
+            }
+        }
+
+        self::assertSame(['system ' . FHIRFixedValue::class, 'value ' . Count::class], $rules);
+        self::assertTrue($class->hasConstant('FIXED_SYSTEM'), 'the fixed value is still baked in');
     }
 
     // -----------------------------------------------------------------
