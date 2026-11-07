@@ -182,21 +182,27 @@ final class StructureDefinitionCompiler
 
             $at = $trail === '' ? $propertyPath : "{$trail}.{$propertyPath}";
 
-            // The data-type profile and each constraint ancestor, up to the base data type
+            // The data-type profile and each constraint ancestor, up to the base data type. Like a
+            // profile requested directly, each one must carry a snapshot: slicing a differential
+            // inherits is only found there.
             $current = $definition;
             $seen    = $visited;
+            $chain   = [];
             while (is_array($current) && ($current['derivation'] ?? null) === 'constraint') {
                 $currentUrl        = self::canonicalWithoutVersion((string) ($current['url'] ?? ''));
                 $seen[$currentUrl] = true;
 
-                $rules = [
+                if (self::snapshotElements($current) === []) {
+                    $notEnforced("{$currentUrl} has no snapshot, which runtime validation requires");
+                    $chain = [];
+                    break;
+                }
+
+                $chain[] = [
                     ...self::differentialConstraints($current, $groupUrl),
                     ...self::differentialSliceConstraints($current, $groupUrl, $diagnostics),
                     ...self::inlinedDataTypeProfiles($current, $groupUrl, $lookup, $seen, $depth + 1, $diagnostics, $at),
                 ];
-                foreach ($rules as $rule) {
-                    $attributes[] = self::underPath($rule, $propertyPath);
-                }
 
                 $parent = is_string($current['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($current['baseDefinition']) : '';
                 if ($parent === '' || isset($seen[$parent])) {
@@ -207,9 +213,90 @@ final class StructureDefinitionCompiler
                     $notEnforced("{$currentUrl} derives from {$parent}, which is not available, so its rules are missing");
                 }
             }
+
+            foreach (self::mergeInheritedSlices(array_merge(...($chain === [] ? [[]] : $chain))) as $rule) {
+                $attributes[] = self::underPath($rule, $propertyPath);
+            }
         }
 
         return $attributes;
+    }
+
+    /**
+     * One slice definition per slice, where a data-type profile and its ancestors each compiled one.
+     *
+     * A resource profile and its parent check their slices in separate groups. An inlined data-type
+     * profile and its ancestors all land in the referencing profile's group, and the slice validator
+     * gives each item to the first slice it matches, so two definitions of one slice would leave the
+     * second with no items. They are merged instead, most-derived first: the tighter cardinality of
+     * the two, the first discriminator value found, and the rules of both. Slicing rules declared at
+     * several levels keep the most-derived one.
+     *
+     * @param list<CompiledAttribute> $attributes Most-derived definition's rules first
+     *
+     * @return list<CompiledAttribute>
+     */
+    private static function mergeInheritedSlices(array $attributes): array
+    {
+        $merged  = [];
+        $slices  = [];
+        $slicing = [];
+
+        foreach ($attributes as $attribute) {
+            $arguments = $attribute->arguments;
+            $property  = (string) ($arguments['property'] ?? '');
+
+            if ($attribute->class === FHIRSlicingRules::class) {
+                if (isset($slicing[$property])) {
+                    continue;
+                }
+                $slicing[$property] = true;
+            }
+
+            if ($attribute->class === FHIRSliceConstraint::class) {
+                $key = $property . ':' . (string) ($arguments['sliceName'] ?? '');
+                if (isset($slices[$key])) {
+                    $index          = $slices[$key];
+                    $merged[$index] = new CompiledAttribute(FHIRSliceConstraint::class, self::mergeSlice($merged[$index]->arguments, $arguments));
+                    continue;
+                }
+                $slices[$key] = count($merged);
+            }
+
+            $merged[] = $attribute;
+        }
+
+        return array_values($merged);
+    }
+
+    /**
+     * @param array<string, mixed> $derived  Arguments of the more derived definition
+     * @param array<string, mixed> $ancestor Arguments of the ancestor's definition of the same slice
+     *
+     * @return array<string, mixed>
+     */
+    private static function mergeSlice(array $derived, array $ancestor): array
+    {
+        $derived['min'] = max((int) ($derived['min'] ?? 0), (int) ($ancestor['min'] ?? 0));
+
+        $maxes = array_filter([$derived['max'] ?? '*', $ancestor['max'] ?? '*'], static fn (mixed $max): bool => $max !== '*');
+        if ($maxes !== []) {
+            $derived['max'] = min(array_map('intval', $maxes));
+        }
+
+        $derived['discriminatorValue'] ??= $ancestor['discriminatorValue'] ?? null;
+
+        $rules = is_array($derived['rules'] ?? null) ? $derived['rules'] : [];
+        foreach (is_array($ancestor['rules'] ?? null) ? $ancestor['rules'] : [] as $rule) {
+            if (!in_array($rule, $rules, true)) {
+                $rules[] = $rule;
+            }
+        }
+        if ($rules !== []) {
+            $derived['rules'] = $rules;
+        }
+
+        return $derived;
     }
 
     /**
@@ -232,15 +319,16 @@ final class StructureDefinitionCompiler
             return false;
         }
 
+        // Only a parent that allows exactly this one profiled type enforced it; one that allowed
+        // several types left the element unenforced, so the narrowed child must enforce it itself
         $element = self::snapshotElements($parent)[$id] ?? null;
-        foreach (is_array($element['type'] ?? null) ? $element['type'] : [] as $type) {
-            $inherited = is_array($type['profile'] ?? null) ? array_map(self::canonicalWithoutVersion(...), array_filter($type['profile'], 'is_string')) : [];
-            if ($inherited !== [] && $inherited === array_map(self::canonicalWithoutVersion(...), $profiles)) {
-                return true;
-            }
+        $types   = is_array($element['type'] ?? null) ? array_values($element['type']) : [];
+        if (count($types) !== 1 || !is_array($types[0]['profile'] ?? null)) {
+            return false;
         }
+        $inherited = array_values(array_map(self::canonicalWithoutVersion(...), array_filter($types[0]['profile'], 'is_string')));
 
-        return false;
+        return $inherited === array_map(self::canonicalWithoutVersion(...), $profiles);
     }
 
     /**

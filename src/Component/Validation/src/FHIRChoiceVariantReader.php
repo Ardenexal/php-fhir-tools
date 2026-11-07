@@ -134,7 +134,8 @@ final class FHIRChoiceVariantReader
         }
 
         $found = [];
-        foreach (array_values($value) as $index => $entry) {
+        // The array's own keys, as every other finding path uses them
+        foreach ($value as $index => $entry) {
             if ($entry !== null) {
                 $found[] = [$entry, "{$path}[{$index}]"];
             }

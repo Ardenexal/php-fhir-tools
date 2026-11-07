@@ -100,6 +100,18 @@ final class RuntimeDataTypeProfileTest extends TestCase
     }
 
     /**
+     * An array whose keys are not 0..n-1, such as one filtered by the caller, is named by its own keys.
+     */
+    public function testARepetitionIsNamedByItsOwnKey(): void
+    {
+        $observation             = new ObservationResource();
+        $observation->identifier = [0 => self::identifier('http://example.org/kinds'), 2 => self::identifier('http://example.org/other')];
+
+        self::assertSame([], $this->profileFindings($observation, 'identifier[1].type.coding'));
+        self::assertCount(1, $this->profileFindings($observation, 'identifier[2].type.coding'));
+    }
+
+    /**
      * A compiled profile inlines other definitions, so it is compiled again when one of them changes.
      */
     public function testAddingAnInlinedProfileLaterIsPickedUp(): void

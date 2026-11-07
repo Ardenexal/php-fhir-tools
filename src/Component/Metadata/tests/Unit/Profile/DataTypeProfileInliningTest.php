@@ -200,7 +200,6 @@ final class DataTypeProfileInliningTest extends TestCase
     {
         $element            = self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty|2.0']]);
         $parent             = self::profile(self::BASE . 'parent', 'resource', 'Observation', [$element]);
-        $parent['snapshot'] = $parent['differential'];
         $child              = self::profile(self::OBSERVATION, 'resource', 'Observation', [$element], self::BASE . 'parent');
         $lookup             = static fn (string $url): ?array => [
             self::BASE . 'qty'    => self::quantityProfile(self::BASE . 'qty', []),
@@ -209,6 +208,86 @@ final class DataTypeProfileInliningTest extends TestCase
 
         self::assertSame([], (new StructureDefinitionCompiler())->compile($child, $lookup)->attributes);
         self::assertNotSame([], (new StructureDefinitionCompiler())->compile($parent, $lookup)->attributes);
+    }
+
+    /**
+     * A parent that allowed several types left the element unenforced, so a child that narrows it
+     * to one profiled type enforces that profile itself.
+     */
+    public function testAChildNarrowingAMultiTypeParentElementIsInlined(): void
+    {
+        $parent = self::profile(self::BASE . 'parent', 'resource', 'Observation', [[
+            'id'   => 'Observation.value[x]',
+            'path' => 'Observation.value[x]',
+            'type' => [['code' => 'Quantity', 'profile' => [self::BASE . 'qty']], ['code' => 'string']],
+        ]]);
+        $child  = self::profile(self::OBSERVATION, 'resource', 'Observation', [
+            self::element('Observation.value[x]:valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty']], 'value[x]'),
+        ], self::BASE . 'parent');
+        $lookup = static fn (string $url): ?array => [
+            self::BASE . 'qty'    => self::quantityProfile(self::BASE . 'qty', []),
+            self::BASE . 'parent' => $parent,
+        ][$url] ?? null;
+
+        $compiled = (new StructureDefinitionCompiler())->compile($child, $lookup);
+
+        self::assertSame([[FHIRProfileConstraint::class, 'valueQuantity.comparator', [self::OBSERVATION]]], self::summary($compiled));
+    }
+
+    /**
+     * Slicing a data-type profile inherits is only found in its snapshot, so one without a snapshot
+     * is reported instead of enforced from its differential alone.
+     */
+    public function testAnInlinedProfileWithoutASnapshotIsReported(): void
+    {
+        $quantity = self::quantityProfile(self::BASE . 'qty', []);
+        unset($quantity['snapshot']);
+
+        $compiled = self::compile(
+            [self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty']])],
+            [self::BASE . 'qty' => $quantity],
+        );
+
+        self::assertSame([], $compiled->attributes);
+        self::assertCount(1, self::inliningDiagnostics($compiled));
+        self::assertStringContainsString(self::BASE . 'qty has no snapshot', self::inliningDiagnostics($compiled)[0]);
+    }
+
+    /**
+     * A data-type profile and its ancestor both define slice "kind"; in one group, two definitions
+     * would leave the second with no items, so they merge into the tighter of the two.
+     */
+    public function testASliceRedefinedByAnAncestorIsMergedIntoOne(): void
+    {
+        $slicing  = [
+            'id'      => 'Identifier.type.coding',
+            'path'    => 'Identifier.type.coding',
+            'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'system']], 'rules' => 'open'],
+        ];
+        $system   = ['id' => 'Identifier.type.coding:kind.system', 'path' => 'Identifier.type.coding.system', 'fixedUri' => 'http://example.org/kinds'];
+        $ancestor = self::profile(self::BASE . 'ident-base', 'complex-type', 'Identifier', [
+            $slicing,
+            ['id' => 'Identifier.type.coding:kind', 'path' => 'Identifier.type.coding', 'sliceName' => 'kind', 'min' => 0, 'max' => '2'],
+            $system,
+        ]);
+        $derived  = self::profile(self::BASE . 'ident', 'complex-type', 'Identifier', [
+            $slicing,
+            ['id' => 'Identifier.type.coding:kind', 'path' => 'Identifier.type.coding', 'sliceName' => 'kind', 'min' => 1, 'max' => '*'],
+        ], self::BASE . 'ident-base');
+        // The derived snapshot carries the fixed system it inherits, which identifies its slice
+        $derived['snapshot']['element'][] = $system;
+
+        $compiled = self::compile(
+            [self::element('Observation.identifier', ['code' => 'Identifier', 'profile' => [self::BASE . 'ident']])],
+            [self::BASE . 'ident' => $derived, self::BASE . 'ident-base' => $ancestor],
+        );
+
+        $slices = array_values(array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRSliceConstraint::class));
+        self::assertCount(1, $slices);
+        self::assertSame(1, $slices[0]->arguments['min']);
+        self::assertSame(2, $slices[0]->arguments['max']);
+        self::assertSame('http://example.org/kinds', $slices[0]->arguments['discriminatorValue'] ?? null);
+        self::assertCount(1, array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRSlicingRules::class));
     }
 
     public function testExtensionProfilesAreLeftToExtensionValidation(): void
@@ -285,6 +364,8 @@ final class DataTypeProfileInliningTest extends TestCase
      */
     private static function profile(string $url, string $kind, string $type, array $elements, ?string $base = null): array
     {
+        $elements = [['id' => $type, 'path' => $type], ...$elements];
+
         return [
             'resourceType'   => 'StructureDefinition',
             'url'            => $url,
@@ -292,7 +373,8 @@ final class DataTypeProfileInliningTest extends TestCase
             'type'           => $type,
             'derivation'     => 'constraint',
             'baseDefinition' => $base ?? 'http://hl7.org/fhir/StructureDefinition/' . $type,
-            'differential'   => ['element' => [['id' => $type, 'path' => $type], ...$elements]],
+            'snapshot'       => ['element' => $elements],
+            'differential'   => ['element' => $elements],
         ];
     }
 
