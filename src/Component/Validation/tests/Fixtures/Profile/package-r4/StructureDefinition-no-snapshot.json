@@ -1,0 +1,27 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "no-snapshot",
+  "url": "http://example.org/fhir/StructureDefinition/no-snapshot",
+  "version": "1.0.0",
+  "name": "nosnapshot",
+  "status": "active",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Observation",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Observation",
+        "path": "Observation"
+      },
+      {
+        "id": "Observation.subject",
+        "path": "Observation.subject",
+        "min": 1
+      }
+    ]
+  }
+}
