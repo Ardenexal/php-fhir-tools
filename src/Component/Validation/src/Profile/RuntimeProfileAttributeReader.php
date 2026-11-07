@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
  * and keeps those in the active group. A generated profile class carries them as attributes; a base
  * resource validated against a runtime profile carries none, so the validator would find no slices
  * and enforce nothing. This decorator adds the compiled slice attributes of
- * every profile {@see RuntimeProfileResolver} has resolved for the object's FHIR release and type.
+ * every profile {@see RuntimeProfileResolver} has activated for the object's FHIR release and type.
  * The validator's own group filter then keeps only the profile being checked.
  *
  * A profile the object's class already declares is left out, so a generated profile instance never

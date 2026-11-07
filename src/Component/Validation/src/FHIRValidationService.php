@@ -411,6 +411,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         /** @var array<string, string> $checked canonical => the URL as written that is checked */
         $checked = [];
 
+        /** @var array<string, CompiledProfile> $selected profile URL => the compiled version checked */
+        $selected = [];
+
         foreach ($wanted as $url => $withAncestors) {
             $canonical = self::canonicalWithoutVersion($url);
             if (in_array($canonical, $declared, true)) {
@@ -477,16 +480,52 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 $chain = [$chain[array_key_last($chain)]];
             }
 
-            foreach ($chain as $profile) {
-                if (!in_array($profile->profileUrl, $declared, true)) {
-                    $constraintsByGroup[$profile->profileUrl] ??= $this->runtimeConstraintsOf($profile);
+            $applies = array_values(array_filter(
+                $chain,
+                static fn (CompiledProfile $profile): bool => !in_array($profile->profileUrl, $declared, true),
+            ));
+
+            // A chain that needs another version of a profile already selected here (a child of
+            // parent|2 beside parent|1) would mix the two in one group, so it is not checked.
+            $conflict = null;
+            foreach ($applies as $profile) {
+                if (isset($selected[$profile->profileUrl]) && $selected[$profile->profileUrl] !== $profile) {
+                    $conflict = $profile->profileUrl;
+
+                    break;
                 }
+            }
+            if ($conflict !== null) {
+                $violations[] = new FHIRValidationViolation(
+                    severity: 'warning',
+                    path: rtrim($prefix, '.'),
+                    message: sprintf(
+                        "Profile reference '%s' has not been checked: it needs a different version of '%s' than another profile checked on this resource",
+                        $url,
+                        $conflict,
+                    ),
+                    constraintClass: RuntimeProfileResolver::class,
+                    profileGroup: $canonical,
+                    invariantKey: null,
+                    parameters: ['reason' => 'version-conflict'],
+                    code: FHIRViolationCode::WARNING,
+                );
+
+                continue;
+            }
+
+            foreach ($applies as $profile) {
+                $selected[$profile->profileUrl] = $profile;
+                $constraintsByGroup[$profile->profileUrl] ??= $this->runtimeConstraintsOf($profile);
             }
         }
 
         if ($constraintsByGroup === []) {
             return $mismatches;
         }
+
+        // The slice reader must serve the versions whose constraints run here.
+        $this->runtimeProfiles->activate($fhirVersion, $resourceType, array_values($selected));
 
         $raw = $this->validator->validate($resource, array_merge(...array_values($constraintsByGroup)), array_keys($constraintsByGroup));
         foreach ($raw as $rawViolation) {

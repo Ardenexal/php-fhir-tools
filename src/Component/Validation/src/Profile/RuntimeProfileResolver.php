@@ -39,12 +39,12 @@ final class RuntimeProfileResolver
     private array $compiled = [];
 
     /**
-     * Every profile a successful resolution has handed out, by release, then root type, then URL.
+     * The profiles validation last checked each type against, by release, then root type, then URL.
      *
      * The slice validator finds a profile's sibling slices by reading attributes off the validated
      * object's class. A base instance has none, so {@see RuntimeProfileAttributeReader} looks them up
-     * here instead. A later resolution of the same URL replaces the entry, so one URL never
-     * contributes two sets of slices.
+     * here instead. Filled by {@see activate()}, not by resolution, so a profile resolved but not
+     * checked (a conflicting version, say) never replaces the slices of the one that is.
      *
      * @var array<string, array<string, array<string, CompiledProfile>>>
      */
@@ -141,15 +141,34 @@ final class RuntimeProfileResolver
             $currentUrl = $parentUrl;
         }
 
-        foreach ($chain as $profile) {
-            $this->resolvedByRootType[$release][$rootType][$profile->profileUrl] = $profile;
-        }
-
         return RuntimeProfileResolution::resolved($url, $release, array_reverse($chain), $rootType, $kind);
     }
 
     /**
-     * Profiles resolved so far that constrain one type, in the order they were first resolved.
+     * Record the compiled profiles a validation pass is about to check one type against.
+     *
+     * The slice reader serves these, so it always reads the exact versions whose constraints run.
+     * A later activation of the same URL replaces the entry, so one URL never contributes two sets
+     * of slices.
+     *
+     * @param string                $fhirVersion 'R4', 'R4B' or 'R5'
+     * @param string                $rootType    FHIR type name, e.g. 'Observation'
+     * @param list<CompiledProfile> $profiles
+     */
+    public function activate(string $fhirVersion, string $rootType, array $profiles): void
+    {
+        $release = FhirReleaseLabel::normalize($fhirVersion);
+        if ($release === null) {
+            return;
+        }
+
+        foreach ($profiles as $profile) {
+            $this->resolvedByRootType[$release][$rootType][$profile->profileUrl] = $profile;
+        }
+    }
+
+    /**
+     * Profiles activated so far for one type, in the order they were first activated.
      *
      * @param string $fhirVersion 'R4', 'R4B' or 'R5'
      * @param string $rootType    FHIR type name, e.g. 'Observation'

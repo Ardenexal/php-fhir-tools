@@ -38,14 +38,14 @@ final class RuntimeProfileAttributeReaderTest extends TestCase
         $this->reader = new RuntimeProfileAttributeReader($this->resolver);
     }
 
-    public function testAddsNothingBeforeAProfileIsResolved(): void
+    public function testAddsNothingBeforeAProfileIsActivated(): void
     {
         self::assertSame([], $this->reader->classAttributesInHierarchy(new ObservationResource(), FHIRSliceConstraint::class));
     }
 
     public function testAddsSlicesOfResolvedProfilesForTheSubjectsType(): void
     {
-        $this->resolver->resolve(self::SLICED, 'R4');
+        $this->activate(self::SLICED);
 
         $slices = $this->reader->classAttributesInHierarchy(new ObservationResource(), FHIRSliceConstraint::class);
         $rules  = $this->reader->classAttributesInHierarchy(ObservationResource::class, FHIRSlicingRules::class);
@@ -60,7 +60,7 @@ final class RuntimeProfileAttributeReaderTest extends TestCase
 
     public function testReusesInstancesAcrossReads(): void
     {
-        $this->resolver->resolve(self::SLICED, 'R4');
+        $this->activate(self::SLICED);
 
         self::assertSame(
             $this->reader->classAttributesInHierarchy(new ObservationResource(), FHIRSliceConstraint::class)[0],
@@ -70,7 +70,7 @@ final class RuntimeProfileAttributeReaderTest extends TestCase
 
     public function testLeavesOutProfilesTheClassDeclares(): void
     {
-        $this->resolver->resolve(self::CORE . 'vitalsigns', 'R4');
+        $this->activate(self::CORE . 'vitalsigns');
 
         $declared = array_filter(
             $this->reader->classAttributesInHierarchy(ObservationVitalsignsProfile::class, FHIRSliceConstraint::class),
@@ -82,7 +82,7 @@ final class RuntimeProfileAttributeReaderTest extends TestCase
 
     public function testOtherAttributesPassThrough(): void
     {
-        $this->resolver->resolve(self::SLICED, 'R4');
+        $this->activate(self::SLICED);
 
         self::assertSame([], $this->reader->classAttributesInHierarchy(new ObservationResource(), FHIRProfile::class));
         self::assertSame(
@@ -92,6 +92,20 @@ final class RuntimeProfileAttributeReaderTest extends TestCase
                 $this->reader->classAttributesInHierarchy(ObservationVitalsignsProfile::class, FHIRProfile::class),
             ),
         );
+    }
+
+    public function testServesOnlyActivatedProfiles(): void
+    {
+        $this->resolver->resolve(self::SLICED, 'R4');
+
+        self::assertSame([], $this->reader->classAttributesInHierarchy(new ObservationResource(), FHIRSliceConstraint::class));
+    }
+
+    private function activate(string $url): void
+    {
+        $resolution = $this->resolver->resolve($url, 'R4');
+        self::assertTrue($resolution->isResolved(), (string) $resolution->message);
+        $this->resolver->activate('R4', 'Observation', $resolution->chain);
     }
 
     /**

@@ -42,6 +42,10 @@ final class RuntimeProfileValidationTest extends TestCase
 
     private const string LAB_ONLY = self::EXAMPLE . 'lab-only';
 
+    private const string PARENT = self::EXAMPLE . 'parent';
+
+    private const string CHILD_OF_V2 = self::EXAMPLE . 'child-of-parent-2';
+
     private const string MISSING_SUBJECT = 'This collection should contain exactly 1 element.|This collection should contain exactly 1 elements.';
 
     private const string MISSING_ISSUED = self::MISSING_SUBJECT;
@@ -59,6 +63,10 @@ final class RuntimeProfileValidationTest extends TestCase
             self::profile(self::NEED_ISSUED, self::NEED_SUBJECT, [self::element('issued', 1, '1')]),
             self::profile(self::LAB_CATEGORY, self::CORE . 'Observation', self::labCategorySlice('open')),
             self::profile(self::LAB_ONLY, self::CORE . 'Observation', self::labCategorySlice('closed')),
+            // Two versions of one parent, and a child bound to the second.
+            self::profile(self::PARENT, self::CORE . 'Observation', [self::element('subject', 1, '1')]),
+            [...self::profile(self::PARENT, self::CORE . 'Observation', [self::element('issued', 1, '1')]), 'version' => '2.0'],
+            self::profile(self::CHILD_OF_V2, self::PARENT . '|2.0', [self::element('effective[x]', 1, '1')]),
             // Same URL as the generated ObservationVitalsignsProfile, with a rule that class does not have.
             self::profile(self::CORE . 'vitalsigns', self::CORE . 'Observation', [self::element('issued', 1, '1')]),
         ]);
@@ -225,6 +233,23 @@ final class RuntimeProfileValidationTest extends TestCase
         self::assertSame(
             [
                 ['warning', '', "Profile reference '" . self::NEED_SUBJECT . "|2.0' has not been checked: '" . self::NEED_SUBJECT . "|1.0' is already checked on this resource, and two versions of one profile cannot be checked together"],
+                ['error', 'subject', self::MISSING_SUBJECT],
+            ],
+            array_map(static fn (FHIRValidationViolation $v): array => [$v->severity, $v->path, $v->message], $violations),
+        );
+    }
+
+    public function testChainNeedingAnotherVersionOfAnAncestorIsNotChecked(): void
+    {
+        $violations = $this->profileViolations(
+            $this->observation(),
+            [self::PARENT . '|1.0', self::CHILD_OF_V2],
+            deriveProfilesFromClass: true,
+        );
+
+        self::assertSame(
+            [
+                ['warning', '', "Profile reference '" . self::CHILD_OF_V2 . "' has not been checked: it needs a different version of '" . self::PARENT . "' than another profile checked on this resource"],
                 ['error', 'subject', self::MISSING_SUBJECT],
             ],
             array_map(static fn (FHIRValidationViolation $v): array => [$v->severity, $v->path, $v->message], $violations),
