@@ -372,6 +372,43 @@ jobs:
             -   name: Run the Symfony 6.4 acceptance checks
                 run: tests/Compat/symfony-6.4/acceptance.sh --with-generation
 
+    # The other end of the range. Every other job in this workflow runs on PHP 8.3, which Symfony 8
+    # does not support, so without this the generators would only meet 8.1 after merging. PHP 8.4
+    # is Symfony 8's floor. Package Integrity's 8.4 and 8.5 legs cover the unit suite on 8.1.
+    symfony-upper-bound:
+        runs-on: ubuntu-latest
+        needs: [ changes ]
+        # `!= 'false'` rather than `== 'true'`: see symfony-lower-bound.
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
+        env:
+            COMPOSER_NO_INTERACTION: 1
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.4'
+                    extensions: ctype, iconv, zip, curl
+
+            -   name: Install the Symfony 8.1 consumer harness
+                run: composer install --working-dir=tests/Compat/symfony-8.1 --prefer-dist --no-progress
+
+            -   name: Assert Symfony 8.1 was actually installed
+                run: |
+                    status=0
+                    for package in console dependency-injection filesystem finder http-client intl string validator; do
+                      version="$(composer show --working-dir=tests/Compat/symfony-8.1 --format=json "symfony/${package}" | php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];')"
+                      case "$version" in
+                        v8.1.*) echo "ok   symfony/${package} ${version}" ;;
+                        *) echo "FAIL symfony/${package} ${version} — expected an 8.1 release"; status=1 ;;
+                      esac
+                    done
+                    exit "$status"
+
+            -   name: Run the Symfony 8.1 acceptance checks
+                run: tests/Compat/symfony-8.1/acceptance.sh --with-generation
+
     recipe-validation:
         runs-on: ubuntu-latest
         needs: [ changes ]

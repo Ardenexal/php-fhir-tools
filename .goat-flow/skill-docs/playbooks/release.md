@@ -63,7 +63,7 @@ breaks CI or consumers:
 | Cross-pins `"ardenexal/<pkg>": "^0.N"` (14 as of 0.6.1) | `src/Component/*/composer.json`, `src/Bundle/FHIRBundle/composer.json` | `^0.6` | Unchanged, unless a sibling fix is required, then floor at `^0.6.2` |
 | Branch aliases `"dev-main": "0.N.x-dev"` (8) | Same manifests | `0.6.x-dev` | Unchanged |
 | CI sibling stamp `composer config version 0.N.x-dev` and its comments | `.github/workflows/package-integrity.yml` (search: "composer config version") | `0.6.x-dev` | Unchanged |
-| Compat harness `0.N.999` (3 sites) and the floor quoted in its README | `tests/Compat/symfony-6.4/composer.json`, `tests/Compat/symfony-6.4/README.md` | `0.6.999` | Unchanged |
+| Compat harness `0.N.999` (3 sites in each of the 2 manifests) and the floor quoted in its README | `tests/Compat/symfony-6.4/composer.json`, `tests/Compat/symfony-8.1/composer.json`, `tests/Compat/symfony-6.4/README.md` | `0.6.999` | Unchanged |
 
 Also update the `^0.N` wording in `.github/workflows/split-monorepo.yml` comments and error text.
 Changes under `.github/workflows/` are Confirm-tier in `CLAUDE.md`: get the user's approval first.
@@ -152,6 +152,8 @@ has no lock, passes. Move the lock aside first, then:
 ```bash
 COMPOSER_ALLOW_SUPERUSER=1 composer install --working-dir=tests/Compat/symfony-6.4 --prefer-dist -n
 tests/Compat/symfony-6.4/acceptance.sh     # expect "all checks passed against symfony/console 6.4.x"
+COMPOSER_ALLOW_SUPERUSER=1 composer install --working-dir=tests/Compat/symfony-8.1 --prefer-dist -n
+tests/Compat/symfony-8.1/acceptance.sh     # expect "all checks passed against symfony/console 8.1.x"
 ```
 
 ## Step 5: Handoff Block A (commit, push, PR)
@@ -163,6 +165,7 @@ why, no AI mentions, and no `-S` unless a signing key exists.
 ```bash
 git add CHANGELOG.md src/Bundle/FHIRBundle/composer.json src/Component/*/composer.json \
   tests/Compat/symfony-6.4/composer.json tests/Compat/symfony-6.4/README.md \
+  tests/Compat/symfony-8.1/composer.json \
   .github/workflows/package-integrity.yml .github/workflows/split-monorepo.yml \
 && git commit -m "chore(release): prepare X.Y.Z" -m "<why>" \
 && git push -u origin chore/release-X-Y-Z \
@@ -174,7 +177,7 @@ Then stop and wait for the user.
 ## Step 6: PR checks
 
 `gh pr checks <n>`. The bump-sensitive checks are all seven `Undeclared deps (<pkg>)` jobs,
-`package-integrity-passed` and `symfony-lower-bound`. A stale CI stamp fails every
+`package-integrity-passed`, `symfony-lower-bound` and `symfony-upper-bound`. A stale CI stamp fails every
 `Undeclared deps` job except `fhir-metadata`'s, which has no siblings; a single green job among
 red ones is the sign of that. Merging needs an approving review (`REVIEW_REQUIRED`).
 

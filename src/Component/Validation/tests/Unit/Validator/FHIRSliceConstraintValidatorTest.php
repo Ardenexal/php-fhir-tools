@@ -115,6 +115,8 @@ class SliceTestPatientOpenAtEnd
  */
 final class FHIRSliceConstraintValidatorTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -376,7 +378,7 @@ final class FHIRSliceConstraintValidatorTest extends ConstraintValidatorTestCase
         // Simulate a new $validator->validate() call by re-initializing with a fresh context.
         // With the WeakMap keyed on ExecutionContext, the dedup state does not carry over.
         $freshContext = $this->createContext();
-        $this->validator->initialize($freshContext);
+        $this->bindContext($this->validator, $freshContext);
         $this->validator->validate($obj, $constraint);
         self::assertGreaterThan(
             0,

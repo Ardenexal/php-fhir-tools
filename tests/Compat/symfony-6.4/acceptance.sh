@@ -19,7 +19,11 @@
 
 set -euo pipefail
 
-cd "$(dirname "$0")"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+
+# A sibling harness sets COMPAT_HARNESS_DIR to run these checks against its own install; see
+# tests/Compat/symfony-8.1/acceptance.sh.
+cd "${COMPAT_HARNESS_DIR:-$script_dir}"
 
 WITH_GENERATION=0
 if [[ "${1:-}" == "--with-generation" ]]; then
@@ -48,7 +52,7 @@ pass() {
 # Runs the harness and prints its output, without letting a non-zero exit abort the script:
 # several checks below assert on deliberate failure paths.
 run() {
-    php console.php "$@" 2>&1 || true
+    php "${script_dir}/console.php" "$@" 2>&1 || true
 }
 
 # Counts the generated files. find fails when generation never created the directory, and under
@@ -183,7 +187,7 @@ else
 fi
 
 set +e
-guidance="$(php console.php fhir:generate-ig 2>&1)"
+guidance="$(php "${script_dir}/console.php" fhir:generate-ig 2>&1)"
 guidance_status=$?
 set -e
 if [[ "$guidance_status" -ne 0 ]] && grep -q "No packages specified" <<<"$guidance"; then

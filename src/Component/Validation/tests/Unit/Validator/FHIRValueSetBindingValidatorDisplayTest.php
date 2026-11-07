@@ -38,6 +38,8 @@ enum DisplayBindingStatus: string
  */
 final class FHIRValueSetBindingValidatorDisplayTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     private const string VS = 'http://test.example/ValueSet/display-binding-status';
 
     private const string SYSTEM = 'http://test.example/CodeSystem/status';
@@ -163,7 +165,7 @@ final class FHIRValueSetBindingValidatorDisplayTest extends ConstraintValidatorT
             [__NAMESPACE__],
             $client,
         );
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
         $this->validator = $validator;
     }
 

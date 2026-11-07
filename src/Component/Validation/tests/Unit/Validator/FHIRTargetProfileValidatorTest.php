@@ -42,6 +42,8 @@ final class ProfileBTargetProfileFixture
  */
 final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     private const string PROFILE_A = 'http://example.org/fhir/StructureDefinition/profile-a';
 
     private const string PROFILE_B = 'http://example.org/fhir/StructureDefinition/profile-b';
@@ -97,7 +99,7 @@ final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
         $ref = new \stdClass();
 
         $validator = new FHIRTargetProfileValidator(new NullFHIRReferenceResolver(), new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
         $validator->validate($ref, new FHIRTargetProfile([self::PROFILE_A]));
 
         $this->assertNoViolation();
@@ -115,7 +117,7 @@ final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
         $this->mockResolver->method('resolve')->willReturn($resolved);
 
         $validator = new FHIRTargetProfileValidator($this->mockResolver, new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
         $validator->validate($ref, new FHIRTargetProfile([self::PROFILE_A, self::PROFILE_B]));
 
         $this->assertNoViolation();
@@ -129,7 +131,7 @@ final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
         $this->mockResolver->method('resolve')->willReturn($resolved);
 
         $validator = new FHIRTargetProfileValidator($this->mockResolver, new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
         $validator->validate($ref, new FHIRTargetProfile([self::PROFILE_A, self::PROFILE_B]));
 
         $this->assertNoViolation();
@@ -147,7 +149,7 @@ final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
         $this->mockResolver->method('resolve')->willReturn($resolved);
 
         $validator = new FHIRTargetProfileValidator($this->mockResolver, new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
         $validator->validate($ref, new FHIRTargetProfile([self::PROFILE_A]));
 
         $this->buildViolation(FHIRTargetProfileValidator::DEFAULT_PROFILE_MISMATCH_MESSAGE)
@@ -172,7 +174,7 @@ final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
         $this->mockResolver->method('resolve')->willReturn($resolved);
 
         $validator = new FHIRTargetProfileValidator($this->mockResolver, new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
         $validator->validate($ref, new FHIRTargetProfile([self::PROFILE_A]));
 
         $this->buildViolation(FHIRTargetProfileValidator::DEFAULT_UNVERIFIABLE_MESSAGE)
@@ -193,7 +195,7 @@ final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
         $this->mockResolver->method('resolve')->willReturn($resolved);
 
         $validator = new FHIRTargetProfileValidator($this->mockResolver, new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
         $validator->validate([$ref], new FHIRTargetProfile([self::PROFILE_A]));
 
         $this->buildViolation(FHIRTargetProfileValidator::DEFAULT_PROFILE_MISMATCH_MESSAGE)

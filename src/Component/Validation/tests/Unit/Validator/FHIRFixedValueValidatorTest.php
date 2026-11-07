@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 final class FHIRFixedValueValidatorTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     protected function createValidator(): FHIRFixedValueValidator
     {
         return new FHIRFixedValueValidator(new FHIRValidationMessageRegistry());
@@ -109,7 +111,7 @@ final class FHIRFixedValueValidatorTest extends ConstraintValidatorTestCase
         $registry->setOverride('FHIRFixedValue', 'Custom fixed value message.');
 
         $validator = new FHIRFixedValueValidator($registry);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('wrong', new FHIRFixedValue('right'));
 

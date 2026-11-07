@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 final class FHIRPatternValueValidatorTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     protected function createValidator(): FHIRPatternValueValidator
     {
         return new FHIRPatternValueValidator(new FHIRValidationMessageRegistry());
@@ -139,7 +141,7 @@ final class FHIRPatternValueValidatorTest extends ConstraintValidatorTestCase
         $registry->setOverride('FHIRPatternValue', 'Custom pattern message.');
 
         $validator = new FHIRPatternValueValidator($registry);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate(['wrong' => 'x'], new FHIRPatternValue(['required_key' => 'y']));
 
