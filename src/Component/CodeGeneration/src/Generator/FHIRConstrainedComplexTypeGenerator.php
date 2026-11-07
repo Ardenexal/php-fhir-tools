@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRSliceDiscriminator;
+use Ardenexal\FHIRTools\Component\Metadata\Profile\StructureDefinitionCompiler;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
@@ -114,6 +115,13 @@ class FHIRConstrainedComplexTypeGenerator
      */
     private array $useMapCache = [];
 
+    private readonly CompiledProfileAttributeEmitter $attributes;
+
+    public function __construct(StructureDefinitionCompiler $compiler = new StructureDefinitionCompiler())
+    {
+        $this->attributes = new CompiledProfileAttributeEmitter($compiler);
+    }
+
     /**
      * Determine whether a StructureDefinition has any fixed[x] or pattern[x] constraints
      * on its top-level properties that would benefit from constructor baking.
@@ -220,6 +228,11 @@ class FHIRConstrainedComplexTypeGenerator
         foreach ($this->buildDiscriminatorAttributes($fixedConstraints) as $discriminatorArgs) {
             $class->addAttribute(FHIRSliceDiscriminator::class, $discriminatorArgs);
         }
+
+        // The profile's validation rules, as FHIRProfileGenerator emits them for core data-type
+        // profiles. Baking fixed values into the constructor sets them on new instances; these rules
+        // check them, and every other rule, on instances that arrive from elsewhere.
+        $this->attributes->emit($structureDefinition, $class, $namespace, $context, $errorCollector);
 
         if (empty($fixedConstraints)) {
             // No fixed values found — fall back to thin marker class (only PROFILE_URL constant)

@@ -104,15 +104,13 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         $processed[$dedupKey] = true;
         $keys[$ctx]           = $processed;
 
-        // Read the property value (must be an array for sliced properties)
-        $readPath = FHIRElementPath::toPropertyPath($property);
-
-        if (!$this->propertyAccessor->isReadable($value, $readPath)) {
-            return;
-        }
-
-        $items = $this->propertyAccessor->getValue($value, $readPath);
-        if (!is_array($items)) {
+        // One list of items per parent the sliced element hangs off. A path through a repeating
+        // element ("identifier.type.coding", from a data-type profile inlined under `identifier`)
+        // reaches one coding list per identifier, and slice cardinality holds for each of them, never
+        // for their union. A path with no repeating ancestor reaches exactly one list. No groups means
+        // an ancestor is absent, which is that ancestor's rule to report.
+        $groups = $this->reader->readGroups($value, FHIRElementPath::toPropertyPath($property));
+        if ($groups === []) {
             return;
         }
 
@@ -125,8 +123,15 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         // Read slicing rules for this property (if any)
         $slicingRules = $this->readSlicingRules($value, $property, $activeGroup);
 
-        // Match items → slices
-        $this->validateSlices($items, $sliceConstraints, $slicingRules, $property);
+        // Match items → slices, per parent. A finding names the parent's occurrence
+        // ("identifier[1].type.coding") only when the path crosses a repeating element; a path that
+        // does not keeps the property as declared, as it always has.
+        $repeats = count($groups) > 1 || str_contains($groups[0]['path'], '[');
+        foreach ($groups as $group) {
+            if (is_array($group['value'])) {
+                $this->validateSlices($group['value'], $sliceConstraints, $slicingRules, $repeats ? $group['path'] : $property);
+            }
+        }
     }
 
     /**

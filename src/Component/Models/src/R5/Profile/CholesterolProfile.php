@@ -140,6 +140,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationResource;
 #[FHIRProfileMustSupport(path: 'interpretation', groups: ['http://hl7.org/fhir/StructureDefinition/cholesterol'])]
 #[FHIRProfileMustSupport(path: 'note', groups: ['http://hl7.org/fhir/StructureDefinition/cholesterol'])]
 #[FHIRProfileMustSupport(path: 'referenceRange', groups: ['http://hl7.org/fhir/StructureDefinition/cholesterol'])]
+#[FHIRProfileConstraint(
+    path: 'referenceRange.high.comparator',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 0],
+    groups: ['http://hl7.org/fhir/StructureDefinition/cholesterol'],
+)]
 class CholesterolProfile extends ObservationResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

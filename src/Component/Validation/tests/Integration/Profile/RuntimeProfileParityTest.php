@@ -194,6 +194,67 @@ final class RuntimeProfileParityTest extends TestCase
     }
 
     /**
+     * Cholesterol types `referenceRange.high` as SimpleQuantity, so SimpleQuantity's rule (no
+     * comparator) is inlined at `referenceRange.high.comparator` in cholesterol's group, by the
+     * generator and at runtime alike. A second reference range breaks it, so the inlined rule must
+     * fire through the repeating element, the same way on both sides.
+     */
+    #[DataProvider('releases')]
+    public function testInlinedDataTypeProfileMatchesTheGeneratedClass(FhirVersion $version): void
+    {
+        $services = self::services($version);
+        $url      = 'http://hl7.org/fhir/StructureDefinition/cholesterol';
+        $models   = "Ardenexal\\FHIRTools\\Component\\Models\\{$version->value}";
+
+        $build = static function(object $observation) use ($models): object {
+            $ranges = [];
+            foreach ([null, '<'] as $comparator) {
+                /** @var class-string $rangeClass */
+                $rangeClass = "{$models}\\Resource\\Observation\\ObservationReferenceRange";
+                /** @var class-string $quantityClass */
+                $quantityClass = "{$models}\\DataType\\Quantity";
+                /** @var class-string $comparatorClass */
+                $comparatorClass = "{$models}\\DataType\\QuantityComparatorType";
+
+                $range       = new $rangeClass();
+                $range->high = new $quantityClass();
+                if ($comparator !== null) {
+                    $range->high->comparator = new $comparatorClass($comparator);
+                }
+                $ranges[] = $range;
+            }
+            $observation->referenceRange = $ranges;
+
+            return $observation;
+        };
+
+        /** @var class-string $generatedClass */
+        $generatedClass = "{$models}\\Profile\\CholesterolProfile";
+        /** @var class-string $baseClass */
+        $baseClass = "{$models}\\Resource\\ObservationResource";
+
+        $generated = self::findings($services['generated']->validate($build(new $generatedClass()), [$url]));
+        $runtime   = self::findings($services['runtime']->validate($build(new $baseClass()), [$url]));
+
+        self::assertNotSame(
+            [],
+            array_filter($generated, static fn (string $f): bool => str_contains($f, ' | referenceRange.high.comparator | ') && str_contains($f, " | {$url} | ")),
+            'the inlined SimpleQuantity rule reports in the cholesterol group',
+        );
+        self::assertSame($generated, $runtime);
+    }
+
+    /**
+     * @return iterable<string, array{FhirVersion}>
+     */
+    public static function releases(): iterable
+    {
+        foreach (FhirVersion::cases() as $version) {
+            yield $version->value => [$version];
+        }
+    }
+
+    /**
      * @return iterable<string, array{bool}>
      */
     public static function deriveFlags(): iterable

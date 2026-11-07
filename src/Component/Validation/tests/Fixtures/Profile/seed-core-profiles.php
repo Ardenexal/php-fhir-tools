@@ -105,9 +105,13 @@ foreach ($files === false ? [] : $files as $file) {
 }
 
 // Each profile and its ancestors, trimmed; the definition a chain ends at, reduced to its identity.
+// Data-type profiles a written profile names in an element's type.profile join the queue, since
+// compiling the profile inlines their rules.
 $written = [];
 $missing = [];
-foreach (array_unique($urls) as $url) {
+$queue   = array_values(array_unique($urls));
+while ($queue !== []) {
+    $url     = array_shift($queue);
     $current = $loader->find($release, $url);
     if ($current === null) {
         $missing[] = $url;
@@ -131,6 +135,21 @@ foreach (array_unique($urls) as $url) {
             $definition = array_intersect_key($current, array_flip(BASE_FIELDS));
         }
         $written[$currentUrl] = $definition;
+
+        foreach ($isConstraint ? ($current['differential']['element'] ?? []) : [] as $element) {
+            foreach (is_array($element) ? ($element['type'] ?? []) : [] as $type) {
+                if (!is_array($type) || ($type['code'] ?? 'Extension') === 'Extension') {
+                    continue;
+                }
+                foreach (is_array($type['profile'] ?? null) ? $type['profile'] : [] as $profile) {
+                    $referenced = is_string($profile) ? explode('|', $profile)[0] : '';
+                    $found      = $referenced === '' || isset($written[$referenced]) ? null : $loader->find($release, $referenced);
+                    if ($found !== null && ($found['kind'] ?? null) === 'complex-type') {
+                        $queue[] = $referenced;
+                    }
+                }
+            }
+        }
 
         $parent = $current['baseDefinition'] ?? null;
         if (!$isConstraint || !is_string($parent) || $parent === '') {

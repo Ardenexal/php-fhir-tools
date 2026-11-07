@@ -52,10 +52,15 @@ final class FHIRChoiceVariantReader
      * property as it stands, which is what every other rule inspects: `All` needs the array itself, and
      * a fixed-value rule needs the object, not a list wrapping it.
      *
-     * @return list<array{value: mixed, occurrences: list<mixed>}> One entry per parent the final segment
-     *                                                             hangs off; empty when no parent exists,
-     *                                                             which means an ancestor is absent rather
-     *                                                             than the element occurring zero times
+     * `path` is the element's concrete property path under that parent, with the index of each
+     * repeating ancestor ("identifier[1].type.coding"), so a finding can name the occurrence it is
+     * about.
+     *
+     * @return list<array{value: mixed, occurrences: list<mixed>, path: string}> One entry per parent the final
+     *                                                                           segment hangs off; empty when no
+     *                                                                           parent exists, which means an
+     *                                                                           ancestor is absent rather than the
+     *                                                                           element occurring zero times
      */
     public function readGroups(object|array $subject, string $path): array
     {
@@ -66,18 +71,19 @@ final class FHIRChoiceVariantReader
         $segments = explode('.', FHIRElementPath::toPropertyPath($path));
         $leaf     = array_pop($segments);
 
-        $parents = [$subject];
+        /** @var list<array{0: mixed, 1: string}> $parents node and its concrete path */
+        $parents = [[$subject, '']];
 
         foreach ($segments as $segment) {
             $next = [];
 
-            foreach ($parents as $node) {
+            foreach ($parents as [$node, $nodePath]) {
                 if (!is_object($node) && !is_array($node)) {
                     continue;
                 }
 
-                foreach ($this->readSegment($node, $segment) as $value) {
-                    $next[] = $value;
+                foreach ($this->readSegmentWithPaths($node, $segment, $nodePath) as $entry) {
+                    $next[] = $entry;
                 }
             }
 
@@ -86,7 +92,7 @@ final class FHIRChoiceVariantReader
 
         $groups = [];
 
-        foreach ($parents as $parent) {
+        foreach ($parents as [$parent, $parentPath]) {
             if (!is_object($parent) && !is_array($parent)) {
                 continue;
             }
@@ -94,10 +100,53 @@ final class FHIRChoiceVariantReader
             $groups[] = [
                 'value'       => $this->readLeafValue($parent, (string) $leaf),
                 'occurrences' => $this->readSegment($parent, (string) $leaf, preserveNulls: true),
+                'path'        => self::join($parentPath, (string) $leaf),
             ];
         }
 
         return $groups;
+    }
+
+    /**
+     * The values at one segment, as readSegment() finds them, each with its concrete path: an entry
+     * of a repeating element carries its index, "identifier[1]".
+     *
+     * @param object|array<string, mixed> $node     Node reached so far
+     * @param string                      $segment  One dot-separated step of the element path
+     * @param string                      $nodePath Concrete path of $node, '' for the subject
+     *
+     * @return list<array{0: mixed, 1: string}>
+     */
+    private function readSegmentWithPaths(object|array $node, string $segment, string $nodePath): array
+    {
+        $path = self::join($nodePath, $segment);
+
+        try {
+            $value = $this->propertyAccessor->getValue($node, $segment);
+        } catch (\Throwable) {
+            return is_object($node)
+                ? array_map(static fn (mixed $variant): array => [$variant, $path], $this->readChoiceVariant($node, $segment))
+                : [];
+        }
+
+        if (!is_array($value)) {
+            return $value === null ? [] : [[$value, $path]];
+        }
+
+        $found = [];
+        // The array's own keys, as every other finding path uses them
+        foreach ($value as $index => $entry) {
+            if ($entry !== null) {
+                $found[] = [$entry, "{$path}[{$index}]"];
+            }
+        }
+
+        return $found;
+    }
+
+    private static function join(string $base, string $segment): string
+    {
+        return $base === '' ? $segment : "{$base}.{$segment}";
     }
 
     /**

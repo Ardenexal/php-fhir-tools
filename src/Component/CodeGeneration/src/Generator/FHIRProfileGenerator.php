@@ -6,7 +6,6 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\StructureDefinitionCompiler;
@@ -49,9 +48,11 @@ use function Symfony\Component\String\u;
  */
 class FHIRProfileGenerator
 {
-    public function __construct(
-        private readonly StructureDefinitionCompiler $compiler = new StructureDefinitionCompiler(),
-    ) {
+    private readonly CompiledProfileAttributeEmitter $attributes;
+
+    public function __construct(StructureDefinitionCompiler $compiler = new StructureDefinitionCompiler())
+    {
+        $this->attributes = new CompiledProfileAttributeEmitter($compiler);
     }
 
     /**
@@ -107,42 +108,10 @@ class FHIRProfileGenerator
             ->setType('string')
             ->addComment('Canonical URL of this profile\'s StructureDefinition.');
 
-        $this->emitCompiledAttributes($structureDefinition, $class, $namespace, $errorCollector);
+        // Validation rules, from the compiler that runtime validation uses too
+        $this->attributes->emit($structureDefinition, $class, $namespace, $context, $errorCollector);
 
         return $class;
-    }
-
-    /**
-     * Adds the profile's validation attributes to the class, as compiled by the shared
-     * StructureDefinitionCompiler, and forwards its diagnostics as warnings.
-     *
-     * Runtime validation compiles StructureDefinitions with the same compiler, so a generated
-     * profile class and a profile loaded at runtime enforce the same rules.
-     *
-     * @param array<string, mixed> $structureDefinition
-     */
-    private function emitCompiledAttributes(
-        array $structureDefinition,
-        ClassType $class,
-        PhpNamespace $namespace,
-        ?ErrorCollector $errorCollector,
-    ): void {
-        $compiled = $this->compiler->compile($structureDefinition);
-
-        foreach ($compiled->diagnostics as $diagnostic) {
-            $errorCollector?->addWarning($diagnostic->message, $diagnostic->elementId, $diagnostic->context);
-        }
-
-        foreach ($compiled->attributes as $attribute) {
-            $namespace->addUse($attribute->class);
-
-            // A profile constraint names its inner rule by class string; import it alongside
-            if ($attribute->class === FHIRProfileConstraint::class && is_string($attribute->arguments['constraint'] ?? null)) {
-                $namespace->addUse($attribute->arguments['constraint']);
-            }
-
-            $class->addAttribute($attribute->class, $attribute->arguments);
-        }
     }
 
     /**

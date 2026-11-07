@@ -32,9 +32,10 @@ final class RuntimeProfileResolver
     private const array SUPPORTED_KINDS = ['resource', 'complex-type'];
 
     /**
-     * Compiled profiles by "release|url|version", each with the definition it was compiled from.
+     * Compiled profiles by "release|url|version", each with the definition it was compiled from and
+     * every data-type profile lookup the compile made, with what it found.
      *
-     * @var array<string, array{definition: array<string, mixed>, profile: CompiledProfile}>
+     * @var array<string, array{definition: array<string, mixed>, lookups: array<string, array<string, mixed>|null>, profile: CompiledProfile}>
      */
     private array $compiled = [];
 
@@ -191,18 +192,43 @@ final class RuntimeProfileResolver
     {
         $key = $release . '|' . (string) ($structureDefinition['url'] ?? '') . '|' . self::businessVersion($structureDefinition);
 
-        // A registry may replace a definition under the same URL and version, so the cached
-        // copy is reused only while the definition is unchanged. Registries hand back the
-        // array they hold, which PHP compares by reference before comparing contents.
+        // A registry may replace a definition under the same URL and version, so the cached copy is
+        // reused only while the definition, and every data-type profile it inlined or failed to
+        // find, is unchanged. Registries hand back the array they hold, which PHP compares by
+        // reference before comparing contents.
         $cached = $this->compiled[$key] ?? null;
-        if ($cached !== null && $cached['definition'] === $structureDefinition) {
+        if ($cached !== null && $cached['definition'] === $structureDefinition && $this->lookupsUnchanged($release, $cached['lookups'])) {
             return $cached['profile'];
         }
 
-        $profile              = $this->compiler->compile($structureDefinition);
-        $this->compiled[$key] = ['definition' => $structureDefinition, 'profile' => $profile];
+        // Data-type profiles named on elements come from the same registry, at the version
+        // find() returns for a URL without one
+        $lookups = [];
+        $profile = $this->compiler->compile(
+            $structureDefinition,
+            function(string $url) use ($release, &$lookups): ?array {
+                return $lookups[$url] = $this->registry->find($release, $url);
+            },
+        );
+        $this->compiled[$key] = ['definition' => $structureDefinition, 'lookups' => $lookups, 'profile' => $profile];
 
         return $profile;
+    }
+
+    /**
+     * Whether the registry still answers each recorded lookup with the same definition.
+     *
+     * @param array<string, array<string, mixed>|null> $lookups
+     */
+    private function lookupsUnchanged(string $release, array $lookups): bool
+    {
+        foreach ($lookups as $url => $found) {
+            if ($this->registry->find($release, $url) !== $found) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function notFound(string $url, string $release, string $canonical, ?string $version): RuntimeProfileResolution
