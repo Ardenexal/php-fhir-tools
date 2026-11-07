@@ -77,6 +77,8 @@ must-support, obligations).
 | `#[FHIRPathInvariant]` | `FHIRPathInvariantValidator` | FHIRPath constraint expressions | [Invariants](invariants.md) |
 | `#[FHIRValueSetBinding]` | `FHIRValueSetBindingValidator` | Terminology bindings | [Terminology](terminology.md) |
 | `#[FHIRProfileConstraint]` | `FHIRProfileConstraintValidator` | Profile cardinality/value rules | [Structural](structural.md) |
+| `#[FHIRProfileInvariant]` | `FHIRProfileInvariantValidator` | A profile's FHIRPath invariants | [Invariants](invariants.md) |
+| `#[FHIRProfileBinding]` | `FHIRProfileBindingValidator` | A profile's required and extensible bindings | [Terminology](terminology.md) |
 | `#[FHIRFixedValue]` | `FHIRFixedValueValidator` | `fixed[x]` element constraints | [Structural](structural.md) |
 | `#[FHIRPatternValue]` | `FHIRPatternValueValidator` | `pattern[x]` element constraints | [Structural](structural.md) |
 | `#[FHIRSliceConstraint]` | `FHIRSliceConstraintValidator` | Slice cardinality | [Structural](structural.md) |
@@ -128,7 +130,7 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Fixed / pattern values | Supported | `FHIRFixedValueValidator` / `FHIRPatternValueValidator` |
 | Slicing (closed/open/openAtEnd) | Supported | `FHIRSliceConstraintValidator` |
 | Profile constraints (generated) | Supported | `FHIRProfileConstraintValidator`; requires pre-generated models |
-| Profile constraints (dynamic/runtime) | Not supported | Dynamic StructureDefinition loading not yet supported |
+| Profile constraints (dynamic/runtime) | Supported | `RuntimeProfileResolver`; StructureDefinitions must carry a snapshot |
 | Extension contexts (element/fhirpath/extension) | Supported | Recursive walk; defer-not-deny safety; see [Extensions](extensions.md) |
 | Modifier extensions (unknown URL) | Supported | Recursive walk; requires a `FHIRIGTypeRegistry` |
 | Extensible / preferred bindings | Conditional | Needs a real terminology client; otherwise `fhir:unchecked-binding` INFO |

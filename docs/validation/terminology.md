@@ -69,6 +69,24 @@ if ($report->hasUncheckedBindings()) {
 }
 ```
 
+## Profile bindings
+
+A profile's own `required` and `extensible` bindings are emitted as `#[FHIRProfileBinding]` on the
+profile class, with the element `path` they apply to and the profile URL as their group. A binding
+the base type already declares with the same strength and value set is left out, because the base
+model checks it. `FHIRProfileBindingValidator` checks each occurrence the way
+`#[FHIRValueSetBinding]` would, with the same enums and terminology client, and reports at the
+element's path. Two things differ:
+
+* Only an enum generated from that exact value set, in the element's own release, is used. A profile
+  names a value set by URL, so an enum whose class name merely matches the URL is not trusted, and an
+  R5 element is not checked against the R4 enum of a value set whose codes changed between releases.
+* A required binding that neither an enum nor a terminology client can check is reported as
+  `fhir:unchecked-binding` INFO, not as a missing enum.
+
+Bindings on an element inside a slice are not enforced yet. Generation reports each one as a
+warning, and runtime compilation as a `CompilerDiagnostic`.
+
 ## Message overrides
 
 Invalid-code and missing-enum messages use the `FHIRValueSetBinding` registry key; the

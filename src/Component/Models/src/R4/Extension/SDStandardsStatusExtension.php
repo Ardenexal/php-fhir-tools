@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 
@@ -30,6 +31,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.allowedType')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.targetProfile')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide.definition.page')]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/standards-status', strength: 'required')]
 class SDStandardsStatusExtension extends Extension
 {
     /**

@@ -10,24 +10,31 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Profile;
  * Its `contexts` are the placement rules: the definition's contexts, then its context invariants.
  * A generated extension class carries the same facts in two forms: its contexts and context
  * invariants as class attributes, and its value type and sub-extensions in its constructor and
- * `fromSubExtensions()`. Runtime validation of a plain `Extension` reads them from here instead,
- * so both forms come from one translation.
+ * `fromSubExtensions()`. Its differential invariants and bindings are class attributes too.
+ * Runtime validation of a plain `Extension` reads all of them from here instead, so both forms
+ * come from one translation.
  *
  * @author Ardenexal
  */
 final readonly class CompiledExtension
 {
     /**
-     * @param string                  $url           Canonical URL of the extension
-     * @param list<CompiledAttribute> $contexts      FHIRExtensionContext then FHIRContextInvariant attributes, in generator order
-     * @param list<string>            $valueTypes    Type codes `Extension.value[x]` allows; empty when the value is prohibited
-     * @param list<ExtensionSlice>    $subExtensions The `Extension.extension` slices, in snapshot order
+     * @param string                   $url           Canonical URL of the extension
+     * @param list<CompiledAttribute>  $contexts      FHIRExtensionContext then FHIRContextInvariant attributes, in generator order
+     * @param list<string>             $valueTypes    Type codes `Extension.value[x]` allows; empty when the value is prohibited
+     * @param list<ExtensionSlice>     $subExtensions The `Extension.extension` slices, in snapshot order
+     * @param list<CompiledAttribute>  $constraints   FHIRProfileInvariant then FHIRProfileBinding attributes from the
+     *                                                differential, in the default validation group
+     * @param list<CompilerDiagnostic> $diagnostics   Invariants and bindings that are not enforced, such as those
+     *                                                on a sub-extension
      */
     public function __construct(
         public string $url,
         public array $contexts,
         public array $valueTypes,
         public array $subExtensions,
+        public array $constraints = [],
+        public array $diagnostics = [],
     ) {
     }
 

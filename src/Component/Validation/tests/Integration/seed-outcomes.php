@@ -88,6 +88,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileBindingValidator;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileInvariantValidator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
@@ -512,6 +516,8 @@ function createValidationService(FhirVersion $version = FhirVersion::R4): FHIRVa
         {
             return match (true) {
                 $constraint instanceof FHIRProfileConstraint  => new FHIRProfileConstraintValidator($this->accessor),
+                $constraint instanceof FHIRProfileInvariant   => new FHIRProfileInvariantValidator($this->pathSvc, $this->registry, $this->accessor),
+                $constraint instanceof FHIRProfileBinding     => new FHIRProfileBindingValidator($this->accessor),
                 $constraint instanceof FHIRPathInvariant      => new FHIRPathInvariantValidator($this->pathSvc, $this->registry),
                 $constraint instanceof FHIRValueSetBinding    => new FHIRValueSetBindingValidator(
                     $this->registry,

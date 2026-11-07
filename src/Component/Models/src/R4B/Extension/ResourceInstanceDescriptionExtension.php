@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 
@@ -19,6 +20,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-instance-description', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'rid-1',
+    severity: 'error',
+    expression: '%resource.description.exists().not() or ((%resource.description is string).not() and (%resource.description is markdown).not())',
+    human: 'Cannot be used where description already exists or description is of type string or markdown.',
+)]
 class ResourceInstanceDescriptionExtension extends Extension
 {
     /**

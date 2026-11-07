@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -23,6 +24,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-alertDetection', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceMetric')]
 #[FHIRExtensionContext(type: 'element', expression: 'Device')]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'alrtdet-1',
+    severity: 'error',
+    expression: 'extension(\'alertCode\').exists().not() implies (%resource is Device)',
+    human: 'Subextension `alertCode` may only be omitted on the Device resource.',
+)]
 class DeviceAlertDetectionExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -59,6 +60,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'TestPlan')]
 #[FHIRExtensionContext(type: 'element', expression: 'TestScript')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://terminology.hl7.org/ValueSet/artifact-version-policy', strength: 'extensible')]
 class ArtifactVersionPolicyExtension extends Extension
 {
     /**

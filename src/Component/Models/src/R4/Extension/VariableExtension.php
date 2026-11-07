@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
@@ -30,6 +31,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Measure')]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure.group')]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure.group.population')]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'var-1',
+    severity: 'error',
+    expression: 'value.name.exists()',
+    human: 'Variable expressions must have a name',
+)]
 class VariableExtension extends Extension
 {
     /**

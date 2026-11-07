@@ -52,3 +52,20 @@ expression. If your engine covers all invariant expressions in your StructureDef
 {% endhint %}
 
 See [Validation Reports & Violation Codes](reports.md) for how `fhir:eval-error` maps to severity.
+
+## Profile invariants
+
+A profile's own invariants are emitted as `#[FHIRProfileInvariant]` on the profile class, with the
+element `path` they apply to and the profile URL as their group. A profile cannot add attributes to
+the properties it inherits, so the class carries them. `FHIRProfileInvariantValidator` evaluates the
+expression once per occurrence of the element and reports a failure at that occurrence, such as
+`component[1]`. An empty `path` means the profiled resource or data type itself. `%resource` is the
+resource around the element, as for base invariants.
+
+Extension definitions work the same way: their invariants and bindings are attributes on the
+generated extension class, with no group, and they apply wherever the extension is used. A plain
+`Extension` whose definition was loaded at runtime is held to the same rules.
+
+Invariants on an element inside a slice are not enforced yet, and neither are those on an extension
+definition's sub-extensions. Generation reports each one as a warning, and runtime compilation as a
+`CompilerDiagnostic`.

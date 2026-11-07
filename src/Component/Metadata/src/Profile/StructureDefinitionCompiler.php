@@ -8,7 +8,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvar
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
@@ -64,6 +66,8 @@ final class StructureDefinitionCompiler
             ...self::differentialMustSupport($structureDefinition, $profileUrl),
             ...self::differentialSliceConstraints($structureDefinition, $profileUrl, $diagnostics),
             ...self::snapshotObligations($structureDefinition, $profileUrl),
+            ...self::differentialInvariants($structureDefinition, [$profileUrl], $lookup, $diagnostics),
+            ...self::differentialBindings($structureDefinition, [$profileUrl], $lookup, $diagnostics),
         ];
 
         if ($lookup !== null) {
@@ -142,7 +146,15 @@ final class StructureDefinitionCompiler
             }
         }
 
-        return new CompiledExtension((string) ($structureDefinition['url'] ?? ''), $contexts, $valueTypes ?? [], $subExtensions);
+        // Invariants and bindings apply wherever the extension is used, so they carry no group. Those on
+        // a sub-extension sit inside a slice and come back as diagnostics
+        $diagnostics = [];
+        $constraints = [
+            ...self::differentialInvariants($structureDefinition, null, null, $diagnostics),
+            ...self::differentialBindings($structureDefinition, null, null, $diagnostics),
+        ];
+
+        return new CompiledExtension((string) ($structureDefinition['url'] ?? ''), $contexts, $valueTypes ?? [], $subExtensions, $constraints, $diagnostics);
     }
 
     /**
@@ -291,6 +303,8 @@ final class StructureDefinitionCompiler
                 $chain[] = [
                     ...self::differentialConstraints($current, $groupUrl),
                     ...self::differentialSliceConstraints($current, $groupUrl, $diagnostics),
+                    ...self::differentialInvariants($current, [$groupUrl], $lookup, $diagnostics),
+                    ...self::differentialBindings($current, [$groupUrl], $lookup, $diagnostics),
                     ...self::inlinedDataTypeProfiles($current, $groupUrl, $lookup, $seen, $depth + 1, $diagnostics, $at),
                 ];
 
@@ -429,7 +443,8 @@ final class StructureDefinitionCompiler
         $arguments = $attribute->arguments;
         $key       = array_key_exists('path', $arguments) ? 'path' : 'property';
         if (is_string($arguments[$key] ?? null)) {
-            $arguments[$key] = $prefix . '.' . $arguments[$key];
+            // An invariant on the data type itself has no path of its own
+            $arguments[$key] = $arguments[$key] === '' ? $prefix : $prefix . '.' . $arguments[$key];
         }
 
         return new CompiledAttribute($attribute->class, $arguments);
@@ -492,6 +507,201 @@ final class StructureDefinitionCompiler
         }
 
         return $attributes;
+    }
+
+    /**
+     * One FHIRProfileInvariant per invariant a differential element declares.
+     *
+     * An invariant on the root element applies to the profiled type itself and gets an empty path.
+     * Skipped invariants:
+     *  - Those with no FHIRPath expression (XPath only)
+     *  - Those another definition declares (`source` names it), as the base model generator skips
+     *    them: that definition's own class or group enforces them
+     *  - Those the base type already declares on the same element, found through $lookup, which
+     *    a differential may restate
+     *  - Those on an element inside a slice, which are reported as diagnostics
+     *
+     * @param array<string, mixed>                                 $structureDefinition
+     * @param list<string>|null                                    $groups              Validation groups; null for the default group
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup              Finds the base type's definition
+     * @param list<CompilerDiagnostic>                             $diagnostics
+     *
+     * @return list<CompiledAttribute>
+     */
+    private static function differentialInvariants(array $structureDefinition, ?array $groups, ?\Closure $lookup, array &$diagnostics): array
+    {
+        $url        = self::canonicalWithoutVersion((string) ($structureDefinition['url'] ?? ''));
+        $attributes = [];
+
+        foreach (self::differentialElements($structureDefinition) as $id => $element) {
+            $constraints = is_array($element['constraint'] ?? null) ? $element['constraint'] : [];
+            if ($constraints === [] || ElementDefinitionReader::hasContentReference($element)) {
+                continue;
+            }
+
+            $path         = (string) ($element['path'] ?? '');
+            $propertyPath = str_contains($path, '.') ? self::differentialPropertyPath($element) : '';
+            $inherited    = null;
+
+            foreach ($constraints as $constraint) {
+                if (!is_array($constraint) || !is_string($constraint['expression'] ?? null) || $constraint['expression'] === '') {
+                    continue;
+                }
+
+                $key    = (string) ($constraint['key'] ?? '');
+                $source = is_string($constraint['source'] ?? null) ? self::canonicalWithoutVersion($constraint['source']) : null;
+                if ($source !== null && $source !== $url) {
+                    continue;
+                }
+
+                $inherited ??= self::baseElementRules($structureDefinition, $path, $lookup)['keys'];
+                if (in_array($key, $inherited, true)) {
+                    continue;
+                }
+
+                if ($propertyPath === null) {
+                    $diagnostics[] = new CompilerDiagnostic(
+                        "Profile {$url}: invariant {$key} on {$id} is inside a slice; it is not enforced",
+                        $id,
+                        ['profileUrl' => $url, 'invariant' => $key],
+                    );
+                    continue;
+                }
+
+                $arguments = [
+                    'path'       => $propertyPath,
+                    'key'        => $key,
+                    'severity'   => (string) ($constraint['severity'] ?? 'error'),
+                    'expression' => $constraint['expression'],
+                    'human'      => (string) ($constraint['human'] ?? ''),
+                ];
+                if (self::isBestPractice($constraint)) {
+                    $arguments['bestPractice'] = true;
+                }
+                if ($groups !== null) {
+                    $arguments['groups'] = $groups;
+                }
+
+                $attributes[] = new CompiledAttribute(FHIRProfileInvariant::class, $arguments);
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * One FHIRProfileBinding per required or extensible binding a differential element declares.
+     *
+     * Skipped bindings:
+     *  - `preferred` and `example` ones, which are guidance
+     *  - One the base type already declares on the same element with the same strength and value
+     *    set, found through $lookup: the base model's own binding checks it
+     *  - Those on an element inside a slice, which are reported as diagnostics
+     *
+     * @param array<string, mixed>                                 $structureDefinition
+     * @param list<string>|null                                    $groups              Validation groups; null for the default group
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup              Finds the base type's definition
+     * @param list<CompilerDiagnostic>                             $diagnostics
+     *
+     * @return list<CompiledAttribute>
+     */
+    private static function differentialBindings(array $structureDefinition, ?array $groups, ?\Closure $lookup, array &$diagnostics): array
+    {
+        $url        = self::canonicalWithoutVersion((string) ($structureDefinition['url'] ?? ''));
+        $attributes = [];
+
+        foreach (self::differentialElements($structureDefinition) as $id => $element) {
+            $binding  = is_array($element['binding'] ?? null) ? $element['binding'] : [];
+            $strength = $binding['strength'] ?? null;
+            $valueSet = $binding['valueSet'] ?? null;
+            if (!in_array($strength, ['required', 'extensible'], true) || !is_string($valueSet) || $valueSet === '') {
+                continue;
+            }
+
+            $path = (string) ($element['path'] ?? '');
+            if (!str_contains($path, '.') || ElementDefinitionReader::hasContentReference($element)) {
+                continue;
+            }
+
+            $base = self::baseElementRules($structureDefinition, $path, $lookup)['binding'];
+            if ($base === [$strength, self::canonicalWithoutVersion($valueSet)]) {
+                continue;
+            }
+
+            $propertyPath = self::differentialPropertyPath($element);
+            if ($propertyPath === null) {
+                $diagnostics[] = new CompilerDiagnostic(
+                    "Profile {$url}: the {$strength} binding to {$valueSet} on {$id} is inside a slice; it is not enforced",
+                    $id,
+                    ['profileUrl' => $url, 'valueSet' => $valueSet],
+                );
+                continue;
+            }
+
+            $arguments = ['path' => $propertyPath, 'valueSetUrl' => $valueSet, 'strength' => $strength];
+            if ($groups !== null) {
+                $arguments['groups'] = $groups;
+            }
+
+            $attributes[] = new CompiledAttribute(FHIRProfileBinding::class, $arguments);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * What the base type declares on the element at $path: its invariant keys, and its binding as
+     * [strength, value set without version]. Empty when $lookup is null or does not find the type.
+     *
+     * @param array<string, mixed>                                 $structureDefinition
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup
+     *
+     * @return array{keys: list<string>, binding: array{0: mixed, 1: string}|null}
+     */
+    private static function baseElementRules(array $structureDefinition, string $path, ?\Closure $lookup): array
+    {
+        $type = $structureDefinition['type'] ?? null;
+        $base = $lookup !== null && is_string($type) ? $lookup(self::CORE_BASE . $type) : null;
+
+        $elements = is_array($base) && is_array($base['snapshot']['element'] ?? null) ? $base['snapshot']['element'] : [];
+        foreach ($elements as $element) {
+            if (!is_array($element) || ($element['path'] ?? null) !== $path || isset($element['sliceName'])) {
+                continue;
+            }
+
+            $keys = [];
+            foreach (is_array($element['constraint'] ?? null) ? $element['constraint'] : [] as $constraint) {
+                if (is_array($constraint) && is_string($constraint['key'] ?? null)) {
+                    $keys[] = $constraint['key'];
+                }
+            }
+
+            $binding = is_array($element['binding'] ?? null) ? $element['binding'] : [];
+            $bound   = is_string($binding['valueSet'] ?? null) ? [$binding['strength'] ?? null, self::canonicalWithoutVersion($binding['valueSet'])] : null;
+
+            return ['keys' => $keys, 'binding' => $bound];
+        }
+
+        return ['keys' => [], 'binding' => null];
+    }
+
+    /**
+     * Whether a constraint carries `elementdefinition-bestpractice` set to true.
+     *
+     * @param array<mixed> $constraint
+     */
+    private static function isBestPractice(array $constraint): bool
+    {
+        foreach (is_array($constraint['extension'] ?? null) ? $constraint['extension'] : [] as $extension) {
+            if (is_array($extension)
+                && is_string($extension['url'] ?? null)
+                && str_ends_with($extension['url'], '/elementdefinition-bestpractice')
+                && ($extension['valueBoolean'] ?? false) === true) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

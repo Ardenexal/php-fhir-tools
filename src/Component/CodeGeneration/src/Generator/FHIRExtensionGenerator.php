@@ -121,10 +121,16 @@ class FHIRExtensionGenerator
             'fhirVersion' => $version,
         ]);
 
-        // Contexts and context invariants come from the shared compiler, so a plain Extension
-        // validated against this definition at runtime is placed by the same rules
-        foreach ($this->compiler->compileExtension($structureDefinition)->contexts as $attribute) {
+        // Contexts, context invariants, and the differential's invariants and bindings come from the
+        // shared compiler, so a plain Extension validated against this definition at runtime is held
+        // to the same rules
+        $compiled = $this->compiler->compileExtension($structureDefinition);
+        foreach ([...$compiled->contexts, ...$compiled->constraints] as $attribute) {
             $class->addAttribute($attribute->class, $attribute->arguments);
+        }
+
+        foreach ($compiled->diagnostics as $diagnostic) {
+            $errorCollector?->addWarning($diagnostic->message, $diagnostic->elementId, $diagnostic->context);
         }
 
         if (isset($structureDefinition['publisher'])) {

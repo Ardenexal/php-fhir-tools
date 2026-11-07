@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BundleTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
@@ -14,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Profile\ObservationvitalsignsProfile
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Bundle\BundleEntry;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationResource;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationReport;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
@@ -242,6 +244,65 @@ final class RuntimeProfileParityTest extends TestCase
             'the inlined SimpleQuantity rule reports in the cholesterol group',
         );
         self::assertSame($generated, $runtime);
+    }
+
+    /**
+     * A vital signs document that breaks vs-1 (a month-precise date) and vs-3 (a component with
+     * neither value nor data absent reason), and carries codes for the profile's bindings to check.
+     * The generated class and the runtime definition must report the same invariant and binding
+     * findings: the same keys, paths, severities and codes.
+     */
+    #[DataProvider('releases')]
+    public function testInvariantsAndBindingsMatchTheGeneratedClass(FhirVersion $version): void
+    {
+        $services = self::services($version);
+        $url      = 'http://hl7.org/fhir/StructureDefinition/vitalsigns';
+        $models   = "Ardenexal\\FHIRTools\\Component\\Models\\{$version->value}";
+        $json     = (string) json_encode([
+            'resourceType'      => 'Observation',
+            'status'            => 'final',
+            'code'              => ['coding' => [['system' => 'http://loinc.org', 'code' => '85354-9']]],
+            'effectiveDateTime' => '2024-01',
+            'component'         => [
+                ['code' => ['coding' => [['system' => 'http://loinc.org', 'code' => '8480-6']]]],
+                ['code' => ['text' => 'diastolic'], 'valueQuantity' => ['value' => 1, 'system' => 'http://unitsofmeasure.org', 'code' => 'furlong']],
+            ],
+        ]);
+
+        /** @var class-string $baseClass */
+        $baseClass = "{$models}\\Resource\\ObservationResource";
+        $runtime   = FHIRSerializationService::createDefault($version)->deserializeFromJson($json, $baseClass);
+
+        // A profile class cannot be deserialized into, so it takes the base instance's elements
+        $generatedClass = self::profileClassOf($version, $url);
+        $generated      = new $generatedClass();
+        foreach (get_object_vars($runtime) as $property => $value) {
+            $generated->{$property} = $value;
+        }
+
+        $expected = self::findings($services['generated']->validate($generated, [$url]));
+
+        $keys = array_map(static fn (string $f): string => substr($f, (int) strrpos($f, ' | ') + 3), $expected);
+        self::assertContains('vs-1', $keys);
+        self::assertContains('vs-3', $keys);
+        self::assertNotSame([], array_filter($expected, static fn (string $f): bool => str_contains($f, ' | ' . FHIRProfileBinding::class . ' | ')));
+        self::assertSame($expected, self::findings($services['runtime']->validate($runtime, [$url])));
+    }
+
+    /**
+     * The generated profile class of a release that declares $url.
+     *
+     * @return class-string
+     */
+    private static function profileClassOf(FhirVersion $version, string $url): string
+    {
+        foreach (self::profileClasses() as [$release, $class]) {
+            if ($release === $version && self::profileUrl($class) === $url) {
+                return $class;
+            }
+        }
+
+        self::fail("No {$version->value} profile class declares {$url}");
     }
 
     /**
