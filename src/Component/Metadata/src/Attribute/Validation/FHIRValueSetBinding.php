@@ -25,6 +25,10 @@ use Symfony\Component\Validator\Constraint;
  * value set by URL alone, so only an enum stamped with that URL is trusted, never one guessed from
  * the URL's last segment, and a required binding that nothing can check is reported as unchecked
  * instead of as a missing enum.
+ *
+ * `$release` ('R4', 'R4B', 'R5') limits the enum lookup to the namespace roots of that release. A
+ * value set keeps its URL across releases while its codes change: FHIR-version gains `5.0.0` in R5,
+ * so an R5 element checked against the R4 enum would reject a valid code. Null searches every root.
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 final class FHIRValueSetBinding extends Constraint
@@ -38,6 +42,7 @@ final class FHIRValueSetBinding extends Constraint
         ?array $groups = null,
         mixed $payload = null,
         public readonly bool $fromProfile = false,
+        public readonly ?string $release = null,
     ) {
         parent::__construct(null, $groups, $payload);
     }

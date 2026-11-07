@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Validation\FHIRChoiceVariantReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
@@ -21,6 +25,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  * same generated enums and terminology client as every other binding. Its findings are reported
  * again here, at the element's path, so they are attributed to the profile.
  *
+ * The check looks enums up in the release of the class it runs on. A value set keeps its URL across
+ * releases while its codes change, so an R5 element must not be checked against the R4 enum.
+ *
  * @author Ardenexal
  */
 final class FHIRProfileBindingValidator extends ConstraintValidator
@@ -30,6 +37,7 @@ final class FHIRProfileBindingValidator extends ConstraintValidator
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
         ?FHIRChoiceVariantReader $reader = null,
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
     ) {
         $this->reader = $reader ?? new FHIRChoiceVariantReader($propertyAccessor);
     }
@@ -48,7 +56,7 @@ final class FHIRProfileBindingValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'object');
         }
 
-        $binding = new FHIRValueSetBinding($constraint->valueSetUrl, $constraint->strength, fromProfile: true);
+        $binding = new FHIRValueSetBinding($constraint->valueSetUrl, $constraint->strength, fromProfile: true, release: $this->releaseOf($value));
 
         // One group per parent the element hangs off; an absent ancestor yields none
         foreach ($this->reader->readGroups($value, $constraint->path) as $group) {
@@ -71,5 +79,21 @@ final class FHIRProfileBindingValidator extends ConstraintValidator
                     ->addViolation();
             }
         }
+    }
+
+    /**
+     * The FHIR release ('R4', 'R4B', 'R5') of a generated resource or data type, or null when the
+     * class does not say, in which case every configured release is searched.
+     */
+    private function releaseOf(object $value): ?string
+    {
+        $resource = $this->attributes->classAttributesInHierarchy($value, FhirResource::class);
+        if ($resource !== []) {
+            return $resource[0]->fhirVersion;
+        }
+
+        $type = $this->attributes->classAttributesInHierarchy($value, FHIRComplexType::class);
+
+        return $type !== [] ? $type[0]->fhirVersion : null;
     }
 }

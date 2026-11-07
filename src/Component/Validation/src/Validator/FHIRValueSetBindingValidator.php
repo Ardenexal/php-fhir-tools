@@ -352,9 +352,14 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
      *
      * @return class-string<\BackedEnum>|null
      */
-    private function resolveEnumFqcn(string $className): ?string
+    private function resolveEnumFqcn(string $className, ?string $release = null): ?string
     {
         foreach ($this->enumNamespaceRoots as $root) {
+            // A root belongs to a release when the release is one of its namespace segments
+            if ($release !== null && !in_array($release, explode('\\', $root), true)) {
+                continue;
+            }
+
             $fqcn = $root . '\\' . $className;
 
             // Folds the existence, enum and backing checks into one question: a candidate name built
@@ -388,7 +393,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
             }
         }
 
-        $guessed = $this->resolveEnumFqcn($this->classNameFromUrl($constraint->valueSetUrl));
+        $guessed = $this->resolveEnumFqcn($this->classNameFromUrl($constraint->valueSetUrl), $constraint->release);
 
         // A profile binding trusts only an enum generated from that very value set
         if ($constraint->fromProfile && $guessed !== null && !$this->enumDeclaresValueSet($guessed, $constraint->valueSetUrl)) {
