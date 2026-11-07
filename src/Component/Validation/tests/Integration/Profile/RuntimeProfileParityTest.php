@@ -79,6 +79,9 @@ final class RuntimeProfileParityTest extends TestCase
         'ProfileForHLAGenotypingResultsProfile'         => 'extension rules only',
         'ServiceRequestGeneticsProfile'                 => 'extension rules only',
         'CQFquestionnaireProfile'                       => 'an optional extension slice only (R4B)',
+        // They mark elements must-support and state no rules (R4).
+        'EHRSFMrecordLifecycleEventAuditEventProfile'  => 'must-support markers only',
+        'EHRSFMrecordLifecycleEventProvenanceProfile'  => 'must-support markers only',
     ];
 
     /** @var array<string, array{generated: FHIRValidationService, runtime: FHIRValidationService, resolver: RuntimeProfileResolver}> */

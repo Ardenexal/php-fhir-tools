@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Observation","url":"http://hl7.org/fhir/StructureDefinition/Observation","version":"4.0.1","name":"Observation","status":"active","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Observation","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

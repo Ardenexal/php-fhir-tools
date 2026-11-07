@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"ServiceRequest","url":"http://hl7.org/fhir/StructureDefinition/ServiceRequest","version":"4.0.1","name":"ServiceRequest","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"ServiceRequest","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

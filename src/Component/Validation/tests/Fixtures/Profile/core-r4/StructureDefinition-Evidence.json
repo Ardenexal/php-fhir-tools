@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Evidence","url":"http://hl7.org/fhir/StructureDefinition/Evidence","version":"4.0.1","name":"Evidence","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Evidence","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}
