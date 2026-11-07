@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Metadata\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
@@ -72,6 +74,94 @@ final class StructureDefinitionCompiler
         }
 
         return new CompiledProfile($profileUrl, $attributes, $diagnostics);
+    }
+
+    /**
+     * Compile an extension's StructureDefinition: where it may appear, and what value or sub-extensions it holds.
+     *
+     * Contexts and context invariants become the attributes a generated extension class carries,
+     * in the order the generator writes them. The value types and sub-extension slices are read
+     * from the snapshot the way the generator reads them to build the class's constructor.
+     *
+     * @param array<string, mixed> $structureDefinition An extension definition: type Extension, derivation constraint
+     */
+    public function compileExtension(array $structureDefinition): CompiledExtension
+    {
+        $contexts = [];
+        foreach (is_array($structureDefinition['context'] ?? null) ? $structureDefinition['context'] : [] as $context) {
+            if (!is_array($context) || !isset($context['type'], $context['expression'])) {
+                continue;
+            }
+            $contexts[] = new CompiledAttribute(FHIRExtensionContext::class, [
+                'type'       => (string) $context['type'],
+                'expression' => (string) $context['expression'],
+            ]);
+        }
+
+        foreach (is_array($structureDefinition['contextInvariant'] ?? null) ? $structureDefinition['contextInvariant'] : [] as $invariant) {
+            if (!is_string($invariant) || $invariant === '') {
+                continue;
+            }
+            $contexts[] = new CompiledAttribute(FHIRContextInvariant::class, ['expression' => $invariant]);
+        }
+
+        $elements = is_array($structureDefinition['snapshot']['element'] ?? null) ? $structureDefinition['snapshot']['element'] : [];
+        $byId     = [];
+        foreach ($elements as $element) {
+            if (is_array($element) && is_string($element['id'] ?? null)) {
+                $byId[$element['id']] = $element;
+            }
+        }
+
+        // Read the way FHIRExtensionGenerator reads them: the first value[x] that may occur, with a
+        // type entry without a code taken as string, and every Extension.extension with a slice name
+        $valueTypes    = null;
+        $subExtensions = [];
+        foreach ($elements as $element) {
+            if (!is_array($element)) {
+                continue;
+            }
+            $path = $element['path'] ?? null;
+
+            if ($valueTypes === null && $path === 'Extension.value[x]' && (string) ($element['max'] ?? '1') !== '0') {
+                $valueTypes = [];
+                foreach (is_array($element['type'] ?? null) ? $element['type'] : [] as $type) {
+                    $valueTypes[] = is_array($type) && is_string($type['code'] ?? null) ? $type['code'] : 'string';
+                }
+            }
+
+            if ($path === 'Extension.extension' && isset($element['sliceName']) && is_scalar($element['sliceName'])) {
+                $sliceName       = (string) $element['sliceName'];
+                $sliceId         = is_string($element['id'] ?? null) ? $element['id'] : "Extension.extension:{$sliceName}";
+                $subExtensions[] = new ExtensionSlice(
+                    $sliceName,
+                    (int) ($element['min'] ?? 0),
+                    isset($element['max']) && is_scalar($element['max']) ? (string) $element['max'] : null,
+                    self::typeCodes($byId[$sliceId . '.value[x]'] ?? [])[0] ?? null,
+                );
+            }
+        }
+
+        return new CompiledExtension((string) ($structureDefinition['url'] ?? ''), $contexts, $valueTypes ?? [], $subExtensions);
+    }
+
+    /**
+     * The type codes an element allows, in order.
+     *
+     * @param array<string, mixed> $element
+     *
+     * @return list<string>
+     */
+    private static function typeCodes(array $element): array
+    {
+        $codes = [];
+        foreach (is_array($element['type'] ?? null) ? $element['type'] : [] as $type) {
+            if (is_array($type) && is_string($type['code'] ?? null) && $type['code'] !== '') {
+                $codes[] = $type['code'];
+            }
+        }
+
+        return $codes;
     }
 
     /**

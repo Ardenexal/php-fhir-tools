@@ -15,11 +15,15 @@ declare(strict_types=1);
  * or data type a chain ends at keeps its identity fields only; resolution stops there and never
  * compiles it.
  *
+ * The extension parity test does the same for a few extensions: each one in PARITY_EXTENSIONS is
+ * copied from the extensions package the generated extension classes were built from.
+ *
  * Usage:
- *   php src/Component/Validation/tests/Fixtures/Profile/seed-core-profiles.php <R4|R4B|R5> <package-dir>
+ *   php src/Component/Validation/tests/Fixtures/Profile/seed-core-profiles.php <R4|R4B|R5> <package-dir> <extensions-package-dir>
  *
  * <package-dir> is an extracted core package (hl7.fhir.r4.core 4.0.1, hl7.fhir.r4b.core 4.3.0 or
  * hl7.fhir.r5.core 5.0.0): the directory holding package.json, or the tarball root holding package/.
+ * <extensions-package-dir> is the matching hl7.fhir.uv.extensions package (5.3.0 for every release).
  * Run it again after regenerating models, so a new profile class gets its definitions.
  */
 
@@ -34,6 +38,16 @@ const KEPT_FIELDS = [
     'context', 'contextInvariant', 'type', 'baseDefinition', 'derivation', 'extension', 'snapshot', 'differential',
 ];
 
+/** Extensions the extension parity test checks; each has a generated class in every release. */
+const PARITY_EXTENSIONS = [
+    'http://hl7.org/fhir/StructureDefinition/patient-animal',
+    'http://hl7.org/fhir/StructureDefinition/geolocation',
+    'http://hl7.org/fhir/StructureDefinition/patient-birthPlace',
+    'http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName',
+    'http://hl7.org/fhir/StructureDefinition/data-absent-reason',
+    'http://hl7.org/fhir/StructureDefinition/allergyintolerance-substanceExposureRisk',
+];
+
 /** Top-level fields kept on the base definition a chain ends at. */
 const BASE_FIELDS = ['resourceType', 'id', 'url', 'version', 'name', 'status', 'fhirVersion', 'kind', 'abstract', 'type', 'baseDefinition', 'derivation'];
 
@@ -43,12 +57,12 @@ const DROPPED_ELEMENT_FIELDS = [
     'isModifierReason', 'label', 'orderMeaning', 'code', 'base', 'isSummary', 'condition',
 ];
 
-[$script, $release, $packageDir] = $argv + [null, null, null];
-$repositoryRoot                  = dirname(__DIR__, 6);
+[$script, $release, $packageDir, $extensionsDir] = $argv + [null, null, null, null];
+$repositoryRoot                                  = dirname(__DIR__, 6);
 
 $releases = ['R4' => '4.0.1', 'R4B' => '4.3.0', 'R5' => '5.0.0'];
-if (!is_string($release) || !isset($releases[$release]) || !is_string($packageDir)) {
-    fwrite(STDERR, "Usage: php {$script} <R4|R4B|R5> <package-dir>\n");
+if (!is_string($release) || !isset($releases[$release]) || !is_string($packageDir) || !is_string($extensionsDir)) {
+    fwrite(STDERR, "Usage: php {$script} <R4|R4B|R5> <package-dir> <extensions-package-dir>\n");
     exit(2);
 }
 
@@ -158,6 +172,23 @@ while ($queue !== []) {
         $pipe    = strpos($parent, '|');
         $current = $loader->find($release, $pipe === false ? $parent : substr($parent, 0, $pipe));
     }
+}
+
+// The parity extensions, from the extensions package; their own snapshot is all validation reads
+$extensions = new PackageDirectoryStructureDefinitionLoader($extensionsDir, $release);
+foreach (PARITY_EXTENSIONS as $url) {
+    $extension = $extensions->find($release, $url);
+    if ($extension === null) {
+        $missing[] = $url;
+        continue;
+    }
+    $definition = array_intersect_key($extension, array_flip(KEPT_FIELDS));
+    foreach (['snapshot', 'differential'] as $view) {
+        if (is_array($definition[$view] ?? null)) {
+            $definition[$view] = ['element' => $trimElements($definition[$view]['element'] ?? [], $view === 'snapshot' ? $url : null)];
+        }
+    }
+    $written[$url] = $definition;
 }
 
 ksort($written);

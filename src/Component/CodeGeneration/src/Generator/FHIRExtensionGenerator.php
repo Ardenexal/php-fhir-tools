@@ -7,9 +7,8 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Profile\StructureDefinitionCompiler;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Method;
@@ -89,6 +88,11 @@ class FHIRExtensionGenerator
         'positiveInt', 'uuid', 'xhtml', 'decimal',
     ];
 
+    public function __construct(
+        private readonly StructureDefinitionCompiler $compiler = new StructureDefinitionCompiler(),
+    ) {
+    }
+
     /**
      * Generate a typed extension class from a FHIR extension StructureDefinition.
      *
@@ -117,23 +121,10 @@ class FHIRExtensionGenerator
             'fhirVersion' => $version,
         ]);
 
-        foreach ($structureDefinition['context'] ?? [] as $ctx) {
-            if (!is_array($ctx) || !isset($ctx['type'], $ctx['expression'])) {
-                continue;
-            }
-            $class->addAttribute(FHIRExtensionContext::class, [
-                'type'       => (string) $ctx['type'],
-                'expression' => (string) $ctx['expression'],
-            ]);
-        }
-
-        foreach ($structureDefinition['contextInvariant'] ?? [] as $invariant) {
-            if (!is_string($invariant) || $invariant === '') {
-                continue;
-            }
-            $class->addAttribute(FHIRContextInvariant::class, [
-                'expression' => $invariant,
-            ]);
+        // Contexts and context invariants come from the shared compiler, so a plain Extension
+        // validated against this definition at runtime is placed by the same rules
+        foreach ($this->compiler->compileExtension($structureDefinition)->contexts as $attribute) {
+            $class->addAttribute($attribute->class, $attribute->arguments);
         }
 
         if (isset($structureDefinition['publisher'])) {

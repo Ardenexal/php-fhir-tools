@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledExtension;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\StructureDefinitionCompiler;
 
@@ -50,6 +51,13 @@ final class RuntimeProfileResolver
      * @var array<string, array<string, array<string, CompiledProfile>>>
      */
     private array $resolvedByRootType = [];
+
+    /**
+     * Compiled extension definitions by "release|url", each with the definition it was compiled from.
+     *
+     * @var array<string, array{definition: array<string, mixed>, extension: CompiledExtension}>
+     */
+    private array $extensions = [];
 
     public function __construct(
         private readonly StructureDefinitionRegistryInterface $registry,
@@ -143,6 +151,46 @@ final class RuntimeProfileResolver
         }
 
         return RuntimeProfileResolution::resolved($url, $release, array_reverse($chain), $rootType, $kind);
+    }
+
+    /**
+     * The compiled definition of an extension, for a plain `Extension` whose url names one.
+     *
+     * Only a definition of type Extension, with derivation constraint and a snapshot, is used.
+     * Anything else answers null, and the extension is then treated as one
+     * nothing is known about, exactly as before runtime definitions existed.
+     *
+     * @param string $url         The extension's url, optionally with a `|version` suffix
+     * @param string $fhirVersion 'R4', 'R4B' or 'R5'
+     */
+    public function resolveExtension(string $url, string $fhirVersion): ?CompiledExtension
+    {
+        $release = FhirReleaseLabel::normalize($fhirVersion);
+        if ($release === null) {
+            return null;
+        }
+
+        [$canonical, $version] = self::splitCanonical($url);
+        $definition            = $this->registry->find($release, $canonical, $version);
+        if ($definition === null
+            || ($definition['type'] ?? null)       !== 'Extension'
+            || ($definition['derivation'] ?? null) !== 'constraint'
+            || !self::hasSnapshot($definition)
+        ) {
+            return null;
+        }
+
+        // Reused while the registry hands back the same definition, as compiled profiles are
+        $key    = $release . '|' . $url;
+        $cached = $this->extensions[$key] ?? null;
+        if ($cached !== null && $cached['definition'] === $definition) {
+            return $cached['extension'];
+        }
+
+        $extension              = $this->compiler->compileExtension($definition);
+        $this->extensions[$key] = ['definition' => $definition, 'extension' => $extension];
+
+        return $extension;
     }
 
     /**
