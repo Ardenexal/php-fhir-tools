@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolati
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRUnreadableDocumentException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationOptions;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationViolation;
 
@@ -305,7 +306,13 @@ final class ComparisonHarness
                 ? ($this->validationWithoutExtensionResolution ?? $this->validation)
                 : $this->validation;
 
-            $report = $service->validate($resource, deriveProfilesFromClass: true);
+            // profilesFromMeta covers the rest of meta.profile: a URL the resource's class does not declare is
+            // checked against the StructureDefinition the runtime resolver finds for it, and one it
+            // cannot find is reported unchecked, as the reference validator reports it.
+            $report = $service->validateWithOptions($resource, new FHIRValidationOptions(
+                deriveProfilesFromClass: true,
+                profilesFromMeta: true,
+            ));
         } catch (\Throwable) {
             $skips[$name] = SkipReason::ValidateCrashed;
 

@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"DiagnosticReport","url":"http://hl7.org/fhir/StructureDefinition/DiagnosticReport","version":"5.0.0","name":"DiagnosticReport","status":"draft","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"DiagnosticReport","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

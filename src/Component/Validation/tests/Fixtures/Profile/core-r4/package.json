@@ -1,0 +1,8 @@
+{
+    "name": "php-fhir-tools.parity.r4",
+    "version": "0.0.0",
+    "description": "Trimmed core StructureDefinitions for the runtime profile parity test. Written by seed-core-profiles.php; do not edit.",
+    "fhirVersions": [
+        "4.0.1"
+    ]
+}

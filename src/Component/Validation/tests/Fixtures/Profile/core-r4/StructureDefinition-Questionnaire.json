@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Questionnaire","url":"http://hl7.org/fhir/StructureDefinition/Questionnaire","version":"4.0.1","name":"Questionnaire","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Questionnaire","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

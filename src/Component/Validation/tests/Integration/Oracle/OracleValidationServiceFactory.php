@@ -18,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FhirPropertyTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPathInvariantValidator;
@@ -43,14 +46,26 @@ use Symfony\Component\Validator\Validation;
  */
 final class OracleValidationServiceFactory
 {
-    public static function create(FhirVersion $version, bool $resolveExtensions = true): FHIRValidationService
-    {
-        $collaborators  = self::collaborators($resolveExtensions);
+    /**
+     * @param RuntimeProfileResolver|null $runtimeProfiles Resolves profiles the resource's class does not declare from
+     *                                                     StructureDefinitions at runtime; null uses the one
+     *                                                     collaborators() builds over the release's core package
+     */
+    public static function create(
+        FhirVersion $version,
+        bool $resolveExtensions = true,
+        ?RuntimeProfileResolver $runtimeProfiles = null,
+    ): FHIRValidationService {
+        $collaborators   = self::collaborators($resolveExtensions, $version);
+        $runtimeProfiles ??= $collaborators->runtimeProfiles;
         $accessor       = PropertyAccess::createPropertyAccessor();
         $registry       = new FHIRValidationMessageRegistry();
         $pathService    = new FHIRPathService();
         $matcher        = new SliceDiscriminatorMatcher($accessor);
         $defaultFactory = new ConstraintValidatorFactory();
+        // The slice validator finds sibling slices by reading attributes off the validated class. A
+        // base resource checked against a runtime profile has none, so this reader adds them.
+        $sliceReader    = new RuntimeProfileAttributeReader($runtimeProfiles);
         $enumNamespace  = "Ardenexal\\FHIRTools\\Component\\Models\\{$version->value}\\Enum";
 
         $factory = new class (
@@ -61,6 +76,7 @@ final class OracleValidationServiceFactory
             $collaborators,
             $defaultFactory,
             $enumNamespace,
+            $sliceReader,
         ) implements ConstraintValidatorFactoryInterface {
             public function __construct(
                 private readonly PropertyAccessorInterface $accessor,
@@ -70,6 +86,7 @@ final class OracleValidationServiceFactory
                 private readonly OracleHarnessCollaborators $collaborators,
                 private readonly ConstraintValidatorFactory $default,
                 private readonly string $enumNamespace,
+                private readonly FHIRAttributeReaderInterface $sliceReader,
             ) {
             }
 
@@ -86,7 +103,7 @@ final class OracleValidationServiceFactory
                     $constraint instanceof FHIRValueSetBinding   => new FHIRValueSetBindingValidator($this->registry, [$this->enumNamespace], $this->collaborators->terminologyClient),
                     $constraint instanceof FHIRFixedValue        => new FHIRFixedValueValidator($this->registry),
                     $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->registry),
-                    $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, $this->matcher),
+                    $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, $this->matcher, $this->sliceReader),
                     $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->collaborators->referenceResolver, $this->registry),
                     default                                      => $this->default->getInstance($constraint),
                 };
@@ -107,6 +124,7 @@ final class OracleValidationServiceFactory
             $pathService,
             registry: $collaborators->igTypeRegistry,
             typeResolver: new FhirPropertyTypeHierarchyResolver(),
+            runtimeProfiles: $runtimeProfiles,
         );
     }
 
@@ -117,19 +135,21 @@ final class OracleValidationServiceFactory
      * OracleHarnessCollaborators::DECLARED_ABSENT against what is actually built. create() reads
      * every optional collaborator from here, so the guard cannot pass while the wiring differs.
      *
-     * @param bool $resolveExtensions false drops the IG type registry, which switches
-     *                                FHIRValidationService's extension pass off wholesale — a
-     *                                deliberate variant compare-java-outcomes.php uses to show what
-     *                                that pass contributes, not a configuration to measure against
+     * @param bool        $resolveExtensions false drops the IG type registry, which switches
+     *                                       FHIRValidationService's extension pass off wholesale — a
+     *                                       deliberate variant compare-java-outcomes.php uses to show what
+     *                                       that pass contributes, not a configuration to measure against
+     * @param FhirVersion $version           selects the core package the runtime profile resolver reads
      *
      * @return OracleHarnessCollaborators the slots as create() will fill them
      */
-    public static function collaborators(bool $resolveExtensions = true): OracleHarnessCollaborators
+    public static function collaborators(bool $resolveExtensions = true, FhirVersion $version = FhirVersion::R4): OracleHarnessCollaborators
     {
         return new OracleHarnessCollaborators(
             referenceResolver: new NullFHIRReferenceResolver(),
             terminologyClient: null,
             igTypeRegistry: $resolveExtensions ? FHIRIGTypeRegistryFactory::create() : null,
+            runtimeProfiles: new RuntimeProfileResolver(CoreStructureDefinitionPackages::registry($version)),
         );
     }
 }

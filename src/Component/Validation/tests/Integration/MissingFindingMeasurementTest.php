@@ -158,13 +158,37 @@ final class MissingFindingMeasurementTest extends TestCase
     #[DataProvider('versions')]
     public function testWarningDivergenceIsPinned(FhirVersion $version): void
     {
-        $expected = ['R4' => 97, 'R4B' => 1, 'R5' => 45];
+        // R4 fell from 97 when meta.profile activation arrived (#170): a profile the reference
+        // validator reports as unknown, we now report unchecked in the same words.
+        $expected = ['R4' => 92, 'R4B' => 1, 'R5' => 45];
 
         self::assertSame(
             $expected[$version->value] ?? null,
             count($this->report($version)->warningMismatches()),
             'warning parity moved; ADR-004 and the terminology wiring decide this, so read why',
         );
+    }
+
+    /**
+     * The runtime profile pass runs on the corpus, so its findings and its silence both mean something.
+     *
+     * `observation-triglyceride-bad-wrongcode` claims the core triglyceride profile, but the document
+     * is XML and deserializes into a base Observation, so the generated TriglycerideProfile never
+     * runs. Its one error, a code that does not match the profile's pattern, can only
+     * come from the StructureDefinition resolved at runtime. If the harness stops wiring the resolver,
+     * or stops asking for `meta.profile`, the case goes quiet and this fails rather than the profile
+     * family reading as a gap.
+     *
+     * The finding does not pair with the reference one yet: ours says "does not match the required
+     * pattern", theirs "The pattern [...] not found", and no pairing rule covers that wording.
+     */
+    public function testTheRuntimeProfilePassRunsOnTheCorpus(): void
+    {
+        $case = $this->case(FhirVersion::R5, 'observation-triglyceride-bad-wrongcode');
+
+        self::assertSame(1, $case->javaErrorCount, 'corpus drifted: expected one reference error');
+        self::assertSame(1, $case->ourErrorCount, 'the runtime profile pass did not run');
+        self::assertContains('constraint:FHIRProfileConstraint', $case->families);
     }
 
     private function case(FhirVersion $version, string $name): CaseComparison

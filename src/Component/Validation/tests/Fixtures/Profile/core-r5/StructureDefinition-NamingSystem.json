@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"NamingSystem","url":"http://hl7.org/fhir/StructureDefinition/NamingSystem","version":"5.0.0","name":"NamingSystem","status":"draft","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"NamingSystem","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

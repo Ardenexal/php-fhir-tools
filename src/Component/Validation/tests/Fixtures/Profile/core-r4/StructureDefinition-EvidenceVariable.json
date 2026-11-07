@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"EvidenceVariable","url":"http://hl7.org/fhir/StructureDefinition/EvidenceVariable","version":"4.0.1","name":"EvidenceVariable","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"EvidenceVariable","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

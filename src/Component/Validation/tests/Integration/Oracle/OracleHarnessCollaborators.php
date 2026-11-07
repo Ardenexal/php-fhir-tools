@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 
 /**
  * The optional collaborators the comparison harness wires, and the ones it leaves absent on purpose.
@@ -69,11 +70,18 @@ final readonly class OracleHarnessCollaborators
      * @param FHIRReferenceResolverInterface      $referenceResolver reaches FHIRTargetProfileValidator
      * @param FHIRTerminologyClientInterface|null $terminologyClient reaches FHIRValueSetBindingValidator
      * @param FHIRIGTypeRegistry|null             $igTypeRegistry    gates FHIRValidationService's extension pass
+     * @param RuntimeProfileResolver|null         $runtimeProfiles   gates the runtime profile pass, which checks
+     *                                                               `meta.profile` URLs the resource's class does not
+     *                                                               declare. It reads the R5 core package from vendor;
+     *                                                               R4 and R4B get an empty registry, so there it only
+     *                                                               reports profiles as unchecked and every R4/R4B
+     *                                                               runtime-profile finding still reads as a gap
      */
     public function __construct(
         public FHIRReferenceResolverInterface $referenceResolver,
         public ?FHIRTerminologyClientInterface $terminologyClient,
         public ?FHIRIGTypeRegistry $igTypeRegistry,
+        public ?RuntimeProfileResolver $runtimeProfiles = null,
     ) {
     }
 
@@ -98,6 +106,10 @@ final readonly class OracleHarnessCollaborators
 
         if (self::isAbsent($this->igTypeRegistry)) {
             $absent[] = FHIRIGTypeRegistry::class;
+        }
+
+        if (self::isAbsent($this->runtimeProfiles)) {
+            $absent[] = RuntimeProfileResolver::class;
         }
 
         sort($absent);

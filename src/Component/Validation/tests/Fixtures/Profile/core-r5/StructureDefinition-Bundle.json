@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Bundle","url":"http://hl7.org/fhir/StructureDefinition/Bundle","version":"5.0.0","name":"Bundle","status":"active","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"Bundle","baseDefinition":"http://hl7.org/fhir/StructureDefinition/Resource","derivation":"specialization"}
