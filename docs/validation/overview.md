@@ -18,6 +18,7 @@ and produces a structured [validation report](reports.md).
 * [Reference & Target Profile Validation](references.md) — what a `Reference` may point to.
 * [Quantity & Temporal Range Validation](ranges.md) — `minValue` / `maxValue` bounds.
 * [Extensions, Modifiers & Obligations](extensions.md) — context, modifier, must-support, and obligation checks.
+* [Runtime Profiles](runtime-profiles.md) — validate against StructureDefinitions you load, without generating classes.
 * [Questionnaire Validation](questionnaire.md) — a separate validator for questionnaires and responses.
 * [The $validate Operation](operation-outcome.md) — producing an `OperationOutcome`.
 * [Configuration](configuration.md) — wiring terminology clients, resolvers, and obligation contexts.
@@ -130,7 +131,7 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Fixed / pattern values | Supported | `FHIRFixedValueValidator` / `FHIRPatternValueValidator` |
 | Slicing (closed/open/openAtEnd) | Supported | `FHIRSliceConstraintValidator` |
 | Profile constraints (generated) | Supported | `FHIRProfileConstraintValidator`; requires pre-generated models |
-| Profile constraints (dynamic/runtime) | Supported | `RuntimeProfileResolver`; StructureDefinitions must carry a snapshot |
+| Profile constraints (dynamic/runtime) | Supported | `RuntimeProfileResolver`; StructureDefinitions must carry a snapshot; see [Runtime Profiles](runtime-profiles.md) |
 | Extension contexts (element/fhirpath/extension) | Supported | Recursive walk; defer-not-deny safety; see [Extensions](extensions.md) |
 | Modifier extensions (unknown URL) | Supported | Recursive walk; requires a `FHIRIGTypeRegistry` |
 | Extensible / preferred bindings | Conditional | Needs a real terminology client; otherwise `fhir:unchecked-binding` INFO |

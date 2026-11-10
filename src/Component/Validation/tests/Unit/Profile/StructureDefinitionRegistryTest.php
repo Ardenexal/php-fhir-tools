@@ -80,6 +80,35 @@ final class StructureDefinitionRegistryTest extends TestCase
         new InMemoryStructureDefinitionRegistry([['url' => self::BP]]);
     }
 
+    public function testInMemoryRegistryReadsStructureDefinitionFiles(): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents($dir . '/bp.json', (string) json_encode(['resourceType' => 'StructureDefinition', 'url' => self::BP, 'fhirVersion' => '4.0.1', 'id' => 'from-file']));
+
+        $registry = InMemoryStructureDefinitionRegistry::fromFiles([$dir . '/bp.json']);
+
+        self::assertSame('from-file', $registry->find('R4', self::BP)['id'] ?? null);
+    }
+
+    public function testInMemoryRegistryRejectsAFileThatIsNotAStructureDefinition(): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents($dir . '/patient.json', '{"resourceType":"Patient"}');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('does not hold a StructureDefinition');
+
+        InMemoryStructureDefinitionRegistry::fromFiles([$dir . '/patient.json']);
+    }
+
+    public function testInMemoryRegistryRejectsAMissingFile(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('cannot be read');
+
+        InMemoryStructureDefinitionRegistry::fromFiles(['/nonexistent/sd.json']);
+    }
+
     public function testPackageLoaderReadsIndexFileAndPackageRelease(): void
     {
         $loader = new PackageDirectoryStructureDefinitionLoader(self::PACKAGE);

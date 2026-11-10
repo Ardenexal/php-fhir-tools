@@ -41,6 +41,7 @@
 * [Reference & Target Profile Validation](validation/references.md)
 * [Quantity & Temporal Range Validation](validation/ranges.md)
 * [Extensions, Modifiers & Obligations](validation/extensions.md)
+* [Runtime Profiles](validation/runtime-profiles.md)
 * [Questionnaire Validation](validation/questionnaire.md)
 * [The $validate Operation](validation/operation-outcome.md)
 * [Configuration](validation/configuration.md)
