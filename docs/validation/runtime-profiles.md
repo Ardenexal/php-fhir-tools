@@ -36,6 +36,9 @@ not exist fails when the validation service is first built, not at container com
 package's definitions are read the first time one is looked up. With both lists empty, which is the
 default, nothing changes.
 
+When several sources hold the same URL and version, the files win, then the packages in the order
+listed. That lets a local file replace a published definition.
+
 List the core package of your FHIR release (`hl7.fhir.r4.core`, `hl7.fhir.r4b.core` or
 `hl7.fhir.r5.core`) too, and every package a profile depends on. A profile is resolved through its
 parents up to the core resource definition, and data-type profiles and extension definitions it names
@@ -86,8 +89,22 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRValidationOptions;
 $report = $service->validateWithOptions($bundle, new FHIRValidationOptions(profilesFromMeta: true));
 ```
 
-A profile URL that the resource's class already declares is checked from the class. Any other URL
-is resolved at runtime.
+A profile URL that the resource's class already declares is checked from the class, nested typed
+instances included. Any other URL is resolved at runtime; without a resolver, a `meta.profile` URL
+no class declares is reported as not checked, and a URL passed to `validate()` is ignored.
+
+`validateWithOptions()` is on `FHIRValidationService`, not on `FHIRValidationServiceInterface`, so
+inject the concrete class to use it.
+
+To check that a profile and its parents resolve before validating anything, for example at
+startup:
+
+```php
+$resolution = $resolver->resolve('http://hl7.org.au/fhir/StructureDefinition/au-bodyweight', 'R4');
+if (!$resolution->isResolved()) {
+    throw new \RuntimeException($resolution->message); // names the missing parent or unreadable file
+}
+```
 
 ## What is checked
 
@@ -115,11 +132,21 @@ A profile that cannot be used is reported as a warning, and validation goes on w
 * `Profile reference '…' has not been checked because it is unknown` when no registry holds it.
 * `Profile reference '…' has not been checked: …` naming the reason otherwise: the definition is
   for another FHIR release, has no snapshot, has a parent that cannot be found, is not a resource,
-  data type or extension definition (a logical model, for example), or has parents that refer to
-  each other.
+  data type or extension definition (a logical model, for example), has parents that refer to
+  each other, or needs a definition whose file cannot be read.
+
+`parameters['reason']` on the finding names the reason in a stable form, such as `unknown`,
+`unresolved-parent` or `unreadable`.
+
+A broken file in a package only affects the profiles that need it. When `.index.json` lists a file
+that is missing or not JSON, only that definition's URL fails. When the package has no
+`.index.json` and a StructureDefinition in it is not valid JSON, the scan cannot tell which URL it
+held, so every profile from that package is reported as not checked. An extension whose definition
+cannot be read is treated as one nothing is known about.
 
 A profile for another resource type than the one validated is an error, unless a resource nested
-inside it, such as a Bundle entry, is of that type and is checked against it instead.
+inside it, such as a Bundle entry, claims that profile in its `meta.profile` or class and is checked
+against it instead.
 
 ## Limits
 
@@ -127,9 +154,11 @@ inside it, such as a Bundle entry, is of that type and is checked against it ins
   packages carry snapshots; a profile you write yourself needs one generated, for example by the
   IG Publisher or SUSHI.
 * **Rules inside a slice are not enforced.** An invariant or binding on an element inside a slice,
-  including an extension's sub-extensions, is skipped without a finding. The reason is kept as a
-  `CompilerDiagnostic` on each entry of `RuntimeProfileResolver::resolve($url, 'R4')->chain`, and
-  `fhir:generate-ig` reports the same rules as warnings.
+  including an extension's sub-extensions, is skipped without a finding. Each skipped rule is kept
+  as a `CompilerDiagnostic`: in `diagnostics` on each entry of
+  `RuntimeProfileResolver::resolve($url, 'R4')->chain` for a profile, and in
+  `resolveExtension($url, 'R4')->diagnostics` for an extension. `fhir:generate-ig` reports the same
+  rules as warnings.
 * **No terminology server, no binding check.** A binding no generated enum covers needs a
   terminology client; without one it is reported as `fhir:unchecked-binding` INFO.
 * **Sub-extension cardinality, fixed and pattern values are not checked**, because the generated

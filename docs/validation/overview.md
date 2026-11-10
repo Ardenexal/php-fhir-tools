@@ -59,8 +59,14 @@ public function validate(
     array $profileUrls = [],
     bool $includeMustSupportInfo = false,
     ?FHIRObligationContext $obligationContext = null,
+    bool $deriveProfilesFromClass = false,
 ): FHIRValidationReport
 ```
+
+`validateWithOptions($resource, new FHIRValidationOptions(...))` takes the same settings plus
+`profilesFromMeta`, which checks each resource against the profiles in its own `meta.profile`. It
+is on `FHIRValidationService`, not on `FHIRValidationServiceInterface`. See
+[Runtime Profiles](runtime-profiles.md#validate).
 
 ## Architecture
 
@@ -110,6 +116,9 @@ FHIRValidationService::validate($resource, $profileUrls, $includeMustSupportInfo
   │       #[FHIRTargetProfile], #[FHIRQuantityRange], #[FHIRTemporalRange],
   │       and built-in Symfony constraints (#[NotBlank], #[Count], etc.)
   │
+  ├─ runtime profile pass        (profile URLs no generated class declares, resolved by a
+  │                               RuntimeProfileResolver; and meta.profile with profilesFromMeta)
+  │
   ├─ collectMustSupportInfo()    (only when $includeMustSupportInfo = true)
   ├─ validateExtensionContexts() (always; recursive walk across the full resource tree)
   ├─ validateModifierExtensions() (only when a FHIRIGTypeRegistry is provided)
@@ -152,8 +161,9 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
   `FHIRTerminologyClientInterface` is wired. Without one, each skipped check emits a
   `fhir:unchecked-binding` INFO violation (queryable via
   `FHIRValidationReport::hasUncheckedBindings()`). See [Terminology](terminology.md).
-* **Profile validation requires pre-generated models.** Runtime/dynamic StructureDefinitions
-  cannot be validated. All HL7 core profiles for R4/R4B/R5 are pre-generated.
+* **Runtime profiles need snapshots.** A profile you have not generated can be validated from its
+  StructureDefinition, but only when it carries a snapshot, and rules inside slices are skipped. All
+  HL7 core profiles for R4/R4B/R5 are pre-generated. See [Runtime Profiles](runtime-profiles.md#limits).
 * **Target profile reference validation** requires a `FHIRReferenceResolverInterface`. The
   default `NullFHIRReferenceResolver` returns `null`, silently skipping the check. See
   [References](references.md).
