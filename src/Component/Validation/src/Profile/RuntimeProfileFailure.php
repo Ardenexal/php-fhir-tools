@@ -28,4 +28,7 @@ enum RuntimeProfileFailure: string
 
     /** Following `baseDefinition` leads back to a definition already in the chain. */
     case CircularParent = 'circular-parent';
+
+    /** A registry holds a definition the profile needs but cannot read it: a missing or corrupt file. */
+    case Unreadable = 'unreadable';
 }

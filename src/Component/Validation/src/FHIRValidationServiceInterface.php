@@ -26,6 +26,14 @@ interface FHIRValidationServiceInterface
     ): FHIRValidationReport;
 
     /**
+     * Validate a FHIR model object with settings {@see validate()} does not take, such as checking
+     * each resource against the profiles in its own `meta.profile`.
+     *
+     * New settings are added to {@see FHIRValidationOptions} rather than to a method signature.
+     */
+    public function validateWithOptions(object $resource, FHIRValidationOptions $options): FHIRValidationReport;
+
+    /**
      * Validate a FHIR resource and return a standards-compliant OperationOutcome.
      *
      * @param string       $mode        '' | 'create' | 'update' | 'profile' | 'delete'

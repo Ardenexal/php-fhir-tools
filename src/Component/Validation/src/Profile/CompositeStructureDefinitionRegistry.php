@@ -11,6 +11,9 @@ namespace Ardenexal\FHIRTools\Component\Validation\Profile;
  * so a typical setup is the IG's package directory first and the core package directory second.
  * Earlier registries win, which lets a caller override a published definition with a local one.
  *
+ * A registry that cannot read what it holds does not hide the others: the search goes on, and the
+ * first such failure is rethrown only when no registry answers.
+ *
  * @author Ardenexal
  */
 final class CompositeStructureDefinitionRegistry implements StructureDefinitionRegistryInterface
@@ -22,13 +25,24 @@ final class CompositeStructureDefinitionRegistry implements StructureDefinitionR
     {
     }
 
-    public function find(string $fhirVersion, string $url, ?string $version = null): ?array
+    public function find(string $url, string $fhirVersion, ?string $version = null): ?array
     {
+        $failure = null;
         foreach ($this->registries as $registry) {
-            $structureDefinition = $registry->find($fhirVersion, $url, $version);
+            try {
+                $structureDefinition = $registry->find($url, $fhirVersion, $version);
+            } catch (UnreadableStructureDefinitionException $e) {
+                $failure ??= $e;
+
+                continue;
+            }
             if ($structureDefinition !== null) {
                 return $structureDefinition;
             }
+        }
+
+        if ($failure !== null) {
+            throw $failure;
         }
 
         return null;
@@ -37,8 +51,17 @@ final class CompositeStructureDefinitionRegistry implements StructureDefinitionR
     public function fhirVersionsFor(string $url): array
     {
         $releases = [];
+        $failure  = null;
         foreach ($this->registries as $registry) {
-            $releases = [...$releases, ...$registry->fhirVersionsFor($url)];
+            try {
+                $releases = [...$releases, ...$registry->fhirVersionsFor($url)];
+            } catch (UnreadableStructureDefinitionException $e) {
+                $failure ??= $e;
+            }
+        }
+
+        if ($releases === [] && $failure !== null) {
+            throw $failure;
         }
 
         return array_values(array_unique($releases));

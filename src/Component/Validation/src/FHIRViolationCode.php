@@ -27,4 +27,12 @@ final class FHIRViolationCode
      * 'FHIRValueSetBindingUnchecked' (not a class name, unlike other keys).
      */
     public const string UNCHECKED_BINDING = 'fhir:unchecked-binding';
+
+    /**
+     * A profile asked for, directly or through `meta.profile`, was not checked: it is unknown,
+     * its StructureDefinition cannot be used, it conflicts with another version checked on the same
+     * resource, or there is no runtime profile resolver to check it with. Surfaced at WARNING
+     * severity, so isValid() is unaffected; the reason is in the violation's `parameters['reason']`.
+     */
+    public const string PROFILE_NOT_CHECKED = 'fhir:profile-not-checked';
 }

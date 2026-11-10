@@ -33,6 +33,40 @@ final class InMemoryStructureDefinitionRegistry implements StructureDefinitionRe
     }
 
     /**
+     * A registry of the StructureDefinitions in these JSON files, one definition per file.
+     *
+     * @param list<string> $paths Paths to StructureDefinition JSON files, each carrying its own `fhirVersion`
+     *
+     * @throws \InvalidArgumentException When a file cannot be read, is not JSON, or is not a StructureDefinition
+     */
+    public static function fromFiles(array $paths): self
+    {
+        $registry = new self();
+
+        foreach ($paths as $path) {
+            $json = is_file($path) && is_readable($path) ? file_get_contents($path) : false;
+            if ($json === false) {
+                throw new \InvalidArgumentException(sprintf('StructureDefinition file "%s" cannot be read.', $path));
+            }
+
+            try {
+                $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                throw new \InvalidArgumentException(sprintf('StructureDefinition file "%s" is not valid JSON: %s', $path, $e->getMessage()), 0, $e);
+            }
+
+            if (!is_array($decoded) || ($decoded['resourceType'] ?? null) !== 'StructureDefinition') {
+                throw new \InvalidArgumentException(sprintf('File "%s" does not hold a StructureDefinition.', $path));
+            }
+
+            /** @var array<string, mixed> $decoded */
+            $registry->add($decoded);
+        }
+
+        return $registry;
+    }
+
+    /**
      * Add one StructureDefinition.
      *
      * @param array<string, mixed> $structureDefinition Decoded StructureDefinition JSON
@@ -58,7 +92,7 @@ final class InMemoryStructureDefinitionRegistry implements StructureDefinitionRe
         $this->definitions[$release][$url][is_string($version) ? $version : ''] = $structureDefinition;
     }
 
-    public function find(string $fhirVersion, string $url, ?string $version = null): ?array
+    public function find(string $url, string $fhirVersion, ?string $version = null): ?array
     {
         $release   = FhirReleaseLabel::normalize($fhirVersion);
         $byVersion = $release === null ? [] : ($this->definitions[$release][$url] ?? []);

@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Profile;
 
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\BundleTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Profile\ObservationVitalsignsProfile;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntry;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationOptions;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationServiceBuilder;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationViolation;
+use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
@@ -28,6 +36,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(FHIRValidationService::class)]
 #[CoversClass(FHIRValidationOptions::class)]
 #[CoversClass(RuntimeProfileAttributeReader::class)]
+#[CoversClass(FHIRValidationServiceBuilder::class)]
 final class RuntimeProfileValidationTest extends TestCase
 {
     private const string CORE = 'http://hl7.org/fhir/StructureDefinition/';
@@ -54,9 +63,11 @@ final class RuntimeProfileValidationTest extends TestCase
 
     private FHIRSerializationService $serializer;
 
+    private InMemoryStructureDefinitionRegistry $registry;
+
     protected function setUp(): void
     {
-        $registry = new InMemoryStructureDefinitionRegistry([
+        $this->registry = $registry = new InMemoryStructureDefinitionRegistry([
             self::specialization('Observation'),
             self::specialization('Patient'),
             self::profile(self::NEED_SUBJECT, self::CORE . 'Observation', [self::element('subject', 1, '1')]),
@@ -125,6 +136,21 @@ final class RuntimeProfileValidationTest extends TestCase
         self::assertSame([self::LAB_ONLY, 'category'], [$findings[0][0], $findings[0][1]]);
     }
 
+    /**
+     * The builder wires the service the way the harness does, slice reader included, so the same
+     * profiles give the same findings.
+     */
+    public function testAServiceFromTheBuilderGivesTheSameFindings(): void
+    {
+        $this->service = FHIRValidationServiceBuilder::create()->withStructureDefinitionRegistry($this->registry)->build();
+
+        $this->testRequestedProfileAppliesItsRules();
+        $this->testMissingRequiredSliceIsReported();
+        $this->testClosedSlicingRejectsItemsNoSliceMatches();
+        $this->testMetaProfilesApplyWhenAskedFor();
+        $this->testUnknownProfileIsAWarning();
+    }
+
     public function testUnknownProfileIsAWarning(): void
     {
         $url        = self::EXAMPLE . 'nowhere';
@@ -134,6 +160,7 @@ final class RuntimeProfileValidationTest extends TestCase
         self::assertSame('warning', $violations[0]->severity);
         self::assertSame("Profile reference '{$url}' has not been checked because it is unknown", $violations[0]->message);
         self::assertSame('unknown', $violations[0]->parameters['reason'] ?? null);
+        self::assertSame(FHIRViolationCode::PROFILE_NOT_CHECKED, $violations[0]->code);
     }
 
     public function testProfileForAnotherTypeIsAnError(): void
@@ -167,6 +194,29 @@ final class RuntimeProfileValidationTest extends TestCase
         self::assertSame(
             [[self::NEED_SUBJECT, 'subject', self::MISSING_SUBJECT], [self::NEED_ISSUED, 'issued', self::MISSING_ISSUED]],
             $this->profileFindings($observation, [], profilesFromMeta: true),
+        );
+    }
+
+    /**
+     * A typed profile instance nested in a Bundle is checked against the profile its meta.profile
+     * claims from its own class, as a top-level one is with deriveProfilesFromClass, and the runtime
+     * definition with the same URL does not run on it.
+     */
+    public function testNestedTypedInstanceIsCheckedFromItsClassAgainstItsMetaProfile(): void
+    {
+        $vitals       = new ObservationVitalsignsProfile(meta: new Meta(profile: [new CanonicalPrimitive(value: self::CORE . 'vitalsigns')]));
+        $fromTopLevel = array_column($this->profileFindings(clone $vitals, [], deriveProfilesFromClass: true), 1);
+        self::assertNotSame([], $fromTopLevel);
+
+        $bundle = new BundleResource(
+            type: new BundleTypeType(value: 'collection'),
+            entry: [new BundleEntry(fullUrl: new UriPrimitive(value: 'urn:uuid:1'), resource: $vitals)],
+        );
+
+        self::assertSame([], $this->profileFindings($bundle, []), 'nothing asks for the entry\'s profile');
+        self::assertSame(
+            array_map(static fn (string $path): string => 'entry[0].resource' . ($path === '' ? '' : '.' . $path), $fromTopLevel),
+            array_column($this->profileFindings($bundle, [], profilesFromMeta: true), 1),
         );
     }
 

@@ -8,10 +8,12 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConst
 use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledProfile;
 use Ardenexal\FHIRTools\Component\Validation\Profile\CompositeStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
-use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileFailure;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolution;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
+use Ardenexal\FHIRTools\Component\Validation\Profile\StructureDefinitionRegistryInterface;
+use Ardenexal\FHIRTools\Component\Validation\Profile\UnreadableStructureDefinitionException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -26,11 +28,15 @@ final class RuntimeProfileResolverTest extends TestCase
 
     private const string EXAMPLE = 'http://example.org/fhir/StructureDefinition/';
 
+    public const string VITAL_SIGNS = 'http://hl7.org/fhir/StructureDefinition/vitalsigns';
+
+    public const string EXTENSION = 'http://example.org/fhir/StructureDefinition/example-extension';
+
     private RuntimeProfileResolver $resolver;
 
     protected function setUp(): void
     {
-        $this->resolver = new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionLoader(self::PACKAGE));
+        $this->resolver = new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionRegistry(self::PACKAGE));
     }
 
     public function testResolvesTwoLevelChainAncestorFirst(): void
@@ -85,7 +91,7 @@ final class RuntimeProfileResolverTest extends TestCase
         $registry = new InMemoryStructureDefinitionRegistry([$definition('subject')]);
         $resolver = new RuntimeProfileResolver(new CompositeStructureDefinitionRegistry([
             $registry,
-            new PackageDirectoryStructureDefinitionLoader(self::PACKAGE),
+            new PackageDirectoryStructureDefinitionRegistry(self::PACKAGE),
         ]));
 
         $before = $resolver->resolve(self::EXAMPLE . 'replaced', 'R4');
@@ -172,12 +178,49 @@ final class RuntimeProfileResolverTest extends TestCase
         ]]);
         $resolver = new RuntimeProfileResolver(new CompositeStructureDefinitionRegistry([
             $ig,
-            new PackageDirectoryStructureDefinitionLoader(self::PACKAGE),
+            new PackageDirectoryStructureDefinitionRegistry(self::PACKAGE),
         ]));
 
         $resolution = $resolver->resolve(self::EXAMPLE . 'ig-bp', 'R4');
 
         self::assertSame([self::CORE . 'vitalsigns', self::CORE . 'bp', self::EXAMPLE . 'ig-bp'], self::chainUrls($resolution));
+    }
+
+    /**
+     * A definition that cannot be read anywhere in the chain makes the profile unusable, and an
+     * extension definition that cannot be read is one nothing is known about; neither throws.
+     */
+    public function testAnUnreadableDefinitionIsAFailureNotAnException(): void
+    {
+        $package = new PackageDirectoryStructureDefinitionRegistry(self::PACKAGE);
+        self::assertNotNull((new RuntimeProfileResolver($package))->resolveExtension(self::EXTENSION, 'R4'));
+
+        $registry = new class ($package) implements StructureDefinitionRegistryInterface {
+            public function __construct(private readonly StructureDefinitionRegistryInterface $inner)
+            {
+            }
+
+            public function find(string $url, string $fhirVersion, ?string $version = null): ?array
+            {
+                if (in_array($url, [RuntimeProfileResolverTest::VITAL_SIGNS, RuntimeProfileResolverTest::EXTENSION], true)) {
+                    throw new UnreadableStructureDefinitionException(sprintf('Cannot read the file for "%s".', $url));
+                }
+
+                return $this->inner->find($url, $fhirVersion, $version);
+            }
+
+            public function fhirVersionsFor(string $url): array
+            {
+                return $this->inner->fhirVersionsFor($url);
+            }
+        };
+        $resolver = new RuntimeProfileResolver($registry);
+
+        $resolution = $resolver->resolve(self::CORE . 'bp', 'R4');
+
+        self::assertSame(RuntimeProfileFailure::Unreadable, $resolution->failure);
+        self::assertSame('Cannot read the file for "' . self::VITAL_SIGNS . '".', $resolution->message);
+        self::assertNull($resolver->resolveExtension(self::EXTENSION, 'R4'));
     }
 
     public function testRejectsUnsupportedFhirRelease(): void

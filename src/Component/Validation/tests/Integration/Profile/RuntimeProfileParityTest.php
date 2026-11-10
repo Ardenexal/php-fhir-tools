@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationReport;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationViolation;
-use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\CoreStructureDefinitionPackages;
@@ -367,14 +367,14 @@ final class RuntimeProfileParityTest extends TestCase
             ));
         }
 
-        $runtimeResolver = new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionLoader($directory, $version->value));
+        $runtimeResolver = new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionRegistry($directory, $version->value));
 
         return self::$services[$version->value] = [
             'generated' => OracleValidationServiceFactory::create($version),
             'runtime'   => OracleValidationServiceFactory::create($version, true, $runtimeResolver),
             // A second resolver for reading rule paths, so the fixture never resolves a profile
             // in the runtime service's resolver before the service itself does.
-            'resolver' => new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionLoader($directory, $version->value)),
+            'resolver' => new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionRegistry($directory, $version->value)),
         ];
     }
 

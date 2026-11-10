@@ -7,6 +7,9 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationOptions;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\MustSupportFixture;
@@ -342,5 +345,38 @@ final class FHIRValidationServiceTest extends TestCase
             code: $code,
             constraint: null,
         );
+    }
+
+    // --- meta.profile without a runtime resolver ---
+
+    /**
+     * profilesFromMeta asks for every claimed profile to be checked, so one nothing can check is
+     * reported rather than silently passing.
+     */
+    public function testMetaProfileNoClassDeclaresIsReportedWithoutAResolver(): void
+    {
+        $this->stubViolations([]);
+        $observation = FHIRSerializationService::createDefault(FhirVersion::R4)->deserialize(
+            '{"resourceType":"Observation","status":"final","code":{"text":"x"},"meta":{"profile":["http://example.org/fhir/StructureDefinition/p|1.0"]}}',
+        );
+
+        $report = $this->service->validateWithOptions($observation, new FHIRValidationOptions(profilesFromMeta: true));
+
+        self::assertCount(1, $report->violations);
+        $violation = $report->violations[0];
+        self::assertSame('warning', $violation->severity);
+        self::assertSame(
+            "Profile reference 'http://example.org/fhir/StructureDefinition/p|1.0' has not been checked: no generated class declares it and no runtime profile resolver is configured",
+            $violation->message,
+        );
+        self::assertSame('http://example.org/fhir/StructureDefinition/p', $violation->profileGroup);
+        self::assertSame('no-runtime-resolver', $violation->parameters['reason'] ?? null);
+        self::assertSame(FHIRViolationCode::PROFILE_NOT_CHECKED, $violation->code);
+        self::assertTrue($report->hasUncheckedProfiles());
+        self::assertSame([$violation], $report->uncheckedProfiles());
+        self::assertTrue($report->isValid(), 'a profile that was not checked is a warning, not an error');
+
+        // A requested URL is ignored without a resolver, as it always was
+        self::assertSame([], $this->service->validate($observation, ['http://example.org/fhir/StructureDefinition/p'])->violations);
     }
 }

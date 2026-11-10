@@ -58,6 +58,29 @@ final class FHIRValidationReport
     }
 
     /**
+     * Whether a profile that was asked for was not checked, for example because it is unknown or
+     * its parent cannot be found. A true result means the report does not cover that profile; it
+     * does not affect isValid().
+     */
+    public function hasUncheckedProfiles(): bool
+    {
+        return $this->uncheckedProfiles() !== [];
+    }
+
+    /**
+     * Violations reporting a profile that was not checked, identified by the
+     * fhir:profile-not-checked code. Each names its reason in `parameters['reason']`.
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    public function uncheckedProfiles(): array
+    {
+        return array_values(
+            array_filter($this->violations, static fn (FHIRValidationViolation $v) => $v->code === FHIRViolationCode::PROFILE_NOT_CHECKED),
+        );
+    }
+
+    /**
      * Whether extensible/preferred binding checks were skipped because no real terminology
      * client was configured. A true result means terminology coverage is incomplete — it does
      * not affect isValid().

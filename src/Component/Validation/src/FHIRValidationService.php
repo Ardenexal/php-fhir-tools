@@ -39,6 +39,7 @@ use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileFailure;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -129,8 +130,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * A profile URL that the resource's class does not declare is checked against the
      * StructureDefinition the runtime profile resolver finds for it, when the service has one. Its
      * rules then apply to a base resource exactly as a generated profile class's attributes would.
-     * A URL the resolver cannot use is reported as a warning naming the reason; without a resolver,
-     * such a URL is ignored as it always was.
+     * A URL the resolver cannot use is reported as a warning naming the reason. Without a resolver,
+     * such a requested URL is ignored as it always was, and such a `meta.profile` URL is reported as
+     * not checked.
      *
      * @return FHIRValidationReport A structured report containing all violations found at all severity levels
      */
@@ -165,8 +167,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // Profiles the resource's class does not declare, checked against StructureDefinitions
         // resolved at runtime. A separate pass because their rules are not attributes on any class:
         // they are handed to the validator explicitly, under the same group names a generated class uses.
-        if ($this->runtimeProfiles !== null && ($profileUrls !== [] || $options->profilesFromMeta)) {
-            $walk = ['visited' => [], 'reached' => [], 'mismatched' => []];
+        // Without a resolver the walk still runs for `meta.profile`, whose profiles a nested resource's
+        // generated class may declare without the pass above having run them
+        if (($this->runtimeProfiles !== null && $profileUrls !== []) || $options->profilesFromMeta) {
+            $walk = ['visited' => [], 'reached' => [], 'mismatched' => [], 'groups' => $groups];
             $this->collectRuntimeProfileViolations($resource, '', $profileUrls, $options, $violations, $walk);
 
             // A profile for another type is only a mistake when it reached nothing: asking for an
@@ -332,17 +336,19 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * With `profilesFromMeta`, every resource is also checked against all its own `meta.profile` URLs.
      *
      * A URL the resource's class already declares stays with the generated attributes, so its rules
-     * never run twice. `deriveProfilesFromClass` brings a requested profile's ancestors on the
+     * never run twice. When the pass over the whole resource did not run that URL's group (a
+     * `meta.profile` URL on a nested typed instance, say), the class's own profiles are run here. `deriveProfilesFromClass` brings a requested profile's ancestors on the
      * top-level resource only, because on a generated class it adds the top-level class's own
      * profiles and nothing nested. A `meta.profile` URL always brings its ancestors, because a
      * resource that claims a profile claims all of it.
      *
-     * @param list<string>                                                                                                       $requested  URLs asked for at the top level; a nested resource works out its own
-     * @param list<FHIRValidationViolation>                                                                                      $violations appended to
-     * @param array{visited: array<int, true>, reached: array<string, true>, mismatched: array<string, FHIRValidationViolation>} $walk
-     *                                                                                                                                       resources already walked by spl_object_id; requested canonicals a
-     *                                                                                                                                       nested resource took up; top-level type mismatches held back by canonical
-     * @param object|null                                                                                                        $root       The object validation started at; null at the start
+     * @param list<string>                                                                                                                             $requested  URLs asked for at the top level; a nested resource works out its own
+     * @param list<FHIRValidationViolation>                                                                                                            $violations appended to
+     * @param array{visited: array<int, true>, reached: array<string, true>, mismatched: array<string, FHIRValidationViolation>, groups: list<string>} $walk
+     *                                                                                                                                                             resources already walked by spl_object_id; requested canonicals a
+     *                                                                                                                                                             nested resource took up; top-level type mismatches held back by
+     *                                                                                                                                                             canonical; the groups the pass over the whole resource ran
+     * @param object|null                                                                                                                              $root       The object validation started at; null at the start
      */
     private function collectRuntimeProfileViolations(
         object $resource,
@@ -377,14 +383,14 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 }
             }
 
-            /** @var array<string, bool> $wanted canonical URL as written => whether its ancestors apply */
+            /** @var array<string, array{ancestors: bool, fromMeta: bool}> $wanted URL as written => whether its ancestors apply, and whether meta.profile named it */
             $wanted = [];
             foreach ($requested as $url) {
-                $wanted[$url] = $topLevel && $options->deriveProfilesFromClass;
+                $wanted[$url] = ['ancestors' => $topLevel && $options->deriveProfilesFromClass, 'fromMeta' => false];
             }
             if ($options->profilesFromMeta) {
                 foreach ($metaProfiles as $url) {
-                    $wanted[$url] = true;
+                    $wanted[$url] = ['ancestors' => true, 'fromMeta' => true];
                 }
             }
 
@@ -393,6 +399,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 $prefix,
                 $resourceAttributes[0]->fhirVersion,
                 $wanted,
+                $walk['groups'],
                 $violations,
                 $root,
             );
@@ -409,9 +416,11 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * @param array<string, bool>           $wanted     URL as written => whether its constraint ancestors apply
-     * @param list<FHIRValidationViolation> $violations appended to
-     * @param object                        $root       The object validation started at, which $prefix is relative to
+     * @param array<string, array{ancestors: bool, fromMeta: bool}> $wanted     URL as written => whether its constraint ancestors
+     *                                                                          apply, and whether `meta.profile` named it
+     * @param list<string>                                          $mainGroups The groups the pass over the whole resource ran
+     * @param list<FHIRValidationViolation>                         $violations appended to
+     * @param object                                                $root       The object validation started at, which $prefix is relative to
      *
      * @return array<string, FHIRValidationViolation> one error per wanted profile that constrains another type, by canonical
      */
@@ -420,11 +429,12 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         string $prefix,
         string $fhirVersion,
         array $wanted,
+        array $mainGroups,
         array &$violations,
         object $root,
     ): array {
         $mismatches = [];
-        if ($wanted === [] || $this->runtimeProfiles === null) {
+        if ($wanted === []) {
             return $mismatches;
         }
 
@@ -440,9 +450,43 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         /** @var array<string, CompiledProfile> $selected profile URL => the compiled version checked */
         $selected = [];
 
-        foreach ($wanted as $url => $withAncestors) {
+        /** @var array<string, true> $classGroups profiles the class declares that the pass over the whole resource did not run */
+        $classGroups = [];
+
+        foreach ($wanted as $url => $how) {
             $canonical = self::canonicalWithoutVersion($url);
             if (in_array($canonical, $declared, true)) {
+                // The class's attributes check it. A requested URL's group already ran over the whole
+                // resource; a meta.profile URL's group ran only if it was also requested, so a typed
+                // nested instance claiming its profile would otherwise go unchecked. Claiming a
+                // profile claims its ancestors too, so every profile the class declares runs.
+                if ($how['fromMeta'] && !in_array($canonical, $mainGroups, true)) {
+                    foreach ($declared as $group) {
+                        if (!in_array($group, $mainGroups, true)) {
+                            $classGroups[$group] = true;
+                        }
+                    }
+                }
+
+                continue;
+            }
+
+            if ($this->runtimeProfiles === null) {
+                // Without a resolver a requested URL is ignored, as it always was; a meta.profile URL
+                // is reported, because profilesFromMeta asks for every claimed profile to be checked
+                if ($how['fromMeta']) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'warning',
+                        path: rtrim($prefix, '.'),
+                        message: sprintf("Profile reference '%s' has not been checked: no generated class declares it and no runtime profile resolver is configured", $url),
+                        constraintClass: RuntimeProfileResolver::class,
+                        profileGroup: $canonical,
+                        invariantKey: null,
+                        parameters: ['reason' => 'no-runtime-resolver'],
+                        code: FHIRViolationCode::PROFILE_NOT_CHECKED,
+                    );
+                }
+
                 continue;
             }
 
@@ -461,7 +505,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     profileGroup: $canonical,
                     invariantKey: null,
                     parameters: ['reason' => 'version-conflict'],
-                    code: FHIRViolationCode::WARNING,
+                    code: FHIRViolationCode::PROFILE_NOT_CHECKED,
                 );
 
                 continue;
@@ -478,22 +522,22 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                         ? sprintf("Profile reference '%s' has not been checked because it is unknown", $url)
                         : sprintf("Profile reference '%s' has not been checked: %s", $url, $resolution->message),
                     constraintClass: RuntimeProfileResolver::class,
-                    profileGroup: $url,
+                    profileGroup: $canonical,
                     invariantKey: null,
                     parameters: ['reason' => $resolution->failure?->value],
-                    code: FHIRViolationCode::WARNING,
+                    code: FHIRViolationCode::PROFILE_NOT_CHECKED,
                 );
 
                 continue;
             }
 
             if ($resolution->rootType !== $resourceType) {
-                $mismatches[self::canonicalWithoutVersion($url)] = new FHIRValidationViolation(
+                $mismatches[$canonical] = new FHIRValidationViolation(
                     severity: 'error',
                     path: rtrim($prefix, '.'),
                     message: sprintf("Profile '%s' constrains %s, so it cannot be used to validate a %s", $url, (string) $resolution->rootType, $resourceType),
                     constraintClass: RuntimeProfileResolver::class,
-                    profileGroup: $url,
+                    profileGroup: $canonical,
                     invariantKey: null,
                     code: FHIRViolationCode::ERROR,
                 );
@@ -502,7 +546,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             }
 
             $chain = $resolution->chain;
-            if (!$withAncestors && $chain !== []) {
+            if (!$how['ancestors'] && $chain !== []) {
                 $chain = [$chain[array_key_last($chain)]];
             }
 
@@ -534,7 +578,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     profileGroup: $canonical,
                     invariantKey: null,
                     parameters: ['reason' => 'version-conflict'],
-                    code: FHIRViolationCode::WARNING,
+                    code: FHIRViolationCode::PROFILE_NOT_CHECKED,
                 );
 
                 continue;
@@ -546,17 +590,47 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             }
         }
 
+        if ($classGroups !== []) {
+            $this->appendValidatedWithin(
+                $resource,
+                $root,
+                $prefix,
+                fn (): ConstraintViolationListInterface => $this->validator->validate($resource, null, array_keys($classGroups)),
+                $violations,
+            );
+        }
+
         if ($constraintsByGroup === []) {
             return $mismatches;
         }
 
         // The slice reader must serve the versions whose constraints run here.
-        $this->runtimeProfiles->activate($fhirVersion, $resourceType, array_values($selected));
+        $this->runtimeProfiles?->activate($fhirVersion, $resourceType, array_values($selected));
 
-        // A nested resource is validated on its own, but its invariants see the resources around it,
-        // as on a generated class reached from the root: a contained resource's %rootResource is its container
-        $validate = fn () => $this->validator->validate($resource, array_merge(...array_values($constraintsByGroup)), array_keys($constraintsByGroup));
-        $raw      = $prefix === '' ? $validate() : FHIRPathResourceContext::within($resource, $root, rtrim($prefix, '.'), $validate);
+        $this->appendValidatedWithin(
+            $resource,
+            $root,
+            $prefix,
+            fn (): ConstraintViolationListInterface => $this->validator->validate($resource, array_merge(...array_values($constraintsByGroup)), array_keys($constraintsByGroup)),
+            $violations,
+        );
+
+        return $mismatches;
+    }
+
+    /**
+     * Run one validation of a resource that may sit inside $root, and append its findings with
+     * paths placed under $prefix.
+     *
+     * A nested resource is validated on its own, but its invariants see the resources around it,
+     * as on a generated class reached from the root: a contained resource's %rootResource is its container.
+     *
+     * @param \Closure(): ConstraintViolationListInterface $validate
+     * @param list<FHIRValidationViolation>                $violations appended to
+     */
+    private function appendValidatedWithin(object $resource, object $root, string $prefix, \Closure $validate, array &$violations): void
+    {
+        $raw = $prefix === '' ? $validate() : FHIRPathResourceContext::within($resource, $root, rtrim($prefix, '.'), $validate);
         foreach ($raw as $rawViolation) {
             $violation    = $this->mapViolation($rawViolation);
             $violations[] = $prefix === '' ? $violation : new FHIRValidationViolation(
@@ -570,8 +644,6 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 code: $violation->code,
             );
         }
-
-        return $mismatches;
     }
 
     /**
@@ -715,11 +787,12 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         $code = $violation->getCode();
 
         $severity = match ($code) {
-            FHIRViolationCode::WARNING           => 'warning',
-            FHIRViolationCode::INFO              => 'info',
-            FHIRViolationCode::EVAL_ERROR        => 'info',
-            FHIRViolationCode::UNCHECKED_BINDING => 'info',
-            default                              => 'error',
+            FHIRViolationCode::WARNING             => 'warning',
+            FHIRViolationCode::PROFILE_NOT_CHECKED => 'warning',
+            FHIRViolationCode::INFO                => 'info',
+            FHIRViolationCode::EVAL_ERROR          => 'info',
+            FHIRViolationCode::UNCHECKED_BINDING   => 'info',
+            default                                => 'error',
         };
 
         $constraint      = $violation->getConstraint();

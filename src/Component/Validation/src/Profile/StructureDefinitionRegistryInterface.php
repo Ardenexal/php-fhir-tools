@@ -18,13 +18,15 @@ interface StructureDefinitionRegistryInterface
     /**
      * Find a StructureDefinition by canonical URL.
      *
-     * @param string      $fhirVersion 'R4', 'R4B' or 'R5'
      * @param string      $url         Canonical URL without a `|version` suffix
+     * @param string      $fhirVersion 'R4', 'R4B' or 'R5'
      * @param string|null $version     Business version to match exactly; null returns the latest
      *
      * @return array<string, mixed>|null The decoded StructureDefinition, or null when none matches
+     *
+     * @throws UnreadableStructureDefinitionException When the matching definition, or the registry's index, cannot be read
      */
-    public function find(string $fhirVersion, string $url, ?string $version = null): ?array;
+    public function find(string $url, string $fhirVersion, ?string $version = null): ?array;
 
     /**
      * List the FHIR releases that hold a StructureDefinition with this canonical URL.
@@ -35,6 +37,8 @@ interface StructureDefinitionRegistryInterface
      * @param string $url Canonical URL without a `|version` suffix
      *
      * @return list<string> Release labels, e.g. ['R4B', 'R5']; empty when the URL is unknown
+     *
+     * @throws UnreadableStructureDefinitionException When the registry's index cannot be read
      */
     public function fhirVersionsFor(string $url): array;
 }

@@ -14,15 +14,19 @@ namespace Ardenexal\FHIRTools\Component\Validation\Profile;
  * The index comes from the package's `.index.json` when it has one. Packages from
  * packages.fhir.org do; npm mirrors of the same packages often do not, and then the directory is
  * scanned instead: each `*.json` file whose first member names another resource type is skipped,
- * and the rest are decoded once to read their URL. A file that names StructureDefinition but is
- * not valid JSON fails the scan with a \RuntimeException rather than vanishing from the index. Decoded files are not kept from the scan.
+ * and the rest are decoded once to read their URL. Decoded files are not kept from the scan.
+ *
+ * A definition that cannot be read throws {@see UnreadableStructureDefinitionException} from the
+ * lookup that needs it: a file `.index.json` lists that is missing or not JSON fails lookups of its
+ * URL only. A file that names StructureDefinition but is not valid JSON fails the scan, since its URL
+ * is unknown, and so every lookup; the failure is kept, so the directory is not scanned again.
  *
  * The FHIR release comes from the constructor, else from `package.json` (`fhirVersions`), else
  * from each StructureDefinition's own `fhirVersion` (which forces a scan).
  *
  * @author Ardenexal
  */
-final class PackageDirectoryStructureDefinitionLoader implements StructureDefinitionRegistryInterface
+final class PackageDirectoryStructureDefinitionRegistry implements StructureDefinitionRegistryInterface
 {
     /** Bytes read from the start of a file to find its resourceType without decoding it. */
     private const int HEAD_BYTES = 2048;
@@ -41,6 +45,9 @@ final class PackageDirectoryStructureDefinitionLoader implements StructureDefini
 
     /** @var array<string, array<string, mixed>> Decoded definitions by file name */
     private array $decoded = [];
+
+    /** Why the scan failed, rethrown by every later lookup instead of scanning again. */
+    private ?UnreadableStructureDefinitionException $scanFailure = null;
 
     /**
      * @param string      $directory   The package directory: the one holding `package.json`, or the
@@ -73,7 +80,7 @@ final class PackageDirectoryStructureDefinitionLoader implements StructureDefini
         }
     }
 
-    public function find(string $fhirVersion, string $url, ?string $version = null): ?array
+    public function find(string $url, string $fhirVersion, ?string $version = null): ?array
     {
         $release   = FhirReleaseLabel::normalize($fhirVersion);
         $byVersion = $release === null ? [] : ($this->index()[$release][$url] ?? []);
@@ -104,16 +111,28 @@ final class PackageDirectoryStructureDefinitionLoader implements StructureDefini
      * Build the URL index on first use.
      *
      * @return array<string, array<string, array<string, string>>>
+     *
+     * @throws UnreadableStructureDefinitionException When the directory had to be scanned and holds a broken StructureDefinition
      */
     private function index(): array
     {
         if ($this->index !== null) {
             return $this->index;
         }
+        if ($this->scanFailure !== null) {
+            throw $this->scanFailure;
+        }
 
         $index = $this->packageRelease === null ? null : $this->indexFromIndexFile($this->packageRelease);
+        if ($index === null) {
+            try {
+                $index = $this->indexByScanning();
+            } catch (UnreadableStructureDefinitionException $e) {
+                throw $this->scanFailure = $e;
+            }
+        }
 
-        return $this->index = $index ?? $this->indexByScanning();
+        return $this->index = $index;
     }
 
     /**
@@ -155,7 +174,7 @@ final class PackageDirectoryStructureDefinitionLoader implements StructureDefini
      *
      * @return array<string, array<string, array<string, string>>>
      *
-     * @throws \RuntimeException When a StructureDefinition file is not valid JSON
+     * @throws UnreadableStructureDefinitionException When a StructureDefinition file is not valid JSON
      */
     private function indexByScanning(): array
     {
@@ -170,7 +189,7 @@ final class PackageDirectoryStructureDefinitionLoader implements StructureDefini
 
             try {
                 $resource = $this->decodeFile($path);
-            } catch (\RuntimeException $e) {
+            } catch (UnreadableStructureDefinitionException $e) {
                 // A file that announced itself as a StructureDefinition must be readable; any other
                 // unreadable JSON file is not ours to judge.
                 if ($declaredType === 'StructureDefinition') {
@@ -226,23 +245,23 @@ final class PackageDirectoryStructureDefinitionLoader implements StructureDefini
     /**
      * @return array<string, mixed>
      *
-     * @throws \RuntimeException When the file cannot be read or is not a JSON object
+     * @throws UnreadableStructureDefinitionException When the file cannot be read or is not a JSON object
      */
     private function decodeFile(string $path): array
     {
-        $json = @file_get_contents($path);
+        $json = is_file($path) ? @file_get_contents($path) : false;
         if ($json === false) {
-            throw new \RuntimeException(sprintf('Cannot read "%s".', $path));
+            throw new UnreadableStructureDefinitionException(sprintf('Cannot read "%s".', $path));
         }
 
         try {
             $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new \RuntimeException(sprintf('"%s" is not valid JSON: %s', $path, $e->getMessage()), 0, $e);
+            throw new UnreadableStructureDefinitionException(sprintf('"%s" is not valid JSON: %s', $path, $e->getMessage()), 0, $e);
         }
 
         if (!is_array($decoded) || array_is_list($decoded) && $decoded !== []) {
-            throw new \RuntimeException(sprintf('"%s" does not hold a JSON object.', $path));
+            throw new UnreadableStructureDefinitionException(sprintf('"%s" does not hold a JSON object.', $path));
         }
 
         /** @var array<string, mixed> $decoded */

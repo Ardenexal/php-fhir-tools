@@ -22,7 +22,7 @@ declare(strict_types=1);
 use Ardenexal\FHIRTools\Component\Models\R5\Profile\ObservationbpProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationResource;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
-use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\CoreStructureDefinitionPackages;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\OracleValidationServiceFactory;
@@ -60,12 +60,12 @@ if (is_string($options['single'] ?? null)) {
     $runtime = $options['single'] === 'runtime';
     $start   = hrtime(true);
 
-    $resolver = new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionLoader($directory, 'R5'));
+    $resolver = new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionRegistry($directory, 'R5'));
     $service  = OracleValidationServiceFactory::create(FhirVersion::R5, true, $resolver);
 
     // Rule paths from a separate resolver, so building the fixture does not warm the measured one.
     $paths = ProfileRulePathMaterialiser::rulePaths(
-        (new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionLoader($directory, 'R5')))->resolve(BP_PROFILE, 'R5')->chain,
+        (new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionRegistry($directory, 'R5')))->resolve(BP_PROFILE, 'R5')->chain,
     );
     $fixture = static function() use ($runtime, $paths): object {
         $instance = $runtime ? new ObservationResource() : new ObservationbpProfile();

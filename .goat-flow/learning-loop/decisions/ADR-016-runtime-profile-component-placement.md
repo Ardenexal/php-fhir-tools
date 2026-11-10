@@ -22,7 +22,7 @@ attributes, inside `fhir-code-generation`. `fhir-validation` must not depend on
   (ADR-002: anything visible to more than one component belongs there). The generator renders the
   compiler's output; runtime validation instantiates it. One translation means the two cannot drift.
 - **The registry and resolver live in Validation** (`Validation\Profile\`). Only runtime validation
-  uses them. `PackageDirectoryStructureDefinitionLoader` reads an already extracted package
+  uses them. `PackageDirectoryStructureDefinitionRegistry` reads an already extracted package
   directory; downloading packages stays in CodeGeneration's `PackageLoader`.
 - **Every lookup is keyed by FHIR release** ('R4', 'R4B', 'R5') as well as URL, because core
   profiles such as `http://hl7.org/fhir/StructureDefinition/bp` exist in several releases.

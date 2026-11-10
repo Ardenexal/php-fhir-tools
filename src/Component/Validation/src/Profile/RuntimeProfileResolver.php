@@ -80,8 +80,23 @@ final class RuntimeProfileResolver
             throw new \InvalidArgumentException(sprintf('FHIR version "%s" is not R4, R4B or R5.', $fhirVersion));
         }
 
+        // A broken file makes this profile unusable, never the validation around it
+        try {
+            return $this->resolveChain($url, $release);
+        } catch (UnreadableStructureDefinitionException $e) {
+            return RuntimeProfileResolution::failed($url, $release, RuntimeProfileFailure::Unreadable, $url, $e->getMessage());
+        }
+    }
+
+    /**
+     * Walk and compile a profile's constraint chain for one normalised release.
+     *
+     * @throws UnreadableStructureDefinitionException When a registry cannot read a definition the chain needs
+     */
+    private function resolveChain(string $url, string $release): RuntimeProfileResolution
+    {
         [$canonical, $version] = self::splitCanonical($url);
-        $current               = $this->registry->find($release, $canonical, $version);
+        $current               = $this->registry->find($canonical, $release, $version);
         if ($current === null) {
             return $this->notFound($url, $release, $canonical, $version);
         }
@@ -136,7 +151,7 @@ final class RuntimeProfileResolver
             }
 
             [$parentUrl, $parentVersion] = self::splitCanonical($parentRef);
-            $parent                      = $this->registry->find($release, $parentUrl, $parentVersion);
+            $parent                      = $this->registry->find($parentUrl, $release, $parentVersion);
             if ($parent === null) {
                 return RuntimeProfileResolution::failed($url, $release, RuntimeProfileFailure::UnresolvedParent, $parentRef, sprintf(
                     'StructureDefinition "%s" derives from "%s", which no registry holds for %s.',
@@ -157,8 +172,8 @@ final class RuntimeProfileResolver
      * The compiled definition of an extension, for a plain `Extension` whose url names one.
      *
      * Only a definition of type Extension, with derivation constraint and a snapshot, is used.
-     * Anything else answers null, and the extension is then treated as one
-     * nothing is known about, exactly as before runtime definitions existed.
+     * Anything else, a definition no registry can read included, answers null, and the extension is
+     * then treated as one nothing is known about, exactly as before runtime definitions existed.
      *
      * @param string $url         The extension's url, optionally with a `|version` suffix
      * @param string $fhirVersion 'R4', 'R4B' or 'R5'
@@ -171,7 +186,11 @@ final class RuntimeProfileResolver
         }
 
         [$canonical, $version] = self::splitCanonical($url);
-        $definition            = $this->registry->find($release, $canonical, $version);
+        try {
+            $definition = $this->registry->find($canonical, $release, $version);
+        } catch (UnreadableStructureDefinitionException) {
+            return null;
+        }
         if ($definition === null
             || ($definition['type'] ?? null)       !== 'Extension'
             || ($definition['derivation'] ?? null) !== 'constraint'
@@ -203,6 +222,8 @@ final class RuntimeProfileResolver
      * @param string                $fhirVersion 'R4', 'R4B' or 'R5'
      * @param string                $rootType    FHIR type name, e.g. 'Observation'
      * @param list<CompiledProfile> $profiles
+     *
+     * @internal Validation state shared between FHIRValidationService and RuntimeProfileAttributeReader
      */
     public function activate(string $fhirVersion, string $rootType, array $profiles): void
     {
@@ -223,6 +244,8 @@ final class RuntimeProfileResolver
      * @param string $rootType    FHIR type name, e.g. 'Observation'
      *
      * @return list<CompiledProfile>
+     *
+     * @internal Validation state shared between FHIRValidationService and RuntimeProfileAttributeReader
      */
     public function resolvedProfilesFor(string $fhirVersion, string $rootType): array
     {
@@ -255,7 +278,7 @@ final class RuntimeProfileResolver
         $profile = $this->compiler->compile(
             $structureDefinition,
             function(string $url) use ($release, &$lookups): ?array {
-                return $lookups[$url] = $this->registry->find($release, $url);
+                return $lookups[$url] = $this->registry->find($url, $release);
             },
         );
         $this->compiled[$key] = ['definition' => $structureDefinition, 'lookups' => $lookups, 'profile' => $profile];
@@ -271,7 +294,7 @@ final class RuntimeProfileResolver
     private function lookupsUnchanged(string $release, array $lookups): bool
     {
         foreach ($lookups as $url => $found) {
-            if ($this->registry->find($release, $url) !== $found) {
+            if ($this->registry->find($url, $release) !== $found) {
                 return false;
             }
         }
@@ -282,7 +305,7 @@ final class RuntimeProfileResolver
     private function notFound(string $url, string $release, string $canonical, ?string $version): RuntimeProfileResolution
     {
         $elsewhere = array_values(array_diff($this->registry->fhirVersionsFor($canonical), [$release]));
-        if ($elsewhere !== [] && $this->registry->find($release, $canonical) === null) {
+        if ($elsewhere !== [] && $this->registry->find($canonical, $release) === null) {
             return RuntimeProfileResolution::failed($url, $release, RuntimeProfileFailure::FhirVersionMismatch, $canonical, sprintf(
                 'Profile "%s" is registered for %s, not for %s.',
                 $canonical,

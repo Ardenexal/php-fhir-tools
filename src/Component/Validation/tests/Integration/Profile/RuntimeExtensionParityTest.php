@@ -13,7 +13,7 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationViolation;
 use Ardenexal\FHIRTools\Component\Validation\Profile\CompositeStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
-use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\CoreStructureDefinitionPackages;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\OracleValidationServiceFactory;
@@ -174,10 +174,10 @@ final class RuntimeExtensionParityTest extends TestCase
             self::markTestSkipped("No {$release->value} fixtures; run tests/Fixtures/Profile/seed-core-profiles.php");
         }
 
-        $loader   = new PackageDirectoryStructureDefinitionLoader($fixtures, $release->value);
+        $loader   = new PackageDirectoryStructureDefinitionRegistry($fixtures, $release->value);
         $aliased  = [];
         foreach (self::EXTENSIONS as $name) {
-            $definition = $loader->find($release->value, self::SD . $name);
+            $definition = $loader->find(self::SD . $name, $release->value);
             self::assertNotNull($definition, "{$name} is not in the {$release->value} fixtures");
             $aliased[] = ['url' => self::ALIAS . $name] + $definition;
         }
