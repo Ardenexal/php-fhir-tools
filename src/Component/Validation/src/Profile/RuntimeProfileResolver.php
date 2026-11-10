@@ -96,7 +96,7 @@ final class RuntimeProfileResolver
     private function resolveChain(string $url, string $release): RuntimeProfileResolution
     {
         [$canonical, $version] = self::splitCanonical($url);
-        $current               = $this->registry->find($release, $canonical, $version);
+        $current               = $this->registry->find($canonical, $release, $version);
         if ($current === null) {
             return $this->notFound($url, $release, $canonical, $version);
         }
@@ -151,7 +151,7 @@ final class RuntimeProfileResolver
             }
 
             [$parentUrl, $parentVersion] = self::splitCanonical($parentRef);
-            $parent                      = $this->registry->find($release, $parentUrl, $parentVersion);
+            $parent                      = $this->registry->find($parentUrl, $release, $parentVersion);
             if ($parent === null) {
                 return RuntimeProfileResolution::failed($url, $release, RuntimeProfileFailure::UnresolvedParent, $parentRef, sprintf(
                     'StructureDefinition "%s" derives from "%s", which no registry holds for %s.',
@@ -187,7 +187,7 @@ final class RuntimeProfileResolver
 
         [$canonical, $version] = self::splitCanonical($url);
         try {
-            $definition = $this->registry->find($release, $canonical, $version);
+            $definition = $this->registry->find($canonical, $release, $version);
         } catch (UnreadableStructureDefinitionException) {
             return null;
         }
@@ -278,7 +278,7 @@ final class RuntimeProfileResolver
         $profile = $this->compiler->compile(
             $structureDefinition,
             function(string $url) use ($release, &$lookups): ?array {
-                return $lookups[$url] = $this->registry->find($release, $url);
+                return $lookups[$url] = $this->registry->find($url, $release);
             },
         );
         $this->compiled[$key] = ['definition' => $structureDefinition, 'lookups' => $lookups, 'profile' => $profile];
@@ -294,7 +294,7 @@ final class RuntimeProfileResolver
     private function lookupsUnchanged(string $release, array $lookups): bool
     {
         foreach ($lookups as $url => $found) {
-            if ($this->registry->find($release, $url) !== $found) {
+            if ($this->registry->find($url, $release) !== $found) {
                 return false;
             }
         }
@@ -305,7 +305,7 @@ final class RuntimeProfileResolver
     private function notFound(string $url, string $release, string $canonical, ?string $version): RuntimeProfileResolution
     {
         $elsewhere = array_values(array_diff($this->registry->fhirVersionsFor($canonical), [$release]));
-        if ($elsewhere !== [] && $this->registry->find($release, $canonical) === null) {
+        if ($elsewhere !== [] && $this->registry->find($canonical, $release) === null) {
             return RuntimeProfileResolution::failed($url, $release, RuntimeProfileFailure::FhirVersionMismatch, $canonical, sprintf(
                 'Profile "%s" is registered for %s, not for %s.',
                 $canonical,

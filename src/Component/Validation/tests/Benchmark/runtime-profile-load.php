@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * Load benchmark for runtime profile resolution.
  *
- * Measures what it costs to point a PackageDirectoryStructureDefinitionLoader at a full core
+ * Measures what it costs to point a PackageDirectoryStructureDefinitionRegistry at a full core
  * package and resolve one profile chain (default: the core blood-pressure profile, which derives
  * from vital signs). Each run is a fresh PHP process, so "cold" includes building the package
  * index and "peak" is the whole process's peak memory.
@@ -21,7 +21,7 @@ declare(strict_types=1);
  * Output: median and spread (min-max) for cold index+resolve, warm re-resolve, and peak memory.
  */
 
-use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 
 require dirname(__DIR__, 5) . '/vendor/autoload.php';
@@ -47,7 +47,7 @@ $fhirVersion = is_string($options['fhir-version'] ?? null) ? $options['fhir-vers
 if (($options['single'] ?? false) === true) {
     // One measured run, reported as JSON to the parent process.
     $start    = hrtime(true);
-    $loader   = new PackageDirectoryStructureDefinitionLoader($dir, $fhirVersion);
+    $loader   = new PackageDirectoryStructureDefinitionRegistry($dir, $fhirVersion);
     $resolver = new RuntimeProfileResolver($loader);
     $release  = $fhirVersion ?? (function() use ($loader, $profile): string {
         $releases = $loader->fhirVersionsFor($profile);

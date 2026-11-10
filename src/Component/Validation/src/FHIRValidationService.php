@@ -483,7 +483,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                         profileGroup: $canonical,
                         invariantKey: null,
                         parameters: ['reason' => 'no-runtime-resolver'],
-                        code: FHIRViolationCode::WARNING,
+                        code: FHIRViolationCode::PROFILE_NOT_CHECKED,
                     );
                 }
 
@@ -505,7 +505,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     profileGroup: $canonical,
                     invariantKey: null,
                     parameters: ['reason' => 'version-conflict'],
-                    code: FHIRViolationCode::WARNING,
+                    code: FHIRViolationCode::PROFILE_NOT_CHECKED,
                 );
 
                 continue;
@@ -525,7 +525,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     profileGroup: $canonical,
                     invariantKey: null,
                     parameters: ['reason' => $resolution->failure?->value],
-                    code: FHIRViolationCode::WARNING,
+                    code: FHIRViolationCode::PROFILE_NOT_CHECKED,
                 );
 
                 continue;
@@ -578,7 +578,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     profileGroup: $canonical,
                     invariantKey: null,
                     parameters: ['reason' => 'version-conflict'],
-                    code: FHIRViolationCode::WARNING,
+                    code: FHIRViolationCode::PROFILE_NOT_CHECKED,
                 );
 
                 continue;
@@ -787,11 +787,12 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         $code = $violation->getCode();
 
         $severity = match ($code) {
-            FHIRViolationCode::WARNING           => 'warning',
-            FHIRViolationCode::INFO              => 'info',
-            FHIRViolationCode::EVAL_ERROR        => 'info',
-            FHIRViolationCode::UNCHECKED_BINDING => 'info',
-            default                              => 'error',
+            FHIRViolationCode::WARNING             => 'warning',
+            FHIRViolationCode::PROFILE_NOT_CHECKED => 'warning',
+            FHIRViolationCode::INFO                => 'info',
+            FHIRViolationCode::EVAL_ERROR          => 'info',
+            FHIRViolationCode::UNCHECKED_BINDING   => 'info',
+            default                                => 'error',
         };
 
         $constraint      = $violation->getConstraint();

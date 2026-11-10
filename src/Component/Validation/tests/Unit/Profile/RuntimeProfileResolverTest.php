@@ -8,7 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConst
 use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledProfile;
 use Ardenexal\FHIRTools\Component\Validation\Profile\CompositeStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
-use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileFailure;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolution;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
@@ -36,7 +36,7 @@ final class RuntimeProfileResolverTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->resolver = new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionLoader(self::PACKAGE));
+        $this->resolver = new RuntimeProfileResolver(new PackageDirectoryStructureDefinitionRegistry(self::PACKAGE));
     }
 
     public function testResolvesTwoLevelChainAncestorFirst(): void
@@ -91,7 +91,7 @@ final class RuntimeProfileResolverTest extends TestCase
         $registry = new InMemoryStructureDefinitionRegistry([$definition('subject')]);
         $resolver = new RuntimeProfileResolver(new CompositeStructureDefinitionRegistry([
             $registry,
-            new PackageDirectoryStructureDefinitionLoader(self::PACKAGE),
+            new PackageDirectoryStructureDefinitionRegistry(self::PACKAGE),
         ]));
 
         $before = $resolver->resolve(self::EXAMPLE . 'replaced', 'R4');
@@ -178,7 +178,7 @@ final class RuntimeProfileResolverTest extends TestCase
         ]]);
         $resolver = new RuntimeProfileResolver(new CompositeStructureDefinitionRegistry([
             $ig,
-            new PackageDirectoryStructureDefinitionLoader(self::PACKAGE),
+            new PackageDirectoryStructureDefinitionRegistry(self::PACKAGE),
         ]));
 
         $resolution = $resolver->resolve(self::EXAMPLE . 'ig-bp', 'R4');
@@ -192,7 +192,7 @@ final class RuntimeProfileResolverTest extends TestCase
      */
     public function testAnUnreadableDefinitionIsAFailureNotAnException(): void
     {
-        $package = new PackageDirectoryStructureDefinitionLoader(self::PACKAGE);
+        $package = new PackageDirectoryStructureDefinitionRegistry(self::PACKAGE);
         self::assertNotNull((new RuntimeProfileResolver($package))->resolveExtension(self::EXTENSION, 'R4'));
 
         $registry = new class ($package) implements StructureDefinitionRegistryInterface {
@@ -200,13 +200,13 @@ final class RuntimeProfileResolverTest extends TestCase
             {
             }
 
-            public function find(string $fhirVersion, string $url, ?string $version = null): ?array
+            public function find(string $url, string $fhirVersion, ?string $version = null): ?array
             {
                 if (in_array($url, [RuntimeProfileResolverTest::VITAL_SIGNS, RuntimeProfileResolverTest::EXTENSION], true)) {
                     throw new UnreadableStructureDefinitionException(sprintf('Cannot read the file for "%s".', $url));
                 }
 
-                return $this->inner->find($fhirVersion, $url, $version);
+                return $this->inner->find($url, $fhirVersion, $version);
             }
 
             public function fhirVersionsFor(string $url): array

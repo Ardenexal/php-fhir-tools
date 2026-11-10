@@ -92,7 +92,7 @@ final class InMemoryStructureDefinitionRegistry implements StructureDefinitionRe
         $this->definitions[$release][$url][is_string($version) ? $version : ''] = $structureDefinition;
     }
 
-    public function find(string $fhirVersion, string $url, ?string $version = null): ?array
+    public function find(string $url, string $fhirVersion, ?string $version = null): ?array
     {
         $release   = FhirReleaseLabel::normalize($fhirVersion);
         $byVersion = $release === null ? [] : ($this->definitions[$release][$url] ?? []);

@@ -27,12 +27,11 @@ and produces a structured [validation report](reports.md).
 ## Quick start
 
 ```php
-use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationServiceBuilder;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 
-// $validator is a Symfony ValidatorInterface wired with the FHIR constraint validators.
-// In Symfony DI this is handled by FHIRBundle; for manual wiring see Configuration.
-$service = new FHIRValidationService($validator, $pathService);
+// In Symfony, inject FHIRValidationServiceInterface instead: FHIRBundle wires it
+$service = FHIRValidationServiceBuilder::create()->build();
 
 $report = $service->validate(new PatientResource());
 
@@ -46,9 +45,10 @@ if ($report->isValid()) {
 ```
 
 {% hint style="info" %}
-Manual wiring of the constraint-validator factory, terminology client, reference resolver, and
-type-hierarchy resolver is covered on the [Configuration](configuration.md) page. Symfony DI
-users get this automatically via `FHIRBundle`.
+The builder takes a terminology client, a reference resolver, an IG type registry and
+StructureDefinitions to validate against at runtime; see [Runtime Profiles](runtime-profiles.md).
+Wiring the constraint-validator factory by hand is covered on the [Configuration](configuration.md)
+page. Symfony DI users get all of this from `FHIRBundle`.
 {% endhint %}
 
 `FHIRValidationService::validate()` has the following signature:
@@ -64,8 +64,7 @@ public function validate(
 ```
 
 `validateWithOptions($resource, new FHIRValidationOptions(...))` takes the same settings plus
-`profilesFromMeta`, which checks each resource against the profiles in its own `meta.profile`. It
-is on `FHIRValidationService`, not on `FHIRValidationServiceInterface`. See
+`profilesFromMeta`, which checks each resource against the profiles in its own `meta.profile`. See
 [Runtime Profiles](runtime-profiles.md#validate).
 
 ## Architecture

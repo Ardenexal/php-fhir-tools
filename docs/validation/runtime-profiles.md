@@ -47,30 +47,26 @@ reported as not checked, and none of its rules run.
 
 ## Set it up without the bundle
 
+`FHIRValidationServiceBuilder` wires the service the way the bundle does:
+
 ```php
-use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
-use Ardenexal\FHIRTools\Component\Validation\Profile\CompositeStructureDefinitionRegistry;
-use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
-use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
-use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
-use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
-use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationServiceBuilder;
 
-$resolver = new RuntimeProfileResolver(new CompositeStructureDefinitionRegistry([
-    new PackageDirectoryStructureDefinitionLoader('/path/to/hl7.fhir.r4.core'),
-    new PackageDirectoryStructureDefinitionLoader('/path/to/hl7.fhir.au.base'),
-    InMemoryStructureDefinitionRegistry::fromFiles(['/path/to/my-observation.json']),
-]));
-
-// Pass the resolver to the service...
-$service = new FHIRValidationService($validator, $pathService, runtimeProfiles: $resolver);
-
-// ...and give the slice validator the runtime attribute reader in your ConstraintValidatorFactory,
-// or slices from runtime profiles are not enforced
-new FHIRSliceConstraintValidator($propertyAccessor, $matcher, new RuntimeProfileAttributeReader($resolver));
+$service = FHIRValidationServiceBuilder::create()
+    ->withPackageDirectories('/path/to/hl7.fhir.r4.core', '/path/to/hl7.fhir.au.base')
+    ->withStructureDefinitionFiles('/path/to/my-observation.json')
+    ->build();
 ```
 
-You can also add decoded definitions directly with `new InMemoryStructureDefinitionRegistry([...])`.
+Each `with*()` call returns a new builder. Definitions are searched in files, then registries, then
+package directories, and the first match wins. The builder also takes a registry of your own
+(`withStructureDefinitionRegistry()`, for example one backed by a database), a terminology client, a
+reference resolver and an IG type registry.
+
+To wire the service yourself, pass a `RuntimeProfileResolver` as `runtimeProfiles`, and give
+`FHIRSliceConstraintValidator` a `RuntimeProfileAttributeReader` over the same resolver in your
+`ConstraintValidatorFactory`. Without the reader, slices from runtime profiles are not enforced.
+`InMemoryStructureDefinitionRegistry` also takes decoded definitions directly.
 
 ## Validate
 
@@ -92,9 +88,6 @@ $report = $service->validateWithOptions($bundle, new FHIRValidationOptions(profi
 A profile URL that the resource's class already declares is checked from the class, nested typed
 instances included. Any other URL is resolved at runtime; without a resolver, a `meta.profile` URL
 no class declares is reported as not checked, and a URL passed to `validate()` is ignored.
-
-`validateWithOptions()` is on `FHIRValidationService`, not on `FHIRValidationServiceInterface`, so
-inject the concrete class to use it.
 
 To check that a profile and its parents resolve before validating anything, for example at
 startup:
@@ -127,7 +120,9 @@ Findings carry the profile URL in `profileGroup`, as findings from a generated p
 
 ## When a profile cannot be checked
 
-A profile that cannot be used is reported as a warning, and validation goes on without it:
+A profile that cannot be used is reported as a warning with the code `fhir:profile-not-checked`, and
+validation goes on without it. `$report->hasUncheckedProfiles()` tells you whether that happened,
+and `$report->uncheckedProfiles()` lists the findings:
 
 * `Profile reference '…' has not been checked because it is unknown` when no registry holds it.
 * `Profile reference '…' has not been checked: …` naming the reason otherwise: the definition is

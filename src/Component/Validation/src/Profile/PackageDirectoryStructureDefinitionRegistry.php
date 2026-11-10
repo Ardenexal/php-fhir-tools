@@ -26,7 +26,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Profile;
  *
  * @author Ardenexal
  */
-final class PackageDirectoryStructureDefinitionLoader implements StructureDefinitionRegistryInterface
+final class PackageDirectoryStructureDefinitionRegistry implements StructureDefinitionRegistryInterface
 {
     /** Bytes read from the start of a file to find its resourceType without decoding it. */
     private const int HEAD_BYTES = 2048;
@@ -80,7 +80,7 @@ final class PackageDirectoryStructureDefinitionLoader implements StructureDefini
         }
     }
 
-    public function find(string $fhirVersion, string $url, ?string $version = null): ?array
+    public function find(string $url, string $fhirVersion, ?string $version = null): ?array
     {
         $release   = FhirReleaseLabel::normalize($fhirVersion);
         $byVersion = $release === null ? [] : ($this->index()[$release][$url] ?? []);

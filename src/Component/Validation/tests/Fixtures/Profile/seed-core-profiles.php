@@ -28,7 +28,7 @@ declare(strict_types=1);
  */
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
-use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 
 require dirname(__DIR__, 6) . '/vendor/autoload.php';
 
@@ -66,7 +66,7 @@ if (!is_string($release) || !isset($releases[$release]) || !is_string($packageDi
     exit(2);
 }
 
-$loader = new PackageDirectoryStructureDefinitionLoader($packageDir, $release);
+$loader = new PackageDirectoryStructureDefinitionRegistry($packageDir, $release);
 $target = __DIR__ . '/core-' . strtolower($release);
 
 /*
@@ -126,7 +126,7 @@ $missing = [];
 $queue   = array_values(array_unique($urls));
 while ($queue !== []) {
     $url     = array_shift($queue);
-    $current = $loader->find($release, $url);
+    $current = $loader->find($url, $release);
     if ($current === null) {
         $missing[] = $url;
         continue;
@@ -157,7 +157,7 @@ while ($queue !== []) {
                 }
                 foreach (is_array($type['profile'] ?? null) ? $type['profile'] : [] as $profile) {
                     $referenced = is_string($profile) ? explode('|', $profile)[0] : '';
-                    $found      = $referenced === '' || isset($written[$referenced]) ? null : $loader->find($release, $referenced);
+                    $found      = $referenced === '' || isset($written[$referenced]) ? null : $loader->find($referenced, $release);
                     if ($found !== null && ($found['kind'] ?? null) === 'complex-type') {
                         $queue[] = $referenced;
                     }
@@ -170,14 +170,14 @@ while ($queue !== []) {
             break;
         }
         $pipe    = strpos($parent, '|');
-        $current = $loader->find($release, $pipe === false ? $parent : substr($parent, 0, $pipe));
+        $current = $loader->find($pipe === false ? $parent : substr($parent, 0, $pipe), $release);
     }
 }
 
 // The parity extensions, from the extensions package; their own snapshot is all validation reads
-$extensions = new PackageDirectoryStructureDefinitionLoader($extensionsDir, $release);
+$extensions = new PackageDirectoryStructureDefinitionRegistry($extensionsDir, $release);
 foreach (PARITY_EXTENSIONS as $url) {
-    $extension = $extensions->find($release, $url);
+    $extension = $extensions->find($url, $release);
     if ($extension === null) {
         $missing[] = $url;
         continue;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation;
 
 /**
- * Settings for one {@see FHIRValidationService::validateWithOptions()} call.
+ * Settings for one {@see FHIRValidationServiceInterface::validateWithOptions()} call.
  *
  * Carries everything {@see FHIRValidationServiceInterface::validate()} takes, plus settings added
  * since. New settings go here rather than onto `validate()`, because a new parameter on an interface

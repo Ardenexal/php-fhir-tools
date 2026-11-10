@@ -13,7 +13,7 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\Profile\CompositeStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
-use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator;
@@ -180,7 +180,7 @@ class FHIRExtension extends Extension
         }
 
         foreach ($packageDirs as $directory) {
-            $registries[] = new Definition(PackageDirectoryStructureDefinitionLoader::class, [$directory]);
+            $registries[] = new Definition(PackageDirectoryStructureDefinitionRegistry::class, [$directory]);
         }
 
         $container->register('fhir.runtime_profiles.registry', CompositeStructureDefinitionRegistry::class)

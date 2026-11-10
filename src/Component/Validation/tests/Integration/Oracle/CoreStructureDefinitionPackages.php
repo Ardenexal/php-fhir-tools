@@ -6,7 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
 
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
-use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\StructureDefinitionRegistryInterface;
 
 /**
@@ -84,7 +84,7 @@ final class CoreStructureDefinitionPackages
 
         return $directory === null
             ? new InMemoryStructureDefinitionRegistry()
-            : new PackageDirectoryStructureDefinitionLoader($directory, $version->value);
+            : new PackageDirectoryStructureDefinitionRegistry($directory, $version->value);
     }
 
     /**

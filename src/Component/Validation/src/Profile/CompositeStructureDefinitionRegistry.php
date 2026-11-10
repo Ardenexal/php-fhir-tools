@@ -25,12 +25,12 @@ final class CompositeStructureDefinitionRegistry implements StructureDefinitionR
     {
     }
 
-    public function find(string $fhirVersion, string $url, ?string $version = null): ?array
+    public function find(string $url, string $fhirVersion, ?string $version = null): ?array
     {
         $failure = null;
         foreach ($this->registries as $registry) {
             try {
-                $structureDefinition = $registry->find($fhirVersion, $url, $version);
+                $structureDefinition = $registry->find($url, $fhirVersion, $version);
             } catch (UnreadableStructureDefinitionException $e) {
                 $failure ??= $e;
 
