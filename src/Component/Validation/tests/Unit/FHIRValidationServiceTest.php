@@ -371,6 +371,10 @@ final class FHIRValidationServiceTest extends TestCase
         );
         self::assertSame('http://example.org/fhir/StructureDefinition/p', $violation->profileGroup);
         self::assertSame('no-runtime-resolver', $violation->parameters['reason'] ?? null);
+        self::assertSame(FHIRViolationCode::PROFILE_NOT_CHECKED, $violation->code);
+        self::assertTrue($report->hasUncheckedProfiles());
+        self::assertSame([$violation], $report->uncheckedProfiles());
+        self::assertTrue($report->isValid(), 'a profile that was not checked is a warning, not an error');
 
         // A requested URL is ignored without a resolver, as it always was
         self::assertSame([], $this->service->validate($observation, ['http://example.org/fhir/StructureDefinition/p'])->violations);

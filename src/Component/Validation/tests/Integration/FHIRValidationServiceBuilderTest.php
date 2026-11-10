@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration;
 
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistryFactory;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRConstraintValidatorFactory;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationServiceBuilder;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationViolation;
+use Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver;
+use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -50,6 +55,55 @@ final class FHIRValidationServiceBuilderTest extends TestCase
         $unconfigured = $builder->build()->validate(self::observation('{"resourceType":"Observation","status":"final","code":{"text":"x"}}'), [self::BP]);
         self::assertSame([], $unconfigured->uncheckedProfiles());
         self::assertNotContains(self::BP, array_map(static fn (FHIRValidationViolation $v): ?string => $v->profileGroup, $unconfigured->violations));
+    }
+
+    /**
+     * Every source and collaborator the builder takes reaches the service: a file overrides the
+     * package's bp, and the custom registry and message registry are used.
+     */
+    public function testEverySourceAndCollaboratorIsUsed(): void
+    {
+        $file = sys_get_temp_dir() . '/fhir-builder-bp-' . bin2hex(random_bytes(4)) . '.json';
+        file_put_contents($file, json_encode([
+            'resourceType' => 'StructureDefinition', 'url' => self::BP, 'fhirVersion' => '4.0.1', 'kind' => 'resource',
+            'type'         => 'Observation', 'derivation' => 'constraint', 'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/Observation',
+            'snapshot'     => ['element' => [['id' => 'Observation', 'path' => 'Observation']]],
+            'differential' => ['element' => [['id' => 'Observation', 'path' => 'Observation', 'constraint' => [
+                ['key' => 'loc-1', 'severity' => 'error', 'human' => 'The local bp applies', 'expression' => "status = 'cancelled'"],
+            ]]]],
+        ], JSON_THROW_ON_ERROR));
+        $custom = new InMemoryStructureDefinitionRegistry([[
+            'resourceType'   => 'StructureDefinition', 'url' => 'http://example.org/fhir/StructureDefinition/custom', 'fhirVersion' => '4.0.1',
+            'kind'           => 'resource', 'type' => 'Observation', 'derivation' => 'constraint',
+            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/Observation',
+            'snapshot'       => ['element' => [['id' => 'Observation', 'path' => 'Observation']]],
+            'differential'   => ['element' => [['id' => 'Observation', 'path' => 'Observation', 'constraint' => [
+                ['key' => 'cus-1', 'severity' => 'error', 'human' => 'The custom registry applies', 'expression' => 'false'],
+            ]]]],
+        ]]);
+
+        try {
+            $service = FHIRValidationServiceBuilder::create()
+                ->withPackageDirectories(self::PACKAGE)
+                ->withStructureDefinitionFiles($file)
+                ->withStructureDefinitionRegistry($custom)
+                ->withTerminologyClient(new NullFHIRTerminologyClient())
+                ->withReferenceResolver(new NullFHIRReferenceResolver())
+                ->withIgTypeRegistry(FHIRIGTypeRegistryFactory::create())
+                ->withMessageRegistry(new FHIRValidationMessageRegistry())
+                ->build();
+        } finally {
+            unlink($file);
+        }
+
+        $report = $service->validate(
+            self::observation('{"resourceType":"Observation","status":"final","code":{"text":"x"}}'),
+            [self::BP, 'http://example.org/fhir/StructureDefinition/custom'],
+        );
+        $messages = array_map(static fn (FHIRValidationViolation $v): string => $v->message, $report->violations);
+
+        self::assertContains('The local bp applies', $messages);
+        self::assertContains('The custom registry applies', $messages);
     }
 
     public function testAMissingPackageDirectoryFailsWhenBuilding(): void
