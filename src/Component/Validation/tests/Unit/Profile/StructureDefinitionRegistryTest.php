@@ -101,6 +101,17 @@ final class StructureDefinitionRegistryTest extends TestCase
         InMemoryStructureDefinitionRegistry::fromFiles([$dir . '/patient.json']);
     }
 
+    public function testInMemoryRegistryRejectsAFileThatIsNotJson(): void
+    {
+        $dir = $this->tempDir();
+        file_put_contents($dir . '/broken.json', '{"resourceType":');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('is not valid JSON');
+
+        InMemoryStructureDefinitionRegistry::fromFiles([$dir . '/broken.json']);
+    }
+
     public function testInMemoryRegistryRejectsAMissingFile(): void
     {
         $this->expectException(\InvalidArgumentException::class);

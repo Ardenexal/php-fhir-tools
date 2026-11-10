@@ -102,6 +102,7 @@
             <directory>src/Exception</directory>
             <directory>src/Component/*/Exception</directory>
             <directory>src/Component/*/tests</directory>
+            <directory>src/Bundle/*/tests</directory>
             <directory>src/Component/*/output</directory>
         </exclude>
 
