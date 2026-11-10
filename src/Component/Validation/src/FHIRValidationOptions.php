@@ -23,9 +23,10 @@ final readonly class FHIRValidationOptions
      *                                                            included; for a profile resolved at runtime, also its constraint ancestors, on the
      *                                                            top-level resource only, as a generated class's inherited profiles are
      * @param bool                       $profilesFromMeta        Also validate each resource, nested ones included, against the profiles its own
-     *                                                            `meta.profile` names, as the reference validator does. Needs a runtime profile
-     *                                                            resolver on the service; generated profile classes are covered by
-     *                                                            $deriveProfilesFromClass instead
+     *                                                            `meta.profile` names, as the reference validator does. A profile the
+     *                                                            resource's class declares is checked from the class; any other needs a
+     *                                                            runtime profile resolver on the service, and without one is reported as
+     *                                                            not checked
      */
     public function __construct(
         public array $profileUrls = [],

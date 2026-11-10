@@ -171,14 +171,16 @@ class FHIRExtension extends Extension
             return;
         }
 
+        // Single files come first, so a local definition overrides a package's with the same URL and
+        // version; packages are then searched in the order listed
         $registries = [];
-        foreach ($packageDirs as $directory) {
-            $registries[] = new Definition(PackageDirectoryStructureDefinitionLoader::class, [$directory]);
-        }
-
         if ($files !== []) {
             $registries[] = (new Definition(InMemoryStructureDefinitionRegistry::class, [$files]))
                 ->setFactory([InMemoryStructureDefinitionRegistry::class, 'fromFiles']);
+        }
+
+        foreach ($packageDirs as $directory) {
+            $registries[] = new Definition(PackageDirectoryStructureDefinitionLoader::class, [$directory]);
         }
 
         $container->register('fhir.runtime_profiles.registry', CompositeStructureDefinitionRegistry::class)

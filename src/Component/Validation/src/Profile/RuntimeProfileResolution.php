@@ -38,12 +38,17 @@ final readonly class RuntimeProfileResolution
 
     /**
      * @param list<CompiledProfile> $chain Root-most ancestor first
+     *
+     * @internal Built by RuntimeProfileResolver
      */
     public static function resolved(string $profileUrl, string $fhirVersion, array $chain, string $rootType, string $kind): self
     {
         return new self($profileUrl, $fhirVersion, $chain, $rootType, $kind, null, null, '');
     }
 
+    /**
+     * @internal Built by RuntimeProfileResolver
+     */
     public static function failed(
         string $profileUrl,
         string $fhirVersion,

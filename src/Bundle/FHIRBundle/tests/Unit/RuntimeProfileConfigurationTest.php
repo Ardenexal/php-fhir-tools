@@ -62,6 +62,19 @@ final class RuntimeProfileConfigurationTest extends TestCase
         );
     }
 
+    public function testAConfiguredFileOverridesAPackageDefinitionWithTheSameUrl(): void
+    {
+        $service = self::validationService([
+            'package_dirs' => [self::FIXTURES . '/package'],
+            'files'        => [self::FIXTURES . '/final-observation-override.json'],
+        ]);
+
+        self::assertSame(
+            [['error', '', 'The local definition applies']],
+            self::findings($service, 'http://example.org/fhir/StructureDefinition/final-observation'),
+        );
+    }
+
     /**
      * A resource checked against a runtime profile has no slice attributes of its own, so the slice
      * validator reads them through the runtime attribute reader.

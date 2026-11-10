@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Profile;
 
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\BundleTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Profile\ObservationVitalsignsProfile;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntry;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationOptions;
@@ -167,6 +173,29 @@ final class RuntimeProfileValidationTest extends TestCase
         self::assertSame(
             [[self::NEED_SUBJECT, 'subject', self::MISSING_SUBJECT], [self::NEED_ISSUED, 'issued', self::MISSING_ISSUED]],
             $this->profileFindings($observation, [], profilesFromMeta: true),
+        );
+    }
+
+    /**
+     * A typed profile instance nested in a Bundle is checked against the profile its meta.profile
+     * claims from its own class, as a top-level one is with deriveProfilesFromClass, and the runtime
+     * definition with the same URL does not run on it.
+     */
+    public function testNestedTypedInstanceIsCheckedFromItsClassAgainstItsMetaProfile(): void
+    {
+        $vitals       = new ObservationVitalsignsProfile(meta: new Meta(profile: [new CanonicalPrimitive(value: self::CORE . 'vitalsigns')]));
+        $fromTopLevel = array_column($this->profileFindings(clone $vitals, [], deriveProfilesFromClass: true), 1);
+        self::assertNotSame([], $fromTopLevel);
+
+        $bundle = new BundleResource(
+            type: new BundleTypeType(value: 'collection'),
+            entry: [new BundleEntry(fullUrl: new UriPrimitive(value: 'urn:uuid:1'), resource: $vitals)],
+        );
+
+        self::assertSame([], $this->profileFindings($bundle, []), 'nothing asks for the entry\'s profile');
+        self::assertSame(
+            array_map(static fn (string $path): string => 'entry[0].resource' . ($path === '' ? '' : '.' . $path), $fromTopLevel),
+            array_column($this->profileFindings($bundle, [], profilesFromMeta: true), 1),
         );
     }
 

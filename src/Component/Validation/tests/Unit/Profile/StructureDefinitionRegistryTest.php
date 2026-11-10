@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Validation\Profile\CompositeStructureDefinitio
 use Ardenexal\FHIRTools\Component\Validation\Profile\FhirReleaseLabel;
 use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionLoader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\UnreadableStructureDefinitionException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -178,16 +179,36 @@ final class StructureDefinitionRegistryTest extends TestCase
         self::assertSame('bp', $loader->find('R4', self::BP)['id'] ?? null);
     }
 
-    public function testPackageLoaderFailsOnBrokenStructureDefinitionFile(): void
+    /**
+     * The broken file's URL is unknown, so the scan cannot leave it out of one lookup only. It fails
+     * every lookup, and keeps the failure rather than reading the whole directory again each time.
+     */
+    public function testPackageLoaderFailsEveryLookupOnceAScannedStructureDefinitionIsBroken(): void
     {
         $dir = $this->copyPackage(withIndex: false);
         file_put_contents($dir . '/StructureDefinition-broken.json', '{"resourceType": "StructureDefinition", "url": ');
 
         $loader = new PackageDirectoryStructureDefinitionLoader($dir);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('StructureDefinition-broken.json');
-        $loader->find('R4', self::BP);
+        $first = self::unreadable(static fn () => $loader->find('R4', self::BP));
+        self::assertStringContainsString('StructureDefinition-broken.json', $first->getMessage());
+
+        unlink($dir . '/StructureDefinition-broken.json');
+        self::assertSame($first, self::unreadable(static fn () => $loader->fhirVersionsFor(self::BP)));
+    }
+
+    /**
+     * `.index.json` names each file's URL, so a file it lists that is missing fails only that URL.
+     */
+    public function testPackageLoaderFailsOnlyTheLookupOfAnIndexedFileThatIsMissing(): void
+    {
+        $dir = $this->copyPackage(withIndex: true);
+        unlink($dir . '/StructureDefinition-bp.json');
+
+        $loader = new PackageDirectoryStructureDefinitionLoader($dir);
+
+        self::assertStringContainsString('StructureDefinition-bp.json', self::unreadable(static fn () => $loader->find('R4', self::BP))->getMessage());
+        self::assertSame('vitalsigns', $loader->find('R4', 'http://hl7.org/fhir/StructureDefinition/vitalsigns')['id'] ?? null);
     }
 
     public function testPackageLoaderRejectsMissingDirectory(): void
@@ -205,6 +226,37 @@ final class StructureDefinitionRegistryTest extends TestCase
         self::assertSame('local', $composite->find('R4', self::BP)['id'] ?? null);
         self::assertSame('vitalsigns', $composite->find('R4', 'http://hl7.org/fhir/StructureDefinition/vitalsigns')['id'] ?? null);
         self::assertSame(['R4'], $composite->fhirVersionsFor(self::BP));
+    }
+
+    public function testCompositeLooksPastARegistryThatCannotReadAndRethrowsWhenNothingAnswers(): void
+    {
+        $dir = $this->copyPackage(withIndex: false);
+        file_put_contents($dir . '/StructureDefinition-broken.json', '{"resourceType": "StructureDefinition", "url": ');
+        $broken = new PackageDirectoryStructureDefinitionLoader($dir);
+        $local  = new InMemoryStructureDefinitionRegistry([['url' => self::BP, 'fhirVersion' => 'R4', 'id' => 'local']]);
+
+        $composite = new CompositeStructureDefinitionRegistry([$broken, $local]);
+
+        self::assertSame('local', $composite->find('R4', self::BP)['id'] ?? null);
+        self::assertSame(['R4'], $composite->fhirVersionsFor(self::BP));
+        self::unreadable(static fn () => $composite->find('R4', self::VERSIONED));
+        self::unreadable(static fn () => $composite->fhirVersionsFor(self::VERSIONED));
+    }
+
+    /**
+     * Run a lookup that must fail to read a definition, and return why.
+     *
+     * @param \Closure(): mixed $lookup
+     */
+    private static function unreadable(\Closure $lookup): UnreadableStructureDefinitionException
+    {
+        try {
+            $lookup();
+        } catch (UnreadableStructureDefinitionException $e) {
+            return $e;
+        }
+
+        self::fail('The lookup did not report an unreadable definition.');
     }
 
     private function copyPackage(bool $withIndex): string
