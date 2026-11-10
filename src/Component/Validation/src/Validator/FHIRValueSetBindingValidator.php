@@ -204,7 +204,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         $enumFqcn = $this->resolveBoundEnum($constraint);
 
         if ($enumFqcn === null) {
-            if ($this->terminologyClient !== null) {
+            if ($this->terminologyClient !== null && !($constraint->fromProfile && $this->terminologyClient instanceof NullFHIRTerminologyClient)) {
                 $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
                 foreach ($this->codeValues($value) as $item) {
                     if (!$this->terminologyClient->validateCode($constraint->valueSetUrl, $item)) {
@@ -215,6 +215,14 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
                             ->addViolation();
                     }
                 }
+
+                return;
+            }
+
+            // A profile's binding names a value set this library may never have seen. Saying so is
+            // honest; "no enum class generated" would read as a fault in the generated models.
+            if ($constraint->fromProfile) {
+                $this->reportUnchecked($constraint);
 
                 return;
             }
@@ -261,11 +269,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         }
 
         if ($this->terminologyClient === null || $this->terminologyClient instanceof NullFHIRTerminologyClient) {
-            $override = $this->messageRegistry->getOverride('FHIRValueSetBindingUnchecked');
-            $this->context->buildViolation($override ?? self::DEFAULT_UNCHECKED_BINDING_MESSAGE)
-                ->setParameters(['{{ url }}' => $constraint->valueSetUrl])
-                ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
-                ->addViolation();
+            $this->reportUnchecked($constraint);
 
             return;
         }
@@ -290,6 +294,18 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
                     ->addViolation();
             }
         }
+    }
+
+    /**
+     * One fhir:unchecked-binding INFO violation: the binding exists but nothing configured can check it.
+     */
+    private function reportUnchecked(FHIRValueSetBinding $constraint): void
+    {
+        $override = $this->messageRegistry->getOverride('FHIRValueSetBindingUnchecked');
+        $this->context->buildViolation($override ?? self::DEFAULT_UNCHECKED_BINDING_MESSAGE)
+            ->setParameters(['{{ url }}' => $constraint->valueSetUrl])
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+            ->addViolation();
     }
 
     /**
@@ -336,9 +352,14 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
      *
      * @return class-string<\BackedEnum>|null
      */
-    private function resolveEnumFqcn(string $className): ?string
+    private function resolveEnumFqcn(string $className, ?string $release = null): ?string
     {
         foreach ($this->enumNamespaceRoots as $root) {
+            // A root belongs to a release when the release is one of its namespace segments
+            if ($release !== null && !in_array($release, explode('\\', $root), true)) {
+                continue;
+            }
+
             $fqcn = $root . '\\' . $className;
 
             // Folds the existence, enum and backing checks into one question: a candidate name built
@@ -372,7 +393,14 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
             }
         }
 
-        return $this->resolveEnumFqcn($this->classNameFromUrl($constraint->valueSetUrl));
+        $guessed = $this->resolveEnumFqcn($this->classNameFromUrl($constraint->valueSetUrl), $constraint->release);
+
+        // A profile binding trusts only an enum generated from that very value set
+        if ($constraint->fromProfile && $guessed !== null && !$this->enumDeclaresValueSet($guessed, $constraint->valueSetUrl)) {
+            return null;
+        }
+
+        return $guessed;
     }
 
     /**

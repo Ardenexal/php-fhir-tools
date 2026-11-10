@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
@@ -24,6 +25,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/DeviceDefinition-partVariableCount', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition.hasPart.count')]
 #[FHIRContextInvariant(expression: '$this.hasValue().not()')]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'pvc2',
+    severity: 'error',
+    expression: '$this.extension(\'minimum\').value.ofType(unsignedInt) <= $this.extension(\'maximum\').value.ofType(unsignedInt)',
+    human: 'Minimum count must be less than or equal to maximum count of part.',
+)]
 class DeviceDefinitionPartVariableCountExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

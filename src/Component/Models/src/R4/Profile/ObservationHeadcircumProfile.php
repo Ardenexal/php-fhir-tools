@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
@@ -84,6 +85,12 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'options'    => ['value' => '9843-4'],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/headcircum'],
+)]
+#[FHIRProfileBinding(
+    path: 'valueQuantity.code',
+    valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-bodylength|4.0.1',
+    strength: 'required',
     groups: ['http://hl7.org/fhir/StructureDefinition/headcircum'],
 )]
 class ObservationHeadcircumProfile extends ObservationVitalsignsProfile

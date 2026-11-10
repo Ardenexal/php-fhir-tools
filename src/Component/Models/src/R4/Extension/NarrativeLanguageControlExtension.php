@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/narrative-language-control', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'Reference')]
 #[FHIRExtensionContext(type: 'element', expression: 'canonical')]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/narrative-language-control', strength: 'required')]
 class NarrativeLanguageControlExtension extends Extension
 {
     /**

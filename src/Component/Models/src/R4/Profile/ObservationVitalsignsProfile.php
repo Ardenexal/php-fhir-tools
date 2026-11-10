@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
@@ -123,6 +125,48 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
             'options'    => ['value' => 'vital-signs'],
         ],
     ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
+)]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'vs-2',
+    severity: 'error',
+    expression: '(component.empty() and hasMember.empty()) implies (dataAbsentReason.exists() or value.exists())',
+    human: 'If there is no component or hasMember element then either a value[x] or a data absent reason must be present.',
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
+)]
+#[FHIRProfileInvariant(
+    path: 'effective[x]',
+    key: 'vs-1',
+    severity: 'error',
+    expression: '($this as dateTime).toString().length() >= 8',
+    human: 'if Observation.effective[x] is dateTime and has a value then that value shall be precise to the day',
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
+)]
+#[FHIRProfileInvariant(
+    path: 'component',
+    key: 'vs-3',
+    severity: 'error',
+    expression: 'value.exists() or dataAbsentReason.exists()',
+    human: 'If there is no a value a data absent reason must be present',
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
+)]
+#[FHIRProfileBinding(
+    path: 'code',
+    valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-vitalsignresult',
+    strength: 'extensible',
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
+)]
+#[FHIRProfileBinding(
+    path: 'component.code',
+    valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-vitalsignresult',
+    strength: 'extensible',
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
+)]
+#[FHIRProfileBinding(
+    path: 'component.value[x]',
+    valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-vitals-common|4.0.1',
+    strength: 'required',
     groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
 )]
 class ObservationVitalsignsProfile extends ObservationResource

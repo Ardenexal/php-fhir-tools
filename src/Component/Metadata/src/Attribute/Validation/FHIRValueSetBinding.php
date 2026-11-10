@@ -20,6 +20,15 @@ use Symfony\Component\Validator\Constraint;
  * Null when the generator could not resolve an enum (the value set was never materialised, or is
  * unenumerable like `AllLanguages`). Null must behave exactly as before: fall back to derivation and
  * then to the "no enum class generated" warning.
+ *
+ * `$fromProfile` marks a binding a profile declares (see FHIRProfileBinding). The profile names a
+ * value set by URL alone, so only an enum stamped with that URL is trusted, never one guessed from
+ * the URL's last segment, and a required binding that nothing can check is reported as unchecked
+ * instead of as a missing enum.
+ *
+ * `$release` ('R4', 'R4B', 'R5') limits the enum lookup to the namespace roots of that release. A
+ * value set keeps its URL across releases while its codes change: FHIR-version gains `5.0.0` in R5,
+ * so an R5 element checked against the R4 enum would reject a valid code. Null searches every root.
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 final class FHIRValueSetBinding extends Constraint
@@ -32,6 +41,8 @@ final class FHIRValueSetBinding extends Constraint
         public readonly ?string $enumClass = null,
         ?array $groups = null,
         mixed $payload = null,
+        public readonly bool $fromProfile = false,
+        public readonly ?string $release = null,
     ) {
         parent::__construct(null, $groups, $payload);
     }

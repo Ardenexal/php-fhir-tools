@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -19,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-structureLaterality', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation.bodySite')]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/structure-laterality-vs', strength: 'required')]
 class StructureLateralityExtension extends Extension
 {
     /**
