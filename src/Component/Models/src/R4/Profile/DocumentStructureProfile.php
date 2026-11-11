@@ -13,7 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
  * @see http://hl7.org/fhir/StructureDefinition/example-composition
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/example-composition', baseType: 'Composition', fhirVersion: 'R4')]
-#[FHIRSlicingRules(property: 'section', rules: 'closed', groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'])]
+#[FHIRSlicingRules(property: 'section', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'])]
 #[FHIRSliceConstraint(
     property: 'section',
     sliceName: 'procedure',
