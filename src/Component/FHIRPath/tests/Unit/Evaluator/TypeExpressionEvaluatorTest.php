@@ -423,7 +423,7 @@ final class TypeExpressionEvaluatorTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // Resources held as raw arrays (issue #147)
+    // Resources held as raw arrays
     // -------------------------------------------------------------------------
 
     public function testIsOperatorRecognisesArrayResourceByResourceType(): void
