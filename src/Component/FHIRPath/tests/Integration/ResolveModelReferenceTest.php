@@ -129,6 +129,22 @@ final class ResolveModelReferenceTest extends TestCase
         self::assertSame([$expected], $result->toArray());
     }
 
+    public function testInvariantPassesForAnUnresolvableMember(): void
+    {
+        // ctm-1's iif(empty(), true, ...) exists so a member that cannot be resolved passes. With an
+        // empty input, iif() used to evaluate empty() against the participant instead, and returned false.
+        $expression = 'onBehalfOf.exists() implies (member.resolve().iif(empty(), true, ofType(Practitioner).exists()))';
+        $careTeam   = $this->deserialize(FhirVersion::R4, [
+            'resourceType' => 'CareTeam',
+            'participant'  => [['member' => ['reference' => '#missing'], 'onBehalfOf' => ['reference' => 'Organization/o1']]],
+        ]);
+        self::assertInstanceOf(CareTeamResource::class, $careTeam);
+
+        $result = $this->service->evaluate($expression, $careTeam->participant[0], new EvaluationContext($careTeam));
+
+        self::assertSame([true], $result->toArray());
+    }
+
     public function testPolymorphicallyNavigatedRawReferenceResolves(): void
     {
         // `value` on a raw array finds `valueReference` and hands back a FHIRTypedCollection, which
