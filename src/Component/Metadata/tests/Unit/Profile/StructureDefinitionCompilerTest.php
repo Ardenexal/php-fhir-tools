@@ -100,6 +100,162 @@ final class StructureDefinitionCompilerTest extends TestCase
     }
 
     /**
+     * An `exists` slice is told apart by its own cardinality for the discriminator path: `min` 1
+     * means the element is present, `max` "0" that it is absent.
+     */
+    public function testExistsSliceTakesItsPresenceFromItsCardinalityAtThePath(): void
+    {
+        $sd = self::entrySlicing('openAtEnd', ['type' => 'exists', 'path' => 'resource'], [
+            ['id' => 'Bundle.entry:withResource', 'path' => 'Bundle.entry', 'sliceName' => 'withResource', 'min' => 1, 'max' => '1'],
+            ['id' => 'Bundle.entry:withResource.resource', 'path' => 'Bundle.entry.resource', 'min' => 1],
+            ['id' => 'Bundle.entry:withoutResource', 'path' => 'Bundle.entry', 'sliceName' => 'withoutResource'],
+            ['id' => 'Bundle.entry:withoutResource.resource', 'path' => 'Bundle.entry.resource', 'max' => '0'],
+        ]);
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+        $slices   = self::sliceArguments($compiled->attributes);
+
+        self::assertTrue($slices['withResource']['discriminatorValue']);
+        self::assertSame(1, $slices['withResource']['min']);
+        self::assertFalse($slices['withoutResource']['discriminatorValue']);
+        self::assertSame(['openAtEnd'], self::slicingRules($compiled->attributes));
+        self::assertSame([], $compiled->diagnostics);
+    }
+
+    /**
+     * A slice that states nothing about the `exists` path can never be matched, so it has no
+     * value, no minimum, and the openAtEnd rules relax to open with a diagnostic. The core
+     * subscription notification bundle slices `entry` this way, on a path no slice constrains.
+     */
+    public function testExistsSliceWithNoPresenceRelaxesItsSlicingToOpen(): void
+    {
+        $sd = self::entrySlicing('openAtEnd', ['type' => 'exists', 'path' => 'entry'], [
+            ['id' => 'Bundle.entry:first', 'path' => 'Bundle.entry', 'sliceName' => 'first', 'min' => 1, 'max' => '1'],
+            ['id' => 'Bundle.entry:first.resource', 'path' => 'Bundle.entry.resource', 'min' => 1],
+        ]);
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+        $slices   = self::sliceArguments($compiled->attributes);
+
+        self::assertArrayNotHasKey('discriminatorValue', $slices['first']);
+        self::assertSame(0, $slices['first']['min']);
+        self::assertSame(['open'], self::slicingRules($compiled->attributes));
+        self::assertCount(1, $compiled->diagnostics);
+        self::assertSame('Bundle.entry', $compiled->diagnostics[0]->elementId);
+        self::assertStringContainsString('first', $compiled->diagnostics[0]->message);
+    }
+
+    /**
+     * Closed slicing on a discriminator the validator cannot evaluate (here `resolve()`, as in the
+     * core lipid profile) is enforced as open, and its default slice is left out so items belonging
+     * to the named slices are not held to the default slice's rules. Matchable slicing keeps its rules.
+     */
+    public function testClosedSlicingWithAnUnmatchableSliceIsEnforcedAsOpen(): void
+    {
+        $sd = self::entrySlicing('closed', ['type' => 'value', 'path' => 'resolve().code'], [
+            ['id' => 'Bundle.entry:cholesterol', 'path' => 'Bundle.entry', 'sliceName' => 'cholesterol', 'min' => 1, 'max' => '1'],
+            ['id' => 'Bundle.entry:@default', 'path' => 'Bundle.entry', 'sliceName' => '@default'],
+            ['id' => 'Bundle.entry:@default.search', 'path' => 'Bundle.entry.search', 'max' => '0'],
+        ]);
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+
+        self::assertSame(['cholesterol'], array_keys(self::sliceArguments($compiled->attributes)));
+        self::assertSame(['open'], self::slicingRules($compiled->attributes));
+        self::assertCount(1, $compiled->diagnostics);
+
+        $matchable = self::entrySlicing('closed', ['type' => 'value', 'path' => 'fullUrl'], [
+            ['id' => 'Bundle.entry:status', 'path' => 'Bundle.entry', 'sliceName' => 'status', 'min' => 1],
+            ['id' => 'Bundle.entry:status.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:status'],
+        ]);
+
+        self::assertSame(['closed'], self::slicingRules((new StructureDefinitionCompiler())->compile($matchable)->attributes));
+    }
+
+    /**
+     * Slicing beneath a slice travels in that slice's rules, and relaxes the same way.
+     */
+    public function testUnmatchableSlicingBeneathASliceIsEnforcedAsOpen(): void
+    {
+        $sd = self::entrySlicing('open', ['type' => 'value', 'path' => 'fullUrl'], [
+            ['id' => 'Bundle.entry:status', 'path' => 'Bundle.entry', 'sliceName' => 'status'],
+            ['id' => 'Bundle.entry:status.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:status'],
+            [
+                'id'      => 'Bundle.entry:status.link',
+                'path'    => 'Bundle.entry.link',
+                'slicing' => ['discriminator' => [['type' => 'type', 'path' => '$this']], 'rules' => 'closed'],
+            ],
+            ['id' => 'Bundle.entry:status.link:self', 'path' => 'Bundle.entry.link', 'sliceName' => 'self'],
+        ]);
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+        $rules    = self::sliceArguments($compiled->attributes)['status']['rules'];
+
+        $slicing = array_values(array_filter($rules, static fn (array $rule): bool => $rule['constraint'] === FHIRSlicingRules::class));
+        self::assertCount(1, $slicing);
+        self::assertSame('open', $slicing[0]['options']['rules']);
+        self::assertCount(1, $compiled->diagnostics);
+        self::assertSame('Bundle.entry:status.link', $compiled->diagnostics[0]->elementId);
+    }
+
+    /**
+     * A Bundle profile slicing `entry` with the given rules and discriminator, plus $slices.
+     *
+     * @param array{type: string, path: string} $discriminator
+     * @param list<array<string, mixed>>        $slices
+     *
+     * @return array<string, mixed>
+     */
+    private static function entrySlicing(string $rules, array $discriminator, array $slices): array
+    {
+        $elements = [
+            ['id' => 'Bundle', 'path' => 'Bundle'],
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => ['discriminator' => [$discriminator], 'rules' => $rules]],
+            ...$slices,
+        ];
+
+        return ['url' => self::URL, 'differential' => ['element' => $elements], 'snapshot' => ['element' => $elements]];
+    }
+
+    /**
+     * Each compiled FHIRSliceConstraint's arguments, by slice name.
+     *
+     * @param list<CompiledAttribute> $attributes
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private static function sliceArguments(array $attributes): array
+    {
+        $slices = [];
+        foreach ($attributes as $attribute) {
+            if ($attribute->class === FHIRSliceConstraint::class) {
+                $slices[(string) $attribute->arguments['sliceName']] = $attribute->arguments;
+            }
+        }
+
+        return $slices;
+    }
+
+    /**
+     * The rules of each compiled FHIRSlicingRules, in order.
+     *
+     * @param list<CompiledAttribute> $attributes
+     *
+     * @return list<string>
+     */
+    private static function slicingRules(array $attributes): array
+    {
+        $rules = [];
+        foreach ($attributes as $attribute) {
+            if ($attribute->class === FHIRSlicingRules::class) {
+                $rules[] = (string) $attribute->arguments['rules'];
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
      * @param list<CompiledAttribute> $attributes
      *
      * @return list<string>

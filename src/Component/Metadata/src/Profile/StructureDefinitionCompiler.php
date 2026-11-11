@@ -771,7 +771,9 @@ final class StructureDefinitionCompiler
      * Limitations:
      *  - Only the first discriminator of a composite discriminator is used.
      *  - A slice whose discriminator cannot be matched (types 'type' and 'profile', `$this`, or a
-     *    value or pattern discriminator with no value found) gets no minimum, since it could only fail.
+     *    value, pattern or exists discriminator with no value or presence found) gets no minimum,
+     *    since it could only fail. Closed or openAtEnd slicing with such a slice is enforced as open,
+     *    and its default slice is left out; the relaxed rules are reported as a diagnostic.
      *  - Choice type slices ("value[x]:valueQuantity") are left to the plain constraints, which put
      *    them on the variant path. Reslices ("component:a/b") are not compiled.
      *  - A slice on slicing found in neither the differential nor the snapshot (a StructureDefinition
@@ -806,7 +808,7 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
-            $slices = self::sliceDefinitions($slicedId, $slicing, $diff, $snapshot);
+            $slices = self::sliceDefinitions($slicedId, $slicing, $diff, $snapshot, $profileUrl, $diagnostics);
             if ($slices === []) {
                 continue;
             }
@@ -817,7 +819,7 @@ final class StructureDefinitionCompiler
             if ($slicing['declaredHere']) {
                 $attributes[] = new CompiledAttribute(FHIRSlicingRules::class, [
                     'property' => $propertyPath,
-                    'rules'    => (string) ($slicing['definition']['rules'] ?? 'open'),
+                    'rules'    => self::enforceableRules($slicedId, $slicing, $slices, $profileUrl, $diagnostics),
                     'groups'   => [$profileUrl],
                 ]);
             }
@@ -949,15 +951,23 @@ final class StructureDefinitionCompiler
      * FHIRSlicingRules compiled in this profile's group judges every item against the slices in that
      * group, so an item matching only a parent's slice would otherwise be rejected.
      *
-     * @param string                                                      $slicedId Id of the sliced element, e.g. 'Observation.component'
-     * @param array{definition: array<string, mixed>, declaredHere: bool} $slicing  Its slicing, from slicingFor()
-     * @param array<string, array<string, mixed>>                         $diff     Differential elements by id
-     * @param array<string, array<string, mixed>>                         $snapshot Snapshot elements by id
+     * @param string                                                      $slicedId    Id of the sliced element, e.g. 'Observation.component'
+     * @param array{definition: array<string, mixed>, declaredHere: bool} $slicing     Its slicing, from slicingFor()
+     * @param array<string, array<string, mixed>>                         $diff        Differential elements by id
+     * @param array<string, array<string, mixed>>                         $snapshot    Snapshot elements by id
+     * @param string                                                      $profileUrl  URL of the profile being compiled
+     * @param list<CompilerDiagnostic>                                    $diagnostics Receives slicing beneath a slice that is enforced as open
      *
      * @return list<array<string, mixed>>
      */
-    private static function sliceDefinitions(string $slicedId, array $slicing, array $diff, array $snapshot): array
-    {
+    private static function sliceDefinitions(
+        string $slicedId,
+        array $slicing,
+        array $diff,
+        array $snapshot,
+        string $profileUrl,
+        array &$diagnostics,
+    ): array {
         $definition     = $slicing['definition'];
         $discriminators = is_array($definition['discriminator'] ?? null) ? array_values($definition['discriminator']) : [];
         $first          = is_array($discriminators[0] ?? null) ? $discriminators[0] : [];
@@ -979,9 +989,7 @@ final class StructureDefinitionCompiler
 
             // An item can only join a slice its discriminator can match, so a minimum on any other
             // slice could only fail. The default slice takes the items no named slice matched.
-            $matchable = $isDefault
-                || $discType === 'exists'
-                || (in_array($discType, ['value', 'pattern'], true) && $value !== null);
+            $matchable = $isDefault || $value !== null;
 
             $definition = [
                 'sliceName'         => $sliceName,
@@ -1001,7 +1009,7 @@ final class StructureDefinitionCompiler
 
             $definition['orderedIndex'] = $orderedIndex;
 
-            $rules = self::sliceRules($sliceId, $diff, $snapshot);
+            $rules = self::sliceRules($sliceId, $diff, $snapshot, $profileUrl, $diagnostics);
             if ($rules !== []) {
                 $definition['rules'] = $rules;
             }
@@ -1009,7 +1017,65 @@ final class StructureDefinitionCompiler
             $definitions[] = $definition;
         }
 
+        // The default slice takes the items no named slice matched. While a named slice cannot match
+        // its own items, they would land there too and be held to the default slice's rules.
+        if (array_filter($definitions, self::isUnmatchable(...)) !== []) {
+            $definitions = array_values(array_filter($definitions, static fn (array $d): bool => !($d['isDefault'] ?? false)));
+        }
+
         return $definitions;
+    }
+
+    /**
+     * True for a named slice whose discriminator cannot be evaluated against an item, so no item
+     * ever matches it: types 'type' and 'profile', `$this`, a path through `resolve()`, or a value,
+     * pattern or presence the compiler did not find.
+     *
+     * @param array<string, mixed> $definition A slice definition from sliceDefinitions()
+     */
+    private static function isUnmatchable(array $definition): bool
+    {
+        return !($definition['isDefault'] ?? false) && !array_key_exists('discriminatorValue', $definition);
+    }
+
+    /**
+     * The slicing rules to enforce for a slicing declared here: its own, unless a slice cannot be
+     * matched, in which case 'open'.
+     *
+     * Closed and openAtEnd rules judge every item by the slice it matches. An item belonging to a
+     * slice the validator cannot match matches none, so closed rules would reject it and openAtEnd
+     * would reject the matched items after it, though the resource conforms. Enforcing 'open' gives
+     * up those checks for the whole slicing, and a diagnostic says so.
+     *
+     * @param array{definition: array<string, mixed>, declaredHere: bool} $slicing     Its slicing, from slicingFor()
+     * @param list<array<string, mixed>>                                  $slices      Its slices, from sliceDefinitions()
+     * @param list<CompilerDiagnostic>                                    $diagnostics Receives one entry when the rules are relaxed
+     */
+    private static function enforceableRules(string $slicedId, array $slicing, array $slices, string $profileUrl, array &$diagnostics): string
+    {
+        $rules = (string) ($slicing['definition']['rules'] ?? 'open');
+        if ($rules === 'open') {
+            return $rules;
+        }
+
+        $unmatchable = array_column(array_filter($slices, self::isUnmatchable(...)), 'sliceName');
+        if ($unmatchable === []) {
+            return $rules;
+        }
+
+        $diagnostics[] = new CompilerDiagnostic(
+            sprintf(
+                'Profile %s slices %s with %s rules, but slice(s) %s use a discriminator that cannot be evaluated; the slicing is enforced as open',
+                $profileUrl,
+                $slicedId,
+                $rules,
+                implode(', ', $unmatchable),
+            ),
+            $slicedId,
+            ['profileUrl' => $profileUrl],
+        );
+
+        return 'open';
     }
 
     /**
@@ -1019,13 +1085,15 @@ final class StructureDefinitionCompiler
      * slice, plus its FHIRSlicingRules when the slicing is declared here; the validator applies them
      * to that element's items within each item matching this slice.
      *
-     * @param string                              $sliceId  Id of the slice, e.g. 'Observation.component:SystolicBP'
-     * @param array<string, array<string, mixed>> $diff     Differential elements by id
-     * @param array<string, array<string, mixed>> $snapshot Snapshot elements by id
+     * @param string                              $sliceId     Id of the slice, e.g. 'Observation.component:SystolicBP'
+     * @param array<string, array<string, mixed>> $diff        Differential elements by id
+     * @param array<string, array<string, mixed>> $snapshot    Snapshot elements by id
+     * @param string                              $profileUrl  URL of the profile being compiled
+     * @param list<CompilerDiagnostic>            $diagnostics Receives slicing beneath the slice that is enforced as open
      *
      * @return list<array{path: string, constraint: class-string, options: array<string, mixed>}>
      */
-    private static function sliceRules(string $sliceId, array $diff, array $snapshot): array
+    private static function sliceRules(string $sliceId, array $diff, array $snapshot, string $profileUrl, array &$diagnostics): array
     {
         $prefix = $sliceId . '.';
         $rules  = [];
@@ -1054,7 +1122,7 @@ final class StructureDefinitionCompiler
 
             // As at the top level, a slicing with no slices to check compiles to nothing: closed rules
             // with no slice beside them would reject every item
-            $definitions = self::sliceDefinitions($nestedId, $slicing, $diff, $snapshot);
+            $definitions = self::sliceDefinitions($nestedId, $slicing, $diff, $snapshot, $profileUrl, $diagnostics);
             if ($definitions === []) {
                 continue;
             }
@@ -1065,7 +1133,10 @@ final class StructureDefinitionCompiler
                 $rules[] = [
                     'path'       => $relative,
                     'constraint' => FHIRSlicingRules::class,
-                    'options'    => ['property' => $relative, 'rules' => (string) ($slicing['definition']['rules'] ?? 'open')],
+                    'options'    => [
+                        'property' => $relative,
+                        'rules'    => self::enforceableRules($nestedId, $slicing, $definitions, $profileUrl, $diagnostics),
+                    ],
                 ];
             }
 
@@ -1101,7 +1172,15 @@ final class StructureDefinitionCompiler
         array $diff,
         array $snapshot,
     ): mixed {
-        if (!in_array($discType, ['value', 'pattern'], true) || $discPath === '' || $discPath === '$this') {
+        if ($discPath === '' || $discPath === '$this') {
+            return null;
+        }
+
+        if ($discType === 'exists') {
+            return self::discriminatorPresence($sliceId, $discPath, $diff, $snapshot);
+        }
+
+        if (!in_array($discType, ['value', 'pattern'], true)) {
             return null;
         }
 
@@ -1142,6 +1221,38 @@ final class StructureDefinitionCompiler
             $header = $snapshot[$sliceId] ?? $diff[$sliceId] ?? [];
 
             return $header['type'][0]['profile'][0] ?? null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether an item must have (true) or lack (false) the element at an `exists` discriminator's
+     * path to belong to a slice, or null when the slice does not say.
+     *
+     * The slice states it in its own cardinality for that element: `min` 1 or more requires it,
+     * `max` "0" forbids it. The snapshot is read first, then the differential.
+     *
+     * @param array<string, array<string, mixed>> $diff     Differential elements by id
+     * @param array<string, array<string, mixed>> $snapshot Snapshot elements by id
+     */
+    private static function discriminatorPresence(string $sliceId, string $discPath, array $diff, array $snapshot): ?bool
+    {
+        $id = $sliceId . '.' . $discPath;
+
+        foreach ([$snapshot, $diff] as $source) {
+            $element = $source[$id] ?? null;
+            if ($element === null) {
+                continue;
+            }
+
+            if ((string) ($element['max'] ?? '') === '0') {
+                return false;
+            }
+
+            if ((int) ($element['min'] ?? 0) >= 1) {
+                return true;
+            }
         }
 
         return null;

@@ -81,6 +81,11 @@ final class RuntimeProfileParityTest extends TestCase
         'ProfileForHLAGenotypingResultsProfile'         => 'extension rules only',
         'ServiceRequestGeneticsProfile'                 => 'extension rules only',
         'CQFquestionnaireProfile'                       => 'an optional extension slice only (R4B)',
+        // Their slicing cannot be matched, so it is enforced as open (#141); the remaining rules
+        // bound elements an empty entry leaves absent (R5).
+        'HistoryBundleProfile'                  => 'unmatchable slicing enforced as open',
+        'SearchSetBundleProfile'                => 'unmatchable slicing enforced as open',
+        'SubscriptionNotificationBundleProfile' => 'unmatchable slicing enforced as open',
         // They mark elements must-support and state no rules (R4).
         'EHRSFMrecordLifecycleEventAuditEventProfile'  => 'must-support markers only',
         'EHRSFMrecordLifecycleEventProvenanceProfile'  => 'must-support markers only',

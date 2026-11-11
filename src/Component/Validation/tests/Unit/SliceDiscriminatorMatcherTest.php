@@ -155,6 +155,19 @@ final class SliceDiscriminatorMatcherTest extends TestCase
         self::assertFalse($this->matcher->matches($item, 'exists', 'system', false));
     }
 
+    /**
+     * A slice whose definition states no presence carries no boolean, and must not read as
+     * "absent": that made every item without the element match it.
+     */
+    public function testExistsWithNoPresenceMatchesNothing(): void
+    {
+        $item         = new \stdClass();
+        $item->system = 'http://example.org';
+
+        self::assertFalse($this->matcher->matches($item, 'exists', 'missingField', null));
+        self::assertFalse($this->matcher->matches($item, 'exists', 'system', null));
+    }
+
     // ------------------------------------------------------------------
     // unsupported discriminator types
     // ------------------------------------------------------------------

@@ -14,7 +14,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *   - 'value'  — The item has a specific value at the given path (exact match, string-coerced)
  *   - 'pattern' — The item contains a pattern at the given path (subset/recursive match)
  *   - 'exists'  — The discriminator value is a boolean: true means the path element must be
- *                 present (non-null), false means it must be absent (null)
+ *                 present (non-null), false means it must be absent (null). With no boolean, the
+ *                 slice does not say which, and no item matches it
  *
  * Unsupported types ('type', 'profile'):
  *   These require full profile resolution and are out of scope for this milestone.
@@ -116,6 +117,10 @@ final class SliceDiscriminatorMatcher
      * true  → path element must be present (non-null)
      * false → path element must be absent (null)
      *
+     * Anything else, such as the null a slice gets when its definition states neither, matches
+     * nothing. Reading null as "absent" made every item without the element match the slice, so a
+     * slice capped at one item rejected any second item.
+     *
      * @param object|array<string, mixed> $item
      */
     private function matchesExists(
@@ -123,9 +128,13 @@ final class SliceDiscriminatorMatcher
         string $path,
         mixed $expected,
     ): bool {
+        if (!is_bool($expected)) {
+            return false;
+        }
+
         $present = $this->readPathValues($item, $path) !== [];
 
-        return (bool) $expected === $present;
+        return $expected === $present;
     }
 
     /**
