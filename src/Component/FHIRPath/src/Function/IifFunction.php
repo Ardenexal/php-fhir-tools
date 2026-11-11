@@ -38,11 +38,7 @@ class IifFunction extends AbstractFunction
             throw new EvaluationException('iif() requires a single-item or empty input collection');
         }
 
-        // When input has a single item, expose it as $this and as the current node so that
-        // condition/branches can reference $this to mean the iif's focus (e.g. $this = 'context').
-        $evalContext = !$input->isEmpty()
-            ? $context->withCurrentNode($input->first())->withBundleEntryScope($input->scopeAt(0))->withVariable('this', $input->first())
-            : $context;
+        $evalContext = $this->focusContext($input, $context);
 
         // Evaluate condition
         $conditionResult = $evaluator->evaluateWithContext($parameters[0], $evalContext);
@@ -78,5 +74,30 @@ class IifFunction extends AbstractFunction
         }
 
         return $evaluator->evaluateWithContext($parameters[2], $evalContext);
+    }
+
+    /**
+     * Build the context the criterion and both branches are evaluated in, with the input as their focus.
+     */
+    private function focusContext(Collection $input, EvaluationContext $context): EvaluationContext
+    {
+        // A single item becomes the current node and $this, so condition/branches can reference
+        // $this to mean the iif's focus (e.g. $this = 'context').
+        if (!$input->isEmpty()) {
+            return $context->withCurrentNode($input->first())->withBundleEntryScope($input->scopeAt(0))->withVariable('this', $input->first());
+        }
+
+        // A bare iif() on a null current node, such as an extension-only primitive in a raw array
+        // inside select(), is already focused on that node, and $this names it. Clearing $this
+        // would make `$this.exists()` false for an element that exists.
+        if ($context->getCurrentNode() === null) {
+            return $context;
+        }
+
+        // Otherwise the empty input came from navigation (`missing.iif(...)`, `{}.iif(...)`). Leave no
+        // current node and no $this, so `empty()` or `exists()` see the empty input and a path such
+        // as `active` does not navigate from the enclosing focus. ctm-1's
+        // `member.resolve().iif(empty(), true, ...)` depends on this.
+        return $context->withCurrentNode(null)->withBundleEntryScope(null)->withoutVariable('this');
     }
 }
