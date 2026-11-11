@@ -60,6 +60,14 @@ final class FHIRTypeResolverTest extends TestCase
         self::assertSame('dateTime', $this->resolver->inferType($fhirDateTime));
     }
 
+    public function testInferTypeReadsResourceTypeFromArray(): void
+    {
+        self::assertSame('Patient', $this->resolver->inferType(['resourceType' => 'Patient']));
+        // Without a string resourceType an array names no FHIR type.
+        self::assertSame('Collection', $this->resolver->inferType(['family' => 'Example']));
+        self::assertSame('Collection', $this->resolver->inferType(['resourceType' => ['Patient']]));
+    }
+
     public function testIsOfTypeWithPrimitiveValues(): void
     {
         self::assertTrue($this->resolver->isOfType(true, 'boolean'));

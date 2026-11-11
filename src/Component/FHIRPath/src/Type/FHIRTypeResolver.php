@@ -251,6 +251,14 @@ class FHIRTypeResolver
         }
 
         if (is_array($value)) {
+            // A resource held as a raw array (decoded JSON, a contained resource, a Bundle entry)
+            // names its own type in `resourceType`, so it answers is/as/ofType like the equivalent
+            // model. TypeFunction::getTypeInfo() reads the same key for type(). Complex types held
+            // as arrays carry no such key and stay untyped: naming them needs the parent's schema.
+            if (isset($value['resourceType']) && is_string($value['resourceType'])) {
+                return $value['resourceType'];
+            }
+
             return 'Collection';
         }
 
