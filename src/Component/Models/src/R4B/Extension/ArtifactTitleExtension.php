@@ -20,7 +20,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-title', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'CompartmentDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ExampleScenario')]
 #[FHIRExtensionContext(type: 'element', expression: 'GraphDefinition')]

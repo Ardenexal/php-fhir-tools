@@ -22,7 +22,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 #[FHIRExtensionContext(type: 'element', expression: 'DocumentReference')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
 class EventStatusReasonExtension extends Extension
 {

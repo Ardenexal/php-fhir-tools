@@ -9,10 +9,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSour
 /**
  * ValueSet: Value Filter Comparator
  * URL: http://hl7.org/fhir/ValueSet/value-filter-comparator
- * Version: 5.3.0
+ * Version: 5.0.0
  * Description: The type of comparator operator to use
  */
-#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/value-filter-comparator', version: '5.3.0')]
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/value-filter-comparator', version: '5.0.0')]
 enum ValueFilterComparator: string
 {
     /** Equals */

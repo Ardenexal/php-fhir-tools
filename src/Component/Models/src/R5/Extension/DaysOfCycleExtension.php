@@ -19,8 +19,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/timing-daysOfCycle', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration.action.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action.action')]
 class DaysOfCycleExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

@@ -19,10 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  * @description The status of this artifact. Enables tracking the life-cycle of the content.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-status', fhirVersion: 'R4')]
-#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment')]
-#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication')]
@@ -31,8 +28,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
 #[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Substance')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'required')]
 class ArtifactStatusExtension extends Extension
 {

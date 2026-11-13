@@ -21,13 +21,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-compliesWith', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
-#[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity.plannedActivityReference')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImmunizationRecommendation')]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]

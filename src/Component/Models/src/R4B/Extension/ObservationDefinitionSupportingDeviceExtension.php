@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+
+/**
+ * @author HL7 International / Orders and Observations
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/observationdefinition-supportingDevice
+ *
+ * @description A reference to additional devices, kits, or reagents (e.g., TestKit, Calibration Kit, QC materials) to support the generation of the measurement.
+ */
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observationdefinition-supportingDevice', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
+class ObservationDefinitionSupportingDeviceExtension extends Extension
+{
+    /**
+     * @param list<Extension> $extension
+     */
+    public function __construct(
+        /** @var CodeableReference|null valueCodeableReference Value of extension */
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        public ?CodeableReference $valueCodeableReference = null,
+        ?string $id = null,
+        array $extension = [],
+    ) {
+        parent::__construct(
+            id: $id,
+            extension: $extension,
+            url: 'http://hl7.org/fhir/StructureDefinition/observationdefinition-supportingDevice',
+            value: $this->valueCodeableReference,
+        );
+    }
+}

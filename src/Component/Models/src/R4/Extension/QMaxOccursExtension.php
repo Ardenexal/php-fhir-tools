@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
-#[FHIRContextInvariant(expression: 'type=\'display\' implies (repeats.empty() or repeats=false) and (required.empty() or repeats=false)')]
+#[FHIRContextInvariant(expression: 'repeats=true')]
 class QMaxOccursExtension extends Extension
 {
     /**

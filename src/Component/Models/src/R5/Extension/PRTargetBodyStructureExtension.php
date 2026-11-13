@@ -15,7 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @see http://hl7.org/fhir/StructureDefinition/procedure-targetBodyStructure
  *
- * @description The target body site used for this procedure.  Multiple locations are allowed.
+ * @description The target body site used for this procedure.  Multiple locations are allowed.  For Procedure, this extension is no longer required in FHIR R6 or later because Procedure has a core reference to BodyStructure.  For ServiceRequest, this extension is only needed before R5 because ServiceRequest.bodyStructure is available in FHIR R5 and later.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-targetBodyStructure', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]

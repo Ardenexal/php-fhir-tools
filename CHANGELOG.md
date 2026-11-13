@@ -31,7 +31,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [FHIRPath] `is`, `as` and `ofType()` now recognise a resource held as a raw array by its `resourceType`, as they already did for models and as `type()` already did for arrays. `$this is Patient` on an array Patient was `false`, and `ofType(Patient)` and `as Patient` returned nothing, so `Bundle.entry.resource.ofType(Composition)` was empty on an array Bundle and R4 `ctm-1` failed for a member resolving to a contained `Practitioner`. Results of invariants and expressions using these operators on arrays can change. Complex types held as arrays, such as `name.ofType(HumanName)`, still do not match, because an array does not name its own data type. (#147)
 - [Validation] An extension nested one level inside another extension is now checked against its element contexts. The reference validator places it at `Extension` and at the carrying extension's path (`Patient.extension`), so `bodySite` inside `patient-animal` is reported as not permitted. Such contexts were previously never denied. Deeper nesting still defers. (#167)
 
+### Changed
+- **BREAKING: [Models] Four extension classes change shape in R4, R4B and R5, because the models are now generated from `hl7.fhir.uv.extensions` 5.4.0 instead of 5.3.0.** Update code that constructs these classes or reads the listed properties:
+  - `DosageMinimumGapBetweenDoseExtension` is now a simple extension with a `valueDuration`. `meetGoal`, `whenTrigger`, `precondition` and `fromSubExtensions()` are removed, and the class no longer implements `FHIRComplexExtensionInterface`.
+  - `EnteredInErrorStatusExtension` replaces `valueUrl` with a `value` choice of `valueString` or `valueCode`.
+  - `LargeValueExtension` replaces `valueDecimal` with a `value` choice of `valueDecimal` or `valueString` (`valueInteger64` in R5), and invariant `lv-1` requires a whole number.
+  - `RelativeDateCriteriaExtension` makes `targetReference` and `targetCode` optional and moves `$offset` to the first constructor parameter, so positional calls must be reordered. Invariant `rdt-1` requires one of the two.
+- [Models] [Validation] Extension contexts, context invariants and bindings follow 5.4.0, so validation results can change. R4 and R4B extensions drop contexts that name R5-only resources and elements. A few contexts that do exist in R4 and R4B go too: `QuantityAccuracyExtension` no longer allows `DeviceMetric`, and `CSExpectationExtension` no longer allows `CapabilityStatement.messaging.reliableCache` or `CapabilityStatement.messaging.supportedMessage`. In every release, `SDStandardsStatusExtension` moves from `CodeSystem.concept` to `ValueSet.compose.include.concept`. The `StructureLateralityExtension` binding is now `extensible` rather than `required`. The `QMinOccursExtension`, `QMaxOccursExtension` and `QChoiceOrientationExtension` context invariants are replaced with the 5.4.0 expressions. Several extensions gain contexts, such as `PlanDefinition.action.action` and `Questionnaire.item.item`. R5's `ValueFilterComparator` enum now comes from `hl7.fhir.r5.core` 5.0.0, because 5.4.0 no longer ships its value set, and has the same cases.
+- [CodeGeneration] `fhir:generate` and `fhir:generate-ig` default to `hl7.fhir.uv.extensions` 5.4.0, as do the `generate-models-*` composer scripts. The commands in `docs/code-generation/base-models.md` now pin every package version.
+
 ### Removed
+- **BREAKING: [Models] Five R4 and four R4B extension classes are removed by the move to `hl7.fhir.uv.extensions` 5.4.0.** Code that names one of them no longer autoloads. JSON carrying their URLs still reads and writes back the same content.
+
+  | Removed class | Releases | Extension URL (`http://hl7.org/fhir/StructureDefinition/…`) | Use instead |
+  |---|---|---|---|
+  | `AdoptionInfoExtension` | R4, R4B | `patient-adoptionInfo` | `PatAdoptionInfoExtension`: same URL and constructor, renamed after its 5.4.0 definition |
+  | `CitationSocietyAffiliationExtension` | R4, R4B | `citation-societyAffiliation` | None. 5.4.0 drops the definition; build a plain `Extension` with the URL |
+  | `DeviceDefinitionPartVariableCountExtension` | R4, R4B | `DeviceDefinition-partVariableCount` | None, as above |
+  | `RequirementsParentExtension` | R4, R4B | `requirements-parent` | None, as above |
+  | `StatisticModelIncludeIfExtension` | R4 | `statistic-model-include-if` | None, as above. R4B keeps the class |
+
 - **BREAKING: [Models] The `CNX` case (`chinesepeopl_es_bankdollar`) is removed from the R4, R4B and R5 `Currencies` enums.** The enum is generated from `symfony/intl` currency data, and 7.4.22 no longer lists CNX. `Currencies::from('CNX')` now throws and `tryFrom('CNX')` returns `null`. There is no replacement.
 
 ### Infrastructure

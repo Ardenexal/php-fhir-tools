@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
+namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
 /**
- * @author HL7
+ * @author HL7 International / Patient Administration
  *
  * @see http://hl7.org/fhir/StructureDefinition/patient-adoptionInfo
  *
  * @description Code indication the adoption status of the patient.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-adoptionInfo', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-adoptionInfo', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient')]
-class AdoptionInfoExtension extends Extension
+class PatAdoptionInfoExtension extends Extension
 {
     /**
      * @param list<Extension> $extension

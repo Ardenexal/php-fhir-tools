@@ -20,7 +20,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  * @description The details provided in this contact may be used according to the attached availability guidelines.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/extended-contact-availability', fhirVersion: 'R4')]
-#[FHIRExtensionContext(type: 'element', expression: 'ExtendedContactDetail')]
 #[FHIRExtensionContext(type: 'element', expression: 'ContactDetail')]
 #[FHIRExtensionContext(type: 'element', expression: 'Address')]
 class ExtendedContactAvailabilityExtension extends Extension implements FHIRComplexExtensionInterface

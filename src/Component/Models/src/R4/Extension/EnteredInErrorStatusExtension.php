@@ -8,7 +8,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
 /**
  * @author HL7 International / FHIR Infrastructure
@@ -25,9 +26,27 @@ class EnteredInErrorStatusExtension extends Extension
      * @param list<Extension> $extension
      */
     public function __construct(
-        /** @var UrlPrimitive|null valueUrl Value of extension */
-        #[FhirProperty(fhirType: 'url', propertyKind: 'primitive')]
-        public ?UrlPrimitive $valueUrl = null,
+        /** @var StringPrimitive|CodePrimitive|null value Value of extension */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+                    'jsonKey'      => 'valueString',
+                ],
+                [
+                    'fhirType'     => 'code',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive',
+                    'jsonKey'      => 'valueCode',
+                ],
+            ],
+        )]
+        StringPrimitive|CodePrimitive|null $value = null,
         ?string $id = null,
         array $extension = [],
     ) {
@@ -35,7 +54,7 @@ class EnteredInErrorStatusExtension extends Extension
             id: $id,
             extension: $extension,
             url: 'http://hl7.org/fhir/StructureDefinition/entered-in-error-status',
-            value: $this->valueUrl,
+            value: $value,
         );
     }
 }

@@ -21,8 +21,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-preferenceType', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient.communication.preferred')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson.communication.preferred')]
-#[FHIRExtensionContext(type: 'element', expression: 'Practitioner.communication.preferred')]
-#[FHIRExtensionContext(type: 'element', expression: 'Person.communication.preferred')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/language-preference-type', strength: 'extensible')]
 class PatPreferenceTypeExtension extends Extension
 {

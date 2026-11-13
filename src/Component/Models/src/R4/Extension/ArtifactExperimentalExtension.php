@@ -17,10 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description A Boolean value to indicate that this artifact is authored for testing purposes (or education/evaluation/marketing) and is not intended to be used for genuine usage.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-experimental', fhirVersion: 'R4')]
-#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment')]
-#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Evidence')]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
@@ -31,8 +28,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
 #[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Substance')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
 class ArtifactExperimentalExtension extends Extension
 {
     /**
