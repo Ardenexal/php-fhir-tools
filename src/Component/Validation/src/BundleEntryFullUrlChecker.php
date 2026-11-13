@@ -97,19 +97,19 @@ final class BundleEntryFullUrlChecker
      * `[type]/[id]`, then an optional `_history/[vid]`.
      *
      * The base path uses the reference validator's own narrow character class: no hyphen, so
-     * `http://my-server.org/Patient/1` does not look RESTful to it and is not checked. The base is
-     * required. A relative `fullUrl` is never checked by this rule: `mni-patientOverview-bundle-example1b`
+     * `http://my-server.org/Patient/1` does not look RESTful to it and is not checked. The base needs
+     * at least one segment, so a host is never read as the type (`http://Patient/p2` is not checked). A relative `fullUrl` is never checked by this rule: `mni-patientOverview-bundle-example1b`
      * holds a Composition with id `1a` at `Composition/1`, and the reference validator reports only
      * that the URL is not absolute (rule 1). The type segment is confirmed against the resource type
      * enums after the match.
      */
-    private const string RESTFUL_FULL_URL = '~\Ahttps?://(?:[A-Za-z0-9\\\\.:%$]*/)*(?<type>[A-Za-z]+)/[A-Za-z0-9\-.]{1,64}(?:/_history/[A-Za-z0-9\-.]{1,64})?\z~';
+    private const string RESTFUL_FULL_URL = '~\Ahttps?://(?:[A-Za-z0-9\\\\.:%$]*/)+(?<type>[A-Za-z]+)/[A-Za-z0-9\-.]{1,64}(?:/_history/[A-Za-z0-9\-.]{1,64})?\z~';
 
     /** @var array<class-string, bool> keyed by class name; the attribute read is cached upstream too, this saves the call */
     private array $isBundleEntry = [];
 
-    /** @var array<class-string, string|null> FHIR resource type per class */
-    private array $resourceTypes = [];
+    /** @var array<class-string, FhirResource|null> resource attribute per class; reflection is not free */
+    private array $resourceAttributes = [];
 
     /** @var array<class-string, bool> whether the class is a `Reference` */
     private array $isReference = [];
@@ -247,7 +247,9 @@ final class BundleEntryFullUrlChecker
      */
     private function checkRestfulFullUrl(string $fullUrl, object $resource): ?string
     {
-        if (preg_match(self::RESTFUL_FULL_URL, $fullUrl, $parts) !== 1 || !$this->isKnownResourceType($parts['type'])) {
+        $fhirVersion = $this->resourceAttribute($resource)?->fhirVersion;
+
+        if (preg_match(self::RESTFUL_FULL_URL, $fullUrl, $parts) !== 1 || !$this->isKnownResourceType($parts['type'], $fhirVersion)) {
             return null;
         }
 
@@ -272,17 +274,21 @@ final class BundleEntryFullUrlChecker
     }
 
     /**
-     * Whether a type name is a resource type in any supported FHIR version.
-     *
-     * The union of R4, R4B and R5 is slightly wider than the reference validator, which uses only the
-     * version being validated. A URL whose type segment exists in another version only is rare, and
-     * the cost of misjudging one is a type-and-id comparison the entry would usually pass anyway.
+     * Whether a type name is a resource type in the entry resource's FHIR release, as the reference
+     * validator decides it. `ActorDefinition` exists only in R5, so an R4 entry at
+     * `http://example.org/ActorDefinition/1` does not look RESTful. A resource class that declares no
+     * release falls back to any release.
      */
-    private function isKnownResourceType(string $type): bool
+    private function isKnownResourceType(string $type, ?string $fhirVersion): bool
     {
-        return R4ResourceType::tryFrom($type)  !== null
-            || R4BResourceType::tryFrom($type) !== null
-            || R5ResourceType::tryFrom($type)  !== null;
+        return match ($fhirVersion) {
+            'R4'    => R4ResourceType::tryFrom($type)  !== null,
+            'R4B'   => R4BResourceType::tryFrom($type) !== null,
+            'R5'    => R5ResourceType::tryFrom($type)  !== null,
+            default => R4ResourceType::tryFrom($type)  !== null
+                || R4BResourceType::tryFrom($type)     !== null
+                || R5ResourceType::tryFrom($type)      !== null,
+        };
     }
 
     /**
@@ -307,9 +313,11 @@ final class BundleEntryFullUrlChecker
         if ($this->isReference($node)) {
             $reference = $this->readString($node, 'reference');
 
-            return $reference !== null
-                && !str_starts_with($reference, '#')
-                && preg_match(self::SCHEME, $reference) !== 1;
+            if ($reference !== null && !str_starts_with($reference, '#') && preg_match(self::SCHEME, $reference) !== 1) {
+                return true;
+            }
+
+            // Not relative itself, but a Reference can hold another one in `identifier.assigner`.
         }
 
         foreach ($this->models->publicPropertyNames($node) as $name) {
@@ -396,17 +404,22 @@ final class BundleEntryFullUrlChecker
 
     private function resourceType(object $node): ?string
     {
+        return $this->resourceAttribute($node)?->getResourceType();
+    }
+
+    private function resourceAttribute(object $node): ?FhirResource
+    {
         $key = $node::class;
 
-        if (array_key_exists($key, $this->resourceTypes)) {
-            return $this->resourceTypes[$key];
+        if (array_key_exists($key, $this->resourceAttributes)) {
+            return $this->resourceAttributes[$key];
         }
 
         // Hierarchy, not concrete class: a generated profile class such as `BatchBundleProfile` extends
         // `BundleResource` without repeating its `#[FhirResource]`, and is still a Bundle.
         $attributes = $this->attributes->classAttributesInHierarchy($node, FhirResource::class);
 
-        return $this->resourceTypes[$key] = $attributes === [] ? null : $attributes[0]->getResourceType();
+        return $this->resourceAttributes[$key] = $attributes === [] ? null : $attributes[0];
     }
 
     private function isReference(object $node): bool

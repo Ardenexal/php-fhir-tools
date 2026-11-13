@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BundleTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntry;
@@ -149,6 +150,24 @@ final class BundleEntryFullUrlCheckerTest extends TestCase
     }
 
     /**
+     * A Reference whose own `reference` needs no base can still hold a relative one in
+     * `identifier.assigner`.
+     */
+    public function testRelativeReferenceNestedInsideAnotherReferenceIsReported(): void
+    {
+        $observation          = $this->observationReferencing('http://example.org/fhir/Patient/1');
+        $observation->subject = new Reference(
+            reference: new StringPrimitive(value: 'http://example.org/fhir/Patient/1'),
+            identifier: new Identifier(assigner: new Reference(reference: new StringPrimitive(value: 'Organization/1'))),
+        );
+
+        self::assertSame(['Bundle entry missing fullUrl'], $this->messagesFor(new BundleResource(
+            type: new BundleTypeType(value: 'transaction'),
+            entry: [new BundleEntry(resource: $observation)],
+        )));
+    }
+
+    /**
      * Absolute and fragment references need no base, so they never make a missing fullUrl a problem.
      *
      * @return iterable<string, array{string}>
@@ -196,6 +215,8 @@ final class BundleEntryFullUrlCheckerTest extends TestCase
         yield 'urn:uuid is not RESTful'          => ['urn:uuid:1a19a371-91b8-4a1d-9bb0-e8a997baa655', 'p1', null];
         yield 'unknown type segment'             => ['http://acme.com/Thing/p2', 'p1', null];
         yield 'hyphenated host is not RESTful'   => ['http://my-server.org/Patient/p2', 'p1', null];
+        yield 'host is never the type'           => ['http://Patient/p2', 'p1', null];
+        yield 'type from another release only'   => ['http://example.org/ActorDefinition/p2', 'p1', null];
         yield 'relative is left to rule 1'       => ['Patient/p2', 'p1', "The fullUrl must be an absolute URL (not 'Patient/p2')"];
     }
 
