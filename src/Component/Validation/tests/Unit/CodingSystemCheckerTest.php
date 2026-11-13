@@ -6,8 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding as R5Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive as R5UriPrimitive;
 use Ardenexal\FHIRTools\Component\Validation\CodingSystemChecker;
@@ -105,6 +107,33 @@ final class CodingSystemCheckerTest extends TestCase
         self::assertCount(1, $violations);
         self::assertSame('error', $violations[0]->severity);
         self::assertSame('coding[0].system', $violations[0]->path);
+    }
+
+    /**
+     * Wording from `R4.japanese-utf8-ok`, located on the Identifier rather than its `system`, as the
+     * reference validator locates it (`Patient.identifier[0]`).
+     */
+    public function testRelativeIdentifierSystemIsReportedOnTheIdentifier(): void
+    {
+        $violations = (new CodingSystemChecker())->check(new PatientResource(identifier: [
+            new Identifier(system: new UriPrimitive(value: 'http://example.org/mrn')),
+            new Identifier(system: new UriPrimitive(value: '2.16.840.1.113883.2.2.3.10.1.2')),
+        ]));
+
+        self::assertCount(1, $violations);
+        self::assertSame('Identifier.system must be an absolute reference, not a local reference', $violations[0]->message);
+        self::assertSame('identifier[1]', $violations[0]->path);
+    }
+
+    /** Only the absolute rule applies to an Identifier; a `/ValueSet/` URL names nothing wrong there. */
+    public function testIdentifierSystemCarriesNoValueSetRule(): void
+    {
+        self::assertSame([], (new CodingSystemChecker())->check(new PatientResource(identifier: [
+            new Identifier(system: new UriPrimitive(value: 'urn:oid:1.2.36.146.595.217.0.1')),
+            new Identifier(system: new UriPrimitive(value: 'http://example.org/ValueSet/ids')),
+            new Identifier(system: new UriPrimitive()),
+            new Identifier(),
+        ])));
     }
 
     /** @return list<string> */

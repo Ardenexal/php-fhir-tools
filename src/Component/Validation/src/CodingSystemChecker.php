@@ -11,7 +11,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 
 /**
- * Reports `Coding.system` values that are not usable as a code-system identity.
+ * Reports `Coding.system` values that are not usable as a code-system identity, and
+ * `Identifier.system` values that are not absolute.
  *
  * ## Why this is not a Symfony constraint
  *
@@ -38,8 +39,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
  */
 final class CodingSystemChecker
 {
-    /** The FHIR complex type this rule applies to, read from the class attribute. */
+    /** The FHIR complex types these rules apply to, read from the class attribute. */
     private const string CODING = 'Coding';
+
+    private const string IDENTIFIER = 'Identifier';
 
     /**
      * A URI is absolute when it opens with a scheme.
@@ -49,8 +52,8 @@ final class CodingSystemChecker
      */
     private const string SCHEME = '/\A[A-Za-z][A-Za-z0-9+.\-]*:/';
 
-    /** @var array<class-string, bool> keyed by class name; the attribute read is cached upstream too, this saves the call */
-    private array $isCoding = [];
+    /** @var array<class-string, ?string> keyed by class name; the attribute read is cached upstream too, this saves the call */
+    private array $typeNames = [];
 
     public function __construct(
         private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
@@ -85,7 +88,16 @@ final class CodingSystemChecker
 
         $visited[$id] = true;
         $violations   = [];
-        $nodeIsCoding = $this->isCoding($node);
+        $typeName     = $this->complexTypeName($node);
+
+        // Identifier.system is located on the Identifier itself, where the reference validator puts it.
+        if ($typeName === self::IDENTIFIER) {
+            $violation = $this->checkIdentifierSystem($node, $path);
+
+            if ($violation !== null) {
+                $violations[] = $violation;
+            }
+        }
 
         foreach ($this->models->publicPropertyNames($node) as $name) {
             // Deserializers bypass the constructor, so an absent field is uninitialized rather than
@@ -98,7 +110,7 @@ final class CodingSystemChecker
             $value   = $this->models->readInitializedValue($node, $name);
             $subPath = $path === '' ? $name : $path . '.' . $name;
 
-            if ($nodeIsCoding && $name === 'system') {
+            if ($typeName === self::CODING && $name === 'system') {
                 $violation = $this->checkSystem($value, $subPath);
 
                 if ($violation !== null) {
@@ -152,6 +164,27 @@ final class CodingSystemChecker
     }
 
     /**
+     * `Identifier.system` must be absolute, like `Coding.system`.
+     *
+     * Only the absolute rule applies. The value-set rule is a Coding concern: an identifier system
+     * names a namespace of identifiers, and nothing about one carrying `/ValueSet/` is wrong.
+     */
+    private function checkIdentifierSystem(object $identifier, string $path): ?FHIRValidationViolation
+    {
+        if (!$this->models->isPropertyInitialized($identifier, 'system')) {
+            return null;
+        }
+
+        $system = $this->readUri($this->models->readInitializedValue($identifier, 'system'));
+
+        if ($system === null || $system === '' || preg_match(self::SCHEME, $system) === 1) {
+            return null;
+        }
+
+        return $this->violation($path, 'Identifier.system must be an absolute reference, not a local reference');
+    }
+
+    /**
      * Read the lexeme out of whatever the deserializer put on the property.
      *
      * `system` is a `?UriPrimitive` in R4, R4B and R5, but the wrapper is \Stringable and its own
@@ -184,21 +217,22 @@ final class CodingSystemChecker
     }
 
     /**
-     * Reads the concrete class only, which is what the raw reflection did. Three classes carry
-     * `#[FHIRComplexType(typeName: 'Coding')]` -- one per FHIR version -- and none of them is
-     * extended anywhere in the generated or CDA models, so an ancestor walk would widen the match
-     * for nothing.
+     * The FHIR complex type name a class declares, or null when it declares none.
+     *
+     * Reads the concrete class only, which is what the raw reflection did. The `Coding` and
+     * `Identifier` classes -- one of each per FHIR version -- are not extended anywhere in the
+     * generated or CDA models, so an ancestor walk would widen the match for nothing.
      */
-    private function isCoding(object $node): bool
+    private function complexTypeName(object $node): ?string
     {
         $key = $node::class;
 
-        if (isset($this->isCoding[$key])) {
-            return $this->isCoding[$key];
+        if (array_key_exists($key, $this->typeNames)) {
+            return $this->typeNames[$key];
         }
 
         $attributes = $this->attributes->classAttributes($node, FHIRComplexType::class);
 
-        return $this->isCoding[$key] = $attributes !== [] && $attributes[0]->typeName === self::CODING;
+        return $this->typeNames[$key] = $attributes !== [] ? $attributes[0]->typeName : null;
     }
 }

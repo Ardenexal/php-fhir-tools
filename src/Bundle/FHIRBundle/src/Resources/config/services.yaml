@@ -206,6 +206,9 @@ services:
     # Bundle.entry.fullUrl checker — the spec requires an absolute URL; nothing else enforces it.
     Ardenexal\FHIRTools\Component\Validation\BundleEntryFullUrlChecker: ~
 
+    # Duplicate element id checker — element ids must be unique within their resource.
+    Ardenexal\FHIRTools\Component\Validation\DuplicateElementIdChecker: ~
+
     # Validation Service
     Ardenexal\FHIRTools\Component\Validation\FHIRValidationService:
         public: true

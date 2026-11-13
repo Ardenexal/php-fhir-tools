@@ -89,6 +89,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly PropertyMetadataProviderInterface $properties = new PropertyMetadataProvider(),
         private readonly ComplexExtensionChecker $complexExtensionChecker = new ComplexExtensionChecker(),
         private readonly ?RuntimeProfileResolver $runtimeProfiles = null,
+        private readonly DuplicateElementIdChecker $duplicateIdChecker = new DuplicateElementIdChecker(),
     ) {
         $this->runtimeConstraints          = new \WeakMap();
         $this->runtimeExtensionConstraints = new \WeakMap();
@@ -211,6 +212,12 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // needs no terminology server: both rules read the URL alone. See CodingSystemChecker.
         foreach ($this->codingSystemChecker->check($resource) as $codingViolation) {
             $violations[] = $codingViolation;
+        }
+
+        // Element ids repeated within one resource. Unconditional like the passes above; it reads ids
+        // alone. See DuplicateElementIdChecker.
+        foreach ($this->duplicateIdChecker->check($resource) as $duplicateIdViolation) {
+            $violations[] = $duplicateIdViolation;
         }
 
         // Elements the reader could not place on the model. Unconditional like the passes above,
