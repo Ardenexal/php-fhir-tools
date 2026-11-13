@@ -211,8 +211,10 @@ final class BundleEntryFullUrlCheckerTest extends TestCase
 
         self::assertSame($expected === null ? [] : [$expected], array_map(static fn (FHIRValidationViolation $v): string => $v->message, $violations));
 
-        if ($expected !== null && str_starts_with($expected, 'The fullUrl \'')) {
-            self::assertSame('entry[0]', $violations[0]->path);
+        // The RESTful rule reports on the entry; the absolute-URL rule reports on `fullUrl` itself.
+        if ($expected !== null) {
+            $expectedPath = str_contains($expected, 'looks like a RESTful server URL') ? 'entry[0]' : 'entry[0].fullUrl';
+            self::assertSame($expectedPath, $violations[0]->path);
         }
     }
 
