@@ -69,7 +69,8 @@ final class DuplicateElementIdChecker
 
     /**
      * @param array<string, true> $seen    element ids already met in the enclosing resource
-     * @param array<int, true>    $visited spl_object_id keys of already-visited objects (cycle guard)
+     * @param array<int, true>    $visited spl_object_id keys of the objects on the current descent
+     *                                     (cycle guard); an object leaves it once its subtree is walked
      *
      * @return list<FHIRValidationViolation>
      */
@@ -133,6 +134,10 @@ final class DuplicateElementIdChecker
             }
         }
 
+        // Only a cycle is skipped. The same instance placed twice in a list serializes as two
+        // elements carrying the same id, so its second occurrence has to be walked and counted.
+        unset($visited[$objectId]);
+
         return $violations;
     }
 
@@ -152,14 +157,19 @@ final class DuplicateElementIdChecker
         );
     }
 
+    /**
+     * Read through the hierarchy: a generated resource profile such as `SearchSetBundleProfile`
+     * extends `BundleResource` without redeclaring `#[FhirResource]`, and is still a resource.
+     */
     private function isResource(object $node): bool
     {
-        return $this->isResource[$node::class] ??= $this->attributes->classAttributes($node, FhirResource::class) !== [];
+        return $this->isResource[$node::class] ??= $this->attributes->declaresInHierarchy($node, FhirResource::class);
     }
 
     /**
      * R4 and R4B generate ElementDefinition as a backbone element of its own name, R5 as a complex
-     * type, so both attributes are read.
+     * type, so both attributes are read, through the hierarchy so that a data-type profile on
+     * ElementDefinition counts too.
      */
     private function isElementDefinition(object $node): bool
     {
@@ -169,10 +179,16 @@ final class DuplicateElementIdChecker
             return $this->isElementDefinition[$key];
         }
 
-        $complex  = $this->attributes->classAttributes($node, FHIRComplexType::class);
-        $backbone = $this->attributes->classAttributes($node, FHIRBackboneElement::class);
+        $found = false;
 
-        return $this->isElementDefinition[$key] = ($complex !== [] && $complex[0]->typeName === 'ElementDefinition')
-            || ($backbone !== [] && $backbone[0]->elementPath === 'ElementDefinition');
+        foreach ($this->attributes->classAttributesInHierarchy($node, FHIRComplexType::class) as $complex) {
+            $found = $found || $complex->typeName === 'ElementDefinition';
+        }
+
+        foreach ($this->attributes->classAttributesInHierarchy($node, FHIRBackboneElement::class) as $backbone) {
+            $found = $found || $backbone->elementPath === 'ElementDefinition';
+        }
+
+        return $this->isElementDefinition[$key] = $found;
     }
 }

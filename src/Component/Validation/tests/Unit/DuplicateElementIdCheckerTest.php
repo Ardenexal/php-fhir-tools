@@ -14,6 +14,10 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinition\Structu
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinition\StructureDefinitionSnapshot;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinitionResource;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinition as R5ElementDefinition;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\HumanName as R5HumanName;
+use Ardenexal\FHIRTools\Component\Models\R5\Profile\SearchSetBundleProfile;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Bundle\BundleEntry as R5BundleEntry;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\PatientResource as R5PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureDefinition\StructureDefinitionDifferential as R5Differential;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureDefinition\StructureDefinitionSnapshot as R5Snapshot;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureDefinitionResource as R5StructureDefinitionResource;
@@ -81,6 +85,28 @@ final class DuplicateElementIdCheckerTest extends TestCase
             snapshot: new R5Snapshot(element: [new R5ElementDefinition(id: 'Patient.name')]),
             differential: new R5Differential(element: [new R5ElementDefinition(id: 'Patient.name')]),
         )));
+    }
+
+    /**
+     * A generated resource profile extends its resource class without redeclaring `#[FhirResource]`,
+     * so the resource test reads the hierarchy: the profile's logical id is not an element id.
+     */
+    public function testResourceProfileIsStillAResource(): void
+    {
+        $bundle = new SearchSetBundleProfile(id: 'b1', entry: [new R5BundleEntry(id: 'b1')]);
+
+        self::assertSame([], (new DuplicateElementIdChecker())->check($bundle));
+    }
+
+    /** The same instance placed twice serializes as two elements with one id, so it is a duplicate. */
+    public function testTheSameInstanceTwiceIsADuplicate(): void
+    {
+        $name = new R5HumanName(id: 'x');
+
+        $violations = (new DuplicateElementIdChecker())->check(new R5PatientResource(name: [$name, $name]));
+
+        self::assertSame(["Duplicate id value 'x'"], $this->messages($violations));
+        self::assertSame('name[1]', $violations[0]->path);
     }
 
     /**

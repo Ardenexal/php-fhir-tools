@@ -96,6 +96,22 @@ final class MalformedScalarRecordingTest extends TestCase
         );
     }
 
+    /**
+     * A bare `<valueInteger/>` decodes to an empty string rather than an array, and is an element with
+     * nothing in it; an explicit `value=""` is text, and judged as text.
+     */
+    public function testBareEmptyElementIsRecordedAsHavingNoValue(): void
+    {
+        self::assertEquals(
+            [new MalformedPrimitive('value', MalformedPrimitive::KIND_NO_VALUE, null)],
+            MalformedPrimitiveRecorder::forObject($this->xmlParameter('<valueInteger/>')),
+        );
+        self::assertEquals(
+            [new MalformedPrimitive('value', MalformedPrimitive::KIND_INTEGER, '')],
+            MalformedPrimitiveRecorder::forObject($this->xmlParameter('<valueInteger value=""/>')),
+        );
+    }
+
     /** A non-choice boolean property goes through a different branch of the reader. */
     public function testXmlBooleanOnAPlainPropertyIsRecorded(): void
     {

@@ -753,6 +753,14 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return;
         }
 
+        // A bare `<valueInteger/>` decodes to an empty string, not an array: an element with nothing
+        // in it. An explicit `value=""` arrives as `['@value' => '']` and is judged as text below.
+        if ($rawValue === '') {
+            MalformedPrimitiveRecorder::record($object, new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_NO_VALUE, null));
+
+            return;
+        }
+
         $lexeme = $rawValue;
 
         if (is_array($rawValue)) {
