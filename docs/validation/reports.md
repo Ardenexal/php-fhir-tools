@@ -28,6 +28,8 @@ exposed as the public readonly `$violations`) and offers severity-filtered acces
 | `info()` | `list<FHIRValidationViolation>` | Info-severity violations only. |
 | `hasUncheckedBindings()` | `bool` | True when any extensible/preferred binding check was skipped. |
 | `uncheckedBindings()` | `list<FHIRValidationViolation>` | Violations with code `FHIRViolationCode::UNCHECKED_BINDING`. |
+| `hasUncheckedProfiles()` | `bool` | True when a profile that was asked for was not checked. Without a runtime profile resolver, a URL passed in `$profileUrls` that no generated class declares is ignored and does not count; only `meta.profile` URLs under `profilesFromMeta` are reported. |
+| `uncheckedProfiles()` | `list<FHIRValidationViolation>` | Violations with code `FHIRViolationCode::PROFILE_NOT_CHECKED`. |
 
 ```php
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationReport;
@@ -76,9 +78,10 @@ both map to `info`. Any other code (such as built-in Symfony constraints like `C
 | `FHIRViolationCode::INFO` | `fhir:info` | Informational note. |
 | `FHIRViolationCode::EVAL_ERROR` | `fhir:eval-error` | A FHIRPath invariant could not be evaluated (engine limitation, e.g. an unsupported function). Tooling incompleteness, not non-conformance — surfaced at info severity. |
 | `FHIRViolationCode::UNCHECKED_BINDING` | `fhir:unchecked-binding` | An extensible/preferred binding check was skipped (no real terminology client). A coverage gap, not non-conformance — surfaced at info severity. |
+| `FHIRViolationCode::PROFILE_NOT_CHECKED` | `fhir:profile-not-checked` | A profile asked for, directly or through `meta.profile`, was not checked: it is unknown, its StructureDefinition cannot be used, it conflicts with another version of the same profile, or no runtime profile resolver is configured. The reason is in `parameters['reason']`. Surfaced at warning severity. See [Runtime Profiles](runtime-profiles.md). |
 
 {% hint style="info" %}
-`fhir:eval-error` and `fhir:unchecked-binding` describe *tooling limitations*, not
+`fhir:eval-error`, `fhir:unchecked-binding` and `fhir:profile-not-checked` describe *tooling limitations*, not
 problems with the resource. Consumers can inspect `FHIRValidationViolation::$code` to
 distinguish them from genuine non-conformance.
 {% endhint %}

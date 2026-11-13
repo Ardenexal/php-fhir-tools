@@ -11,9 +11,9 @@ on the generated model classes; Symfony Validator reads them and dispatches to t
 validator.
 
 {% hint style="info" %}
-Profile validation requires the relevant pre-generated models. See
-[Code Generation](../code-generation/overview.md). Runtime/dynamic StructureDefinitions are not
-supported.
+Profile validation uses the pre-generated models (see
+[Code Generation](../code-generation/overview.md)), or StructureDefinitions you load at runtime
+(see [Runtime Profiles](runtime-profiles.md)).
 {% endhint %}
 
 ## Cardinality
@@ -38,8 +38,10 @@ $report = $service->validate($patient, profileUrls: [
 ]);
 ```
 
-Passing an unknown profile URL is silently ignored — no violation, no error. Only profiles
-pre-generated into PHP classes are supported.
+A profile URL that no generated class declares is checked against its StructureDefinition when
+the service has a runtime profile resolver. Without one, the URL is ignored and produces no
+violation. With one, a profile that cannot be resolved is reported as a `fhir:profile-not-checked`
+warning. See [Runtime Profiles](runtime-profiles.md).
 
 ## Slicing
 
@@ -55,6 +57,11 @@ slicing is supported. Subsequent invocations for the same `(property, group, obj
 `validate()` call are no-ops (deduplicated via a `WeakMap` keyed on the execution context), so
 multiple slice attributes on one property never produce duplicate violations. Out-of-cardinality
 or unmatched-closed items raise ERROR violations.
+
+`SliceDiscriminatorMatcher` evaluates `value`, `pattern` and `exists` discriminators. A slice that
+needs a `type` or `profile` discriminator, `$this`, or a path through `resolve()` matches no item.
+The generator and the runtime compiler enforce closed or openAtEnd slicing that depends on such a
+slice as open, and report a warning, so a conforming resource is not rejected.
 
 ## Fixed and pattern values
 
