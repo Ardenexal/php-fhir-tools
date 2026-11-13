@@ -28,7 +28,7 @@ exposed as the public readonly `$violations`) and offers severity-filtered acces
 | `info()` | `list<FHIRValidationViolation>` | Info-severity violations only. |
 | `hasUncheckedBindings()` | `bool` | True when any extensible/preferred binding check was skipped. |
 | `uncheckedBindings()` | `list<FHIRValidationViolation>` | Violations with code `FHIRViolationCode::UNCHECKED_BINDING`. |
-| `hasUncheckedProfiles()` | `bool` | True when a profile that was asked for was not checked. |
+| `hasUncheckedProfiles()` | `bool` | True when a profile that was asked for was not checked. Without a runtime profile resolver, a URL passed in `$profileUrls` that no generated class declares is ignored and does not count; only `meta.profile` URLs under `profilesFromMeta` are reported. |
 | `uncheckedProfiles()` | `list<FHIRValidationViolation>` | Violations with code `FHIRViolationCode::PROFILE_NOT_CHECKED`. |
 
 ```php

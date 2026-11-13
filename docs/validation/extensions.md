@@ -14,7 +14,7 @@ attribute, so the service walks the resource tree itself:
 | Extension context | `validateExtensionContexts()` | Always (recursive walk over the full tree) |
 | Extension `contextInvariant` | `validateExtensionContexts()` | Always, on the extension's use context |
 | Extension structure | `validateExtensionStructure()` | Always (recursive walk over the full tree) |
-| Missing required sub-extension | `ComplexExtensionChecker` | Always, on extensions read from JSON or XML |
+| Missing required sub-extension | `ComplexExtensionChecker` | Always: a typed extension read from JSON or XML, or a plain `Extension` with a runtime definition |
 | Modifier extension walk | `validateModifierExtensions()` | A `FHIRIGTypeRegistry` is provided |
 | MustSupport collection | `collectMustSupportInfo()` | `$includeMustSupportInfo = true` |
 | Obligation enforcement | `collectObligationViolations()` | A `FHIRObligationContext` is provided |
@@ -65,6 +65,8 @@ surfaces as a `fhir:eval-error` INFO (not an ERROR) — see [Invariants](invaria
   `species`, so it is not held to this rule;
 * a value whose type the extension's definition does not allow;
 * a sub-extension the definition does not declare.
+
+A plain `Extension` with a runtime definition is also checked for a missing required sub-extension.
 
 It also runs the extension's own invariants and bindings, which Symfony never reaches because it
 does not cascade into extensions. Each rule comes from the generated extension class, or from the
