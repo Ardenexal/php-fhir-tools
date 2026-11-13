@@ -40,6 +40,14 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     private static array $propertyCache = [];
 
     /**
+     * Per class, its public property names as keys when `get_object_vars()` already lists them in
+     * `publicPropertyNames()` order, or false when it does not and has to be reordered.
+     *
+     * @var array<class-string, array<string, true>|false>
+     */
+    private static array $objectVarsInOrderCache = [];
+
+    /**
      * {@inheritDoc}
      */
     public function publicPropertyNames(object|string $subject): array
@@ -272,7 +280,16 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
         // Called from this class's scope, get_object_vars() sees public properties only, and it leaves
         // out typed properties that were never written: exactly the ones isPropertyInitialized()
         // rejects. It also leaves out statics, which are read through their handle instead.
-        $vars   = get_object_vars($object);
+        $vars     = get_object_vars($object);
+        $inOrder  = self::$objectVarsInOrderCache[$object::class] ??= self::objectVarsInOrder($object::class);
+
+        // Most generated classes list their properties in the same order both ways. Then the array
+        // is already the answer, unless it ends in a dynamic property, which always sorts after the
+        // declared ones. The tree walks call this for every node, so skipping the loop below matters.
+        if ($inOrder !== false && ($vars === [] || isset($inOrder[array_key_last($vars)]))) {
+            return $vars;
+        }
+
         $values = [];
 
         foreach ($this->publicPropertyNames($object) as $name) {
@@ -333,6 +350,63 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
                 break;
             }
         }
+    }
+
+    /**
+     * Whether `get_object_vars()` lists a class's public properties in `publicPropertyNames()` order.
+     *
+     * `get_object_vars()` follows the object's property slots: the parent's properties first, in its
+     * own slot order, then the properties the class itself adds, in declaration order; a property
+     * the class redeclares keeps its parent's slot. Reflection lists the class's own declarations
+     * first instead, so the two differ wherever a subclass adds a property, as the generated
+     * extension classes do with their typed `value[x]`. Statics and non-public properties make the
+     * slot layout harder to reason about, so a class with either is always reordered.
+     *
+     * @param class-string $class
+     *
+     * @return array<string, true>|false The names as keys when the orders agree, false otherwise
+     */
+    private function objectVarsInOrder(string $class): array|false
+    {
+        $slots = self::slotOrder(self::reflect($class));
+
+        if ($slots === false || $slots !== $this->publicPropertyNames($class)) {
+            return false;
+        }
+
+        return array_fill_keys($slots, true);
+    }
+
+    /**
+     * Property names in object slot order, or false when a static or non-public property is declared.
+     *
+     * @param \ReflectionClass<object> $class
+     *
+     * @return list<string>|false
+     */
+    private static function slotOrder(\ReflectionClass $class): array|false
+    {
+        $parent = $class->getParentClass();
+        $order  = $parent === false ? [] : self::slotOrder($parent);
+
+        if ($order === false) {
+            return false;
+        }
+
+        $seen = array_fill_keys($order, true);
+
+        foreach ($class->getProperties() as $property) {
+            if ($property->isStatic() || !$property->isPublic()) {
+                return false;
+            }
+
+            if ($property->getDeclaringClass()->getName() === $class->getName() && !isset($seen[$property->getName()])) {
+                $order[]                       = $property->getName();
+                $seen[$property->getName()]    = true;
+            }
+        }
+
+        return $order;
     }
 
     /**
