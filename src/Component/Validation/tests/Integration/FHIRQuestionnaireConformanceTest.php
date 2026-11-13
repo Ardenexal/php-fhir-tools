@@ -27,8 +27,8 @@ use PHPUnit\Framework\TestCase;
  *
  * Why seeded (not Java-parity) outcomes: the validator's error/warning verdict does not always
  * match the HL7 Java validator's — answer-type mismatches are reported at `warning` rather than
- * `error` by design, and a few SDC/R5 rules remain uncovered (SDC `answerExpression`,
- * `calculatedExpression`, R5 `answerConstraint`). Seeding pins each case to the validator's own
+ * `error` by design, and a few SDC rules remain uncovered (`answerExpression`,
+ * `calculatedExpression`). Seeding pins each case to the validator's own
  * correct output instead. All 78 eligible R4 cases are now seeded and asserted (156 assertions);
  * none are left markTestIncomplete or skipped.
  *

@@ -635,7 +635,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     /**
      * Rule 5 — the answer value type must match the declared item type (warning severity:
-     * a mismatch may be legitimate in some contexts per the specification).
+     * a mismatch may be legitimate in some contexts per the specification). A string answer to an
+     * R5 item whose answerConstraint is optionsOrString is not a mismatch.
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
      * @param R4Item|R4BItem|R5Item                         $questionnaireItem
@@ -655,16 +656,16 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             return; // group, display, or unknown type code — no answer value expectation
         }
 
+        $answerConstraint = $this->answerConstraint($questionnaireItem);
+
         foreach (array_values($item->answer) as $j => $answer) {
             if ($answer->value === null) {
                 continue;
             }
 
-            $actual = \is_object($answer->value)
-                ? $this->classBasename($answer->value::class)
-                : get_debug_type($answer->value);
+            $actual = $this->answerTypeName($answer->value);
 
-            if (!\in_array($actual, $expected, true)) {
+            if (!\in_array($actual, $expected, true) && !$this->answerConstraintAdmits($answer->value, $type, $answerConstraint)) {
                 $violations[] = $this->violation(
                     'warning',
                     sprintf('%s.answer[%d].value', $path, $j),
@@ -1595,7 +1596,9 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      * client is configured, each answer is validated against it. Coding answers call
      * validateCoding(); StringPrimitive answers (string type) call validateCode(). For open-choice
      * items, a StringPrimitive answer is always valid per the FHIR R4 spec — only Codings are
-     * checked. Returns immediately when no client is wired (backward-compatible, zero-config).
+     * checked. Likewise an answer admitted by an R5 answerConstraint of optionsOrType /
+     * optionsOrString is not looked up. Returns immediately when no client is wired
+     * (backward-compatible, zero-config).
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
      * @param R4Item|R4BItem|R5Item                         $questionnaireItem
@@ -1618,11 +1621,12 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             return;
         }
 
-        $client = $this->resolveClientForItem($linkId);
+        $client           = $this->resolveClientForItem($linkId);
+        $answerConstraint = $this->answerConstraint($questionnaireItem);
 
         foreach (array_values($item->answer) as $j => $answer) {
             $value = $answer->value;
-            if ($value === null) {
+            if ($value === null || $this->answerConstraintAdmits($value, $type, $answerConstraint)) {
                 continue;
             }
 
@@ -1857,6 +1861,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      * uses normalizeValue() identity, so a Coding matches on system+code, numerics compare
      * numerically, and date/time/string compare by value. The optionExclusive extension marks an
      * option that may not be co-selected: choosing it alongside any other answer is a single error.
+     * An R5 answerConstraint of optionsOrType / optionsOrString also admits a non-option answer of
+     * the item's type / a free-text string (answerConstraintAdmits()).
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
      * @param R4Item|R4BItem|R5Item                         $questionnaireItem
@@ -1895,7 +1901,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             return;
         }
 
-        $answeredKeys = [];
+        $answeredKeys     = [];
+        $answerConstraint = $this->answerConstraint($questionnaireItem);
 
         foreach (array_values($item->answer) as $j => $answer) {
             $identity = $this->normalizeValue($answer->value);
@@ -1906,7 +1913,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             $key            = $this->identityKey($identity);
             $answeredKeys[] = $key;
 
-            if (!isset($permitted[$key])) {
+            if (!isset($permitted[$key]) && !$this->answerConstraintAdmits($answer->value, $type, $answerConstraint)) {
                 $violations[] = $this->violation(
                     'error',
                     sprintf('%s.answer[%d].value', $path, $j),
@@ -1927,6 +1934,44 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 }
             }
         }
+    }
+
+    /**
+     * The item's R5 answerConstraint code. R4/R4B items have no such element, and an absent
+     * constraint means optionsOnly, so both resolve to 'optionsOnly'.
+     *
+     * @param R4Item|R4BItem|R5Item $questionnaireItem
+     */
+    private function answerConstraint(object $questionnaireItem): string
+    {
+        if ($questionnaireItem instanceof R5Item && $questionnaireItem->answerConstraint !== null) {
+            return (string) $questionnaireItem->answerConstraint;
+        }
+
+        return 'optionsOnly';
+    }
+
+    /**
+     * Whether the answerConstraint admits an answer that is not one of the item's options:
+     * optionsOrType admits any value of the declared item type (per TYPE_MAP), optionsOrString
+     * admits a free-text string, and optionsOnly admits nothing beyond the options.
+     */
+    private function answerConstraintAdmits(mixed $value, string $type, string $answerConstraint): bool
+    {
+        return match ($answerConstraint) {
+            'optionsOrType'   => \in_array($this->answerTypeName($value), self::TYPE_MAP[$type] ?? [], true),
+            'optionsOrString' => $this->answerTypeName($value) === 'StringPrimitive',
+            default           => false,
+        };
+    }
+
+    /**
+     * The answer value's type as TYPE_MAP names it: the class basename for objects, the PHP
+     * scalar type name otherwise.
+     */
+    private function answerTypeName(mixed $value): string
+    {
+        return \is_object($value) ? $this->classBasename($value::class) : get_debug_type($value);
     }
 
     /**
