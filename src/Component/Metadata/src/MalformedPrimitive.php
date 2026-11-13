@@ -26,9 +26,9 @@ final readonly class MalformedPrimitive
     /**
      * @param string      $propertyName the model property the value was written to
      * @param string      $kind         one of the self::KIND_* constants
-     * @param string|null $lexeme       the text as written; null for self::KIND_NO_VALUE, and for a
-     *                                  JSON value that was not a string to begin with it is that
-     *                                  value encoded as JSON
+     * @param string|null $lexeme       the text as written; null for self::KIND_NO_VALUE. A JSON
+     *                                  value is re-encoded as JSON, so `1` stays `1` and the string
+     *                                  `"true"` keeps its quotes
      */
     public function __construct(
         public string $propertyName,

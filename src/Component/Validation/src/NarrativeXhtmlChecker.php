@@ -313,6 +313,9 @@ final class NarrativeXhtmlChecker
      * percent-encoding, with any Unicode letter or digit also accepted. Everything else is listed in
      * document order, in the reference validator's wording, e.g. `R5.patient-url-bad`'s
      * `http://example.com/{[-}]/link.html`, whose `{` and `}` are the only offenders.
+     *
+     * "Characters" stays plural whatever the count: the corpus has no one-character case showing
+     * whether the reference validator writes a singular form.
      */
     private function checkHref(string $href, string $path): ?FHIRValidationViolation
     {
