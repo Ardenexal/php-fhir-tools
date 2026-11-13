@@ -24,11 +24,12 @@ final class FHIRAttributeReader implements FHIRAttributeReaderInterface
     private array $propertyCache = [];
 
     /**
-     * The {@see $propertyCache} key for each `class::property::attribute` asked about, or null when
-     * the class has no such property. Finding the declaring class takes a new ReflectionProperty,
-     * and tree walks ask about every property of every node.
+     * The {@see $propertyCache} key for each declared `class::property::attribute` asked about.
+     * Finding the declaring class takes a new ReflectionProperty, and tree walks ask about every
+     * property of every node. A name the class does not declare is not kept, so names taken from
+     * input cannot grow this without bound.
      *
-     * @var array<string, string|null>
+     * @var array<string, string>
      */
     private array $propertyKeyCache = [];
 
@@ -84,13 +85,15 @@ final class FHIRAttributeReader implements FHIRAttributeReaderInterface
 
         $lookup = $class . '::' . $property . '::' . $attributeClass;
 
-        if (!array_key_exists($lookup, $this->propertyKeyCache)) {
-            $this->propertyKeyCache[$lookup] = $this->cachePropertyAttributes($class, $property, $attributeClass);
+        $key = $this->propertyKeyCache[$lookup] ?? $this->cachePropertyAttributes($class, $property, $attributeClass);
+
+        if ($key === null) {
+            return [];
         }
 
-        $key = $this->propertyKeyCache[$lookup];
+        $this->propertyKeyCache[$lookup] = $key;
 
-        return $key === null ? [] : self::narrow($this->propertyCache[$key], $attributeClass);
+        return self::narrow($this->propertyCache[$key], $attributeClass);
     }
 
     /**

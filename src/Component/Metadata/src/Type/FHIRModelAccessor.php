@@ -28,12 +28,14 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     private static array $defaultsCache = [];
 
     /**
-     * Property handles by class and name; false records a name the class does not have.
+     * Handles for declared properties, by class and name.
      *
      * `ReflectionClass::getProperty()` builds a new handle on every call, and the validation tree
-     * walks read every property of every node through here, so the handles are kept.
+     * walks read every property of every node through here, so the handles are kept. Names a class
+     * does not declare are not kept: the deserializer asks about every key in its input, so caching
+     * misses would grow without bound in a long-running worker.
      *
-     * @var array<class-string, array<string, \ReflectionProperty|false>>
+     * @var array<class-string, array<string, \ReflectionProperty>>
      */
     private static array $propertyCache = [];
 
@@ -392,7 +394,7 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     }
 
     /**
-     * Cached handle for one property of a class, or false when the class has no such property.
+     * Cached handle for one property of a class, or false (not cached) when the class has no such property.
      *
      * @param class-string $class    Class declaring or inheriting the property
      * @param string       $property Property name
@@ -409,6 +411,10 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
 
         $reflection = self::reflect($class);
 
-        return self::$propertyCache[$class][$property] = $reflection->hasProperty($property) ? $reflection->getProperty($property) : false;
+        if (!$reflection->hasProperty($property)) {
+            return false;
+        }
+
+        return self::$propertyCache[$class][$property] = $reflection->getProperty($property);
     }
 }
