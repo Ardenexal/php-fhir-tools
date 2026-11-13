@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPathInvariantFastPaths;
 use PHPUnit\Framework\TestCase;
 
@@ -49,6 +50,43 @@ final class FHIRPathInvariantFastPathsTest extends TestCase
 
         self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::EXT_1, $extension));
         self::assertTrue(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::EXT_1, new Extension(url: 'http://example.org/ext', value: 'y')));
+    }
+
+    public function testExt1LeavesAnExtensionWithNeitherValueNorSubExtensionsToTheEngine(): void
+    {
+        self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::EXT_1, new Extension(url: 'http://example.org/ext')));
+    }
+
+    /**
+     * A primitive wrapper with no value and no extensions might read as absent, so it is not a plain value.
+     */
+    public function testExt1PassesAWrappedValueOnlyWhenTheWrapperHoldsSomething(): void
+    {
+        $filled = new Extension(url: 'http://example.org/ext', value: new StringPrimitive(value: 'y'));
+        $empty  = new Extension(url: 'http://example.org/ext', value: new StringPrimitive());
+
+        self::assertTrue(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::EXT_1, $filled));
+        self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::EXT_1, $empty));
+    }
+
+    public function testRef1PassesAReferenceWithNoTarget(): void
+    {
+        self::assertTrue(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::REF_1_R5, new Reference(display: 'Dr Smith')));
+    }
+
+    /**
+     * A wrapped target is read through its value; a wrapper with no value may carry extensions only.
+     */
+    public function testRef1ReadsAWrappedTargetThroughItsValue(): void
+    {
+        self::assertTrue(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::REF_1_R4, new Reference(reference: new StringPrimitive(value: 'Patient/1'))));
+        self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::REF_1_R4, new Reference(reference: new StringPrimitive(value: '#med1'))));
+        self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::REF_1_R4, new Reference(reference: new StringPrimitive())));
+    }
+
+    public function testAValueThatIsNotAnObjectIsLeftToTheEngine(): void
+    {
+        self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::ELE_1, 'Weight'));
     }
 
     /**
