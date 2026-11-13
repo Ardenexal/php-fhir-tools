@@ -1,5 +1,5 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 2,
     "infoCount": 1,
     "java": {
@@ -15,7 +15,11 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:BundleEntryFullUrlChecker": [
+                "entry[0] — The fullUrl 'http://hl7.org/fhir/test/Composition/test-css-document' looks like a RESTful server URL, so it must end with the correct type and id (/Composition/test-document-good)"
+            ]
+        },
         "warnings": {
             "constraint:FHIRValueSetBinding": [
                 "entry[1].resource.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated.",

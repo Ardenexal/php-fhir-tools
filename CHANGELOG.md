@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Bundle] [Validation] `fhir.validation.runtime_profiles.package_dirs` and `fhir.validation.runtime_profiles.files` give the bundle's `FHIRValidationService` a `RuntimeProfileResolver` over those package directories and StructureDefinition files, and gives `FHIRSliceConstraintValidator` a `RuntimeProfileAttributeReader`, so `validate($resource, [$url])` checks a profile you never generated. List the release's core package as well, because a profile is resolved through its parents up to the core definition. A file overrides a package definition with the same URL and version. Both default to empty, which changes nothing. `InMemoryStructureDefinitionRegistry::fromFiles()` loads StructureDefinition JSON files outside Symfony. See `docs/validation/runtime-profiles.md` (#170)
 
 ### Changed
+- **[Validation] Bundles that validated clean can now fail: three new `Bundle.entry.fullUrl` rules report errors.** They follow the HL7 Java reference validator, with its wording:
+  - An entry without a `fullUrl` is an error in every Bundle type except `transaction`, `batch`, `transaction-response` and `batch-response` (`Except for transactions and batches, each entry in a Bundle must have a fullUrl which is the identity of the resource in the entry`).
+  - An entry without a `fullUrl` whose resource holds a relative reference, such as `Patient/1`, is an error in every Bundle type, transactions included, because the reference has nothing to resolve against (`Bundle entry missing fullUrl`).
+  - An `http(s)` `fullUrl` shaped like `[base]/[type]/[id]` must end with the entry resource's own type and id (`…looks like a RESTful server URL, so it must end with the correct type and id (/Patient/p1)`), and the resource must have an id (`…but the resource has no id`).
+
+  An empty `"fullUrl": ""` is not treated as missing. To pass, give each entry a `fullUrl` such as `urn:uuid:…` or the resource's server URL (#156)
 - **BREAKING: [Validation] `FHIRValidationServiceInterface` now declares `validateWithOptions(object $resource, FHIRValidationOptions $options): FHIRValidationReport`, so a class implementing the interface fails with a fatal error until it adds the method.** A decorator can forward it to the service it wraps. The package is pre-1.0, so there is no deprecation window (#170)
 
 ### Fixed
