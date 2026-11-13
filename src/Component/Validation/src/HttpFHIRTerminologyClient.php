@@ -9,7 +9,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Calls a FHIR terminology server's ValueSet/$validate-code operation.
- * Returns false on any HTTP or parse error (graceful degradation).
+ * The bool methods return false on any HTTP or parse error (graceful degradation); checkCode() and
+ * checkCoding() return null instead, so a caller can tell a failed exchange from a "not a member" verdict.
  */
 final class HttpFHIRTerminologyClient implements FHIRTerminologyMembershipClientInterface
 {

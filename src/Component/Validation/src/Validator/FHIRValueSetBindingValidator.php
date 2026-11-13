@@ -28,7 +28,8 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireValidator;
  * terminology client when no enum exists); `extensible`/`preferred` bindings are checked via the
  * terminology client. `example` bindings are ignored. When no real terminology client is
  * configured, non-required checks are skipped and surfaced as a single fhir:unchecked-binding
- * INFO violation (issue #71) that does not affect overall validity.
+ * INFO violation (issue #71) that does not affect overall validity. A terminology check the server
+ * gave no answer to is surfaced the same way, never as an invalid code (issue #182).
  */
 final class FHIRValueSetBindingValidator extends ConstraintValidator
 {
@@ -37,6 +38,8 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     public const string DEFAULT_INVALID_VALUE_MESSAGE = 'The value {{ value }} is not a valid case of value set {{ url }}.';
 
     public const string DEFAULT_UNCHECKED_BINDING_MESSAGE = 'Terminology validation for value set {{ url }} was skipped: no terminology client is configured.';
+
+    public const string DEFAULT_UNANSWERED_BINDING_MESSAGE = 'Terminology validation for value set {{ url }} was skipped: the terminology server gave no answer.';
 
     public const string DEFAULT_WRONG_DISPLAY_MESSAGE = 'The display {{ value }} is not valid for code {{ code }} in system {{ system }}; the terminology server gives {{ expected }}.';
 
@@ -310,7 +313,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         }
 
         if (!$allAnswered && $reportUnanswered) {
-            $this->reportUnchecked($constraint);
+            $this->reportUnchecked($constraint, self::DEFAULT_UNANSWERED_BINDING_MESSAGE);
         }
 
         return $allAnswered;
@@ -394,12 +397,14 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     }
 
     /**
-     * One fhir:unchecked-binding INFO violation: the binding exists but nothing configured can check it.
+     * One fhir:unchecked-binding INFO violation: the binding exists but could not be checked.
+     *
+     * @param string $defaultMessage why: nothing configured can check it, or the server gave no answer
      */
-    private function reportUnchecked(FHIRValueSetBinding $constraint): void
+    private function reportUnchecked(FHIRValueSetBinding $constraint, string $defaultMessage = self::DEFAULT_UNCHECKED_BINDING_MESSAGE): void
     {
         $override = $this->messageRegistry->getOverride('FHIRValueSetBindingUnchecked');
-        $this->context->buildViolation($override ?? self::DEFAULT_UNCHECKED_BINDING_MESSAGE)
+        $this->context->buildViolation($override ?? $defaultMessage)
             ->setParameters(['{{ url }}' => $constraint->valueSetUrl])
             ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
             ->addViolation();
@@ -562,9 +567,8 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
      *
      * A binding may be declared on a complex element (`CodeableConcept`, `Coding`), whose value is an
      * object that is not `Stringable`. Casting one for the violation message is a fatal `Error` — it
-     * turned 12 R4 cases into `validate-crashed` the first time enum resolution was repaired. Deciding
-     * membership from `coding[].code` is a separate capability; until it exists, decline rather than
-     * crash or guess.
+     * turned 12 R4 cases into `validate-crashed` the first time enum resolution was repaired. Such an
+     * object is never a code itself; {@see codeGroups()} reads the codes it carries.
      */
     private static function isTestableCode(mixed $value): bool
     {

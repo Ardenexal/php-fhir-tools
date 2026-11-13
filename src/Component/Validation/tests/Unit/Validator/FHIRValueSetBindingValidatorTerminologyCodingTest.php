@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
+use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Validation\InMemoryFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRValueSetBindingValidator;
@@ -136,9 +137,9 @@ final class FHIRValueSetBindingValidatorTerminologyCodingTest extends Constraint
 
         $this->validator->validate($this->coding(self::MEMBER, self::SNOMED), new FHIRValueSetBinding(self::VALUE_SET, 'required'));
 
-        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_UNCHECKED_BINDING_MESSAGE)
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_UNANSWERED_BINDING_MESSAGE)
             ->setParameters(['{{ url }}' => self::VALUE_SET])
-            ->setCode('fhir:unchecked-binding')
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
             ->assertRaised();
     }
 
