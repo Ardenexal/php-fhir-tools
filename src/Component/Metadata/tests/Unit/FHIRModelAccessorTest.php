@@ -174,4 +174,48 @@ final class FHIRModelAccessorTest extends TestCase
 
         self::assertFalse(property_exists($instance, 'noSuchPropertyExists'));
     }
+
+    /**
+     * The tree walks swapped a probe-then-read per property for this one call, so it has to give
+     * exactly the pairs the probe and read gave: an explicit null kept, an unwritten slot left out,
+     * in `publicPropertyNames()` order.
+     */
+    public function testInitializedPublicValuesMatchesProbingThenReadingEachName(): void
+    {
+        $accessor = new FHIRModelAccessor();
+        $instance = (new \ReflectionClass(self::COMPLEX_TYPE))->newInstanceWithoutConstructor();
+
+        $accessor->writeValue($instance, 'value', '5.4');
+        $accessor->writeValue($instance, 'unit', null);
+
+        $expected = [];
+        foreach ($accessor->publicPropertyNames($instance) as $name) {
+            if ($accessor->isPropertyInitialized($instance, $name)) {
+                $expected[$name] = $accessor->readInitializedValue($instance, $name);
+            }
+        }
+
+        self::assertSame(['value', 'unit'], array_keys($expected), 'the fixture must hold one value and one explicit null');
+        self::assertSame($expected, $accessor->initializedPublicValues($instance));
+    }
+
+    /**
+     * A public static property is not instance state, so get_object_vars() leaves it out; it is
+     * still initialised, so the probe-then-read the walks used to do included it.
+     */
+    public function testInitializedPublicValuesKeepsAnInitializedStaticProperty(): void
+    {
+        $instance = new class () {
+            public static string $shared = 'class-wide';
+
+            public string $written = 'instance';
+
+            public string $unwritten;
+        };
+
+        self::assertSame(
+            ['shared' => 'class-wide', 'written' => 'instance'],
+            (new FHIRModelAccessor())->initializedPublicValues($instance),
+        );
+    }
 }

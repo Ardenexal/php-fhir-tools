@@ -36,6 +36,9 @@ class FHIRTypeResolver
 
     private FHIRModelClassLocatorInterface $modelClasses;
 
+    /** @var array<class-string, string> {@see inferType()} answers for objects, by class */
+    private array $objectTypeCache = [];
+
     /**
      * Every collaborator is optional so that the many `new FHIRTypeResolver()` call sites keep
      * working unchanged. The defaults are the same implementations the container wires, and each
@@ -212,42 +215,10 @@ class FHIRTypeResolver
         }
 
         if (is_object($value)) {
-            // Walk the class hierarchy to find a FHIRPrimitive attribute — subclasses
-            // (e.g. NameUseType → CodePrimitive → StringPrimitive) carry it on an ancestor.
-            $primitive = $this->structureKinds->nearestPrimitiveAttribute($value);
-
-            if ($primitive !== null) {
-                return $primitive->primitiveType;
-            }
-
-            // FHIR resources carry a canonical type name in their #[FhirResource(type: '...')]
-            // attribute (e.g. PatientResource → 'Patient'). Prefer this over the PHP class
-            // short name to avoid 'PatientResource' ≠ 'Patient' mismatches.
-            $resourceType = $this->resourceTypeInHierarchy($value);
-            if ($resourceType !== null) {
-                return $resourceType;
-            }
-
-            // FHIR complex data types (HumanName, Quantity, Age, etc.) carry a canonical type
-            // name in their #[FHIRComplexType(typeName: '...')] attribute. Walk the class
-            // hierarchy so that subclasses (Age extends Quantity) are also matched.
-            $complexType = $this->declaredComplexTypeName($value);
-            if ($complexType !== null) {
-                return $complexType;
-            }
-
-            // Get the class name and extract the FHIR type
-            $class = get_class($value);
-
-            // Check if it's a generated FHIR model
-            if (str_contains($class, '\\FHIR\\') || str_contains($class, '\\Models\\')) {
-                // Extract the type name from the class name
-                $parts = explode('\\', $class);
-
-                return end($parts);
-            }
-
-            return 'Resource';
+            // Every object test above is on the instance's own type, so from here on the answer
+            // depends on the class alone. inferObjectType() reads attributes up the class hierarchy,
+            // and descendants().ofType() asks once per node, so the answer is kept per class.
+            return $this->objectTypeCache[$value::class] ??= $this->inferObjectType($value);
         }
 
         if (is_array($value)) {
@@ -263,6 +234,49 @@ class FHIRTypeResolver
         }
 
         return 'Any';
+    }
+
+    /**
+     * The FHIR type name of a model object, read from its class's attributes or name.
+     */
+    private function inferObjectType(object $value): string
+    {
+        // Walk the class hierarchy to find a FHIRPrimitive attribute — subclasses
+        // (e.g. NameUseType → CodePrimitive → StringPrimitive) carry it on an ancestor.
+        $primitive = $this->structureKinds->nearestPrimitiveAttribute($value);
+
+        if ($primitive !== null) {
+            return $primitive->primitiveType;
+        }
+
+        // FHIR resources carry a canonical type name in their #[FhirResource(type: '...')]
+        // attribute (e.g. PatientResource → 'Patient'). Prefer this over the PHP class
+        // short name to avoid 'PatientResource' ≠ 'Patient' mismatches.
+        $resourceType = $this->resourceTypeInHierarchy($value);
+        if ($resourceType !== null) {
+            return $resourceType;
+        }
+
+        // FHIR complex data types (HumanName, Quantity, Age, etc.) carry a canonical type
+        // name in their #[FHIRComplexType(typeName: '...')] attribute. Walk the class
+        // hierarchy so that subclasses (Age extends Quantity) are also matched.
+        $complexType = $this->declaredComplexTypeName($value);
+        if ($complexType !== null) {
+            return $complexType;
+        }
+
+        // Get the class name and extract the FHIR type
+        $class = get_class($value);
+
+        // Check if it's a generated FHIR model
+        if (str_contains($class, '\\FHIR\\') || str_contains($class, '\\Models\\')) {
+            // Extract the type name from the class name
+            $parts = explode('\\', $class);
+
+            return end($parts);
+        }
+
+        return 'Resource';
     }
 
     /**

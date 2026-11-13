@@ -23,6 +23,16 @@ final class FHIRAttributeReader implements FHIRAttributeReaderInterface
     /** @var array<string, list<object>> keyed by `declaringClass::property::attribute` */
     private array $propertyCache = [];
 
+    /**
+     * The {@see $propertyCache} key for each declared `class::property::attribute` asked about.
+     * Finding the declaring class takes a new ReflectionProperty, and tree walks ask about every
+     * property of every node. A name the class does not declare is not kept, so names taken from
+     * input cannot grow this without bound.
+     *
+     * @var array<string, string>
+     */
+    private array $propertyKeyCache = [];
+
     /** @var array<string, bool> keyed by `class::attribute` */
     private array $hierarchyCache = [];
 
@@ -73,10 +83,32 @@ final class FHIRAttributeReader implements FHIRAttributeReaderInterface
             return [];
         }
 
+        $lookup = $class . '::' . $property . '::' . $attributeClass;
+
+        $key = $this->propertyKeyCache[$lookup] ?? $this->cachePropertyAttributes($class, $property, $attributeClass);
+
+        if ($key === null) {
+            return [];
+        }
+
+        $this->propertyKeyCache[$lookup] = $key;
+
+        return self::narrow($this->propertyCache[$key], $attributeClass);
+    }
+
+    /**
+     * Read a property's attributes into {@see $propertyCache} and return their key, or null when the
+     * class has no such property.
+     *
+     * @param class-string         $class
+     * @param class-string<object> $attributeClass
+     */
+    private function cachePropertyAttributes(string $class, string $property, string $attributeClass): ?string
+    {
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
         } catch (\ReflectionException) {
-            return [];
+            return null;
         }
 
         // Keyed by the DECLARING class, not the concrete one: an inherited property resolves to the
@@ -88,7 +120,7 @@ final class FHIRAttributeReader implements FHIRAttributeReaderInterface
             $this->propertyCache[$key] = self::instantiate($reflectionProperty->getAttributes($attributeClass));
         }
 
-        return self::narrow($this->propertyCache[$key], $attributeClass);
+        return $key;
     }
 
     /**

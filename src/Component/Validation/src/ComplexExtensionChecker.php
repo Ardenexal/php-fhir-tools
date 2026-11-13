@@ -303,12 +303,7 @@ final class ComplexExtensionChecker
             $violations[] = $this->violation($record, $node, $path);
         }
 
-        foreach ($this->models->publicPropertyNames($node) as $name) {
-            if (!$this->models->isPropertyInitialized($node, $name)) {
-                continue;
-            }
-
-            $value    = $this->models->readInitializedValue($node, $name);
+        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
             $propPath = $path === '' ? $name : $path . '.' . $name;
 
             if (is_object($value)) {
