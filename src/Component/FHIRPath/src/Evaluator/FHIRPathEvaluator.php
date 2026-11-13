@@ -136,7 +136,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private array $complexPropertyTypeCache = [];
 
     /**
-     * Whether a class declares getResourceType(), by class; see {@see matchesResourceType()}.
+     * Whether a class has a getResourceType() method, by class; see {@see matchesResourceType()}.
      *
      * @var array<string, bool>
      */
@@ -624,8 +624,8 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                     $scopes[$offset + $position] = $scope;
                 }
 
-                // Appending in place keeps this linear: spreading into a new array per item copied
-                // everything gathered so far, which made wide navigations quadratic.
+                // Append in place: spreading into a new array per item would copy everything gathered
+                // so far, making wide navigations quadratic.
                 foreach ($memberResult->toArray() as $value) {
                     $results[] = $value;
                 }
@@ -1012,8 +1012,8 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         if (is_object($node)) {
             // Asked for every identifier the evaluator navigates, and generated models have no such
-            // getter, so the negative answer is kept per class. A class that has one asks again, which
-            // is what lets the call below be typed.
+            // getter, so the answer is kept per class. The second method_exists() is what lets
+            // PHPStan type the call below; it runs only for classes that have the getter.
             if (($this->resourceTypeGetterCache[$node::class] ??= method_exists($node, 'getResourceType'))
                 && method_exists($node, 'getResourceType')
             ) {
