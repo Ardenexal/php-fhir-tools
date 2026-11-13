@@ -68,7 +68,7 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     {
         $class = self::classOf($subject);
 
-        return $class !== null && self::reflect($class)->hasProperty($property);
+        return $class !== null && self::property($class, $property) !== false;
     }
 
     /**
@@ -269,7 +269,7 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     {
         // Called from this class's scope, get_object_vars() sees public properties only, and it leaves
         // out typed properties that were never written: exactly the ones isPropertyInitialized()
-        // rejects. Statics are not instance state, so they are read through their handle as before.
+        // rejects. It also leaves out statics, which are read through their handle instead.
         $vars   = get_object_vars($object);
         $values = [];
 
@@ -309,19 +309,20 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
      */
     public function copyTypedExtensionValueBack(object $object): void
     {
-        $reflection = self::reflect($object::class);
+        $valueProperty = self::property($object::class, 'value');
 
-        if (!$reflection->hasProperty('value')) {
+        if ($valueProperty === false) {
             return;
         }
 
-        $valueProperty = $reflection->getProperty('value');
+        foreach ($this->publicPropertyNames($object) as $name) {
+            if ($name === 'value' || !str_starts_with($name, 'value')) {
+                continue;
+            }
 
-        foreach ($reflection->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-            $name = $property->getName();
+            $property = self::property($object::class, $name);
 
-            if ($name !== 'value'
-                && str_starts_with($name, 'value')
+            if ($property !== false
                 && $property->isInitialized($object)
                 && $property->getValue($object) !== null
             ) {

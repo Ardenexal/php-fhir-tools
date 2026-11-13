@@ -216,7 +216,7 @@ class FHIRTypeResolver
 
         if (is_object($value)) {
             // Every object test above is on the instance's own type, so from here on the answer
-            // depends on the class alone. The walks below read attributes up the class hierarchy,
+            // depends on the class alone. inferObjectType() reads attributes up the class hierarchy,
             // and descendants().ofType() asks once per node, so the answer is kept per class.
             return $this->objectTypeCache[$value::class] ??= $this->inferObjectType($value);
         }
