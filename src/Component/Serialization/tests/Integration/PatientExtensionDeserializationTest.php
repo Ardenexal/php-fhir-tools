@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Integration;
 
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension as R4Extension;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -105,6 +106,35 @@ JSON;
     protected function setUp(): void
     {
         $this->service = FHIRSerializationService::createDefault();
+    }
+
+    /**
+     * An extension URL with a typed class only in another FHIR version reads as the plain
+     * Extension of the document's version.
+     *
+     * `requirements-parent` has a generated class for R5 only, so an R4 Patient carrying it must not
+     * get the R5 class.
+     */
+    public function testExtensionTypedOnlyInAnotherVersionReadsAsPlainExtension(): void
+    {
+        $json = <<<'JSON'
+{
+  "resourceType": "Patient",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/requirements-parent",
+      "valueCanonical": "http://example.org/fhir/Requirements/parent"
+    }
+  ]
+}
+JSON;
+
+        $patient    = $this->service->deserialize($json);
+        $extensions = (new \ReflectionClass($patient))->getProperty('extension')->getValue($patient);
+
+        self::assertIsArray($extensions);
+        self::assertCount(1, $extensions);
+        self::assertSame(R4Extension::class, $extensions[0]::class);
     }
 
     /**

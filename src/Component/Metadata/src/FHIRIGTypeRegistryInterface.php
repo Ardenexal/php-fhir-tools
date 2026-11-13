@@ -28,6 +28,7 @@ interface FHIRIGTypeRegistryInterface
      * @param string $version FHIR version to scope the lookup to; empty means any
      *
      * @return string|null Fully-qualified extension class, or null when the URL is not registered
+     *                     for $version (or for any version, when $version is empty)
      */
     public function resolveExtensionClass(string $url, string $version = ''): ?string;
 
