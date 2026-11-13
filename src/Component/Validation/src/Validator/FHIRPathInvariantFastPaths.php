@@ -23,8 +23,8 @@ namespace Ardenexal\FHIRTools\Component\Validation\Validator;
  * - "Passes" covers both a true result and an empty one, because the invariant validator treats
  *   them the same way.
  *
- * `FHIRPathInvariantFastPathsTest` checks every answer against the engine across the FHIR validator
- * test corpus.
+ * `FHIRPathInvariantFastPathsCorpusTest` checks every pass against the engine across the FHIR
+ * validator test corpus.
  *
  * @internal used by FHIRPathInvariantValidator, not part of the public API
  *
