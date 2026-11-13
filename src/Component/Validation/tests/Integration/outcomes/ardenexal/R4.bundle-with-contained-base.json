@@ -1,5 +1,5 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 1,
     "java": {
@@ -18,6 +18,9 @@
     },
     "outcome": {
         "errors": {
+            "constraint:BundleEntryFullUrlChecker": [
+                "entry[0] — The fullUrl 'http://example.org/MessageHeader/LabelerCodeRequestMessage' looks like a RESTful server URL, so it must end with the correct type and id (/MessageHeader/SampleLabelerCodeRequestMessage)"
+            ],
             "constraint:BundleReferenceResolutionChecker": [
                 "entry[0].resource.focus[0] — Can't find 'Organization/SampleLabelerOrganization' in the bundle. A resource with the same type and id is present at fullUrl 'http://example.org/Organization/SampleLabelerOrganization', but the fullUrl based rules around matching relative references do not match it against the source fullUrl 'http://example.org/MessageHeader/LabelerCodeRequestMessage'"
             ]

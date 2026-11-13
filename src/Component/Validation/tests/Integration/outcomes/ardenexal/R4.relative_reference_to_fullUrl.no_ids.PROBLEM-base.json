@@ -1,5 +1,5 @@
 {
-    "errorCount": 0,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 1,
     "java": {
@@ -16,7 +16,12 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:BundleEntryFullUrlChecker": [
+                "entry[0] — The fullUrl 'http://zrbj.eu/x/Composition/666' looks like a RESTful server URL, but the resource has no id",
+                "entry[1] — The fullUrl 'http://zrbj.eu/x/Organization/666' looks like a RESTful server URL, but the resource has no id"
+            ]
+        },
         "warnings": {}
     }
 }

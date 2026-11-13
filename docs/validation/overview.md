@@ -106,7 +106,7 @@ rules, modifier extensions, must-support, and obligations.
 | Primitive formats | `PrimitiveFormatChecker` | Unparsable temporal and decimal lexemes; malformed `code`, `id`, `oid`, `uri`, `base64Binary` → ERROR |
 | `Coding.system` | `CodingSystemChecker` | A relative `system`, or one that names a ValueSet → ERROR |
 | Unknown input | `UnknownInputChecker` | Elements the deserializer read but could not place on the model → ERROR |
-| Bundle `fullUrl` | `BundleEntryFullUrlChecker` | `Bundle.entry.fullUrl` that is not an absolute URL → ERROR |
+| Bundle `fullUrl` | `BundleEntryFullUrlChecker` | `Bundle.entry.fullUrl` that is not an absolute URL; an `http(s)` `fullUrl` of the form `[base]/[type]/[id]` that does not end with the entry resource's type and id; a missing `fullUrl` outside `transaction`/`batch` bundles and their responses, or on any entry whose resource holds a relative reference → ERROR |
 | Bundle reference resolution | `BundleReferenceResolutionChecker` | Relative reference to an entry the bundle holds that the `fullUrl` rules cannot resolve → ERROR |
 | Modifier extension walk | `validateModifierExtensions()` | Unknown modifier extension URLs → ERROR (needs registry) |
 | Obligation enforcement | `collectObligationViolations()` | Actor-scoped populate obligations → ERROR/WARNING/INFO |
@@ -174,7 +174,7 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Narrative / XHTML | Partial | `NarrativeXhtmlChecker`: disallowed elements and attributes, DOCTYPE, undefined entities and unparsable markup. Empty or whitespace-only narratives, the XHTML namespace, link schemes and stray text are not checked |
 | Primitive formats | Partial | `PrimitiveFormatChecker`. Malformed `boolean` and `integer` values are lost when read, so they cannot be reported |
 | Unknown elements | Partial | `UnknownInputChecker`; deserialized input only. XML element order is not checked |
-| Bundle `fullUrl` and references | Partial | Absolute `fullUrl` and relative-reference resolution. Missing `fullUrl`, RESTful `fullUrl` mismatch and document reachability are not checked |
+| Bundle `fullUrl` and references | Partial | Absolute, RESTful and missing `fullUrl`, and relative-reference resolution. Document reachability is not checked |
 
 ### Known limitations
 

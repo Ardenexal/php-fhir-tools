@@ -1,19 +1,23 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 1,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 1,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "The fullUrl 'http://something/Bundle/1' looks like a RESTful server URL, so it must end with the correct type and id (/Binary/1)"
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:BundleEntryFullUrlChecker": [
+                "parameter[0].resource.entry[0] — The fullUrl 'http://something/Bundle/1' looks like a RESTful server URL, so it must end with the correct type and id (/Binary/1)"
+            ]
+        },
         "warnings": {
             "constraint:FHIRValueSetBinding": [
                 "parameter[0].resource.entry[0].resource.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|5.0.0 could not be validated: no enum class generated."

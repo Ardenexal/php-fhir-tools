@@ -227,9 +227,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $violations[] = $complexExtensionViolation;
         }
 
-        // Bundle.entry.fullUrl must be absolute. Unconditional for the same reason again, and a shape
-        // test on the URL alone — it resolves nothing, so it is independent of the reference-resolution
-        // work. See BundleEntryFullUrlChecker.
+        // Bundle.entry.fullUrl rules: absolute, matching the resource when RESTful, and present where
+        // the Bundle type or a relative reference needs it. Unconditional for the same reason again, and
+        // it resolves nothing, so it is independent of the reference-resolution work. See
+        // BundleEntryFullUrlChecker.
         foreach ($this->bundleFullUrlChecker->check($resource) as $fullUrlViolation) {
             $violations[] = $fullUrlViolation;
         }
