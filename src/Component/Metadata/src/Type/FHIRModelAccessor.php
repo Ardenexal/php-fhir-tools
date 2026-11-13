@@ -28,6 +28,16 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     private static array $defaultsCache = [];
 
     /**
+     * Property handles by class and name; false records a name the class does not have.
+     *
+     * `ReflectionClass::getProperty()` builds a new handle on every call, and the validation tree
+     * walks read every property of every node through here, so the handles are kept.
+     *
+     * @var array<class-string, array<string, \ReflectionProperty|false>>
+     */
+    private static array $propertyCache = [];
+
+    /**
      * {@inheritDoc}
      */
     public function publicPropertyNames(object|string $subject): array
@@ -233,13 +243,11 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
      */
     public function readInitializedValue(object $object, string $property): mixed
     {
-        $reflection = self::reflect($object::class);
+        $handle = self::property($object::class, $property);
 
-        if (!$reflection->hasProperty($property)) {
+        if ($handle === false) {
             return null;
         }
-
-        $handle = $reflection->getProperty($property);
 
         return $handle->isInitialized($object) ? $handle->getValue($object) : null;
     }
@@ -249,13 +257,37 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
      */
     public function isPropertyInitialized(object $object, string $property): bool
     {
-        $reflection = self::reflect($object::class);
+        $handle = self::property($object::class, $property);
 
-        if (!$reflection->hasProperty($property)) {
-            return false;
+        return $handle !== false && $handle->isInitialized($object);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializedPublicValues(object $object): array
+    {
+        // Called from this class's scope, get_object_vars() sees public properties only, and it leaves
+        // out typed properties that were never written: exactly the ones isPropertyInitialized()
+        // rejects. Statics are not instance state, so they are read through their handle as before.
+        $vars   = get_object_vars($object);
+        $values = [];
+
+        foreach ($this->publicPropertyNames($object) as $name) {
+            if (array_key_exists($name, $vars)) {
+                $values[$name] = $vars[$name];
+
+                continue;
+            }
+
+            $handle = self::property($object::class, $name);
+
+            if ($handle !== false && $handle->isStatic() && $handle->isInitialized($object)) {
+                $values[$name] = $handle->getValue($object);
+            }
         }
 
-        return $reflection->getProperty($property)->isInitialized($object);
+        return $values;
     }
 
     /**
@@ -263,13 +295,13 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
      */
     public function writeValue(object $object, string $property, mixed $value): void
     {
-        $reflection = self::reflect($object::class);
+        $handle = self::property($object::class, $property);
 
-        if (!$reflection->hasProperty($property)) {
+        if ($handle === false) {
             return;
         }
 
-        $reflection->getProperty($property)->setValue($object, $value);
+        $handle->setValue($object, $value);
     }
 
     /**
@@ -318,13 +350,9 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
             return null;
         }
 
-        $reflection = self::reflect($class);
+        $handle = self::property($class, $property);
 
-        if (!$reflection->hasProperty($property)) {
-            return null;
-        }
-
-        return $reflection->getProperty($property)->getType();
+        return $handle === false ? null : $handle->getType();
     }
 
     /**
@@ -360,5 +388,26 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     private static function reflect(string $class): \ReflectionClass
     {
         return self::$classCache[$class] ??= new \ReflectionClass($class);
+    }
+
+    /**
+     * Cached handle for one property of a class, or false when the class has no such property.
+     *
+     * @param class-string $class    Class declaring or inheriting the property
+     * @param string       $property Property name
+     *
+     * @return \ReflectionProperty|false The cached handle, never handed to a caller
+     */
+    private static function property(string $class, string $property): \ReflectionProperty|false
+    {
+        $cached = self::$propertyCache[$class][$property] ?? null;
+
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $reflection = self::reflect($class);
+
+        return self::$propertyCache[$class][$property] = $reflection->hasProperty($property) ? $reflection->getProperty($property) : false;
     }
 }

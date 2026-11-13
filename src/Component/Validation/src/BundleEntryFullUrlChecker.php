@@ -103,15 +103,7 @@ final class BundleEntryFullUrlChecker
         $violations   = [];
         $nodeIsEntry  = $this->isBundleEntry($node);
 
-        foreach ($this->models->publicPropertyNames($node) as $name) {
-            // Deserializers bypass the constructor, so an absent field is uninitialized rather than
-            // null; reading it would throw \Error and drop the whole case out of the comparison set.
-            // The guarded read answers null for both, and every branch below skips on null anyway.
-            if (!$this->models->isPropertyInitialized($node, $name)) {
-                continue;
-            }
-
-            $value   = $this->models->readInitializedValue($node, $name);
+        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
             $subPath = $path === '' ? $name : $path . '.' . $name;
 
             if ($nodeIsEntry && $name === 'fullUrl') {

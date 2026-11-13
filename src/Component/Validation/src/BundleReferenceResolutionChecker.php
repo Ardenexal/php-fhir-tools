@@ -236,17 +236,12 @@ final class BundleReferenceResolutionChecker
             return $found;
         }
 
-        foreach ($this->models->publicPropertyNames($node) as $name) {
-            if (!$this->models->isPropertyInitialized($node, $name)) {
-                continue;
-            }
-
+        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
             // Contained resources resolve by their own rules, never against the bundle's entries.
             if ($name === 'contained') {
                 continue;
             }
 
-            $value   = $this->models->readInitializedValue($node, $name);
             $subPath = $path . '.' . $name;
 
             if (is_object($value)) {
