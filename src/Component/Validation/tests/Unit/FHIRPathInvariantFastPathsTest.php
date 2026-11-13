@@ -1,0 +1,61 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
+
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPathInvariantFastPaths;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * The fast paths may only ever answer "passes"; anything that could fail goes to the engine.
+ *
+ * The corpus test proves the passes are right. These pin the other half: the cases that must be
+ * left to the engine, because answering them here would either need data the fast path does not
+ * read or would be a failure the engine has to report with its own message.
+ */
+final class FHIRPathInvariantFastPathsTest extends TestCase
+{
+    public function testEle1PassesAnElementWithAChildOtherThanItsId(): void
+    {
+        self::assertTrue(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::ELE_1, new Coding(code: null, display: 'Weight')));
+    }
+
+    public function testEle1LeavesAnElementHoldingOnlyAnIdToTheEngine(): void
+    {
+        self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::ELE_1, new Coding(id: 'a1')));
+    }
+
+    public function testRef1PassesAnAbsoluteOrRelativeReference(): void
+    {
+        self::assertTrue(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::REF_1_R4, new Reference(reference: 'Patient/1')));
+        self::assertTrue(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::REF_1_R4, new Reference(display: 'Dr Smith')));
+    }
+
+    /**
+     * A `#` reference resolves against `%rootResource.contained`, which the fast path never reads.
+     */
+    public function testRef1LeavesAContainedReferenceToTheEngine(): void
+    {
+        self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::REF_1_R4, new Reference(reference: '#med1')));
+    }
+
+    public function testExt1LeavesAnExtensionWithBothValueAndSubExtensionsToTheEngine(): void
+    {
+        $extension = new Extension(extension: [new Extension(url: 'part', value: 'x')], url: 'http://example.org/ext', value: 'y');
+
+        self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::EXT_1, $extension));
+        self::assertTrue(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::EXT_1, new Extension(url: 'http://example.org/ext', value: 'y')));
+    }
+
+    /**
+     * Matching is on the exact text: a profile that tightens ele-1 must not be answered as ele-1.
+     */
+    public function testAnExpressionThatDiffersFromThePublishedTextIsLeftToTheEngine(): void
+    {
+        self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::ELE_1 . ' and id.exists()', new Coding(display: 'Weight')));
+    }
+}
