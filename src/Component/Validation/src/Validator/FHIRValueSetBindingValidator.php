@@ -209,7 +209,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
 
         if ($enumFqcn === null) {
             if ($this->terminologyClient !== null && !($constraint->fromProfile && $this->terminologyClient instanceof NullFHIRTerminologyClient)) {
-                $this->checkGroupsWithClient($this->terminologyClient, $value, $constraint, $constraint->valueSetUrl, FHIRViolationCode::ERROR);
+                $this->checkGroupsWithClient($this->terminologyClient, $value, $constraint->valueSetUrl, FHIRViolationCode::ERROR);
 
                 return;
             }
@@ -217,7 +217,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
             // A profile's binding names a value set this library may never have seen. Saying so is
             // honest; "no enum class generated" would read as a fault in the generated models.
             if ($constraint->fromProfile) {
-                $this->reportUnchecked($constraint);
+                $this->reportUnchecked($constraint->valueSetUrl);
 
                 return;
             }
@@ -261,18 +261,18 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         }
 
         if ($this->terminologyClient === null || $this->terminologyClient instanceof NullFHIRTerminologyClient) {
-            $this->reportUnchecked($constraint);
+            $this->reportUnchecked($constraint->valueSetUrl);
 
             return;
         }
 
         $bindingCode = $constraint->strict ? FHIRViolationCode::ERROR : FHIRViolationCode::WARNING;
 
-        $answered = $this->checkGroupsWithClient($this->terminologyClient, $value, $constraint, $constraint->valueSetUrl, $bindingCode);
+        $answered = $this->checkGroupsWithClient($this->terminologyClient, $value, $constraint->valueSetUrl, $bindingCode);
 
         // One unchecked finding per value is enough; the max value set check would only repeat it.
         if ($constraint->maxValueSetUrl !== null) {
-            $this->checkGroupsWithClient($this->terminologyClient, $value, $constraint, $constraint->maxValueSetUrl, FHIRViolationCode::ERROR, reportUnanswered: $answered);
+            $this->checkGroupsWithClient($this->terminologyClient, $value, $constraint->maxValueSetUrl, FHIRViolationCode::ERROR, reportUnanswered: $answered);
         }
     }
 
@@ -295,7 +295,6 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     private function checkGroupsWithClient(
         FHIRTerminologyClientInterface $client,
         mixed $value,
-        FHIRValueSetBinding $constraint,
         string $valueSetUrl,
         string $failureCode,
         bool $reportUnanswered = true,
@@ -313,7 +312,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         }
 
         if (!$allAnswered && $reportUnanswered) {
-            $this->reportUnchecked($constraint, self::DEFAULT_UNANSWERED_BINDING_MESSAGE);
+            $this->reportUnchecked($valueSetUrl, self::DEFAULT_UNANSWERED_BINDING_MESSAGE);
         }
 
         return $allAnswered;
@@ -399,13 +398,14 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     /**
      * One fhir:unchecked-binding INFO violation: the binding exists but could not be checked.
      *
+     * @param string $valueSetUrl    the value set that went unchecked: the binding's own, or its max value set
      * @param string $defaultMessage why: nothing configured can check it, or the server gave no answer
      */
-    private function reportUnchecked(FHIRValueSetBinding $constraint, string $defaultMessage = self::DEFAULT_UNCHECKED_BINDING_MESSAGE): void
+    private function reportUnchecked(string $valueSetUrl, string $defaultMessage = self::DEFAULT_UNCHECKED_BINDING_MESSAGE): void
     {
         $override = $this->messageRegistry->getOverride('FHIRValueSetBindingUnchecked');
         $this->context->buildViolation($override ?? $defaultMessage)
-            ->setParameters(['{{ url }}' => $constraint->valueSetUrl])
+            ->setParameters(['{{ url }}' => $valueSetUrl])
             ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
             ->addViolation();
     }

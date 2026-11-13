@@ -18,6 +18,16 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class CachingFHIRTerminologyClient implements FHIRTerminologyMembershipClientInterface
 {
+    /**
+     * Prefix of the membership cache keys.
+     *
+     * Before #182 a refused or failed request was stored as `false`, a "not a member" verdict, and a
+     * bare code was asked without `inferSystem`, which Ontoserver and tx.fhir.org always refuse. A
+     * PSR-6 pool kept from then can still hold those entries, so membership keys carry this prefix and
+     * never read them. Bump it whenever stored membership verdicts stop meaning what they meant.
+     */
+    private const string MEMBERSHIP_KEY_VERSION = 'v2::';
+
     /** @var array<string, bool|CodingValidationResult> */
     private array $inProcess = [];
 
@@ -65,7 +75,7 @@ final class CachingFHIRTerminologyClient implements FHIRTerminologyMembershipCli
             return $resolve();
         }
 
-        return $this->remember(md5("code::{$valueSetUrl}::{$valueStr}"), $resolve);
+        return $this->remember(md5(self::MEMBERSHIP_KEY_VERSION . "code::{$valueSetUrl}::{$valueStr}"), $resolve);
     }
 
     /**
@@ -121,7 +131,7 @@ final class CachingFHIRTerminologyClient implements FHIRTerminologyMembershipCli
     public function checkCoding(string $valueSetUrl, string $system, string $code): ?bool
     {
         return $this->remember(
-            md5("coding::{$valueSetUrl}::{$system}|{$code}"),
+            md5(self::MEMBERSHIP_KEY_VERSION . "coding::{$valueSetUrl}::{$system}|{$code}"),
             fn (): ?bool => $this->inner instanceof FHIRTerminologyMembershipClientInterface
                 ? $this->inner->checkCoding($valueSetUrl, $system, $code)
                 : $this->inner->validateCoding($valueSetUrl, $system, $code),

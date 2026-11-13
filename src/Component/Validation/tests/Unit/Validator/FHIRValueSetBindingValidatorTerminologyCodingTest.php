@@ -143,6 +143,33 @@ final class FHIRValueSetBindingValidatorTerminologyCodingTest extends Constraint
             ->assertRaised();
     }
 
+    /** The unchecked finding names the value set that went unanswered, here the max value set. */
+    public function testUnansweredMaxValueSetCheckNamesTheMaxValueSet(): void
+    {
+        $max = 'http://example.org/ValueSet/max';
+
+        $this->useClient(new HttpFHIRTerminologyClient(
+            new MockHttpClient(static function(string $method, string $url) use ($max): MockResponse {
+                parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
+
+                return ($query['url'] ?? null) === $max
+                    ? new MockResponse('{"resourceType":"OperationOutcome"}', ['http_code' => 503])
+                    : new MockResponse('{"resourceType":"Parameters","parameter":[{"name":"result","valueBoolean":true}]}');
+            }),
+            'https://tx.example.org/fhir',
+        ));
+
+        $this->validator->validate(
+            $this->coding(self::MEMBER, self::SNOMED),
+            new FHIRValueSetBinding(self::VALUE_SET, 'extensible', maxValueSetUrl: $max),
+        );
+
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_UNANSWERED_BINDING_MESSAGE)
+            ->setParameters(['{{ url }}' => $max])
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+            ->assertRaised();
+    }
+
     private function useClient(FHIRTerminologyClientInterface $client): void
     {
         $this->client    = $client;

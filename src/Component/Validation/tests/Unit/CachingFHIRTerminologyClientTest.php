@@ -375,6 +375,35 @@ final class CachingFHIRTerminologyClientTest extends TestCase
         self::assertFalse($client->checkCoding(self::VS_URL, self::SYSTEM, self::CODE));
     }
 
+    /**
+     * A pool kept from before #182 can hold a refused request stored as `false`. Membership keys
+     * therefore no longer match the old ones, so that entry is never read as a verdict.
+     */
+    public function testMembershipKeysDoNotReuseEntriesWrittenBeforeUnansweredChecksExisted(): void
+    {
+        $requested = [];
+        $item      = $this->createStub(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(false);
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturnCallback(static function(string $key) use (&$requested, $item): CacheItemInterface {
+            $requested[] = $key;
+
+            return $item;
+        });
+
+        $inner = $this->createStub(FHIRTerminologyClientInterface::class);
+        $inner->method('validateCode')->willReturn(true);
+        $inner->method('validateCoding')->willReturn(true);
+
+        $client = new CachingFHIRTerminologyClient($inner, $pool);
+        $client->validateCode(self::VS_URL, self::CODE);
+        $client->validateCoding(self::VS_URL, self::SYSTEM, self::CODE);
+
+        self::assertCount(2, $requested);
+        self::assertNotContains(md5('code::' . self::VS_URL . '::' . self::CODE), $requested);
+        self::assertNotContains(md5('coding::' . self::VS_URL . '::' . self::SYSTEM . '|' . self::CODE), $requested);
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
