@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\Metadata\MalformedPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\MalformedPrimitiveRecorder;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
@@ -433,6 +435,39 @@ final class PrimitiveFormatCheckerTest extends TestCase
     public function testDateWithoutATimeNeedsNoTimezone(): void
     {
         self::assertSame([], $this->messagesFor(new DateTimePrimitive(value: FHIRDateTime::parse('2020-11-11'))));
+    }
+
+    /**
+     * Text the reader could not hold on a bare `bool`/`int` is reported from the recorder, located on
+     * the property it was written to. Wording from `R5.primitive-bad` and `R4.Observation-ex-pain.xml`.
+     */
+    public function testRecordedBooleanAndIntegerTextIsReported(): void
+    {
+        MalformedPrimitiveRecorder::reset();
+
+        $boolean    = new ParametersParameter(name: 'b', value: false);
+        $integer    = new ParametersParameter(name: 'i', value: PHP_INT_MAX);
+        $noValue    = new ParametersParameter(name: 'n', value: 1);
+        $wellFormed = new ParametersParameter(name: 'w', value: true);
+
+        MalformedPrimitiveRecorder::record($boolean, new MalformedPrimitive('value', MalformedPrimitive::KIND_BOOLEAN, 'yes'));
+        MalformedPrimitiveRecorder::record($integer, new MalformedPrimitive('value', MalformedPrimitive::KIND_INTEGER, '34534536346345345345'));
+        MalformedPrimitiveRecorder::record($noValue, new MalformedPrimitive('value', MalformedPrimitive::KIND_NO_VALUE, null));
+
+        $violations = (new PrimitiveFormatChecker())->check(
+            new ParametersResource(parameter: [$boolean, $integer, $noValue, $wellFormed]),
+        );
+
+        MalformedPrimitiveRecorder::reset();
+
+        self::assertSame(
+            [
+                ['parameter[0].value', "Boolean values must be 'true' or 'false'"],
+                ['parameter[1].value', "The value '34534536346345345345' is not a valid integer"],
+                ['parameter[2].value', 'Primitive types must have a value or must have child extensions'],
+            ],
+            array_map(static fn (FHIRValidationViolation $v): array => [$v->path, $v->message], $violations),
+        );
     }
 
     /** @return list<string> */

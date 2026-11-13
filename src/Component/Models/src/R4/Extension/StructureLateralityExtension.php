@@ -16,11 +16,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/observation-structureLaterality
  *
- * @description Indicates the laterality of the body structure. Only for use when laterality is needed to augment the Observation.bodySite in cases where the laterality is not expressed in the Observation.code and/or the use of  BodyStructure will duplicate information for the anatomical structure.  We are seeking feedback from implementers regarding the use of this extension.
+ * @description Indicates the laterality of the body structure. Only for use when laterality is needed to augment the Observation.bodySite in cases where the laterality is not expressed in the Observation.code and/or the use of BodyStructure will duplicate information for the anatomical structure. This extension is used with Observation.bodySite through FHIR R5. In FHIR R6 and later, the bodySite element is deprecated and replaced with the bodyStructure element with reference to BodyStructure, so this extension is no longer required.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-structureLaterality', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation.bodySite')]
-#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/structure-laterality-vs', strength: 'required')]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/structure-laterality-vs', strength: 'extensible')]
 class StructureLateralityExtension extends Extension
 {
     /**

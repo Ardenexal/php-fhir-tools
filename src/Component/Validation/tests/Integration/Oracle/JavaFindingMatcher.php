@@ -132,6 +132,10 @@ final class JavaFindingMatcher
      */
     private const SHARED_PHRASES = [
         'invalid resource id:',
+        // `Not a valid time (null)` against our `Not a valid time format: '11:60:59'` on the same
+        // element: the reference validator loses the lexeme and prints `null`, we name it.
+        // `R5.primitive-bad` parameter[21] and [22].
+        'not a valid time',
     ];
 
     /**
@@ -569,7 +573,11 @@ final class JavaFindingMatcher
             return false;
         }
 
-        return $this->instancePath($javaExpression) === $ours->path;
+        // Java types a choice element's location (`parameter[21].value.ofType(time)`); our path names
+        // the element alone. The type suffix is the only difference, so only it is dropped.
+        $javaPath = (string) preg_replace('/\.ofType\([A-Za-z0-9]+\)$/', '', $this->instancePath($javaExpression));
+
+        return $javaPath === $ours->path;
     }
 
     /**

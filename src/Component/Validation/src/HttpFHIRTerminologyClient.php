@@ -9,9 +9,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Calls a FHIR terminology server's ValueSet/$validate-code operation.
- * Returns false on any HTTP or parse error (graceful degradation).
+ * The bool methods return false on any HTTP or parse error (graceful degradation); checkCode() and
+ * checkCoding() return null instead, so a caller can tell a failed exchange from a "not a member" verdict.
  */
-final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
+final class HttpFHIRTerminologyClient implements FHIRTerminologyMembershipClientInterface
 {
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -23,9 +24,8 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
     /**
      * Returns true when $value is a valid member of the named value set.
      *
-     * Calls GET /ValueSet/$validate-code with url and code parameters. Returns false on any
-     * HTTP error, transport failure, malformed response, or when the value cannot be converted
-     * to a string (e.g. null or unsupported object type).
+     * Returns false on any HTTP error, transport failure, malformed response, or when the value
+     * cannot be converted to a string. {@see checkCode()} keeps those apart from a "not a member" verdict.
      *
      * @param string $valueSetUrl Canonical URL of the value set to check against
      * @param mixed  $value       The code to validate; accepts string, int, or BackedEnum
@@ -34,21 +34,39 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
      */
     public function validateCode(string $valueSetUrl, mixed $value): bool
     {
+        return $this->checkCode($valueSetUrl, $value) === true;
+    }
+
+    /**
+     * Whether a code with no known system is in the value set, or null when the server gave no answer.
+     *
+     * Calls `ValueSet/$validate-code` with `url`, `code` and `inferSystem=true`. A code with no system is
+     * ambiguous to the operation unless the server is told to infer the system from the value set, and
+     * tx.fhir.org and Ontoserver both refuse the request without it.
+     *
+     * @param string $valueSetUrl Canonical URL of the value set to check against
+     * @param mixed  $value       The code to validate; accepts string, int, or BackedEnum
+     *
+     * @return bool|null the server's verdict; null on an HTTP error, transport failure, unreadable
+     *                   response, or a value that is not a code
+     */
+    public function checkCode(string $valueSetUrl, mixed $value): ?bool
+    {
         $code = $this->toCodeString($value);
         if ($code === null) {
-            return false;
+            return null;
         }
 
-        $body = $this->dispatchRaw('ValueSet/$validate-code', ['url' => $valueSetUrl, 'code' => $code]);
+        $body = $this->dispatchRaw('ValueSet/$validate-code', ['url' => $valueSetUrl, 'code' => $code, 'inferSystem' => 'true']);
 
-        return $body !== null && $this->parseResultParameter($body);
+        return $body === null ? null : self::parseOptionalResultParameter($body);
     }
 
     /**
      * Returns true when the system+code pair is a valid member of the named value set.
      *
-     * Calls GET /ValueSet/$validate-code with url, system, and code parameters. Returns false
-     * on any HTTP error, transport failure, or malformed response.
+     * Returns false on any HTTP error, transport failure, or malformed response. {@see checkCoding()}
+     * keeps those apart from a "not a member" verdict.
      *
      * @param string $valueSetUrl Canonical URL of the value set to check against
      * @param string $system      The coding system URI (e.g. 'http://loinc.org')
@@ -58,13 +76,29 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
      */
     public function validateCoding(string $valueSetUrl, string $system, string $code): bool
     {
+        return $this->checkCoding($valueSetUrl, $system, $code) === true;
+    }
+
+    /**
+     * Whether the system+code pair is in the value set, or null when the server gave no answer.
+     *
+     * Calls `ValueSet/$validate-code` with `url`, `system` and `code`.
+     *
+     * @param string $valueSetUrl Canonical URL of the value set to check against
+     * @param string $system      The coding system URI (e.g. 'http://loinc.org')
+     * @param string $code        The code within that system
+     *
+     * @return bool|null the server's verdict; null on an HTTP error, transport failure or unreadable response
+     */
+    public function checkCoding(string $valueSetUrl, string $system, string $code): ?bool
+    {
         $body = $this->dispatchRaw('ValueSet/$validate-code', [
             'url'    => $valueSetUrl,
             'system' => $system,
             'code'   => $code,
         ]);
 
-        return $body !== null && $this->parseResultParameter($body);
+        return $body === null ? null : self::parseOptionalResultParameter($body);
     }
 
     /**
@@ -185,14 +219,6 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
     }
 
     /**
-     * Extracts the result boolean from a FHIR Parameters response body.
-     */
-    private function parseResultParameter(string $body): bool
-    {
-        return self::parseOptionalResultParameter($body) === true;
-    }
-
-    /**
      * The `result` boolean, or null when the body carries no readable one.
      *
      * The plain boolean form cannot tell a server that said `result: false` from one whose answer could
@@ -267,6 +293,7 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             $parameters[] = match ($name) {
                 'url', 'system' => ['name' => $name, 'valueUri'  => $value],
                 'code'          => ['name' => $name, 'valueCode' => $value],
+                'inferSystem'   => ['name' => $name, 'valueBoolean' => $value === 'true'],
                 default         => ['name' => $name, 'valueString' => $value],
             };
         }

@@ -22,7 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
-#[FHIRContextInvariant(expression: 'type.exists(code=\'Coding\') or (type.hasValue() and type!=\'group\' and type!=\'display\')')]
+#[FHIRContextInvariant(expression: 'type.exists(code = \'Coding\' or (hasValue() and $this != \'group\' and $this != \'display\'))')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/choice-list-orientation', strength: 'required')]
 class QChoiceOrientationExtension extends Extension
 {

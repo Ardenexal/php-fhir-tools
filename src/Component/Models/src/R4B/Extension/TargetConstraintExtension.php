@@ -35,10 +35,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal.target')]
-#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.actor')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.item')]
 class TargetConstraintExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

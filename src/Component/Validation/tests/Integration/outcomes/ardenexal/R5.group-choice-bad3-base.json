@@ -1,19 +1,23 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 1,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Boolean values must be 'true' or 'false'"
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:PrimitiveFormatChecker": [
+                "characteristic[0].value — Boolean values must be 'true' or 'false'"
+            ]
+        },
         "warnings": {}
     }
 }

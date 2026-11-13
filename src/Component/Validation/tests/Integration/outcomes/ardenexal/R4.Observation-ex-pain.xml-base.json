@@ -1,5 +1,5 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -20,6 +20,9 @@
         "errors": {
             "constraint:NotBlank": [
                 "code — This value should not be blank."
+            ],
+            "constraint:PrimitiveFormatChecker": [
+                "value — Primitive types must have a value or must have child extensions"
             ]
         },
         "warnings": {}

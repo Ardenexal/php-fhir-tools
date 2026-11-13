@@ -73,8 +73,9 @@ Validation is attribute-driven. FHIR constraints are emitted as PHP 8 attributes
 generated model classes during code generation (`fhir:generate`). At runtime,
 `FHIRValidationService` calls Symfony Validator's `validate()` — which reads the attributes and
 dispatches each to its matching `ConstraintValidator` — then augments the result with
-FHIR-specific checks that Symfony cannot express (extension contexts, modifier extensions,
-must-support, obligations).
+FHIR-specific checks that Symfony cannot express: extension contexts and structure, narrative
+XHTML, primitive formats, `Coding.system`, input the reader could not place, Bundle `fullUrl`
+rules, modifier extensions, must-support, and obligations.
 
 ### Validator map
 
@@ -99,10 +100,25 @@ must-support, obligations).
 | Must-support collection | `collectMustSupportInfo()` | Null/empty must-support properties → INFO (opt-in) |
 | Extension context | `validateExtensionContexts()` | Extension applied outside its declared context → ERROR |
 | Extension `contextInvariant` | `validateExtensionContexts()` | FHIRPath invariant on the extension's use context |
+| Extension structure | `validateExtensionStructure()` | Missing `url`, non-absolute top-level `url`, or a value type the definition does not allow → ERROR; the extension's own invariants and bindings at their usual severity |
+| Complex extension sub-extensions | `ComplexExtensionChecker` | Missing required or undeclared sub-extension → ERROR |
+| Narrative XHTML | `NarrativeXhtmlChecker` | Disallowed elements, attributes, DOCTYPE and undefined entities (`txt-1`) and unparsable markup (`txt-2`) on every `xhtml` value, with the offending element, attribute or entity named → ERROR |
+| Primitive formats | `PrimitiveFormatChecker` | Unparsable temporal and decimal lexemes; malformed `code`, `id`, `oid`, `uri`, `base64Binary` → ERROR |
+| `Coding.system` | `CodingSystemChecker` | A relative `system`, or one that names a ValueSet → ERROR |
+| Unknown input | `UnknownInputChecker` | Elements the deserializer read but could not place on the model → ERROR |
+| Bundle `fullUrl` | `BundleEntryFullUrlChecker` | `Bundle.entry.fullUrl` that is not an absolute URL; an `http(s)` `fullUrl` of the form `[base]/[type]/[id]` that does not end with the entry resource's type and id; a missing `fullUrl` outside `transaction`/`batch` bundles and their responses, or on any entry whose resource holds a relative reference → ERROR |
+| Bundle reference resolution | `BundleReferenceResolutionChecker` | Relative reference to an entry the bundle holds that the `fullUrl` rules cannot resolve → ERROR |
 | Modifier extension walk | `validateModifierExtensions()` | Unknown modifier extension URLs → ERROR (needs registry) |
 | Obligation enforcement | `collectObligationViolations()` | Actor-scoped populate obligations → ERROR/WARNING/INFO |
 
-These are documented under [Extensions, Modifiers & Obligations](extensions.md).
+The extension, modifier, must-support and obligation checks are documented under
+[Extensions, Modifiers & Obligations](extensions.md).
+
+Every check from narrative XHTML down to Bundle reference resolution runs on every call and needs
+no configuration. The unknown-input check and the unparsable temporal check report what the
+deserializer recorded, so they only find something on a resource read from JSON or XML, not on one
+built in PHP. So does the missing-sub-extension check on a typed complex extension; a plain
+`Extension` with a runtime definition is checked against that definition however it was built.
 
 ### Validation flow
 
@@ -120,6 +136,10 @@ FHIRValidationService::validate($resource, $profileUrls, $includeMustSupportInfo
   │
   ├─ collectMustSupportInfo()    (only when $includeMustSupportInfo = true)
   ├─ validateExtensionContexts() (always; recursive walk across the full resource tree)
+  ├─ NarrativeXhtmlChecker, PrimitiveFormatChecker, CodingSystemChecker,
+  │  UnknownInputChecker, ComplexExtensionChecker,
+  │  BundleEntryFullUrlChecker, BundleReferenceResolutionChecker  (always)
+  ├─ validateExtensionStructure() (always)
   ├─ validateModifierExtensions() (only when a FHIRIGTypeRegistry is provided)
   └─ collectObligationViolations() (only when a FHIRObligationContext is provided)
        └─ applyNoErrorSuppression() (suppress errors for SHALL:no-error obligations)
@@ -137,10 +157,11 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Required bindings | Supported | `FHIRValueSetBindingValidator`; enum-backed |
 | FHIRPath invariants | Supported | Engine eval errors emit `fhir:eval-error` INFO (not ERROR) |
 | Fixed / pattern values | Supported | `FHIRFixedValueValidator` / `FHIRPatternValueValidator` |
-| Slicing (closed/open/openAtEnd) | Supported | `FHIRSliceConstraintValidator` |
+| Slicing (closed/open/openAtEnd) | Supported | `FHIRSliceConstraintValidator`; `value`, `pattern` and `exists` discriminators. Closed slicing the validator cannot match is enforced as open |
 | Profile constraints (generated) | Supported | `FHIRProfileConstraintValidator`; requires pre-generated models |
 | Profile constraints (dynamic/runtime) | Supported | `RuntimeProfileResolver`; StructureDefinitions must carry a snapshot; see [Runtime Profiles](runtime-profiles.md) |
 | Extension contexts (element/fhirpath/extension) | Supported | Recursive walk; defer-not-deny safety; see [Extensions](extensions.md) |
+| Extension structure and sub-extensions | Supported | `url`, value type, missing and undeclared sub-extensions; generated or runtime definitions |
 | Modifier extensions (unknown URL) | Supported | Recursive walk; requires a `FHIRIGTypeRegistry` |
 | Extensible / preferred bindings | Conditional | Needs a real terminology client; otherwise `fhir:unchecked-binding` INFO |
 | Target profile references | Conditional | Needs a `FHIRReferenceResolverInterface`; null resolver skips silently |
@@ -150,7 +171,10 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Obligations (populate) | Conditional | `SHALL`/`SHOULD:populate` enforced; filter evaluation deferred |
 | `$validate` operation output | Supported | `validateForOperation()` → `OperationOutcomeResource` |
 | Questionnaire validation | Separate service | `FHIRQuestionnaireValidator`; see [Questionnaire](questionnaire.md) |
-| Narrative / XHTML | Not implemented | — |
+| Narrative / XHTML | Partial | `NarrativeXhtmlChecker`: disallowed elements and attributes, DOCTYPE, undefined entities and unparsable markup. Empty or whitespace-only narratives, the XHTML namespace, link schemes and stray text are not checked |
+| Primitive formats | Partial | `PrimitiveFormatChecker`. Malformed `boolean` and `integer` values are lost when read, so they cannot be reported |
+| Unknown elements | Partial | `UnknownInputChecker`; deserialized input only. XML element order is not checked |
+| Bundle `fullUrl` and references | Partial | Absolute, RESTful and missing `fullUrl`, and relative-reference resolution. Document reachability is not checked |
 
 ### Known limitations
 
@@ -163,6 +187,13 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 * **Runtime profiles need snapshots.** A profile you have not generated can be validated from its
   StructureDefinition, but only when it carries a snapshot, and rules inside slices are skipped. All
   HL7 core profiles for R4/R4B/R5 are pre-generated. See [Runtime Profiles](runtime-profiles.md#limits).
+* **Slice discriminators** of type `type` or `profile`, `$this`, and paths through `resolve()` are
+  not evaluated. Closed or openAtEnd slicing that depends on one is enforced as open, and the
+  generator (or the runtime compiler) reports a warning. See [Structural](structural.md#slicing).
+* **Narrative XHTML** is checked for disallowed content (`txt-1`) and unparsable markup (`txt-2`).
+  A well-formed narrative with no non-whitespace content is not reported, and neither is the XHTML
+  namespace: the XML reader drops namespace bindings on `div`, so a correct narrative and a wrong
+  one look the same.
 * **Target profile reference validation** requires a `FHIRReferenceResolverInterface`. The
   default `NullFHIRReferenceResolver` returns `null`, silently skipping the check. See
   [References](references.md).

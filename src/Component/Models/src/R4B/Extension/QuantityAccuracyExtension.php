@@ -25,7 +25,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/quantity-accuracy', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Quantity')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceMetric')]
 class QuantityAccuracyExtension extends Extension
 {
     /**

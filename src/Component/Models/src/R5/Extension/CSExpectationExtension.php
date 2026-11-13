@@ -24,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.format')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.implementationGuide')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.imports')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.instantiates')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.patchFormat')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.interaction')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.operation')]

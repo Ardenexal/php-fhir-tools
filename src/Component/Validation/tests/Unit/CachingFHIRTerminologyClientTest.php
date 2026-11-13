@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 use Ardenexal\FHIRTools\Component\Validation\CachingFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Validation\CodingValidationResult;
 use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
+use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyMembershipClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
@@ -320,6 +321,87 @@ final class CachingFHIRTerminologyClientTest extends TestCase
         $client = new CachingFHIRTerminologyClient($inner);
         self::assertTrue($client->validateCode(self::VS_URL, self::CODE));
         self::assertFalse($client->validateCoding(self::VS_URL, self::SYSTEM, self::CODE));
+    }
+
+    // -------------------------------------------------------------------------
+    // Tri-state membership: a missing answer is passed through and never cached
+    // -------------------------------------------------------------------------
+
+    /**
+     * A refused request is not a verdict. Caching it would remember a passing outage as "not a
+     * member" for the whole TTL, so the next call asks again.
+     */
+    public function testUnansweredCheckIsReturnedAsNullAndNotCached(): void
+    {
+        [$pool, $item] = $this->createPoolWithMiss();
+        $item->expects($this->never())->method('set');
+
+        $inner = $this->createMock(FHIRTerminologyMembershipClientInterface::class);
+        $inner->expects($this->exactly(2))
+            ->method('checkCoding')
+            ->with(self::VS_URL, self::SYSTEM, self::CODE)
+            ->willReturn(null);
+
+        $client = new CachingFHIRTerminologyClient($inner, $pool);
+
+        self::assertNull($client->checkCoding(self::VS_URL, self::SYSTEM, self::CODE));
+        self::assertFalse($client->validateCoding(self::VS_URL, self::SYSTEM, self::CODE));
+    }
+
+    public function testCheckCodeCachesAVerdictFromAMembershipClient(): void
+    {
+        $inner = $this->createMock(FHIRTerminologyMembershipClientInterface::class);
+        $inner->expects($this->once())
+            ->method('checkCode')
+            ->with(self::VS_URL, 'final')
+            ->willReturn(false);
+
+        $client = new CachingFHIRTerminologyClient($inner);
+
+        self::assertFalse($client->checkCode(self::VS_URL, 'final'));
+        self::assertFalse($client->checkCode(self::VS_URL, 'final'));
+    }
+
+    /** A plain bool client always gives a verdict, so checkCoding() never returns null for it. */
+    public function testCheckCodingOnAPlainClientReturnsItsVerdict(): void
+    {
+        $inner = $this->createInnerMock();
+        $inner->expects($this->once())
+            ->method('validateCoding')
+            ->willReturn(false);
+
+        $client = new CachingFHIRTerminologyClient($inner);
+
+        self::assertFalse($client->checkCoding(self::VS_URL, self::SYSTEM, self::CODE));
+    }
+
+    /**
+     * A pool kept from before #182 can hold a refused request stored as `false`. Membership keys
+     * therefore no longer match the old ones, so that entry is never read as a verdict.
+     */
+    public function testMembershipKeysDoNotReuseEntriesWrittenBeforeUnansweredChecksExisted(): void
+    {
+        $requested = [];
+        $item      = $this->createStub(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(false);
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturnCallback(static function(string $key) use (&$requested, $item): CacheItemInterface {
+            $requested[] = $key;
+
+            return $item;
+        });
+
+        $inner = $this->createStub(FHIRTerminologyClientInterface::class);
+        $inner->method('validateCode')->willReturn(true);
+        $inner->method('validateCoding')->willReturn(true);
+
+        $client = new CachingFHIRTerminologyClient($inner, $pool);
+        $client->validateCode(self::VS_URL, self::CODE);
+        $client->validateCoding(self::VS_URL, self::SYSTEM, self::CODE);
+
+        self::assertCount(2, $requested);
+        self::assertNotContains(md5('code::' . self::VS_URL . '::' . self::CODE), $requested);
+        self::assertNotContains(md5('coding::' . self::VS_URL . '::' . self::SYSTEM . '|' . self::CODE), $requested);
     }
 
     // -------------------------------------------------------------------------

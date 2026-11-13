@@ -60,19 +60,19 @@ after merging.
 | A required group needs at least one answered descendant question | `error` |
 | Non-repeating items: at most one occurrence per parent and one answer | `error` |
 | Answer must satisfy item constraint extensions: `minValue`/`maxValue`, `minLength`/`maxLength`, `maxDecimalPlaces`, `regex`, `minOccurs`/`maxOccurs` | `error` |
-| `answerOption` membership, including the exclusive-option (`optionExclusive`) rule | `error` |
+| `answerOption` membership, including the exclusive-option (`optionExclusive`) rule; an R5 `answerConstraint` of `optionsOrType` or `optionsOrString` also admits any value of the item type or any string | `error` |
 | Non-answerable item types (`display`, abstract `question`) must not carry an answer | `error` |
 | `Reference` answers must match the constrained target resource type and be a well-formed URL | `error` |
 | `Attachment` answers must satisfy content-type / size / data-size constraints | `error` |
 | `Quantity` answers must satisfy `minQuantity`/`maxQuantity` bounds and unit-option constraints | `error` |
-| Answer value type must match the declared item type | `warning` |
+| Answer value type must match the declared item type (an R5 `optionsOrString` item also accepts a string) | `warning` |
 | Items present while their `enableWhen` conditions are unsatisfied | `warning` |
 | `enableWhen.question` must reference a known `linkId` | `warning` |
 
 {% hint style="warning" %}
-SDC `answerExpression`, calculated expressions (`calculatedExpression`), and R5
-`answerConstraint` are not yet covered. (`enableWhenExpression` — both the canonical SDC and
-Kanta PHR variants — and `regex` constraints are now validated.) `enableWhen` answers are
+SDC `answerExpression` and calculated expressions (`calculatedExpression`) are not yet
+covered. (`enableWhenExpression` — both the canonical SDC and Kanta PHR variants — `regex`
+constraints and R5 `answerConstraint` are now validated.) `enableWhen` answers are
 looked up response-globally — a documented approximation of the spec's nearest-occurrence
 resolution that is exact whenever the referenced question occurs once.
 {% endhint %}

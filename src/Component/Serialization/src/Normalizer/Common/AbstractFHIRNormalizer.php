@@ -18,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationExcep
 use Ardenexal\FHIRTools\Component\Metadata\ComplexExtensionSubExtensions;
 use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtension;
 use Ardenexal\FHIRTools\Component\Metadata\UnknownInput;
+use Ardenexal\FHIRTools\Component\Metadata\MalformedPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\MalformedPrimitiveRecorder;
 use Ardenexal\FHIRTools\Component\Metadata\UnknownInputRecorder;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
@@ -709,6 +711,91 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             case FHIRSerializationContext::UNKNOWN_POLICY_IGNORE:
             default:
                 break;
+        }
+    }
+
+    /**
+     * Record `boolean` and `integer` text that the property's PHP type cannot hold as written.
+     *
+     * Those FHIR types are generated as bare `bool` and `int`, so coercion loses the text before
+     * validation could see it: `TRUE` and `yes` both become a boolean, and an out-of-range integer
+     * saturates. This changes nothing about the coerced value; it only keeps the original text in
+     * {@see MalformedPrimitiveRecorder}, where validation reports it.
+     *
+     * XML arrives as the decoded element: the bare `value` text, or an array carrying `@value`
+     * alongside children. An array with neither `@value` nor `extension` is an element with nothing
+     * in it, like `<valueInteger><value value="0"/></valueInteger>` in `R4.Observation-ex-pain.xml`.
+     *
+     * JSON types its own scalars, so only a `boolean` written as something other than `true` or
+     * `false` is recorded, such as `"valueBoolean": 1` in `R5.group-choice-bad3`. Integer text is out
+     * of reach there: `json_decode()` has already turned it into a number.
+     *
+     * @param object      $object       the model object being read into, and the record's key
+     * @param string      $propertyName the model property the value is written to
+     * @param string|null $phpType      the property's PHP type; anything but `bool` or `int` is ignored
+     * @param mixed       $rawValue     the decoded value before any coercion
+     * @param string      $format       'json' or 'xml'
+     */
+    protected function recordMalformedScalar(object $object, string $propertyName, ?string $phpType, mixed $rawValue, string $format): void
+    {
+        if ($phpType !== 'bool' && $phpType !== 'int') {
+            return;
+        }
+
+        if ($format === 'json') {
+            if ($phpType === 'bool' && $rawValue !== null && !is_bool($rawValue)) {
+                MalformedPrimitiveRecorder::record(
+                    $object,
+                    new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_BOOLEAN, (string) json_encode($rawValue)),
+                );
+            }
+
+            return;
+        }
+
+        // A bare `<valueInteger/>` decodes to an empty string, not an array: an element with nothing
+        // in it. An explicit `value=""` arrives as `['@value' => '']` and is judged as text below.
+        if ($rawValue === '') {
+            MalformedPrimitiveRecorder::record($object, new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_NO_VALUE, null));
+
+            return;
+        }
+
+        $lexeme = $rawValue;
+
+        if (is_array($rawValue)) {
+            if (!array_key_exists('@value', $rawValue)) {
+                if (!array_key_exists('extension', $rawValue)) {
+                    MalformedPrimitiveRecorder::record($object, new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_NO_VALUE, null));
+                }
+
+                return;
+            }
+
+            $lexeme = $rawValue['@value'];
+        }
+
+        if (!is_string($lexeme)) {
+            return;
+        }
+
+        if ($phpType === 'bool') {
+            if ($lexeme !== 'true' && $lexeme !== 'false') {
+                MalformedPrimitiveRecorder::record($object, new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_BOOLEAN, $lexeme));
+            }
+
+            return;
+        }
+
+        // FHIR's integer is a signed 32-bit value with no leading zeros; positiveInt and unsignedInt
+        // narrow the range further, which is a separate rule this does not judge.
+        $isInteger = preg_match('/\A(0|[-+]?[1-9][0-9]*)\z/', $lexeme) === 1
+            && strlen(ltrim($lexeme, '+-')) <= 10
+            && (int) $lexeme >= -2147483648
+            && (int) $lexeme <= 2147483647;
+
+        if (!$isInteger) {
+            MalformedPrimitiveRecorder::record($object, new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_INTEGER, $lexeme));
         }
     }
 

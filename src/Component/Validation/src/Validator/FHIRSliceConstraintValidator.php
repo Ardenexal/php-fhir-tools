@@ -156,6 +156,12 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             }
         }
 
+        // Items of a slice no item can match would be judged unmatched, which closed and openAtEnd
+        // rules reject; current classes are generated with open rules for such slicing
+        if (array_filter($namedSlices, self::isUndecidedExistsSlice(...)) !== []) {
+            $rules = 'open';
+        }
+
         // Track match counts per slice and which items matched any slice
         /** @var array<int, int> $matchCounts  sliceConstraints index → count */
         $matchCounts        = array_fill(0, count($namedSlices), 0);
@@ -198,7 +204,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         foreach ($namedSlices as $sliceIdx => $sc) {
             $count = $matchCounts[$sliceIdx];
 
-            if ($count < $sc->min) {
+            if ($count < $sc->min && !self::isUndecidedExistsSlice($sc)) {
                 $this->context->buildViolation(
                     'Slice "{{ slice }}" on "{{ property }}" requires at least {{ min }} item(s), but {{ count }} matched.',
                 )->setParameters([
@@ -272,6 +278,19 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                 '{{ property }}' => $property,
             ])->atPath($property)->setCode(FHIRViolationCode::ERROR)->addViolation();
         }
+    }
+
+    /**
+     * True for an `exists` slice with no presence to test, which no item can match.
+     *
+     * Classes generated before the generator read an `exists` slice's presence from its definition
+     * carry none, yet keep the slice's minimum and the slicing's closed or openAtEnd rules. Both
+     * would fail resources that conform, so neither is checked; current classes give such a slice
+     * no minimum and its slicing open rules in the first place.
+     */
+    private static function isUndecidedExistsSlice(FHIRSliceConstraint $slice): bool
+    {
+        return $slice->discriminatorType === 'exists' && !is_bool($slice->discriminatorValue);
     }
 
     /**

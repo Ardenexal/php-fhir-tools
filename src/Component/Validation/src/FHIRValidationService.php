@@ -89,6 +89,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly PropertyMetadataProviderInterface $properties = new PropertyMetadataProvider(),
         private readonly ComplexExtensionChecker $complexExtensionChecker = new ComplexExtensionChecker(),
         private readonly ?RuntimeProfileResolver $runtimeProfiles = null,
+        private readonly DuplicateElementIdChecker $duplicateIdChecker = new DuplicateElementIdChecker(),
     ) {
         $this->runtimeConstraints          = new \WeakMap();
         $this->runtimeExtensionConstraints = new \WeakMap();
@@ -213,6 +214,12 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $violations[] = $codingViolation;
         }
 
+        // Element ids repeated within one resource. Unconditional like the passes above; it reads ids
+        // alone. See DuplicateElementIdChecker.
+        foreach ($this->duplicateIdChecker->check($resource) as $duplicateIdViolation) {
+            $violations[] = $duplicateIdViolation;
+        }
+
         // Elements the reader could not place on the model. Unconditional like the passes above,
         // and it reads what deserialization recorded rather than the object: by this point the
         // model holds only the names it could place, so the dropped ones are gone from it.
@@ -227,9 +234,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $violations[] = $complexExtensionViolation;
         }
 
-        // Bundle.entry.fullUrl must be absolute. Unconditional for the same reason again, and a shape
-        // test on the URL alone — it resolves nothing, so it is independent of the reference-resolution
-        // work. See BundleEntryFullUrlChecker.
+        // Bundle.entry.fullUrl rules: absolute, matching the resource when RESTful, and present where
+        // the Bundle type or a relative reference needs it. Unconditional for the same reason again, and
+        // it resolves nothing, so it is independent of the reference-resolution work. See
+        // BundleEntryFullUrlChecker.
         foreach ($this->bundleFullUrlChecker->check($resource) as $fullUrlViolation) {
             $violations[] = $fullUrlViolation;
         }

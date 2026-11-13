@@ -42,8 +42,12 @@ wrappers are coerced to string before the `tryFrom()` check.
 
 ### Extensible / preferred bindings
 
-These are checked via `FHIRTerminologyClientInterface::validateCode()`. Behaviour depends on the
-constraint flags:
+These are checked through the terminology client, as is a `required` binding with no generated
+enum. A `Coding` is sent with its system through `validateCoding()`. A code with no system, such as
+a `code` element, goes through `validateCode()`, which `HttpFHIRTerminologyClient` sends with
+`inferSystem=true`. A `CodeableConcept` meets the binding when any one of its codings is in the value
+set; a concept with no member is one finding naming its codes. Behaviour depends on the constraint
+flags:
 
 * Default failures use WARNING (`fhir:warning`); `strict = true` escalates to ERROR.
 * When `maxValueSetUrl` is set, a value outside that max value set always produces an ERROR,
@@ -55,6 +59,18 @@ the check is skipped and a single `fhir:unchecked-binding` INFO violation is emi
 ```
 Terminology validation for value set {{ url }} was skipped: no terminology client is configured.
 ```
+
+A check the server gave no answer to (a non-2xx response, a timeout, an unreadable body) is reported
+the same way, never as an invalid code, with this message instead:
+
+```
+Terminology validation for value set {{ url }} was skipped: the terminology server gave no answer.
+```
+
+This needs a client that implements `FHIRTerminologyMembershipClientInterface`, whose `checkCode()`
+and `checkCoding()` return `null` for no answer. `HttpFHIRTerminologyClient` and
+`CachingFHIRTerminologyClient` do; a client that implements only `FHIRTerminologyClientInterface`
+answers `false`, which is reported as an invalid code.
 
 This INFO never affects `isValid()`. Query it via
 `FHIRValidationReport::hasUncheckedBindings()` / `uncheckedBindings()`:

@@ -15,7 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
  * @description This profile holds all the requirements and constraints related to a FHIR history bundle.
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/history-bundle', baseType: 'Bundle', fhirVersion: 'R5')]
-#[FHIRSlicingRules(property: 'entry', rules: 'closed', groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'])]
+#[FHIRSlicingRules(property: 'entry', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/history-bundle'])]
 #[FHIRSliceConstraint(
     property: 'entry',
     sliceName: 'put',

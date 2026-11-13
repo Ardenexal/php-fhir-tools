@@ -60,7 +60,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\DiagnosticReportResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
 #[FHIRProfileMustSupport(path: 'conclusion', groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'])]
-#[FHIRSlicingRules(property: 'result', rules: 'closed', groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'])]
+#[FHIRSlicingRules(property: 'result', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'])]
 #[FHIRSliceConstraint(
     property: 'result',
     sliceName: 'Cholesterol',

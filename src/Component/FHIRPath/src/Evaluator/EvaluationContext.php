@@ -272,6 +272,30 @@ final class EvaluationContext
     }
 
     /**
+     * Create a new context without the given variable, so that reading it yields an empty collection.
+     *
+     * withVariable($name, null) is different: it binds the variable to a null node, which reads as a
+     * single-item collection.
+     */
+    public function withoutVariable(string $name): self
+    {
+        $variables = $this->variables;
+        unset($variables[$name]);
+
+        return new self(
+            $this->rootResource,
+            $this->currentNode,
+            $variables,
+            $this->externalConstants,
+            $this->evaluator,
+            $this->fhirVersion,
+            null,
+            $this->strictMode,
+            bundleEntryScope: $this->bundleEntryScope,
+        );
+    }
+
+    /**
      * Get an external constant value
      */
     public function getExternalConstant(string $name): mixed

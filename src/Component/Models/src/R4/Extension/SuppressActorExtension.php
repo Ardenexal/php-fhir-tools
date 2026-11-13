@@ -13,13 +13,14 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 /**
  * @author HL7 International / FHIR Infrastructure
  *
- * @see http://hl7.org/fhir/StructureDefinition/requirements-parent
+ * @see http://hl7.org/fhir/StructureDefinition/canonicalresource-suppressActor
  *
- * @description A larger/more generic set of requirements that this set of requirements helps to refine and enable.
+ * @description Identifies an actor that is 'not relevant' for the purposes of the current publication and that will therefore not be prominently exposed in the profile tables, nor used when determining 'key elements' based on obligations.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/requirements-parent', fhirVersion: 'R4')]
-#[FHIRExtensionContext(type: 'element', expression: 'Requirements.statement')]
-class RequirementsParentExtension extends Extension
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/canonicalresource-suppressActor', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide')]
+#[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
+class SuppressActorExtension extends Extension
 {
     /**
      * @param list<Extension> $extension
@@ -34,7 +35,7 @@ class RequirementsParentExtension extends Extension
         parent::__construct(
             id: $id,
             extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/requirements-parent',
+            url: 'http://hl7.org/fhir/StructureDefinition/canonicalresource-suppressActor',
             value: $this->valueCanonical,
         );
     }

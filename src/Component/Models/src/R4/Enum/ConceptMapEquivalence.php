@@ -9,10 +9,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSour
 /**
  * ValueSet: Concept Map Equivalence Value Set
  * URL: http://hl7.org/fhir/ValueSet/concept-map-equivalence
- * Version: 5.3.0
+ * Version: 5.4.0
  * Description: The degree of equivalence between concepts.
  */
-#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/concept-map-equivalence', version: '5.3.0')]
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/concept-map-equivalence', version: '5.4.0')]
 enum ConceptMapEquivalence: string
 {
     /** Related To */

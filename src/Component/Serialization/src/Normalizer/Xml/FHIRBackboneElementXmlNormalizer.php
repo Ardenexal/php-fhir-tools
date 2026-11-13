@@ -105,6 +105,7 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
                         } else {
+                            $this->recordMalformedScalar($object, $propertyName, $phpType, $value, 'xml');
                             $rawValue = $this->unwrapXmlValue($value, $phpType);
 
                             // A choice variant the generator maps to a PHP scalar (boolean, integer,
@@ -171,6 +172,7 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                     if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                         $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
                     } else {
+                        $this->recordMalformedScalar($object, $elementName, $propertyType, $value, 'xml');
                         $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
                         if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {
                             $denormalizedValue = $denormalizedValue['@value'];

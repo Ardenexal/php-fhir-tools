@@ -131,7 +131,7 @@ final class SymfonyConsoleCompatibilityTest extends TestCase
             [
                 'hl7.terminology.r4#7.0.0',
                 'hl7.fhir.r4.core#4.0.1',
-                'hl7.fhir.uv.extensions.r4#5.3.0',
+                'hl7.fhir.uv.extensions.r4#5.4.0',
             ],
             $command->getDefinition()->getOption('package')->getDefault(),
         );

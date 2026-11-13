@@ -15,7 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
  * @description Document Structure (For testing section templates)
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/example-composition', baseType: 'Composition', fhirVersion: 'R5')]
-#[FHIRSlicingRules(property: 'section', rules: 'closed', groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'])]
+#[FHIRSlicingRules(property: 'section', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'])]
 #[FHIRSliceConstraint(
     property: 'section',
     sliceName: 'procedure',

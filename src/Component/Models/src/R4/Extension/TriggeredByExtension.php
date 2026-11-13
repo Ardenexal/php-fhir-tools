@@ -21,14 +21,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-triggeredBy', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
-#[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity.plannedActivityReference')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImmunizationRecommendation')]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
@@ -43,12 +41,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
 #[FHIRExtensionContext(type: 'element', expression: 'VisionPrescription')]
-#[FHIRExtensionContext(type: 'element', expression: 'BiologicallyDerivedProductDispense')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceDispense')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
-#[FHIRExtensionContext(type: 'element', expression: 'NutritionIntake')]
-#[FHIRExtensionContext(type: 'element', expression: 'Transport')]
 class TriggeredByExtension extends Extension
 {
     /**

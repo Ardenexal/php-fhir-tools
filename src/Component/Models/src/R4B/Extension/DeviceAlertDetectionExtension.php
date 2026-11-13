@@ -15,7 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 
 /**
- * @author HL7 International / Health Care Devices
+ * @author HL7 International / Devices
  *
  * @see http://hl7.org/fhir/StructureDefinition/device-alertDetection
  *

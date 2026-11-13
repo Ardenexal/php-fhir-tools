@@ -110,6 +110,24 @@ final class NarrativeXhtmlCheckerTest extends TestCase
         self::assertSame([], $this->messagesFor('<div><n:p>This is some narrative</n:p></div>'));
     }
 
+    /** Wording from `R5.patient-url-bad`; `[`, `]` and `-` are legal URL characters, `{` and `}` are not. */
+    public function testHrefWithInvalidCharactersIsReported(): void
+    {
+        self::assertSame(
+            ["The URL is not valid because '(URL contains 2 Invalid Characters: '{','}')': http://example.com/{[-}]/link.html"],
+            $this->messagesFor('<div><a href="http://example.com/{[-}]/link.html">Absolute Link</a></div>'),
+        );
+    }
+
+    /** `R5.patient-url-good`'s shape, plus fragment, percent-encoded and non-ASCII hrefs. */
+    public function testWellFormedHrefsAreAccepted(): void
+    {
+        self::assertSame([], $this->messagesFor(
+            '<div><a href="http://example.com/a-b/link.html?x=1&amp;y=2#top">a</a><a href="#local">b</a>'
+            . '<a href="http://example.com/a%20b">c</a><a href="http://例え.jp/パス">d</a></div>',
+        ));
+    }
+
     public function testTextWithoutMarkupIsNotTreatedAsMalformed(): void
     {
         // The XML normalizer strips the <div> wrapper off a text-only narrative.

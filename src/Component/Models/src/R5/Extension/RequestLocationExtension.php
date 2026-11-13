@@ -1,0 +1,61 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+
+/**
+ * @author HL7 International / FHIR Infrastructure
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/request-location
+ *
+ * @description The location at which the request should be performed.
+ */
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-location', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
+class RequestLocationExtension extends Extension
+{
+    /**
+     * @param list<Extension> $extension
+     */
+    public function __construct(
+        /** @var CodeableConcept|Reference|null value Value of extension */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+                    'jsonKey'      => 'valueCodeableConcept',
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+                    'jsonKey'      => 'valueReference',
+                ],
+            ],
+        )]
+        CodeableConcept|Reference|null $value = null,
+        ?string $id = null,
+        array $extension = [],
+    ) {
+        parent::__construct(
+            id: $id,
+            extension: $extension,
+            url: 'http://hl7.org/fhir/StructureDefinition/request-location',
+            value: $value,
+        );
+    }
+}
