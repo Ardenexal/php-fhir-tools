@@ -307,20 +307,44 @@ class FHIRSerializationContextTest extends TestCase
      */
     public function testFromSymfonyContextNeverReturnsAContextBuiltFromOtherSettings(): void
     {
-        $xml  = ['fhir_format' => FHIRSerializationContext::FORMAT_XML, 'fhir_custom_options' => ['a' => 1]];
-        $json = ['fhir_format' => FHIRSerializationContext::FORMAT_JSON, 'fhir_custom_options' => ['a' => 2]];
+        $xml  = ['fhir_format' => FHIRSerializationContext::FORMAT_XML, 'fhir_include_extensions' => false];
+        $json = ['fhir_format' => FHIRSerializationContext::FORMAT_JSON];
 
         $first  = FHIRSerializationContext::fromSymfonyContext($xml);
         $second = FHIRSerializationContext::fromSymfonyContext($json);
         $third  = FHIRSerializationContext::fromSymfonyContext($xml);
 
         self::assertTrue($first->isXmlFormat());
-        self::assertSame(1, $first->getCustomOption('a'));
+        self::assertFalse($first->includeExtensions);
         self::assertFalse($second->isXmlFormat());
-        self::assertSame(2, $second->getCustomOption('a'));
+        self::assertTrue($second->includeExtensions);
         self::assertTrue($third->isXmlFormat());
-        self::assertSame(1, $third->getCustomOption('a'));
+        self::assertFalse($third->includeExtensions);
         self::assertSame($third, FHIRSerializationContext::fromSymfonyContext($xml), 'identical settings reuse the immutable instance');
+
+        $withOptions = FHIRSerializationContext::fromSymfonyContext(['fhir_custom_options' => ['a' => 2]]);
+        self::assertSame(2, $withOptions->getCustomOption('a'));
+        self::assertNull(FHIRSerializationContext::fromSymfonyContext([])->getCustomOption('a'), 'custom options never carry into a later context');
+    }
+
+    /**
+     * Two separately built self-referencing option arrays in a row must not reach a deep comparison,
+     * which PHP aborts with "Nesting level too deep".
+     */
+    public function testFromSymfonyContextAcceptsConsecutiveSelfReferencingCustomOptions(): void
+    {
+        // Equal contents, so a deep comparison would have to follow the cycle (a fatal error, which
+        // would abort the whole run rather than fail this test).
+        $first          = ['name' => 'options'];
+        $first['self']  = &$first;
+        $second         = ['name' => 'options'];
+        $second['self'] = &$second;
+
+        $a = FHIRSerializationContext::fromSymfonyContext(['fhir_custom_options' => $first]);
+        $b = FHIRSerializationContext::fromSymfonyContext(['fhir_custom_options' => $second]);
+
+        self::assertSame('options', $a->getCustomOption('name'));
+        self::assertSame('options', $b->getCustomOption('name'));
     }
 
     /**

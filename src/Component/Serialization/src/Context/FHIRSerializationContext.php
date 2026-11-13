@@ -388,15 +388,21 @@ class FHIRSerializationContext
         // Every normalizer rebuilds this from the Symfony context on every object it visits, and the
         // settings almost never change within one document. The context is immutable, so the instance
         // built from the previous identical settings is handed back instead of constructing and
-        // re-validating a new one.
-        if (self::$lastSymfonyArguments === $arguments && self::$lastFromSymfonyContext !== null) {
+        // re-validating a new one. Only settings without custom options are remembered: comparing
+        // caller-supplied option arrays deeply can throw on a self-referencing array, and a context
+        // with custom options is then simply built fresh, as it always was.
+        $memoizable = $arguments['customOptions'] === [];
+
+        if ($memoizable && self::$lastSymfonyArguments === $arguments && self::$lastFromSymfonyContext !== null) {
             return self::$lastFromSymfonyContext;
         }
 
         $created = new self(...$arguments);
 
-        self::$lastSymfonyArguments   = $arguments;
-        self::$lastFromSymfonyContext = $created;
+        if ($memoizable) {
+            self::$lastSymfonyArguments   = $arguments;
+            self::$lastFromSymfonyContext = $created;
+        }
 
         return $created;
     }
