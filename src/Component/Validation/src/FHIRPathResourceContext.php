@@ -123,11 +123,9 @@ final class FHIRPathResourceContext
             $resolved = self::$resolved ??= new \WeakMap();
             $key      = spl_object_id($root) . '|' . $path;
 
-            if (!isset($resolved[$scope][$key])) {
-                $forScope         = $resolved[$scope] ?? [];
-                $forScope[$key]   = self::enclosingResourceAndContainer($root, $path);
-                $resolved[$scope] = $forScope;
-            }
+            // Written in place: copying the scope's array out and back would copy every path cached so far
+            $resolved[$scope]       ??= [];
+            $resolved[$scope][$key] ??= self::enclosingResourceAndContainer($root, $path);
 
             [$enclosing, $container] = $resolved[$scope][$key];
         }

@@ -119,7 +119,8 @@ final class FHIRPathInvariantFastPaths
     {
         $vars          = get_object_vars($extension);
         $subExtensions = $vars['extension'] ?? null;
-        $hasExtensions = is_array($subExtensions) && array_filter($subExtensions, static fn (mixed $item): bool => $item !== null) !== [];
+        // The engine's extension.exists() counts any entry, a null one included, so any entry counts here
+        $hasExtensions = is_array($subExtensions) && $subExtensions !== [];
 
         $hasAnyValue = false;
         foreach ($vars as $name => $child) {

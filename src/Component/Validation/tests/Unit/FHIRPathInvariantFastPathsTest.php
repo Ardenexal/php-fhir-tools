@@ -52,6 +52,20 @@ final class FHIRPathInvariantFastPathsTest extends TestCase
         self::assertTrue(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::EXT_1, new Extension(url: 'http://example.org/ext', value: 'y')));
     }
 
+    /**
+     * The engine's `extension.exists()` counts a null entry or a keyed entry, so a value alongside
+     * either one fails ext-1 and must not be passed here.
+     */
+    public function testExt1LeavesAValueBesideNullOrKeyedSubExtensionsToTheEngine(): void
+    {
+        foreach ([[null], ['a' => new Extension(url: 'part', value: 'z')]] as $subExtensions) {
+            $extension            = new Extension(url: 'http://example.org/ext', value: 'y');
+            $extension->extension = $subExtensions; // @phpstan-ignore assign.propertyType (an in-memory shape the generated type does not allow)
+
+            self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::EXT_1, $extension));
+        }
+    }
+
     public function testExt1LeavesAnExtensionWithNeitherValueNorSubExtensionsToTheEngine(): void
     {
         self::assertNull(FHIRPathInvariantFastPaths::passes(FHIRPathInvariantFastPaths::EXT_1, new Extension(url: 'http://example.org/ext')));
