@@ -1,5 +1,5 @@
 {
-    "errorCount": 5,
+    "errorCount": 7,
     "warningCount": 0,
     "infoCount": 6,
     "java": {
@@ -31,6 +31,10 @@
             "constraint:BundleReferenceResolutionChecker": [
                 "entry[0].resource.subject — Can't find 'Patient/1' in the bundle. A resource with the same type and id is present at fullUrl 'Patient/1', but the fullUrl based rules around matching relative references do not match it against the source fullUrl 'Composition/1'",
                 "entry[0].resource.author[0] — Can't find 'Device/1' in the bundle. A resource with the same type and id is present at fullUrl 'Device/1', but the fullUrl based rules around matching relative references do not match it against the source fullUrl 'Composition/1'"
+            ],
+            "constraint:DuplicateElementIdChecker": [
+                "entry[1].resource.name[0] — Duplicate id value '2'",
+                "entry[2] — Duplicate id value '1a'"
             ]
         },
         "warnings": {}

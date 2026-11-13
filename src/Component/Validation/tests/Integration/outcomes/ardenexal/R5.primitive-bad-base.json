@@ -1,5 +1,5 @@
 {
-    "errorCount": 30,
+    "errorCount": 36,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -54,6 +54,12 @@
     "outcome": {
         "errors": {
             "constraint:PrimitiveFormatChecker": [
+                "parameter[0].value — Boolean values must be 'true' or 'false'",
+                "parameter[1].value — Boolean values must be 'true' or 'false'",
+                "parameter[2].value — Boolean values must be 'true' or 'false'",
+                "parameter[3].value — The value '34534536346345345345' is not a valid integer",
+                "parameter[4].value — The value '$0' is not a valid integer",
+                "parameter[5].value — The value '1e4' is not a valid integer",
                 "parameter[6].value — The value '00.1' is not a valid decimal",
                 "parameter[7].value — The value 'YXNhcs2Rhc2Q=' is not a valid Base64 value",
                 "parameter[8].value — Element value '0000-01-01T12:32:45Z' does not meet instant regex '([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]{1,9})?(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))'",
