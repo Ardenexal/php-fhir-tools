@@ -1,6 +1,6 @@
 ---
 category: terminology-validatecode-requires-infersystem
-last_reviewed: 2026-08-05
+last_reviewed: 2026-11-13
 ---
 
 # Footguns: `HttpFHIRTerminologyClient::validateCode()` needed `inferSystem` to work against a real server
@@ -29,7 +29,13 @@ code — valid or not — as invalid against any strict server. `validateCoding(
 — it already had no ambiguity.
 
 **Mitigation:** `validateCode()` now sends `inferSystem: true` alongside `url`/`code` (both GET query-string
-and POST `Parameters` body paths). This is additive — no signature change, no behavior change for any
+and POST `Parameters` body paths).
+
+**Correction, 2026-11-13 (#182):** the mitigation above was written on 2026-08-05 but never reached `main`;
+no branch carried `inferSystem` until #182. Check the code before trusting a "resolved" status here. #182
+also found the binding validator calling `validateCode()` for codings that carry a system, dropping it, and
+handing the client `code` elements as primitive wrapper objects, which `HttpFHIRTerminologyClient` reads as
+no code. Search `HttpFHIRTerminologyClient::checkCode` and `FHIRValueSetBindingValidator::codingMembership`. This is additive — no signature change, no behavior change for any
 server that already worked. Verified directly: `curl` against `tx.fhir.org` with `inferSystem=true` returns
 `result: true` for `code=male` against `administrative-gender`; without it, the same request returns the
 "unable to find code" `OperationOutcome` regardless of code validity.

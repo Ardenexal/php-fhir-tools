@@ -89,16 +89,30 @@ final class FHIRValueSetBindingValidatorCodingTest extends ConstraintValidatorTe
     }
 
     /**
-     * A concept may carry several codings and only one need be the bound code, so each is checked on
-     * its own. This is the `Condition.clinicalStatus` shape: a translation alongside the real code.
+     * A concept may carry several codings and only one need be the bound code (issue #182). This is the
+     * `Condition.clinicalStatus` shape: a translation alongside the real code.
      */
-    public function testEveryCodingInAConceptIsCheckedIndependently(): void
+    public function testConceptWithOneBoundCodingSatisfiesTheBinding(): void
     {
-        $value = new CodeableConcept(coding: [$this->coding('active'), $this->coding('wrong')]);
+        $value = new CodeableConcept(coding: [$this->coding('active'), $this->coding('translation')]);
 
         $this->validator->validate($value, new FHIRValueSetBinding(self::TEST_VALUE_SET_URL));
 
-        $this->expectInvalidValue('wrong');
+        $this->assertNoViolation();
+    }
+
+    /** It is the concept that fails the binding, so a concept with no bound coding is one finding. */
+    public function testConceptWithNoBoundCodingIsOneFindingNamingEveryCode(): void
+    {
+        $value = new CodeableConcept(coding: [$this->coding('wrong'), $this->coding('also-wrong')]);
+
+        $this->validator->validate($value, new FHIRValueSetBinding(self::TEST_VALUE_SET_URL));
+
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_INVALID_VALUE_MESSAGE)
+            ->setParameters(['{{ value }}' => 'wrong, also-wrong', '{{ url }}' => self::TEST_VALUE_SET_URL])
+            ->setInvalidValue('wrong, also-wrong')
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
     }
 
     /**
@@ -134,7 +148,8 @@ final class FHIRValueSetBindingValidatorCodingTest extends ConstraintValidatorTe
     }
 
     /**
-     * The system is deliberately not read, so a right code under a wrong system passes.
+     * The generated enum path deliberately ignores the system, so a right code under a wrong system
+     * passes. The terminology path sends it (see `FHIRValueSetBindingValidatorTerminologyCodingTest`).
      *
      * That is a miss rather than a false positive. This rule switches on across every coded element at
      * once, so it is written to under-report rather than to invent findings on data it has not seen.

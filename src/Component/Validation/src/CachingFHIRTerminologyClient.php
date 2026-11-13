@@ -11,9 +11,23 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * Results are stored in an in-process array for the lifetime of the request. When a
  * PSR-6 pool is provided, results are also persisted across requests with the configured TTL.
+ *
+ * Only a verdict is cached. When the inner client implements {@see FHIRTerminologyMembershipClientInterface}
+ * and gives no answer (a refused request, a timeout), nothing is stored, so a passing outage is not
+ * remembered as "not a member" for the length of the TTL.
  */
-final class CachingFHIRTerminologyClient implements FHIRTerminologyClientInterface
+final class CachingFHIRTerminologyClient implements FHIRTerminologyMembershipClientInterface
 {
+    /**
+     * Prefix of the membership cache keys.
+     *
+     * Before #182 a refused or failed request was stored as `false`, a "not a member" verdict, and a
+     * bare code was asked without `inferSystem`, which Ontoserver and tx.fhir.org always refuse. A
+     * PSR-6 pool kept from then can still hold those entries, so membership keys carry this prefix and
+     * never read them. Bump it whenever stored membership verdicts stop meaning what they meant.
+     */
+    private const string MEMBERSHIP_KEY_VERSION = 'v2::';
+
     /** @var array<string, bool|CodingValidationResult> */
     private array $inProcess = [];
 
@@ -37,14 +51,31 @@ final class CachingFHIRTerminologyClient implements FHIRTerminologyClientInterfa
      */
     public function validateCode(string $valueSetUrl, mixed $value): bool
     {
+        return $this->checkCode($valueSetUrl, $value) === true;
+    }
+
+    /**
+     * Whether a code is in the value set, or null when the inner client gave no answer; verdicts are cached.
+     *
+     * An inner client without {@see FHIRTerminologyMembershipClientInterface} always gives a verdict.
+     *
+     * @param string $valueSetUrl Canonical URL of the value set to check against
+     * @param mixed  $value       The code to validate; accepts string, int, or BackedEnum
+     *
+     * @return bool|null the cached or fresh verdict, or null when the inner client gave none
+     */
+    public function checkCode(string $valueSetUrl, mixed $value): ?bool
+    {
+        $resolve = fn (): ?bool => $this->inner instanceof FHIRTerminologyMembershipClientInterface
+            ? $this->inner->checkCode($valueSetUrl, $value)
+            : $this->inner->validateCode($valueSetUrl, $value);
+
         $valueStr = $this->valueToString($value);
         if ($valueStr === null) {
-            return $this->inner->validateCode($valueSetUrl, $value);
+            return $resolve();
         }
 
-        $key = md5("code::{$valueSetUrl}::{$valueStr}");
-
-        return $this->remember($key, fn () => $this->inner->validateCode($valueSetUrl, $value));
+        return $this->remember(md5(self::MEMBERSHIP_KEY_VERSION . "code::{$valueSetUrl}::{$valueStr}"), $resolve);
     }
 
     /**
@@ -85,9 +116,26 @@ final class CachingFHIRTerminologyClient implements FHIRTerminologyClientInterfa
      */
     public function validateCoding(string $valueSetUrl, string $system, string $code): bool
     {
-        $key = md5("coding::{$valueSetUrl}::{$system}|{$code}");
+        return $this->checkCoding($valueSetUrl, $system, $code) === true;
+    }
 
-        return $this->remember($key, fn () => $this->inner->validateCoding($valueSetUrl, $system, $code));
+    /**
+     * Whether a system+code pair is in the value set, or null when the inner client gave no answer; verdicts are cached.
+     *
+     * @param string $valueSetUrl Canonical URL of the value set to check against
+     * @param string $system      The coding system URI (e.g. 'http://loinc.org')
+     * @param string $code        The code within that system
+     *
+     * @return bool|null the cached or fresh verdict, or null when the inner client gave none
+     */
+    public function checkCoding(string $valueSetUrl, string $system, string $code): ?bool
+    {
+        return $this->remember(
+            md5(self::MEMBERSHIP_KEY_VERSION . "coding::{$valueSetUrl}::{$system}|{$code}"),
+            fn (): ?bool => $this->inner instanceof FHIRTerminologyMembershipClientInterface
+                ? $this->inner->checkCoding($valueSetUrl, $system, $code)
+                : $this->inner->validateCoding($valueSetUrl, $system, $code),
+        );
     }
 
     /**
@@ -114,42 +162,42 @@ final class CachingFHIRTerminologyClient implements FHIRTerminologyClientInterfa
     }
 
     /**
-     * Returns a cached boolean result for the given key, resolving and storing it on a miss.
+     * Returns a cached membership verdict for the given key, resolving and storing it on a miss.
      *
      * Checks the in-process array first, then the PSR-6 pool (if configured), then calls
-     * $resolve() and writes the result to both layers.
+     * $resolve(). A verdict is written to both layers; a null (no answer) is returned uncached.
      *
-     * @param string   $key     MD5 cache key unique to the operation and its arguments
-     * @param \Closure $resolve Callable that performs the actual terminology lookup
+     * @param string            $key     MD5 cache key unique to the operation and its arguments
+     * @param \Closure(): ?bool $resolve Callable that performs the actual terminology lookup
      *
-     * @return bool The cached or freshly resolved result
+     * @return bool|null The cached or freshly resolved verdict, or null when the lookup gave none
      */
-    private function remember(string $key, \Closure $resolve): bool
+    private function remember(string $key, \Closure $resolve): ?bool
     {
         if (array_key_exists($key, $this->inProcess)) {
             return (bool) $this->inProcess[$key];
         }
 
-        if ($this->cache !== null) {
-            $cacheItem = $this->cache->getItem($key);
-            if ($cacheItem->isHit()) {
-                $result                = (bool) $cacheItem->get();
-                $this->inProcess[$key] = $result;
-
-                return $result;
-            }
-
-            $result                = $resolve();
+        $cacheItem = $this->cache?->getItem($key);
+        if ($cacheItem !== null && $cacheItem->isHit()) {
+            $result                = (bool) $cacheItem->get();
             $this->inProcess[$key] = $result;
-            $cacheItem->set($result);
-            $cacheItem->expiresAfter($this->ttl > 0 ? $this->ttl : null);
-            $this->cache->save($cacheItem);
 
             return $result;
         }
 
-        $result                = $resolve();
+        $result = $resolve();
+        if ($result === null) {
+            return null;
+        }
+
         $this->inProcess[$key] = $result;
+
+        if ($this->cache !== null && $cacheItem !== null) {
+            $cacheItem->set($result);
+            $cacheItem->expiresAfter($this->ttl > 0 ? $this->ttl : null);
+            $this->cache->save($cacheItem);
+        }
 
         return $result;
     }
