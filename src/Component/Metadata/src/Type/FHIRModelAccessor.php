@@ -25,12 +25,12 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     private static array $propertyNameCache = [];
 
     /**
-     * Per-class instance with defaults applied, cloned by instantiateWithDefaults(); false marks a
-     * class that defines __clone() and so is built fresh each time.
+     * Per-class template instance with defaults applied, which instantiateWithDefaults() clones;
+     * false marks a class that defines __clone() and so is built fresh each time.
      *
      * @var array<class-string, object|false>
      */
-    private static array $prototypeCache = [];
+    private static array $defaultInstanceCache = [];
 
     /**
      * Per-class constructor arguments for instantiateWithConstructorDefaults(); null marks a class
@@ -177,17 +177,17 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
         }
 
         // Deserialization builds one instance per element, so the defaults walk runs once per class
-        // and every later instance is a shallow clone of that prototype. The clone is the object the
+        // and every later instance is a shallow clone of that template. The clone is the object the
         // walk would build: default values come from the shared defaults cache either way, and
         // uninitialized typed properties stay uninitialized. A class defining __clone() could make a
         // clone differ, so it is never cached and takes the walk every time.
-        if (!array_key_exists($class, self::$prototypeCache)) {
-            self::$prototypeCache[$class] = self::reflect($class)->hasMethod('__clone') ? false : $this->buildWithDefaults($class);
+        if (!array_key_exists($class, self::$defaultInstanceCache)) {
+            self::$defaultInstanceCache[$class] = self::reflect($class)->hasMethod('__clone') ? false : $this->buildWithDefaults($class);
         }
 
-        $prototype = self::$prototypeCache[$class];
+        $template = self::$defaultInstanceCache[$class];
 
-        return $prototype === false ? $this->buildWithDefaults($class) : clone $prototype;
+        return $template === false ? $this->buildWithDefaults($class) : clone $template;
     }
 
     /**

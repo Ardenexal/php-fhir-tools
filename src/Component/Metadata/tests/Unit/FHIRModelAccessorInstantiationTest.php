@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  * Pins what the per-class instantiation caches must not change.
  *
  * Deserialization builds every element through instantiateWithDefaults() or
- * instantiateWithConstructorDefaults(), and both now reuse per-class work: a cloned prototype and a
+ * instantiateWithConstructorDefaults(), and both now reuse per-class work: a cloned template instance and a
  * cached argument list. If either leaked state between instances, two documents deserialized in the
  * same process would share data, so independence is asserted directly.
  */
