@@ -18,9 +18,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description Contact details to assist a user in finding and communicating with the publisher.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-contact', fhirVersion: 'R4')]
-#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment')]
-#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication')]
@@ -28,8 +25,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Substance')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
 class ArtifactContactExtension extends Extension
 {
     /**

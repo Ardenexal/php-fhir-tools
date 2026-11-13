@@ -18,7 +18,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-performerOrder', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest.performer')]
-#[FHIRExtensionContext(type: 'element', expression: 'Task.requestedPerformer')]
 class PerformerOrderExtension extends Extension
 {
     /**

@@ -13,13 +13,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 /**
  * @author HL7 International / FHIR Infrastructure
  *
- * @see http://hl7.org/fhir/StructureDefinition/requirements-parent
+ * @see http://hl7.org/fhir/StructureDefinition/additional-operation-context
  *
- * @description A larger/more generic set of requirements that this set of requirements helps to refine and enable.
+ * @description The canonical URL of an operation whose context (i.e. OperationDefinition.resource) is supplemented to include this resource.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/requirements-parent', fhirVersion: 'R4B')]
-#[FHIRExtensionContext(type: 'element', expression: 'Requirements.statement')]
-class RequirementsParentExtension extends Extension
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/additional-operation-context', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
+class AdditionalOperationContextExtension extends Extension
 {
     /**
      * @param list<Extension> $extension
@@ -34,7 +34,7 @@ class RequirementsParentExtension extends Extension
         parent::__construct(
             id: $id,
             extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/requirements-parent',
+            url: 'http://hl7.org/fhir/StructureDefinition/additional-operation-context',
             value: $this->valueCanonical,
         );
     }

@@ -18,9 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  * @description An absolute URI that is used to identify this artifact when it is referenced in a specification, model, design or an instance; also called its canonical identifier. This SHOULD be globally unique and SHOULD be a literal address at which an authoritative instance of this artifact is (or will be) published. This URL can be the target of a canonical reference. It SHALL remain the same when the artifact is stored on different servers.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-url', fhirVersion: 'R4B')]
-#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment')]
 #[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]

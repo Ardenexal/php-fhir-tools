@@ -19,7 +19,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/evidence-variable-handling-detail', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'EvidenceVariable')]
-#[FHIRExtensionContext(type: 'element', expression: 'Evidence.statistic.modelCharacteristic.variable')]
 class EvidenceVariableHandlingDetailExtension extends Extension
 {
     /**

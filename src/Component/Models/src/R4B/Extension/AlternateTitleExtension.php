@@ -11,15 +11,15 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
 /**
- * @author HL7 International / Clinical Decision Support
+ * @author HL7 International / FHIR Infrastructure
  *
- * @see http://hl7.org/fhir/StructureDefinition/citation-societyAffiliation
+ * @see http://hl7.org/fhir/StructureDefinition/canonicalresource-alternateTitle
  *
- * @description A society affiliation for the venue (publication form) that the cited artifact is cited in.
+ * @description Alternative human label for the artifact.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/citation-societyAffiliation', fhirVersion: 'R4B')]
-#[FHIRExtensionContext(type: 'element', expression: 'Citation.citedArtifact.publicationForm.publishedIn')]
-class CitationSocietyAffiliationExtension extends Extension
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/canonicalresource-alternateTitle', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'CanonicalResource')]
+class AlternateTitleExtension extends Extension
 {
     /**
      * @param list<Extension> $extension
@@ -34,7 +34,7 @@ class CitationSocietyAffiliationExtension extends Extension
         parent::__construct(
             id: $id,
             extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/citation-societyAffiliation',
+            url: 'http://hl7.org/fhir/StructureDefinition/canonicalresource-alternateTitle',
             value: $this->valueString,
         );
     }

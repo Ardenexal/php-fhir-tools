@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'CanonicalResource')]
-#[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.context')]
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter.base')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
@@ -28,7 +28,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type.targetProfile')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.type')]
-#[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.allowedType')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.targetProfile')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide.definition.page')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/standards-status', strength: 'required')]

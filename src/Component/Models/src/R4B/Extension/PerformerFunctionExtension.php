@@ -22,7 +22,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Observation.performer')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport.performer')]
 #[FHIRExtensionContext(type: 'element', expression: 'DocumentReference.author')]
-#[FHIRExtensionContext(type: 'element', expression: 'Consent.grantee')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/performer-function', strength: 'extensible')]
 class PerformerFunctionExtension extends Extension
 {

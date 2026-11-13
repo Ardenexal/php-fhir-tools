@@ -19,7 +19,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/contactpoint-comment', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'ContactPoint')]
-#[FHIRExtensionContext(type: 'element', expression: 'ExtendedContactDetail')]
 class ContactPointCommentExtension extends Extension
 {
     /**

@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
-#[FHIRContextInvariant(expression: 'type!=\'display\' and (required=true or (required.value.empty() and required.extension.exists()))')]
+#[FHIRContextInvariant(expression: 'required=true and repeats=true')]
 class QMinOccursExtension extends Extension
 {
     /**

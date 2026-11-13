@@ -18,12 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description Descriptive topics related to the content of the artifact. Topics provide a high-level categorization of the artifact that can be useful for filtering and searching.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-topic', fhirVersion: 'R4')]
-#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]
-#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]
 #[FHIRExtensionContext(type: 'element', expression: 'CompartmentDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ConceptMap')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ExampleScenario')]
@@ -40,8 +37,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter')]
 #[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Substance')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureMap')]
 #[FHIRExtensionContext(type: 'element', expression: 'TerminologyCapabilities')]

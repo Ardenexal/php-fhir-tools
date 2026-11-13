@@ -27,6 +27,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'decimal')]
 #[FHIRExtensionContext(type: 'element', expression: 'string')]
 #[FHIRExtensionContext(type: 'element', expression: 'code')]
+#[FHIRExtensionContext(type: 'element', expression: 'Ratio')]
 class RenderedValueExtension extends Extension
 {
     /**

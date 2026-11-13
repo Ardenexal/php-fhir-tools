@@ -14,7 +14,7 @@ Generates canonical FHIR model classes from FHIR definition packages.
 
 | Option | Shortcut | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `--package` | — | array (repeatable) | `hl7.terminology.r4#7.0.0`, `hl7.fhir.r4.core#4.0.1`, `hl7.fhir.uv.extensions.r4#5.2.0` | Implementation Guide / core packages to include, as `name` or `name#version`. |
+| `--package` | — | array (repeatable) | `hl7.terminology.r4#7.0.0`, `hl7.fhir.r4.core#4.0.1`, `hl7.fhir.uv.extensions.r4#5.4.0` | Implementation Guide / core packages to include, as `name` or `name#version`. |
 | `--offline` | — | flag | `false` | Work offline using only cached packages (no network downloads). |
 
 Notes:

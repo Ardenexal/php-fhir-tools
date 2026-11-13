@@ -20,7 +20,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/location-communication', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Location')]
-#[FHIRExtensionContext(type: 'element', expression: 'ExtendedContactDetail')]
 #[FHIRExtensionContext(type: 'element', expression: 'Organization')]
 #[FHIRExtensionContext(type: 'element', expression: 'OrganizationAffiliation')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages', strength: 'required')]

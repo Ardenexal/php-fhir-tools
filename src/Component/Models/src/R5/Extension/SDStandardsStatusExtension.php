@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'CanonicalResource')]
-#[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.context')]
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter.base')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
