@@ -53,6 +53,9 @@ final class NarrativeXhtmlChecker
 
     private const string XMLNS_NS = 'http://www.w3.org/2000/xmlns/';
 
+    /** One character outside RFC 3986's URL alphabet (letters, digits, `-._~`, delimiters and `%`). */
+    private const string URL_INVALID_CHARACTER = '/[^\p{L}\p{N}\-._~:\/?#\[\]@!$&\'()*+,;=%]/u';
+
     private const string TXT_1 = "Constraint failed: txt-1: 'The narrative SHALL contain only the basic html formatting elements and attributes described in chapters 7-11 (except section 4 of chapter 9) and 15 of the HTML 4.0 standard, <a> elements (either name or href), images and internally contained style attributes'";
 
     private const string TXT_2 = "Constraint failed: txt-2: 'The narrative SHALL have some non-whitespace content'";
@@ -272,6 +275,14 @@ final class NarrativeXhtmlChecker
                 }
 
                 if ($allowed && $this->isAllowedAttribute($local, strtolower($attribute->nodeName))) {
+                    if ($local === 'a' && strtolower($attribute->nodeName) === 'href') {
+                        $urlViolation = $this->checkHref($attribute->value, $path);
+
+                        if ($urlViolation !== null) {
+                            $diagnostics[] = $urlViolation;
+                        }
+                    }
+
                     continue;
                 }
 
@@ -293,6 +304,37 @@ final class NarrativeXhtmlChecker
         }
 
         return $violations;
+    }
+
+    /**
+     * Report an `<a href>` carrying characters a URL may not contain.
+     *
+     * The permitted set is RFC 3986's: unreserved characters, reserved delimiters and `%` for
+     * percent-encoding, with any Unicode letter or digit also accepted. Everything else is listed in
+     * document order, in the reference validator's wording, e.g. `R5.patient-url-bad`'s
+     * `http://example.com/{[-}]/link.html`, whose `{` and `}` are the only offenders.
+     *
+     * "Characters" stays plural whatever the count: the corpus has no one-character case showing
+     * whether the reference validator writes a singular form.
+     */
+    private function checkHref(string $href, string $path): ?FHIRValidationViolation
+    {
+        if (preg_match_all(self::URL_INVALID_CHARACTER, $href, $matches) < 1) {
+            return null;
+        }
+
+        $quoted = array_map(static fn (string $char): string => "'" . $char . "'", $matches[0]);
+
+        return $this->violation(
+            $path,
+            sprintf(
+                "The URL is not valid because '(URL contains %d Invalid Characters: %s)': %s",
+                count($quoted),
+                implode(',', $quoted),
+                $href,
+            ),
+            null,
+        );
     }
 
     /**

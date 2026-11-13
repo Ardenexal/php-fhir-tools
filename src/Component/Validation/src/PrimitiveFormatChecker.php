@@ -7,6 +7,8 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
+use Ardenexal\FHIRTools\Component\Metadata\MalformedPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\MalformedPrimitiveRecorder;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
@@ -62,11 +64,16 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
  * now measured. The exclusion stands only because the rule is not written yet, not because it is free.
  * Do not restore the old justification.
  *
- * **`boolean` and `integer` of any shape.** Not a decision so much as a consequence: those types are
- * generated as bare PHP scalars, so `TRUE`, `1` and `yes` all reach the model as `false`, and
- * `34534536346345345345` arrives saturated at `PHP_INT_MAX`. The malformed text is gone before any
- * rule could see it. Reporting them needs the lexeme retained at the reader, the way
- * {@see FHIRTemporalValue::unparsed()} retains a temporal one.
+ * **JSON numbers as written.** `json_decode()` turns `1.000000000000000000E-24` into a float and
+ * rejects `925.` outright, before any model code runs, so neither the decimal regex nor the
+ * not-a-number rule can see the original text of a JSON number. The same goes for a JSON integer.
+ *
+ * ## `boolean` and `integer`
+ *
+ * Those types are generated as bare PHP scalars, so `TRUE`, `1` and `yes` all reach the model as a
+ * boolean, and `34534536346345345345` arrives saturated at `PHP_INT_MAX`. The reader keeps the text
+ * it could not read in {@see MalformedPrimitiveRecorder}, and {@see self::checkRecorded()} reports it
+ * from there, the way {@see FHIRTemporalValue::unparsed()} keeps a temporal lexeme.
  */
 final class PrimitiveFormatChecker
 {
@@ -220,6 +227,10 @@ final class PrimitiveFormatChecker
 
         $visited[$id] = true;
         $violations   = $this->checkShape($node, $path);
+
+        foreach ($this->checkRecorded($node, $path) as $recorded) {
+            $violations[] = $recorded;
+        }
 
         foreach ($this->models->publicPropertyNames($node) as $name) {
             if (!$this->models->isPropertyInitialized($node, $name)) {
@@ -511,6 +522,36 @@ final class PrimitiveFormatChecker
         }
 
         return [$this->violation($path, sprintf("URI values cannot have whitespace('%s')", $value))];
+    }
+
+    /**
+     * Report the `boolean` and `integer` text the reader recorded against this node.
+     *
+     * Each message is the reference validator's wording, from `R5.primitive-bad` and
+     * `R4.Observation-ex-pain.xml`. The finding is located on the property the value was written to,
+     * so a choice element reads `parameter[0].value`, not `parameter[0].valueBoolean`.
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    private function checkRecorded(object $node, string $path): array
+    {
+        if (MalformedPrimitiveRecorder::isEmpty()) {
+            return [];
+        }
+
+        $violations = [];
+
+        foreach (MalformedPrimitiveRecorder::forObject($node) as $malformed) {
+            $propertyPath = $path === '' ? $malformed->propertyName : $path . '.' . $malformed->propertyName;
+
+            $violations[] = $this->violation($propertyPath, match ($malformed->kind) {
+                MalformedPrimitive::KIND_BOOLEAN => "Boolean values must be 'true' or 'false'",
+                MalformedPrimitive::KIND_INTEGER => sprintf("The value '%s' is not a valid integer", $malformed->lexeme),
+                default                          => 'Primitive types must have a value or must have child extensions',
+            });
+        }
+
+        return $violations;
     }
 
     private function violation(string $path, string $message): FHIRValidationViolation

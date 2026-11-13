@@ -322,6 +322,7 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
                         } else {
+                            $this->recordMalformedScalar($object, $propertyName, $phpType, $value, 'xml');
                             $rawValue = $this->unwrapXmlValue($value, $phpType);
 
                             $denormalizedValue = match ($phpType) {
@@ -408,6 +409,7 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                         self::assertSingleValuedElement($elementName, $value, $resolvedType);
                         $denormalizedValue = $denormalizer->denormalize($value, $propertyType, 'xml', $context);
                     } else {
+                        $this->recordMalformedScalar($object, $elementName, $propertyType, $value, 'xml');
                         $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
 
                         // Primitive-with-extension: <field value="X"><extension .../></field> or

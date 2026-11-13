@@ -314,6 +314,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'json', $context);
                         } else {
+                            $this->recordMalformedScalar($object, $propertyName, $phpType, $value, 'json');
                             $denormalizedValue = ($fhirType === 'decimal' || $fhirType === 'http://hl7.org/fhirpath/System.Decimal') && is_numeric($value)
                                 ? self::decimalToLexicalString($value)
                                 : $value;

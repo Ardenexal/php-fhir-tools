@@ -24,6 +24,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - An `http(s)` `fullUrl` shaped like `[base]/[type]/[id]` must end with the entry resource's own type and id (`…looks like a RESTful server URL, so it must end with the correct type and id (/Patient/p1)`), and the resource must have an id (`…but the resource has no id`).
 
   An empty `"fullUrl": ""` is not treated as missing. To pass, give each entry a `fullUrl` such as `urn:uuid:…` or the resource's server URL (#156)
+- **[Validation] Resources that validated clean can now fail: six new primitive and element rules report errors.** They follow the HL7 Java reference validator, with its wording:
+  - An XML `boolean` other than `true` or `false` (`TRUE`, `1`, `yes`), or a JSON `value[x]` boolean that is not `true` or `false`, such as `"valueBoolean": 1` (`Boolean values must be 'true' or 'false'`).
+  - An XML `integer` that is not a 32-bit whole number without leading zeros (`The value '1e4' is not a valid integer`).
+  - An XML `boolean` or `integer` element with neither a `value` nor an extension (`Primitive types must have a value or must have child extensions`).
+  - An element `id` repeated within one resource (`Duplicate id value '2'`). Each resource, including one inside a Bundle entry or `contained`, has its own ids; a resource's own `id` and `ElementDefinition.id` are not counted.
+  - An `Identifier.system` without a scheme, reported on the Identifier (`Identifier.system must be an absolute reference, not a local reference`).
+  - A narrative `<a href>` containing characters a URL may not hold, such as `{` or `}` (`The URL is not valid because '(URL contains 2 Invalid Characters: '{','}')': …`).
+
+  The reader still converts these values as before; it now also records the original `boolean` and `integer` text in `MalformedPrimitiveRecorder` (Metadata) so validation can report it. Not covered yet: the original text of a JSON number (`json_decode()` turns `1.000000000000000000E-24` into a float and rejects `925.`), JSON integer text, and an `id` on a `boolean`, `integer` or `decimal` element, which the model has nowhere to keep (#160)
 - **BREAKING: [Validation] `FHIRValidationServiceInterface` now declares `validateWithOptions(object $resource, FHIRValidationOptions $options): FHIRValidationReport`, so a class implementing the interface fails with a fatal error until it adds the method.** A decorator can forward it to the service it wraps. The package is pre-1.0, so there is no deprecation window (#170)
 
 ### Fixed
