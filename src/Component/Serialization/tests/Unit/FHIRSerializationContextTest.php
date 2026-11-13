@@ -300,4 +300,41 @@ class FHIRSerializationContextTest extends TestCase
         $context = FHIRSerializationContext::fromSymfonyContext($legacyContext);
         self::assertTrue($context->shouldErrorOnUnknownElements());
     }
+
+    /**
+     * fromSymfonyContext() hands back the previous instance when the settings repeat; alternating
+     * settings must still each produce their own values, never the previous call's.
+     */
+    public function testFromSymfonyContextNeverReturnsAContextBuiltFromOtherSettings(): void
+    {
+        $xml  = ['fhir_format' => FHIRSerializationContext::FORMAT_XML, 'fhir_custom_options' => ['a' => 1]];
+        $json = ['fhir_format' => FHIRSerializationContext::FORMAT_JSON, 'fhir_custom_options' => ['a' => 2]];
+
+        $first  = FHIRSerializationContext::fromSymfonyContext($xml);
+        $second = FHIRSerializationContext::fromSymfonyContext($json);
+        $third  = FHIRSerializationContext::fromSymfonyContext($xml);
+
+        self::assertTrue($first->isXmlFormat());
+        self::assertSame(1, $first->getCustomOption('a'));
+        self::assertFalse($second->isXmlFormat());
+        self::assertSame(2, $second->getCustomOption('a'));
+        self::assertTrue($third->isXmlFormat());
+        self::assertSame(1, $third->getCustomOption('a'));
+        self::assertSame($third, FHIRSerializationContext::fromSymfonyContext($xml), 'identical settings reuse the immutable instance');
+    }
+
+    /**
+     * Invalid settings must keep throwing on every call, not only the first.
+     */
+    public function testFromSymfonyContextRejectsInvalidSettingsEveryTime(): void
+    {
+        for ($attempt = 0; $attempt < 2; ++$attempt) {
+            try {
+                FHIRSerializationContext::fromSymfonyContext(['fhir_format' => 'yaml']);
+                self::fail('an invalid format must be rejected');
+            } catch (\InvalidArgumentException $e) {
+                self::assertStringContainsString('Invalid format "yaml"', $e->getMessage());
+            }
+        }
+    }
 }

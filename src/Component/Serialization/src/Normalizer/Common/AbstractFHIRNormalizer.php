@@ -1270,15 +1270,26 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      */
     protected function stripXmlMetaKeys(array $data): array
     {
-        $result = [];
+        // Edits in place rather than rebuilding: every nesting level of an XML array property passes
+        // its whole subtree through here again, and most subtrees carry no '#' key at all. Leaving
+        // those untouched lets PHP's copy-on-write share them instead of copying them at each level.
         foreach ($data as $key => $value) {
             if (is_string($key) && str_starts_with($key, '#')) {
+                unset($data[$key]);
+
                 continue;
             }
-            $result[$key] = is_array($value) ? $this->stripXmlMetaKeys($value) : $value;
+
+            if (is_array($value) && $value !== []) {
+                $stripped = $this->stripXmlMetaKeys($value);
+
+                if ($stripped !== $value) {
+                    $data[$key] = $stripped;
+                }
+            }
         }
 
-        return $result;
+        return $data;
     }
 
     /**

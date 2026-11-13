@@ -59,6 +59,13 @@ abstract class AbstractOperationPayloadNormalizer extends AbstractFHIRNormalizer
      */
     private ?OperationParameterMapper $mapper = null;
 
+    /**
+     * Per-class cache for {@see self::payloadAttribute()}; `false` records a class that is not a payload.
+     *
+     * @var array<string, FhirOperationPayload|false>
+     */
+    private static array $payloadAttributes = [];
+
     public function __construct(
         FHIRMetadataExtractorInterface $metadataExtractor,
         private readonly FHIRTypeResolverInterface $typeResolver,
@@ -193,11 +200,22 @@ abstract class AbstractOperationPayloadNormalizer extends AbstractFHIRNormalizer
      */
     protected static function payloadAttribute(string $class): ?FhirOperationPayload
     {
+        // These normalizers sit first in the chain, so the Serializer asks them about every object
+        // and every target class; one lookup per class keeps that question cheap. `false` caches a
+        // class that is not a payload. A name that is not (yet) a loadable class is not cached.
+        if (array_key_exists($class, self::$payloadAttributes)) {
+            return self::$payloadAttributes[$class] ?: null;
+        }
+
         if (!class_exists($class)) {
             return null;
         }
 
-        return self::operationMetadata()->payloadOf($class);
+        $payload = self::operationMetadata()->payloadOf($class);
+
+        self::$payloadAttributes[$class] = $payload ?? false;
+
+        return $payload;
     }
 
     /**
