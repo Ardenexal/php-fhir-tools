@@ -166,6 +166,25 @@ final class HttpFHIRTerminologyClientTest extends TestCase
         self::assertFalse($client->validateCode(self::VS_URL, ''));
     }
 
+    /**
+     * A code with no system is ambiguous to `$validate-code` unless the server is told to infer the
+     * system from the value set. tx.fhir.org and Ontoserver both refuse the request without it.
+     */
+    public function testValidateCodeAsksTheServerToInferTheSystem(): void
+    {
+        $capturedUrl = null;
+        $mockClient  = new MockHttpClient(function(string $_method, string $url) use (&$capturedUrl): MockResponse {
+            $capturedUrl = $url;
+
+            return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
+        });
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client->validateCode(self::VS_URL, 'final');
+
+        self::assertStringContainsString('inferSystem=true', (string) $capturedUrl);
+    }
+
     // -------------------------------------------------------------------------
     // validateCoding
     // -------------------------------------------------------------------------
