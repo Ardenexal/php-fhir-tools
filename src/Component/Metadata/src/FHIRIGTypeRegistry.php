@@ -56,11 +56,15 @@ class FHIRIGTypeRegistry implements FHIRIGTypeRegistryInterface
     private readonly array $sliceDiscriminatorMappings;
 
     /**
-     * Resolve the typed extension class for the given extension URL, preferring the given FHIR version.
+     * Resolve the typed extension class for the given extension URL in the given FHIR version.
      *
-     * When $version is provided and a class is registered for that version, it is returned.
-     * Otherwise falls back to any registered version (first-registered wins).
-     * Returns null when no typed class is registered for the URL.
+     * With a $version, only the class registered for that version is returned, or null when that
+     * version has none. A class generated for another version is never handed out: it extends that
+     * version's Extension and would sit in a resource tree of the wrong version, so null tells the
+     * caller to use its own base Extension instead.
+     *
+     * With an empty $version, the first class registered for the URL under any version is returned,
+     * which answers "does any version define this URL". Null means no version does.
      *
      * @return class-string|null
      */
@@ -72,8 +76,8 @@ class FHIRIGTypeRegistry implements FHIRIGTypeRegistryInterface
             return null;
         }
 
-        if ($version !== '' && isset($byVersion[$version])) {
-            return $byVersion[$version];
+        if ($version !== '') {
+            return $byVersion[$version] ?? null;
         }
 
         return reset($byVersion) ?: null;
