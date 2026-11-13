@@ -65,7 +65,7 @@ after merging.
 | `Reference` answers must match the constrained target resource type and be a well-formed URL | `error` |
 | `Attachment` answers must satisfy content-type / size / data-size constraints | `error` |
 | `Quantity` answers must satisfy `minQuantity`/`maxQuantity` bounds and unit-option constraints | `error` |
-| Answer value type must match the declared item type | `warning` |
+| Answer value type must match the declared item type (an R5 `optionsOrString` item also accepts a string) | `warning` |
 | Items present while their `enableWhen` conditions are unsatisfied | `warning` |
 | `enableWhen.question` must reference a known `linkId` | `warning` |
 

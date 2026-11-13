@@ -635,7 +635,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     /**
      * Rule 5 — the answer value type must match the declared item type (warning severity:
-     * a mismatch may be legitimate in some contexts per the specification).
+     * a mismatch may be legitimate in some contexts per the specification). A string answer to an
+     * R5 item whose answerConstraint is optionsOrString is not a mismatch.
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
      * @param R4Item|R4BItem|R5Item                         $questionnaireItem
