@@ -216,7 +216,7 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
             $result = $this->pathService->evaluate(
                 $constraint->expression,
                 $value,
-                FHIRPathResourceContext::at($this->context->getRoot(), (string) $this->context->getPropertyPath()),
+                FHIRPathResourceContext::at($this->context->getRoot(), (string) $this->context->getPropertyPath(), $this->context),
             );
         } catch (FHIRPathException) {
             // The engine could not evaluate the expression (e.g. an unsupported function).
