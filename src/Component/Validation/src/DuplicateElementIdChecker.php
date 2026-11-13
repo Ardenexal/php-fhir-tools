@@ -95,12 +95,7 @@ final class DuplicateElementIdChecker
             $ids = &$seen;
         }
 
-        foreach ($this->models->publicPropertyNames($node) as $name) {
-            if (!$this->models->isPropertyInitialized($node, $name)) {
-                continue;
-            }
-
-            $value   = $this->models->readInitializedValue($node, $name);
+        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
             $subPath = $path === '' ? $name : $path . '.' . $name;
 
             if ($name === 'id') {

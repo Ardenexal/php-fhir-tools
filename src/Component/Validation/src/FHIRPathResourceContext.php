@@ -203,15 +203,9 @@ final class FHIRPathResourceContext
 
         // Typed properties on generated models may be declared but never assigned; reading one of
         // those is an Error, not a null. See the property_exists footgun in model-object-initialization.
-        try {
-            if (!(new \ReflectionProperty($current, $segment))->isInitialized($current)) {
-                return null;
-            }
-        } catch (\ReflectionException) {
-            // Dynamic property — readable.
-        }
-
-        return $current->{$segment};
+        // `??` reads through isset(), which answers false for an unassigned slot instead of throwing,
+        // without building a ReflectionProperty on every step of every invariant's path.
+        return $current->{$segment} ?? null;
     }
 
     /**

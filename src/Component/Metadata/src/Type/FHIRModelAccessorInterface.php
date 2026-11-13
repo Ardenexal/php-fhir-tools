@@ -171,6 +171,20 @@ interface FHIRModelAccessorInterface
     public function isPropertyInitialized(object $object, string $property): bool;
 
     /**
+     * Every initialized public property of an instance, by name, in {@see publicPropertyNames()} order.
+     *
+     * The same pairs as calling `isPropertyInitialized()` and then `readInitializedValue()` for each
+     * public name, so a property holding null is included and an unwritten one is left out. Tree walks
+     * that visit every property of every node should use this: it reads the instance once instead of
+     * twice per property.
+     *
+     * @param object $object Instance to read
+     *
+     * @return array<string, mixed> Values keyed by property name
+     */
+    public function initializedPublicValues(object $object): array;
+
+    /**
      * Assign a property's value, or do nothing when the class does not declare the property.
      *
      * The silent no-op mirrors `readInitializedValue()`, and matches how the deserializer already

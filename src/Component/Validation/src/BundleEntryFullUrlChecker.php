@@ -155,15 +155,7 @@ final class BundleEntryFullUrlChecker
             ? ($this->readString($node, 'type') ?? '')
             : null;
 
-        foreach ($this->models->publicPropertyNames($node) as $name) {
-            // Deserializers bypass the constructor, so an absent field is uninitialized rather than
-            // null; reading it would throw \Error and drop the whole case out of the comparison set.
-            // The guarded read answers null for both, and every branch below skips on null anyway.
-            if (!$this->models->isPropertyInitialized($node, $name)) {
-                continue;
-            }
-
-            $value   = $this->models->readInitializedValue($node, $name);
+        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
             $subPath = $path === '' ? $name : $path . '.' . $name;
 
             if (is_object($value)) {
@@ -320,12 +312,11 @@ final class BundleEntryFullUrlChecker
             // Not relative itself, but a Reference can hold another one in `identifier.assigner`.
         }
 
-        foreach ($this->models->publicPropertyNames($node) as $name) {
-            if ($name === 'contained' || !$this->models->isPropertyInitialized($node, $name)) {
+        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
+            if ($name === 'contained') {
                 continue;
             }
 
-            $value = $this->models->readInitializedValue($node, $name);
             $items = is_array($value) ? $value : [$value];
 
             foreach ($items as $item) {

@@ -162,12 +162,7 @@ final class NarrativeXhtmlChecker
             return [];
         }
 
-        foreach ($this->models->publicPropertyNames($node) as $name) {
-            if (!$this->models->isPropertyInitialized($node, $name)) {
-                continue;
-            }
-
-            $value   = $this->models->readInitializedValue($node, $name);
+        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
             $subPath = $path === '' ? $name : $path . '.' . $name;
 
             if ($this->isXhtmlProperty($node, $name)) {
