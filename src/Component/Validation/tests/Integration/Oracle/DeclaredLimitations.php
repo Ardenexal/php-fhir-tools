@@ -177,6 +177,20 @@ final class DeclaredLimitations
         'http://ehelse.no/fhir'                              => self::REASON_UNVENDORED_IG,
     ];
 
+    /**
+     * A profile from a guide the corpus names but does not ship.
+     *
+     * `no.gastronet` claims `http://kvalitetsregistre.no/fhir/StructureDefinition/colonoscopyreport-bundle-gastronet`,
+     * and its manifest entry loads the `colonoscopyreport.no#0.7.4` package for the reference validator. That
+     * package is in neither the vendored corpus nor any package this repository carries, so the profile is
+     * never resolved here and every finding that comes from it (its required `Bundle.entry` slices, and the
+     * `Unable to find a profile match` findings for the entry profiles it names) stays unreachable.
+     *
+     * Kept apart from {@see REASON_UNVENDORED_IG}, which is about a missing code system rather than a missing
+     * profile, so the two can be revisited separately.
+     */
+    public const REASON_UNVENDORED_PROFILE = 'the implementation guide defining this profile is not vendored, and the corpus names its package without shipping it';
+
     /** Refusing a DOCTYPE is the right behaviour, so the reference finding behind it is unreachable. */
     public const REASON_XXE_REFUSAL = 'refusing an XML DOCTYPE is deliberate: it blocks external-entity attacks, so this finding is unreachable by design';
 
@@ -188,6 +202,10 @@ final class DeclaredLimitations
      * again". `list-xhtml-xxe1` is the whole of it: the reference validator parses a document declaring a
      * DOCTYPE, we refuse, and refusing is correct — `disallow-doctype-decl` is what stops an external-entity
      * attack. Counting that as a gap would put pressure on a security control.
+     *
+     * One entry is a missing-data claim instead: {@see REASON_UNVENDORED_PROFILE} names a profile, not a
+     * code system, so {@see TERMINOLOGY_SYSTEMS} is the wrong home for it, and its signature is the
+     * profile's canonical prefix.
      *
      * @var array<string, string>
      */
@@ -203,6 +221,10 @@ final class DeclaredLimitations
         // licence-bound systems are matched first in reasonFor(), so a LOINC display keeps REASON_LOINC
         // and only a display on a system with no licence excuse falls through to here.
         'wrong display name' => self::REASON_HL7_DISPLAY,
+        // Every profile under this prefix comes from `colonoscopyreport.no`, the package `no.gastronet`
+        // loads and the corpus does not ship. Matched on the StructureDefinition prefix, not the domain,
+        // so a code system from the same registry would still count as open work.
+        'http://kvalitetsregistre.no/fhir/structuredefinition/' => self::REASON_UNVENDORED_PROFILE,
     ];
 
     /**
@@ -224,13 +246,14 @@ final class DeclaredLimitations
         'R4' => [
             // Order matters: the pin compares with assertSame against a histogram sorted by count
             // descending, then by reason text, so list these largest first and break ties the same way.
-            self::REASON_UNKNOWN_EXTENSION => 30,
-            self::REASON_LOINC             => 27,
-            self::REASON_SNOMED            => 19,
-            self::REASON_ICD10             => 4,
-            self::REASON_CVX               => 3,
-            self::REASON_HL7_DISPLAY       => 2,
-            self::REASON_NCI               => 1,
+            self::REASON_UNKNOWN_EXTENSION  => 30,
+            self::REASON_LOINC              => 27,
+            self::REASON_SNOMED             => 19,
+            self::REASON_UNVENDORED_PROFILE => 6,
+            self::REASON_ICD10              => 4,
+            self::REASON_CVX                => 3,
+            self::REASON_HL7_DISPLAY        => 2,
+            self::REASON_NCI                => 1,
         ],
         'R4B' => [],
         'R5'  => [

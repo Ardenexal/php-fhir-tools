@@ -380,6 +380,91 @@ final class JavaFindingMatcherTest extends TestCase
         self::assertSame($java, $this->matcher->unmatched($java, $ours, ['DocumentReference.category[0].coding']));
     }
 
+    /**
+     * A required slice that matched nothing, in each validator's own words.
+     *
+     * Texts verbatim from `outcomes/java/R4.obs-quantity-us-base.json` and from our
+     * `FHIRSliceConstraintValidator`. Nothing in the two sentences is shared beyond the slice and element
+     * names, so neither `same-text` nor any phrase in the table reaches them.
+     */
+    public function testARequiredSliceThatMatchedNothingPairsWithOurZeroMatchSlice(): void
+    {
+        $java = ["Slice 'Observation.component:SystolicBP': a matching slice is required, but not found (from http://hl7.org/fhir/StructureDefinition/bp|4.0.1). Note that other slices are allowed in addition to this required slice"];
+        $ours = [$this->slice('component', 'Slice "SystolicBP" on "component" requires at least 1 item(s), but 0 matched.')];
+
+        $pairs = $this->matcher->matchedPairs($java, $ours, ['Observation']);
+
+        self::assertCount(1, $pairs);
+        self::assertSame('required-slice', $pairs[0]['rule']);
+    }
+
+    /** `obs-quantity-us` misses both blood-pressure slices; each must pair with its own. */
+    public function testRequiredSlicePairingRefusesADifferentSlice(): void
+    {
+        $java = ["Slice 'Observation.component:DiastolicBP': a matching slice is required, but not found (from http://hl7.org/fhir/StructureDefinition/bp|4.0.1). Note that other slices are allowed in addition to this required slice"];
+        $ours = [$this->slice('component', 'Slice "SystolicBP" on "component" requires at least 1 item(s), but 0 matched.')];
+
+        self::assertSame($java, $this->matcher->unmatched($java, $ours, ['Observation']));
+    }
+
+    /**
+     * `not found` means no item matched. A slice that matched one item of the two it needs is a different
+     * finding, which the reference validator words as a cardinality breach instead.
+     */
+    public function testRequiredSlicePairingRefusesASliceThatMatchedSomething(): void
+    {
+        $java = ["Slice 'Observation.component:SystolicBP': a matching slice is required, but not found (from http://hl7.org/fhir/StructureDefinition/bp|4.0.1). Note that other slices are allowed in addition to this required slice"];
+        $ours = [$this->slice('component', 'Slice "SystolicBP" on "component" requires at least 2 item(s), but 1 matched.')];
+
+        self::assertSame($java, $this->matcher->unmatched($java, $ours, ['Observation']));
+    }
+
+    /** The slice name is per profile, not per instance: two Observations in one Bundle can both miss it. */
+    public function testRequiredSlicePairingRefusesADifferentInstance(): void
+    {
+        $java = ["Slice 'Observation.category:VSCat': a matching slice is required, but not found (from http://hl7.org/fhir/StructureDefinition/bp|4.0.1). Note that other slices are allowed in addition to this required slice"];
+        $ours = [$this->slice('entry[0].resource.category', 'Slice "VSCat" on "category" requires at least 1 item(s), but 0 matched.')];
+
+        self::assertSame($java, $this->matcher->unmatched($java, $ours, ['Bundle.entry[1].resource/*Observation/bp*/']));
+    }
+
+    /**
+     * Closed type slicing on a choice element, against our cardinality check on the typed element.
+     *
+     * The R4 `bp` profile slices `value[x]` closed by type and gives its only slice, `valueQuantity`,
+     * `max = 0`. A present `valueQuantity` is that one breach, which the reference validator reports as an
+     * item no slice accepts and we report as an element the profile prohibits. Texts verbatim from
+     * `outcomes/java/R4.obs-quantity-us-base.json` and our `FHIRProfileConstraint` message.
+     */
+    public function testAClosedChoiceSliceMissPairsWithOurProhibitedTypedElement(): void
+    {
+        $java = ["This element does not match any known slice defined in the profile http://hl7.org/fhir/StructureDefinition/bp|4.0.1 and slicing is CLOSED: Observation.value.ofType(Quantity): Does not match slice 'valueQuantity' (discriminator: \$this.empty())"];
+        $ours = [$this->profileCount('valueQuantity', 'This collection should contain exactly 0 element.|This collection should contain exactly 0 elements.')];
+
+        $pairs = $this->matcher->matchedPairs($java, $ours, ['Observation.value.ofType(Quantity)']);
+
+        self::assertCount(1, $pairs);
+        self::assertSame('closed-choice-slice', $pairs[0]['rule']);
+    }
+
+    /** The type in the expression has to be the type our element names. */
+    public function testClosedChoicePairingRefusesAnotherType(): void
+    {
+        $java = ["This element does not match any known slice defined in the profile http://hl7.org/fhir/StructureDefinition/bp|4.0.1 and slicing is CLOSED: Observation.value.ofType(Quantity): Does not match slice 'valueQuantity' (discriminator: \$this.empty())"];
+        $ours = [$this->profileCount('valueString', 'This collection should contain exactly 0 element.|This collection should contain exactly 0 elements.')];
+
+        self::assertSame($java, $this->matcher->unmatched($java, $ours, ['Observation.value.ofType(Quantity)']));
+    }
+
+    /** Only a prohibition says the element must not be there; a minimum on the same element is another rule. */
+    public function testClosedChoicePairingRefusesAnyCountButZero(): void
+    {
+        $java = ["This element does not match any known slice defined in the profile http://hl7.org/fhir/StructureDefinition/bp|4.0.1 and slicing is CLOSED: Observation.value.ofType(Quantity): Does not match slice 'valueQuantity' (discriminator: \$this.empty())"];
+        $ours = [$this->profileCount('valueQuantity', 'This collection should contain exactly 1 element.|This collection should contain exactly 1 elements.')];
+
+        self::assertSame($java, $this->matcher->unmatched($java, $ours, ['Observation.value.ofType(Quantity)']));
+    }
+
     private function notBlank(string $path): FHIRValidationViolation
     {
         return new FHIRValidationViolation(
@@ -411,6 +496,30 @@ final class JavaFindingMatcherTest extends TestCase
             path: $path,
             message: $message,
             constraintClass: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRCheck',
+            profileGroup: null,
+            invariantKey: null,
+        );
+    }
+
+    private function slice(string $path, string $message): FHIRValidationViolation
+    {
+        return new FHIRValidationViolation(
+            severity: 'error',
+            path: $path,
+            message: $message,
+            constraintClass: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint',
+            profileGroup: null,
+            invariantKey: null,
+        );
+    }
+
+    private function profileCount(string $path, string $message): FHIRValidationViolation
+    {
+        return new FHIRValidationViolation(
+            severity: 'error',
+            path: $path,
+            message: $message,
+            constraintClass: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint',
             profileGroup: null,
             invariantKey: null,
         );

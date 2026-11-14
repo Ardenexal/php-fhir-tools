@@ -318,6 +318,8 @@ final class JavaFindingMatcher
             $this->matchesBySharedPhrase($javaText, $ours, $javaExpression)        => 'shared-phrase',
             $this->matchesByBundleResolution($javaText, $ours)                     => 'bundle-resolution',
             $this->matchesByInvariantParaphrase($javaText, $ours, $javaExpression) => 'invariant-paraphrase',
+            $this->matchesByRequiredSlice($javaText, $ours, $javaExpression)       => 'required-slice',
+            $this->matchesByClosedChoiceSlice($javaText, $ours, $javaExpression)   => 'closed-choice-slice',
             default                                                                => null,
         };
     }
@@ -630,6 +632,101 @@ final class JavaFindingMatcher
         }
 
         return $javaPath === $ourPath;
+    }
+
+    /**
+     * Both sides say a slice the profile requires matched no item at all.
+     *
+     * The reference validator writes `Slice 'Observation.component:SystolicBP': a matching slice is
+     * required, but not found`; we write `Slice "SystolicBP" on "component" requires at least 1 item(s),
+     * but 0 matched.`. The sentences share nothing but the two names, so four agreements are required:
+     *
+     *  1. the rule, from each side's own sentence template, with ours held to **zero** matches. `not
+     *     found` means nothing matched; a slice that matched one item of the two it needs is a cardinality
+     *     breach the reference validator words differently, and must not pair here;
+     *  2. the slice name, which both take from the same StructureDefinition;
+     *  3. the sliced element;
+     *  4. the instance, from the expression, exactly as {@see matchesByCardinality()} compares it. A slice
+     *     name belongs to a profile rather than to an instance, so two Observations in one Bundle that
+     *     both miss `VSCat` would otherwise pair in arrival order.
+     *
+     * Corpus case: `R4.obs-quantity-us`, which misses `VSCat`, `SystolicBP` and `DiastolicBP` together.
+     */
+    private function matchesByRequiredSlice(
+        string $javaText,
+        FHIRValidationViolation $ours,
+        string $javaExpression,
+    ): bool {
+        if ($javaExpression === '') {
+            return false;
+        }
+
+        if (preg_match("/^Slice '(?<element>[^':]+):(?<slice>[^']+)': a matching slice is required, but not found/", $javaText, $java) !== 1) {
+            return false;
+        }
+
+        if ((new ViolationFamilyClassifier())->classify($ours) !== 'constraint:FHIRSliceConstraint') {
+            return false;
+        }
+
+        if (preg_match('/^Slice "(?<slice>[^"]+)" on "(?<property>[^"]+)" requires at least \d+ item\(s\), but 0 matched\.$/', $ours->message, $mine) !== 1) {
+            return false;
+        }
+
+        if ($java['slice'] !== $mine['slice']) {
+            return false;
+        }
+
+        $element = $this->leaf($java['element']);
+        if ($element === '' || $element !== $mine['property'] || $element !== $this->leaf($ours->path)) {
+            return false;
+        }
+
+        return $this->instancePath($javaExpression) === $this->parentPath($ours->path);
+    }
+
+    /**
+     * A choice element sliced closed by type, against our prohibition of the typed element.
+     *
+     * The R4 `bp` profile slices `value[x]` closed by type and gives its one slice, `valueQuantity`,
+     * `max = 0`. A `valueQuantity` in the instance is then a single breach: the reference validator
+     * reports it as an item no slice accepts (`slicing is CLOSED: … Does not match slice 'valueQuantity'`)
+     * and we report the typed element as one the profile allows zero of. Three agreements:
+     *
+     *  1. the rule: closed slicing on Java's side, and on ours a count of exactly **zero**, which is the only
+     *     count that says the element must not be there at all;
+     *  2. the element: Java's expression names the choice and its type (`value.ofType(Quantity)`), which
+     *     spells the typed name our path carries (`valueQuantity`), and the slice Java names is that same
+     *     typed name;
+     *  3. the instance the choice element sits on.
+     *
+     * Corpus case: `R4.obs-quantity-us`.
+     */
+    private function matchesByClosedChoiceSlice(
+        string $javaText,
+        FHIRValidationViolation $ours,
+        string $javaExpression,
+    ): bool {
+        if (preg_match("/and slicing is CLOSED: .*Does not match slice '(?<slice>[^']+)'/", $javaText, $java) !== 1) {
+            return false;
+        }
+
+        if (preg_match('/^(?<choice>.+)\.ofType\((?<type>[A-Za-z0-9]+)\)$/', $javaExpression, $where) !== 1) {
+            return false;
+        }
+
+        if (!str_starts_with($ours->message, 'This collection should contain exactly 0 element')) {
+            return false;
+        }
+
+        $choicePath = $this->instancePath($where['choice']);
+        $typedName  = $this->leaf($choicePath) . ucfirst($where['type']);
+
+        if ($java['slice'] !== $typedName || $this->leaf($ours->path) !== $typedName) {
+            return false;
+        }
+
+        return $this->parentPath($choicePath) === $this->parentPath($ours->path);
     }
 
     /** A path with every repeat index removed, for comparing against a source that carries none. */
