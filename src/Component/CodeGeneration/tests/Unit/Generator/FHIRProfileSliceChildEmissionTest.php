@@ -570,8 +570,8 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         ]);
 
         self::assertSame([
-            'component[1].value[x].code: The value mmHg does not match the required fixed value mm[Hg].',
-            'component[0].valueQuantity.system: The value http://example.org/units does not match the required fixed value http://unitsofmeasure.org.',
+            "component[1].value[x].code: Value is 'mmHg' but is fixed to 'mm[Hg]'",
+            "component[0].valueQuantity.system: Value is 'http://example.org/units' but is fixed to 'http://unitsofmeasure.org'",
         ], $this->validateAgainstProfile($observation, self::BP_PROFILE_URL));
     }
 

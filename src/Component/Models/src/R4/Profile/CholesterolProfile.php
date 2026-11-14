@@ -25,6 +25,22 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/cholesterol'],
 )]
 #[FHIRProfileConstraint(
+    path: 'code',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+    options: [
+        'value' => [
+            'coding' => [
+                [
+                    'system'  => 'http://loinc.org',
+                    'code'    => '35200-5',
+                    'display' => "Cholesterol [Moles/\u{200B}volume] in Serum or Plasma",
+                ],
+            ],
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/cholesterol'],
+)]
+#[FHIRProfileConstraint(
     path: 'valueQuantity',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 1],
@@ -100,6 +116,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
     path: 'referenceRange.high',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/cholesterol'],
+)]
+#[FHIRProfileConstraint(
+    path: 'referenceRange.high',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+    options: ['value' => ['value' => 4.5]],
     groups: ['http://hl7.org/fhir/StructureDefinition/cholesterol'],
 )]
 #[FHIRProfileConstraint(
