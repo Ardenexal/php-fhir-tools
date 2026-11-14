@@ -68,7 +68,7 @@ final class FHIRProfileInvariantValidator extends ConstraintValidator
         foreach ($this->occurrences($value, $constraint->path) as [$path, $focus]) {
             // %resource is the resource around this occurrence, found from the validation root
             $at      = $path === '' ? $base : ($base === '' ? $path : "{$base}.{$path}");
-            $context = FHIRPathResourceContext::at($this->context->getRoot(), $at);
+            $context = FHIRPathResourceContext::at($this->context->getRoot(), $at, $this->context);
 
             try {
                 $result = $this->pathService->evaluate($constraint->expression, $focus, $context);

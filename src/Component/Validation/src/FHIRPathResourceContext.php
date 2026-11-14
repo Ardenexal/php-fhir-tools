@@ -29,6 +29,13 @@ final class FHIRPathResourceContext
     private static ?\WeakMap $anchors = null;
 
     /**
+     * Resolved `[enclosing resource, container]` pairs, per validation run and then per root and path.
+     *
+     * @var \WeakMap<object, array<string, array{0: object, 1: object|null}>>|null
+     */
+    private static ?\WeakMap $resolved = null;
+
+    /**
      * Run $validation on $node alone, with `%resource` bound as if validation had started at $root.
      *
      * A plain extension checked against a definition loaded at runtime is validated by itself, so
@@ -88,8 +95,16 @@ final class FHIRPathResourceContext
      * Walking the property path is what makes this possible: Symfony hands us the root object plus a
      * path like `parameter[1].resource.payor[0]`, so the deepest `#[FhirResource]` along that path is
      * the enclosing resource. Falling back to the root keeps the common top-level case unchanged.
+     *
+     * Every invariant on a node asks for the same path, and resolving it walks the path again from
+     * the root. A caller that passes `$scope` gets that walk done once per root and path for as long
+     * as the scope object lives; the invariant validators pass Symfony's execution context, which
+     * lasts one `validate()` call. The model must not change while a scope is in use, which holds
+     * within one validation and is why no longer-lived scope is used.
+     *
+     * @param object|null $scope Keys the cache of resolved paths; null resolves every time
      */
-    public static function at(mixed $root, string $path): EvaluationContext
+    public static function at(mixed $root, string $path, ?object $scope = null): EvaluationContext
     {
         if (!is_object($root)) {
             return new EvaluationContext(null);
@@ -101,8 +116,21 @@ final class FHIRPathResourceContext
             $path            = $path === '' ? $prefix : "{$prefix}.{$path}";
         }
 
-        [$enclosing, $container] = self::enclosingResourceAndContainer($root, $path);
+        if ($scope === null) {
+            [$enclosing, $container] = self::enclosingResourceAndContainer($root, $path);
+        } else {
+            /** @var \WeakMap<object, array<string, array{0: object, 1: object|null}>> $resolved */
+            $resolved = self::$resolved ??= new \WeakMap();
+            $key      = spl_object_id($root) . '|' . $path;
 
+            // Written in place: copying the scope's array out and back would copy every path cached so far
+            $resolved[$scope]       ??= [];
+            $resolved[$scope][$key] ??= self::enclosingResourceAndContainer($root, $path);
+
+            [$enclosing, $container] = $resolved[$scope][$key];
+        }
+
+        // A new context every time: the engine sets variables on the one it is given
         return new EvaluationContext(rootResource: $enclosing, containerResource: $container);
     }
 
