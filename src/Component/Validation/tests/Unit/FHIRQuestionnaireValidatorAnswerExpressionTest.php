@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -11,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireResponseStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItem;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResource;
@@ -82,7 +84,7 @@ final class FHIRQuestionnaireValidatorAnswerExpressionTest extends TestCase
         );
     }
 
-    private static function numericResponse(int $answer): QuestionnaireResponseResource
+    private static function scalarResponse(int|string|TimePrimitive $answer): QuestionnaireResponseResource
     {
         return new QuestionnaireResponseResource(
             status: new QuestionnaireResponseStatusType('completed'),
@@ -132,8 +134,47 @@ final class FHIRQuestionnaireValidatorAnswerExpressionTest extends TestCase
         $questionnaire = self::questionnaire('5.0 | 6', 'integer');
 
         // The FHIRPath decimal 5.0 equals the integer answer 5.
-        self::assertSame([], $validator->validate($questionnaire, self::numericResponse(5))->violations);
-        self::assertCount(1, $validator->validate($questionnaire, self::numericResponse(7))->errors());
+        self::assertSame([], $validator->validate($questionnaire, self::scalarResponse(5))->violations);
+        self::assertCount(1, $validator->validate($questionnaire, self::scalarResponse(7))->errors());
+    }
+
+    public function testComparesDecimalsWithoutRounding(): void
+    {
+        $validator     = new FHIRQuestionnaireValidator();
+        $questionnaire = self::questionnaire('0.00000000001', 'decimal');
+
+        self::assertSame([], $validator->validate($questionnaire, self::scalarResponse('0.000000000010'))->violations);
+        self::assertCount(1, $validator->validate($questionnaire, self::scalarResponse('0.00000000002'))->errors());
+    }
+
+    public function testComparesDecimalFunctionResults(): void
+    {
+        // toDecimal() yields a PHP float rather than a FHIRPath decimal literal.
+        $validator     = new FHIRQuestionnaireValidator();
+        $questionnaire = self::questionnaire('5.toDecimal() | 6', 'integer');
+
+        self::assertSame([], $validator->validate($questionnaire, self::scalarResponse(5))->violations);
+        self::assertCount(1, $validator->validate($questionnaire, self::scalarResponse(7))->errors());
+    }
+
+    public function testKeepsStringsLexicallyDistinct(): void
+    {
+        $validator     = new FHIRQuestionnaireValidator();
+        $questionnaire = self::questionnaire("'01' | '1'", 'string');
+
+        self::assertSame([], $validator->validate($questionnaire, self::response(new StringPrimitive(value: '1')))->violations);
+
+        $onlyPadded = self::questionnaire("'01'", 'string');
+        self::assertCount(1, $validator->validate($onlyPadded, self::response(new StringPrimitive(value: '1')))->errors());
+    }
+
+    public function testComparesTimeLiteralWithTimeAnswer(): void
+    {
+        $validator     = new FHIRQuestionnaireValidator();
+        $questionnaire = self::questionnaire('@T14:30:00', 'time');
+
+        self::assertSame([], $validator->validate($questionnaire, self::scalarResponse(new TimePrimitive(value: FHIRTime::parse('14:30:00'))))->violations);
+        self::assertCount(1, $validator->validate($questionnaire, self::scalarResponse(new TimePrimitive(value: FHIRTime::parse('15:00:00'))))->errors());
     }
 
     public function testBindsQuestionnaireAndContextVariables(): void
@@ -176,6 +217,17 @@ final class FHIRQuestionnaireValidatorAnswerExpressionTest extends TestCase
         $report = (new FHIRQuestionnaireValidator())->validate(
             self::questionnaire('%patient.name.given'),
             self::response(self::coding('blue')),
+        );
+
+        self::assertSame([], $report->violations);
+    }
+
+    public function testSkipsExpressionThatRaisesAPhpError(): void
+    {
+        // The evaluator hands the exponent literal to bcadd(), which throws a ValueError.
+        $report = (new FHIRQuestionnaireValidator())->validate(
+            self::questionnaire('1e2 + 1', 'integer'),
+            self::scalarResponse(7),
         );
 
         self::assertSame([], $report->violations);
