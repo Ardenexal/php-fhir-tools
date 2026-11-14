@@ -203,6 +203,10 @@ final class DeclaredLimitations
      * DOCTYPE, we refuse, and refusing is correct — `disallow-doctype-decl` is what stops an external-entity
      * attack. Counting that as a gap would put pressure on a security control.
      *
+     * One entry is a missing-data claim instead: {@see REASON_UNVENDORED_PROFILE} names a profile, not a
+     * code system, so {@see TERMINOLOGY_SYSTEMS} is the wrong home for it, and its signature is the
+     * profile's canonical prefix.
+     *
      * @var array<string, string>
      */
     public const DECLARED_SIGNATURES = [
