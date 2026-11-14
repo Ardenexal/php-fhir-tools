@@ -508,9 +508,12 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             $this->contentModelOrder($object),
         );
 
+        // One read of the instance instead of a reflection lookup per declared property.
+        $values = self::modelAccessor()->initializedPublicValues($object);
+
         foreach ($propertyNames as $propertyName) {
             // Unwritten and explicitly null both read as null, and the skip below catches both.
-            $value = self::modelAccessor()->readInitializedValue($object, $propertyName);
+            $value = $values[$propertyName] ?? null;
 
             if ($value === null || (is_array($value) && empty($value))) {
                 continue;
