@@ -66,7 +66,8 @@ final class QuestionnaireDefinitionChecker
         $visited[$objectId] = true;
 
         if ($this->isQuestionnaire($node)) {
-            $this->checkItems($this->itemsOf($node), $path === '' ? 'item' : $path . '.item', $violations);
+            $itemVisited = [];
+            $this->checkItems($this->itemsOf($node), $path === '' ? 'item' : $path . '.item', $itemVisited, $violations);
         }
 
         foreach ($this->models->initializedPublicValues($node) as $name => $value) {
@@ -89,18 +90,28 @@ final class QuestionnaireDefinitionChecker
     /**
      * Check each item at one level, then the levels beneath it.
      *
-     * @param list<object>                  $items
+     * @param array<int|string, object>     $items
+     * @param array<int, true>              $visited    spl_object_id keys of the items on the current descent
+     *                                                  (cycle guard); an item leaves it once its subtree is checked
      * @param list<FHIRValidationViolation> $violations
      */
-    private function checkItems(array $items, string $path, array &$violations): void
+    private function checkItems(array $items, string $path, array &$visited, array &$violations): void
     {
         foreach ($items as $i => $item) {
-            $itemPath = $path . '[' . $i . ']';
-            $children = $this->itemsOf($item);
+            $objectId = spl_object_id($item);
+
+            if (isset($visited[$objectId])) {
+                continue;
+            }
+
+            $visited[$objectId] = true;
+            $itemPath           = $path . '[' . $i . ']';
+            $children           = $this->itemsOf($item);
 
             if ($children !== [] && $this->enableWhenQuestions($item) !== []) {
-                $inner = [];
-                $this->collectLinkIds($children, $inner);
+                $inner        = [];
+                $innerVisited = [$objectId => true];
+                $this->collectLinkIds($children, $inner, $innerVisited);
 
                 foreach ($this->enableWhenQuestions($item) as $question) {
                     if (isset($inner[$question])) {
@@ -118,24 +129,34 @@ final class QuestionnaireDefinitionChecker
                 }
             }
 
-            $this->checkItems($children, $itemPath . '.item', $violations);
+            $this->checkItems($children, $itemPath . '.item', $visited, $violations);
+
+            unset($visited[$objectId]);
         }
     }
 
     /**
-     * @param list<object>        $items
-     * @param array<string, true> $linkIds collects every linkId at or below these items
+     * @param array<int|string, object> $items
+     * @param array<string, true>       $linkIds collects every linkId at or below these items
+     * @param array<int, true>          $visited spl_object_id keys of the items already collected (cycle guard)
      */
-    private function collectLinkIds(array $items, array &$linkIds): void
+    private function collectLinkIds(array $items, array &$linkIds, array &$visited): void
     {
         foreach ($items as $item) {
-            $linkId = $this->stringValue($this->models->readInitializedValue($item, 'linkId'));
+            $objectId = spl_object_id($item);
+
+            if (isset($visited[$objectId])) {
+                continue;
+            }
+
+            $visited[$objectId] = true;
+            $linkId             = $this->stringValue($this->models->readInitializedValue($item, 'linkId'));
 
             if ($linkId !== null) {
                 $linkIds[$linkId] = true;
             }
 
-            $this->collectLinkIds($this->itemsOf($item), $linkIds);
+            $this->collectLinkIds($this->itemsOf($item), $linkIds, $visited);
         }
     }
 
@@ -168,7 +189,9 @@ final class QuestionnaireDefinitionChecker
     }
 
     /**
-     * @return list<object>
+     * The `item` list, keyed as the model holds it so a finding's index names the actual occurrence.
+     *
+     * @return array<int|string, object>
      */
     private function itemsOf(object $node): array
     {
@@ -178,7 +201,7 @@ final class QuestionnaireDefinitionChecker
             return [];
         }
 
-        return array_values(array_filter($items, is_object(...)));
+        return array_filter($items, is_object(...));
     }
 
     /**

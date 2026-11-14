@@ -115,12 +115,13 @@ final class AttachmentIntegrityChecker
         }
 
         $statedHash = $this->primitiveString($this->models->readInitializedValue($attachment, 'hash'));
-        $actualHash = base64_encode(sha1($content, true));
+        $actualHash = sha1($content, true);
 
-        if ($statedHash !== null && $statedHash !== $actualHash) {
+        // Compared as digest bytes: base64 may carry whitespace, so equal digests can differ as text
+        if ($statedHash !== null && base64_decode($statedHash, true) !== $actualHash) {
             $violations[] = $this->violation(
                 $path,
-                sprintf("The hash of the data did not match the data (stated: '%s', actual: '%s')", $statedHash, $actualHash),
+                sprintf("The hash of the data did not match the data (stated: '%s', actual: '%s')", $statedHash, base64_encode($actualHash)),
             );
         }
     }

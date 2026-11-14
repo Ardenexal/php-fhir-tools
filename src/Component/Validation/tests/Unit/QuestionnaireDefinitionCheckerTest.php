@@ -82,6 +82,39 @@ final class QuestionnaireDefinitionCheckerTest extends TestCase
     }
 
     /**
+     * A finding names the item where it sits, also when the list's keys are not 0..n.
+     */
+    public function testFindingKeepsTheItemsOwnIndex(): void
+    {
+        $violations = (new QuestionnaireDefinitionChecker())->check(new QuestionnaireResource(item: [
+            3 => new QuestionnaireItem(
+                linkId: 'group',
+                enableWhen: [new QuestionnaireItemEnableWhen(question: 'condition', answer: true)],
+                item: [new QuestionnaireItem(linkId: 'condition')],
+            ),
+        ]));
+
+        self::assertSame(['item[3]'], array_map(static fn (FHIRValidationViolation $v): string => $v->path, $violations));
+    }
+
+    /**
+     * An item placed inside itself cannot come from a document, but a model built in code can hold
+     * one, and the walk must still end.
+     */
+    public function testItemCycleTerminates(): void
+    {
+        $group = new QuestionnaireItem(
+            linkId: 'group',
+            enableWhen: [new QuestionnaireItemEnableWhen(question: 'condition', answer: true)],
+        );
+        $group->item = [$group, new QuestionnaireItem(linkId: 'condition')];
+
+        $violations = (new QuestionnaireDefinitionChecker())->check(new QuestionnaireResource(item: [$group]));
+
+        self::assertSame(['item[0]'], array_map(static fn (FHIRValidationViolation $v): string => $v->path, $violations));
+    }
+
+    /**
      * @param list<FHIRValidationViolation> $violations
      *
      * @return list<string>

@@ -91,6 +91,19 @@ final class AttachmentIntegrityCheckerTest extends TestCase
     }
 
     /**
+     * base64 may carry whitespace, so a correct hash split across lines still matches.
+     */
+    public function testHashWithWhitespaceIsComparedAsBytes(): void
+    {
+        $hash = chunk_split(base64_encode(sha1("help i'm a bug", true)), 8, "\n");
+
+        self::assertSame([], (new AttachmentIntegrityChecker())->check(new MediaResource(content: new Attachment(
+            data: new Base64BinaryPrimitive(value: self::DATA),
+            hash: new Base64BinaryPrimitive(value: $hash),
+        ))));
+    }
+
+    /**
      * @param list<FHIRValidationViolation> $violations
      *
      * @return list<string>

@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
@@ -279,6 +280,21 @@ final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($canonical, new FHIRTargetProfile([self::PROFILE_A]));
         $this->validator->validate($canonical, new FHIRTargetProfile(['http://hl7.org/fhir/StructureDefinition/Resource']));
         $this->validator->validate($canonical, new FHIRTargetProfile([self::CORE_QUESTIONNAIRE, 'http://hl7.org/fhir/StructureDefinition/vitalsigns']));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * `PlanDefinition.action.definition[x]` carries the canonical's target list on its `uri` variant
+     * too, and a uri may point anywhere. `CanonicalPrimitive` extends `UriPrimitive`, so this pins
+     * that the primitive type, not the class hierarchy, decides.
+     */
+    public function testUriVariantIsNotReadAsNamingAType(): void
+    {
+        $constraint = new FHIRTargetProfile([self::CORE_QUESTIONNAIRE]);
+
+        $this->validator->validate(new UriPrimitive(value: 'http://example.org/fhir/Patient/example'), $constraint);
+        $this->validator->validate([new UriPrimitive(value: 'http://example.org/fhir/Patient/example')], $constraint);
 
         $this->assertNoViolation();
     }

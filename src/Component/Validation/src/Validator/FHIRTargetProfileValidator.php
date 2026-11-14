@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
@@ -100,7 +101,9 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
 
         // canonical-typed values (CanonicalPrimitive implements \Stringable, or raw string)
         if (is_string($value) || $value instanceof \Stringable) {
-            $this->checkCanonicalType((string) $value, $constraint);
+            if ($this->isCanonical($value)) {
+                $this->checkCanonicalType((string) $value, $constraint);
+            }
 
             return;
         }
@@ -108,7 +111,9 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
         if (is_array($value)) {
             foreach ($value as $item) {
                 if (is_string($item) || $item instanceof \Stringable) {
-                    $this->checkCanonicalType((string) $item, $constraint);
+                    if ($this->isCanonical($item)) {
+                        $this->checkCanonicalType((string) $item, $constraint);
+                    }
                 } elseif (is_object($item)) {
                     $this->validateItem($item, $constraint);
                 }
@@ -237,6 +242,30 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
             ])
             ->setCode(FHIRViolationCode::ERROR)
             ->addViolation();
+    }
+
+    /**
+     * Whether a string-like value is a canonical, the only kind whose path is read as naming a type.
+     *
+     * A choice such as `PlanDefinition.action.definition[x]` carries the same target list on its
+     * `uri` variant, and a `uri` is not an identifier of a definition: `definitionUri` may point at
+     * `http://example.org/fhir/Patient/example` legitimately. The two cannot be told apart by class,
+     * because `CanonicalPrimitive` extends `UriPrimitive`, so the generated `#[FHIRPrimitive]` type is
+     * read instead. A bare string is a canonical generated as a plain string.
+     */
+    private function isCanonical(string|\Stringable $value): bool
+    {
+        if (is_string($value)) {
+            return true;
+        }
+
+        foreach ($this->attributes->classAttributes($value, FHIRPrimitive::class) as $primitive) {
+            if ($primitive->primitiveType === 'canonical') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
