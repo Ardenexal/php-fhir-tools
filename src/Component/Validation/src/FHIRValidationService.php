@@ -90,6 +90,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly ComplexExtensionChecker $complexExtensionChecker = new ComplexExtensionChecker(),
         private readonly ?RuntimeProfileResolver $runtimeProfiles = null,
         private readonly DuplicateElementIdChecker $duplicateIdChecker = new DuplicateElementIdChecker(),
+        private readonly AttachmentIntegrityChecker $attachmentChecker = new AttachmentIntegrityChecker(),
+        private readonly QuestionnaireDefinitionChecker $questionnaireDefinitionChecker = new QuestionnaireDefinitionChecker(),
     ) {
         $this->runtimeConstraints          = new \WeakMap();
         $this->runtimeExtensionConstraints = new \WeakMap();
@@ -218,6 +220,18 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // alone. See DuplicateElementIdChecker.
         foreach ($this->duplicateIdChecker->check($resource) as $duplicateIdViolation) {
             $violations[] = $duplicateIdViolation;
+        }
+
+        // Attachment.size and Attachment.hash against the inline data they describe. Unconditional like
+        // the passes above; it fetches nothing. See AttachmentIntegrityChecker.
+        foreach ($this->attachmentChecker->check($resource) as $attachmentViolation) {
+            $violations[] = $attachmentViolation;
+        }
+
+        // Rules on a Questionnaire's own item tree, which the response validator never checks because
+        // it only reads a Questionnaire. See QuestionnaireDefinitionChecker.
+        foreach ($this->questionnaireDefinitionChecker->check($resource) as $questionnaireViolation) {
+            $violations[] = $questionnaireViolation;
         }
 
         // Elements the reader could not place on the model. Unconditional like the passes above,
