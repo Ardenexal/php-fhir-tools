@@ -36,11 +36,9 @@ class ExcludeFunction extends AbstractFunction
             return $input;
         }
 
-        // Normalize exclusion items so FHIR primitive wrappers compare equal to plain scalars
-        $normalizedOtherItems = array_map(
-            fn ($o) => $context->normalizeValue($o),
-            $otherResult->toArray(),
-        );
+        // evaluateParameter() already unwrapped the exclusions; unwrap each input item the same way so
+        // a FHIR primitive wrapper compares equal to its plain scalar.
+        $normalizedOtherItems = $otherResult->toArray();
 
         $indexes = [];
         foreach ($input as $index => $item) {
