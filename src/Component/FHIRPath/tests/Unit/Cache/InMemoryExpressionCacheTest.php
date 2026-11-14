@@ -144,6 +144,17 @@ class InMemoryExpressionCacheTest extends TestCase
         self::assertTrue($cache->has('expr4'));
     }
 
+    public function testLRUEvictsNumericExpression(): void
+    {
+        // PHP stores the key '1' as the integer 1; evicting it must still work under strict types.
+        $cache = new InMemoryExpressionCache(1);
+        $cache->set('1', $this->createCompiledExpression('1'));
+        $cache->set('2 + 2', $this->createCompiledExpression('2 + 2'));
+
+        self::assertFalse($cache->has('1'));
+        self::assertTrue($cache->has('2 + 2'));
+    }
+
     public function testGetHitRate(): void
     {
         $expression = 'name.given';
@@ -178,7 +189,7 @@ class InMemoryExpressionCacheTest extends TestCase
     {
         $cache = new InMemoryExpressionCache();
 
-        self::assertSame(100, $cache->getMaxSize());
+        self::assertSame(1000, $cache->getMaxSize());
     }
 
     public function testClearResetsStats(): void

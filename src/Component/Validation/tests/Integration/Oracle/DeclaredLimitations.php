@@ -35,8 +35,7 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
  *    declaring a limitation where Java is silent would hide an `ABOVE` case rather than document a gap.
  *
  * Deliberately excluded, because they are ours to fix and must not hide here:
- * `qr-bad-ref2` (canonical resolves to the wrong resource type), `vs-params-4` (a ValueSet expression
- * language rule),
+ * `vs-params-4` (a ValueSet expression language rule),
  * `mimic` (its package *is* vendored — the instance has a system-URI typo), and `obs-temp-bad`
  * (the reference validator's hard-coded vitals code table, a different kind of limitation entirely).
  *
@@ -194,8 +193,38 @@ final class DeclaredLimitations
         'http://ehelse.no/fhir'                              => self::REASON_UNVENDORED_IG,
     ];
 
+    /**
+     * A profile from a guide the corpus names but does not ship.
+     *
+     * `no.gastronet` claims `http://kvalitetsregistre.no/fhir/StructureDefinition/colonoscopyreport-bundle-gastronet`,
+     * and its manifest entry loads the `colonoscopyreport.no#0.7.4` package for the reference validator. That
+     * package is in neither the vendored corpus nor any package this repository carries, so the profile is
+     * never resolved here and every finding that comes from it (its required `Bundle.entry` slices, and the
+     * `Unable to find a profile match` findings for the entry profiles it names) stays unreachable.
+     *
+     * Kept apart from {@see REASON_UNVENDORED_IG}, which is about a missing code system rather than a missing
+     * profile, so the two can be revisited separately.
+     */
+    public const REASON_UNVENDORED_PROFILE = 'the implementation guide defining this profile is not vendored, and the corpus names its package without shipping it';
+
     /** Refusing a DOCTYPE is the right behaviour, so the reference finding behind it is unreachable. */
     public const REASON_XXE_REFUSAL = 'refusing an XML DOCTYPE is deliberate: it blocks external-entity attacks, so this finding is unreachable by design';
+
+    /**
+     * A reference's type is not read from its URL, because the reference validator's default does not.
+     *
+     * `R4.dr-eh` reports `The type 'Device' implied by the reference URL Device/foo is not a valid Target`.
+     * The reference validator raises that only when its manifest sets `assumeValidRestReferences`, which
+     * tells it to treat `Type/id` as proof of the target's type without resolving it. On its default
+     * settings it accepts `Practitioner/2` on an element that allows only `Organization`
+     * (`R5.fhirpath-good`), which inferring the type here would report as an error. Matching the
+     * default is the comparison's baseline, so the opt-in finding is declared rather than chased.
+     *
+     * `dr-eh` is unreachable for a second reason too: the `[Patient]` restriction comes from US Core
+     * 3.1.0, which the manifest loads for that case and this harness does not. Against the base
+     * `DocumentReference.subject` targets, `Device` is allowed.
+     */
+    public const REASON_ASSUMED_REST_REFERENCE = 'a reference URL is taken as proof of its target type only under the reference validator option assumeValidRestReferences, which is off by default';
 
     /**
      * Text signature => reason, for limitations that are not about a code system.
@@ -205,6 +234,10 @@ final class DeclaredLimitations
      * again". `list-xhtml-xxe1` is the whole of it: the reference validator parses a document declaring a
      * DOCTYPE, we refuse, and refusing is correct — `disallow-doctype-decl` is what stops an external-entity
      * attack. Counting that as a gap would put pressure on a security control.
+     *
+     * One entry is a missing-data claim instead: {@see REASON_UNVENDORED_PROFILE} names a profile, not a
+     * code system, so {@see TERMINOLOGY_SYSTEMS} is the wrong home for it, and its signature is the
+     * profile's canonical prefix.
      *
      * @var array<string, string>
      */
@@ -220,6 +253,12 @@ final class DeclaredLimitations
         // licence-bound systems are matched first in reasonFor(), so a LOINC display keeps REASON_LOINC
         // and only a display on a system with no licence excuse falls through to here.
         'wrong display name' => self::REASON_HL7_DISPLAY,
+        // Every profile under this prefix comes from `colonoscopyreport.no`, the package `no.gastronet`
+        // loads and the corpus does not ship. Matched on the StructureDefinition prefix, not the domain,
+        // so a code system from the same registry would still count as open work.
+        'http://kvalitetsregistre.no/fhir/structuredefinition/' => self::REASON_UNVENDORED_PROFILE,
+        // The opening of exactly one reference validator rule, raised only under assumeValidRestReferences.
+        'implied by the reference url' => self::REASON_ASSUMED_REST_REFERENCE,
         // The host of every KBV canonical. No vendored package defines anything under it, so no
         // finding naming it can be one we could decide.
         'https://fhir.kbv.de/' => self::REASON_UNVENDORED_PACKAGE,
@@ -244,14 +283,17 @@ final class DeclaredLimitations
         'R4' => [
             // Order matters: the pin compares with assertSame against a histogram sorted by count
             // descending, then by reason text, so list these largest first and break ties the same way.
-            self::REASON_UNKNOWN_EXTENSION  => 30,
-            self::REASON_LOINC              => 27,
-            self::REASON_SNOMED             => 19,
-            self::REASON_ICD10              => 4,
-            self::REASON_CVX                => 3,
-            self::REASON_HL7_DISPLAY        => 2,
-            self::REASON_UNVENDORED_PACKAGE => 2,
-            self::REASON_NCI                => 1,
+            self::REASON_UNKNOWN_EXTENSION      => 30,
+            self::REASON_LOINC                  => 27,
+            self::REASON_SNOMED                 => 19,
+            self::REASON_UNVENDORED_PROFILE     => 6,
+            self::REASON_ICD10                  => 4,
+            self::REASON_CVX                    => 3,
+            self::REASON_HL7_DISPLAY            => 2,
+            self::REASON_UNVENDORED_PACKAGE     => 2,
+            // Tied at one: ordered by reason text, as in R5 below.
+            self::REASON_ASSUMED_REST_REFERENCE => 1,
+            self::REASON_NCI                    => 1,
         ],
         'R4B' => [],
         'R5'  => [

@@ -1,19 +1,23 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Questions with an enableWhen cannot refer to an inner question for its enableWhen condition"
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:QuestionnaireDefinitionChecker": [
+                "item[0] — Questions with an enableWhen cannot refer to an inner question for its enableWhen condition"
+            ]
+        },
         "warnings": {}
     }
 }

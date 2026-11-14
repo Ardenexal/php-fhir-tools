@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
@@ -47,6 +50,10 @@ final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
     private const string PROFILE_A = 'http://example.org/fhir/StructureDefinition/profile-a';
 
     private const string PROFILE_B = 'http://example.org/fhir/StructureDefinition/profile-b';
+
+    private const string CORE_QUESTIONNAIRE = 'http://hl7.org/fhir/StructureDefinition/Questionnaire';
+
+    private const string CORE_DEVICE = 'http://hl7.org/fhir/StructureDefinition/Device';
 
     /** @var MockObject&FHIRReferenceResolverInterface */
     private MockObject $mockResolver;
@@ -225,5 +232,107 @@ final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
 
         self::assertNull($resolver->resolve(new \stdClass()));
         self::assertNull($resolver->resolve(new \stdClass()));
+    }
+
+    // -------------------------------------------------------------------------
+    // Canonical type (R4.qr-bad-ref2)
+    // -------------------------------------------------------------------------
+
+    public function testCanonicalNamingAnotherResourceTypeEmitsErrorViolation(): void
+    {
+        $canonical = 'http://hl7.org/fhir/ValueSet/example-extensional';
+
+        $this->validator->validate(new CanonicalPrimitive(value: $canonical), new FHIRTargetProfile([self::CORE_QUESTIONNAIRE]));
+
+        $this->buildViolation(FHIRTargetProfileValidator::CANONICAL_TYPE_MESSAGE)
+            ->setParameters([
+                '{{ canonical }}' => $canonical,
+                '{{ type }}'      => 'ValueSet',
+                '{{ allowed }}'   => 'Questionnaire',
+            ])
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * A version and a fragment are not part of the path, and a canonical that is not of the
+     * `[base]/Type/id` shape names no type at all.
+     */
+    public function testCanonicalOfAnAllowedTypeOrWithNoTypeInItsPathIsAccepted(): void
+    {
+        $constraint = new FHIRTargetProfile([self::CORE_QUESTIONNAIRE]);
+
+        $this->validator->validate('http://example.org/fhir/Questionnaire/q1|1.0.0', $constraint);
+        $this->validator->validate('http://example.org/fhir/Questionnaire/q1#frag', $constraint);
+        $this->validator->validate('http://loinc.org/q/12345-6', $constraint);
+        $this->validator->validate('urn:uuid:3fa85f64-5717-4562-b3fc-2c963f66afa6', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * An IG profile or an abstract type as the target says nothing a type name can be compared to.
+     */
+    public function testCanonicalTypeIsNotCheckedAgainstNonCoreOrAbstractTargets(): void
+    {
+        $canonical = 'http://hl7.org/fhir/ValueSet/example-extensional';
+
+        $this->validator->validate($canonical, new FHIRTargetProfile([self::PROFILE_A]));
+        $this->validator->validate($canonical, new FHIRTargetProfile(['http://hl7.org/fhir/StructureDefinition/Resource']));
+        $this->validator->validate($canonical, new FHIRTargetProfile([self::CORE_QUESTIONNAIRE, 'http://hl7.org/fhir/StructureDefinition/vitalsigns']));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * `PlanDefinition.action.definition[x]` carries the canonical's target list on its `uri` variant
+     * too, and a uri may point anywhere. `CanonicalPrimitive` extends `UriPrimitive`, so this pins
+     * that the primitive type, not the class hierarchy, decides.
+     */
+    public function testUriVariantIsNotReadAsNamingAType(): void
+    {
+        $constraint = new FHIRTargetProfile([self::CORE_QUESTIONNAIRE]);
+
+        $this->validator->validate(new UriPrimitive(value: 'http://example.org/fhir/Patient/example'), $constraint);
+        $this->validator->validate([new UriPrimitive(value: 'http://example.org/fhir/Patient/example')], $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    // -------------------------------------------------------------------------
+    // Conditional references (R5.bundle-conditional-reference-bad)
+    // -------------------------------------------------------------------------
+
+    public function testConditionalReferenceWithMalformedQueryEmitsErrorViolation(): void
+    {
+        $this->validator->validate(new Reference(reference: 'Device?identifier=1234&?=='), new FHIRTargetProfile([self::CORE_DEVICE]));
+
+        $this->buildViolation(FHIRTargetProfileValidator::CONDITIONAL_QUERY_MESSAGE)
+            ->setParameter('{{ reference }}', 'Device?identifier=1234&?==')
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testWellFormedConditionalReferencesAreAccepted(): void
+    {
+        $constraint = new FHIRTargetProfile([self::CORE_DEVICE]);
+
+        $this->validator->validate(new Reference(reference: 'Device?identifier=http://acme.org|1234'), $constraint);
+        $this->validator->validate(new Reference(reference: 'Device?identifier=1234&patient:Patient.name='), $constraint);
+        $this->validator->validate(new Reference(reference: 'Device?_has:Observation:device:code=1'), $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * The reference validator reads a type from a reference URL only under its opt-in
+     * `assumeValidRestReferences`, and accepts `Practitioner/2` on an Organization-only element
+     * by default (`R5.fhirpath-good`). So a plain `Type/id` of another type passes here too.
+     */
+    public function testReferenceTypeIsNotInferredFromAPlainUrl(): void
+    {
+        $this->validator->validate(new Reference(reference: 'Practitioner/2'), new FHIRTargetProfile(['http://hl7.org/fhir/StructureDefinition/Organization']));
+
+        $this->assertNoViolation();
     }
 }
