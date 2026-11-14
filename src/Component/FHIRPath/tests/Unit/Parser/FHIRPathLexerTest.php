@@ -193,20 +193,31 @@ class FHIRPathLexerTest extends TestCase
         self::assertEquals('3.14', $tokens[0]->value);
     }
 
-    public function testTokenizeScientificNotation(): void
+    /**
+     * The FHIRPath grammar has no exponent form (NUMBER: [0-9]+('.' [0-9]+)?), so '2.5e10' is the
+     * number 2.5 followed by the identifier e10, which the parser then rejects.
+     */
+    public function testScientificNotationIsNotPartOfNumber(): void
     {
         $tokens = $this->lexer->tokenize('2.5e10');
 
         self::assertEquals(TokenType::NUMBER, $tokens[0]->type);
-        self::assertEquals('2.5e10', $tokens[0]->value);
+        self::assertEquals('2.5', $tokens[0]->value);
+        self::assertEquals(TokenType::IDENTIFIER, $tokens[1]->type);
+        self::assertEquals('e10', $tokens[1]->value);
     }
 
-    public function testTokenizeScientificNotationWithNegativeExponent(): void
+    public function testScientificNotationWithNegativeExponentIsNotPartOfNumber(): void
     {
         $tokens = $this->lexer->tokenize('1.5e-3');
 
         self::assertEquals(TokenType::NUMBER, $tokens[0]->type);
-        self::assertEquals('1.5e-3', $tokens[0]->value);
+        self::assertEquals('1.5', $tokens[0]->value);
+        self::assertEquals(TokenType::IDENTIFIER, $tokens[1]->type);
+        self::assertEquals('e', $tokens[1]->value);
+        self::assertEquals(TokenType::MINUS, $tokens[2]->type);
+        self::assertEquals(TokenType::NUMBER, $tokens[3]->type);
+        self::assertEquals('3', $tokens[3]->value);
     }
 
     // Quantity Literal Tests
