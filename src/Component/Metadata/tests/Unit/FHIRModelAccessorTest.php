@@ -32,6 +32,9 @@ final class FHIRModelAccessorTest extends TestCase
 
     private const string COMPLEX_TYPE = 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity';
 
+    /** An Extension subclass that adds its own typed value property after the inherited ones. */
+    private const string SUBCLASS_ADDING_PROPERTY = 'Ardenexal\FHIRTools\Component\Models\R4\Extension\DataAbsentReasonExtension';
+
     /**
      * The sequence must match reflection exactly, on a class that really does inherit public
      * properties -- an own-properties-only class would pass this test without exercising anything.
@@ -217,5 +220,55 @@ final class FHIRModelAccessorTest extends TestCase
             ['shared' => 'class-wide', 'written' => 'instance'],
             (new FHIRModelAccessor())->initializedPublicValues($instance),
         );
+    }
+
+    /**
+     * A subclass that adds a property lists it last in the object but first by reflection, so the
+     * values have to be reordered rather than returned as `get_object_vars()` gives them. The
+     * generated extension classes all have this shape, adding their typed `value[x]`.
+     */
+    public function testInitializedPublicValuesReordersAClassThatAddsPropertiesToItsParent(): void
+    {
+        $accessor  = new FHIRModelAccessor();
+        $extension = $accessor->instantiateWithDefaults(self::SUBCLASS_ADDING_PROPERTY);
+
+        $accessor->writeValue($extension, 'url', 'http://hl7.org/fhir/StructureDefinition/data-absent-reason');
+
+        self::assertNotSame(
+            array_keys(get_object_vars($extension)),
+            $accessor->publicPropertyNames($extension),
+            'the fixture must list its properties in a different order from reflection',
+        );
+        self::assertSame(self::probeThenRead($accessor, $extension), $accessor->initializedPublicValues($extension));
+    }
+
+    /**
+     * A dynamic property is not a declared one, so it is left out, as the probe-then-read leaves it out.
+     */
+    public function testInitializedPublicValuesLeavesOutADynamicProperty(): void
+    {
+        $instance = new #[\AllowDynamicProperties] class () {
+            public string $declared = 'kept';
+        };
+        $instance->added = 'dropped';
+
+        self::assertSame(['declared' => 'kept'], (new FHIRModelAccessor())->initializedPublicValues($instance));
+    }
+
+    /**
+     * The values and their order, read one declared name at a time.
+     *
+     * @return array<string, mixed>
+     */
+    private static function probeThenRead(FHIRModelAccessor $accessor, object $instance): array
+    {
+        $expected = [];
+        foreach ($accessor->publicPropertyNames($instance) as $name) {
+            if ($accessor->isPropertyInitialized($instance, $name)) {
+                $expected[$name] = $accessor->readInitializedValue($instance, $name);
+            }
+        }
+
+        return $expected;
     }
 }

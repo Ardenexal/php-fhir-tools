@@ -19,6 +19,21 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 trait LogicalModelLocatorTrait
 {
     /**
+     * Per-class cache for {@see self::declaredLogicalModel()}; `false` records a class that declares none.
+     *
+     * @var array<string, LogicalModel|false>
+     */
+    private static array $declaredLogicalModels = [];
+
+    /**
+     * Per-class cache for {@see self::locateLogicalModel()}; `false` records a class with no logical
+     * model anywhere in its hierarchy.
+     *
+     * @var array<string, array{0: class-string, 1: LogicalModel}|false>
+     */
+    private static array $locatedLogicalModels = [];
+
+    /**
      * Return the #[LogicalModel] attribute declared by the subject's class or an ancestor, or null
      * when none is present (i.e. the subject is not a CDA logical model).
      *
@@ -169,13 +184,25 @@ trait LogicalModelLocatorTrait
      */
     private static function declaredLogicalModel(string $class): ?LogicalModel
     {
+        // Memoised per class: the normalizer chain asks this for every object it (de)serializes, and
+        // the attribute is immutable, so one reflection read per class is enough. `false` marks "no
+        // attribute" so a miss is cached too.
+        if (array_key_exists($class, self::$declaredLogicalModels)) {
+            return self::$declaredLogicalModels[$class] ?: null;
+        }
+
         try {
             $attributes = (new \ReflectionClass($class))->getAttributes(LogicalModel::class);
         } catch (\ReflectionException) {
+            // Not cached: the class may yet become loadable.
             return null;
         }
 
-        return $attributes === [] ? null : $attributes[0]->newInstance();
+        $model = $attributes === [] ? null : $attributes[0]->newInstance();
+
+        self::$declaredLogicalModels[$class] = $model ?? false;
+
+        return $model;
     }
 
     /**
@@ -193,18 +220,28 @@ trait LogicalModelLocatorTrait
     {
         $class = is_object($subject) ? $subject::class : $subject;
 
+        if (array_key_exists($class, self::$locatedLogicalModels)) {
+            return self::$locatedLogicalModels[$class] ?: null;
+        }
+
         if (!class_exists($class)) {
             return null;
         }
+
+        $located = null;
 
         for ($current = $class; $current !== false; $current = get_parent_class($current)) {
             $model = self::declaredLogicalModel($current);
 
             if ($model !== null) {
-                return [$current, $model];
+                $located = [$current, $model];
+
+                break;
             }
         }
 
-        return null;
+        self::$locatedLogicalModels[$class] = $located ?? false;
+
+        return $located;
     }
 }

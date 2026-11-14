@@ -35,13 +35,8 @@ final class MatchesFunction extends AbstractFunction
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'string');
         }
 
-        $evaluator = $context->getEvaluator();
-        if ($evaluator === null) {
-            throw new EvaluationException('Evaluator not available in context');
-        }
-
         // Empty pattern parameter collection → propagate empty per FHIRPath spec
-        $patternResult = $evaluator->evaluate($parameters[0], $context);
+        $patternResult = $this->evaluateParameter($parameters[0], $context);
         if ($patternResult->isEmpty()) {
             return Collection::empty();
         }

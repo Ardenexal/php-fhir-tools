@@ -35,12 +35,7 @@ final class SplitFunction extends AbstractFunction
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'string');
         }
 
-        $evaluator = $context->getEvaluator();
-        if ($evaluator === null) {
-            throw new EvaluationException('Evaluator not available in context');
-        }
-
-        $delimiter = $evaluator->evaluate($parameters[0], $context)->first();
+        $delimiter = $this->evaluateParameter($parameters[0], $context)->first();
         if (!is_string($delimiter)) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'delimiter', 'string');
         }

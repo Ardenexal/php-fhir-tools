@@ -24,6 +24,22 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     /** @var array<class-string, list<string>> */
     private static array $propertyNameCache = [];
 
+    /**
+     * Per-class template instance with defaults applied, which instantiateWithDefaults() clones;
+     * false marks a class that defines __clone() and so is built fresh each time.
+     *
+     * @var array<class-string, object|false>
+     */
+    private static array $defaultInstanceCache = [];
+
+    /**
+     * Per-class constructor arguments for instantiateWithConstructorDefaults(); null marks a class
+     * without a constructor. A list holding an object is never stored, so each call builds its own.
+     *
+     * @var array<class-string, list<mixed>|null>
+     */
+    private static array $constructorArgsCache = [];
+
     /** @var array<class-string, array<string, mixed>> */
     private static array $defaultsCache = [];
 
@@ -38,6 +54,14 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
      * @var array<class-string, array<string, \ReflectionProperty>>
      */
     private static array $propertyCache = [];
+
+    /**
+     * Per class, its public property names as keys when `get_object_vars()` already lists them in
+     * `publicPropertyNames()` order, or false when it does not and has to be reordered.
+     *
+     * @var array<class-string, array<string, true>|false>
+     */
+    private static array $objectVarsInOrderCache = [];
 
     /**
      * {@inheritDoc}
@@ -172,6 +196,30 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
             throw new \ReflectionException(sprintf('Cannot instantiate unknown class "%s".', is_string($subject) ? $subject : $subject::class));
         }
 
+        // Deserialization builds one instance per element, so the defaults walk runs once per class
+        // and every later instance is a shallow clone of that template. The clone is the object the
+        // walk would build: default values come from the shared defaults cache either way, and
+        // uninitialized typed properties stay uninitialized. A class defining __clone() could make a
+        // clone differ, so it is never cached and takes the walk every time.
+        if (!array_key_exists($class, self::$defaultInstanceCache)) {
+            self::$defaultInstanceCache[$class] = self::reflect($class)->hasMethod('__clone') ? false : $this->buildWithDefaults($class);
+        }
+
+        $template = self::$defaultInstanceCache[$class];
+
+        return $template === false ? $this->buildWithDefaults($class) : clone $template;
+    }
+
+    /**
+     * A fresh instance with constructor defaults and empty arrays applied, as instantiateWithDefaults()
+     * describes.
+     *
+     * @param class-string $class Class to build
+     *
+     * @throws \ReflectionException When the class cannot be reflected
+     */
+    private function buildWithDefaults(string $class): object
+    {
         $reflection = self::reflect($class);
         $object     = $reflection->newInstanceWithoutConstructor();
         $defaults   = $this->constructorDefaults($class);
@@ -210,17 +258,23 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
             throw new \ReflectionException(sprintf('Cannot instantiate unknown class "%s".', is_string($subject) ? $subject : $subject::class));
         }
 
-        $reflection  = self::reflect($class);
-        $constructor = $reflection->getConstructor();
+        $reflection = self::reflect($class);
 
-        if ($constructor === null) {
-            return $reflection->newInstanceWithoutConstructor();
+        // The argument list is the same for every instance, so it is read from reflection once per
+        // class. A default built with `new` evaluates to a fresh object on every read, so a list
+        // holding an object is not cached: sharing it would hand every instance the same object.
+        if (array_key_exists($class, self::$constructorArgsCache)) {
+            $args = self::$constructorArgsCache[$class];
+        } else {
+            $args = self::constructorArguments($reflection);
+
+            if (!self::holdsObject($args ?? [])) {
+                self::$constructorArgsCache[$class] = $args;
+            }
         }
 
-        $args = [];
-
-        foreach ($constructor->getParameters() as $parameter) {
-            $args[] = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
+        if ($args === null) {
+            return $reflection->newInstanceWithoutConstructor();
         }
 
         return $reflection->newInstanceArgs($args);
@@ -272,7 +326,16 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
         // Called from this class's scope, get_object_vars() sees public properties only, and it leaves
         // out typed properties that were never written: exactly the ones isPropertyInitialized()
         // rejects. It also leaves out statics, which are read through their handle instead.
-        $vars   = get_object_vars($object);
+        $vars     = get_object_vars($object);
+        $inOrder  = self::$objectVarsInOrderCache[$object::class] ??= self::objectVarsInOrder($object::class);
+
+        // Most generated classes list their properties in the same order both ways. Then the array
+        // is already the answer, unless it ends in a dynamic property, which always sorts after the
+        // declared ones. The tree walks call this for every node, so skipping the loop below matters.
+        if ($inOrder !== false && ($vars === [] || isset($inOrder[array_key_last($vars)]))) {
+            return $vars;
+        }
+
         $values = [];
 
         foreach ($this->publicPropertyNames($object) as $name) {
@@ -336,6 +399,103 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
     }
 
     /**
+     * The argument list instantiateWithConstructorDefaults() passes: each parameter's default, or null.
+     *
+     * @param \ReflectionClass<object> $reflection Class whose constructor is read
+     *
+     * @return list<mixed>|null The arguments, or null when the class has no constructor
+     */
+    private static function constructorArguments(\ReflectionClass $reflection): ?array
+    {
+        $constructor = $reflection->getConstructor();
+
+        if ($constructor === null) {
+            return null;
+        }
+
+        $args = [];
+
+        foreach ($constructor->getParameters() as $parameter) {
+            $args[] = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
+        }
+
+        return $args;
+    }
+
+    /**
+     * Whether a value list holds an object at any depth, such as a `new` default inside an array.
+     *
+     * @param array<mixed> $values Values to inspect
+     */
+    private static function holdsObject(array $values): bool
+    {
+        foreach ($values as $value) {
+            if (is_object($value) || (is_array($value) && self::holdsObject($value))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether `get_object_vars()` lists a class's public properties in `publicPropertyNames()` order.
+     *
+     * `get_object_vars()` follows the object's property slots: the parent's properties first, in its
+     * own slot order, then the properties the class itself adds, in declaration order; a property
+     * the class redeclares keeps its parent's slot. Reflection lists the class's own declarations
+     * first instead, so the two differ wherever a subclass adds a property, as the generated
+     * extension classes do with their typed `value[x]`. Statics and non-public properties make the
+     * slot layout harder to reason about, so a class with either is always reordered.
+     *
+     * @param class-string $class
+     *
+     * @return array<string, true>|false The names as keys when the orders agree, false otherwise
+     */
+    private function objectVarsInOrder(string $class): array|false
+    {
+        $slots = self::slotOrder(self::reflect($class));
+
+        if ($slots === false || $slots !== $this->publicPropertyNames($class)) {
+            return false;
+        }
+
+        return array_fill_keys($slots, true);
+    }
+
+    /**
+     * Property names in object slot order, or false when a static or non-public property is declared.
+     *
+     * @param \ReflectionClass<object> $class
+     *
+     * @return list<string>|false
+     */
+    private static function slotOrder(\ReflectionClass $class): array|false
+    {
+        $parent = $class->getParentClass();
+        $order  = $parent === false ? [] : self::slotOrder($parent);
+
+        if ($order === false) {
+            return false;
+        }
+
+        $seen = array_fill_keys($order, true);
+
+        foreach ($class->getProperties() as $property) {
+            if ($property->isStatic() || !$property->isPublic()) {
+                return false;
+            }
+
+            if ($property->getDeclaringClass()->getName() === $class->getName() && !isset($seen[$property->getName()])) {
+                $order[]                       = $property->getName();
+                $seen[$property->getName()]    = true;
+            }
+        }
+
+        return $order;
+    }
+
+    /**
      * The declared type of a property, as a reflection type or null.
      *
      * Private so the reflection type object never leaves this class.
@@ -376,6 +536,14 @@ final class FHIRModelAccessor implements FHIRModelAccessorInterface
 
         if (is_object($subject)) {
             return $subject::class;
+        }
+
+        // A class already reflected is known to exist; skipping class_exists() matters because
+        // deserialization resolves a class name here for every property it writes.
+        $reflected = self::$classCache[$subject] ?? null;
+
+        if ($reflected !== null) {
+            return $reflected->getName();
         }
 
         return class_exists($subject) ? $subject : null;

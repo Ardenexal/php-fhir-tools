@@ -34,12 +34,7 @@ class RoundFunction extends AbstractFunction
 
         $precision = 0;
         if (!empty($parameters)) {
-            $evaluator = $context->getEvaluator();
-            if ($evaluator === null) {
-                throw new EvaluationException('Evaluator not available in context');
-            }
-
-            $precisionResult = $evaluator->evaluate($parameters[0], $context);
+            $precisionResult = $this->evaluateParameter($parameters[0], $context);
             if (!$precisionResult->isEmpty()) {
                 $precisionValue   = $precisionResult->first();
                 $precisionNumeric = $this->extractNumeric($precisionValue);

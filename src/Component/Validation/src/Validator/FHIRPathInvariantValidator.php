@@ -206,11 +206,17 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
             return;
         }
 
+        // ele-1, ext-1 and ref-1 run on nearly every node and nearly always pass; when the answer
+        // certainly is a pass, skip the engine. See FHIRPathInvariantFastPaths.
+        if (FHIRPathInvariantFastPaths::passes($constraint->expression, $value) === true) {
+            return;
+        }
+
         try {
             $result = $this->pathService->evaluate(
                 $constraint->expression,
                 $value,
-                FHIRPathResourceContext::at($this->context->getRoot(), (string) $this->context->getPropertyPath()),
+                FHIRPathResourceContext::at($this->context->getRoot(), (string) $this->context->getPropertyPath(), $this->context),
             );
         } catch (FHIRPathException) {
             // The engine could not evaluate the expression (e.g. an unsupported function).

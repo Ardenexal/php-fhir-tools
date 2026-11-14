@@ -300,4 +300,65 @@ class FHIRSerializationContextTest extends TestCase
         $context = FHIRSerializationContext::fromSymfonyContext($legacyContext);
         self::assertTrue($context->shouldErrorOnUnknownElements());
     }
+
+    /**
+     * fromSymfonyContext() hands back the previous instance when the settings repeat; alternating
+     * settings must still each produce their own values, never the previous call's.
+     */
+    public function testFromSymfonyContextNeverReturnsAContextBuiltFromOtherSettings(): void
+    {
+        $xml  = ['fhir_format' => FHIRSerializationContext::FORMAT_XML, 'fhir_include_extensions' => false];
+        $json = ['fhir_format' => FHIRSerializationContext::FORMAT_JSON];
+
+        $first  = FHIRSerializationContext::fromSymfonyContext($xml);
+        $second = FHIRSerializationContext::fromSymfonyContext($json);
+        $third  = FHIRSerializationContext::fromSymfonyContext($xml);
+
+        self::assertTrue($first->isXmlFormat());
+        self::assertFalse($first->includeExtensions);
+        self::assertFalse($second->isXmlFormat());
+        self::assertTrue($second->includeExtensions);
+        self::assertTrue($third->isXmlFormat());
+        self::assertFalse($third->includeExtensions);
+        self::assertSame($third, FHIRSerializationContext::fromSymfonyContext($xml), 'identical settings reuse the immutable instance');
+
+        $withOptions = FHIRSerializationContext::fromSymfonyContext(['fhir_custom_options' => ['a' => 2]]);
+        self::assertSame(2, $withOptions->getCustomOption('a'));
+        self::assertNull(FHIRSerializationContext::fromSymfonyContext([])->getCustomOption('a'), 'custom options never carry into a later context');
+    }
+
+    /**
+     * Two separately built self-referencing option arrays in a row must not reach a deep comparison,
+     * which PHP aborts with "Nesting level too deep".
+     */
+    public function testFromSymfonyContextAcceptsConsecutiveSelfReferencingCustomOptions(): void
+    {
+        // Equal contents, so a deep comparison would have to follow the cycle (a fatal error, which
+        // would abort the whole run rather than fail this test).
+        $first          = ['name' => 'options'];
+        $first['self']  = &$first;
+        $second         = ['name' => 'options'];
+        $second['self'] = &$second;
+
+        $a = FHIRSerializationContext::fromSymfonyContext(['fhir_custom_options' => $first]);
+        $b = FHIRSerializationContext::fromSymfonyContext(['fhir_custom_options' => $second]);
+
+        self::assertSame('options', $a->getCustomOption('name'));
+        self::assertSame('options', $b->getCustomOption('name'));
+    }
+
+    /**
+     * Invalid settings must keep throwing on every call, not only the first.
+     */
+    public function testFromSymfonyContextRejectsInvalidSettingsEveryTime(): void
+    {
+        for ($attempt = 0; $attempt < 2; ++$attempt) {
+            try {
+                FHIRSerializationContext::fromSymfonyContext(['fhir_format' => 'yaml']);
+                self::fail('an invalid format must be rejected');
+            } catch (\InvalidArgumentException $e) {
+                self::assertStringContainsString('Invalid format "yaml"', $e->getMessage());
+            }
+        }
+    }
 }

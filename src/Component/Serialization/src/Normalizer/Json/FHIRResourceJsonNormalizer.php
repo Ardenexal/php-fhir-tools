@@ -184,6 +184,9 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
 
         $metaMap = $this->getPropertyMetadataMap($object);
 
+        // One read of the instance instead of a reflection lookup per declared property.
+        $values = self::modelAccessor()->initializedPublicValues($object);
+
         foreach (self::modelAccessor()->publicPropertyNames($object) as $propertyName) {
             if ($propertyName === 'resourceType') {
                 continue;
@@ -191,7 +194,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
 
             // Unwritten and explicitly null both read as null, and shouldOmitValue below treats them
             // the same: every emit branch guards against null regardless of the omitNullValues option.
-            $value = self::modelAccessor()->readInitializedValue($object, $propertyName);
+            $value = $values[$propertyName] ?? null;
 
             if ($this->shouldOmitValue($value, $fhirContext)) {
                 continue;
