@@ -61,6 +61,7 @@ after merging.
 | Non-repeating items: at most one occurrence per parent and one answer | `error` |
 | Answer must satisfy item constraint extensions: `minValue`/`maxValue`, `minLength`/`maxLength`, `maxDecimalPlaces`, `regex`, `minOccurs`/`maxOccurs` | `error` |
 | `answerOption` membership, including the exclusive-option (`optionExclusive`) rule; an R5 `answerConstraint` of `optionsOrType` or `optionsOrString` also admits any value of the item type or any string | `error` |
+| Answer must be one of the values returned by the item's SDC `answerExpression` (FHIRPath only; see below) | `error` |
 | Non-answerable item types (`display`, abstract `question`) must not carry an answer | `error` |
 | `Reference` answers must match the constrained target resource type and be a well-formed URL | `error` |
 | `Attachment` answers must satisfy content-type / size / data-size constraints | `error` |
@@ -70,9 +71,13 @@ after merging.
 | `enableWhen.question` must reference a known `linkId` | `warning` |
 
 {% hint style="warning" %}
-SDC `answerExpression` and calculated expressions (`calculatedExpression`) are not yet
-covered. (`enableWhenExpression` — both the canonical SDC and Kanta PHR variants — `regex`
-constraints and R5 `answerConstraint` are now validated.) `enableWhen` answers are
+Calculated expressions (`calculatedExpression`) are not yet covered. SDC `answerExpression`
+is checked only when its language is `text/fhirpath`. It is evaluated with the response as
+`%resource`, the response item as its focus and `%context`, and the Questionnaire as
+`%questionnaire`; an expression that needs anything else (`%patient`, launch context, item
+`variable` extensions), fails, or returns no value comparable with an answer checks nothing. (`enableWhenExpression` —
+both the canonical SDC and Kanta PHR variants — `regex` constraints and R5 `answerConstraint`
+are also validated.) `enableWhen` answers are
 looked up response-globally — a documented approximation of the spec's nearest-occurrence
 resolution that is exact whenever the referenced question occurs once.
 {% endhint %}
