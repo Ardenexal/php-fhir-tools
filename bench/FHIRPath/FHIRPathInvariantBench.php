@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Benchmarks\FHIRPath;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
@@ -14,7 +15,9 @@ use PhpBench\Attributes as Bench;
 
 /**
  * Benchmarks FHIRPath on the workload validation gives it: every core invariant of every element
- * of real R4 examples, each evaluated against its own node with the resource as `%resource`.
+ * of real R4 examples, each evaluated against its own node. `%resource` is the nearest enclosing
+ * resource, so a Bundle entry's resource or a contained resource binds itself rather than the
+ * document, and a contained resource also gets its container, as validation binds them.
  *
  * The examples come from the official FHIR test cases (a Patient, a Questionnaire, an Observation
  * and a 130 KB DiagnosticReport Bundle), so the expressions and data are the ones users meet. A
@@ -49,7 +52,7 @@ class FHIRPathInvariantBench
     /** @var array<string, object> */
     private array $resources = [];
 
-    /** @var list<array{string, object, object}> expression, node it applies to, enclosing resource */
+    /** @var list<array{string, object, object, object|null}> expression, node, enclosing resource, container */
     private array $invariants = [];
 
     public function setUp(): void
@@ -61,9 +64,9 @@ class FHIRPathInvariantBench
             $resource               = $serializer->deserialize((string) file_get_contents($directory . $file));
             $this->resources[$file] = $resource;
 
-            foreach (self::objectsIn($resource) as $node) {
+            foreach (self::objectsIn($resource, $resource, null, null) as [$node, $enclosing, $container]) {
                 foreach (self::invariantsOf($node::class) as $expression) {
-                    $this->invariants[] = [$expression, $node, $resource];
+                    $this->invariants[] = [$expression, $node, $enclosing, $container];
                 }
             }
         }
@@ -84,9 +87,9 @@ class FHIRPathInvariantBench
     #[Bench\BeforeMethods(['setUp'])]
     public function benchCoreInvariants(): void
     {
-        foreach ($this->invariants as [$expression, $node, $resource]) {
+        foreach ($this->invariants as [$expression, $node, $resource, $container]) {
             try {
-                $this->service->evaluate($expression, $node, new EvaluationContext($resource));
+                $this->service->evaluate($expression, $node, new EvaluationContext(rootResource: $resource, containerResource: $container));
             } catch (FHIRPathException) {
                 // Validation reports these as eval-errors; the cost up to the throw still counts.
             }
@@ -138,16 +141,17 @@ class FHIRPathInvariantBench
     }
 
     /**
-     * Every model object reachable from a value, the value itself included.
+     * Every model object reachable from a value, the value itself included, each with its nearest
+     * enclosing resource and, for a contained resource and what it holds, the resource containing it.
      *
-     * @return list<object>
+     * @return list<array{object, object, object|null}>
      */
-    private static function objectsIn(mixed $value): array
+    private static function objectsIn(mixed $value, object $enclosing, ?object $container, ?string $property): array
     {
         if (is_array($value)) {
             $objects = [];
             foreach ($value as $item) {
-                array_push($objects, ...self::objectsIn($item));
+                array_push($objects, ...self::objectsIn($item, $enclosing, $container, $property));
             }
 
             return $objects;
@@ -157,9 +161,14 @@ class FHIRPathInvariantBench
             return [];
         }
 
-        $objects = [$value];
-        foreach (get_object_vars($value) as $property) {
-            array_push($objects, ...self::objectsIn($property));
+        if ($value !== $enclosing && (new \ReflectionClass($value))->getAttributes(FhirResource::class) !== []) {
+            $container = $property === 'contained' ? $enclosing : null;
+            $enclosing = $value;
+        }
+
+        $objects = [[$value, $enclosing, $container]];
+        foreach (get_object_vars($value) as $name => $child) {
+            array_push($objects, ...self::objectsIn($child, $enclosing, $container, $name));
         }
 
         return $objects;
