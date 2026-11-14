@@ -2380,8 +2380,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      *
      * Anything that cannot be evaluated with confidence skips the check rather than reporting:
      * a non-FHIRPath language, an evaluation error, a variable that fails or yields several values,
-     * an empty result (inputs not answered yet), or values that do not compare as the same kind
-     * (for example a calculated string against a Coding answer).
+     * a calculation that reads the clock, an empty result (inputs not answered yet), or values that
+     * do not compare as the same kind (for example a calculated string against a Coding answer).
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
      * @param R4Item|R4BItem|R5Item                         $questionnaireItem
@@ -2403,7 +2403,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             }
         }
 
-        if ($expression === null) {
+        if ($expression === null || $this->readsClock($expression)) {
             return;
         }
 
@@ -2419,7 +2419,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             return;
         }
 
-        $expected = $this->calculatedIdentities($result);
+        $expected = $this->comparableIdentities($result);
         if ($expected === null || $expected === []) {
             return;
         }
@@ -2431,7 +2431,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             }
         }
 
-        $actual = $this->calculatedIdentities($answerValues);
+        $actual = $this->comparableIdentities($answerValues);
         if ($actual === null) {
             return;
         }
@@ -2469,8 +2469,9 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      * response instance), then the item itself (focus: its response item). Each variable can use
      * the ones bound before it.
      *
-     * Returns null when any in-scope variable cannot be bound — not FHIRPath, an evaluation error,
-     * more than one value, or an ancestor with no matching response instance — so the caller skips
+     * Returns null when any in-scope variable cannot be bound — not FHIRPath, reads the clock, an
+     * evaluation error, more than one value, or an ancestor with no matching response instance — so
+     * the caller skips
      * the check instead of evaluating against an incomplete environment.
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
@@ -2530,7 +2531,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 $name            = ($valueExpression !== null && isset($valueExpression->name)) ? $this->extensionString($valueExpression->name) : null;
                 $expression      = $this->fhirPathExpression($valueExpression);
 
-                if ($name === null || $name === '' || $expression === null) {
+                if ($name === null || $name === '' || $expression === null || $this->readsClock($expression)) {
                     return null;
                 }
 
@@ -2554,8 +2555,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     /**
      * Extracts the FHIRPath text from an Expression value. Returns null when the value is not an
-     * Expression, carries no expression text, or names a language other than FHIRPath (an absent
-     * language is read as FHIRPath, as the enableWhenExpression handling does).
+     * Expression, carries no expression text, or names a language other than FHIRPath. An absent
+     * language, which Expression requires, is read leniently as FHIRPath.
      */
     private function fhirPathExpression(mixed $valueExpression): ?string
     {
@@ -2574,6 +2575,15 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
+     * Whether an expression calls now(), today() or timeOfDay(). Its result depends on when it runs,
+     * so a value calculated when the form was filled in cannot be recalculated at validation time.
+     */
+    private function readsClock(string $expression): bool
+    {
+        return preg_match('/\b(?:now|today|timeOfDay)\s*\(/', $expression) === 1;
+    }
+
+    /**
      * Normalizes calculated or answered values for comparison; null when any value has no
      * comparable identity.
      *
@@ -2581,7 +2591,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      *
      * @return list<bool|float|string>|null
      */
-    private function calculatedIdentities(iterable $values): ?array
+    private function comparableIdentities(iterable $values): ?array
     {
         $identities = [];
 

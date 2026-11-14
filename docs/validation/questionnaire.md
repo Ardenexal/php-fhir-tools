@@ -89,7 +89,8 @@ group instance that contains the answer.
 
 Only read-only items are checked: SDC lets a user override the calculated value of an editable
 item. The check is skipped, not reported, when the expression or a variable is not
-`text/fhirpath`, fails to evaluate, or a variable returns more than one value; when the
+`text/fhirpath`, calls `now()`, `today()` or `timeOfDay()` (the result depends on when it
+runs), fails to evaluate, or a variable returns more than one value; when the
 expression returns nothing; and when the calculated and answered values are different kinds,
 such as a string against a `Coding`. Numbers are compared exactly, so a decimal calculation
 should round to the precision the form stores (`(%weight / %height.power(2)).round(1)`).

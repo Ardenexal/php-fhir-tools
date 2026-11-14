@@ -149,7 +149,8 @@ canonical-URL resolution; `display` validation for Coding answers.
 through the existing `FHIRPathService` with `%resource` = the QuestionnaireResponse, focus = the
 response item, and in-scope `variable` extensions (Questionnaire root, ancestors, item) bound as
 `%name` constants. A mismatch is an `error`. Editable items are not checked because SDC allows the
-user to override a calculated value. Evaluation failures, non-FHIRPath languages, multi-valued
+user to override a calculated value. Evaluation failures, non-FHIRPath languages, clock reads
+(`now()`, `today()`, `timeOfDay()`), multi-valued
 variables, empty results and kind mismatches skip the check (DEFER-not-DENY), as
 `enableWhenExpression` does.
 

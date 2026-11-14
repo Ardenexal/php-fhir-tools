@@ -203,6 +203,34 @@ final class FHIRQuestionnaireValidatorCalculatedExpressionTest extends TestCase
         self::assertCount(0, $report->errors());
     }
 
+    public function testCalculationThatReadsTheClockIsNotChecked(): void
+    {
+        // today() at validation time is not the day the form was filled in.
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'completed',
+            type: new QuestionnaireItemTypeType('string'),
+            readOnly: true,
+            extension: [self::calculated('today().toString()')],
+        )]);
+
+        $report = $this->validator->validate($questionnaire, self::response(new QuestionnaireResponseItem(
+            linkId: 'completed',
+            answer: [new QuestionnaireResponseItemAnswer(value: new StringPrimitive(value: '2001-01-01'))],
+        )));
+
+        self::assertCount(0, $report->errors());
+    }
+
+    public function testVariableThatReadsTheClockDefersTheCheck(): void
+    {
+        $report = $this->validator->validate(
+            self::sumQuestionnaire(self::calculated('5'), [self::variable('stamp', 'now()')]),
+            self::response(self::integerAnswer('a', 2), self::integerAnswer('b', 3), self::integerAnswer('total', 6)),
+        );
+
+        self::assertCount(0, $report->errors());
+    }
+
     public function testRootVariablesAreBound(): void
     {
         $questionnaire = self::sumQuestionnaire(
