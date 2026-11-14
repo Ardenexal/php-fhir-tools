@@ -94,8 +94,8 @@ final class FHIRFixedValueValidator extends ConstraintValidator
         foreach ($fixed as $name => $fixedChild) {
             $name = (string) $name;
 
-            // `_code` and the like carry a primitive's id and extensions in JSON; the model folds
-            // them into the primitive itself, so there is no separate element to compare
+            // `_code` and the like carry a primitive's id and extensions in JSON. The model folds
+            // them into the primitive itself, so they are compared with it, below
             if (str_starts_with($name, '_')) {
                 continue;
             }
@@ -113,11 +113,12 @@ final class FHIRFixedValueValidator extends ConstraintValidator
                 $this->compareComplex($actualChild, $fixedChild, $childPath);
             } else {
                 $this->compareScalar($actualChild, $fixedChild, $childPath);
+                $this->comparePrimitiveMetadata($actualChild, $fixed['_' . $name] ?? [], $childPath);
             }
         }
 
         foreach (array_keys($children) as $property) {
-            if (!isset($matched[$property])) {
+            if (!isset($matched[$property]) && !self::aliasesAMatchedChild($children[$property], $children, $matched)) {
                 $this->report(self::EXTRA_ELEMENT_MESSAGE, ['{{ element }}' => $property], self::childPath($path, $property), $children[$property]);
             }
         }
@@ -158,6 +159,48 @@ final class FHIRFixedValueValidator extends ConstraintValidator
         }
     }
 
+    /**
+     * Compare a primitive's id and extensions with the fixed value's `_name` entry for it.
+     *
+     * Both must be absent or equal, so an extension the fixed value gives the primitive is required
+     * and one it does not give is reported, as for any other element. A primitive held as a plain
+     * scalar has neither.
+     */
+    private function comparePrimitiveMetadata(mixed $actual, mixed $fixedMetadata, string $path): void
+    {
+        $metadata = is_object($actual) ? self::children($actual) : [];
+        unset($metadata['value']);
+        $fixedMetadata = is_array($fixedMetadata) ? $fixedMetadata : [];
+
+        if ($metadata !== [] || $fixedMetadata !== []) {
+            $this->compareComplex($metadata, $fixedMetadata, $path);
+        }
+    }
+
+    /**
+     * Whether an unmatched child is the same object as a matched one under another name.
+     *
+     * A generated typed extension holds its value in both its variant property (`valueString`) and
+     * the inherited choice property (`value`). That is one FHIR element, not an extra one.
+     *
+     * @param array<string, mixed> $children
+     * @param array<string, true>  $matched
+     */
+    private static function aliasesAMatchedChild(mixed $child, array $children, array $matched): bool
+    {
+        if (!is_object($child)) {
+            return false;
+        }
+
+        foreach (array_keys($matched) as $property) {
+            if (($children[$property] ?? null) === $child) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function compareScalar(mixed $actual, mixed $fixed, string $path): void
     {
         if (!self::scalarEquals($actual, $fixed)) {
@@ -172,11 +215,16 @@ final class FHIRFixedValueValidator extends ConstraintValidator
      * follow from how each side is read. A wrapper or enum is compared by its string form. A fixed
      * number compares numerically against a numeric string: the model keeps a decimal as a string to
      * preserve its lexical form, while JSON decoding turns the fixed `4.50` into the float 4.5 and a
-     * fixed `5` into the integer 5. So `4.50` equals a fixed `4.5`, and `5` equals a fixed `5`.
+     * fixed `5` into the integer 5. So `4.50` equals a fixed `4.5`, and `5.0` equals a fixed `5`.
+     * A whole number is compared digit by digit, so integers beyond a float's precision stay distinct.
      */
     private static function scalarEquals(mixed $actual, mixed $fixed): bool
     {
         $actual = self::scalarOf($actual);
+
+        if (is_int($fixed) && is_string($actual) && preg_match('/^([+-]?)0*(\d+?)(?:\.0*)?$/', $actual, $whole) === 1) {
+            return ($whole[2] === '0' ? '0' : ($whole[1] === '-' ? '-' : '') . $whole[2]) === (string) $fixed;
+        }
 
         if ((is_int($fixed) || is_float($fixed)) && is_string($actual) && is_numeric($actual)) {
             return (float) $actual === (float) $fixed;
@@ -226,7 +274,9 @@ final class FHIRFixedValueValidator extends ConstraintValidator
      * The instance property holding the fixed value's element $name, or null when the instance lacks it.
      *
      * A choice element is named by its variant in JSON (`valueQuantity`) and held in one property in the
-     * model (`value`), so a name with no property of its own is looked up by that property's prefix.
+     * model (`value`), so a name with no property of its own is looked up by that property's prefix. The
+     * value found there must be of the variant's type: a `valueCode` is not matched by a held
+     * `StringPrimitive`. A plain PHP scalar carries no type, so it is accepted.
      *
      * @param array<string, mixed> $children
      */
@@ -238,12 +288,34 @@ final class FHIRFixedValueValidator extends ConstraintValidator
 
         foreach (array_keys($children) as $property) {
             $suffix = substr($name, strlen($property));
-            if (str_starts_with($name, $property) && $suffix !== '' && ctype_upper($suffix[0])) {
+            if (str_starts_with($name, $property) && $suffix !== '' && ctype_upper($suffix[0])
+                                                  && self::holdsVariant($children[$property], $suffix)
+            ) {
                 return $property;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Whether a choice property's value is of the variant type $type (`Quantity`, `String`), judged by
+     * the model class or an ancestor: `Quantity`, or `StringPrimitive` for a primitive.
+     */
+    private static function holdsVariant(mixed $value, string $type): bool
+    {
+        if (!is_object($value)) {
+            return true;
+        }
+
+        for ($class = $value::class; $class !== false; $class = get_parent_class($class)) {
+            $short = substr((string) strrchr('\\' . $class, '\\'), 1);
+            if ($short === $type || $short === $type . 'Primitive') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static function childPath(string $path, string $name): string
