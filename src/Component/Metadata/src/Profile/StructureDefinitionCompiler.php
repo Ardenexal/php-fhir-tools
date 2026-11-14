@@ -904,8 +904,8 @@ final class StructureDefinitionCompiler
 
     /**
      * The constraints one differential element places on its own path: cardinality (Count) when
-     * min > 0 or max is bounded, a scalar fixed[x] (complex fixed[x] needs profile resolution), and
-     * an array pattern[x] (scalar patterns use value matching).
+     * min > 0 or max is bounded, a fixed[x], scalar or complex, and an array pattern[x] (scalar
+     * patterns use value matching).
      *
      * @param array<string, mixed> $element
      *
@@ -930,7 +930,7 @@ final class StructureDefinitionCompiler
         }
 
         $fixedField = ElementDefinitionReader::extractPolymorphicField($element, 'fixed');
-        if ($fixedField !== null && is_scalar($fixedField['value'])) {
+        if ($fixedField !== null && (is_scalar($fixedField['value']) || is_array($fixedField['value']))) {
             $rules[] = ['constraint' => FHIRFixedValue::class, 'options' => ['value' => $fixedField['value']]];
         }
 

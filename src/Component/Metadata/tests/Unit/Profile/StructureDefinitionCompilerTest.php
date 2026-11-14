@@ -81,6 +81,30 @@ final class StructureDefinitionCompilerTest extends TestCase
         self::assertSame(FHIRFixedValue::class, $compiled->attributes[1]->arguments['constraint']);
     }
 
+    /**
+     * A complex fixed[x] compiles to a fixed-value rule carrying the whole structure, so the
+     * validator can hold the instance to it exactly. The cholesterol profile fixes `code` this way.
+     */
+    public function testComplexFixedValueCompilesToAFixedValueRule(): void
+    {
+        $coding = ['coding' => [['system' => 'http://loinc.org', 'code' => '35200-5']]];
+        $sd     = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Observation', 'path' => 'Observation'],
+                ['id' => 'Observation.code', 'path' => 'Observation.code', 'fixedCodeableConcept' => $coding],
+            ]],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+
+        self::assertCount(1, $compiled->attributes);
+        self::assertSame(
+            ['path' => 'code', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => $coding], 'groups' => [self::URL]],
+            $compiled->attributes[0]->arguments,
+        );
+    }
+
     public function testSliceOnUndefinedSlicingIsReportedNotDropped(): void
     {
         $sd = [

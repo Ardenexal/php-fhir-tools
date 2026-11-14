@@ -36,7 +36,7 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
  *
  * Deliberately excluded, because they are ours to fix and must not hide here:
  * `qr-bad-ref2` (canonical resolves to the wrong resource type), `vs-params-4` (a ValueSet expression
- * language rule), `obs-de-notx` (a fixed-value mismatch),
+ * language rule),
  * `mimic` (its package *is* vendored — the instance has a system-URI typo), and `obs-temp-bad`
  * (the reference validator's hard-coded vitals code table, a different kind of limitation entirely).
  *
@@ -145,6 +145,23 @@ final class DeclaredLimitations
     public const REASON_UNVENDORED_IG = 'the implementation guide defining this system is not vendored, and the corpus does not ship it';
 
     /**
+     * German KBV profiles and value sets, which `obs-de` and `obs-de-notx` load from IG packages by name.
+     *
+     * The manifest gives those cases `packages` (`kbv.basis#1.2.0`, `kbv.mio.diga#1.0.0-festlegung` and
+     * two more) that the reference validator downloads from the package registry. The corpus does not
+     * ship them, and the harness validates offline against the core package only, so the profile the
+     * instance claims is never found. Both cases' fixed-value finding on `code.coding:loinc.version`
+     * (#161) and the `KBV_VS_Base_Body_Weight_Snomed` binding finding stand on that.
+     *
+     * Loading the packages would not be enough on its own, checked 2026-11-14 against
+     * `kbv.mio.diga#1.0.0-festlegung`: its body weight profile ships without a snapshot, which runtime
+     * validation requires, inherits the fixed `version` from `kbv.basis`, and slices `code.coding` by
+     * pattern on `$this`, which the compiler cannot yet turn into a discriminator value. The fixed value
+     * on a slice child itself is enforced: `FixedValueValidationTest::testFixedValueInsideASliceIsChecked`.
+     */
+    public const REASON_UNVENDORED_PACKAGE = 'the IG packages this case loads by name are not vendored, and their profile ships without a snapshot';
+
+    /**
      * Code system => why no work on this codebase can decide a finding that names it.
      *
      * Keyed on the **obstacle** rather than the case, because the measurement is finding-level now: one
@@ -203,6 +220,9 @@ final class DeclaredLimitations
         // licence-bound systems are matched first in reasonFor(), so a LOINC display keeps REASON_LOINC
         // and only a display on a system with no licence excuse falls through to here.
         'wrong display name' => self::REASON_HL7_DISPLAY,
+        // The host of every KBV canonical. No vendored package defines anything under it, so no
+        // finding naming it can be one we could decide.
+        'https://fhir.kbv.de/' => self::REASON_UNVENDORED_PACKAGE,
     ];
 
     /**
@@ -224,13 +244,14 @@ final class DeclaredLimitations
         'R4' => [
             // Order matters: the pin compares with assertSame against a histogram sorted by count
             // descending, then by reason text, so list these largest first and break ties the same way.
-            self::REASON_UNKNOWN_EXTENSION => 30,
-            self::REASON_LOINC             => 27,
-            self::REASON_SNOMED            => 19,
-            self::REASON_ICD10             => 4,
-            self::REASON_CVX               => 3,
-            self::REASON_HL7_DISPLAY       => 2,
-            self::REASON_NCI               => 1,
+            self::REASON_UNKNOWN_EXTENSION  => 30,
+            self::REASON_LOINC              => 27,
+            self::REASON_SNOMED             => 19,
+            self::REASON_ICD10              => 4,
+            self::REASON_CVX                => 3,
+            self::REASON_HL7_DISPLAY        => 2,
+            self::REASON_UNVENDORED_PACKAGE => 2,
+            self::REASON_NCI                => 1,
         ],
         'R4B' => [],
         'R5'  => [
