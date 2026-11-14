@@ -310,8 +310,8 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
 
     /**
      * Whether a name is a resource type in any supported FHIR release. The constraint carries no
-     * release, and a type name that is a resource in one release and not another is rare enough
-     * (`ActorDefinition` is R5-only) that accepting any release costs nothing in practice.
+     * release, so a type that exists only in another release (`ActorDefinition` is R5-only) still
+     * counts: an R4 canonical naming it is compared to the allowed targets rather than ignored.
      */
     private function isResourceType(string $type): bool
     {

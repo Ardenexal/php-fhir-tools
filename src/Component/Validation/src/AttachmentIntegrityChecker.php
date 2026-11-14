@@ -18,13 +18,15 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
  * anything: decode `data`, count its bytes, hash them. The reference validator reports each mismatch
  * as an error located at the Attachment, in the wording used here.
  *
+ * FHIR fixes the hash algorithm, so a `hash` computed with anything other than SHA-1, or a hex digest
+ * encoded as base64 instead of the digest bytes, is reported as a mismatch, as the reference validator
+ * reports it.
+ *
  * ## What is not checked
  *
  * - An Attachment without `data`. Its content sits behind `url`, and nothing is fetched.
  * - `data` that is not valid base64. The primitive's own format rule reports that, and a byte count of
  *   undecodable text would only add a second, misleading error on top of it.
- * - A `hash` computed with something other than SHA-1. FHIR fixes the algorithm, so a different one
- *   reads as a mismatch, which is what the reference validator reports too.
  */
 final class AttachmentIntegrityChecker
 {

@@ -186,7 +186,7 @@ final class DeclaredLimitations
      * The reference validator raises that only when its manifest sets `assumeValidRestReferences`, which
      * tells it to treat `Type/id` as proof of the target's type without resolving it. On its default
      * settings it accepts `Practitioner/2` on an element that allows only `Organization`
-     * (`R5.fhirpath-good`), and inferring the type here reported exactly that as an error. Matching the
+     * (`R5.fhirpath-good`), which inferring the type here would report as an error. Matching the
      * default is the comparison's baseline, so the opt-in finding is declared rather than chased.
      *
      * `dr-eh` is unreachable for a second reason too: the `[Patient]` restriction comes from US Core

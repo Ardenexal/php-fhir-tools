@@ -20,9 +20,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
  *
  * ## enableWhen on an inner question
  *
- * An item's `enableWhen.question` must not name one of that item's own descendants. Whether the
- * descendant can be answered depends on whether the item is enabled, so the condition could never be
- * evaluated. The reference validator reports it as an error on the item carrying the `enableWhen`,
+ * An item's `enableWhen.question` must not name one of that item's own descendants. A descendant
+ * can only be answered while the item is enabled, so the condition would depend on its own outcome. The reference validator reports it as an error on the item carrying the `enableWhen`,
  * in the wording used here.
  */
 final class QuestionnaireDefinitionChecker
