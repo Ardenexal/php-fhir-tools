@@ -434,8 +434,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             $result   = [];
             $accessor = self::modelAccessor();
 
-            foreach ($accessor->publicPropertyNames($value) as $propertyName) {
-                $propertyValue = $accessor->readInitializedValue($value, $propertyName);
+            foreach ($accessor->initializedPublicValues($value) as $propertyName => $propertyValue) {
                 if ($propertyValue !== null) {
                     $result[$propertyName] = $this->normalizeBasicValue($propertyValue, $format, $context);
                 }
