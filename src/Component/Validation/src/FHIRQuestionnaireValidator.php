@@ -42,6 +42,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\Quest
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResource as R5Response;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
+use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Ucum\UcumConverter;
 use Brick\DateTime\LocalDate;
@@ -214,6 +216,9 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      */
     private array $responseAncestors = [];
 
+    /** Whether an enclosing response item is disabled; calculations inside it are not checked. */
+    private bool $insideDisabledItem = false;
+
     public function __construct(
         private readonly UcumConverter $ucum = new UcumConverter(),
         private readonly FHIRPathService $pathService = new FHIRPathService(),
@@ -290,6 +295,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             $this->currentItemIndex     = [];
             $this->currentParentOf      = [];
             $this->responseAncestors    = [];
+            $this->insideDisabledItem   = false;
         }
     }
 
@@ -381,9 +387,10 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
             // Context for this item's children; unmatched or linkId-less items suspend
             // placement checking below them but pass the required gate through unchanged.
-            $childParentLinkId  = $parentLinkId;
-            $childParentKnown   = false;
-            $childCheckRequired = $checkRequired;
+            $childParentLinkId   = $parentLinkId;
+            $childParentKnown    = false;
+            $childCheckRequired  = $checkRequired;
+            $childInsideDisabled = $this->insideDisabledItem;
 
             if ($linkId !== '') {
                 $questionnaireItem = $itemIndex[$linkId] ?? null;
@@ -420,7 +427,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                             $path,
                             sprintf("Item '%s' is present but its enableWhen conditions are not satisfied.", $linkId),
                         );
-                    } else {
+                    } elseif (!$this->insideDisabledItem) {
                         $this->checkCalculatedExpression($item, $questionnaireItem, $linkId, $path, $violations);
                     }
 
@@ -435,14 +442,17 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                         );
                     }
 
-                    $childParentLinkId  = $linkId;
-                    $childParentKnown   = true;
-                    $childCheckRequired = $checkRequired && $enabled;
+                    $childParentLinkId   = $linkId;
+                    $childParentKnown    = true;
+                    $childCheckRequired  = $checkRequired && $enabled;
+                    $childInsideDisabled = $this->insideDisabledItem || !$enabled;
                 }
             }
 
             // Children see this item as their innermost enclosing response instance.
             $this->responseAncestors[] = $item;
+            $insideDisabled            = $this->insideDisabledItem;
+            $this->insideDisabledItem  = $childInsideDisabled;
 
             $this->walkResponseItems(
                 $item->item,
@@ -473,6 +483,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             }
 
             array_pop($this->responseAncestors);
+            $this->insideDisabledItem = $insideDisabled;
         }
     }
 
@@ -2374,9 +2385,9 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     /**
      * SDC calculatedExpression: a readOnly item's answers must equal the result of its calculated
      * expression. Only readOnly items are checked, because SDC lets a user override the calculated
-     * value of an editable item. The expression is evaluated with the response item as focus,
-     * `%resource` bound to the QuestionnaireResponse, and every in-scope `variable` bound as a
-     * `%name` constant.
+     * value of an editable item. The expression is evaluated with the response item as both focus
+     * and `%context`, with `%resource` bound to the QuestionnaireResponse, and with every in-scope
+     * `variable` bound as a `%name` constant. Items inside a disabled ancestor are not checked.
      *
      * Anything that cannot be evaluated with confidence skips the check rather than reporting:
      * a non-FHIRPath language, an evaluation error, a variable that fails or yields several values,
@@ -2413,8 +2424,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         try {
-            // A fresh context per call: evaluate() writes into the context it is given.
-            $result = $this->pathService->evaluate($expression, $item, new EvaluationContext(rootResource: $response, externalConstants: $constants));
+            $result = $this->pathService->evaluate($expression, $item, $this->expressionContext($response, $item, $constants));
         } catch (FHIRPathException) {
             return;
         }
@@ -2536,7 +2546,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 }
 
                 try {
-                    $value = $this->pathService->evaluate($expression, $focus, new EvaluationContext(rootResource: $response, externalConstants: $constants));
+                    $value = $this->pathService->evaluate($expression, $focus, $this->expressionContext($response, $focus, $constants));
                 } catch (FHIRPathException) {
                     return null;
                 }
@@ -2580,7 +2590,37 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      */
     private function readsClock(string $expression): bool
     {
-        return preg_match('/\b(?:now|today|timeOfDay)\s*\(/', $expression) === 1;
+        // Tokens, not raw text: comments and string literals neither hide nor imitate a call.
+        try {
+            $tokens = array_values((new FHIRPathLexer())->tokenize($expression));
+        } catch (FHIRPathException) {
+            return true; // unreadable: evaluation would fail too, so skip either way
+        }
+
+        foreach ($tokens as $i => $token) {
+            if (
+                $token->type === TokenType::IDENTIFIER
+                && \in_array($token->value, ['now', 'today', 'timeOfDay'], true)
+                && ($tokens[$i + 1] ?? null)?->type === TokenType::LPAREN
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * A fresh context for one evaluation (evaluate() writes into the context it is given), with
+     * `%resource` bound to the response and `%context` to the response item the expression belongs
+     * to, as SDC defines them. The evaluator would otherwise resolve `%context` to the response.
+     * A variable the form itself names `context` takes precedence.
+     *
+     * @param array<string, mixed> $constants
+     */
+    private function expressionContext(object $response, object $focus, array $constants): EvaluationContext
+    {
+        return new EvaluationContext(rootResource: $response, externalConstants: $constants + ['context' => $focus]);
     }
 
     /**
@@ -2596,6 +2636,13 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         $identities = [];
 
         foreach ($values as $value) {
+            // Primitives and FHIRPath values (FHIRPathDecimal, dates) go through their string form,
+            // so '9.5', 9.5 and a StringPrimitive '9.5' all become the same number and a calculated
+            // '123' compares with a string answer '456' instead of being skipped as another kind.
+            if ($value instanceof \Stringable) {
+                $value = (string) $value;
+            }
+
             $identity = $this->normalizeValue($value);
             if ($identity === null) {
                 return null;

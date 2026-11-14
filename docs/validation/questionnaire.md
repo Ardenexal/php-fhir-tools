@@ -81,8 +81,9 @@ resolution that is exact whenever the referenced question occurs once.
 ### Calculated answers
 
 An enabled item with `readOnly: true` and an SDC `calculatedExpression` must carry exactly the
-values its expression returns, in any order. The FHIRPath expression is evaluated with the
-response item as its focus and `%resource` bound to the QuestionnaireResponse. `variable`
+values its expression returns, in any order. Items inside a disabled group are not checked. The
+FHIRPath expression is evaluated with the response item as its focus and `%context`, and with
+`%resource` bound to the QuestionnaireResponse. `variable`
 extensions on the Questionnaire, on each enclosing item and on the item itself are bound first,
 in that order, as `%name` constants; a variable on a repeating group is evaluated against the
 group instance that contains the answer.
@@ -92,7 +93,8 @@ item. The check is skipped, not reported, when the expression or a variable is n
 `text/fhirpath`, calls `now()`, `today()` or `timeOfDay()` (the result depends on when it
 runs), fails to evaluate, or a variable returns more than one value; when the
 expression returns nothing; and when the calculated and answered values are different kinds,
-such as a string against a `Coding`. Numbers are compared exactly, so a decimal calculation
+such as a number against a `Coding`. Numeric values are compared as numbers, so `5`, `5.0` and a
+string answer `'5'` are equal. Numbers are compared exactly, so a decimal calculation
 should round to the precision the form stores (`(%weight / %height.power(2)).round(1)`).
 
 ## Derived Questionnaires

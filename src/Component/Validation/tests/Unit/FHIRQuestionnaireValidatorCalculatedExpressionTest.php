@@ -385,6 +385,121 @@ final class FHIRQuestionnaireValidatorCalculatedExpressionTest extends TestCase
         self::assertCount(1, $report->warnings());
     }
 
+    public function testContextIsTheItemsOwnResponseItem(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'label',
+            type: new QuestionnaireItemTypeType('string'),
+            readOnly: true,
+            extension: [self::calculated('%context.linkId')],
+        )]);
+
+        $report = $this->validator->validate($questionnaire, self::response(new QuestionnaireResponseItem(
+            linkId: 'label',
+            answer: [new QuestionnaireResponseItemAnswer(value: new StringPrimitive(value: 'wrong'))],
+        )));
+
+        self::assertCalculationError($report, 'item[0]', '(wrong) does not match its calculatedExpression result (label)');
+    }
+
+    public function testUnroundedDecimalCalculationIsCompared(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'dose',
+            type: new QuestionnaireItemTypeType('decimal'),
+            readOnly: true,
+            extension: [self::calculated('2.5')],
+        )]);
+
+        $answer = static fn (string $value): QuestionnaireResponseItem => new QuestionnaireResponseItem(
+            linkId: 'dose',
+            answer: [new QuestionnaireResponseItemAnswer(value: $value)],
+        );
+
+        self::assertCount(0, $this->validator->validate($questionnaire, self::response($answer('2.5')))->errors());
+        self::assertCalculationError($this->validator->validate($questionnaire, self::response($answer('9.5'))), 'item[0]', 'result (2.5)');
+    }
+
+    public function testNumericLookingStringCalculationIsCompared(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'code',
+            type: new QuestionnaireItemTypeType('string'),
+            readOnly: true,
+            extension: [self::calculated("'123'")],
+        )]);
+
+        $answer = static fn (string $value): QuestionnaireResponseItem => new QuestionnaireResponseItem(
+            linkId: 'code',
+            answer: [new QuestionnaireResponseItemAnswer(value: new StringPrimitive(value: $value))],
+        );
+
+        self::assertCount(0, $this->validator->validate($questionnaire, self::response($answer('123')))->errors());
+        self::assertCalculationError($this->validator->validate($questionnaire, self::response($answer('456'))), 'item[0]', '(456) does not match its calculatedExpression result (123)');
+    }
+
+    public function testItemInsideDisabledGroupIsNotChecked(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [
+            self::integerItem('a'),
+            new QuestionnaireItem(
+                linkId: 'group',
+                type: new QuestionnaireItemTypeType('group'),
+                enableWhen: [new QuestionnaireItemEnableWhen(
+                    question: 'a',
+                    operator: new QuestionnaireItemOperatorType('exists'),
+                    answer: false,
+                )],
+                item: [self::totalItem([self::calculated('5')])],
+            ),
+        ]);
+
+        $report = $this->validator->validate($questionnaire, self::response(
+            self::integerAnswer('a', 1),
+            new QuestionnaireResponseItem(linkId: 'group', item: [self::integerAnswer('total', 6)]),
+        ));
+
+        // Only the disabled group's enableWhen warning.
+        self::assertCount(0, $report->errors());
+        self::assertCount(1, $report->warnings());
+    }
+
+    public function testClockCallHiddenByCommentOrBackticksIsStillSkipped(): void
+    {
+        foreach (['today /* completion date */ ().toString()', '`today`().toString()'] as $expression) {
+            $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+                linkId: 'completed',
+                type: new QuestionnaireItemTypeType('string'),
+                readOnly: true,
+                extension: [self::calculated($expression)],
+            )]);
+
+            $report = $this->validator->validate($questionnaire, self::response(new QuestionnaireResponseItem(
+                linkId: 'completed',
+                answer: [new QuestionnaireResponseItemAnswer(value: new StringPrimitive(value: '2001-01-01'))],
+            )));
+
+            self::assertCount(0, $report->errors(), $expression);
+        }
+    }
+
+    public function testClockNameInsideAStringLiteralIsStillChecked(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'label',
+            type: new QuestionnaireItemTypeType('string'),
+            readOnly: true,
+            extension: [self::calculated("'today()'")],
+        )]);
+
+        $report = $this->validator->validate($questionnaire, self::response(new QuestionnaireResponseItem(
+            linkId: 'label',
+            answer: [new QuestionnaireResponseItemAnswer(value: new StringPrimitive(value: 'tomorrow'))],
+        )));
+
+        self::assertCalculationError($report, 'item[0]', 'result (today())');
+    }
+
     public function testR5ResourcesAreSupported(): void
     {
         $questionnaire = new R5QuestionnaireResource(item: [new R5QuestionnaireItem(
