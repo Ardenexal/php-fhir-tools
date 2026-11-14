@@ -56,6 +56,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/ldlcholesterol'],
 )]
 #[FHIRProfileConstraint(
+    path: 'referenceRange.high',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+    options: ['value' => ['value' => 3.0]],
+    groups: ['http://hl7.org/fhir/StructureDefinition/ldlcholesterol'],
+)]
+#[FHIRProfileConstraint(
     path: 'referenceRange.type',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],

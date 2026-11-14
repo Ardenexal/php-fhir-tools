@@ -756,7 +756,8 @@ final class JavaFindingMatcher
      * Quoted values are emptied rather than removed: `Unknown code 'A'` and `Unknown code 'B'` are the
      * same rule on different data, while dropping the quotes entirely would also erase the difference
      * between `'X' is not valid` and `is not valid`. Trailing provenance (`(from http://…)`,
-     * `(defined in http://…)`) is boilerplate only Java emits.
+     * `(defined in http://…)`, and the fixed-value rule's closing `in the profile http://…|5.0.0#Observation`)
+     * is boilerplate only Java emits.
      */
     private function normalise(string $text): string
     {
@@ -764,6 +765,7 @@ final class JavaFindingMatcher
         $out = (string) preg_replace("/'[^']*'/", "''", $out);
         $out = (string) preg_replace('/"[^"]*"/', '""', $out);
         $out = (string) preg_replace('/\((?:from|defined in|url:|ids:)[^)]*\)/', '', $out);
+        $out = (string) preg_replace('/ in the profile \S+$/', '', $out);
         $out = (string) preg_replace('/\s+/', ' ', $out);
 
         return trim($out, " \t\n\r.;:");

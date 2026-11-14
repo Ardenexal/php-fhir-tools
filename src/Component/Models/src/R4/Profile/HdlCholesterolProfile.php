@@ -25,6 +25,14 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/hdlcholesterol'],
 )]
 #[FHIRProfileConstraint(
+    path: 'code',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+    options: [
+        'value' => ['coding' => [['system' => 'http://loinc.org', 'code' => '2085-9', 'display' => 'HDL Cholesterol']]],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/hdlcholesterol'],
+)]
+#[FHIRProfileConstraint(
     path: 'valueQuantity',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 1],
@@ -46,6 +54,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
     path: 'referenceRange.low',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/hdlcholesterol'],
+)]
+#[FHIRProfileConstraint(
+    path: 'referenceRange.low',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+    options: ['value' => ['value' => 1.5]],
     groups: ['http://hl7.org/fhir/StructureDefinition/hdlcholesterol'],
 )]
 #[FHIRProfileConstraint(

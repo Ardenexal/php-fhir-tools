@@ -66,13 +66,30 @@ slice as open, and report a warning, so a conforming resource is not rejected.
 ## Fixed and pattern values
 
 `FHIRFixedValueValidator` enforces `#[FHIRFixedValue]`: the instance value must exactly equal the
-declared `fixed[x]` scalar. FHIR primitive wrapper objects (which are `\Stringable`) are coerced
-to string before comparison, so correctly-valued wrappers are not flagged. A mismatch raises an
-ERROR with the default message:
+declared `fixed[x]` value. FHIR primitive wrapper objects (which are `\Stringable`) are coerced
+to string before comparison, so correctly-valued wrappers are not flagged, and a fixed decimal is
+compared by value, so `4.50` equals a fixed `4.5`. A mismatch raises an ERROR with the default
+message:
 
 ```
-The value {{ value }} does not match the required fixed value {{ fixed }}.
+Value is '{{ value }}' but is fixed to '{{ fixed }}'
 ```
+
+A complex fixed value, such as `fixedCodeableConcept` or `fixedQuantity`, is compared as exact
+structure. Every element it carries must match, repeating elements must hold the same number of
+items in the same order, and an element the instance carries that the fixed value does not is an
+error too. Each difference is reported separately at the element it concerns, for example
+`code.coding[0].code` or `referenceRange.high.unit`:
+
+```
+The element {{ element }} is present in the instance but not allowed in the applicable fixed value specified in profile
+Missing element '{{ element }}' - required by the applicable fixed value specified in profile
+Expected {{ expected }} but found {{ actual }} {{ element }} element(s) in the applicable fixed value specified in profile
+```
+
+An extension's definition fixes `Extension.url` to its canonical URL, so an extension written with a
+version suffix (`http://hl7.org/fhir/StructureDefinition/patient-congregation|4.0.0`) is reported
+against that fixed URL when the unversioned URL names a known extension.
 
 `FHIRPatternValueValidator` enforces `#[FHIRPatternValue]`: the instance must contain at least
 the declared `pattern[x]` value (partial-match semantics, rather than exact equality). A mismatch
