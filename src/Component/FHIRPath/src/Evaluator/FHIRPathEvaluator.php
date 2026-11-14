@@ -86,6 +86,13 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private array $bundleIndexes = [];
 
+    /**
+     * Handles for declared properties, by class and name; see {@see isPropertyInitialized()}.
+     *
+     * @var array<class-string, array<string, \ReflectionProperty>>
+     */
+    private static array $declaredPropertyHandles = [];
+
     private int $nextBundleId = 0;
 
     /**
@@ -1242,12 +1249,24 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private static function isPropertyInitialized(object $node, string $propertyName): bool
     {
-        try {
-            return (new \ReflectionProperty($node, $propertyName))->isInitialized($node);
-        } catch (\ReflectionException) {
-            // Dynamic property: property_exists() found it, so it holds something.
-            return true;
+        // Navigation asks this for every member access, so declared properties keep their handle per
+        // class. Dynamic ones belong to the instance, not the class, so they are looked up each time.
+        $handle = self::$declaredPropertyHandles[$node::class][$propertyName] ?? null;
+
+        if ($handle === null) {
+            try {
+                $handle = new \ReflectionProperty($node, $propertyName);
+            } catch (\ReflectionException) {
+                // Dynamic property: property_exists() found it, so it holds something.
+                return true;
+            }
+
+            if ($handle->isDefault()) {
+                self::$declaredPropertyHandles[$node::class][$propertyName] = $handle;
+            }
         }
+
+        return $handle->isInitialized($node);
     }
 
     private function navigateProperty(mixed $node, string $propertyName): Collection

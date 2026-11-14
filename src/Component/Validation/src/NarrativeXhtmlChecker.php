@@ -45,6 +45,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
  */
 final class NarrativeXhtmlChecker
 {
+    /** @var array<class-string, array<string, bool>> {@see isXhtmlProperty()} answers, by class and property */
+    private array $xhtmlProperties = [];
+
     public function __construct(
         private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
         private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
@@ -162,12 +165,7 @@ final class NarrativeXhtmlChecker
             return [];
         }
 
-        foreach ($this->models->publicPropertyNames($node) as $name) {
-            if (!$this->models->isPropertyInitialized($node, $name)) {
-                continue;
-            }
-
-            $value   = $this->models->readInitializedValue($node, $name);
+        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
             $subPath = $path === '' ? $name : $path . '.' . $name;
 
             if ($this->isXhtmlProperty($node, $name)) {
@@ -401,13 +399,26 @@ final class NarrativeXhtmlChecker
      */
     private function isXhtmlProperty(object $owner, string $property): bool
     {
+        // Asked for every property of every node, so the answer is kept per class and property.
+        // Only names the walk read off an object arrive here, so the cache is bounded by the
+        // declared properties of the classes validated.
+        $cached = $this->xhtmlProperties[$owner::class][$property] ?? null;
+
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $isXhtml = false;
+
         foreach ($this->attributes->propertyAttributes($owner, $property, FhirProperty::class) as $attribute) {
             if ($attribute->fhirType === 'xhtml') {
-                return true;
+                $isXhtml = true;
+
+                break;
             }
         }
 
-        return false;
+        return $this->xhtmlProperties[$owner::class][$property] = $isXhtml;
     }
 
     /**

@@ -1025,15 +1025,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             return $violations;
         }
 
-        foreach ($this->models->publicPropertyNames($resource) as $name) {
+        foreach ($this->models->initializedPublicValues($resource) as $name => $value) {
             if (in_array($name, ['extension', 'modifierExtension'], true)) {
                 continue;
             }
-            if (!$this->models->isPropertyInitialized($resource, $name)) {
-                continue;
-            }
-
-            $value       = $this->models->readInitializedValue($resource, $name);
             $subFhirPath = $fhirPath . '.' . $name;
             $subRelPath  = $relPath !== '' ? $relPath . '.' . $name : $name;
 
@@ -1580,14 +1575,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             }
         }
 
-        foreach ($this->models->publicPropertyNames($resource) as $name) {
-            if (!$this->models->isPropertyInitialized($resource, $name)) {
-                continue;
-            }
-
+        foreach ($this->models->initializedPublicValues($resource) as $name => $value) {
             $isExtProp  = $name === 'extension' || $name === 'modifierExtension';
             $childInExt = $insideExtension      || $isExtProp;
-            $value      = $this->models->readInitializedValue($resource, $name);
             $propPath   = $path !== '' ? $path . '.' . $name : $name;
 
             if (is_object($value)) {
@@ -1802,15 +1792,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             }
         }
 
-        foreach ($this->models->publicPropertyNames($resource) as $name) {
+        foreach ($this->models->initializedPublicValues($resource) as $name => $value) {
             if ($name === 'modifierExtension') {
                 continue;
             }
-            if (!$this->models->isPropertyInitialized($resource, $name)) {
-                continue;
-            }
-
-            $value    = $this->models->readInitializedValue($resource, $name);
             $propPath = $path !== '' ? $path . '.' . $name : $name;
 
             if (is_object($value)) {
