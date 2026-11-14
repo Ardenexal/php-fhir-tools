@@ -35,8 +35,7 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
  *    declaring a limitation where Java is silent would hide an `ABOVE` case rather than document a gap.
  *
  * Deliberately excluded, because they are ours to fix and must not hide here:
- * `qr-bad-ref2` (canonical resolves to the wrong resource type), `vs-params-4` (a ValueSet expression
- * language rule), `obs-de-notx` (a fixed-value mismatch),
+ * `vs-params-4` (a ValueSet expression language rule), `obs-de-notx` (a fixed-value mismatch),
  * `mimic` (its package *is* vendored — the instance has a system-URI typo), and `obs-temp-bad`
  * (the reference validator's hard-coded vitals code table, a different kind of limitation entirely).
  *
@@ -195,6 +194,22 @@ final class DeclaredLimitations
     public const REASON_XXE_REFUSAL = 'refusing an XML DOCTYPE is deliberate: it blocks external-entity attacks, so this finding is unreachable by design';
 
     /**
+     * A reference's type is not read from its URL, because the reference validator's default does not.
+     *
+     * `R4.dr-eh` reports `The type 'Device' implied by the reference URL Device/foo is not a valid Target`.
+     * The reference validator raises that only when its manifest sets `assumeValidRestReferences`, which
+     * tells it to treat `Type/id` as proof of the target's type without resolving it. On its default
+     * settings it accepts `Practitioner/2` on an element that allows only `Organization`
+     * (`R5.fhirpath-good`), which inferring the type here would report as an error. Matching the
+     * default is the comparison's baseline, so the opt-in finding is declared rather than chased.
+     *
+     * `dr-eh` is unreachable for a second reason too: the `[Patient]` restriction comes from US Core
+     * 3.1.0, which the manifest loads for that case and this harness does not. Against the base
+     * `DocumentReference.subject` targets, `Device` is allowed.
+     */
+    public const REASON_ASSUMED_REST_REFERENCE = 'a reference URL is taken as proof of its target type only under the reference validator option assumeValidRestReferences, which is off by default';
+
+    /**
      * Text signature => reason, for limitations that are not about a code system.
      *
      * Kept apart from {@see TERMINOLOGY_SYSTEMS} because the two are different claims. A terminology entry
@@ -225,6 +240,8 @@ final class DeclaredLimitations
         // loads and the corpus does not ship. Matched on the StructureDefinition prefix, not the domain,
         // so a code system from the same registry would still count as open work.
         'http://kvalitetsregistre.no/fhir/structuredefinition/' => self::REASON_UNVENDORED_PROFILE,
+        // The opening of exactly one reference validator rule, raised only under assumeValidRestReferences.
+        'implied by the reference url' => self::REASON_ASSUMED_REST_REFERENCE,
     ];
 
     /**
@@ -246,14 +263,16 @@ final class DeclaredLimitations
         'R4' => [
             // Order matters: the pin compares with assertSame against a histogram sorted by count
             // descending, then by reason text, so list these largest first and break ties the same way.
-            self::REASON_UNKNOWN_EXTENSION  => 30,
-            self::REASON_LOINC              => 27,
-            self::REASON_SNOMED             => 19,
-            self::REASON_UNVENDORED_PROFILE => 6,
-            self::REASON_ICD10              => 4,
-            self::REASON_CVX                => 3,
-            self::REASON_HL7_DISPLAY        => 2,
-            self::REASON_NCI                => 1,
+            self::REASON_UNKNOWN_EXTENSION      => 30,
+            self::REASON_LOINC                  => 27,
+            self::REASON_SNOMED                 => 19,
+            self::REASON_UNVENDORED_PROFILE     => 6,
+            self::REASON_ICD10                  => 4,
+            self::REASON_CVX                    => 3,
+            self::REASON_HL7_DISPLAY            => 2,
+            // Tied at one: ordered by reason text, as in R5 below.
+            self::REASON_ASSUMED_REST_REFERENCE => 1,
+            self::REASON_NCI                    => 1,
         ],
         'R4B' => [],
         'R5'  => [
