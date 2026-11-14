@@ -6,9 +6,11 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemOperatorType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireResponseStatusType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItem;
@@ -498,6 +500,63 @@ final class FHIRQuestionnaireValidatorCalculatedExpressionTest extends TestCase
         )));
 
         self::assertCalculationError($report, 'item[0]', 'result (today())');
+    }
+
+    public function testDecimalsAreComparedExactlyBeyondTenPlaces(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'ratio',
+            type: new QuestionnaireItemTypeType('decimal'),
+            readOnly: true,
+            extension: [self::calculated('1.00000000001')],
+        )]);
+
+        $answer = static fn (string $value): QuestionnaireResponseItem => new QuestionnaireResponseItem(
+            linkId: 'ratio',
+            answer: [new QuestionnaireResponseItemAnswer(value: $value)],
+        );
+
+        self::assertCount(0, $this->validator->validate($questionnaire, self::response($answer('1.000000000010')))->errors());
+        self::assertCalculationError(
+            $this->validator->validate($questionnaire, self::response($answer('1.00000000002'))),
+            'item[0]',
+            '(1.00000000002) does not match its calculatedExpression result (1.00000000001)',
+        );
+    }
+
+    public function testQuantityCalculationIsComparedWithQuantityAnswer(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'dose',
+            type: new QuestionnaireItemTypeType('quantity'),
+            readOnly: true,
+            extension: [self::calculated("5 'mg'")],
+        )]);
+
+        $answer = static fn (string $value): QuestionnaireResponseItem => new QuestionnaireResponseItem(
+            linkId: 'dose',
+            answer: [new QuestionnaireResponseItemAnswer(value: new Quantity(value: $value, code: new CodePrimitive(value: 'mg')))],
+        );
+
+        self::assertCount(0, $this->validator->validate($questionnaire, self::response($answer('5.0')))->errors());
+        self::assertCalculationError($this->validator->validate($questionnaire, self::response($answer('6'))), 'item[0]', '(6 mg) does not match its calculatedExpression result (5 mg)');
+    }
+
+    public function testStringThatLooksLikeATypedIdentityIsStillText(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'label',
+            type: new QuestionnaireItemTypeType('string'),
+            readOnly: true,
+            extension: [self::calculated("'reference:Patient/1'")],
+        )]);
+
+        $report = $this->validator->validate($questionnaire, self::response(new QuestionnaireResponseItem(
+            linkId: 'label',
+            answer: [new QuestionnaireResponseItemAnswer(value: new StringPrimitive(value: 'wrong'))],
+        )));
+
+        self::assertCalculationError($report, 'item[0]', '(wrong) does not match its calculatedExpression result (reference:Patient/1)');
     }
 
     public function testR5ResourcesAreSupported(): void

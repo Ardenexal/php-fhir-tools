@@ -93,8 +93,9 @@ item. The check is skipped, not reported, when the expression or a variable is n
 `text/fhirpath`, calls `now()`, `today()` or `timeOfDay()` (the result depends on when it
 runs), fails to evaluate, or a variable returns more than one value; when the
 expression returns nothing; and when the calculated and answered values are different kinds,
-such as a number against a `Coding`. Numeric values are compared as numbers, so `5`, `5.0` and a
-string answer `'5'` are equal. Numbers are compared exactly, so a decimal calculation
+such as a number against a `Coding`. Numeric values are compared as exact decimals, so `5`, `5.0`
+and a string answer `'5'` are equal, and a quantity calculation such as `5 'mg'` compares with a
+`Quantity` answer by value and code. Because the comparison is exact, a decimal calculation
 should round to the precision the form stores (`(%weight / %height.power(2)).round(1)`).
 
 ## Derived Questionnaires

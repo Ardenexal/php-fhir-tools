@@ -1415,7 +1415,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             return $value;
         }
 
-        if (\is_int($value) || \is_float($value)) {
+        if (\is_int($value)) {
             return (float) $value;
         }
 
@@ -2429,7 +2429,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             return;
         }
 
-        $expected = $this->comparableIdentities($result);
+        $expected = $this->calculationComparables($result);
         if ($expected === null || $expected === []) {
             return;
         }
@@ -2441,21 +2441,21 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             }
         }
 
-        $actual = $this->comparableIdentities($answerValues);
+        $actual = $this->calculationComparables($answerValues);
         if ($actual === null) {
             return;
         }
 
         // Compare only like with like; a kind mismatch means the calculation is not comparable.
-        $kinds = array_unique(array_map($this->identityKind(...), [...$expected, ...$actual]));
+        $kinds = array_unique(array_column([...$expected, ...$actual], 0));
         if (\count($kinds) > 1) {
             return;
         }
 
-        $expectedKeys = array_map($this->identityKey(...), $expected);
-        $actualKeys   = array_map($this->identityKey(...), $actual);
-        sort($expectedKeys);
-        sort($actualKeys);
+        $expectedKeys = array_column($expected, 1);
+        $actualKeys   = array_column($actual, 1);
+        sort($expectedKeys, \SORT_STRING);
+        sort($actualKeys, \SORT_STRING);
 
         if ($expectedKeys === $actualKeys) {
             return;
@@ -2467,8 +2467,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             sprintf(
                 "Answer for read-only item '%s' (%s) does not match its calculatedExpression result (%s).",
                 $linkId,
-                $actual === [] ? 'no answer' : implode(', ', array_map($this->displayValue(...), $actual)),
-                implode(', ', array_map($this->displayValue(...), $expected)),
+                $actual === [] ? 'no answer' : implode(', ', array_column($actual, 1)),
+                implode(', ', array_column($expected, 1)),
             ),
         );
     }
@@ -2624,58 +2624,101 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
-     * Normalizes calculated or answered values for comparison; null when any value has no
-     * comparable identity.
+     * Reduces calculated or answered values to `[kind, key]` pairs for comparison; null when any
+     * value has no comparable form. The key doubles as the value's display in the mismatch message.
      *
      * @param iterable<mixed> $values
      *
-     * @return list<bool|float|string>|null
+     * @return list<array{0: string, 1: string}>|null
      */
-    private function comparableIdentities(iterable $values): ?array
+    private function calculationComparables(iterable $values): ?array
     {
-        $identities = [];
+        $comparables = [];
 
         foreach ($values as $value) {
-            // Primitives and FHIRPath values (FHIRPathDecimal, dates) go through their string form,
-            // so '9.5', 9.5 and a StringPrimitive '9.5' all become the same number and a calculated
-            // '123' compares with a string answer '456' instead of being skipped as another kind.
-            if ($value instanceof \Stringable) {
-                $value = (string) $value;
-            }
-
-            $identity = $this->normalizeValue($value);
-            if ($identity === null) {
+            $comparable = $this->calculationComparable($value);
+            if ($comparable === null) {
                 return null;
             }
 
-            $identities[] = $identity;
+            $comparables[] = $comparable;
         }
 
-        return $identities;
+        return $comparables;
     }
 
     /**
-     * Classifies a normalizeValue() result so values of different kinds are never compared:
-     * boolean, number, a complex-type identity (by its `coding:` / `quantity:` / `reference:`
-     * prefix), or plain text.
+     * The kind comes from the value's type, never from its text, so a string answer that happens
+     * to read `coding:…` stays text. Numbers are compared as exact decimal strings, without float
+     * conversion, so `5`, `5.0`, `'5'` and a StringPrimitive `'5'` are equal and
+     * `1.00000000001` differs from `1.00000000002`. Primitives and FHIRPath values
+     * (FHIRPathDecimal, dates) are read through their string form. FHIRPath quantities arrive as
+     * `value` / `code` arrays and compare with Quantity answers by value and code.
+     *
+     * @return array{0: string, 1: string}|null
      */
-    private function identityKind(bool|float|string $identity): string
+    private function calculationComparable(mixed $value): ?array
     {
-        if (\is_bool($identity)) {
-            return 'boolean';
+        if (\is_bool($value)) {
+            return ['boolean', $value ? 'true' : 'false'];
         }
 
-        if (\is_float($identity)) {
-            return 'number';
+        if ($value instanceof R4Coding || $value instanceof R4BCoding || $value instanceof R5Coding) {
+            return ['coding', sprintf('%s|%s', (string) ($value->system ?? ''), (string) ($value->code ?? ''))];
         }
 
-        foreach (['coding:', 'quantity:', 'reference:'] as $prefix) {
-            if (str_starts_with($identity, $prefix)) {
-                return $prefix;
-            }
+        if ($value instanceof R4Reference || $value instanceof R4BReference || $value instanceof R5Reference) {
+            return ['reference', (string) ($value->reference ?? '')];
         }
 
-        return 'text';
+        if ($value instanceof R4Quantity || $value instanceof R4BQuantity || $value instanceof R5Quantity) {
+            return $this->quantityComparable($value->value, $value->code ?? $value->unit ?? null);
+        }
+
+        if (\is_array($value) && \array_key_exists('value', $value)) {
+            return $this->quantityComparable($value['value'], $value['code'] ?? $value['unit'] ?? null);
+        }
+
+        if (\is_int($value) || \is_float($value) || \is_string($value) || $value instanceof \Stringable) {
+            $string = (string) $value;
+            $number = $this->canonicalDecimal($string);
+
+            return $number !== null ? ['number', $number] : ['text', $string];
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array{0: string, 1: string}|null
+     */
+    private function quantityComparable(mixed $magnitude, mixed $code): ?array
+    {
+        $number = \is_scalar($magnitude) || $magnitude instanceof \Stringable ? $this->canonicalDecimal((string) $magnitude) : null;
+        if ($number === null) {
+            return null;
+        }
+
+        $unit = \is_scalar($code) || $code instanceof \Stringable ? (string) $code : '';
+
+        return ['quantity', trim($number . ' ' . $unit)];
+    }
+
+    /**
+     * Canonical text for a plain decimal literal (`-01.50` → `-1.5`, `5.0` → `5`, `-0` → `0`), or
+     * null when the string is not one. Exponent forms are not decimal literals in FHIR and stay text.
+     */
+    private function canonicalDecimal(string $value): ?string
+    {
+        if (preg_match('/^([+-]?)(\d+)(?:\.(\d+))?$/', trim($value), $parts) !== 1) {
+            return null;
+        }
+
+        $integer  = ltrim($parts[2], '0');
+        $fraction = rtrim($parts[3] ?? '', '0');
+        $number   = ($integer === '' ? '0' : $integer) . ($fraction === '' ? '' : '.' . $fraction);
+
+        return $parts[1] === '-' && $number !== '0' ? '-' . $number : $number;
     }
 
     /**
