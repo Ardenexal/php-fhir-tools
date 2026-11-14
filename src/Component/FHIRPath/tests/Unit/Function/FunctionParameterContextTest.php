@@ -5,6 +5,24 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\AbstractFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\ComparableFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\DecodeFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\EncodeFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\EndsWithFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\EscapeFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\ExcludeFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\HighBoundaryFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\JoinFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\LogFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\LowBoundaryFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\MatchesFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\MatchesFullFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\PowerFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\RoundFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\SkipFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\SplitFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\StartsWithFunction;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\TakeFunction;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -19,6 +37,24 @@ use PHPUnit\Framework\TestCase;
  * in the same expression navigated from the wrong focus and lost `%resource` and other variables.
  */
 #[CoversClass(AbstractFunction::class)]
+#[CoversClass(ComparableFunction::class)]
+#[CoversClass(DecodeFunction::class)]
+#[CoversClass(EncodeFunction::class)]
+#[CoversClass(EndsWithFunction::class)]
+#[CoversClass(EscapeFunction::class)]
+#[CoversClass(ExcludeFunction::class)]
+#[CoversClass(HighBoundaryFunction::class)]
+#[CoversClass(JoinFunction::class)]
+#[CoversClass(LogFunction::class)]
+#[CoversClass(LowBoundaryFunction::class)]
+#[CoversClass(MatchesFunction::class)]
+#[CoversClass(MatchesFullFunction::class)]
+#[CoversClass(PowerFunction::class)]
+#[CoversClass(RoundFunction::class)]
+#[CoversClass(SkipFunction::class)]
+#[CoversClass(SplitFunction::class)]
+#[CoversClass(StartsWithFunction::class)]
+#[CoversClass(TakeFunction::class)]
 final class FunctionParameterContextTest extends TestCase
 {
     /**
