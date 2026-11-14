@@ -29,12 +29,7 @@ final class SkipFunction extends AbstractFunction
             throw new FHIRPathSemanticException("Function 'skip' requires an ordered collection");
         }
 
-        $evaluator = $context->getEvaluator();
-        if ($evaluator === null) {
-            throw new EvaluationException('Evaluator not available in context');
-        }
-
-        $numCollection = $evaluator->evaluate($parameters[0], $context);
+        $numCollection = $this->evaluateParameter($parameters[0], $context);
         if ($numCollection->isEmpty()) {
             throw EvaluationException::invalidFunctionParameter('skip', 'num', 'non-empty integer collection');
         }

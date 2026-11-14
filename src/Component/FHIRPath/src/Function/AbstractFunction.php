@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
@@ -72,6 +74,36 @@ abstract class AbstractFunction implements FunctionInterface
         if ($count < $min) {
             throw new EvaluationException(sprintf('Function %s() expects at least %d parameter(s), %d given', $this->name, $min, $count), 0, 0);
         }
+    }
+
+    /**
+     * Evaluate an argument expression in the caller's context and normalize the values it yields.
+     *
+     * The argument sees the same focus, `$this` and variables (`%resource` and friends) as the
+     * function call, and the evaluator's own context is restored afterwards so that whatever follows
+     * the call in the expression is unaffected. Values are normalized the way a top-level evaluation
+     * normalizes its result, so a FHIR primitive wrapper reached by navigation arrives as its scalar.
+     *
+     * @throws EvaluationException If the context has no evaluator
+     */
+    protected function evaluateParameter(ExpressionNode $parameter, EvaluationContext $context): Collection
+    {
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
+
+        $result = $evaluator->evaluateWithContext($parameter, $context);
+        if ($result->isEmpty()) {
+            return $result;
+        }
+
+        $normalized = [];
+        foreach ($result as $item) {
+            $normalized[] = $evaluator->normalizeValue($item);
+        }
+
+        return Collection::from($normalized);
     }
 
     /**

@@ -7,7 +7,6 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
-use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 
 /**
  * Returns items in this collection that are not in the other collection.
@@ -26,12 +25,8 @@ class ExcludeFunction extends AbstractFunction
         $this->validateParameterCount($parameters, 1);
 
         /** @var ExpressionNode $otherExpr */
-        $otherExpr = $parameters[0];
-        $evaluator = $context->getEvaluator();
-        if ($evaluator === null) {
-            throw new EvaluationException('Evaluator not available in context');
-        }
-        $otherResult = $evaluator->evaluate($otherExpr, $context);
+        $otherExpr   = $parameters[0];
+        $otherResult = $this->evaluateParameter($otherExpr, $context);
 
         if ($input->isEmpty()) {
             return Collection::empty();
@@ -41,11 +36,9 @@ class ExcludeFunction extends AbstractFunction
             return $input;
         }
 
-        // Normalize exclusion items so FHIR primitive wrappers compare equal to plain scalars
-        $normalizedOtherItems = array_map(
-            fn ($o) => $context->normalizeValue($o),
-            $otherResult->toArray(),
-        );
+        // evaluateParameter() already unwrapped the exclusions; unwrap each input item the same way so
+        // a FHIR primitive wrapper compares equal to its plain scalar.
+        $normalizedOtherItems = $otherResult->toArray();
 
         $indexes = [];
         foreach ($input as $index => $item) {

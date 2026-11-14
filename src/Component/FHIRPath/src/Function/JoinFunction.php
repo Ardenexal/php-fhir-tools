@@ -30,12 +30,7 @@ final class JoinFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $evaluator = $context->getEvaluator();
-        if ($evaluator === null) {
-            throw new EvaluationException('Evaluator not available in context');
-        }
-
-        $separator = $evaluator->evaluate($parameters[0], $context)->first();
+        $separator = $this->evaluateParameter($parameters[0], $context)->first();
         if (!is_string($separator)) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'separator', 'string');
         }

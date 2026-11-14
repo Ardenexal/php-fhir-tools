@@ -39,7 +39,7 @@ final class ComparableFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not available in context');
         }
 
-        $paramResult = $evaluator->evaluate($parameters[0], $context);
+        $paramResult = $this->evaluateParameter($parameters[0], $context);
         if ($paramResult->isEmpty()) {
             return Collection::single(false);
         }
