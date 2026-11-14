@@ -15,6 +15,8 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\NameUseType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use PHPUnit\Framework\TestCase;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @covers \Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator
@@ -575,5 +577,49 @@ final class FHIRPathEvaluatorTest extends TestCase
         $result = $this->evaluate("Patient.name.where(use = 'official').family", $patient);
 
         self::assertSame(['Chalmers'], $result->toArray());
+    }
+
+    /**
+     * The right operand of `and`, `or` and `implies` is skipped when the left one already decides
+     * the result, as the HL7 Java engine does. `single()` on two items raises an error, so each
+     * expression below would fail if its right operand were evaluated.
+     *
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function shortCircuitProvider(): iterable
+    {
+        yield 'false and X'     => ["false and ('a' | 'b').single()", false];
+        yield 'true or X'       => ["true or ('a' | 'b').single()", true];
+        yield 'false implies X' => ["false implies ('a' | 'b').single()", true];
+    }
+
+    #[DataProvider('shortCircuitProvider')]
+    public function testLeftOperandThatDecidesSkipsRightOperand(string $expression, bool $expected): void
+    {
+        self::assertSame([$expected], $this->evaluate($expression, null)->toArray());
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function undecidedLeftOperandProvider(): iterable
+    {
+        yield 'true and X'     => ["true and ('a' | 'b').single()"];
+        yield 'false or X'     => ["false or ('a' | 'b').single()"];
+        yield 'true implies X' => ["true implies ('a' | 'b').single()"];
+        yield 'empty and X'    => ["{} and ('a' | 'b').single()"];
+        yield 'empty or X'     => ["{} or ('a' | 'b').single()"];
+        yield 'empty implies X' => ["{} implies ('a' | 'b').single()"];
+    }
+
+    /**
+     * A left operand that does not decide the result still evaluates the right one, errors included.
+     */
+    #[DataProvider('undecidedLeftOperandProvider')]
+    public function testLeftOperandThatDoesNotDecideEvaluatesRightOperand(string $expression): void
+    {
+        $this->expectException(EvaluationException::class);
+
+        $this->evaluate($expression, null);
     }
 }

@@ -36,7 +36,7 @@ The default cache is `InMemoryExpressionCache`
 expressions by their source string.
 
 {% hint style="info" %}
-The cache holds up to **100 expressions by default** and evicts the **least recently used (LRU)**
+The cache holds up to **1000 expressions by default** and evicts the **least recently used (LRU)**
 entry when full. Construct the cache with a different `maxSize` to tune this.
 {% endhint %}
 
@@ -67,5 +67,5 @@ The in-memory cache additionally exposes `getHitRate()` (0–100) and `getMaxSiz
 
 * Compile expressions used in hot loops once, outside the loop.
 * Reuse a single `FHIRPathService` instance so its cache survives across calls.
-* For large batches that exceed the default 100-entry cache, raise `maxSize` to keep all
+* For large batches that exceed the default 1000-entry cache, raise `maxSize` to keep all
   expressions resident and avoid re-parsing on eviction.

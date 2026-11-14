@@ -17,28 +17,30 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Service\CompiledExpression;
 class InMemoryExpressionCache implements ExpressionCacheInterface
 {
     /**
+     * Compiled expressions in recency order: the least recently used entry is first.
+     *
+     * PHP arrays keep insertion order, so moving an entry to the end on every hit and evicting the
+     * first key gives LRU in constant time, with no separate access-time map to scan.
+     *
      * @var array<string, CompiledExpression>
      */
     private array $cache = [];
-
-    /**
-     * @var array<string, int>
-     */
-    private array $accessTimes = [];
 
     private int $hits = 0;
 
     private int $misses = 0;
 
-    private int $accessCounter = 0;
-
     /**
      * Create a new in-memory cache.
      *
-     * @param int $maxSize Maximum number of expressions to cache (default: 100)
+     * The default holds the conformance invariants of a whole FHIR release with room to spare.
+     * Validation evaluates them in a repeating cycle, one resource type after another, and an LRU
+     * cache smaller than that cycle misses on every expression: it re-parsed each one.
+     *
+     * @param int $maxSize Maximum number of expressions to cache (default: 1000)
      */
     public function __construct(
-        private readonly int $maxSize = 100
+        private readonly int $maxSize = 1000
     ) {
     }
 
@@ -62,9 +64,13 @@ class InMemoryExpressionCache implements ExpressionCacheInterface
         }
 
         ++$this->hits;
-        $this->accessTimes[$expression] = ++$this->accessCounter;
 
-        return $this->cache[$expression];
+        // Move the entry to the end, the most recently used position.
+        $compiled = $this->cache[$expression];
+        unset($this->cache[$expression]);
+        $this->cache[$expression] = $compiled;
+
+        return $compiled;
     }
 
     /**
@@ -77,8 +83,9 @@ class InMemoryExpressionCache implements ExpressionCacheInterface
             $this->evictLeastRecentlyUsed();
         }
 
-        $this->cache[$expression]       = $compiled;
-        $this->accessTimes[$expression] = ++$this->accessCounter;
+        // Re-setting an entry also makes it the most recently used.
+        unset($this->cache[$expression]);
+        $this->cache[$expression] = $compiled;
     }
 
     /**
@@ -86,7 +93,7 @@ class InMemoryExpressionCache implements ExpressionCacheInterface
      */
     public function delete(string $expression): void
     {
-        unset($this->cache[$expression], $this->accessTimes[$expression]);
+        unset($this->cache[$expression]);
     }
 
     /**
@@ -94,11 +101,9 @@ class InMemoryExpressionCache implements ExpressionCacheInterface
      */
     public function clear(): void
     {
-        $this->cache         = [];
-        $this->accessTimes   = [];
-        $this->hits          = 0;
-        $this->misses        = 0;
-        $this->accessCounter = 0;
+        $this->cache  = [];
+        $this->hits   = 0;
+        $this->misses = 0;
     }
 
     /**
@@ -144,20 +149,12 @@ class InMemoryExpressionCache implements ExpressionCacheInterface
      */
     private function evictLeastRecentlyUsed(): void
     {
-        if (empty($this->accessTimes)) {
-            return;
+        $lruExpression = array_key_first($this->cache);
+
+        // An expression such as `1` is held under an integer key, because PHP converts numeric
+        // string keys, so the key is turned back into the string it was stored under.
+        if ($lruExpression !== null) {
+            $this->delete((string) $lruExpression);
         }
-
-        $lruExpression = array_key_first($this->accessTimes);
-        $lruTime       = PHP_INT_MAX;
-
-        foreach ($this->accessTimes as $expression => $time) {
-            if ($time < $lruTime) {
-                $lruTime       = $time;
-                $lruExpression = $expression;
-            }
-        }
-
-        $this->delete($lruExpression);
     }
 }

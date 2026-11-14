@@ -72,8 +72,12 @@ foreach ($versions as $tag => $version) {
     $harness = new ComparisonHarness(
         vendorDir: __DIR__ . '/../../../../../vendor',
         validation: OracleValidationServiceFactory::create($version),
-        serialization: FHIRSerializationService::createDefault($version),
+        // Read and validate exactly as compare-java-outcomes.php does. With the default service, a
+        // document claiming a core profile such as `bp` deserializes as a base resource, so every
+        // profile finding the comparison pairs is absent here and its pairing can never be audited.
+        serialization: FHIRSerializationService::createWithIG(version: $version, includeBaseProfiles: true),
         version: $version,
+        validationWithoutExtensionResolution: OracleValidationServiceFactory::create($version, resolveExtensions: false),
     );
 
     fwrite(STDERR, "Auditing {$tag}…\n");
