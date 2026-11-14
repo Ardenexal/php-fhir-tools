@@ -40,8 +40,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResource as R5
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\QuestionnaireResponseItem as R5ResponseItem;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\QuestionnaireResponseItemAnswer as R5Answer;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResource as R5Response;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTime;
 use Ardenexal\FHIRTools\Component\Metadata\Ucum\UcumConverter;
 use Brick\DateTime\LocalDate;
 use Brick\DateTime\TimeZone;
@@ -65,8 +68,9 @@ use Brick\DateTime\YearMonth;
  *     min/max value, min/max length, min/max occurs, decimal places, regex (M13). ADR-007
  *     amendment (2026-06-04).
  *  8. value-domain rules (error, M14): non-answerable item types (display/abstract question with an
- *     answer), answerOption membership incl. the exclusive option, Reference target resource-type /
- *     URL well-formedness, Attachment content-type / size / data-size consistency, and url format.
+ *     answer), answerOption membership incl. the exclusive option, SDC answerExpression membership,
+ *     Reference target resource-type / URL well-formedness, Attachment content-type / size /
+ *     data-size consistency, and url format.
  *
  * Type dispatch uses raw code strings, never the generated QuestionnaireItemType enum — the
  * enum only contains the three hierarchy-root codes (see footgun generated-enum-hierarchy-gap).
@@ -173,6 +177,15 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     /** Canonical SDC enableWhenExpression — carries the expression as `valueExpression.expression`. */
     private const string EXT_ENABLE_WHEN_EXPRESSION_SDC = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression';
+
+    /** SDC answerExpression — `valueExpression` whose result is the item's permitted answers. */
+    private const string EXT_ANSWER_EXPRESSION_SDC = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression';
+
+    /** Item types whose answers answerExpression membership compares as numbers. */
+    private const array NUMERIC_ITEM_TYPES = ['integer', 'decimal'];
+
+    /** The only Expression.language the validator can evaluate. */
+    private const string EXPRESSION_LANGUAGE_FHIRPATH = 'text/fhirpath';
 
     /**
      * Item types that carry no answer value of their own: `display` is presentational and the
@@ -1548,6 +1561,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         $this->checkAnswerOptionMembership($item, $questionnaireItem, $type, $linkId, $path, $violations);
+        $this->checkAnswerExpressionMembership($item, $questionnaireItem, $type, $linkId, $path, $violations);
         $this->checkAnswerValueSetMembership($item, $questionnaireItem, $type, $linkId, $path, $violations);
 
         if ($type === 'quantity') {
@@ -1934,6 +1948,228 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 }
             }
         }
+    }
+
+    /**
+     * SDC answerExpression membership: when the item carries an sdc-questionnaire-answerExpression
+     * in text/fhirpath, each answer must equal one value of the expression's result, compared by
+     * expressionKey(). The expression is evaluated with the response
+     * as %resource, the response item as focus and %context, and the source Questionnaire as
+     * %questionnaire. An open-choice item also accepts a free-text string, and an R5
+     * answerConstraint admits answers as it does for answerOption.
+     *
+     * The rule checks nothing (DEFER-not-DENY) when the expression is in another language
+     * (x-fhir-query, CQL), fails to evaluate, or returns no comparable value. Expressions that
+     * read launch context or named variables (%patient, item `variable` extensions) fail here,
+     * because the validator has no form-filling context to supply them.
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     * @param R4Item|R4BItem|R5Item                         $questionnaireItem
+     * @param list<FHIRValidationViolation>                 $violations
+     */
+    private function checkAnswerExpressionMembership(
+        object $item,
+        object $questionnaireItem,
+        string $type,
+        string $linkId,
+        string $path,
+        array &$violations,
+    ): void {
+        if (!$this->hasAnswerValue($item)) {
+            return;
+        }
+
+        $permitted = $this->answerExpressionValues($item, $questionnaireItem, $type);
+        if ($permitted === null) {
+            return;
+        }
+
+        $answerConstraint = $this->answerConstraint($questionnaireItem);
+
+        foreach (array_values($item->answer) as $j => $answer) {
+            $key = $this->expressionKey($answer->value, $type);
+            if ($key === null || isset($permitted[$key])) {
+                continue;
+            }
+
+            if ($type === 'open-choice' && $this->answerTypeName($answer->value) === 'StringPrimitive') {
+                continue;
+            }
+
+            if ($this->answerConstraintAdmits($answer->value, $type, $answerConstraint)) {
+                continue;
+            }
+
+            $violations[] = $this->violation(
+                'error',
+                sprintf('%s.answer[%d].value', $path, $j),
+                sprintf("Answer '%s' for item '%s' is not among the answers its answerExpression allows.", $this->displayValue($answer->value), $linkId),
+            );
+        }
+    }
+
+    /**
+     * Evaluates the item's FHIRPath answerExpression and returns the expressionKey()s of its result,
+     * or null when the item has none, it is not FHIRPath, it fails, or it yields no comparable value.
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     * @param R4Item|R4BItem|R5Item                         $questionnaireItem
+     *
+     * @return array<string, true>|null
+     */
+    private function answerExpressionValues(object $item, object $questionnaireItem, string $type): ?array
+    {
+        $response = $this->currentResponse;
+        if ($response === null) {
+            return null;
+        }
+
+        $expression = null;
+        foreach ($questionnaireItem->extension as $extension) {
+            if ($extension->url !== self::EXT_ANSWER_EXPRESSION_SDC) {
+                continue;
+            }
+
+            $valueExpr = isset($extension->value) ? $extension->value : null;
+            if (!\is_object($valueExpr) || !isset($valueExpr->expression)) {
+                continue;
+            }
+
+            // Expression.language is required; anything but FHIRPath cannot be evaluated here.
+            $language = isset($valueExpr->language) ? $this->extensionString($valueExpr->language) : null;
+            if ($language !== self::EXPRESSION_LANGUAGE_FHIRPATH) {
+                return null;
+            }
+
+            $expression = $this->extensionString($valueExpr->expression);
+            break;
+        }
+
+        if ($expression === null || $expression === '') {
+            return null;
+        }
+
+        // Bind the response as root explicitly: the evaluator otherwise adopts the focus as root
+        // (footgun fhirpath-evaluation-context-mutation). External constants take precedence over
+        // the evaluator's own %context, which would otherwise resolve to the root resource.
+        $context = new EvaluationContext(
+            rootResource: $response,
+            externalConstants: [
+                'context'       => $item,
+                'questionnaire' => $this->currentQuestionnaire,
+            ],
+        );
+
+        try {
+            $result = $this->pathService->evaluate($expression, $item, $context);
+        } catch (FHIRPathException|\ValueError) {
+            // DEFER-not-DENY: an unevaluable expression constrains nothing, including one that
+            // fails on an exponent-form decimal such as 1e2.
+            return null;
+        }
+
+        $permitted = [];
+        foreach ($result as $value) {
+            $key = $this->expressionKey($value, $type);
+            if ($key !== null) {
+                $permitted[$key] = true;
+            }
+        }
+
+        return $permitted === [] ? null : $permitted;
+    }
+
+    /**
+     * The key that compares an answer with an answerExpression result value, or null when the
+     * value has no comparable identity.
+     *
+     * - integer and decimal items compare numbers by exact decimal value, so the FHIRPath decimal
+     *   5.0 equals the answer 5, while 0.00000000001 and 0.00000000002 stay distinct.
+     * - Other items compare strings lexically, so the string '01' does not admit the answer '1'.
+     * - A FHIRPath time keeps its literal 'T' prefix (@T14:30:00), which the model spelling of a
+     *   time answer (14:30:00) lacks, so the prefix is dropped.
+     * - Codings, Quantities, References, booleans and other values use normalizeValue() identity,
+     *   as answerOption membership does.
+     */
+    private function expressionKey(mixed $value, string $type): ?string
+    {
+        if ($value instanceof FHIRPathTime) {
+            $value = substr($value->value, 1);
+        } elseif ($value instanceof FHIRPathDecimal) {
+            $value = $value->value;
+        }
+
+        if (\in_array($type, self::NUMERIC_ITEM_TYPES, true)) {
+            $number = $this->canonicalDecimal($value);
+            if ($number !== null) {
+                return 'n:' . $number;
+            }
+        }
+
+        if (\is_string($value)) {
+            return 's:' . $value;
+        }
+
+        if ($value instanceof \Stringable && !$this->isComplexAnswerValue($value)) {
+            return 's:' . $value;
+        }
+
+        if (\is_int($value) || \is_float($value)) {
+            return 'n:' . $this->canonicalDecimal($value);
+        }
+
+        $identity = $this->normalizeValue($value);
+
+        return $identity !== null ? $this->identityKey($identity) : null;
+    }
+
+    /**
+     * Whether a value is a complex type that normalizeValue() keys by its parts.
+     */
+    private function isComplexAnswerValue(object $value): bool
+    {
+        return $value instanceof R4Coding || $value instanceof R4BCoding || $value instanceof R5Coding
+                                          || $value instanceof R4Quantity || $value instanceof R4BQuantity || $value instanceof R5Quantity
+                                          || $value instanceof R4Reference || $value instanceof R4BReference || $value instanceof R5Reference;
+    }
+
+    /**
+     * A number as a canonical decimal string without precision loss: no leading zeros on the
+     * integer part, no trailing fractional zeros, and "0" for negative zero. Accepts ints, floats,
+     * numeric strings and Stringable primitives; returns null for anything non-numeric. Exponent
+     * notation is expanded through float, the only lossy path.
+     */
+    private function canonicalDecimal(mixed $value): ?string
+    {
+        if (\is_int($value)) {
+            return (string) $value;
+        }
+
+        if (\is_float($value)) {
+            $value = rtrim(rtrim(sprintf('%.20F', $value), '0'), '.');
+        } elseif ($value instanceof \Stringable) {
+            $value = (string) $value;
+        }
+
+        if (!\is_string($value) || !is_numeric($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+        if (stripos($value, 'e') !== false) {
+            $value = rtrim(rtrim(sprintf('%.20F', (float) $value), '0'), '.');
+        }
+
+        $negative = str_starts_with($value, '-');
+        $value    = ltrim($value, '+-');
+
+        [$integer, $fraction] = array_pad(explode('.', $value, 2), 2, '');
+        $integer              = ltrim($integer, '0');
+        $fraction             = rtrim($fraction, '0');
+
+        $digits = ($integer === '' ? '0' : $integer) . ($fraction !== '' ? '.' . $fraction : '');
+
+        return $negative && $digits !== '0' ? '-' . $digits : $digits;
     }
 
     /**

@@ -64,6 +64,9 @@ class FHIRPathService
      * @return Collection The result collection
      *
      * @throws FHIRPathException         If the expression is invalid or evaluation fails
+     * @throws \ValueError               When arithmetic or comparison meets a decimal literal in
+     *                                   exponent form, such as `1e2 + 1`: the lexer accepts it and
+     *                                   bcmath rejects it
      * @throws \InvalidArgumentException When $fhirVersion names no known release. Raised lazily, by
      *                                   the first type lookup that needs to place a class, rather
      *                                   than up front — so an expression that never consults the type
