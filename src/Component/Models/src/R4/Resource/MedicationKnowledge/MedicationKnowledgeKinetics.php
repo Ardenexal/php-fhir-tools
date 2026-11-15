@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The time course of drug absorption, distribution, metabolism and excretion of a medication from the body.
@@ -35,6 +36,7 @@ class MedicationKnowledgeKinetics extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
         )]
+        #[Valid]
         public array $areaUnderCurve = [],
         /** @var array<Quantity> lethalDose50 The median lethal dose of a drug */
         #[FhirProperty(
@@ -43,9 +45,10 @@ class MedicationKnowledgeKinetics extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
         )]
+        #[Valid]
         public array $lethalDose50 = [],
         /** @var Duration|null halfLifePeriod Time required for concentration in the body to decrease by half */
-        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $halfLifePeriod = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

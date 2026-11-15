@@ -1,5 +1,27 @@
 {
-    "errorCount": 0,
+    "errorCount": 2,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 4,
+        "warningCount": 0,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "The System URI could not be determined for the code 'invalid' in the ValueSet 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1'",
+            "The System URI could not be determined for the code 'invalid' in the ValueSet 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1'",
+            "The value provided ('invalid') was not found in the value set 'AdministrativeGender' (http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1), and a code is required from this value set  (error message = The System URI could not be determined for the code 'invalid' in the ValueSet 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1'; The provided code '#invalid' was not found in the value set 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1')",
+            "The value provided ('invalid') was not found in the value set 'AdministrativeGender' (http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1), and a code is required from this value set  (error message = The System URI could not be determined for the code 'invalid' in the ValueSet 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1'; The provided code '#invalid' was not found in the value set 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1')"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:FHIRValueSetBinding": [
+                "entry[0].resource.gender — The value invalid is not a valid case of value set http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1.",
+                "entry[1].resource.gender — The value invalid is not a valid case of value set http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1."
+            ]
+        },
+        "warnings": {}
+    }
 }

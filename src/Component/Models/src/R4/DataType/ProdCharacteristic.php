@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -30,22 +31,22 @@ class ProdCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Quantity|null height Where applicable, the height can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $height = null,
         /** @var Quantity|null width Where applicable, the width can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $width = null,
         /** @var Quantity|null depth Where applicable, the depth can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $depth = null,
         /** @var Quantity|null weight Where applicable, the weight can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $weight = null,
         /** @var Quantity|null nominalVolume Where applicable, the nominal volume can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $nominalVolume = null,
         /** @var Quantity|null externalDiameter Where applicable, the external diameter can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $externalDiameter = null,
         /** @var StringPrimitive|string|null shape Where applicable, the shape can be specified An appropriate controlled vocabulary shall be used The term and the term identifier shall be used */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -73,9 +74,10 @@ class ProdCharacteristic extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment',
         )]
+        #[Valid]
         public array $image = [],
         /** @var CodeableConcept|null scoring Where applicable, the scoring can be specified An appropriate controlled vocabulary shall be used The term and the term identifier shall be used */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $scoring = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

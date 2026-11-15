@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 
 /**
- * @author HL7 International / Community Based Collaborative Care
+ * @author HL7 International / Security
  *
  * @see http://hl7.org/fhir/StructureDefinition/consent-NotificationEndpoint
  *

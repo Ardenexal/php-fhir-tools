@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The protocol (set of recommendations) being followed by the provider who administered the dose.
@@ -36,7 +37,7 @@ class ImmunizationProtocolApplied extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $series = null,
         /** @var Reference|null authority Who is responsible for publishing the recommendations */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $authority = null,
         /** @var array<CodeableConcept> targetDisease Vaccine preventatable disease being targetted */
         #[FhirProperty(
@@ -45,6 +46,7 @@ class ImmunizationProtocolApplied extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $targetDisease = [],
         /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumber Dose number within series */
         #[FhirProperty(

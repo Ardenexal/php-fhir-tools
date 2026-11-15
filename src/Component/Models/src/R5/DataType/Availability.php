@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -31,6 +32,7 @@ class Availability extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\AvailabilityAvailableTime',
         )]
+        #[Valid]
         public array $availableTime = [],
         /** @var array<AvailabilityNotAvailableTime> notAvailableTime Not available during this time due to provided reason */
         #[FhirProperty(
@@ -39,6 +41,7 @@ class Availability extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\AvailabilityNotAvailableTime',
         )]
+        #[Valid]
         public array $notAvailableTime = [],
     ) {
         parent::__construct($id, $extension);

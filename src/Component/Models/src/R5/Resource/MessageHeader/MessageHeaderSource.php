@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The source application from which this message originated.
@@ -63,7 +64,7 @@ class MessageHeaderSource extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $version = null,
         /** @var ContactPoint|null contact Human contact for problems */
-        #[FhirProperty(fhirType: 'ContactPoint', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'ContactPoint', propertyKind: 'complex'), Valid]
         public ?ContactPoint $contact = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

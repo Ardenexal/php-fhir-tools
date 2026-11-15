@@ -40,7 +40,13 @@ class Quantity extends DataType
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $value = null,
         /** @var QuantityComparatorType|null comparator < | <= | >= | > | ad - how to understand the value */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/quantity-comparator|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because the comparator modifies the interpretation of the value significantly. If there is no comparator, then there is no modification of the value')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/quantity-comparator|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\QuantityComparator',
+        )]
+        #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because the comparator modifies the interpretation of the value significantly. If there is no comparator, then there is no modification of the value')]
         public ?QuantityComparatorType $comparator = null,
         /** @var StringPrimitive|string|null unit Unit representation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

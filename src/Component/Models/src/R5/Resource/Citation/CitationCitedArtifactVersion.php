@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The defined version of the cited artifact.
@@ -34,7 +35,7 @@ class CitationCitedArtifactVersion extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $value = null,
         /** @var Reference|null baseCitation Citation for the main version of the cited artifact */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Citation'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Citation'])]
         public ?Reference $baseCitation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

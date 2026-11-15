@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Offer Recipient.
@@ -39,6 +40,7 @@ class ContractTermOfferParty extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[Count(min: 1)]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
@@ -51,7 +53,7 @@ class ContractTermOfferParty extends BackboneElement
         ])]
         public array $reference = [],
         /** @var CodeableConcept|null role Participant engagement type */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $role = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

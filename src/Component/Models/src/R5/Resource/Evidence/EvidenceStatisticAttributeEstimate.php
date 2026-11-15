@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A statistical attribute of the statistic such as a measure of heterogeneity.
@@ -42,18 +43,25 @@ class EvidenceStatisticAttributeEstimate extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var CodeableConcept|null type The type of attribute estimate, e.g., confidence interval or p value */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/attribute-estimate-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/attribute-estimate-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AttributeEstimateType',
+        )]
         public ?CodeableConcept $type = null,
         /** @var Quantity|null quantity The singular quantity of the attribute estimate, for attribute estimates represented as single values; also used to report unit of measure */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var numeric-string|null level Level of confidence interval, e.g., 0.95 for 95% confidence interval */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $level = null,
         /** @var Range|null range Lower and upper bound values of the attribute estimate */
-        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $range = null,
         /** @var array<EvidenceStatisticAttributeEstimate> attributeEstimate A nested attribute estimate; which is the attribute estimate of an attribute estimate */
         #[FhirProperty(
@@ -62,6 +70,7 @@ class EvidenceStatisticAttributeEstimate extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Evidence\EvidenceStatisticAttributeEstimate',
         )]
+        #[Valid]
         public array $attributeEstimate = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

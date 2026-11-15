@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
@@ -19,6 +20,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-instance-name', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'rin-1',
+    severity: 'error',
+    expression: '%resource.title.exists().not()',
+    human: 'Cannot be used where title already exists.',
+)]
 class ResourceInstanceNameExtension extends Extension
 {
     /**

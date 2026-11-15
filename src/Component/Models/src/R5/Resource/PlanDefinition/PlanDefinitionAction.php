@@ -31,6 +31,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An action or group of actions to be taken as part of the plan. For example, in clinical care, an action would be to prescribe a particular indicated medication, or perform a particular test as appropriate. In pharmaceutical quality, an action would be the test that needs to be performed on a drug product as defined in the quality specification.
@@ -64,10 +65,15 @@ class PlanDefinitionAction extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $textEquivalent = null,
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\RequestPriority',
+        )]
         public ?RequestPriorityType $priority = null,
         /** @var CodeableConcept|null code Code representing the meaning of the action or sub-actions */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var array<CodeableConcept> reason Why the action should be performed */
         #[FhirProperty(
@@ -76,6 +82,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $reason = [],
         /** @var array<RelatedArtifact> documentation Supporting documentation for the intended performer of the action */
         #[FhirProperty(
@@ -84,6 +91,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $documentation = [],
         /** @var array<IdPrimitive> goalId What goals this action supports */
         #[FhirProperty(
@@ -119,7 +127,11 @@ class PlanDefinitionAction extends BackboneElement
                 ],
             ],
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participant-resource-types', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/participant-resource-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ParticipantResourceTypes',
+        )]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
         public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var array<TriggerDefinition> trigger When the action should be triggered */
@@ -129,6 +141,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\TriggerDefinition',
         )]
+        #[Valid]
         public array $trigger = [],
         /** @var array<PlanDefinitionActionCondition> condition Whether or not the action is applicable */
         #[FhirProperty(
@@ -137,6 +150,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionActionCondition',
         )]
+        #[Valid]
         public array $condition = [],
         /** @var array<PlanDefinitionActionInput> input Input data requirements */
         #[FhirProperty(
@@ -145,6 +159,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionActionInput',
         )]
+        #[Valid]
         public array $input = [],
         /** @var array<PlanDefinitionActionOutput> output Output data definition */
         #[FhirProperty(
@@ -153,6 +168,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionActionOutput',
         )]
+        #[Valid]
         public array $output = [],
         /** @var array<PlanDefinitionActionRelatedAction> relatedAction Relationship to another action */
         #[FhirProperty(
@@ -161,6 +177,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionActionRelatedAction',
         )]
+        #[Valid]
         public array $relatedAction = [],
         /** @var Age|Duration|Range|Timing|null timing When the action should take place */
         #[FhirProperty(
@@ -196,7 +213,7 @@ class PlanDefinitionAction extends BackboneElement
         )]
         public Age|Duration|Range|Timing|null $timing = null,
         /** @var CodeableReference|null location Where it should happen */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?CodeableReference $location = null,
         /** @var array<PlanDefinitionActionParticipant> participant Who should participate in the action */
         #[FhirProperty(
@@ -205,24 +222,56 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionActionParticipant',
         )]
+        #[Valid]
         public array $participant = [],
         /** @var CodeableConcept|null type create | update | remove | fire-event */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionType',
+        )]
         public ?CodeableConcept $type = null,
         /** @var ActionGroupingBehaviorType|null groupingBehavior visual-group | logical-group | sentence-group */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-grouping-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-grouping-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionGroupingBehavior',
+        )]
         public ?ActionGroupingBehaviorType $groupingBehavior = null,
         /** @var ActionSelectionBehaviorType|null selectionBehavior any | all | all-or-none | exactly-one | at-most-one | one-or-more */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-selection-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-selection-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionSelectionBehavior',
+        )]
         public ?ActionSelectionBehaviorType $selectionBehavior = null,
         /** @var ActionRequiredBehaviorType|null requiredBehavior must | could | must-unless-documented */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-required-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-required-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionRequiredBehavior',
+        )]
         public ?ActionRequiredBehaviorType $requiredBehavior = null,
         /** @var ActionPrecheckBehaviorType|null precheckBehavior yes | no */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-precheck-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-precheck-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionPrecheckBehavior',
+        )]
         public ?ActionPrecheckBehaviorType $precheckBehavior = null,
         /** @var ActionCardinalityBehaviorType|null cardinalityBehavior single | multiple */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-cardinality-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-cardinality-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionCardinalityBehavior',
+        )]
         public ?ActionCardinalityBehaviorType $cardinalityBehavior = null,
         /** @var CanonicalPrimitive|UriPrimitive|null definition Description of the activity to be performed */
         #[FhirProperty(
@@ -263,6 +312,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionActionDynamicValue',
         )]
+        #[Valid]
         public array $dynamicValue = [],
         /** @var array<PlanDefinitionAction> action A sub-action */
         #[FhirProperty(
@@ -271,6 +321,7 @@ class PlanDefinitionAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionAction',
         )]
+        #[Valid]
         public array $action = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

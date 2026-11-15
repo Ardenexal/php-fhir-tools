@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -28,7 +29,7 @@ class VirtualServiceDetail extends DataType
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var Coding|null channelType Channel Type */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid]
         public ?Coding $channelType = null,
         /** @var UrlPrimitive|StringPrimitive|string|ContactPoint|ExtendedContactDetail|null address Contact address/number */
         #[FhirProperty(

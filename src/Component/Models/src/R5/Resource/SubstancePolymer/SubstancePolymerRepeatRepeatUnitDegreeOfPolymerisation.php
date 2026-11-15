@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Applies to homopolymer and block co-polymers where the degree of polymerisation within a block can be described.
@@ -32,7 +33,7 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation extends BackboneEle
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type The type of the degree of polymerisation shall be described, e.g. SRU/Polymer Ratio */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var int|null average An average amount of polymerisation */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]

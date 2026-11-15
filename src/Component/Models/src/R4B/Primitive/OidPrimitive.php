@@ -32,7 +32,7 @@ class OidPrimitive extends UriPrimitive implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var string|null value Primitive value for oid */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: 'urn:oid:[0-2](\.(0|[1-9][0-9]*))+')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '~\A(?:urn:oid:[0-2](\.(0|[1-9][0-9]*))+)\z~')]
         public ?string $value = null,
     ) {
         parent::__construct($id, $extension, $value);

@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -28,10 +29,21 @@ class Address extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var AddressUseType|null use home | work | temp | old | billing - purpose of this address */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/address-use|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not mistake a temporary or old address etc.for a current/permanent one')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/address-use|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AddressUse',
+        )]
+        #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not mistake a temporary or old address etc.for a current/permanent one')]
         public ?AddressUseType $use = null,
         /** @var AddressTypeType|null type postal | physical | both */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/address-type|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/address-type|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AddressType',
+        )]
         public ?AddressTypeType $type = null,
         /** @var StringPrimitive|string|null text Text representation of the address */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -60,7 +72,7 @@ class Address extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $country = null,
         /** @var Period|null period Time period when address was/is in use */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,
     ) {
         parent::__construct($id, $extension);

@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\PackagedProductDefinition\PackagedProductDefinitionLegalStatusOfSupply;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\PackagedProductDefinition\PackagedProductDefinitionPackage;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
@@ -44,7 +45,7 @@ class PackagedProductDefinitionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -55,13 +56,14 @@ class PackagedProductDefinitionResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -76,12 +78,13 @@ class PackagedProductDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null name A name for this package. Typically as listed in a drug formulary, catalogue, inventory etc */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
         /** @var CodeableConcept|null type A high level category e.g. medicinal product, raw material, shipping container etc */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var array<Reference> packageFor The product that this is a pack for */
         #[FhirProperty(
@@ -90,10 +93,18 @@ class PackagedProductDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition'])]
         public array $packageFor = [],
         /** @var CodeableConcept|null status The status within the lifecycle of this item. High level - not intended to duplicate details elsewhere e.g. legal status, or authorization/marketing status */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'preferred'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\PublicationStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
         public ?CodeableConcept $status = null,
         /** @var DateTimePrimitive|null statusDate The date at which the given status became applicable */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -105,6 +116,7 @@ class PackagedProductDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity',
         )]
+        #[Valid]
         public array $containedItemQuantity = [],
         /** @var MarkdownPrimitive|null description Textual description. Note that this is not the name of the package or product */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -116,6 +128,7 @@ class PackagedProductDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\PackagedProductDefinition\PackagedProductDefinitionLegalStatusOfSupply',
         )]
+        #[Valid]
         public array $legalStatusOfSupply = [],
         /** @var array<MarketingStatus> marketingStatus Allows specifying that an item is on the market for sale, or that it is not available, and the dates and locations associated */
         #[FhirProperty(
@@ -124,6 +137,7 @@ class PackagedProductDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\MarketingStatus',
         )]
+        #[Valid]
         public array $marketingStatus = [],
         /** @var array<CodeableConcept> characteristic Allows the key features to be recorded, such as "hospital pack", "nurse prescribable" */
         #[FhirProperty(
@@ -132,6 +146,7 @@ class PackagedProductDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $characteristic = [],
         /** @var bool|null copackagedIndicator If the drug product is supplied with another item such as a diluent or adjuvant */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -143,10 +158,11 @@ class PackagedProductDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $manufacturer = [],
         /** @var PackagedProductDefinitionPackage|null package A packaging item, as a container for medically related items, possibly with other packaging items within, or a packaging component, such as bottle cap */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?PackagedProductDefinitionPackage $package = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

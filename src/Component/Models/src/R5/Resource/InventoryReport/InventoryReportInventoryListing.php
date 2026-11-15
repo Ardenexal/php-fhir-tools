@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An inventory listing section (grouped by any of the attributes).
@@ -31,10 +32,10 @@ class InventoryReportInventoryListing extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Reference|null location Location of the inventory items */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $location = null,
         /** @var CodeableConcept|null itemStatus The status of the items that are being reported */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $itemStatus = null,
         /** @var DateTimePrimitive|null countingDateTime The date and time when the items were counted */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -46,6 +47,7 @@ class InventoryReportInventoryListing extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\InventoryReport\InventoryReportInventoryListingItem',
         )]
+        #[Valid]
         public array $item = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

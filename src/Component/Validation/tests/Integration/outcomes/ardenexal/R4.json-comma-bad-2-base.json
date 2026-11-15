@@ -1,5 +1,25 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "A Comma is missing in the JSON",
+            "There is an extra comma at the end of the Array in the JSON",
+            "There is an extra comma at the end of the Object in the JSON"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to parse JSON: Parse error on line 8:\n...    \"Sarah\",\r      ]\r    }\r  ],\r  \"g\n---------------------^\nExpected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '[' - It appears you have an extra trailing comma"
+            ]
+        },
+        "warnings": {}
+    }
 }

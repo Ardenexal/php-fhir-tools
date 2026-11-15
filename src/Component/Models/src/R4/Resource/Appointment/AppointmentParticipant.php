@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\ParticipationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description List of participants involved in the appointment.
@@ -48,10 +49,16 @@ class AppointmentParticipant extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-participant-type', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-participant-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ParticipantType',
+        )]
         public array $type = [],
         /** @var Reference|null actor Person, Location/HealthcareService or Device */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -63,13 +70,24 @@ class AppointmentParticipant extends BackboneElement
         ])]
         public ?Reference $actor = null,
         /** @var ParticipantRequiredType|null required required | optional | information-only */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participantrequired|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/participantrequired|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ParticipantRequired',
+        )]
         public ?ParticipantRequiredType $required = null,
         /** @var ParticipationStatusType|null status accepted | declined | tentative | needs-action */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participationstatus|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/participationstatus|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ParticipationStatus',
+        )]
         public ?ParticipationStatusType $status = null,
         /** @var Period|null period Participation period of the actor */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -42,7 +42,13 @@ class ConceptMapAdditionalAttribute extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var ConceptMapAttributeTypeType|null type code | Coding | string | boolean | Quantity */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conceptmap-attribute-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/conceptmap-attribute-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConceptMapAttributeType',
+        )]
         public ?ConceptMapAttributeTypeType $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

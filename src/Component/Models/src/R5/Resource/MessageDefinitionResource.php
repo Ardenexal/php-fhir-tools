@@ -30,6 +30,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\MessageDefinition\MessageDefinitionAllowedResponse;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\MessageDefinition\MessageDefinitionFocus;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Infrastructure And Messaging)
@@ -57,19 +58,24 @@ class MessageDefinitionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -87,6 +93,7 @@ class MessageDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version Business version of the message definition */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -111,7 +118,11 @@ class MessageDefinitionResource extends AbstractDomainResource
                 ],
             ],
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\VersionAlgorithm',
+        )]
         public StringPrimitive|string|Coding|null $versionAlgorithm = null,
         /** @var StringPrimitive|string|null name Name for this message definition (computer friendly) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -129,7 +140,14 @@ class MessageDefinitionResource extends AbstractDomainResource
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MessageDefinition'])]
         public array $replaces = [],
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PublicationStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -147,6 +165,7 @@ class MessageDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var MarkdownPrimitive|null description Natural language description of the message definition */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -158,6 +177,7 @@ class MessageDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for message definition (if applicable) */
         #[FhirProperty(
@@ -166,7 +186,12 @@ class MessageDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\JurisdictionValueSet',
+        )]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this message definition is defined */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -216,7 +241,12 @@ class MessageDefinitionResource extends AbstractDomainResource
         #[NotBlank]
         public Coding|UriPrimitive|null $event = null,
         /** @var MessageSignificanceCategoryType|null category consequence | currency | notification */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/message-significance-category|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/message-significance-category|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\MessageSignificanceCategory',
+        )]
         public ?MessageSignificanceCategoryType $category = null,
         /** @var array<MessageDefinitionFocus> focus Resource(s) that are the subject of the event */
         #[FhirProperty(
@@ -225,9 +255,15 @@ class MessageDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MessageDefinition\MessageDefinitionFocus',
         )]
+        #[Valid]
         public array $focus = [],
         /** @var MessageheaderResponseRequestType|null responseRequired always | on-error | never | on-success */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/messageheader-response-request|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/messageheader-response-request|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\MessageheaderResponseRequest',
+        )]
         public ?MessageheaderResponseRequestType $responseRequired = null,
         /** @var array<MessageDefinitionAllowedResponse> allowedResponse Responses to this message */
         #[FhirProperty(
@@ -236,6 +272,7 @@ class MessageDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MessageDefinition\MessageDefinitionAllowedResponse',
         )]
+        #[Valid]
         public array $allowedResponse = [],
         /** @var CanonicalPrimitive|null graph Canonical reference to a GraphDefinition */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/GraphDefinition'])]

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
@@ -18,36 +19,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
  * @description FHIR Body Height Profile
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/bodyheight', baseType: 'Observation', fhirVersion: 'R4')]
-#[FHIRProfileConstraint(
-    path: 'code.coding',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyheight'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.system',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyheight'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.system',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => 'http://loinc.org'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyheight'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.code',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyheight'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.code',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => '8302-2'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyheight'],
-)]
 #[FHIRProfileConstraint(
     path: 'valueQuantity.value',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
@@ -90,9 +61,37 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: 1,
     discriminatorType: 'value',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/bodyheight'],
-    orderedIndex: 0,
     discriminatorValue: '8302-2',
+    orderedIndex: 0,
+    rules: [
+        [
+            'path'       => 'system',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+        [
+            'path'       => 'system',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => 'http://loinc.org'],
+        ],
+        [
+            'path'       => 'code',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+        [
+            'path'       => 'code',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => '8302-2'],
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/bodyheight'],
+)]
+#[FHIRProfileBinding(
+    path: 'valueQuantity.code',
+    valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-bodylength|4.0.1',
+    strength: 'required',
+    groups: ['http://hl7.org/fhir/StructureDefinition/bodyheight'],
 )]
 class ObservationBodyheightProfile extends ObservationVitalsignsProfile
 {

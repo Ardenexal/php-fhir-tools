@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Applicable for single substances that contain a radionuclide or a non-natural isotopic ratio.
@@ -30,19 +31,19 @@ class SubstanceSpecificationStructureIsotope extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Identifier|null identifier Substance identifier for each non-natural or radioisotope */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var CodeableConcept|null name Substance name for each non-natural or radioisotope */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $name = null,
         /** @var CodeableConcept|null substitution The type of isotopic substitution present in a single substance */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $substitution = null,
         /** @var Quantity|null halfLife Half life - for a non-natural nuclide */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $halfLife = null,
         /** @var SubstanceSpecificationStructureIsotopeMolecularWeight|null molecularWeight The molecular weight or weight range (for proteins, polymers or nucleic acids) */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?SubstanceSpecificationStructureIsotopeMolecularWeight $molecularWeight = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

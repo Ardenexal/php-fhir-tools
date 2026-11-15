@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ListStatus
  * URL: http://hl7.org/fhir/ValueSet/list-status
  * Version: 4.3.0
  * Description: The current state of the list.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/list-status', version: '4.3.0')]
 enum ListStatus: string
 {
     /** Current */

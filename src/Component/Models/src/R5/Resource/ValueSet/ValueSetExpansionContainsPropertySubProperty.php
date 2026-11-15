@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description A subproperty value for this concept.
@@ -70,7 +71,7 @@ class ValueSetExpansionContainsPropertySubProperty extends BackboneElement
                 ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

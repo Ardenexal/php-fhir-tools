@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"ElementDefinition","url":"http://hl7.org/fhir/StructureDefinition/ElementDefinition","version":"5.0.0","name":"ElementDefinition","status":"active","fhirVersion":"5.0.0","kind":"complex-type","abstract":false,"type":"ElementDefinition","baseDefinition":"http://hl7.org/fhir/StructureDefinition/BackboneType","derivation":"specialization"}

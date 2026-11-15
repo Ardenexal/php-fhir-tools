@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specifies a concept to be included or excluded.
@@ -42,6 +43,7 @@ class ValueSetComposeIncludeConcept extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ValueSet\ValueSetComposeIncludeConceptDesignation',
         )]
+        #[Valid]
         public array $designation = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -1,0 +1,32 @@
+# Reflection exemptions -- reviewed allowlist for bin/reflection-gate.sh
+#
+# Format: <path>::<substring of the matched line>
+# Matched on file plus code, never on a line number, so an edit above a rule cannot silently widen it.
+#
+# ONLY per-instance state introspection belongs here: "has this typed slot been assigned on THIS
+# object". A per-class registry cannot answer that by construction, so bucketing these as call sites
+# would create migration tasks with no possible target.
+#
+# Everything else -- reading attributes, enumerating properties, resolving types -- belongs to the
+# Metadata registry and must NOT be added here. A line added to this file is a review event, not a pass.
+#
+# Note the ten other `isInitialized` calls in Validation are NOT listed: they sit inside
+# getProperties() enumeration loops, so the gate pattern never matches them. Only the standalone
+# `new \ReflectionProperty(...)` probes below are matches that need suppressing.
+
+# FHIRPathEvaluator::isPropertyInitialized -- guards a read of a typed property that the deserializer
+# may never have assigned; reading it directly throws Error.
+src/Component/FHIRPath/src/Evaluator/FHIRPathEvaluator.php::new \ReflectionProperty($node, $propertyName)
+
+# FHIRPathEvaluator::normalizeValue -- same guard for a primitive wrapper's `value` slot.
+src/Component/FHIRPath/src/Evaluator/FHIRPathEvaluator.php::new \ReflectionProperty($value, 'value')
+
+# FHIRPathInvariantValidator::readSegment -- initialization probe while walking an expression path.
+src/Component/Validation/src/Validator/FHIRPathInvariantValidator.php::new \ReflectionProperty($current, $segment)
+
+# FHIRPathInvariantValidator::narrativeAccountsForContained -- writes onto a probe CLONE, not the
+# subject under validation; this is instance mutation, not metadata.
+src/Component/Validation/src/Validator/FHIRPathInvariantValidator.php::new \ReflectionProperty($value, 'contained')
+
+# ComparisonService::isDirectlyReadable -- asks whether this instance's slot can be read at all.
+src/Component/FHIRPath/src/Evaluator/ComparisonService.php::new \ReflectionProperty($value, $property)

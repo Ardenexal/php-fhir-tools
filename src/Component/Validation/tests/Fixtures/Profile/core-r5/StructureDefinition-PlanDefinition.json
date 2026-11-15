@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"PlanDefinition","url":"http://hl7.org/fhir/StructureDefinition/PlanDefinition","version":"5.0.0","name":"PlanDefinition","status":"draft","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"PlanDefinition","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

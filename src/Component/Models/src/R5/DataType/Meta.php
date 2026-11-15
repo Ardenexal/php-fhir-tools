@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -55,7 +56,12 @@ class Meta extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllSecurityLabels',
+        )]
         public array $security = [],
         /** @var array<Coding> tag Tags applied to this resource */
         #[FhirProperty(
@@ -64,6 +70,7 @@ class Meta extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
+        #[Valid]
         public array $tag = [],
     ) {
         parent::__construct($id, $extension);

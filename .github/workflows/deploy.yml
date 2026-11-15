@@ -1,16 +1,27 @@
 name: Deploy Demo
 
+# DISABLED. The deployment does not currently work, so the automatic trigger is removed
+# rather than left to fail on every demo/ change and every release tag. `workflow_dispatch`
+# keeps the job runnable by hand for whoever fixes it, and keeps the configuration and its
+# history in one piece instead of deleting and reconstructing it later.
+#
+# To re-enable, restore the push trigger below. It read:
+#
+#     push:
+#         branches: [ main ]
+#         paths:
+#             - 'demo/**'
+#             - '.github/workflows/deploy.yml'
+#         # Note: tags and paths are both required when used together.
+#         # Tag pushes will only trigger if the tagged commit includes demo/ changes.
+#         # If you create a tag on a commit that doesn't touch demo/, push an empty
+#         # commit to demo/ (e.g. touch demo/.deploy) and retag.
+#         tags: [ '*.*' ]
+#
+# Note for whoever picks this up: the demo image is also what the tag trigger published, so
+# nothing else builds ghcr.io/ardenexal/php-fhir-tools while this is off.
 on:
-    push:
-        branches: [ main ]
-        paths:
-            - 'demo/**'
-            - '.github/workflows/deploy.yml'
-        # Note: tags and paths are both required when used together.
-        # Tag pushes will only trigger if the tagged commit includes demo/ changes.
-        # If you create a tag on a commit that doesn't touch demo/, push an empty
-        # commit to demo/ (e.g. touch demo/.deploy) and retag.
-        tags: [ '*.*' ]
+    workflow_dispatch:
 
 jobs:
     build-and-deploy:

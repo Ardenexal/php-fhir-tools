@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A device that is part (for example a component) of the present device.
@@ -30,7 +31,7 @@ class DeviceDefinitionHasPart extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Reference|null reference Reference to the part */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DeviceDefinition'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DeviceDefinition'])]
         public ?Reference $reference = null,
         /** @var int|null count Number of occurrences of the part */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]

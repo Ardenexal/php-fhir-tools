@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BiologicallyDerivedProductS
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Product storage.
@@ -37,10 +38,15 @@ class BiologicallyDerivedProductStorage extends BackboneElement
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $temperature = null,
         /** @var BiologicallyDerivedProductStorageScaleType|null scale farenheit | celsius | kelvin */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-storage-scale|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-storage-scale|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\BiologicallyDerivedProductStorageScale',
+        )]
         public ?BiologicallyDerivedProductStorageScaleType $scale = null,
         /** @var Period|null duration Storage timeperiod */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $duration = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

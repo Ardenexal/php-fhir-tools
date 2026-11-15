@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Categorization of the medication within a formulary or classification system.
@@ -31,7 +32,7 @@ class MedicationKnowledgeMedicineClassification extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type The type of category for the medication (for example, therapeutic classification, therapeutic sub-classification) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var StringPrimitive|string|UriPrimitive|null source The source of the classification */
         #[FhirProperty(
@@ -61,6 +62,7 @@ class MedicationKnowledgeMedicineClassification extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $classification = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

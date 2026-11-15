@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Invalid entity in the XHTML ('&reg;')"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NarrativeXhtmlChecker": [
+                "text.div — Invalid entity in the XHTML ('&reg;')"
+            ]
+        },
+        "warnings": {}
+    }
 }

@@ -35,12 +35,8 @@ class StartsWithFunction extends AbstractFunction
         }
 
         /** @var ExpressionNode $prefixExpr */
-        $prefixExpr = $parameters[0];
-        $evaluator  = $context->getEvaluator();
-        if ($evaluator === null) {
-            throw new EvaluationException('Evaluator not available in context');
-        }
-        $prefixResult = $evaluator->evaluate($prefixExpr, $context);
+        $prefixExpr   = $parameters[0];
+        $prefixResult = $this->evaluateParameter($prefixExpr, $context);
 
         if ($prefixResult->isEmpty()) {
             return Collection::single(false);

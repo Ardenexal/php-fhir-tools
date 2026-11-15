@@ -9,7 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description Information about the [ConceptMap/$translate](conceptmap-operation-translate.html) operation.
@@ -28,7 +28,7 @@ class TerminologyCapabilitiesTranslation extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var bool|null needsMap Whether the client must identify the map */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $needsMap = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

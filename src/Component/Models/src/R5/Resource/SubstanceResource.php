@@ -23,6 +23,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Substance\SubstanceIngredient;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
@@ -39,19 +41,24 @@ class SubstanceResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -66,12 +73,19 @@ class SubstanceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var bool|null instance Is this an instance of a substance or a kind of one */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank, FHIRIsModifier(reason: 'Not known why this is labelled a modifier')]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull, FHIRIsModifier(reason: 'Not known why this is labelled a modifier')]
         public ?bool $instance = null,
         /** @var FHIRSubstanceStatusType|null status active | inactive | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/substance-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/substance-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRSubstanceStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?FHIRSubstanceStatusType $status = null,
         /** @var array<CodeableConcept> category What class/type of substance this is */
         #[FhirProperty(
@@ -80,10 +94,15 @@ class SubstanceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/substance-category', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/substance-category',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\SubstanceCategoryCodes',
+        )]
         public array $category = [],
         /** @var CodeableReference|null code What substance this is */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceDefinition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceDefinition'])]
         public ?CodeableReference $code = null,
         /** @var MarkdownPrimitive|null description Textual description of the substance, comments */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -92,7 +111,7 @@ class SubstanceResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $expiry = null,
         /** @var Quantity|null quantity Amount of substance in the package */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var array<SubstanceIngredient> ingredient Composition information about the substance */
         #[FhirProperty(
@@ -101,6 +120,7 @@ class SubstanceResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Substance\SubstanceIngredient',
         )]
+        #[Valid]
         public array $ingredient = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

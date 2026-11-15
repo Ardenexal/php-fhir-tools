@@ -25,6 +25,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Group\GroupCharacteristic;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Group\GroupMember;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -41,19 +42,24 @@ class GroupResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -68,18 +74,31 @@ class GroupResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var bool|null active Whether this group's record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
         public ?bool $active = null,
         /** @var GroupTypeType|null type person | animal | practitioner | device | careteam | healthcareservice | location | organization | relatedperson | specimen */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\GroupType',
+        )]
         public ?GroupTypeType $type = null,
         /** @var GroupMembershipBasisType|null membership definitional | enumerated */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-membership-basis|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-membership-basis|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\GroupMembershipBasis',
+        )]
         public ?GroupMembershipBasisType $membership = null,
         /** @var CodeableConcept|null code Kind of Group members */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var StringPrimitive|string|null name Label for Group */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -92,6 +111,7 @@ class GroupResource extends AbstractDomainResource
         public ?UnsignedIntPrimitive $quantity = null,
         /** @var Reference|null managingEntity Entity that is the custodian of the Group's definition */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
@@ -106,6 +126,7 @@ class GroupResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Group\GroupCharacteristic',
         )]
+        #[Valid]
         public array $characteristic = [],
         /** @var array<GroupMember> member Who or what is in group */
         #[FhirProperty(
@@ -114,6 +135,7 @@ class GroupResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Group\GroupMember',
         )]
+        #[Valid]
         public array $member = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Provenance and copyright of classification.
@@ -31,16 +32,17 @@ class CitationCitedArtifactClassificationWhoClassified extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null person Person who created the classification */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Person',
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
         ])]
         public ?Reference $person = null,
         /** @var Reference|null organization Organization who created the classification */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $organization = null,
         /** @var Reference|null publisher The publisher of the classification, not the publisher of the article or artifact being cited */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $publisher = null,
         /** @var StringPrimitive|string|null classifierCopyright Rights management statement for the classification */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

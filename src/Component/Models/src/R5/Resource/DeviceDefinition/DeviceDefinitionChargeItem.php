@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Billing code or reference associated with the device.
@@ -33,13 +34,13 @@ class DeviceDefinitionChargeItem extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableReference|null chargeItemCode The code or reference for the charge item */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition'])]
         public ?CodeableReference $chargeItemCode = null,
         /** @var Quantity|null count Coefficient applicable to the billing code */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Quantity $count = null,
         /** @var Period|null effectivePeriod A specific time period in which this charge item applies */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $effectivePeriod = null,
         /** @var array<UsageContext> useContext The context to which this charge item applies */
         #[FhirProperty(
@@ -48,6 +49,7 @@ class DeviceDefinitionChargeItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

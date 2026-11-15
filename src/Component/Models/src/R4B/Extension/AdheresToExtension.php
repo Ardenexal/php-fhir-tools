@@ -34,13 +34,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]
-#[FHIRExtensionContext(type: 'element', expression: 'BiologicallyDerivedProductDispense')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceDispense')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
-#[FHIRExtensionContext(type: 'element', expression: 'NutritionIntake')]
-#[FHIRExtensionContext(type: 'element', expression: 'Transport')]
 class AdheresToExtension extends Extension
 {
     /**

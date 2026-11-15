@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -38,13 +39,13 @@ class RatioRange extends DataType
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var Quantity|null lowNumerator Low Numerator limit */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $lowNumerator = null,
         /** @var Quantity|null highNumerator High Numerator limit */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $highNumerator = null,
         /** @var Quantity|null denominator Denominator value */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $denominator = null,
     ) {
         parent::__construct($id, $extension);

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Context;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Context;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Nette\PhpGenerator\PhpNamespace;
@@ -150,5 +150,18 @@ class BuilderContextTest extends TestCase
 
         $finalCount = count($this->context->getPendingEnums());
         self::assertSame($initialCount, $finalCount, 'Removing non-existent enum should not change count');
+    }
+
+    /**
+     * Test a pending type is keyed by the bare URL when the canonical carries a version
+     */
+    public function testAddPendingTypeDropsTheCanonicalVersion(): void
+    {
+        $this->context->addPendingType('http://example.org/ValueSet/test|4.0.1', \stdClass::class);
+
+        self::assertSame(
+            ['http://example.org/ValueSet/test' => \stdClass::class],
+            $this->context->getPendingTypes(),
+        );
     }
 }

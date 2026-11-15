@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Each line item represents one charge for goods and services rendered. Details such.ofType(date), code and amount are found in the referenced ChargeItem resource.
@@ -89,6 +90,7 @@ class InvoiceLineItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\MonetaryComponent',
         )]
+        #[Valid]
         public array $priceComponent = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

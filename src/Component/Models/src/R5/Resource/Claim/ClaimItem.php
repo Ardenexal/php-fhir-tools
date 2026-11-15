@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A claim line. Either a simple  product or service or a 'group' of details which can each be a simple items or groups of sub-details.
@@ -47,6 +48,7 @@ class ClaimItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $traceNumber = [],
         /** @var array<PositiveIntPrimitive> careTeamSequence Applicable careTeam members */
         #[FhirProperty(
@@ -81,16 +83,16 @@ class ClaimItem extends BackboneElement
         )]
         public array $informationSequence = [],
         /** @var CodeableConcept|null revenue Revenue or cost center code */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $revenue = null,
         /** @var CodeableConcept|null category Benefit classification */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $category = null,
         /** @var CodeableConcept|null productOrService Billing, service, product, or drug code */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $productOrService = null,
         /** @var CodeableConcept|null productOrServiceEnd End of a range of codes */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $productOrServiceEnd = null,
         /** @var array<Reference> request Request or Referral for Service */
         #[FhirProperty(
@@ -99,6 +101,7 @@ class ClaimItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/DeviceRequest',
             'http://hl7.org/fhir/StructureDefinition/MedicationRequest',
@@ -115,6 +118,7 @@ class ClaimItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $modifier = [],
         /** @var array<CodeableConcept> programCode Program the product or service is provided under */
         #[FhirProperty(
@@ -123,6 +127,7 @@ class ClaimItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $programCode = [],
         /** @var DatePrimitive|Period|null serviced Date or dates of service or product delivery */
         #[FhirProperty(
@@ -174,22 +179,22 @@ class ClaimItem extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public CodeableConcept|Address|Reference|null $location = null,
         /** @var Money|null patientPaid Paid by the patient */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $patientPaid = null,
         /** @var Quantity|null quantity Count of products or services */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Money|null unitPrice Fee, charge or cost per item */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $unitPrice = null,
         /** @var numeric-string|null factor Price scaling factor */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $factor = null,
         /** @var Money|null tax Total tax */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $tax = null,
         /** @var Money|null net Total item cost */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $net = null,
         /** @var array<Reference> udi Unique device identifier */
         #[FhirProperty(
@@ -198,6 +203,7 @@ class ClaimItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Device'])]
         public array $udi = [],
         /** @var array<ClaimItemBodySite> bodySite Anatomical location */
@@ -207,6 +213,7 @@ class ClaimItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimItemBodySite',
         )]
+        #[Valid]
         public array $bodySite = [],
         /** @var array<Reference> encounter Encounters associated with the listed treatments */
         #[FhirProperty(
@@ -215,6 +222,7 @@ class ClaimItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public array $encounter = [],
         /** @var array<ClaimItemDetail> detail Product or service provided */
@@ -224,6 +232,7 @@ class ClaimItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim\ClaimItemDetail',
         )]
+        #[Valid]
         public array $detail = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

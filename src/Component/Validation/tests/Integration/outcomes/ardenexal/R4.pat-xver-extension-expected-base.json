@@ -1,5 +1,26 @@
 {
-    "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 2
+    "errorCount": 1,
+    "warningCount": 0,
+    "infoCount": 118,
+    "java": {
+        "errorCount": 4,
+        "warningCount": 0,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: eld-18: 'Must have a modifier reason if isModifier = true ((isModifier.exists() and isModifier) implies isModifierReason.exists())'",
+            "Profile http://hl7.org/fhir/3.0/StructureDefinition/extension-Patient.animal is for a modifier extension, but the Patient.extension element is not a modifier",
+            "Profile http://hl7.org/fhir/3.0/StructureDefinition/extension-Patient.animal is for a modifier extension, but the Patient.extension element is not a modifier",
+            "When HL7 is publishing a resource, the owning committee must be stated using the http://hl7.org/fhir/StructureDefinition/structuredefinition-wg extension"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "invariant:eld-18": [
+                "snapshot.element[8] — Must have a modifier reason if isModifier = true"
+            ]
+        },
+        "warnings": {}
+    }
 }

@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 1,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Element must have some content"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "invariant:ele-1": [
+                "characteristic[0].code — All FHIR elements must have a @value or children"
+            ]
+        },
+        "warnings": {}
+    }
 }

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: LinkageType
  * URL: http://hl7.org/fhir/ValueSet/linkage-type
  * Version: 4.3.0
  * Description: Used to distinguish different roles a resource can play within a set of linked resources.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/linkage-type', version: '4.3.0')]
 enum LinkageType: string
 {
     /** Source of Truth */

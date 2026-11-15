@@ -25,6 +25,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceUsage\DeviceUsageAdherence;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -41,19 +42,24 @@ class DeviceUsageResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -68,6 +74,7 @@ class DeviceUsageResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var array<Reference> basedOn Fulfills plan, proposal or order */
         #[FhirProperty(
@@ -76,10 +83,18 @@ class DeviceUsageResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ServiceRequest'])]
         public array $basedOn = [],
         /** @var DeviceUsageStatusType|null status active | completed | not-done | entered-in-error + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/deviceusage-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/deviceusage-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\DeviceUsageStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?DeviceUsageStatusType $status = null,
         /** @var array<CodeableConcept> category The category of the statement - classifying how the statement is made */
         #[FhirProperty(
@@ -88,9 +103,10 @@ class DeviceUsageResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $category = [],
         /** @var Reference|null patient Patient using device */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
         public ?Reference $patient = null,
         /** @var array<Reference> derivedFrom Supporting information */
         #[FhirProperty(
@@ -99,6 +115,7 @@ class DeviceUsageResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/ServiceRequest',
             'http://hl7.org/fhir/StructureDefinition/Procedure',
@@ -110,6 +127,7 @@ class DeviceUsageResource extends AbstractDomainResource
         public array $derivedFrom = [],
         /** @var Reference|null context The encounter or episode of care that establishes the context for this device use statement */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Encounter',
             'http://hl7.org/fhir/StructureDefinition/EpisodeOfCare',
@@ -146,7 +164,13 @@ class DeviceUsageResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $dateAsserted = null,
         /** @var CodeableConcept|null usageStatus The status of the device usage, for example always, sometimes, never. This is not the same as the status of the statement */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/deviceusage-status|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/deviceusage-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\DeviceUsageStatus',
+        )]
         public ?CodeableConcept $usageStatus = null,
         /** @var array<CodeableConcept> usageReason The reason for asserting the usage status - for example forgot, lost, stolen, broken */
         #[FhirProperty(
@@ -155,12 +179,14 @@ class DeviceUsageResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $usageReason = [],
         /** @var DeviceUsageAdherence|null adherence How device is being used */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?DeviceUsageAdherence $adherence = null,
         /** @var Reference|null informationSource Who made the statement */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -171,6 +197,7 @@ class DeviceUsageResource extends AbstractDomainResource
         public ?Reference $informationSource = null,
         /** @var CodeableReference|null device Code or Reference to device used */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Device',
@@ -184,6 +211,7 @@ class DeviceUsageResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Condition',
             'http://hl7.org/fhir/StructureDefinition/Observation',
@@ -193,7 +221,7 @@ class DeviceUsageResource extends AbstractDomainResource
         ])]
         public array $reason = [],
         /** @var CodeableReference|null bodySite Target body site */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BodyStructure'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BodyStructure'])]
         public ?CodeableReference $bodySite = null,
         /** @var array<Annotation> note Addition details (comments, instructions) */
         #[FhirProperty(
@@ -202,6 +230,7 @@ class DeviceUsageResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

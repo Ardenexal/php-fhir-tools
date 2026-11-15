@@ -7,10 +7,10 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Integration;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataCache;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRSerializedTypeResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataCache;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -49,9 +49,9 @@ class FHIRServiceConfigurationTest extends TestCase
 
     public function testFHIRTypeResolverCanBeInstantiated(): void
     {
-        $resolver = new FHIRTypeResolver();
+        $resolver = new FHIRSerializedTypeResolver();
 
-        self::assertInstanceOf(FHIRTypeResolver::class, $resolver);
+        self::assertInstanceOf(FHIRSerializedTypeResolver::class, $resolver);
 
         // Test with empty data
         self::assertNull($resolver->resolveType([], []));

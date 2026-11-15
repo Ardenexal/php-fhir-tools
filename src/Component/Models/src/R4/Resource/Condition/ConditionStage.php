@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Clinical stage or grade of a condition. May include formal severity assessments.
@@ -37,7 +38,7 @@ class ConditionStage extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null summary Simple summary (disease specific) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $summary = null,
         /** @var array<Reference> assessment Formal record of assessment */
         #[FhirProperty(
@@ -46,6 +47,7 @@ class ConditionStage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/ClinicalImpression',
             'http://hl7.org/fhir/StructureDefinition/DiagnosticReport',
@@ -53,7 +55,7 @@ class ConditionStage extends BackboneElement
         ])]
         public array $assessment = [],
         /** @var CodeableConcept|null type Kind of staging */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

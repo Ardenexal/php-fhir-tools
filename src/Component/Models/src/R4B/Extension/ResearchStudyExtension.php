@@ -20,7 +20,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-researchStudy', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Consent')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]

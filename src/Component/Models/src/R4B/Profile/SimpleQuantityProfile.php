@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 
 /**
@@ -20,6 +21,14 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
     path: 'comparator',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
+    groups: ['http://hl7.org/fhir/StructureDefinition/SimpleQuantity'],
+)]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'sqty-1',
+    severity: 'error',
+    expression: 'comparator.empty()',
+    human: 'The comparator is not used on a SimpleQuantity',
     groups: ['http://hl7.org/fhir/StructureDefinition/SimpleQuantity'],
 )]
 class SimpleQuantityProfile extends Quantity

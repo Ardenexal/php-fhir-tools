@@ -1,5 +1,19 @@
 {
     "errorCount": 0,
-    "warningCount": 2,
-    "infoCount": 1
+    "warningCount": 0,
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 19,
+        "infoCount": 4,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "The extension http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-questionnaireAdaptive could not be found so is not allowed here"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

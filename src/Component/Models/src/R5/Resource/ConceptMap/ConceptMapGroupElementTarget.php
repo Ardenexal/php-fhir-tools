@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A concept from the target value set that this concept maps to.
@@ -56,7 +57,14 @@ class ConceptMapGroupElementTarget extends BackboneElement
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $valueSet = null,
         /** @var ConceptMapRelationshipType|null relationship related-to | equivalent | source-is-narrower-than-target | source-is-broader-than-target | not-related-to */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-relationship|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'The \'not-related-to\' relationship means that there is no mapping from the source to the target, and the mapping cannot be interpreted without knowing this value as it could mean the elements are equivalent, totally mismatched or anything in between')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-relationship|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConceptMapRelationship',
+        )]
+        #[FHIRIsModifier(reason: 'The \'not-related-to\' relationship means that there is no mapping from the source to the target, and the mapping cannot be interpreted without knowing this value as it could mean the elements are equivalent, totally mismatched or anything in between')]
         public ?ConceptMapRelationshipType $relationship = null,
         /** @var StringPrimitive|string|null comment Description of status/issues in mapping */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -68,6 +76,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElementTargetProperty',
         )]
+        #[Valid]
         public array $property = [],
         /** @var array<ConceptMapGroupElementTargetDependsOn> dependsOn Other properties required for this mapping */
         #[FhirProperty(
@@ -76,6 +85,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElementTargetDependsOn',
         )]
+        #[Valid]
         public array $dependsOn = [],
         /** @var array<ConceptMapGroupElementTargetDependsOn> product Other data elements that this mapping also produces */
         #[FhirProperty(
@@ -84,6 +94,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElementTargetDependsOn',
         )]
+        #[Valid]
         public array $product = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Common Languages
  * URL: http://hl7.org/fhir/ValueSet/languages
  * Version: 5.0.0
  * Description: This value set includes common codes from BCP-47 (see http://tools.ietf.org/html/bcp47)
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/languages', version: '5.0.0')]
 enum CommonLanguages: string
 {
     /** Arabic */

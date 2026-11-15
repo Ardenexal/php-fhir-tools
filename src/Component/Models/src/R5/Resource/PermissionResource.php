@@ -22,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Permission\PermissionJustification;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Permission\PermissionRule;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Security)
@@ -38,19 +39,24 @@ class PermissionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -59,10 +65,17 @@ class PermissionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var PermissionStatusType|null status active | entered-in-error | draft | rejected */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/permission-status|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/permission-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PermissionStatus',
+        )]
         public ?PermissionStatusType $status = null,
         /** @var Reference|null asserter The person or entity that asserts the permission */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -82,13 +95,20 @@ class PermissionResource extends AbstractDomainResource
         )]
         public array $date = [],
         /** @var Period|null validity The period in which the permission is active */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $validity = null,
         /** @var PermissionJustification|null justification The asserted justification for using the data */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?PermissionJustification $justification = null,
         /** @var PermissionRuleCombiningType|null combining deny-overrides | permit-overrides | ordered-deny-overrides | ordered-permit-overrides | deny-unless-permit | permit-unless-deny */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/permission-rule-combining|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'Defines how the rules are to be combined.')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/permission-rule-combining|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PermissionRuleCombining',
+        )]
+        #[FHIRIsModifier(reason: 'Defines how the rules are to be combined.')]
         public ?PermissionRuleCombiningType $combining = null,
         /** @var array<PermissionRule> rule Constraints to the Permission */
         #[FhirProperty(
@@ -97,6 +117,7 @@ class PermissionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Permission\PermissionRule',
         )]
+        #[Valid]
         public array $rule = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Indicates if the medicinal product has an orphan designation for the treatment of a rare disease.
@@ -38,12 +39,13 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null type The type of special designation, e.g. orphan drug, minor use */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null intendedUse The intended use of the product, e.g. prevention, treatment */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $intendedUse = null,
         /** @var CodeableConcept|Reference|null indication Condition for which the medicinal use applies */
         #[FhirProperty(
@@ -68,13 +70,13 @@ class MedicinalProductSpecialDesignation extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicinalProductIndication'])]
         public CodeableConcept|Reference|null $indication = null,
         /** @var CodeableConcept|null status For example granted, pending, expired or withdrawn */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $status = null,
         /** @var DateTimePrimitive|null date Date when the designation was granted */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,
         /** @var CodeableConcept|null species Animal species for which this applies */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $species = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

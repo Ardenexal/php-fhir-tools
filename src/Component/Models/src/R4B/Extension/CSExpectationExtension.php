@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 
@@ -18,11 +19,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  * @description Defines the level of expectation associated with a given system capability.  See the capabilitystatement-prohibited modifier extension to set expectations to *not* support a feature.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-expectation', fhirVersion: 'R4B')]
-#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.acceptLanguage')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.document')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.format')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.implementationGuide')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.imports')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.instantiates')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.patchFormat')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.interaction')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.operation')]
@@ -32,7 +33,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.conditionalDelete')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.conditionalRead')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.conditionalUpdate')]
-#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.conditionalPatch')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.interaction')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.operation')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.readHistory')]
@@ -47,8 +47,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.security')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.security.cors')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.security.service')]
-#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.messaging.reliableCache')]
-#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.messaging.supportedMessage')]
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter.multipleOr')]
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter.multipleAnd')]
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter.comparator')]
@@ -58,6 +56,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
     type: 'extension',
     expression: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-search-parameter-combination',
 )]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://terminology.hl7.org/ValueSet/conformance-expectation', strength: 'required')]
 class CSExpectationExtension extends Extension
 {
     /**

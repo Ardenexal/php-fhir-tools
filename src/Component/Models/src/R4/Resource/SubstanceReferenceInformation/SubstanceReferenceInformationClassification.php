@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Todo.
@@ -34,10 +35,10 @@ class SubstanceReferenceInformationClassification extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null domain Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $domain = null,
         /** @var CodeableConcept|null classification Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $classification = null,
         /** @var array<CodeableConcept> subtype Todo */
         #[FhirProperty(
@@ -46,6 +47,7 @@ class SubstanceReferenceInformationClassification extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $subtype = [],
         /** @var array<Reference> source Todo */
         #[FhirProperty(
@@ -54,6 +56,7 @@ class SubstanceReferenceInformationClassification extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DocumentReference'])]
         public array $source = [],
     ) {

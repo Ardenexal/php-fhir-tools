@@ -57,6 +57,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UuidPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Additional information that may be needed in the execution of the task.
@@ -75,7 +77,7 @@ class TaskInput extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Label for the input */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null value Content to use in performing the task */
         #[FhirProperty(
@@ -371,7 +373,7 @@ class TaskInput extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

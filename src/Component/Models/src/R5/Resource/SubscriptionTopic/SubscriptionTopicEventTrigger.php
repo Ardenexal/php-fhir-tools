@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Event definition which can be used to trigger the SubscriptionTopic.
@@ -35,10 +36,16 @@ class SubscriptionTopicEventTrigger extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var CodeableConcept|null event Event which can trigger a notification from the SubscriptionTopic */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $event = null,
         /** @var UriPrimitive|null resource Data Type or Resource (reference to definition) for this trigger definition */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-types', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\SubscriptionTypes',
+        )]
         public ?UriPrimitive $resource = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

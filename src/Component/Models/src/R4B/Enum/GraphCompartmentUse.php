@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: GraphCompartmentUse
  * URL: http://hl7.org/fhir/ValueSet/graph-compartment-use
  * Version: 4.3.0
  * Description: Defines how a compartment rule is used.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/graph-compartment-use', version: '4.3.0')]
 enum GraphCompartmentUse: string
 {
     /** Condition */

@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The first-tier service adjudications for payor added product or service lines.
@@ -67,6 +68,7 @@ class ClaimResponseAddItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -74,7 +76,7 @@ class ClaimResponseAddItem extends BackboneElement
         ])]
         public array $provider = [],
         /** @var CodeableConcept|null productOrService Billing, service, product, or drug code */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $productOrService = null,
         /** @var array<CodeableConcept> modifier Service/Product billing modifiers */
         #[FhirProperty(
@@ -83,6 +85,7 @@ class ClaimResponseAddItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $modifier = [],
         /** @var array<CodeableConcept> programCode Program the product or service is provided under */
         #[FhirProperty(
@@ -91,6 +94,7 @@ class ClaimResponseAddItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $programCode = [],
         /** @var DatePrimitive|Period|null serviced Date or dates of service or product delivery */
         #[FhirProperty(
@@ -142,19 +146,19 @@ class ClaimResponseAddItem extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public CodeableConcept|Address|Reference|null $location = null,
         /** @var Quantity|null quantity Count of products or services */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Money|null unitPrice Fee, charge or cost per item */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $unitPrice = null,
         /** @var numeric-string|null factor Price scaling factor */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $factor = null,
         /** @var Money|null net Total item cost */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $net = null,
         /** @var CodeableConcept|null bodySite Anatomical location */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $bodySite = null,
         /** @var array<CodeableConcept> subSite Anatomical sub-location */
         #[FhirProperty(
@@ -163,6 +167,7 @@ class ClaimResponseAddItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $subSite = [],
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
         #[FhirProperty(
@@ -180,6 +185,7 @@ class ClaimResponseAddItem extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ClaimResponse\ClaimResponseItemAdjudication',
         )]
+        #[Valid]
         public array $adjudication = [],
         /** @var array<ClaimResponseAddItemDetail> detail Insurer added line details */
         #[FhirProperty(
@@ -188,6 +194,7 @@ class ClaimResponseAddItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ClaimResponse\ClaimResponseAddItemDetail',
         )]
+        #[Valid]
         public array $detail = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

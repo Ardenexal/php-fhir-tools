@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Financial instruments for reimbursement for the health care products and services.
@@ -34,7 +35,7 @@ class CoverageEligibilityRequestInsurance extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $focal = null,
         /** @var Reference|null coverage Insurance information */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Coverage'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Coverage'])]
         public ?Reference $coverage = null,
         /** @var StringPrimitive|string|null businessArrangement Additional provider contract number */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

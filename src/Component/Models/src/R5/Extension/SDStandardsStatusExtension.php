@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 
@@ -19,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'CanonicalResource')]
-#[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.context')]
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter.base')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
@@ -30,6 +31,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.allowedType')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.targetProfile')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide.definition.page')]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/standards-status', strength: 'required')]
 class SDStandardsStatusExtension extends Extension
 {
     /**

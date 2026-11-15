@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Version Independent Resource Types (All)
  * URL: http://hl7.org/fhir/ValueSet/version-independent-all-resource-types
  * Version: 5.0.0
  * Description: Current and past FHIR resource types (deleted or renamed), including abstract types
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types', version: '5.0.0')]
 enum VersionIndependentResourceTypesAll: string
 {
     /** BodySite */

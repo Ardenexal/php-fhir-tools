@@ -47,7 +47,12 @@ class DeviceUdiCarrier extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $carrierHRF = null,
         /** @var UDIEntryTypeType|null entryType barcode | rfid | manual + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/udi-entry-type|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/udi-entry-type|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\UDIEntryType',
+        )]
         public ?UDIEntryTypeType $entryType = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

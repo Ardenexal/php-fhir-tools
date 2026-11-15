@@ -34,49 +34,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     ],
     groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
 )]
-#[FHIRProfileConstraint(
-    path: 'content.contentType',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
-)]
-#[FHIRProfileConstraint(
-    path: 'content.contentType',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => 'application/xml'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
-)]
-#[FHIRProfileConstraint(
-    path: 'content.data',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
-)]
-#[FHIRProfileConstraint(
-    path: 'content.contentType',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
-)]
-#[FHIRProfileConstraint(
-    path: 'content.contentType',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => 'application/json'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
-)]
-#[FHIRProfileConstraint(
-    path: 'content.data',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
-)]
 #[FHIRProfileMustSupport(path: 'content', groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'])]
-#[FHIRProfileMustSupport(path: 'content', groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'])]
-#[FHIRProfileMustSupport(path: 'content.contentType', groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'])]
-#[FHIRProfileMustSupport(path: 'content.data', groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'])]
-#[FHIRProfileMustSupport(path: 'content', groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'])]
-#[FHIRProfileMustSupport(path: 'content.contentType', groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'])]
-#[FHIRProfileMustSupport(path: 'content.data', groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'])]
 #[FHIRSlicingRules(property: 'content', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'])]
 #[FHIRSliceConstraint(
     property: 'content',
@@ -85,9 +43,26 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'contentType',
-    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
-    orderedIndex: 0,
     discriminatorValue: 'application/xml',
+    orderedIndex: 0,
+    rules: [
+        [
+            'path'       => 'contentType',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['max' => 1],
+        ],
+        [
+            'path'       => 'contentType',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => 'application/xml'],
+        ],
+        [
+            'path'       => 'data',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
 )]
 #[FHIRSliceConstraint(
     property: 'content',
@@ -96,9 +71,26 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'contentType',
-    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
+    discriminatorValue: 'application/json',
     orderedIndex: 1,
-    discriminatorValue: 'application/xml',
+    rules: [
+        [
+            'path'       => 'contentType',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['max' => 1],
+        ],
+        [
+            'path'       => 'contentType',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => 'application/json'],
+        ],
+        [
+            'path'       => 'data',
+            'constraint' => 'Symfony\Component\Validator\Constraints\Count',
+            'options'    => ['min' => 1, 'max' => 1],
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/modelinfolibrary'],
 )]
 class ModelInfoLibraryProfile extends ShareableLibraryProfile
 {

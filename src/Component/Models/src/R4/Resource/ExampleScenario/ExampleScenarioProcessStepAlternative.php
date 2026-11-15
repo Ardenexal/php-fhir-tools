@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Indicates an alternative step that can be taken instead of the operations on the base step in exceptional/atypical circumstances.
@@ -42,6 +43,7 @@ class ExampleScenarioProcessStepAlternative extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioProcessStep',
         )]
+        #[Valid]
         public array $step = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

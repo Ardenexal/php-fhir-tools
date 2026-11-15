@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Link Relation Types
  * URL: http://hl7.org/fhir/ValueSet/iana-link-relations
  * Version: 5.0.0
  * Description: Link Relation Types defined at https://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/iana-link-relations', version: '5.0.0')]
 enum LinkRelationTypes: string
 {
     /** Refers to a resource that is the subject of the link's context. */

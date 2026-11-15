@@ -34,7 +34,13 @@ class DeviceDefinitionDeviceName extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $name = null,
         /** @var DeviceNameTypeType|null type udi-label-name | user-friendly-name | patient-reported-name | manufacturer-name | model-name | other */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-nametype|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-nametype|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\DeviceNameType',
+        )]
         public ?DeviceNameTypeType $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

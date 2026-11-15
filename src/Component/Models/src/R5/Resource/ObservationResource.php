@@ -36,6 +36,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\Observation\ObservationComp
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Observation\ObservationReferenceRange;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Observation\ObservationTriggeredBy;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -70,19 +71,24 @@ class ObservationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -97,6 +103,7 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var CanonicalPrimitive|Reference|null instantiates Instantiates FHIR ObservationDefinition */
         #[FhirProperty(
@@ -127,6 +134,7 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/CarePlan',
             'http://hl7.org/fhir/StructureDefinition/DeviceRequest',
@@ -143,6 +151,7 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Observation\ObservationTriggeredBy',
         )]
+        #[Valid]
         public array $triggeredBy = [],
         /** @var array<Reference> partOf Part of referenced event */
         #[FhirProperty(
@@ -151,6 +160,7 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/MedicationAdministration',
             'http://hl7.org/fhir/StructureDefinition/MedicationDispense',
@@ -162,7 +172,14 @@ class ObservationResource extends AbstractDomainResource
         ])]
         public array $partOf = [],
         /** @var ObservationStatusType|null status registered | preliminary | final | amended + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ObservationStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?ObservationStatusType $status = null,
         /** @var array<CodeableConcept> category Classification of  type of observation */
         #[FhirProperty(
@@ -171,13 +188,19 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-category', strength: 'preferred')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-category',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ObservationCategoryCodes',
+        )]
         public array $category = [],
         /** @var CodeableConcept|null code Type of observation (code / type) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
         /** @var Reference|null subject Who and/or what the observation is about */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
             'http://hl7.org/fhir/StructureDefinition/Group',
@@ -199,10 +222,11 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $focus = [],
         /** @var Reference|null encounter Healthcare event during which this observation is made */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public ?Reference $encounter = null,
         /** @var DateTimePrimitive|Period|Timing|InstantPrimitive|null effective Clinically relevant time/time-period for observation */
         #[FhirProperty(
@@ -247,6 +271,7 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -335,7 +360,13 @@ class ObservationResource extends AbstractDomainResource
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MolecularSequence'])]
         public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|Attachment|Reference|null $value = null,
         /** @var CodeableConcept|null dataAbsentReason Why the result is missing */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/data-absent-reason', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/data-absent-reason',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\DataAbsentReason',
+        )]
         public ?CodeableConcept $dataAbsentReason = null,
         /** @var array<CodeableConcept> interpretation High, low, normal, etc */
         #[FhirProperty(
@@ -344,7 +375,12 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-interpretation', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-interpretation',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ObservationInterpretationCodes',
+        )]
         public array $interpretation = [],
         /** @var array<Annotation> note Comments about the observation */
         #[FhirProperty(
@@ -353,21 +389,23 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var CodeableConcept|null bodySite Observed body part */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $bodySite = null,
         /** @var Reference|null bodyStructure Observed body structure */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BodyStructure'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BodyStructure'])]
         public ?Reference $bodyStructure = null,
         /** @var CodeableConcept|null method How it was done */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $method = null,
         /** @var Reference|null specimen Specimen used for this observation */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Specimen', 'http://hl7.org/fhir/StructureDefinition/Group'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Specimen', 'http://hl7.org/fhir/StructureDefinition/Group'])]
         public ?Reference $specimen = null,
         /** @var Reference|null device A reference to the device that generates the measurements or the device settings for the device */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Device',
             'http://hl7.org/fhir/StructureDefinition/DeviceMetric',
@@ -380,6 +418,7 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Observation\ObservationReferenceRange',
         )]
+        #[Valid]
         public array $referenceRange = [],
         /** @var array<Reference> hasMember Related resource that belongs to the Observation group */
         #[FhirProperty(
@@ -388,6 +427,7 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Observation',
             'http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse',
@@ -401,6 +441,7 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/DocumentReference',
             'http://hl7.org/fhir/StructureDefinition/ImagingStudy',
@@ -418,6 +459,7 @@ class ObservationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Observation\ObservationComponent',
         )]
+        #[Valid]
         public array $component = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

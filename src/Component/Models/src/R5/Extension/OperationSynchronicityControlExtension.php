@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 
@@ -21,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.operation')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.interaction')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.operation')]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/synchronicity-control', strength: 'required')]
 class OperationSynchronicityControlExtension extends Extension
 {
     /**

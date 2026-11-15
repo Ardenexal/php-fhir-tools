@@ -30,7 +30,12 @@ class PaymentReconciliationProcessNote extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var NoteTypeType|null type display | print | printoper */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/note-type|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/note-type|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\NoteType',
+        )]
         public ?NoteTypeType $type = null,
         /** @var StringPrimitive|string|null text Note explanatory text */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

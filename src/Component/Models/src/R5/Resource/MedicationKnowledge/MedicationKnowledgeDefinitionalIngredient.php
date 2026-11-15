@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Identifies a particular constituent of interest in the product.
@@ -33,10 +34,10 @@ class MedicationKnowledgeDefinitionalIngredient extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableReference|null item Substances contained in the medication */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Substance'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Substance'])]
         public ?CodeableReference $item = null,
         /** @var CodeableConcept|null type A code that defines the type of ingredient, active, base, etc */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var Ratio|CodeableConcept|Quantity|null strength Quantity of ingredient present */
         #[FhirProperty(

@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
+use Ardenexal\FHIRTools\Component\Metadata\Profile\ElementDefinitionReader;
+
 /**
  * Utility helpers for reading FHIR StructureDefinition element definition arrays.
+ *
+ * Delegates to {@see ElementDefinitionReader} in Metadata, which runtime profile compilation also
+ * uses, so generator and runtime read elements the same way.
  *
  * @author Ardenexal
  */
@@ -20,7 +25,7 @@ final class ElementDefinitionHelper
      */
     public static function hasContentReference(array $element): bool
     {
-        return isset($element['contentReference']);
+        return ElementDefinitionReader::hasContentReference($element);
     }
 
     /**
@@ -36,13 +41,7 @@ final class ElementDefinitionHelper
      */
     public static function extractPolymorphicField(array $element, string $prefix): ?array
     {
-        foreach ($element as $key => $value) {
-            if ($key !== $prefix && str_starts_with($key, $prefix)) {
-                return ['type' => substr($key, strlen($prefix)), 'value' => $value];
-            }
-        }
-
-        return null;
+        return ElementDefinitionReader::extractPolymorphicField($element, $prefix);
     }
 
     private function __construct()

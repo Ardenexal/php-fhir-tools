@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ConsentDataMeaningType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The resources controlled by this rule if specific resources are referenced.
@@ -32,10 +33,16 @@ class ConsentProvisionData extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var ConsentDataMeaningType|null meaning instance | related | dependents | authoredby */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-data-meaning|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-data-meaning|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ConsentDataMeaning',
+        )]
         public ?ConsentDataMeaningType $meaning = null,
         /** @var Reference|null reference The actual data reference */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $reference = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

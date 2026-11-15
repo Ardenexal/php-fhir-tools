@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-strengthOfRecommendation', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action.action')]
 class StrengthOfRecommendationExtension extends Extension
 {
     /**

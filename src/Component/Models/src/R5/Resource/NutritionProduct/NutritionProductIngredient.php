@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Ingredients contained in this product.
@@ -31,7 +32,7 @@ class NutritionProductIngredient extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableReference|null item The ingredient contained in the product */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/NutritionProduct'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/NutritionProduct'])]
         public ?CodeableReference $item = null,
         /** @var array<Ratio> amount The amount of ingredient that is in the product */
         #[FhirProperty(
@@ -40,6 +41,7 @@ class NutritionProductIngredient extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio',
         )]
+        #[Valid]
         public array $amount = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

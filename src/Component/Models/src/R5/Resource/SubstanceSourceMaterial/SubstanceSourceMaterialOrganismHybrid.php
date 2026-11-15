@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description 4.9.13.8.1 Hybrid species maternal organism ID (Optional).
@@ -41,7 +42,7 @@ class SubstanceSourceMaterialOrganismHybrid extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $paternalOrganismName = null,
         /** @var CodeableConcept|null hybridType The hybrid type of an organism shall be specified */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $hybridType = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

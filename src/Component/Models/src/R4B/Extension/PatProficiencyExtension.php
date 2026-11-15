@@ -22,7 +22,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Patient.communication')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson.communication')]
 #[FHIRExtensionContext(type: 'element', expression: 'Practitioner.communication')]
-#[FHIRExtensionContext(type: 'element', expression: 'Person.communication')]
 class PatProficiencyExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

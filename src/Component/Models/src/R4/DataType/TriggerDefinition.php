@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -50,7 +51,13 @@ class TriggerDefinition extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var TriggerTypeType|null type named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/trigger-type|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/trigger-type|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\TriggerType',
+        )]
         public ?TriggerTypeType $type = null,
         /** @var StringPrimitive|string|null name Name or URI that identifies the event */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -96,9 +103,10 @@ class TriggerDefinition extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\DataRequirement',
         )]
+        #[Valid]
         public array $data = [],
         /** @var Expression|null condition Whether the event triggers (boolean expression) */
-        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex'), Valid]
         public ?Expression $condition = null,
     ) {
         parent::__construct($id, $extension);

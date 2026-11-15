@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ChargeItemStatus
  * URL: http://hl7.org/fhir/ValueSet/chargeitem-status
  * Version: 4.3.0
  * Description: Codes identifying the lifecycle stage of a ChargeItem.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/chargeitem-status', version: '4.3.0')]
 enum ChargeItemStatus: string
 {
     /** Planned */

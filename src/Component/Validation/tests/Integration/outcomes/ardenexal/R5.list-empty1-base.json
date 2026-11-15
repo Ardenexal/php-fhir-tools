@@ -1,5 +1,27 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Element must have some content",
+            "List.entry.item: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/List|5.0.0)"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:NotBlank": [
+                "entry[0].item — This value should not be blank."
+            ],
+            "invariant:ele-1": [
+                "entry[0] — All FHIR elements must have a @value or children"
+            ]
+        },
+        "warnings": {}
+    }
 }

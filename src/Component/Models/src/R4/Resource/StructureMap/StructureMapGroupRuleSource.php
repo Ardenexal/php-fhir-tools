@@ -386,7 +386,12 @@ class StructureMapGroupRuleSource extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $element = null,
         /** @var StructureMapSourceListModeType|null listMode first | not_first | last | not_last | only_one */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-source-list-mode|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-source-list-mode|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\StructureMapSourceListMode',
+        )]
         public ?StructureMapSourceListModeType $listMode = null,
         /** @var IdPrimitive|null variable Named context for field, if a field is specified */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]

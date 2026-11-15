@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationDefinition\ObservationDefinitionQualifiedInterval;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationDefinition\ObservationDefinitionQuantitativeDetails;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -42,7 +43,7 @@ class ObservationDefinitionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -53,13 +54,14 @@ class ObservationDefinitionResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -74,9 +76,10 @@ class ObservationDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $category = [],
         /** @var CodeableConcept|null code Type of observation (code / type) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
         /** @var array<Identifier> identifier Business identifier for this ObservationDefinition instance */
         #[FhirProperty(
@@ -85,6 +88,7 @@ class ObservationDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var array<ObservationDataTypeType> permittedDataType Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period */
         #[FhirProperty(
@@ -93,19 +97,23 @@ class ObservationDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ObservationDataTypeType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/permitted-data-type|4.3.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/permitted-data-type|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ObservationDataType',
+        )]
         public array $permittedDataType = [],
         /** @var bool|null multipleResultsAllowed Multiple results allowed */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $multipleResultsAllowed = null,
         /** @var CodeableConcept|null method Method used to produce the observation */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $method = null,
         /** @var StringPrimitive|string|null preferredReportName Preferred report name */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $preferredReportName = null,
         /** @var ObservationDefinitionQuantitativeDetails|null quantitativeDetails Characteristics of quantitative results */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ObservationDefinitionQuantitativeDetails $quantitativeDetails = null,
         /** @var array<ObservationDefinitionQualifiedInterval> qualifiedInterval Qualified range for continuous and ordinal observation results */
         #[FhirProperty(
@@ -114,18 +122,19 @@ class ObservationDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationDefinition\ObservationDefinitionQualifiedInterval',
         )]
+        #[Valid]
         public array $qualifiedInterval = [],
         /** @var Reference|null validCodedValueSet Value set of valid coded values for the observations conforming to this ObservationDefinition */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?Reference $validCodedValueSet = null,
         /** @var Reference|null normalCodedValueSet Value set of normal coded values for the observations conforming to this ObservationDefinition */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?Reference $normalCodedValueSet = null,
         /** @var Reference|null abnormalCodedValueSet Value set of abnormal coded values for the observations conforming to this ObservationDefinition */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?Reference $abnormalCodedValueSet = null,
         /** @var Reference|null criticalCodedValueSet Value set of critical coded values for the observations conforming to this ObservationDefinition */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?Reference $criticalCodedValueSet = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

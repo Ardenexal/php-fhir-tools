@@ -10,7 +10,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Indicates whether or not substitution can or should be part of the dispense. In some cases, substitution must happen, in other cases substitution must not happen. This block explains the prescriber's intent. If nothing is specified substitution may be done.
@@ -44,10 +45,10 @@ class MedicationRequestSubstitution extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public bool|CodeableConcept|null $allowed = null,
         /** @var CodeableConcept|null reason Why should (not) substitution be made */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $reason = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

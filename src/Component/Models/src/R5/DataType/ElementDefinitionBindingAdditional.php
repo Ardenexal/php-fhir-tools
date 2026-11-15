@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Additional bindings that help applications implementing this element. Additional bindings do not replace the main binding but provide more information and/or context.
@@ -27,7 +28,13 @@ class ElementDefinitionBindingAdditional extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var AdditionalBindingPurposeVSType|null purpose maximum | minimum | required | extensible | candidate | current | preferred | ui | starter | component */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/additional-binding-purpose|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/additional-binding-purpose|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AdditionalBindingPurposeVS',
+        )]
         public ?AdditionalBindingPurposeVSType $purpose = null,
         /** @var CanonicalPrimitive|null valueSet The value set for the additional binding */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
@@ -45,6 +52,7 @@ class ElementDefinitionBindingAdditional extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $usage = [],
         /** @var bool|null any Whether binding can applies to all repeats, or just one */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

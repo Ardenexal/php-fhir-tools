@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: FlagStatus
  * URL: http://hl7.org/fhir/ValueSet/flag-status
  * Version: 4.3.0
  * Description: Indicates whether this flag is active and needs to be displayed to a user, or whether it is no longer needed or was entered in error.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/flag-status', version: '4.3.0')]
 enum FlagStatus: string
 {
     /** Active */

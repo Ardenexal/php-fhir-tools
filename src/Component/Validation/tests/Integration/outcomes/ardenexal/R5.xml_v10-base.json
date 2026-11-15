@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Character reference \"&#x001D\" is an invalid XML character."
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to parse XML: xmlParseCharRef: invalid xmlChar value 29 at line 23 column 81"
+            ]
+        },
+        "warnings": {}
+    }
 }

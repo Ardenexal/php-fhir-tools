@@ -26,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\SupplyRequest\SupplyRequestParameter;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -42,19 +43,24 @@ class SupplyRequestResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -69,9 +75,16 @@ class SupplyRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var SupplyRequestStatusType|null status draft | active | suspended + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/supplyrequest-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/supplyrequest-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\SupplyRequestStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?SupplyRequestStatusType $status = null,
         /** @var array<Reference> basedOn What other request is fulfilled by this supply request */
         #[FhirProperty(
@@ -80,19 +93,26 @@ class SupplyRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $basedOn = [],
         /** @var CodeableConcept|null category The kind of supply (central, non-stock, etc.) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $category = null,
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\RequestPriority',
+        )]
         public ?RequestPriorityType $priority = null,
         /** @var Reference|null deliverFor The patient for who the supply request is for */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
         public ?Reference $deliverFor = null,
         /** @var CodeableReference|null item Medication, Substance, or Device requested to be supplied */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Medication',
@@ -105,7 +125,7 @@ class SupplyRequestResource extends AbstractDomainResource
         ])]
         public ?CodeableReference $item = null,
         /** @var Quantity|null quantity The requested amount of the item indicated */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Quantity $quantity = null,
         /** @var array<SupplyRequestParameter> parameter Ordered item details */
         #[FhirProperty(
@@ -114,6 +134,7 @@ class SupplyRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SupplyRequest\SupplyRequestParameter',
         )]
+        #[Valid]
         public array $parameter = [],
         /** @var DateTimePrimitive|Period|Timing|null occurrence When the request should be fulfilled */
         #[FhirProperty(
@@ -147,6 +168,7 @@ class SupplyRequestResource extends AbstractDomainResource
         public ?DateTimePrimitive $authoredOn = null,
         /** @var Reference|null requester Individual making the request */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -164,6 +186,7 @@ class SupplyRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/HealthcareService',
@@ -176,6 +199,7 @@ class SupplyRequestResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Condition',
             'http://hl7.org/fhir/StructureDefinition/Observation',
@@ -185,6 +209,7 @@ class SupplyRequestResource extends AbstractDomainResource
         public array $reason = [],
         /** @var Reference|null deliverFrom The origin of the supply */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/Location',
@@ -192,6 +217,7 @@ class SupplyRequestResource extends AbstractDomainResource
         public ?Reference $deliverFrom = null,
         /** @var Reference|null deliverTo The destination of the supply */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/Location',

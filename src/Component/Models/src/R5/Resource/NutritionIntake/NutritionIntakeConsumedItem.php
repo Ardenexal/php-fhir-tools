@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description What food or fluid product or item was consumed.
@@ -33,25 +34,25 @@ class NutritionIntakeConsumedItem extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type The type of food or fluid product */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var CodeableReference|null nutritionProduct Code that identifies the food or fluid product that was consumed */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/NutritionProduct'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/NutritionProduct'])]
         public ?CodeableReference $nutritionProduct = null,
         /** @var Timing|null schedule Scheduled frequency of consumption */
-        #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex'), Valid]
         public ?Timing $schedule = null,
         /** @var Quantity|null amount Quantity of the specified food */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $amount = null,
         /** @var Quantity|null rate Rate at which enteral feeding was administered */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $rate = null,
         /** @var bool|null notConsumed Flag to indicate if the food or fluid item was refused or otherwise not consumed */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $notConsumed = null,
         /** @var CodeableConcept|null notConsumedReason Reason food or fluid was not consumed */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $notConsumedReason = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

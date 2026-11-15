@@ -1,0 +1,9 @@
+{
+  "resourceType": "StructureDefinition",
+  "url": "http://hl7.org/fhir/StructureDefinition/Observation",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "type": "Observation",
+  "derivation": "specialization",
+  "snapshot": {"element": [{"id": "Observation", "path": "Observation"}]}
+}

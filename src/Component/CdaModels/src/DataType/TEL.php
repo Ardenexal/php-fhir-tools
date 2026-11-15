@@ -1,0 +1,80 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
+
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+
+#[LogicalModel(
+    url: 'http://hl7.org/cda/stds/core/StructureDefinition/TEL',
+    name: 'TEL',
+    fhirVersion: '5.0.0',
+    xmlNamespace: 'urn:hl7-org:v3',
+    propertyOrder: ['nullFlavor', 'value', 'useablePeriod', 'use'],
+)]
+#[FHIRPathInvariant(
+    key: 'value-null',
+    severity: 'error',
+    expression: '(value | nullFlavor).count() = 1',
+    human: 'value and nullFlavor are mutually exclusive (one must be present)',
+)]
+class TEL extends ANY
+{
+    /**
+     * @param list<SXCMTS> $useablePeriod
+     * @param list<string> $use
+     */
+    public function __construct(
+        #[FhirProperty(fhirType: 'url', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@value')]
+        public ?string $value = null,
+        #[FhirProperty(
+            fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/SXCM-TS',
+            propertyKind: 'polymorphic',
+            isArray: true,
+            isRequired: false,
+            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\SXCMTS',
+            variants: [
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/IVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS',
+                    'jsonKey'      => 'useablePeriod',
+                    'typeName'     => 'IVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/EIVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\EIVLTS',
+                    'jsonKey'      => 'useablePeriod',
+                    'typeName'     => 'EIVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/PIVL-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\PIVLTS',
+                    'jsonKey'      => 'useablePeriod',
+                    'typeName'     => 'PIVL_TS',
+                ],
+                [
+                    'fhirType'     => 'http://hl7.org/cda/stds/core/StructureDefinition/SXPR-TS',
+                    'propertyKind' => 'complex',
+                    'phpType'      => '\Ardenexal\FHIRTools\Component\CdaModels\DataType\SXPRTS',
+                    'jsonKey'      => 'useablePeriod',
+                    'typeName'     => 'SXPR_TS',
+                ],
+            ],
+        )]
+        public array $useablePeriod = [],
+        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: true, isRequired: false, xmlSerializedName: '@use')]
+        public array $use = [],
+        ?NullFlavor $nullFlavor = null,
+    ) {
+        parent::__construct(
+            nullFlavor: $nullFlavor,
+        );
+    }
+}

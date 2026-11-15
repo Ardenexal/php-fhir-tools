@@ -25,6 +25,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     private const string VS_URL = 'http://hl7.org/fhir/ValueSet/languages';
 
     /** @var MockObject&FHIRTerminologyClientInterface */
@@ -48,7 +50,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
     public function testExtensibleBindingWithNullClientProducesUncheckedBindingInfoViolation(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'extensible'));
 
@@ -61,7 +63,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
     public function testPreferredBindingWithNullClientProducesUncheckedBindingInfoViolation(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'preferred'));
 
@@ -74,7 +76,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
     public function testExtensibleBindingWithNullObjectClientProducesUncheckedBindingInfoViolation(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], new NullFHIRTerminologyClient());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'extensible'));
 
@@ -87,7 +89,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
     public function testExampleBindingWithNullClientProducesNoViolation(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'example'));
 
@@ -99,7 +101,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
         $this->mockClient->expects(self::never())->method('validateCode');
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'example'));
 
@@ -109,7 +111,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
     public function testExtensibleBindingWithNullClientAndNullValueProducesNoViolation(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate(null, new FHIRValueSetBinding(self::VS_URL, 'extensible'));
 
@@ -122,7 +124,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
         $registry->setOverride('FHIRValueSetBindingUnchecked', 'Custom skip notice for {{ url }}');
 
         $validator = new FHIRValueSetBindingValidator($registry);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'extensible'));
 
@@ -150,7 +152,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
         $this->mockClient->method('validateCode')->willReturn(true);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('en', new FHIRValueSetBinding(self::VS_URL, 'extensible'));
 
@@ -162,7 +164,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
         $this->mockClient->method('validateCode')->willReturn(true);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('en', new FHIRValueSetBinding(self::VS_URL, 'preferred'));
 
@@ -178,7 +180,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
         $this->mockClient->method('validateCode')->willReturn(false);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('not-a-language', new FHIRValueSetBinding(self::VS_URL, 'extensible'));
 
@@ -194,7 +196,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
         $this->mockClient->method('validateCode')->willReturn(false);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('bad-code', new FHIRValueSetBinding(self::VS_URL, 'preferred'));
 
@@ -214,7 +216,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
         $this->mockClient->method('validateCode')->willReturn(true);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('valid-code', new FHIRValueSetBinding(self::VS_URL, 'required'));
 
@@ -226,7 +228,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
         $this->mockClient->method('validateCode')->willReturn(false);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('bad-code', new FHIRValueSetBinding(self::VS_URL, 'required'));
 
@@ -244,7 +246,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
             ->willReturnMap([[self::VS_URL, 'good', true], [self::VS_URL, 'bad', false]]);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate(['good', 'bad'], new FHIRValueSetBinding(self::VS_URL, 'required'));
 
@@ -258,7 +260,7 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
     public function testRequiredBindingNoEnumWithoutClientProducesWarning(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $url = 'http://hl7.org/fhir/ValueSet/unknown-required-vs';
         $validator->validate('anything', new FHIRValueSetBinding($url, 'required'));

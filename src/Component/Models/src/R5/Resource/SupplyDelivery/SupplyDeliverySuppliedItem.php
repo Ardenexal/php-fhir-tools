@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The item that is being delivered or has been supplied.
@@ -31,7 +32,7 @@ class SupplyDeliverySuppliedItem extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Quantity|null quantity Amount supplied */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var CodeableConcept|Reference|null item Medication, Substance, Device or Biologically Derived Product supplied */
         #[FhirProperty(

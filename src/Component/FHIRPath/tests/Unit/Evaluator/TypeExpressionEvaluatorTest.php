@@ -421,4 +421,61 @@ final class TypeExpressionEvaluatorTest extends TestCase
         $result   = $this->evaluate('items.ofType(System.Boolean)', $resource);
         self::assertSame([true, false], $result->toArray());
     }
+
+    // -------------------------------------------------------------------------
+    // Resources held as raw arrays
+    // -------------------------------------------------------------------------
+
+    public function testIsOperatorRecognisesArrayResourceByResourceType(): void
+    {
+        $patient = ['resourceType' => 'Patient', 'name' => [['family' => 'Example']]];
+
+        self::assertSame([true], $this->evaluate('$this is Patient', $patient)->toArray());
+        self::assertSame([true], $this->evaluate('$this is FHIR.Patient', $patient)->toArray());
+        self::assertSame([false], $this->evaluate('$this is Observation', $patient)->toArray());
+    }
+
+    public function testIsOperatorWalksAncestryForArrayResource(): void
+    {
+        // `is` is non-strict, so a Patient conforms to its base resource types as a model does.
+        $patient = ['resourceType' => 'Patient'];
+
+        self::assertSame([true], $this->evaluate('$this is DomainResource', $patient)->toArray());
+        self::assertSame([true], $this->evaluate('$this is Resource', $patient)->toArray());
+    }
+
+    public function testAsOperatorReturnsArrayResourceOnMatch(): void
+    {
+        $patient = ['resourceType' => 'Patient', 'id' => 'p1'];
+
+        self::assertSame([$patient], $this->evaluate('$this as Patient', $patient)->toArray());
+        self::assertTrue($this->evaluate('$this as Observation', $patient)->isEmpty());
+    }
+
+    public function testOfTypeFiltersArrayResourcesStrictly(): void
+    {
+        $patient  = ['resourceType' => 'Patient', 'id' => 'p1'];
+        $resource = [
+            'resourceType' => 'Bundle',
+            'entry'        => [
+                ['resource' => $patient],
+                ['resource' => ['resourceType' => 'Composition', 'id' => 'c1']],
+            ],
+        ];
+
+        self::assertSame([$patient], $this->evaluate('entry.resource.ofType(Patient)', $resource)->toArray());
+        self::assertSame(['c1'], $this->evaluate('entry.resource.ofType(Composition).id', $resource)->toArray());
+        // ofType() matches the exact type only, never a base type.
+        self::assertTrue($this->evaluate('entry.resource.ofType(DomainResource)', $resource)->isEmpty());
+    }
+
+    public function testArrayWithoutResourceTypeIsNotAResource(): void
+    {
+        // Only resources carry their type in the data; a complex type held as an array has no
+        // type to match without schema knowledge, so it stays unmatched.
+        $resource = ['name' => [['family' => 'Example']]];
+
+        self::assertSame([false], $this->evaluate('name is HumanName', $resource)->toArray());
+        self::assertTrue($this->evaluate('name.ofType(HumanName)', $resource)->isEmpty());
+    }
 }

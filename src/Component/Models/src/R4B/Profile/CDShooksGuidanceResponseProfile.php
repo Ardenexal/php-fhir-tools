@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Profile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\GuidanceResponseResource;
 
 /**
@@ -20,12 +21,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\GuidanceResponseResource;
     profileUrl: 'http://hl7.org/fhir/StructureDefinition/cdshooksguidanceresponse',
     baseType: 'GuidanceResponse',
     fhirVersion: 'R4B',
-)]
-#[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['min' => 1, 'max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksguidanceresponse'],
 )]
 #[FHIRProfileConstraint(
     path: 'requestIdentifier',
@@ -49,6 +44,17 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\GuidanceResponseResource;
 #[FHIRProfileMustSupport(path: 'occurrenceDateTime', groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksguidanceresponse'])]
 #[FHIRProfileMustSupport(path: 'performer', groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksguidanceresponse'])]
 #[FHIRProfileMustSupport(path: 'result', groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksguidanceresponse'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'cdsHooksEndpoint',
+    min: 1,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-cdsHooksEndpoint',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksguidanceresponse'],
+)]
 class CDShooksGuidanceResponseProfile extends GuidanceResponseResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

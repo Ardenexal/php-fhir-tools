@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Immunization Evaluation Status Codes
  * URL: http://hl7.org/fhir/ValueSet/immunization-evaluation-status
  * Version: 5.0.0
  * Description: The value set to instantiate this attribute should be drawn from a terminologically robust code system that consists of or contains concepts to support describing the current status of the evaluation for vaccine administration event.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/immunization-evaluation-status', version: '5.0.0')]
 enum ImmunizationEvaluationStatusCodes: string
 {
     /** In Progress */

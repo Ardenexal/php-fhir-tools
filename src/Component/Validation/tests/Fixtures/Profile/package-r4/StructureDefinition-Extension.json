@@ -1,0 +1,36 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "Extension",
+  "url": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "version": "4.0.1",
+  "name": "Extension",
+  "status": "active",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Element",
+  "derivation": "specialization",
+  "snapshot": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "min": 0,
+        "max": "1"
+      }
+    ]
+  }
+}

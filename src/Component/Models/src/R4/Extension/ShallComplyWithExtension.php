@@ -31,7 +31,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyRequest')]

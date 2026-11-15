@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: DeviceAssociation Status Reason Codes
  * URL: http://hl7.org/fhir/ValueSet/deviceassociation-status-reason
  * Version: 5.0.0
  * Description: DeviceAssociation Status Reason Codes
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/deviceassociation-status-reason', version: '5.0.0')]
 enum DeviceAssociationCodes: string
 {
     /** Attached */

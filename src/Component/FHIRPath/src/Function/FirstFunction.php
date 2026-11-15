@@ -27,6 +27,6 @@ final class FirstFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        return Collection::single($input->first());
+        return $input->only([0]);
     }
 }

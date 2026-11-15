@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description A property value for this source -> target mapping.
@@ -70,7 +71,7 @@ class ConceptMapGroupElementTargetProperty extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public Coding|StringPrimitive|string|int|bool|DateTimePrimitive|CodePrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

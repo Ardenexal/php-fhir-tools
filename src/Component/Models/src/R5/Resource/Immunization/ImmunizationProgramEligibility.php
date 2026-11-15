@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Indicates a patient's eligibility for a funding program.
@@ -29,10 +30,10 @@ class ImmunizationProgramEligibility extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null program The program that eligibility is declared for */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $program = null,
         /** @var CodeableConcept|null programStatus The patient's eligibility status for the program */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $programStatus = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

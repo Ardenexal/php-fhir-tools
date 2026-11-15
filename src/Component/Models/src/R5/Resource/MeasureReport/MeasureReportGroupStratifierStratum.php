@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description This element contains the results for a single stratum within the stratifier. For example, when stratifying on administrative gender, there will be four strata, one for each possible gender value.
@@ -74,6 +75,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MeasureReport\MeasureReportGroupStratifierStratumComponent',
         )]
+        #[Valid]
         public array $component = [],
         /** @var array<MeasureReportGroupStratifierStratumPopulation> population Population results in this stratum */
         #[FhirProperty(
@@ -82,6 +84,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MeasureReport\MeasureReportGroupStratifierStratumPopulation',
         )]
+        #[Valid]
         public array $population = [],
         /** @var Quantity|DateTimePrimitive|CodeableConcept|Period|Range|Duration|null measureScore What score this stratum achieved */
         #[FhirProperty(

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\SubstanceAmount;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Todo.
@@ -30,13 +31,13 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null orientationOfPolymerisation Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $orientationOfPolymerisation = null,
         /** @var StringPrimitive|string|null repeatUnit Todo */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $repeatUnit = null,
         /** @var SubstanceAmount|null amount Todo */
-        #[FhirProperty(fhirType: 'SubstanceAmount', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'SubstanceAmount', propertyKind: 'complex'), Valid]
         public ?SubstanceAmount $amount = null,
         /** @var array<SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation> degreeOfPolymerisation Todo */
         #[FhirProperty(
@@ -45,6 +46,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstancePolymer\SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation',
         )]
+        #[Valid]
         public array $degreeOfPolymerisation = [],
         /** @var array<SubstancePolymerRepeatRepeatUnitStructuralRepresentation> structuralRepresentation Todo */
         #[FhirProperty(
@@ -53,6 +55,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstancePolymer\SubstancePolymerRepeatRepeatUnitStructuralRepresentation',
         )]
+        #[Valid]
         public array $structuralRepresentation = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

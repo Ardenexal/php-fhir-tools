@@ -16,7 +16,12 @@ Full documentation lives in the centralised [documentation site](../../../docs/R
 - [Structural & Profile Validation](../../../docs/validation/structural.md)
 - [FHIRPath Invariant Validation](../../../docs/validation/invariants.md)
 - [Terminology & Binding Validation](../../../docs/validation/terminology.md)
+- [Reference & Target Profile Validation](../../../docs/validation/references.md)
+- [Quantity & Temporal Range Validation](../../../docs/validation/ranges.md)
+- [Extensions, Modifiers & Obligations](../../../docs/validation/extensions.md)
+- [Runtime Profiles](../../../docs/validation/runtime-profiles.md)
 - [Questionnaire Validation](../../../docs/validation/questionnaire.md)
+- [The $validate Operation](../../../docs/validation/operation-outcome.md)
 - [Configuration](../../../docs/validation/configuration.md)
 - [Validation Reports & Violation Codes](../../../docs/validation/reports.md)
 

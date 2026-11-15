@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\TestReportActionResultType;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The results of the assertion performed on the previous operations.
@@ -32,7 +33,13 @@ class TestReportSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var TestReportActionResultType|null result pass | skip | fail | warning | error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/report-action-result-codes|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/report-action-result-codes|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\TestReportActionResult',
+        )]
         public ?TestReportActionResultType $result = null,
         /** @var MarkdownPrimitive|null message A message associated with the result */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -47,6 +54,7 @@ class TestReportSetupActionAssert extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestReport\TestReportSetupActionAssertRequirement',
         )]
+        #[Valid]
         public array $requirement = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: StructureMapTransform
  * URL: http://hl7.org/fhir/ValueSet/map-transform
  * Version: 4.0.1
  * Description: How data is copied/created.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/map-transform', version: '4.0.1')]
 enum StructureMapTransform: string
 {
     /** create */

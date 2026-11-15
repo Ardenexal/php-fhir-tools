@@ -20,7 +20,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-identifier', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'CompartmentDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'GraphDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide')]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationKnowledge')]

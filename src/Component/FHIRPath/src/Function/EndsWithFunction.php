@@ -35,12 +35,8 @@ class EndsWithFunction extends AbstractFunction
         }
 
         /** @var ExpressionNode $suffixExpr */
-        $suffixExpr = $parameters[0];
-        $evaluator  = $context->getEvaluator();
-        if ($evaluator === null) {
-            throw new EvaluationException('Evaluator not available in context');
-        }
-        $suffixResult = $evaluator->evaluate($suffixExpr, $context);
+        $suffixExpr   = $parameters[0];
+        $suffixResult = $this->evaluateParameter($suffixExpr, $context);
 
         if ($suffixResult->isEmpty()) {
             return Collection::single(false);

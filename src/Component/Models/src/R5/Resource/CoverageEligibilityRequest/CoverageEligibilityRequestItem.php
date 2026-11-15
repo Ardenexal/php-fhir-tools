@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Money;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Service categories or billable services for which benefit details and/or an authorization prior to service delivery may be required by the payor.
@@ -41,10 +42,10 @@ class CoverageEligibilityRequestItem extends BackboneElement
         )]
         public array $supportingInfoSequence = [],
         /** @var CodeableConcept|null category Benefit classification */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $category = null,
         /** @var CodeableConcept|null productOrService Billing, service, product, or drug code */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $productOrService = null,
         /** @var array<CodeableConcept> modifier Product or service billing modifiers */
         #[FhirProperty(
@@ -53,22 +54,25 @@ class CoverageEligibilityRequestItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $modifier = [],
         /** @var Reference|null provider Perfoming practitioner */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
         ])]
         public ?Reference $provider = null,
         /** @var Quantity|null quantity Count of products or services */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Money|null unitPrice Fee, charge or cost per item */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $unitPrice = null,
         /** @var Reference|null facility Servicing facility */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Location',
             'http://hl7.org/fhir/StructureDefinition/Organization',
@@ -81,6 +85,7 @@ class CoverageEligibilityRequestItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CoverageEligibilityRequest\CoverageEligibilityRequestItemDiagnosis',
         )]
+        #[Valid]
         public array $diagnosis = [],
         /** @var array<Reference> detail Product or service details */
         #[FhirProperty(
@@ -89,6 +94,7 @@ class CoverageEligibilityRequestItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $detail = [],
     ) {

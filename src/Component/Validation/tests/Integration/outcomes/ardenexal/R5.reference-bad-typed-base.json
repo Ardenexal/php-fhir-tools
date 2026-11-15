@@ -1,5 +1,19 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 0
+    "warningCount": 0,
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Invalid Resource target type. Found Group, but expected one of (Patient)"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

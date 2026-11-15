@@ -27,8 +27,14 @@ composer require ardenexal/fhir-serialization
 # For FHIRPath evaluation
 composer require ardenexal/fhir-path
 
+# For resource validation against profiles
+composer require ardenexal/fhir-validation
+
 # For pre-generated models
 composer require ardenexal/fhir-models
+
+# For pre-generated CDA R2 and AU CDA models
+composer require ardenexal/cda-sd-models
 ```
 
 ### For Development
@@ -86,8 +92,11 @@ src/
 ├── Bundle/FHIRBundle/              # Symfony Bundle integration and console commands
 ├── Component/
 │   ├── CodeGeneration/src/         # FHIR model class generation from Structure Definitions
+│   ├── Metadata/src/               # FHIR type/property metadata, attributes, IG type registry
 │   ├── Serialization/src/          # FHIR JSON/XML serialization and deserialization
+│   ├── Validation/src/             # Resource validation against profiles
 │   ├── Models/src/                 # Generated FHIR model classes (R4, R4B, R5)
+│   ├── CdaModels/src/              # Generated CDA R2 and AU CDA logical model classes
 │   └── FHIRPath/src/               # FHIRPath 2.0 expression evaluator
 ```
 
@@ -95,9 +104,12 @@ Each component has its own README with detailed documentation:
 
 - [FHIRBundle](src/Bundle/FHIRBundle/README.md) — Symfony integration and console commands
 - [CodeGeneration](src/Component/CodeGeneration/README.md) — Model generation from FHIR packages
+- [Metadata](src/Component/Metadata/README.md) — FHIR attributes, type metadata, IG type registry
 - [Serialization](src/Component/Serialization/README.md) — JSON/XML serialization
 - [FHIRPath](src/Component/FHIRPath/README.md) — FHIRPath expression evaluation
+- [Validation](src/Component/Validation/README.md) — Resource validation against profiles
 - [Models](src/Component/Models/README.md) — Generated FHIR model classes
+- [CdaModels](src/Component/CdaModels/README.md) — Generated CDA R2 and AU CDA logical models
 
 ## Monorepo Structure
 
@@ -109,7 +121,10 @@ This is a library monorepo. Each component can be installed and used independent
 | `ardenexal/fhir-code-generation` | Generate PHP from FHIR definitions | `composer require ardenexal/fhir-code-generation` |
 | `ardenexal/fhir-serialization` | JSON/XML serialization | `composer require ardenexal/fhir-serialization` |
 | `ardenexal/fhir-path` | FHIRPath expression evaluator | `composer require ardenexal/fhir-path` |
-| `ardenexal/fhir-models` | Pre-generated FHIR models | `composer require ardenexal/fhir-models` |
+| `ardenexal/fhir-validation` | Resource validation against profiles, returning an `OperationOutcome` | `composer require ardenexal/fhir-validation` |
+| `ardenexal/fhir-metadata` | FHIR type and property metadata, attributes, and the IG type registry | `composer require ardenexal/fhir-metadata` |
+| `ardenexal/fhir-models` | Pre-generated FHIR models (R4, R4B, R5) | `composer require ardenexal/fhir-models` |
+| `ardenexal/cda-sd-models` | Pre-generated CDA R2 and AU CDA logical models | `composer require ardenexal/cda-sd-models` |
 
 ## Development
 

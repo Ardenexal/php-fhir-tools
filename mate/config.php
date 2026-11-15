@@ -3,9 +3,9 @@
 use App\Mate\Factory\FHIRValidationServiceFactory;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 

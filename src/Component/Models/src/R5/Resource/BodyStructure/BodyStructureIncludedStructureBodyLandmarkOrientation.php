@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Body locations in relation to a specific body landmark (tatoo, scar, other body structure).
@@ -39,6 +40,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $landmarkDescription = [],
         /** @var array<CodeableConcept> clockFacePosition Clockface orientation */
         #[FhirProperty(
@@ -47,6 +49,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $clockFacePosition = [],
         /** @var array<BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark> distanceFromLandmark Landmark relative location */
         #[FhirProperty(
@@ -55,6 +58,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\BodyStructure\BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark',
         )]
+        #[Valid]
         public array $distanceFromLandmark = [],
         /** @var array<CodeableConcept> surfaceOrientation Relative landmark surface orientation */
         #[FhirProperty(
@@ -63,7 +67,12 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/bodystructure-relative-location', strength: 'preferred')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/bodystructure-relative-location',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\BodystructureLocationQualifier',
+        )]
         public array $surfaceOrientation = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

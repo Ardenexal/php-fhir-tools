@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description Capabilities that must exist and are assumed to function correctly on the FHIR server being tested.
@@ -32,10 +33,10 @@ class TestScriptMetadataCapability extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var bool|null required Are the capabilities required? */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $required = null,
         /** @var bool|null validated Are the capabilities validated? */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $validated = null,
         /** @var StringPrimitive|string|null description The expected capabilities of the server */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

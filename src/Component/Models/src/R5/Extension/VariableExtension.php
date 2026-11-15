@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -20,16 +21,27 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/variable', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration.action.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure')]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure.group')]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure.group.population')]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'var-1',
+    severity: 'error',
+    expression: 'value.name.exists()',
+    human: 'Variable expressions must have a name',
+)]
 class VariableExtension extends Extension
 {
     /**

@@ -19,7 +19,7 @@ class FHIRSerializationException extends FHIRToolsException
     /**
      * @param string                          $message     The exception message
      * @param int                             $code        The exception code
-     * @param \Exception|null                 $previous    The previous exception
+     * @param \Throwable|null                 $previous    The previous throwable (an \Error must be chainable too)
      * @param string|null                     $elementPath The element path where the error occurred
      * @param array<string, mixed>            $context     Additional context information
      * @param FHIRSerializationDebugInfo|null $debugInfo   Debug information
@@ -27,7 +27,7 @@ class FHIRSerializationException extends FHIRToolsException
     public function __construct(
         string $message = '',
         int $code = 0,
-        ?\Exception $previous = null,
+        ?\Throwable $previous = null,
         public readonly ?string $elementPath = null,
         array $context = [],
         public readonly ?FHIRSerializationDebugInfo $debugInfo = null
@@ -53,10 +53,11 @@ class FHIRSerializationException extends FHIRToolsException
      *
      * @param array<string, mixed> $context
      */
-    public static function formatError(string $format, string $message, array $context = []): self
+    public static function formatError(string $format, string $message, array $context = [], ?\Throwable $previous = null): self
     {
         return new self(
             message: "Format error ({$format}): {$message}",
+            previous: $previous,
             context: array_merge($context, ['format' => $format]),
         );
     }

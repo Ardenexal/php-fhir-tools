@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ObservationDataType
  * URL: http://hl7.org/fhir/ValueSet/permitted-data-type
  * Version: 4.3.0
  * Description: Permitted data type for observation value.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/permitted-data-type', version: '4.3.0')]
 enum ObservationDataType: string
 {
     /** Quantity */

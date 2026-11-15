@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Indicates what should be done and within what timeframe.
@@ -33,7 +34,7 @@ class PlanDefinitionGoalTarget extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null measure The parameter whose value is to be tracked */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $measure = null,
         /** @var Quantity|Range|CodeableConcept|StringPrimitive|string|bool|int|Ratio|null detail The target value to be achieved */
         #[FhirProperty(
@@ -77,7 +78,7 @@ class PlanDefinitionGoalTarget extends BackboneElement
         )]
         public Quantity|Range|CodeableConcept|StringPrimitive|string|bool|int|Ratio|null $detail = null,
         /** @var Duration|null due Reach goal within */
-        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $due = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

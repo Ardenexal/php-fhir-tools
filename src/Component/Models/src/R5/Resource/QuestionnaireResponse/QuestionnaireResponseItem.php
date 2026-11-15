@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A group or question item from the original questionnaire for which answers are provided.
@@ -58,6 +59,7 @@ class QuestionnaireResponseItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\QuestionnaireResponseItemAnswer',
         )]
+        #[Valid]
         public array $answer = [],
         /** @var array<QuestionnaireResponseItem> item Child items of group item */
         #[FhirProperty(
@@ -66,6 +68,7 @@ class QuestionnaireResponseItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\QuestionnaireResponseItem',
         )]
+        #[Valid]
         public array $item = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

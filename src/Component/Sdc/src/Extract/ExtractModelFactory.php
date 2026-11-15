@@ -6,7 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Sdc\Extract;
 
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
 
 /**
  * Version-scoped construction of the FHIR model objects a `$extract` run assembles.

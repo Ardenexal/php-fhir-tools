@@ -1,0 +1,66 @@
+---
+goat-flow-reference-version: "1.18.0"
+---
+# Skill Playbooks
+
+This directory holds **standalone playbooks for tools and capabilities available to coding agents** in this project. Each playbook is self-contained - no skill composes them in. They are loaded on-demand by skills (or by you) when a tool is named.
+
+For shared meta-references inherited by goat-* skills (preamble on every invocation, conventions on full-depth), see the parent `skill-docs/` directory.
+
+> **Illustrative examples below define shape only; they are not incident evidence.**
+
+## How agents should use this directory
+
+1. When the request names a tool or discipline (browser, screenshots, changelog, release notes, logging/instrumentation, naming and placement, code comments, prose and writing style, or writing for agents), check this index for a matching playbook. Skill testing and hardening has no playbook row: load `../skill-quality-testing/README.md`, the skill-authoring methodology pack, and open the topical file its table names. Also check it when the work touches a discipline's surface without naming it: editing `CHANGELOG.md`, release notes, README or `docs/` prose, PR/issue text, a learning-loop entry body, or a skill, playbook, or instruction file an agent reads.
+2. Open the playbook. If it has an **Availability Check** section, run the exact `command -v <tool>` or equivalent it specifies before falling back.
+3. Only after the availability check fails AND the playbook's fallback path also fails, declare the capability unavailable.
+
+**Anti-pattern (don't do this):** spinning up `ToolSearch` or scanning the harness toolbox alone, finding nothing, and declaring "no tool available". That conflates "no harness tool" with "no tool". The playbooks here exist precisely to surface project-local tools the harness cannot see.
+
+## Available playbooks
+
+| Playbook | When to use | Tool / capability |
+|---|---|---|
+| [`browser-use.md`](./browser-use.md) | One-off browser observation: load a URL, screenshot, click, inspect DOM, capture state mid-investigation | `browser-use` CLI, typically at `~/.local/bin/browser-use` |
+| [`page-capture.md`](./page-capture.md) | Batch capture: visit N known pages, screenshot each, emit one MD record per page, for documentation, before/after evidence, or audit snapshots | Playwright (MCP / Node / Python tier), or `browser-use` CLI as a downgrade |
+| [`observability.md`](./observability.md) | Instrumenting code with logs, metrics, span events, or trace context: severity, structured fields, naming, cardinality budget, sensitive-data rules, and the log-vs-metric decision | n/a (instrumentation discipline) |
+| [`code-comments.md`](./code-comments.md) | Writing or editing source code: user-perspective doc comments, self-documenting names, context comments above branches/loops/null checks, null/empty tag meaning, journey anchors, TODO/FIXME/HACK markers, and concise comment cleanup | n/a (commenting discipline) |
+| [`gruff-code-quality.md`](./gruff-code-quality.md) | Running `gruff-go`, `gruff-rs`, `gruff-ts`, `gruff-php`, or `gruff-py`; triaging findings and verifying analyzer-driven cleanup without low-value comments or suppressions | gruff CLI family |
+| [`hook-policy-testing.md`](./hook-policy-testing.md) | Verifying dangerous-shell or native Git policy, paired blocked/allowed grammar, shared-runtime parity, and separate registrations after hook changes | Both policy entrypoints' `--self-test` and `--check` |
+| [`naming-and-placement.md`](./naming-and-placement.md) | Choosing or reviewing where code belongs and what symbols should be called: responsibility-first placement, truthful role/cardinality/time claims, guard legitimacy, and verification | n/a (naming and placement discipline) |
+| [`changelog.md`](./changelog.md) | Writing or editing `CHANGELOG.md`: Keep a Changelog categories, SemVer alignment, breaking-change markers and migration paths, write-at-commit vs write-at-release cadence, version-surface sync | n/a (changelog discipline) |
+| [`release-notes.md`](./release-notes.md) | Writing a per-release narrative for end users (GitHub release body, blog post, email, in-app banner, social): theme identification, user-impact lens, inverted-pyramid structure, multi-surface consistency. Derives from `changelog.md` | n/a (release-notes discipline) |
+| [`skill-playbook-authoring-sync.md`](./skill-playbook-authoring-sync.md) | Adding or materially editing a built-in playbook while keeping source/install mirrors, discovery, audit registration, and manifest ownership aligned | n/a (playbook-authoring discipline) |
+| [`test-selection.md`](./test-selection.md) | Creating, changing, reviewing, consolidating, moving, or pruning tests: value gate, coverage overlap, trustworthy level, dispositions, and mutation handoff | n/a (test-selection discipline) |
+| [`writing-human-facing-prose.md`](./writing-human-facing-prose.md) | Starting any human-read prose edit: compact correctness router, scope and source gates, meaning and precision protection, objective sibling triggers, minimum pass, and early stop. Exempts agent-read control text, plan mechanics, tables, and code | n/a (prose-style discipline) |
+| [`writing-sentence-diagnostics.md`](./writing-sentence-diagnostics.md) | After the writing core identifies sentence-level reader cost: actor choice, reader knowledge, assistant voice, residue, punctuation, social meaning, and non-authorizing lexical or rhythm signals | n/a (sentence-diagnostic discipline) |
+| [`writing-structure-diagnostics.md`](./writing-structure-diagnostics.md) | After the writing core identifies document-level assembly defects: duplicate representations, append seams, compound entries, parallel lists, causal order, padded triads, and chronology | n/a (structure-diagnostic discipline) |
+| [`writing-agent-facing-instructions.md`](./writing-agent-facing-instructions.md) | Creating or editing text an agent executes from: a skill, playbook, shared preamble or conventions file, instruction file, hook message, or README discovery row. Owns the two loads, pointer wording, the information ladder, completion criteria, leading words, negation, and pruning; the agent-read complement to `writing-human-facing-prose.md`'s exemption | n/a (agent-document authoring discipline) |
+
+## Adding a new playbook
+
+Before adding or materially editing a built-in playbook, load
+[`skill-playbook-authoring-sync.md`](./skill-playbook-authoring-sync.md). It owns
+the frontmatter, first-H2, bundling, README, audit-registration, manifest, and
+verification contract. Keep top-level progressive references below 3,000 body
+words and add the discovery row above in both README mirrors.
+
+## Admission checklist
+
+Use the smallest artifact that fits the evidence:
+
+| Candidate shape | Route to |
+|---|---|
+| First-class workflow with Step 0, modes, gates, or reports | goat-* skill |
+| Tool or capability runbook loaded on demand | `.goat-flow/skill-docs/playbooks/<name>.md` |
+| Shared doctrine every skill inherits | `.goat-flow/skill-docs/` |
+| Real incident or permanent caution | `.goat-flow/learning-loop/lessons/` or `footguns/` |
+| Short always-visible project rule | instruction file |
+| Deterministic transform or validation | CLI/check/script |
+| One-off or speculative advice | no new artifact yet |
+
+## Why this index exists
+
+Illustrative failure pattern: an agent asked to use browser-use searches only its harness tools, finds no browser MCP, and declares browser automation unavailable without checking the project-local wrapper.
+
+This index plus a Router Table pointer prevents that error: agents read project-local capability playbooks before treating harness-tool absence as capability absence.

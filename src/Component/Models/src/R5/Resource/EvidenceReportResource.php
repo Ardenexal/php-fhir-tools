@@ -28,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\EvidenceReport\EvidenceRepo
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\EvidenceReport\EvidenceReportSection;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\EvidenceReport\EvidenceReportSubject;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Clinical Decision Support)
@@ -49,19 +50,24 @@ class EvidenceReportResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -73,7 +79,14 @@ class EvidenceReportResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $url = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PublicationStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
         /** @var array<UsageContext> useContext The context that the content is intended to support */
         #[FhirProperty(
@@ -82,6 +95,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<Identifier> identifier Unique identifier for the evidence report */
         #[FhirProperty(
@@ -90,6 +104,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var array<Identifier> relatedIdentifier Identifiers for articles that may relate to more than one evidence report */
         #[FhirProperty(
@@ -98,6 +113,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $relatedIdentifier = [],
         /** @var Reference|MarkdownPrimitive|null citeAs Citation for this report */
         #[FhirProperty(
@@ -122,7 +138,7 @@ class EvidenceReportResource extends AbstractDomainResource
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Citation'])]
         public Reference|MarkdownPrimitive|null $citeAs = null,
         /** @var CodeableConcept|null type Kind of report */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var array<Annotation> note Used for footnotes and annotations */
         #[FhirProperty(
@@ -131,6 +147,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var array<RelatedArtifact> relatedArtifact Link, description or reference to artifact associated with the report */
         #[FhirProperty(
@@ -139,9 +156,10 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $relatedArtifact = [],
         /** @var EvidenceReportSubject|null subject Focus of the report */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isRequired: true), Valid, NotBlank]
         public ?EvidenceReportSubject $subject = null,
         /** @var StringPrimitive|string|null publisher Name of the publisher/steward (organization or individual) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -153,6 +171,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var array<ContactDetail> author Who authored the content */
         #[FhirProperty(
@@ -161,6 +180,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $author = [],
         /** @var array<ContactDetail> editor Who edited the content */
         #[FhirProperty(
@@ -169,6 +189,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $editor = [],
         /** @var array<ContactDetail> reviewer Who reviewed the content */
         #[FhirProperty(
@@ -177,6 +198,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $reviewer = [],
         /** @var array<ContactDetail> endorser Who endorsed the content */
         #[FhirProperty(
@@ -185,6 +207,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $endorser = [],
         /** @var array<EvidenceReportRelatesTo> relatesTo Relationships to other compositions/documents */
         #[FhirProperty(
@@ -193,6 +216,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\EvidenceReport\EvidenceReportRelatesTo',
         )]
+        #[Valid]
         public array $relatesTo = [],
         /** @var array<EvidenceReportSection> section Composition is broken into sections */
         #[FhirProperty(
@@ -201,6 +225,7 @@ class EvidenceReportResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\EvidenceReport\EvidenceReportSection',
         )]
+        #[Valid]
         public array $section = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

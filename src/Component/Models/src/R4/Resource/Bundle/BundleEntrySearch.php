@@ -29,7 +29,12 @@ class BundleEntrySearch extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var SearchEntryModeType|null mode match | include | outcome - why this is in the result set */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-entry-mode|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-entry-mode|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\SearchEntryMode',
+        )]
         public ?SearchEntryModeType $mode = null,
         /** @var numeric-string|null score Search ranking (between 0 and 1) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]

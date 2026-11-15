@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description A property value for this concept.
@@ -70,7 +71,7 @@ class CodeSystemConceptProperty extends BackboneElement
                 ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         public CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

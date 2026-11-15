@@ -8,9 +8,30 @@ Thumbs.db
 
 # Internal tool configs
 .kiro/
-.claude/
-.goat-flow/
 .gruff-cache/
+
+# .claude/ stays local (settings.local.json, worktrees, other skills) except the
+# goat-* skills, which CLAUDE.md and the goat-flow docs route to by name, and the
+# shared settings and hooks, which a remote session only gets from the clone.
+# Ignoring contents (/*) rather than the directory itself is what lets the
+# negations below re-include anything: git never descends into an excluded dir.
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/goat/
+!.claude/skills/goat-*/
+
+# goat-flow is deliberately NOT ignored here: the .goat-flow/ pointers in
+# CLAUDE.md and AGENTS.md have to resolve for anyone who clones the repo.
+# .goat-flow/.gitignore decides what is publishable and is default-deny, so
+# session logs, plan contents, the scratchpad, the audit cache, and install
+# state all stay local. Rules cannot be added here to override it: git gives a
+# deeper .gitignore precedence over its parents. .goat-flow/hooks/ is therefore
+# tracked and executable - review any pull request that touches it before
+# checking the branch out, and see .github/CODEOWNERS.
+.playwright-mcp/
 
 ###> symfony/framework-bundle ###
 /config/secrets/prod/prod.decrypt.private.php
@@ -29,6 +50,13 @@ Thumbs.db
 /demo/.env.*.local
 ###< demo app ###
 
+###> symfony compatibility harnesses ###
+# Standalone consumer installs used by the Symfony 6.4 and 8.1 CI jobs; see
+# tests/Compat/symfony-6.4/README.md.
+/tests/Compat/symfony-*/vendor/
+/tests/Compat/symfony-*/var/
+###< symfony compatibility harnesses ###
+
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###
@@ -39,5 +67,16 @@ phpstan.neon
 /coverage
 /phpunit.phar
 ###< phpunit/phpunit ###
+
+###> codecov uploader ###
+# codecov/codecov-action@v5 downloads its CLI binary plus the checksum and
+# signature it verifies against into the workspace, and does not remove them.
+# The "Verify no uncommitted changes" step in .github/workflows/main.yml counts
+# untracked files, so these three failed the quality gate immediately after
+# every other step in it had passed. Coverage output itself is /coverage above.
+/codecov
+/codecov.SHA256SUM
+/codecov.SHA256SUM.sig
+###< codecov uploader ###
 
 node_modules/

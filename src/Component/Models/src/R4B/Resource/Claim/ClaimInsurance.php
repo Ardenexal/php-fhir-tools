@@ -15,6 +15,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Financial instruments for reimbursement for the health care products and services specified on the claim.
@@ -36,13 +38,13 @@ class ClaimInsurance extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $sequence = null,
         /** @var bool|null focal Coverage to be used for adjudication */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $focal = null,
         /** @var Identifier|null identifier Pre-assigned Claim number */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var Reference|null coverage Insurance information */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Coverage'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Coverage'])]
         public ?Reference $coverage = null,
         /** @var StringPrimitive|string|null businessArrangement Additional provider contract number */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -56,7 +58,7 @@ class ClaimInsurance extends BackboneElement
         )]
         public array $preAuthRef = [],
         /** @var Reference|null claimResponse Adjudication results */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ClaimResponse'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ClaimResponse'])]
         public ?Reference $claimResponse = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

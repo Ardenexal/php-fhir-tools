@@ -19,7 +19,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-generatedFrom', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
-#[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity.plannedActivityReference')]
 #[FHIRExtensionContext(type: 'element', expression: 'Communication')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
@@ -29,7 +28,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]

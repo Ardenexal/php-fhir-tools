@@ -13,12 +13,18 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "symfony/finder": "^6.4|^7.4",
-        "symfony/validator": "^6.4|^7.4"
+        "psr/cache": "^3.0",
+        "symfony/finder": "^6.4|^7.4|^8.1",
+        "symfony/validator": "^6.4|^7.4|^8.1"
     },
     "autoload": {
         "psr-4": {
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\Metadata\\Tests\\": "tests/"
         }
     },
     "keywords": [
@@ -31,14 +37,14 @@
         "r4b",
         "r5"
     ],
-    "homepage": "https://github.com/ardenexal/fhir-tools",
+    "homepage": "https://github.com/Ardenexal/php-fhir-tools",
     "support": {
-        "issues": "https://github.com/ardenexal/fhir-tools/issues",
-        "source": "https://github.com/ardenexal/fhir-tools"
+        "issues": "https://github.com/Ardenexal/php-fhir-tools/issues",
+        "source": "https://github.com/Ardenexal/php-fhir-tools"
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.4.x-dev"
+            "dev-main": "0.6.x-dev"
         }
     }
 }

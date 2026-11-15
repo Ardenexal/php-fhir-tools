@@ -29,12 +29,7 @@ final class SkipFunction extends AbstractFunction
             throw new FHIRPathSemanticException("Function 'skip' requires an ordered collection");
         }
 
-        $evaluator = $context->getEvaluator();
-        if ($evaluator === null) {
-            throw new EvaluationException('Evaluator not available in context');
-        }
-
-        $numCollection = $evaluator->evaluate($parameters[0], $context);
+        $numCollection = $this->evaluateParameter($parameters[0], $context);
         if ($numCollection->isEmpty()) {
             throw EvaluationException::invalidFunctionParameter('skip', 'num', 'non-empty integer collection');
         }
@@ -52,16 +47,13 @@ final class SkipFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $items = [];
-        $count = 0;
-        foreach ($input as $item) {
-            if ($count < $num) {
-                ++$count;
-                continue;
+        $indexes = [];
+        foreach ($input as $index => $item) {
+            if ($index >= $num) {
+                $indexes[] = $index;
             }
-            $items[] = $item;
         }
 
-        return Collection::from($items);
+        return $input->only($indexes);
     }
 }

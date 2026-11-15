@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\StructureMapTargetListModeT
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\StructureMapTransformType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Content to create because of this mapping rule.
@@ -49,7 +50,12 @@ class StructureMapGroupRuleTarget extends BackboneElement
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $context = null,
         /** @var StructureMapContextTypeType|null contextType type | variable */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-context-type|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-context-type|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\StructureMapContextType',
+        )]
         public ?StructureMapContextTypeType $contextType = null,
         /** @var StringPrimitive|string|null element Field to create in the context */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -64,13 +70,22 @@ class StructureMapGroupRuleTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\StructureMapTargetListModeType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-target-list-mode|4.0.1', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-target-list-mode|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\StructureMapTargetListMode',
+        )]
         public array $listMode = [],
         /** @var IdPrimitive|null listRuleId Internal rule reference for shared list items */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $listRuleId = null,
         /** @var StructureMapTransformType|null transform create | copy + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-transform|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-transform|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\StructureMapTransform',
+        )]
         public ?StructureMapTransformType $transform = null,
         /** @var array<StructureMapGroupRuleTargetParameter> parameter Parameters to the transform */
         #[FhirProperty(
@@ -79,6 +94,7 @@ class StructureMapGroupRuleTarget extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureMap\StructureMapGroupRuleTargetParameter',
         )]
+        #[Valid]
         public array $parameter = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -65,7 +65,7 @@ final class TraceFunction extends AbstractFunction
         if (count($parameters) === 2 && $parameters[1] instanceof ExpressionNode) {
             $logItems = [];
             foreach ($input as $index => $item) {
-                $itemContext = $context->withIterationVariables($item, $index, $input->count());
+                $itemContext = $context->withBundleEntryScope($input->scopeAt($index))->withIterationVariables($item, $index, $input->count());
                 $projected   = $evaluator->evaluateWithContext($parameters[1], $itemContext);
                 foreach ($projected as $value) {
                     $logItems[] = $value;

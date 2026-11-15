@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\NoteTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A note that describes or explains adjudication results in a human readable form.
@@ -36,17 +37,24 @@ class ClaimResponseProcessNote extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $number = null,
         /** @var NoteTypeType|null type display | print | printoper */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/note-type|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/note-type|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\NoteType',
+        )]
         public ?NoteTypeType $type = null,
         /** @var StringPrimitive|string|null text Note explanatory text */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $text = null,
         /** @var CodeableConcept|null language Language of the text */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRValueSetBinding(
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?CodeableConcept $language = null,
     ) {

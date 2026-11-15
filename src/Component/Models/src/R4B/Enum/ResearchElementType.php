@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ResearchElementType
  * URL: http://hl7.org/fhir/ValueSet/research-element-type
  * Version: 4.3.0
  * Description: The possible types of research elements (E.g. Population, Exposure, Outcome).
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/research-element-type', version: '4.3.0')]
 enum ResearchElementType: string
 {
     /** Population */

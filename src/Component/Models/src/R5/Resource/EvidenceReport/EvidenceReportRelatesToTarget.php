@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The target composition/document of this relationship.
@@ -35,13 +36,13 @@ class EvidenceReportRelatesToTarget extends BackboneElement
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $url = null,
         /** @var Identifier|null identifier Target of the relationship Identifier */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var MarkdownPrimitive|null display Target of the relationship Display */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $display = null,
         /** @var Reference|null resource Target of the relationship Resource reference */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $resource = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

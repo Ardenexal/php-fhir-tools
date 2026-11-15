@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Country and jurisdiction where the name applies, and associated language.
@@ -34,18 +35,20 @@ class MedicinalProductDefinitionNameCountryLanguage extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null country Country code for where this name applies */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $country = null,
         /** @var CodeableConcept|null jurisdiction Jurisdiction code for where this name applies */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $jurisdiction = null,
         /** @var CodeableConcept|null language Language code for this name */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRValueSetBinding(
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?CodeableConcept $language = null,
     ) {

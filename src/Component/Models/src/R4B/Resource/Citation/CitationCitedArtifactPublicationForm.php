@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description If multiple, used to represent alternative forms of the article that are not separate citations.
@@ -32,10 +33,10 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CitationCitedArtifactPublicationFormPublishedIn|null publishedIn The collection the cited article or artifact is published in */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?CitationCitedArtifactPublicationFormPublishedIn $publishedIn = null,
         /** @var CitationCitedArtifactPublicationFormPeriodicRelease|null periodicRelease The specific issue in which the cited article resides */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?CitationCitedArtifactPublicationFormPeriodicRelease $periodicRelease = null,
         /** @var DateTimePrimitive|null articleDate The date the article was added to the database, or the date the article was released */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -50,7 +51,12 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
+        )]
         public array $language = [],
         /** @var StringPrimitive|string|null accessionNumber Entry number or identifier for inclusion in a database */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

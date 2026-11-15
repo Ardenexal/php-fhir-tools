@@ -7,8 +7,10 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit\Service;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\SyntaxException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\CompiledExpression;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ardenexal\FHIRTools\Component\FHIRPath\Cache\ExpressionCacheInterface;
 
@@ -43,6 +45,34 @@ class FHIRPathServiceTest extends TestCase
 
         self::assertSame(1, $result->count());
         self::assertSame('hello', $result->first());
+    }
+
+    /**
+     * Exponent-form numbers are not FHIRPath syntax. They must fail to parse with a FHIRPath
+     * syntax error rather than reaching bcmath, which rejects them with a PHP ValueError.
+     */
+    #[DataProvider('scientificNotationProvider')]
+    public function testScientificNotationIsASyntaxError(string $expression): void
+    {
+        $this->expectException(SyntaxException::class);
+
+        $this->service->evaluate($expression, null);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function scientificNotationProvider(): array
+    {
+        return [
+            'bare literal'               => ['1e2'],
+            'upper-case exponent'        => ['1E2'],
+            'addition'                   => ['1e2 + 1'],
+            'comparison'                 => ['1e2 > 5'],
+            'decimal mantissa'           => ['1.5e3 - 1'],
+            'negative exponent'          => ['1.5e-3'],
+            'explicit positive exponent' => ['2e+3'],
+        ];
     }
 
     public function testEvaluateWithArray(): void

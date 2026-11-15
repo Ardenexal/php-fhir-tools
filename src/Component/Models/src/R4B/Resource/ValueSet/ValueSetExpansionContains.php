@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The codes that are contained in the value set expansion.
@@ -73,6 +74,7 @@ class ValueSetExpansionContains extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ValueSet\ValueSetComposeIncludeConceptDesignation',
         )]
+        #[Valid]
         public array $designation = [],
         /** @var array<ValueSetExpansionContains> contains Codes contained under this entry */
         #[FhirProperty(
@@ -81,6 +83,7 @@ class ValueSetExpansionContains extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ValueSet\ValueSetExpansionContains',
         )]
+        #[Valid]
         public array $contains = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

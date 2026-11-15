@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about the packaging of the device, i.e. how the device is packaged.
@@ -29,10 +30,10 @@ class DeviceDefinitionPackaging extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Identifier|null identifier Business identifier of the packaged medication */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var CodeableConcept|null type A code that defines the specific type of packaging */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var int|null count The number of items contained in the package (devices or sub-packages) */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
@@ -44,6 +45,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceDefinition\DeviceDefinitionPackagingDistributor',
         )]
+        #[Valid]
         public array $distributor = [],
         /** @var array<DeviceDefinitionUdiDeviceIdentifier> udiDeviceIdentifier Unique Device Identifier (UDI) Barcode string on the packaging */
         #[FhirProperty(
@@ -52,6 +54,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceDefinition\DeviceDefinitionUdiDeviceIdentifier',
         )]
+        #[Valid]
         public array $udiDeviceIdentifier = [],
         /** @var array<DeviceDefinitionPackaging> packaging Allows packages within packages */
         #[FhirProperty(
@@ -60,6 +63,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceDefinition\DeviceDefinitionPackaging',
         )]
+        #[Valid]
         public array $packaging = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

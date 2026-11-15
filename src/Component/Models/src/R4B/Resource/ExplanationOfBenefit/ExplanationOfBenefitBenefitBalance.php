@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Balance by Benefit Category.
@@ -30,7 +31,7 @@ class ExplanationOfBenefitBenefitBalance extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null category Benefit classification */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $category = null,
         /** @var bool|null excluded Excluded from the plan */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -42,13 +43,13 @@ class ExplanationOfBenefitBenefitBalance extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var CodeableConcept|null network In or out of network */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $network = null,
         /** @var CodeableConcept|null unit Individual or family */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $unit = null,
         /** @var CodeableConcept|null term Annual or lifetime */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $term = null,
         /** @var array<ExplanationOfBenefitBenefitBalanceFinancial> financial Benefit Summary */
         #[FhirProperty(
@@ -57,6 +58,7 @@ class ExplanationOfBenefitBenefitBalance extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ExplanationOfBenefit\ExplanationOfBenefitBenefitBalanceFinancial',
         )]
+        #[Valid]
         public array $financial = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

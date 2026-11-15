@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Command;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;

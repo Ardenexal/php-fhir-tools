@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Material or taxonomic/anatomical source for the substance.
@@ -29,16 +30,16 @@ class SubstanceDefinitionSourceMaterial extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Classification of the origin of the raw material. e.g. cat hair is an Animal source type */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null genus The genus of an organism e.g. the Latin epithet of the plant/animal scientific name */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $genus = null,
         /** @var CodeableConcept|null species The species of an organism e.g. the Latin epithet of the species of the plant/animal */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $species = null,
         /** @var CodeableConcept|null part An anatomical origin of the source material within an organism */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $part = null,
         /** @var array<CodeableConcept> countryOfOrigin The country or countries where the material is harvested */
         #[FhirProperty(
@@ -47,7 +48,12 @@ class SubstanceDefinitionSourceMaterial extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/country|4.3.0', strength: 'required')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/country|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CountryValueSet',
+        )]
         public array $countryOfOrigin = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

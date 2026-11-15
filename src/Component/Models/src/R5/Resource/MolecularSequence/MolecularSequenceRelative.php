@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A sequence defined relative to another sequence.
@@ -31,16 +32,16 @@ class MolecularSequenceRelative extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null coordinateSystem Ways of identifying nucleotides or amino acids within a sequence */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://loinc.org/LL5323-2/', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://loinc.org/LL5323-2/', strength: 'extensible')]
         public ?CodeableConcept $coordinateSystem = null,
         /** @var int|null ordinalPosition Indicates the order in which the sequence should be considered when putting multiple 'relative' elements together */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $ordinalPosition = null,
         /** @var Range|null sequenceRange Indicates the nucleotide range in the composed sequence when multiple 'relative' elements are used together */
-        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $sequenceRange = null,
         /** @var MolecularSequenceRelativeStartingSequence|null startingSequence A sequence used as starting sequence */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?MolecularSequenceRelativeStartingSequence $startingSequence = null,
         /** @var array<MolecularSequenceRelativeEdit> edit Changes in sequence from the starting sequence */
         #[FhirProperty(
@@ -49,6 +50,7 @@ class MolecularSequenceRelative extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MolecularSequence\MolecularSequenceRelativeEdit',
         )]
+        #[Valid]
         public array $edit = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

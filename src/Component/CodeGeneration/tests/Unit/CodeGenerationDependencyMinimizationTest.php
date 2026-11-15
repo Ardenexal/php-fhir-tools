@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit;
 
 use Eris\Generator;
 use Eris\TestTrait;
@@ -64,7 +64,7 @@ class CodeGenerationDependencyMinimizationTest extends TestCase
         $essentialDependencies = [
             'php'                 => '>=8.3',
             'nette/php-generator' => '^4.1',
-            'symfony/string'      => '^6.4|^7.0',
+            'symfony/string'      => '^6.4|^7.0|^8.1',
         ];
 
         foreach ($essentialDependencies as $package => $expectedVersion) {

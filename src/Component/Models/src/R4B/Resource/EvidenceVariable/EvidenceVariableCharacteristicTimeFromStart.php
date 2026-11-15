@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Indicates duration, period, or point of observation from the participant's study entry.
@@ -34,10 +35,10 @@ class EvidenceVariableCharacteristicTimeFromStart extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var Quantity|null quantity Used to express the observation at a defined amount of time after the study start */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Range|null range Used to express the observation within a period after the study start */
-        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $range = null,
         /** @var array<Annotation> note Used for footnotes or explanatory notes */
         #[FhirProperty(
@@ -46,6 +47,7 @@ class EvidenceVariableCharacteristicTimeFromStart extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

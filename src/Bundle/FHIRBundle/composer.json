@@ -7,25 +7,25 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-code-generation": "^0.4",
-        "ardenexal/fhir-http-client": "^0.4",
-        "ardenexal/fhir-metadata": "^0.4",
-        "ardenexal/fhir-path": "^0.4",
-        "ardenexal/fhir-serialization": "^0.4",
-        "ardenexal/fhir-validation": "^0.4",
+        "ardenexal/fhir-code-generation": "^0.6.2",
+        "ardenexal/fhir-http-client": "^0.6.2",
+        "ardenexal/fhir-metadata": "^0.6.2",
+        "ardenexal/fhir-path": "^0.6.2",
+        "ardenexal/fhir-serialization": "^0.6.2",
+        "ardenexal/fhir-validation": "^0.6.2",
         "psr/cache": "^3.0",
-        "symfony/config": "^6.4|^7.4",
-        "symfony/console": "^6.4|^7.4",
-        "symfony/dependency-injection": "^6.4|^7.4",
-        "symfony/finder": "^6.4|^7.4",
-        "symfony/framework-bundle": "^6.4|^7.4",
-        "symfony/http-kernel": "^6.4|^7.4",
-        "symfony/serializer": "^6.4|^7.4",
-        "symfony/yaml": "^6.4|^7.4"
+        "symfony/config": "^6.4|^7.4|^8.1",
+        "symfony/console": "^6.4|^7.4|^8.1",
+        "symfony/dependency-injection": "^6.4|^7.4|^8.1",
+        "symfony/finder": "^6.4|^7.4|^8.1",
+        "symfony/framework-bundle": "^6.4|^7.4|^8.1",
+        "symfony/http-kernel": "^6.4|^7.4|^8.1",
+        "symfony/serializer": "^6.4|^7.4|^8.1",
+        "symfony/yaml": "^6.4|^7.4|^8.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5",
-        "symfony/phpunit-bridge": "^6.4|^7.4",
+        "symfony/phpunit-bridge": "^6.4|^7.4|^8.1",
         "giorgiosironi/eris": "^1.0"
     },
     "autoload": {
@@ -44,7 +44,7 @@
             "require": "^6.4|^7.4"
         },
         "branch-alias": {
-            "dev-main": "0.4.x-dev"
+            "dev-main": "0.6.x-dev"
         }
     }
 }

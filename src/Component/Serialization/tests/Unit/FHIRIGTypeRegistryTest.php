@@ -45,17 +45,20 @@ class FHIRIGTypeRegistryTest extends TestCase
         );
     }
 
-    public function testResolveExtensionClassFallsBackToFirstVersionWhenNoVersionMatch(): void
+    /**
+     * A class generated for another FHIR version must not be handed out: the caller would place it
+     * in a resource tree of the wrong version. Null tells the caller to use its own base Extension.
+     */
+    public function testResolveExtensionClassReturnsNullWhenRequestedVersionHasNoClass(): void
     {
         $registry = new FHIRIGTypeRegistry(
             extensionMappings: [
-                'http://hl7.org/fhir/StructureDefinition/patient-birthPlace' => ['R4' => \stdClass::class],
+                'http://hl7.org/fhir/StructureDefinition/requirements-parent' => ['R5' => \stdClass::class],
             ],
         );
 
-        self::assertSame(
-            \stdClass::class,
-            $registry->resolveExtensionClass('http://hl7.org/fhir/StructureDefinition/patient-birthPlace', 'R5'),
+        self::assertNull(
+            $registry->resolveExtensionClass('http://hl7.org/fhir/StructureDefinition/requirements-parent', 'R4'),
         );
     }
 

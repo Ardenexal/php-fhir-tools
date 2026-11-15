@@ -34,7 +34,7 @@ class TimePrimitive extends Element implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var FHIRTime|null value Primitive value for time */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Time', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Time', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '~\A(?:([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?)\z~')]
         public ?FHIRTime $value = null,
     ) {
         parent::__construct($id, $extension);

@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 
 /**
- * @author HL7 International / Orders and Observations
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/documentreference-sourcepatient
  *

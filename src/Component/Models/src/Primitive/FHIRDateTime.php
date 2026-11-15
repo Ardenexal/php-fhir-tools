@@ -19,8 +19,9 @@ use Brick\DateTime\ZonedDateTime;
 final readonly class FHIRDateTime implements FHIRTemporalValue
 {
     private function __construct(
-        private Year|YearMonth|LocalDate|ZonedDateTime $value,
+        private Year|YearMonth|LocalDate|ZonedDateTime|null $value,
         private string $originalString,
+        private ?string $parseError = null,
     ) {
     }
 
@@ -40,18 +41,42 @@ final readonly class FHIRDateTime implements FHIRTemporalValue
 
         try {
             return new self(ZonedDateTime::parse($raw), $raw);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
             // Leniently handle dateTime strings that omit the timezone offset
             // (e.g. "2020-11-11T10:58:14.768528"). FHIR R4 requires a timezone for
             // full dateTime, but some real-world data omits it; treat as UTC and
             // preserve the original string for round-trip fidelity.
-            return new self(ZonedDateTime::parse($raw . 'Z'), $raw);
+            //
+            // The retry is scoped to values that carry no offset at all, and the ORIGINAL
+            // exception is rethrown when it fails. An unscoped retry appended "Z" to a value that
+            // already had an offset, so the surfaced message named a string that was never in the
+            // document ("…T12:59:60+10:00Z", two offsets) and misdirected anyone debugging any
+            // dateTime failure.
+            if (preg_match('/(?:Z|[+\-]\d{2}:\d{2})$/', $raw) === 1) {
+                throw $e;
+            }
+
+            try {
+                return new self(ZonedDateTime::parse($raw . 'Z'), $raw);
+            } catch (\Throwable) {
+                throw $e;
+            }
         }
     }
 
-    public function getValue(): Year|YearMonth|LocalDate|ZonedDateTime
+    public static function unparsed(string $raw, string $error): static
+    {
+        return new self(null, $raw, $error);
+    }
+
+    public function getValue(): Year|YearMonth|LocalDate|ZonedDateTime|null
     {
         return $this->value;
+    }
+
+    public function getParseError(): ?string
+    {
+        return $this->parseError;
     }
 
     /**

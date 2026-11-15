@@ -1,0 +1,128 @@
+{
+  "index-version": 2,
+  "files": [
+    {
+      "filename": "StructureDefinition-Extension.json",
+      "resourceType": "StructureDefinition",
+      "id": "Extension",
+      "url": "http://hl7.org/fhir/StructureDefinition/Extension",
+      "version": "4.0.1",
+      "kind": "complex-type",
+      "type": "Extension"
+    },
+    {
+      "filename": "StructureDefinition-Observation.json",
+      "resourceType": "StructureDefinition",
+      "id": "Observation",
+      "url": "http://hl7.org/fhir/StructureDefinition/Observation",
+      "version": "4.0.1",
+      "kind": "resource",
+      "type": "Observation"
+    },
+    {
+      "filename": "StructureDefinition-bp.json",
+      "resourceType": "StructureDefinition",
+      "id": "bp",
+      "url": "http://hl7.org/fhir/StructureDefinition/bp",
+      "version": "4.0.1",
+      "kind": "resource",
+      "type": "Observation"
+    },
+    {
+      "filename": "StructureDefinition-example-extension.json",
+      "resourceType": "StructureDefinition",
+      "id": "example-extension",
+      "url": "http://example.org/fhir/StructureDefinition/example-extension",
+      "version": "1.0.0",
+      "kind": "complex-type",
+      "type": "Extension"
+    },
+    {
+      "filename": "StructureDefinition-logical.json",
+      "resourceType": "StructureDefinition",
+      "id": "logical",
+      "url": "http://example.org/fhir/StructureDefinition/logical",
+      "version": "1.0.0",
+      "kind": "logical",
+      "type": "http://example.org/fhir/StructureDefinition/logical"
+    },
+    {
+      "filename": "StructureDefinition-loop-a.json",
+      "resourceType": "StructureDefinition",
+      "id": "loop-a",
+      "url": "http://example.org/fhir/StructureDefinition/loop-a",
+      "version": "1.0.0",
+      "kind": "resource",
+      "type": "Observation"
+    },
+    {
+      "filename": "StructureDefinition-loop-b.json",
+      "resourceType": "StructureDefinition",
+      "id": "loop-b",
+      "url": "http://example.org/fhir/StructureDefinition/loop-b",
+      "version": "1.0.0",
+      "kind": "resource",
+      "type": "Observation"
+    },
+    {
+      "filename": "StructureDefinition-no-snapshot.json",
+      "resourceType": "StructureDefinition",
+      "id": "no-snapshot",
+      "url": "http://example.org/fhir/StructureDefinition/no-snapshot",
+      "version": "1.0.0",
+      "kind": "resource",
+      "type": "Observation"
+    },
+    {
+      "filename": "StructureDefinition-orphan.json",
+      "resourceType": "StructureDefinition",
+      "id": "orphan",
+      "url": "http://example.org/fhir/StructureDefinition/orphan",
+      "version": "1.0.0",
+      "kind": "resource",
+      "type": "Observation"
+    },
+    {
+      "filename": "StructureDefinition-versioned-1.0.0.json",
+      "resourceType": "StructureDefinition",
+      "id": "versioned",
+      "url": "http://example.org/fhir/StructureDefinition/versioned",
+      "version": "1.0.0",
+      "kind": "resource",
+      "type": "Observation"
+    },
+    {
+      "filename": "StructureDefinition-versioned-1.10.0.json",
+      "resourceType": "StructureDefinition",
+      "id": "versioned",
+      "url": "http://example.org/fhir/StructureDefinition/versioned",
+      "version": "1.10.0",
+      "kind": "resource",
+      "type": "Observation"
+    },
+    {
+      "filename": "StructureDefinition-versioned-1.2.0.json",
+      "resourceType": "StructureDefinition",
+      "id": "versioned",
+      "url": "http://example.org/fhir/StructureDefinition/versioned",
+      "version": "1.2.0",
+      "kind": "resource",
+      "type": "Observation"
+    },
+    {
+      "filename": "StructureDefinition-vitalsigns.json",
+      "resourceType": "StructureDefinition",
+      "id": "vitalsigns",
+      "url": "http://hl7.org/fhir/StructureDefinition/vitalsigns",
+      "version": "4.0.1",
+      "kind": "resource",
+      "type": "Observation"
+    },
+    {
+      "filename": "ValueSet-example.json",
+      "resourceType": "ValueSet",
+      "id": "example",
+      "url": "http://example.org/fhir/ValueSet/example"
+    }
+  ]
+}

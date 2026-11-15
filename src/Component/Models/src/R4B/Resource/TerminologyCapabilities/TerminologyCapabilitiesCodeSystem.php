@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Identifies a code system that is supported by the server. If there is a no code system URL, then this declares the general assumptions a client can make about support for any CodeSystem resource.
@@ -45,6 +46,7 @@ class TerminologyCapabilitiesCodeSystem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TerminologyCapabilities\TerminologyCapabilitiesCodeSystemVersion',
         )]
+        #[Valid]
         public array $version = [],
         /** @var bool|null subsumption Whether subsumption is supported */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

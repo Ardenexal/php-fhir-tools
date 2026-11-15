@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Dosage for the medication for the specific guidelines.
@@ -35,7 +36,7 @@ class MedicationKnowledgeAdministrationGuidelinesDosage extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Type of dosage */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var array<Dosage> dosage Dosage for the medication for the specific guidelines */
         #[FhirProperty(
@@ -45,6 +46,7 @@ class MedicationKnowledgeAdministrationGuidelinesDosage extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $dosage = [],
     ) {

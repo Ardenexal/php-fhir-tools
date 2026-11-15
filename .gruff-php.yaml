@@ -21,11 +21,19 @@ paths:
         - infection-report.json
         - 'src/Vendor/**'
         - 'tests/Fixtures/**'
+        # Project-local generated output and build artefacts (see CLAUDE.md: never hand-edited).
+        - 'src/Component/Models/src/**'
+        - 'vendor/**'
+        - 'demo/vendor/**'
+        - 'var/**'
+        - 'demo/var/**'
+        - '.gruff-cache/**'
 allowlists:
     acceptedAbbreviations:
         - age
         - app
         - db
+        - dto
         - fs
         - id
         - io
@@ -39,6 +47,7 @@ allowlists:
         - tx
         - ui
         - url
+        - utc
     secretPreviews: []
 selection:
     tiers: []
@@ -87,7 +96,7 @@ rules:
     # Missing class PHPDoc
     docs.missing-class-phpdoc:
         enabled: true
-    # Missing constant PHPDoc
+    # Requires constants to explain their purpose with PHPDoc or meaningful local comments; explicit patterns/regexes families cover at most five names while shipped group categories keep contiguous coverage.
     docs.missing-constant-phpdoc:
         enabled: true
         options:
@@ -99,9 +108,11 @@ rules:
     # Missing @param tag
     docs.missing-param-tag:
         enabled: true
-    # Missing property PHPDoc
+    # Requires declared properties to explain their purpose with PHPDoc; an opt-in toggle also accepts meaningful attached line comments.
     docs.missing-property-phpdoc:
         enabled: true
+        options:
+            acceptLineComments: false
     # Missing method PHPDoc
     docs.missing-public-phpdoc:
         enabled: true
@@ -114,7 +125,7 @@ rules:
     # Missing @throws tag
     docs.missing-throws-tag:
         enabled: true
-    # Requires a one-line explanatory comment immediately above configured PCRE calls (preg_match, preg_match_all, preg_replace, preg_replace_callback, preg_split by default). Exempt when the call is inside a `match (true) { ... => "label" }` arm with a string-literal label, or when the enclosing function-like docblock references the regex behaviour.
+    # Requires an explanatory comment immediately above configured PCRE calls, their nearest statement owner, or a contiguous sibling group of regex-owning statements. String-labelled match arms and narrow, call-specific callable contracts can provide equivalent context.
     docs.regex-comment:
         enabled: true
         options:
@@ -153,7 +164,7 @@ rules:
     # Mixed type overuse
     modernisation.mixed-type-overuse:
         enabled: true
-    # Named argument opportunity
+    # Optionally highlights ambiguous positional calls where named arguments may help, but only when parameter names belong to a stable API contract.
     modernisation.named-argument-opportunity:
         enabled: true
         thresholds:
@@ -161,9 +172,11 @@ rules:
     # Flags PHPDoc @param/@return/@var/@property tags using mixed where a narrower type would carry more meaning. Unstructured array bags and precise array{...} envelope shapes are exempt.
     modernisation.phpdoc-mixed-overuse:
         enabled: true
-    # Public mutable property
+    # Flags public mutable state unless its fully qualified class is an explicit lifecycle or integration contract.
     modernisation.public-property:
         enabled: true
+        options:
+            allowedClasses: []
     # Readonly property candidate
     modernisation.readonly-property-candidate:
         enabled: true
@@ -175,7 +188,7 @@ rules:
                 - this
             minLength: 2
             maxLength: 3
-    # Boolean method prefix
+    # Accepts predicate prefixes, property/parameter state adjectives, multi-token state suffixes, subject-first propositions, and exact compatibility names while flagging vague Boolean identifiers.
     naming.boolean-prefix:
         enabled: true
         options:
@@ -219,16 +232,39 @@ rules:
                 - valid
                 - strict
                 - silent
+                - resolved
+                - limited
+                - printable
+            stateSuffixAllowlist:
+                - requested
+                - present
+                - enabled
+                - allowed
+            propositionVerbAllowlist:
+                - requires
             acceptedBooleanNames: []
+            includePublicApi: true
     # Class/file name mismatch
     naming.class-file-mismatch:
         enabled: true
     # Confusing standalone class name
     naming.confusing-name:
         enabled: true
-    # Generic method name
+    # Flags functions and methods whose names match the configured replacement list of vague verbs.
     naming.generic-method:
         enabled: true
+        options:
+            genericNames:
+                - process
+                - handle
+                - execute
+                - run
+                - manage
+                - doIt
+                - do
+                - perform
+                - make
+                - compute
     # Flags identifiers that duplicate type information with configured prefixes such as arr, obj, str, or bool.
     naming.hungarian-notation:
         enabled: true
@@ -306,9 +342,11 @@ rules:
     # Test method naming consistency
     naming.test-naming-consistency:
         enabled: true
-    # Dangerous function calls
+    # Flags dynamic execution, built-in shell and evaluation patterns, and configured additive global function names.
     security.dangerous-function-call:
         enabled: true
+        options:
+            additionalFunctions: []
     # Forces PHP error display on via ini_set(display_errors, ...), leaking diagnostics in production.
     security.debug-mode-enabled:
         enabled: true
@@ -423,22 +461,22 @@ rules:
     # HTTP(S) URL with an inline user:password@host credential.
     sensitive-data.url-credentials:
         enabled: true
-    # Average method length
+    # Average method length (logical lines: statements only, averaged across the type's methods)
     size.average-method-length:
         enabled: true
         threshold: 50
         severity: error
-    # Class length
+    # Class length (substantive lines: blank and comment-only lines are free)
     size.class-length:
         enabled: true
         threshold: 1000
         severity: error
-    # File length
+    # File length (substantive lines: blank and comment-only lines are free)
     size.file-length:
         enabled: true
         threshold: 1000
         severity: error
-    # Method length
+    # Method length (logical lines: statements, not blank or comment lines)
     size.method-length:
         enabled: true
         threshold: 100

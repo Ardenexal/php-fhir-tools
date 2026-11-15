@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Week Of Month
  * URL: http://hl7.org/fhir/ValueSet/week-of-month
  * Version: 5.0.0
  * Description: The set of weeks in a month.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/week-of-month', version: '5.0.0')]
 enum WeekOfMonth: string
 {
     /** First */

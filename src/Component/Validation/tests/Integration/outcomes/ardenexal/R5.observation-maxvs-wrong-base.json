@@ -1,5 +1,22 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 0
+    "warningCount": 0,
+    "infoCount": 0,
+    "java": {
+        "errorCount": 4,
+        "warningCount": 0,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: vs-2: 'If there is no component or hasMember element then either a value[x] or a data absent reason must be present.' (defined in http://hl7.org/fhir/StructureDefinition/vitalsigns)",
+            "Observation.category: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/bodyweight|5.0.0)",
+            "Observation.effective[x]: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/bodyweight|5.0.0)",
+            "Slice 'Observation.category:VSCat': a matching slice is required, but not found (from http://hl7.org/fhir/StructureDefinition/bodyweight|5.0.0). Note that other slices are allowed in addition to this required slice"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

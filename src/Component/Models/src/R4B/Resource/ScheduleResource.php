@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Patient Administration)
@@ -35,7 +36,7 @@ class ScheduleResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -46,13 +47,14 @@ class ScheduleResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -67,6 +69,7 @@ class ScheduleResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var bool|null active Whether this schedule is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
@@ -78,6 +81,7 @@ class ScheduleResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $serviceCategory = [],
         /** @var array<CodeableConcept> serviceType Specific service */
         #[FhirProperty(
@@ -86,6 +90,7 @@ class ScheduleResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $serviceType = [],
         /** @var array<CodeableConcept> specialty Type of specialty needed */
         #[FhirProperty(
@@ -94,7 +99,12 @@ class ScheduleResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/c80-practice-codes', strength: 'preferred')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/c80-practice-codes',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\PracticeSettingCodeValueSet',
+        )]
         public array $specialty = [],
         /** @var array<Reference> actor Resource(s) that availability information is being provided for */
         #[FhirProperty(
@@ -104,6 +114,7 @@ class ScheduleResource extends AbstractDomainResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[Count(min: 1)]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
@@ -116,7 +127,7 @@ class ScheduleResource extends AbstractDomainResource
         ])]
         public array $actor = [],
         /** @var Period|null planningHorizon Period of time covered by schedule */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $planningHorizon = null,
         /** @var StringPrimitive|string|null comment Comments on availability */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

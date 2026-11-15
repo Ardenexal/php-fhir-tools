@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Schedule information for an enteral formula.
@@ -39,12 +40,13 @@ class NutritionOrderEnteralFormulaAdministrationSchedule extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing',
         )]
+        #[Valid]
         public array $timing = [],
         /** @var bool|null asNeeded Take 'as needed' */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $asNeeded = null,
         /** @var CodeableConcept|null asNeededFor Take 'as needed' for x */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $asNeededFor = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

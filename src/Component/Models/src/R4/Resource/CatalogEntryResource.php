@@ -21,6 +21,8 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\CatalogEntry\CatalogEntryRelatedEntry;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Orders and Observations)
@@ -37,7 +39,7 @@ class CatalogEntryResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -48,13 +50,14 @@ class CatalogEntryResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -69,15 +72,17 @@ class CatalogEntryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null type The type of item - medication, device, service, protocol or other */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var bool|null orderable Whether the entry represents an orderable item */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $orderable = null,
         /** @var Reference|null referencedItem The item that is being defined */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Medication',
@@ -100,6 +105,7 @@ class CatalogEntryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $additionalIdentifier = [],
         /** @var array<CodeableConcept> classification Classification (category or class) of the item entry */
         #[FhirProperty(
@@ -108,12 +114,18 @@ class CatalogEntryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $classification = [],
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\PublicationStatus',
+        )]
         public ?PublicationStatusType $status = null,
         /** @var Period|null validityPeriod The time period in which this catalog entry is expected to be active */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $validityPeriod = null,
         /** @var DateTimePrimitive|null validTo The date until which this catalog entry is expected to be active */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -128,6 +140,7 @@ class CatalogEntryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $additionalCharacteristic = [],
         /** @var array<CodeableConcept> additionalClassification Additional classification of the catalog entry */
         #[FhirProperty(
@@ -136,6 +149,7 @@ class CatalogEntryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $additionalClassification = [],
         /** @var array<CatalogEntryRelatedEntry> relatedEntry An item that this catalog entry is related to */
         #[FhirProperty(
@@ -144,6 +158,7 @@ class CatalogEntryResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\CatalogEntry\CatalogEntryRelatedEntry',
         )]
+        #[Valid]
         public array $relatedEntry = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

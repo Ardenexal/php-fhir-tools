@@ -32,12 +32,7 @@ class PowerFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $evaluator = $context->getEvaluator();
-        if ($evaluator === null) {
-            throw new EvaluationException('Evaluator not available in context');
-        }
-
-        $exponentResult = $evaluator->evaluate($parameters[0], $context);
+        $exponentResult = $this->evaluateParameter($parameters[0], $context);
         if ($exponentResult->isEmpty()) {
             return Collection::empty();
         }

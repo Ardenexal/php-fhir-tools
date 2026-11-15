@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -25,10 +26,10 @@ class CodeableReference extends DataType
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var CodeableConcept|null concept Reference to a concept (by class) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $concept = null,
         /** @var Reference|null reference Reference to a resource (by instance) */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid]
         public ?Reference $reference = null,
     ) {
         parent::__construct($id, $extension);

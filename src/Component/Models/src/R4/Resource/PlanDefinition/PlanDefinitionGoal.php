@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Goals that describe what the activities within the plan are intended to achieve. For example, weight loss, restoring an activity of daily living, obtaining herd immunity via immunization, meeting a process improvement objective, etc.
@@ -31,16 +32,22 @@ class PlanDefinitionGoal extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null category E.g. Treatment, dietary, behavioral */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $category = null,
         /** @var CodeableConcept|null description Code or text describing the goal */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $description = null,
         /** @var CodeableConcept|null priority high-priority | medium-priority | low-priority */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/goal-priority', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/goal-priority',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\GoalPriority',
+        )]
         public ?CodeableConcept $priority = null,
         /** @var CodeableConcept|null start When goal pursuit begins */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $start = null,
         /** @var array<CodeableConcept> addresses What does the goal address */
         #[FhirProperty(
@@ -49,6 +56,7 @@ class PlanDefinitionGoal extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $addresses = [],
         /** @var array<RelatedArtifact> documentation Supporting documentation for the goal */
         #[FhirProperty(
@@ -57,6 +65,7 @@ class PlanDefinitionGoal extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $documentation = [],
         /** @var array<PlanDefinitionGoalTarget> target Target outcome for the goal */
         #[FhirProperty(
@@ -65,6 +74,7 @@ class PlanDefinitionGoal extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\PlanDefinition\PlanDefinitionGoalTarget',
         )]
+        #[Valid]
         public array $target = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

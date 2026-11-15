@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Money;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The second-tier service adjudications for payor added services.
@@ -38,15 +39,16 @@ class ClaimResponseAddItemDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $traceNumber = [],
         /** @var CodeableConcept|null revenue Revenue or cost center code */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $revenue = null,
         /** @var CodeableConcept|null productOrService Billing, service, product, or drug code */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $productOrService = null,
         /** @var CodeableConcept|null productOrServiceEnd End of a range of codes */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $productOrServiceEnd = null,
         /** @var array<CodeableConcept> modifier Service/Product billing modifiers */
         #[FhirProperty(
@@ -55,21 +57,22 @@ class ClaimResponseAddItemDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $modifier = [],
         /** @var Quantity|null quantity Count of products or services */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Money|null unitPrice Fee, charge or cost per item */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $unitPrice = null,
         /** @var numeric-string|null factor Price scaling factor */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $factor = null,
         /** @var Money|null tax Total tax */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $tax = null,
         /** @var Money|null net Total item cost */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $net = null,
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
         #[FhirProperty(
@@ -80,7 +83,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
         )]
         public array $noteNumber = [],
         /** @var ClaimResponseItemReviewOutcome|null reviewOutcome Added items detail level adjudication results */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?ClaimResponseItemReviewOutcome $reviewOutcome = null,
         /** @var array<ClaimResponseItemAdjudication> adjudication Added items detail adjudication */
         #[FhirProperty(
@@ -89,6 +92,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ClaimResponse\ClaimResponseItemAdjudication',
         )]
+        #[Valid]
         public array $adjudication = [],
         /** @var array<ClaimResponseAddItemDetailSubDetail> subDetail Insurer added line items */
         #[FhirProperty(
@@ -97,6 +101,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ClaimResponse\ClaimResponseAddItemDetailSubDetail',
         )]
+        #[Valid]
         public array $subDetail = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

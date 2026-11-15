@@ -29,6 +29,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ChargeItemDefinition\ChargeItemDefinitionApplicability;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ChargeItemDefinition\ChargeItemDefinitionPropertyGroup;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Patient Administration)
@@ -56,7 +57,7 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -67,13 +68,14 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -91,6 +93,7 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version Business version of the charge item definition */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -125,7 +128,14 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition'])]
         public array $replaces = [],
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\PublicationStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -143,6 +153,7 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var MarkdownPrimitive|null description Natural language description of the charge item definition */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -154,6 +165,7 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for charge item definition (if applicable) */
         #[FhirProperty(
@@ -162,7 +174,12 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\JurisdictionValueSet',
+        )]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null copyright Use and/or publishing restrictions */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -174,10 +191,10 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $lastReviewDate = null,
         /** @var Period|null effectivePeriod When the charge item definition is expected to be used */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $effectivePeriod = null,
         /** @var CodeableConcept|null code Billing codes or product types this definition applies to */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var array<Reference> instance Instances this definition applies to */
         #[FhirProperty(
@@ -186,6 +203,7 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Medication',
             'http://hl7.org/fhir/StructureDefinition/Substance',
@@ -199,6 +217,7 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ChargeItemDefinition\ChargeItemDefinitionApplicability',
         )]
+        #[Valid]
         public array $applicability = [],
         /** @var array<ChargeItemDefinitionPropertyGroup> propertyGroup Group of properties which are applicable under the same conditions */
         #[FhirProperty(
@@ -207,6 +226,7 @@ class ChargeItemDefinitionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ChargeItemDefinition\ChargeItemDefinitionPropertyGroup',
         )]
+        #[Valid]
         public array $propertyGroup = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The destination application which the message is intended for.
@@ -35,13 +36,14 @@ class MessageHeaderDestination extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
         /** @var Reference|null target Particular delivery destination within the destination */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Device'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Device'])]
         public ?Reference $target = null,
         /** @var UrlPrimitive|null endpoint Actual destination address or id */
         #[FhirProperty(fhirType: 'url', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?UrlPrimitive $endpoint = null,
         /** @var Reference|null receiver Intended "real-world" recipient for the data */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',

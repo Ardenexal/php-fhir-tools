@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Library","url":"http://hl7.org/fhir/StructureDefinition/Library","version":"5.0.0","name":"Library","status":"draft","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"Library","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

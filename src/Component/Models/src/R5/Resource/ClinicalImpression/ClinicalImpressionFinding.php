@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specific findings or diagnoses that were considered likely or relevant to ongoing treatment.
@@ -31,6 +32,7 @@ class ClinicalImpressionFinding extends BackboneElement
         public array $modifierExtension = [],
         /** @var CodeableReference|null item What was found */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Condition',
             'http://hl7.org/fhir/StructureDefinition/Observation',

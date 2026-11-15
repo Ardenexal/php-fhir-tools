@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specifics for when this is a contraindication.
@@ -30,10 +31,10 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableReference|null diseaseSymptomProcedure The situation that is being documented as contraindicating against this item */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public ?CodeableReference $diseaseSymptomProcedure = null,
         /** @var CodeableReference|null diseaseStatus The status of the disease or symptom for the contraindication */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public ?CodeableReference $diseaseStatus = null,
         /** @var array<CodeableReference> comorbidity A comorbidity (concurrent condition) or coinfection */
         #[FhirProperty(
@@ -42,6 +43,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public array $comorbidity = [],
         /** @var array<Reference> indication The indication which this is a contraidication for */
@@ -51,6 +53,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ClinicalUseDefinition'])]
         public array $indication = [],
         /** @var array<ClinicalUseDefinitionContraindicationOtherTherapy> otherTherapy Information about use of the product in relation to other therapies described as part of the contraindication */
@@ -60,6 +63,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ClinicalUseDefinition\ClinicalUseDefinitionContraindicationOtherTherapy',
         )]
+        #[Valid]
         public array $otherTherapy = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

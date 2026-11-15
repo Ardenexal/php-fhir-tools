@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A suite of underwriter specific classifiers.
@@ -32,10 +33,17 @@ class CoverageClass extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Type of class such as 'group' or 'plan' */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/coverage-class', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/coverage-class',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CoverageClassCodes',
+        )]
         public ?CodeableConcept $type = null,
         /** @var Identifier|null value Value associated with the type */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Identifier $value = null,
         /** @var StringPrimitive|string|null name Human readable description of the type and value */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

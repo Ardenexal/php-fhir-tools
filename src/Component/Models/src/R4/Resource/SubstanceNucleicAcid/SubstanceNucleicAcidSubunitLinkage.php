@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The linkages between sugar residues will also be captured.
@@ -32,7 +33,7 @@ class SubstanceNucleicAcidSubunitLinkage extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $connectivity = null,
         /** @var Identifier|null identifier Each linkage will be registered as a fragment and have an ID */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var StringPrimitive|string|null name Each linkage will be registered as a fragment and have at least one name. A single name shall be assigned to each linkage */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

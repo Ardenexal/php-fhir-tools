@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Details about an insurance plan.
@@ -37,9 +38,10 @@ class InsurancePlanPlan extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null type Type of plan */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var array<Reference> coverageArea Where product applies */
         #[FhirProperty(
@@ -48,6 +50,7 @@ class InsurancePlanPlan extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public array $coverageArea = [],
         /** @var array<Reference> network What networks provide coverage */
@@ -57,6 +60,7 @@ class InsurancePlanPlan extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $network = [],
         /** @var array<InsurancePlanPlanGeneralCost> generalCost Overall costs */
@@ -66,6 +70,7 @@ class InsurancePlanPlan extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\InsurancePlan\InsurancePlanPlanGeneralCost',
         )]
+        #[Valid]
         public array $generalCost = [],
         /** @var array<InsurancePlanPlanSpecificCost> specificCost Specific costs */
         #[FhirProperty(
@@ -74,6 +79,7 @@ class InsurancePlanPlan extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\InsurancePlan\InsurancePlanPlanSpecificCost',
         )]
+        #[Valid]
         public array $specificCost = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

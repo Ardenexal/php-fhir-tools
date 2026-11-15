@@ -1,0 +1,473 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Validation;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
+
+/**
+ * Checks every `xhtml`-typed value in a resource tree (in practice `Narrative.div`) and reports
+ * what is wrong with it, located on the offending element.
+ *
+ * ## Why this is not a Symfony constraint
+ *
+ * FHIR expresses these rules as the Narrative invariants txt-1 and txt-2, whose FHIRPath is
+ * `htmlChecks()`. Our engine's FHIRPath HtmlChecksFunction
+ * returns a bare boolean, so an invariant built on it can only say "the narrative is wrong"
+ * — never which element, which attribute, or why. The Java reference validator reports the
+ * diagnostic *and* the invariant, so a boolean can never reach parity. This pass walks the tree
+ * itself and emits both, which also keeps it out of the generated models.
+ *
+ * ## Rule order matters
+ *
+ * A DOCTYPE short-circuits (txt-1 plus the XXE diagnostic, nothing else). Undefined entities are
+ * reported on their own — with no txt-1 and no txt-2 — and substituted out before parsing, so that
+ * an entity can never masquerade as malformedness. Only then is the document parsed; a genuine
+ * parse failure is the sole trigger for txt-2. txt-1 is emitted at most once per narrative, never
+ * once per diagnostic.
+ *
+ * ## What is deliberately not checked
+ *
+ * The XHTML namespace. The XML deserialization path rebuilds `div` from a decoded array and drops
+ * every namespace binding on it, so a correct narrative and one carrying the wrong namespace arrive
+ * here as the same string. Judging namespaces on that evidence would fail correct documents, so
+ * prefixed names are skipped and root namespaces are not inspected at all. The same erasure removes
+ * the `<div>` wrapper from a text-only narrative, which is why a value not starting with markup is
+ * left alone rather than reported as unparsable.
+ */
+final class NarrativeXhtmlChecker
+{
+    /** @var array<class-string, array<string, bool>> {@see isXhtmlProperty()} answers, by class and property */
+    private array $xhtmlProperties = [];
+
+    public function __construct(
+        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
+    ) {
+    }
+
+    private const string XMLNS_NS = 'http://www.w3.org/2000/xmlns/';
+
+    /** One character outside RFC 3986's URL alphabet (letters, digits, `-._~`, delimiters and `%`). */
+    private const string URL_INVALID_CHARACTER = '/[^\p{L}\p{N}\-._~:\/?#\[\]@!$&\'()*+,;=%]/u';
+
+    private const string TXT_1 = "Constraint failed: txt-1: 'The narrative SHALL contain only the basic html formatting elements and attributes described in chapters 7-11 (except section 4 of chapter 9) and 15 of the HTML 4.0 standard, <a> elements (either name or href), images and internally contained style attributes'";
+
+    private const string TXT_2 = "Constraint failed: txt-2: 'The narrative SHALL have some non-whitespace content'";
+
+    /** R5 outcomes name the defining StructureDefinition on a constraint failure; R4 and R4B do not. */
+    private const string DEFINED_IN = ' (defined in http://hl7.org/fhir/StructureDefinition/Narrative)';
+
+    /** Entities XML defines itself; anything else in a narrative is undefined without a DOCTYPE. */
+    private const array PREDEFINED_ENTITIES = ['amp' => true, 'lt' => true, 'gt' => true, 'quot' => true, 'apos' => true];
+
+    /** The HTML 4.0 elements FHIR permits in a narrative (chapters 7-11 except 9.4, and 15). */
+    private const array ALLOWED_ELEMENTS = [
+        'a'    => true, 'abbr' => true, 'acronym' => true, 'address' => true, 'b' => true, 'bdo' => true,
+        'big'  => true, 'blockquote' => true, 'br' => true, 'caption' => true, 'cite' => true,
+        'code' => true, 'col' => true, 'colgroup' => true, 'dd' => true, 'dfn' => true, 'div' => true,
+        'dl'   => true, 'dt' => true, 'em' => true, 'h1' => true, 'h2' => true, 'h3' => true,
+        'h4'   => true, 'h5' => true, 'h6' => true, 'hr' => true, 'i' => true, 'img' => true,
+        'kbd'  => true, 'li' => true, 'map' => true, 'area' => true, 'ol' => true, 'p' => true,
+        'pre'  => true, 'q' => true, 'samp' => true, 'small' => true, 'span' => true, 'strong' => true,
+        'sub'  => true, 'sup' => true, 'table' => true, 'tbody' => true, 'td' => true, 'tfoot' => true,
+        'th'   => true, 'thead' => true, 'tr' => true, 'tt' => true, 'ul' => true, 'var' => true,
+    ];
+
+    /** Attributes valid on any permitted element (HTML 4.0 core, i18n and the XML attributes). */
+    private const array GLOBAL_ATTRIBUTES = [
+        'id'       => true, 'class' => true, 'style' => true, 'title' => true, 'lang' => true,
+        'xml:lang' => true, 'xml:space' => true, 'dir' => true, 'accesskey' => true,
+        'tabindex' => true, 'idref' => true,
+    ];
+
+    /** Attributes valid only on the element that keys them. */
+    private const array ELEMENT_ATTRIBUTES = [
+        'a'          => ['href' => true, 'name' => true, 'rel' => true, 'rev' => true, 'type' => true, 'charset' => true, 'hreflang' => true, 'shape' => true, 'coords' => true],
+        'area'       => ['shape' => true, 'coords' => true, 'href' => true, 'nohref' => true, 'alt' => true],
+        'blockquote' => ['cite' => true],
+        'br'         => ['clear' => true],
+        'col'        => ['span' => true, 'width' => true, 'align' => true, 'valign' => true, 'char' => true, 'charoff' => true],
+        'colgroup'   => ['span' => true, 'width' => true, 'align' => true, 'valign' => true, 'char' => true, 'charoff' => true],
+        'div'        => ['align' => true],
+        'dl'         => ['compact' => true],
+        'h1'         => ['align' => true], 'h2' => ['align' => true], 'h3' => ['align' => true],
+        'h4'         => ['align' => true], 'h5' => ['align' => true], 'h6' => ['align' => true],
+        'hr'         => ['align' => true, 'noshade' => true, 'size' => true, 'width' => true],
+        'img'        => ['src' => true, 'alt' => true, 'longdesc' => true, 'height' => true, 'width' => true, 'usemap' => true, 'ismap' => true, 'align' => true, 'border' => true, 'hspace' => true, 'vspace' => true],
+        'li'         => ['type' => true, 'value' => true],
+        'map'        => ['name' => true],
+        'ol'         => ['type' => true, 'start' => true, 'compact' => true],
+        'p'          => ['align' => true],
+        'pre'        => ['width' => true],
+        'q'          => ['cite' => true],
+        'table'      => ['summary' => true, 'width' => true, 'border' => true, 'frame' => true, 'rules' => true, 'cellspacing' => true, 'cellpadding' => true, 'align' => true, 'bgcolor' => true],
+        'tbody'      => ['align' => true, 'valign' => true, 'char' => true, 'charoff' => true],
+        'td'         => ['abbr' => true, 'axis' => true, 'headers' => true, 'scope' => true, 'rowspan' => true, 'colspan' => true, 'align' => true, 'valign' => true, 'char' => true, 'charoff' => true, 'nowrap' => true, 'width' => true, 'height' => true, 'bgcolor' => true],
+        'tfoot'      => ['align' => true, 'valign' => true, 'char' => true, 'charoff' => true],
+        'th'         => ['abbr' => true, 'axis' => true, 'headers' => true, 'scope' => true, 'rowspan' => true, 'colspan' => true, 'align' => true, 'valign' => true, 'char' => true, 'charoff' => true, 'nowrap' => true, 'width' => true, 'height' => true, 'bgcolor' => true],
+        'thead'      => ['align' => true, 'valign' => true, 'char' => true, 'charoff' => true],
+        'tr'         => ['align' => true, 'valign' => true, 'char' => true, 'charoff' => true, 'bgcolor' => true],
+        'ul'         => ['type' => true, 'compact' => true],
+    ];
+
+    /** Block-level elements, which HTML 4.0 forbids inside a paragraph. */
+    private const array BLOCK_ELEMENTS = [
+        'p'          => true, 'div' => true, 'h1' => true, 'h2' => true, 'h3' => true, 'h4' => true,
+        'h5'         => true, 'h6' => true, 'table' => true, 'ul' => true, 'ol' => true, 'dl' => true,
+        'blockquote' => true, 'pre' => true, 'hr' => true, 'address' => true,
+    ];
+
+    /**
+     * Walk a resource and report every problem found in its narratives.
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    public function check(object $resource): array
+    {
+        $visited = [];
+
+        return $this->walk($resource, '', $visited);
+    }
+
+    /**
+     * @param array<int, true> $visited spl_object_id keys of already-visited objects (cycle guard)
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    private function walk(object $node, string $path, array &$visited): array
+    {
+        $id = spl_object_id($node);
+
+        if (isset($visited[$id])) {
+            return [];
+        }
+
+        $visited[$id] = true;
+        $violations   = [];
+
+        // Logical models (CDA) are not walked. Their narrative is a StrucDoc markup tree, not
+        // XHTML: it carries several top-level nodes rather than one wrapping div, and its vocabulary
+        // (paragraph, content, linkHtml, styleCode) does not overlap the HTML 4.0 subset txt-1
+        // enforces. Judging one by the other's rules reported three errors on a valid CDA section —
+        // a spurious "malformed XHTML" from the extra top-level nodes, txt-1 for `paragraph`, and
+        // txt-2 claiming there was no content at all. CDA narrative conformance is a separate
+        // concern and is not implemented here.
+        if ($this->attributes->classAttributes($node, LogicalModel::class) !== []) {
+            return [];
+        }
+
+        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
+            $subPath = $path === '' ? $name : $path . '.' . $name;
+
+            if ($this->isXhtmlProperty($node, $name)) {
+                $xhtml = $this->readXhtml($value);
+                if ($xhtml !== null) {
+                    foreach ($this->checkXhtml($xhtml, $subPath, $this->fhirVersionOf($node)) as $v) {
+                        $violations[] = $v;
+                    }
+                }
+
+                continue;
+            }
+
+            if (is_object($value)) {
+                foreach ($this->walk($value, $subPath, $visited) as $v) {
+                    $violations[] = $v;
+                }
+            } elseif (is_array($value)) {
+                foreach ($value as $i => $item) {
+                    if (is_object($item)) {
+                        foreach ($this->walk($item, $subPath . '[' . $i . ']', $visited) as $v) {
+                            $violations[] = $v;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $violations;
+    }
+
+    /**
+     * Apply the narrative rules to one xhtml value.
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    private function checkXhtml(string $xhtml, string $path, string $fhirVersion): array
+    {
+        $trimmed = ltrim($xhtml);
+
+        // Not markup: the XML pipeline strips the <div> wrapper off a text-only narrative, so a
+        // bare string is an artefact of deserialization rather than evidence of a malformed
+        // document. Same "looks like markup" test the XML normalizer uses.
+        if ($trimmed === '' || !str_starts_with($trimmed, '<')) {
+            return [];
+        }
+
+        $suffix = $fhirVersion === 'R5' ? self::DEFINED_IN : '';
+
+        // A DOCTYPE is refused before parsing, so no entity it declares is ever expanded.
+        if (preg_match('/<!DOCTYPE/i', $xhtml) === 1) {
+            return [
+                $this->violation($path, self::TXT_1 . $suffix, 'txt-1'),
+                $this->violation($path, 'Malformed XHTML: Found a DocType declaration, and these are not allowed (XXE security vulnerability protection)', null),
+            ];
+        }
+
+        $violations = [];
+        $parsable   = $xhtml;
+
+        foreach ($this->undefinedEntities($xhtml) as $entity) {
+            $violations[] = $this->violation($path, sprintf("Invalid entity in the XHTML ('&%s;')", $entity), null);
+            $parsable     = str_replace('&' . $entity . ';', '', $parsable);
+        }
+
+        $previous = libxml_use_internal_errors(true);
+        $document = new \DOMDocument();
+        $parsed   = $document->loadXML($parsable);
+        $errors   = libxml_get_errors();
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        $root = $document->documentElement;
+
+        if ($parsed === false || $root === null) {
+            $violations[] = $this->violation($path, 'Error parsing XHTML: Malformed XHTML: ' . $this->describeParseError($errors), null);
+            $violations[] = $this->violation($path, self::TXT_1 . $suffix, 'txt-1');
+            $violations[] = $this->violation($path, self::TXT_2 . $suffix, 'txt-2');
+
+            return $violations;
+        }
+
+        $diagnostics  = [];
+        $breachesTxt1 = false;
+
+        foreach ($document->getElementsByTagName('*') as $element) {
+            // A prefixed name is a namespace question, and the binding that would answer it is
+            // already gone by the time validation runs. Left to the serialization layer.
+            if (str_contains($element->nodeName, ':')) {
+                continue;
+            }
+
+            $name    = (string) $element->localName;
+            $local   = strtolower($name);
+            $allowed = isset(self::ALLOWED_ELEMENTS[$local]);
+
+            if (!$allowed) {
+                $diagnostics[] = $this->violation($path, sprintf("Invalid element name in the XHTML ('%s')", $name), null);
+                $breachesTxt1  = true;
+            }
+
+            foreach ($element->attributes ?? [] as $attribute) {
+                if ($this->isNamespaceDeclaration($attribute)) {
+                    continue;
+                }
+
+                if ($allowed && $this->isAllowedAttribute($local, strtolower($attribute->nodeName))) {
+                    if ($local === 'a' && strtolower($attribute->nodeName) === 'href') {
+                        $urlViolation = $this->checkHref($attribute->value, $path);
+
+                        if ($urlViolation !== null) {
+                            $diagnostics[] = $urlViolation;
+                        }
+                    }
+
+                    continue;
+                }
+
+                $diagnostics[] = $this->violation($path, sprintf("Invalid attribute name in the XHTML ('%s' on '%s')", $attribute->nodeName, $name), null);
+                $breachesTxt1  = true;
+            }
+
+            if ($allowed && isset(self::BLOCK_ELEMENTS[$local]) && $this->hasParagraphAncestor($element)) {
+                $diagnostics[] = $this->violation($path, sprintf("Invalid element name inside a paragraph in the XHTML ('%s')", $name), null);
+            }
+        }
+
+        if ($breachesTxt1) {
+            $violations[] = $this->violation($path, self::TXT_1 . $suffix, 'txt-1');
+        }
+
+        foreach ($diagnostics as $diagnostic) {
+            $violations[] = $diagnostic;
+        }
+
+        return $violations;
+    }
+
+    /**
+     * Report an `<a href>` carrying characters a URL may not contain.
+     *
+     * The permitted set is RFC 3986's: unreserved characters, reserved delimiters and `%` for
+     * percent-encoding, with any Unicode letter or digit also accepted. Everything else is listed in
+     * document order, in the reference validator's wording, e.g. `R5.patient-url-bad`'s
+     * `http://example.com/{[-}]/link.html`, whose `{` and `}` are the only offenders.
+     *
+     * "Characters" stays plural whatever the count: the corpus has no one-character case showing
+     * whether the reference validator writes a singular form.
+     */
+    private function checkHref(string $href, string $path): ?FHIRValidationViolation
+    {
+        if (preg_match_all(self::URL_INVALID_CHARACTER, $href, $matches) < 1) {
+            return null;
+        }
+
+        $quoted = array_map(static fn (string $char): string => "'" . $char . "'", $matches[0]);
+
+        return $this->violation(
+            $path,
+            sprintf(
+                "The URL is not valid because '(URL contains %d Invalid Characters: %s)': %s",
+                count($quoted),
+                implode(',', $quoted),
+                $href,
+            ),
+            null,
+        );
+    }
+
+    /**
+     * Named entities the document uses but XML does not define.
+     *
+     * @return list<string> entity names without the surrounding & and ;, each reported once
+     */
+    private function undefinedEntities(string $xhtml): array
+    {
+        if (preg_match_all('/&([A-Za-z][A-Za-z0-9]*);/', $xhtml, $matches) < 1) {
+            return [];
+        }
+
+        $undefined = [];
+        foreach ($matches[1] as $name) {
+            if (!isset(self::PREDEFINED_ENTITIES[$name])) {
+                $undefined[$name] = true;
+            }
+        }
+
+        return array_keys($undefined);
+    }
+
+    /** @param list<\LibXMLError> $errors */
+    private function describeParseError(array $errors): string
+    {
+        $first = $errors[0] ?? null;
+
+        if ($first === null) {
+            return 'the narrative is not well-formed XML';
+        }
+
+        return sprintf('%s at line %d column %d', trim($first->message), $first->line, $first->column);
+    }
+
+    private function isAllowedAttribute(string $element, string $attribute): bool
+    {
+        return isset(self::GLOBAL_ATTRIBUTES[$attribute])
+            || isset(self::ELEMENT_ATTRIBUTES[$element][$attribute]);
+    }
+
+    private function isNamespaceDeclaration(\DOMAttr $attribute): bool
+    {
+        return $attribute->namespaceURI === self::XMLNS_NS
+            || $attribute->nodeName     === 'xmlns'
+            || str_starts_with($attribute->nodeName, 'xmlns:');
+    }
+
+    private function hasParagraphAncestor(\DOMElement $element): bool
+    {
+        for ($parent = $element->parentNode; $parent instanceof \DOMElement; $parent = $parent->parentNode) {
+            if (!str_contains($parent->nodeName, ':') && strtolower((string) $parent->localName) === 'p') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Reads a *property* attribute, which resolves through the declaring class. That is what makes
+     * this test profile-safe without the checker knowing anything about profiles, and it is the
+     * semantics being preserved rather than an incidental detail.
+     */
+    private function isXhtmlProperty(object $owner, string $property): bool
+    {
+        // Asked for every property of every node, so the answer is kept per class and property.
+        // Only names the walk read off an object arrive here, so the cache is bounded by the
+        // declared properties of the classes validated.
+        $cached = $this->xhtmlProperties[$owner::class][$property] ?? null;
+
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $isXhtml = false;
+
+        foreach ($this->attributes->propertyAttributes($owner, $property, FhirProperty::class) as $attribute) {
+            if ($attribute->fhirType === 'xhtml') {
+                $isXhtml = true;
+
+                break;
+            }
+        }
+
+        return $this->xhtmlProperties[$owner::class][$property] = $isXhtml;
+    }
+
+    /**
+     * The property is declared `xhtml`, so its value is either the raw string or the generated
+     * primitive wrapping it. The wrapper is recognised by its own #[FHIRPrimitive] declaration
+     * rather than by having a `value` property, so an unrelated element that happens to carry one
+     * is never read as narrative markup.
+     */
+    private function readXhtml(mixed $value): ?string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (!is_object($value)) {
+            return null;
+        }
+
+        // Concrete class only, matching the raw reflection. An ancestor walk would let a subclass of
+        // an xhtml wrapper be read as narrative markup where it currently is not.
+        foreach ($this->attributes->classAttributes($value, FHIRPrimitive::class) as $attribute) {
+            if ($attribute->primitiveType !== 'xhtml') {
+                continue;
+            }
+
+            return property_exists($value, 'value') && is_string($value->value) ? $value->value : null;
+        }
+
+        return null;
+    }
+
+    private function fhirVersionOf(object $node): string
+    {
+        foreach ($this->attributes->classAttributes($node, FHIRComplexType::class) as $attribute) {
+            return $attribute->fhirVersion;
+        }
+
+        return 'R4';
+    }
+
+    private function violation(string $path, string $message, ?string $invariantKey): FHIRValidationViolation
+    {
+        return new FHIRValidationViolation(
+            severity: 'error',
+            path: $path,
+            message: $message,
+            constraintClass: self::class,
+            profileGroup: null,
+            invariantKey: $invariantKey,
+        );
+    }
+}

@@ -32,6 +32,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ImplementationGuide\Impleme
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\ImplementationGuide\ImplementationGuideManifest;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -65,19 +66,24 @@ class ImplementationGuideResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -95,6 +101,7 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version Business version of the implementation guide */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -119,7 +126,11 @@ class ImplementationGuideResource extends AbstractDomainResource
                 ],
             ],
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\VersionAlgorithm',
+        )]
         public StringPrimitive|string|Coding|null $versionAlgorithm = null,
         /** @var StringPrimitive|string|null name Name for this implementation guide (computer friendly) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -128,7 +139,14 @@ class ImplementationGuideResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PublicationStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -146,6 +164,7 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
         )]
+        #[Valid]
         public array $contact = [],
         /** @var MarkdownPrimitive|null description Natural language description of the implementation guide */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -157,6 +176,7 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
         )]
+        #[Valid]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for implementation guide (if applicable) */
         #[FhirProperty(
@@ -165,7 +185,12 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\JurisdictionValueSet',
+        )]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this implementation guide is defined */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -180,7 +205,12 @@ class ImplementationGuideResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?IdPrimitive $packageId = null,
         /** @var SPDXLicenseType|null license SPDX license code for this IG (or not-open-source) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/spdx-license|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/spdx-license|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\SPDXLicense',
+        )]
         public ?SPDXLicenseType $license = null,
         /** @var array<FHIRVersionType> fhirVersion FHIR Version(s) this Implementation Guide targets */
         #[FhirProperty(
@@ -191,7 +221,11 @@ class ImplementationGuideResource extends AbstractDomainResource
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRVersionType',
         )]
         #[Count(min: 1)]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/FHIR-version|5.0.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/FHIR-version|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRVersion',
+        )]
         public array $fhirVersion = [],
         /** @var array<ImplementationGuideDependsOn> dependsOn Another Implementation guide this depends on */
         #[FhirProperty(
@@ -200,6 +234,7 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImplementationGuide\ImplementationGuideDependsOn',
         )]
+        #[Valid]
         public array $dependsOn = [],
         /** @var array<ImplementationGuideGlobal> global Profiles that apply globally */
         #[FhirProperty(
@@ -208,12 +243,13 @@ class ImplementationGuideResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImplementationGuide\ImplementationGuideGlobal',
         )]
+        #[Valid]
         public array $global = [],
         /** @var ImplementationGuideDefinition|null definition Information needed to build the IG */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ImplementationGuideDefinition $definition = null,
         /** @var ImplementationGuideManifest|null manifest Information about an assembled IG */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ImplementationGuideManifest $manifest = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

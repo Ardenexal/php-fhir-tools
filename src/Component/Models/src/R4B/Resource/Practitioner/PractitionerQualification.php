@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The official certifications, training, and licenses that authorize or otherwise pertain to the provision of care by the practitioner.  For example, a medical license issued by a medical board authorizing the practitioner to practice medicine within a certian locality.
@@ -39,15 +40,16 @@ class PractitionerQualification extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null code Coded representation of the qualification */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
         /** @var Period|null period Period during which the qualification is valid */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,
         /** @var Reference|null issuer Organization that regulates and issues the qualification */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $issuer = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

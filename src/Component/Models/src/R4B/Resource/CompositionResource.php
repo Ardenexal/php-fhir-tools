@@ -26,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Composition\CompositionRel
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Composition\CompositionSection;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Structured Documents)
@@ -42,7 +43,7 @@ class CompositionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -53,13 +54,14 @@ class CompositionResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -68,13 +70,27 @@ class CompositionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var Identifier|null identifier Version-independent identifier for the Composition */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var CompositionStatusType|null status preliminary | final | amended | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/composition-status|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/composition-status|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CompositionStatus',
+        )]
+        #[FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?CompositionStatusType $status = null,
         /** @var CodeableConcept|null type Kind of composition (LOINC if possible) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/doc-typecodes', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/doc-typecodes',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRDocumentTypeCodes',
+        )]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> category Categorization of Composition */
         #[FhirProperty(
@@ -83,12 +99,13 @@ class CompositionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $category = [],
         /** @var Reference|null subject Who and/or what the composition is about */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $subject = null,
         /** @var Reference|null encounter Context of the Composition */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public ?Reference $encounter = null,
         /** @var DateTimePrimitive|null date Composition editing time */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -101,6 +118,7 @@ class CompositionResource extends AbstractDomainResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[Count(min: 1)]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -115,7 +133,12 @@ class CompositionResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $title = null,
         /** @var ConfidentialityType|null confidentiality As defined by affinity domain */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-Confidentiality|2.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-Confidentiality|2.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\Confidentiality',
+        )]
         public ?ConfidentialityType $confidentiality = null,
         /** @var array<CompositionAttester> attester Attests to accuracy of composition */
         #[FhirProperty(
@@ -124,9 +147,10 @@ class CompositionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Composition\CompositionAttester',
         )]
+        #[Valid]
         public array $attester = [],
         /** @var Reference|null custodian Organization which maintains the composition */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $custodian = null,
         /** @var array<CompositionRelatesTo> relatesTo Relationships to other compositions/documents */
         #[FhirProperty(
@@ -135,6 +159,7 @@ class CompositionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Composition\CompositionRelatesTo',
         )]
+        #[Valid]
         public array $relatesTo = [],
         /** @var array<CompositionEvent> event The clinical service(s) being documented */
         #[FhirProperty(
@@ -143,6 +168,7 @@ class CompositionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Composition\CompositionEvent',
         )]
+        #[Valid]
         public array $event = [],
         /** @var array<CompositionSection> section Composition is broken into sections */
         #[FhirProperty(
@@ -151,6 +177,7 @@ class CompositionResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Composition\CompositionSection',
         )]
+        #[Valid]
         public array $section = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

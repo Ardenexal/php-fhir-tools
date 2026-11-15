@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Links this graph makes rules about.
@@ -60,6 +61,7 @@ class GraphDefinitionLink extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\GraphDefinition\GraphDefinitionLinkCompartment',
         )]
+        #[Valid]
         public array $compartment = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

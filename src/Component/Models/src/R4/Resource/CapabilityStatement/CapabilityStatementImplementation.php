@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Identifies a specific implementation instance that is described by the capability statement - i.e. a particular installation, rather than the capabilities of a software program.
@@ -38,7 +39,7 @@ class CapabilityStatementImplementation extends BackboneElement
         #[FhirProperty(fhirType: 'url', propertyKind: 'primitive')]
         public ?UrlPrimitive $url = null,
         /** @var Reference|null custodian Organization that manages the data */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $custodian = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

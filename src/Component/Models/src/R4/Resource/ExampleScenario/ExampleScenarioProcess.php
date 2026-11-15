@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Each major process - a group of operations.
@@ -48,6 +49,7 @@ class ExampleScenarioProcess extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ExampleScenario\ExampleScenarioProcessStep',
         )]
+        #[Valid]
         public array $step = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

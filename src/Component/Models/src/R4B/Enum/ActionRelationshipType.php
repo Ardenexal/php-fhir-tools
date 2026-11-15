@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ActionRelationshipType
  * URL: http://hl7.org/fhir/ValueSet/action-relationship-type
  * Version: 4.3.0
  * Description: Defines the types of relationships between actions.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/action-relationship-type', version: '4.3.0')]
 enum ActionRelationshipType: string
 {
     /** Before Start */

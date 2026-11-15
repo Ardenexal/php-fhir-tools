@@ -6,7 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 
 /**
  * @author HL7
@@ -16,24 +18,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
  * @description Defines a computable value set as one that SHALL have an expression-based definition (i.e. a value set defined intensionally using expressions of the code systems involved) and MAY have an expansion included. The expression-based definition SHALL be represented in only one of three ways; using the compose element, using the expression extension, or using the rules-text extension to provide a step-by-step process for expanding the value set definition
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/computablevalueset', baseType: 'ValueSet', fhirVersion: 'R5')]
-#[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
-)]
-#[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
-)]
-#[FHIRProfileConstraint(
-    path: 'extension',
-    constraint: 'Symfony\Component\Validator\Constraints\Count',
-    options: ['max' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
-)]
 #[FHIRProfileConstraint(
     path: 'compose.include.filter.property',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
@@ -52,9 +36,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
     options: ['min' => 1, 'max' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
 )]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
 #[FHIRProfileMustSupport(path: 'immutable', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
 #[FHIRProfileMustSupport(path: 'compose', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
 #[FHIRProfileMustSupport(path: 'compose.lockedDate', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
@@ -69,6 +50,47 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
 #[FHIRProfileMustSupport(path: 'compose.include.filter.value', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
 #[FHIRProfileMustSupport(path: 'compose.include.valueSet', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
 #[FHIRProfileMustSupport(path: 'compose.exclude', groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'rulesText',
+    min: 0,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/valueset-rules-text',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'expression',
+    min: 0,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/valueset-expression',
+    orderedIndex: 1,
+    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'supplement',
+    min: 0,
+    max: 1,
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/valueset-supplement',
+    orderedIndex: 2,
+    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
+)]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'cvs-1',
+    severity: 'error',
+    expression: 'extension(\'http://hl7.org/fhir/StructureDefinition/valueset-rules-text\').exists() xor extension(\'http://hl7.org/fhir/StructureDefinition/valueset-expression\').exists() xor compose.exists()',
+    human: 'Only one of rulesText, expression, or a compose definition SHALL be provided',
+    groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
+)]
 class ComputableValueSetProfile extends ShareableValueSetProfile
 {
     /** Canonical URL of this profile's StructureDefinition. */

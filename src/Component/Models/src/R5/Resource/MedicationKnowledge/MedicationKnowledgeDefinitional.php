@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Along with the link to a Medicinal Product Definition resource, this information provides common definitional elements that are needed to understand the specific medication that is being described.
@@ -36,10 +37,11 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition'])]
         public array $definition = [],
         /** @var CodeableConcept|null doseForm powder | tablets | capsule + */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $doseForm = null,
         /** @var array<CodeableConcept> intendedRoute The intended or approved route of administration */
         #[FhirProperty(
@@ -48,6 +50,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $intendedRoute = [],
         /** @var array<MedicationKnowledgeDefinitionalIngredient> ingredient Active or inactive ingredient */
         #[FhirProperty(
@@ -56,6 +59,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeDefinitionalIngredient',
         )]
+        #[Valid]
         public array $ingredient = [],
         /** @var array<MedicationKnowledgeDefinitionalDrugCharacteristic> drugCharacteristic Specifies descriptive properties of the medicine */
         #[FhirProperty(
@@ -64,6 +68,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeDefinitionalDrugCharacteristic',
         )]
+        #[Valid]
         public array $drugCharacteristic = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

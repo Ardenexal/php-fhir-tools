@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Indicates the quantity or duration for the first dispense of the medication.
@@ -29,10 +30,10 @@ class MedicationRequestDispenseRequestInitialFill extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Quantity|null quantity First fill quantity */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Duration|null duration First fill duration */
-        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $duration = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

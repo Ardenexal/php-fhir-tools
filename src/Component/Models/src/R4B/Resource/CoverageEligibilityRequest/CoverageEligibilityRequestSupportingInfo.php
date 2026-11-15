@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
@@ -38,7 +39,7 @@ class CoverageEligibilityRequestSupportingInfo extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $sequence = null,
         /** @var Reference|null information Data to be provided */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $information = null,
         /** @var bool|null appliesToAll Applies to all items */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

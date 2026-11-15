@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specifics for when this is an interaction.
@@ -36,15 +37,16 @@ class ClinicalUseDefinitionInteraction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ClinicalUseDefinition\ClinicalUseDefinitionInteractionInteractant',
         )]
+        #[Valid]
         public array $interactant = [],
         /** @var CodeableConcept|null type The type of the interaction e.g. drug-drug interaction, drug-lab test interaction */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var CodeableReference|null effect The effect of the interaction, for example "reduced gastric absorption of primary medication" */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public ?CodeableReference $effect = null,
         /** @var CodeableConcept|null incidence The incidence of the interaction, e.g. theoretical, observed */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $incidence = null,
         /** @var array<CodeableConcept> management Actions for managing the interaction */
         #[FhirProperty(
@@ -53,6 +55,7 @@ class ClinicalUseDefinitionInteraction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $management = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

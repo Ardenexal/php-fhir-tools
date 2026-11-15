@@ -1,0 +1,11 @@
+{
+  "resourceType": "StructureDefinition",
+  "url": "http://example.org/fhir/StructureDefinition/final-observation",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "type": "Observation",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+  "derivation": "constraint",
+  "snapshot": {"element": [{"id": "Observation", "path": "Observation", "constraint": [{"key": "loc-1", "severity": "error", "human": "The local definition applies", "expression": "status = 'cancelled'"}]}]},
+  "differential": {"element": [{"id": "Observation", "path": "Observation", "constraint": [{"key": "loc-1", "severity": "error", "human": "The local definition applies", "expression": "status = 'cancelled'"}]}]}
+}

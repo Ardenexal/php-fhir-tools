@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\InstantPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -38,14 +39,20 @@ class Signature extends Element
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding',
         )]
+        #[Valid]
         #[Count(min: 1)]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/signature-type', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/signature-type',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\SignatureTypeCodes',
+        )]
         public array $type = [],
         /** @var InstantPrimitive|null when When the signature was created */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?InstantPrimitive $when = null,
         /** @var Reference|null who Who signed */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -58,6 +65,7 @@ class Signature extends Element
         public ?Reference $who = null,
         /** @var Reference|null onBehalfOf The party represented */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -68,10 +76,20 @@ class Signature extends Element
         ])]
         public ?Reference $onBehalfOf = null,
         /** @var MimeTypesType|null targetFormat The technical format of the signed resources */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\MimeTypes',
+        )]
         public ?MimeTypesType $targetFormat = null,
         /** @var MimeTypesType|null sigFormat The technical format of the signature */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\MimeTypes',
+        )]
         public ?MimeTypesType $sigFormat = null,
         /** @var Base64BinaryPrimitive|null data The actual signature content (XML DigSig. JWS, picture, etc.) */
         #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive')]

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Security labels that protect the handling of information about the term and its elements, which may be specifically identified..
@@ -38,7 +39,7 @@ class ContractTermSecurityLabel extends BackboneElement
         )]
         public array $number = [],
         /** @var Coding|null classification Confidentiality Protection */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Coding $classification = null,
         /** @var array<Coding> category Applicable Policy */
         #[FhirProperty(
@@ -47,6 +48,7 @@ class ContractTermSecurityLabel extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
+        #[Valid]
         public array $category = [],
         /** @var array<Coding> control Handling Instructions */
         #[FhirProperty(
@@ -55,6 +57,7 @@ class ContractTermSecurityLabel extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
+        #[Valid]
         public array $control = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

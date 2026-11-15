@@ -31,22 +31,26 @@ The matching **terminology** package (e.g. `hl7.terminology.r4`) is detected fro
 the packages you request and prepended automatically, so shared CodeSystems and ValueSets (such as
 `AdministrativeGender`) resolve correctly.
 
+The commands below pin the package versions the shipped models are built from, the same ones the
+composer scripts use. Without a `#version`, `fhir:generate` takes each package's latest release,
+which can produce classes that differ from the ones in `ardenexal/fhir-models`.
+
 {% tabs %}
 {% tab title="R4" %}
 ```bash
-php demo/bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.uv.extensions.r4 -vvv
+php demo/bin/console fhir:generate --package=hl7.fhir.r4.core#4.0.1 --package=hl7.fhir.uv.extensions.r4#5.4.0 -vvv
 ```
 {% endtab %}
 
 {% tab title="R4B" %}
 ```bash
-php demo/bin/console fhir:generate --package=hl7.fhir.r4b.core --package=hl7.fhir.uv.extensions.r4b -vvv
+php demo/bin/console fhir:generate --package=hl7.fhir.r4b.core#4.3.0 --package=hl7.fhir.uv.extensions.r4b#5.4.0 -vvv
 ```
 {% endtab %}
 
 {% tab title="R5" %}
 ```bash
-php demo/bin/console fhir:generate --package=hl7.fhir.r5.core --package=hl7.fhir.uv.extensions.r5 -vvv
+php demo/bin/console fhir:generate --package=hl7.fhir.r5.core#5.0.0 --package=hl7.fhir.uv.extensions.r5#5.4.0 -vvv
 ```
 {% endtab %}
 {% endtabs %}

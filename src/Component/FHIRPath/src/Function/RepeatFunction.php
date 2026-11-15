@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
@@ -64,32 +65,55 @@ final class RepeatFunction extends AbstractFunction
 
         // Per spec: repeat(expr) returns only items produced by applying the projection,
         // NOT the original input. Start with empty result and use input as the first frontier.
-        $result   = [];
-        $seen     = [];
-        $frontier = [];
+        //
+        // Output is deduplicated by value, as the spec requires. Traversal also tells origins apart:
+        // two equal references in different Bundle entries can lead to different resources.
+        $result    = [];
+        $seen      = [];
+        $visited   = [];
+        $positions = [];
+        $frontier  = [];
+        $origins   = [];
+        $tracked   = false;
 
-        foreach ($input as $item) {
-            $key = $this->itemKey($item);
-            if (!isset($seen[$key])) {
-                $seen[$key] = true;
-                $frontier[] = $item;
+        foreach ($input as $index => $item) {
+            $key   = $this->itemKey($item);
+            $scope = $input->scopeAt($index);
+            $visit = $key . $this->originKey($scope);
+
+            $seen[$key] = true;
+            if (!isset($visited[$visit])) {
+                $visited[$visit] = true;
+                $frontier[]      = [$item, $scope];
             }
         }
 
         while (!empty($frontier)) {
             $nextFrontier = [];
 
-            foreach ($frontier as $item) {
-                $itemContext = $context->withCurrentNode($item);
+            foreach ($frontier as [$item, $scope]) {
+                $itemContext = $context->withCurrentNode($item)->withBundleEntryScope($scope)->withVariable('this', $item);
                 $projected   = $evaluator->evaluateWithContext($projection, $itemContext);
 
-                foreach ($projected as $projectedItem) {
-                    $key = $this->itemKey($projectedItem);
+                foreach ($projected as $position => $projectedItem) {
+                    $key            = $this->itemKey($projectedItem);
+                    $projectedScope = $projected->scopeAt($position);
+                    $visit          = $key . $this->originKey($projectedScope);
 
                     if (!isset($seen[$key])) {
-                        $seen[$key]     = true;
-                        $result[]       = $projectedItem;
-                        $nextFrontier[] = $projectedItem;
+                        $seen[$key]      = true;
+                        $positions[$key] = count($result);
+                        $result[]        = $projectedItem;
+                    }
+
+                    if (isset($positions[$key])) {
+                        $origins[$positions[$key]][] = $projectedScope;
+                        $tracked                     = $tracked || $projectedScope !== null;
+                    }
+
+                    if (!isset($visited[$visit])) {
+                        $visited[$visit] = true;
+                        $nextFrontier[]  = [$projectedItem, $projectedScope];
                     }
                 }
             }
@@ -97,7 +121,16 @@ final class RepeatFunction extends AbstractFunction
             $frontier = $nextFrontier;
         }
 
-        return Collection::from($result);
+        return Collection::from($result)->withScopes($tracked ? Collection::mergeOrigins($origins) : []);
+    }
+
+    /**
+     * Key a Bundle entry by its position rather than its scope object. A projection that navigates
+     * into `Bundle.entry` makes new scopes on each pass, so keying on those would never terminate.
+     */
+    private function originKey(?BundleEntryScope $scope): string
+    {
+        return $scope === null ? '' : '|' . $scope->path;
     }
 
     /**

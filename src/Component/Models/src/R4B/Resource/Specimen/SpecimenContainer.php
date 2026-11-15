@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The container holding the specimen.  The recursive nature of containers; i.e. blood in tube in tray in rack is not addressed here.
@@ -39,18 +40,19 @@ class SpecimenContainer extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var StringPrimitive|string|null description Textual description of the container */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var CodeableConcept|null type Kind of container directly associated with specimen */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var Quantity|null capacity Container volume or size */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $capacity = null,
         /** @var Quantity|null specimenQuantity Quantity of specimen within container */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $specimenQuantity = null,
         /** @var CodeableConcept|Reference|null additive Additive associated with container */
         #[FhirProperty(

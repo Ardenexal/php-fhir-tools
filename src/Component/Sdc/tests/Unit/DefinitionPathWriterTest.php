@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\RelatedPersonResource;
 use Ardenexal\FHIRTools\Component\Sdc\Extract\DefinitionPathWriter;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**

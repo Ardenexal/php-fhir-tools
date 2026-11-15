@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Does this service have specific eligibility requirements that need to be met in order to use the service?
@@ -29,7 +30,7 @@ class HealthcareServiceEligibility extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null code Coded value for the eligibility */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var MarkdownPrimitive|null comment Describes the eligibility conditions for the service */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

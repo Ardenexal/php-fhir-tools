@@ -1,0 +1,25 @@
+# Analyses generated IG output the way a consuming project does: PHPStan level 8 over the
+# emitted classes only, with the library itself on the scan path rather than the analysis path.
+#
+# phpstan.neon deliberately covers src/ but not demo/, so a generated tree that does not
+# type-check is invisible to `composer phpstan`. Three consecutive rounds of IG generation
+# reported success while the output was unusable at level 8 — nullable $extension forwarded to
+# a non-nullable parent, and array parameters with no element type. A class_exists() guard
+# passes all of those: the classes exist and construct fine, only their declared types are
+# wrong. Running the analyser the way a consumer does is what closes that class of defect.
+#
+# Usage:
+#   composer install --working-dir=demo
+#   composer run generate-ig-au-base
+#   composer run phpstan:ig
+parameters:
+    level: 8
+    paths:
+        - demo/src/FHIRIG
+    scanDirectories:
+        - src/Component
+    bootstrapFiles:
+        - demo/vendor/autoload.php
+    excludePaths:
+        - */vendor/*
+    tmpDir: var/cache/phpstan-ig

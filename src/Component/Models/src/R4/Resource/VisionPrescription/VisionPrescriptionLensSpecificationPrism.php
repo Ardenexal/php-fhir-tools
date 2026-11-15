@@ -33,7 +33,13 @@ class VisionPrescriptionLensSpecificationPrism extends BackboneElement
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isRequired: true), NotBlank]
         public ?string $amount = null,
         /** @var VisionBaseType|null base up | down | in | out */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/vision-base-codes|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/vision-base-codes|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\VisionBase',
+        )]
         public ?VisionBaseType $base = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

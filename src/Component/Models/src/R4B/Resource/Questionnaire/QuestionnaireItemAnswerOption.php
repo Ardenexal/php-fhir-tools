@@ -15,7 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\TimePrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description One of the permitted answers for a "choice" or "open-choice" question.
@@ -73,7 +73,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public int|DatePrimitive|TimePrimitive|StringPrimitive|string|Coding|Reference|null $value = null,
         /** @var bool|null initialSelected Whether option is selected by default */

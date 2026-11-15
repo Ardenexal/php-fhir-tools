@@ -6,12 +6,20 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection;
 
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\CacheWarmer\FHIRMetadataCacheWarmer;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\Compatibility\SymfonyVersionHelper;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
 use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
+use Ardenexal\FHIRTools\Component\Validation\Profile\CompositeStructureDefinitionRegistry;
+use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
+use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -37,6 +45,9 @@ class FHIRExtension extends Extension
      * - Wires any validation message overrides into FHIRValidationMessageRegistry.
      * - When a terminology cache pool is configured, registers CachingFHIRTerminologyClient
      *   as a decorator around the terminology client.
+     * - When runtime profile package directories or files are configured, gives the validation
+     *   service a RuntimeProfileResolver over them, and the slice validator a
+     *   RuntimeProfileAttributeReader.
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -111,23 +122,81 @@ class FHIRExtension extends Extension
             }
         }
 
-        // Wire CachingFHIRTerminologyClient as a decorator when a cache pool is configured
+        // Always wire CachingFHIRTerminologyClient as a decorator; the PSR-6 pool is what is optional.
+        //
+        // The decorator holds two layers: a per-instance array and, when given one, a cache pool. Only
+        // the pool used to be optional-by-absence-of-the-whole-decorator, which meant a caller who
+        // configured a terminology server but no pool got no deduplication at all. That mattered little
+        // while the only consumer was FHIRQuestionnaireValidator, and matters now that
+        // FHIRValueSetBindingValidator asks the server about the display on every coded element of every
+        // resource: one Bundle repeating a handful of codes became one request per coding.
+        //
+        // Registering it unconditionally cannot change an answer — the in-process layer only returns what
+        // the inner client already returned for identical arguments — it only removes repeat calls.
         $terminologyCachePool = $config['validation']['terminology_cache_pool'];
         $terminologyCacheTtl  = $config['validation']['terminology_cache_ttl'];
 
         if ($terminologyCachePool !== null) {
             $container->setAlias('fhir.terminology_cache', $terminologyCachePool)->setPublic(false);
-
-            $container->register('fhir.caching_terminology_client', CachingFHIRTerminologyClient::class)
-                ->setAutowired(false)
-                ->setArguments([
-                    new Reference('fhir.caching_terminology_client.inner'),
-                    new Reference('fhir.terminology_cache'),
-                    $terminologyCacheTtl,
-                ])
-                ->setDecoratedService(FHIRTerminologyClientInterface::class)
-                ->setPublic(false);
         }
+
+        $container->register('fhir.caching_terminology_client', CachingFHIRTerminologyClient::class)
+            ->setAutowired(false)
+            ->setArguments([
+                new Reference('fhir.caching_terminology_client.inner'),
+                $terminologyCachePool === null ? null : new Reference('fhir.terminology_cache'),
+                $terminologyCacheTtl,
+            ])
+            ->setDecoratedService(FHIRTerminologyClientInterface::class)
+            ->setPublic(false);
+
+        /** @var array{package_dirs: list<string>, files: list<string>} $runtimeProfileConfig */
+        $runtimeProfileConfig = $config['validation']['runtime_profiles'];
+        $this->registerRuntimeProfiles($container, $runtimeProfileConfig['package_dirs'], $runtimeProfileConfig['files']);
+    }
+
+    /**
+     * Give the validation service a resolver over the configured StructureDefinitions.
+     *
+     * Nothing is registered when both lists are empty, so the validation service keeps working from
+     * generated classes alone. The slice validator gets the runtime attribute reader too: a resource
+     * checked against a runtime profile has no slice attributes of its own, and the reader supplies them.
+     *
+     * @param list<string> $packageDirs
+     * @param list<string> $files
+     */
+    private function registerRuntimeProfiles(ContainerBuilder $container, array $packageDirs, array $files): void
+    {
+        if ($packageDirs === [] && $files === []) {
+            return;
+        }
+
+        // Single files come first, so a local definition overrides a package's with the same URL and
+        // version; packages are then searched in the order listed
+        $registries = [];
+        if ($files !== []) {
+            $registries[] = (new Definition(InMemoryStructureDefinitionRegistry::class, [$files]))
+                ->setFactory([InMemoryStructureDefinitionRegistry::class, 'fromFiles']);
+        }
+
+        foreach ($packageDirs as $directory) {
+            $registries[] = new Definition(PackageDirectoryStructureDefinitionRegistry::class, [$directory]);
+        }
+
+        $container->register('fhir.runtime_profiles.registry', CompositeStructureDefinitionRegistry::class)
+            ->setArguments([$registries]);
+
+        $container->register(RuntimeProfileResolver::class, RuntimeProfileResolver::class)
+            ->setArguments([new Reference('fhir.runtime_profiles.registry')]);
+
+        $container->register('fhir.runtime_profiles.attribute_reader', RuntimeProfileAttributeReader::class)
+            ->setArguments([new Reference(RuntimeProfileResolver::class)]);
+
+        $container->getDefinition(FHIRValidationService::class)
+            ->setArgument('$runtimeProfiles', new Reference(RuntimeProfileResolver::class));
+
+        $container->getDefinition(FHIRSliceConstraintValidator::class)
+            ->setArgument('$attributes', new Reference('fhir.runtime_profiles.attribute_reader'));
     }
 
     public function getAlias(): string

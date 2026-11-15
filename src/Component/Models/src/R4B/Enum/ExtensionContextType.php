@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ExtensionContextType
  * URL: http://hl7.org/fhir/ValueSet/extension-context-type
  * Version: 4.3.0
  * Description: How an extension context is interpreted.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/extension-context-type', version: '4.3.0')]
 enum ExtensionContextType: string
 {
     /** FHIRPath */

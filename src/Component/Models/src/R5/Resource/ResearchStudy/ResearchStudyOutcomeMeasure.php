@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An "outcome measure", "endpoint", "effect measure" or "measure of effect" is a specific measurement or observation used to quantify the effect of experimental variables on the participants in a study, or for observational studies, to describe patterns of diseases or traits or associations with exposures, risk factors or treatment.
@@ -42,13 +43,18 @@ class ResearchStudyOutcomeMeasure extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/research-study-objective-type', strength: 'preferred')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/research-study-objective-type',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ResearchStudyObjectiveType',
+        )]
         public array $type = [],
         /** @var MarkdownPrimitive|null description Description of the outcome */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var Reference|null reference Structured outcome definition */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/EvidenceVariable'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/EvidenceVariable'])]
         public ?Reference $reference = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

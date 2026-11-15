@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: UDIEntryType
  * URL: http://hl7.org/fhir/ValueSet/udi-entry-type
  * Version: 4.3.0
  * Description: Codes to identify how UDI data was entered.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/udi-entry-type', version: '4.3.0')]
 enum UDIEntryType: string
 {
     /** Barcode */

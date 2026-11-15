@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The guidelines for the dosage of the medication for the indication.
@@ -32,7 +33,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline extends BackboneElem
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null treatmentIntent Intention of the treatment */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $treatmentIntent = null,
         /** @var array<MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage> dosage Dosage for the medication for the specific guidelines */
         #[FhirProperty(
@@ -41,9 +42,10 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline extends BackboneElem
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage',
         )]
+        #[Valid]
         public array $dosage = [],
         /** @var CodeableConcept|null administrationTreatment Type of treatment the guideline applies to */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $administrationTreatment = null,
         /** @var array<MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic> patientCharacteristic Characteristics of the patient that are relevant to the administration guidelines */
         #[FhirProperty(
@@ -52,6 +54,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline extends BackboneElem
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic',
         )]
+        #[Valid]
         public array $patientCharacteristic = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specifics for when this is an indication.
@@ -33,10 +34,10 @@ class ClinicalUseDefinitionIndication extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableReference|null diseaseSymptomProcedure The situation that is being documented as an indicaton for this item */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public ?CodeableReference $diseaseSymptomProcedure = null,
         /** @var CodeableReference|null diseaseStatus The status of the disease or symptom for the indication */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public ?CodeableReference $diseaseStatus = null,
         /** @var array<CodeableReference> comorbidity A comorbidity or coinfection as part of the indication */
         #[FhirProperty(
@@ -45,10 +46,18 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public array $comorbidity = [],
         /** @var CodeableReference|null intendedEffect The intended effect, aim or strategy to be achieved */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-intended-use', strength: 'preferred'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-intended-use',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ProductIntendedUse',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public ?CodeableReference $intendedEffect = null,
         /** @var Range|StringPrimitive|string|null duration Timing or duration information */
         #[FhirProperty(
@@ -78,6 +87,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ClinicalUseDefinition'])]
         public array $undesirableEffect = [],
         /** @var array<ClinicalUseDefinitionContraindicationOtherTherapy> otherTherapy The use of the medicinal product in relation to other therapies described as part of the indication */
@@ -87,6 +97,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ClinicalUseDefinition\ClinicalUseDefinitionContraindicationOtherTherapy',
         )]
+        #[Valid]
         public array $otherTherapy = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

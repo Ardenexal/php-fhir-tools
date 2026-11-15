@@ -34,7 +34,7 @@ class DatePrimitive extends Element implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var FHIRDate|null value Primitive value for date */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Date', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Date', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '~\A(?:([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?)\z~')]
         public ?FHIRDate $value = null,
     ) {
         parent::__construct($id, $extension);

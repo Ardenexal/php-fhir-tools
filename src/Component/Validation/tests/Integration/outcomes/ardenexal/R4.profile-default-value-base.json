@@ -1,5 +1,23 @@
 {
     "errorCount": 1,
-    "warningCount": 1,
-    "infoCount": 1
+    "warningCount": 0,
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: sdf-21: 'Default values can only be specified on specializations'"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "invariant:sdf-21": [
+                "(root) — Default values can only be specified on specializations"
+            ]
+        },
+        "warnings": {}
+    }
 }

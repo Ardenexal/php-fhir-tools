@@ -24,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\VerificationResult\Verific
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\VerificationResult\VerificationResultPrimarySource;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\VerificationResult\VerificationResultValidator;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Patient Administration)
@@ -45,7 +46,7 @@ class VerificationResultResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -56,13 +57,14 @@ class VerificationResultResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -77,6 +79,7 @@ class VerificationResultResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $target = [],
         /** @var array<StringPrimitive|string> targetLocation The fhirpath location(s) within the resource that was validated */
@@ -88,16 +91,34 @@ class VerificationResultResource extends AbstractDomainResource
         )]
         public array $targetLocation = [],
         /** @var CodeableConcept|null need none | initial | periodic */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-need', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-need',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\Need',
+        )]
         public ?CodeableConcept $need = null,
         /** @var StatusType|null status attested | validated | in-process | req-revalid | val-fail | reval-fail */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-status|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-status|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\Status',
+        )]
         public ?StatusType $status = null,
         /** @var DateTimePrimitive|null statusDate When the validation status was updated */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $statusDate = null,
         /** @var CodeableConcept|null validationType nothing | primary | multiple */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-validation-type', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-validation-type',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ValidationType',
+        )]
         public ?CodeableConcept $validationType = null,
         /** @var array<CodeableConcept> validationProcess The primary process by which the target is validated (edit check; value set; primary source; multiple sources; standalone; in context) */
         #[FhirProperty(
@@ -106,9 +127,10 @@ class VerificationResultResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $validationProcess = [],
         /** @var Timing|null frequency Frequency of revalidation */
-        #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex'), Valid]
         public ?Timing $frequency = null,
         /** @var DateTimePrimitive|null lastPerformed The date/time validation was last completed (including failed validations) */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -117,7 +139,13 @@ class VerificationResultResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $nextScheduled = null,
         /** @var CodeableConcept|null failureAction fatal | warn | rec-only | none */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-failure-action', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-failure-action',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\FailureAction',
+        )]
         public ?CodeableConcept $failureAction = null,
         /** @var array<VerificationResultPrimarySource> primarySource Information about the primary source(s) involved in validation */
         #[FhirProperty(
@@ -126,9 +154,10 @@ class VerificationResultResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\VerificationResult\VerificationResultPrimarySource',
         )]
+        #[Valid]
         public array $primarySource = [],
         /** @var VerificationResultAttestation|null attestation Information about the entity attesting to information */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?VerificationResultAttestation $attestation = null,
         /** @var array<VerificationResultValidator> validator Information about the entity validating information */
         #[FhirProperty(
@@ -137,6 +166,7 @@ class VerificationResultResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\VerificationResult\VerificationResultValidator',
         )]
+        #[Valid]
         public array $validator = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

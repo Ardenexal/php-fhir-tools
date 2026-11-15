@@ -108,6 +108,26 @@ class SliceTestPatientOpenAtEnd
     public array $identifier = [];
 }
 
+/**
+ * An `exists` slice as generated before the generator read its presence: no value, yet a minimum
+ * and closed rules.
+ */
+#[FHIRSliceConstraint(
+    property: 'identifier',
+    sliceName: 'first',
+    min: 1,
+    max: 1,
+    discriminatorType: 'exists',
+    discriminatorPath: 'identifier',
+    groups: [],
+)]
+#[FHIRSlicingRules(property: 'identifier', rules: 'closed')]
+class SliceTestUndecidedExists
+{
+    /** @var object[] */
+    public array $identifier = [];
+}
+
 // ---------------------------------------------------------------------------
 
 /**
@@ -115,6 +135,8 @@ class SliceTestPatientOpenAtEnd
  */
 final class FHIRSliceConstraintValidatorTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -197,6 +219,21 @@ final class FHIRSliceConstraintValidatorTest extends ConstraintValidatorTestCase
             ->atPath('identifier')
             ->setCode(FHIRViolationCode::ERROR)
             ->assertRaised();
+    }
+
+    /**
+     * An `exists` slice with no presence matches no item, so neither its minimum, its maximum nor
+     * the closed rules may fail a resource: two identifiers once all matched it and broke its
+     * maximum of one, and matching none must not get them rejected as unmatched instead.
+     */
+    public function testExistsSliceWithNoPresenceReportsNothing(): void
+    {
+        $obj             = new SliceTestUndecidedExists();
+        $obj->identifier = [$this->makeIdentifier('a'), $this->makeIdentifier('b')];
+
+        $this->validator->validate($obj, $this->firstConstraintOf($obj));
+
+        $this->assertNoViolation();
     }
 
     // ------------------------------------------------------------------
@@ -376,7 +413,7 @@ final class FHIRSliceConstraintValidatorTest extends ConstraintValidatorTestCase
         // Simulate a new $validator->validate() call by re-initializing with a fresh context.
         // With the WeakMap keyed on ExecutionContext, the dedup state does not carry over.
         $freshContext = $this->createContext();
-        $this->validator->initialize($freshContext);
+        $this->bindContext($this->validator, $freshContext);
         $this->validator->validate($obj, $constraint);
         self::assertGreaterThan(
             0,

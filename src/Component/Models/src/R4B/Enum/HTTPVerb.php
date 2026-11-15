@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: HTTPVerb
  * URL: http://hl7.org/fhir/ValueSet/http-verb
  * Version: 4.3.0
  * Description: HTTP verbs (in the HTTP command line). See [HTTP rfc](https://tools.ietf.org/html/rfc7231) for details.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/http-verb', version: '4.3.0')]
 enum HTTPVerb: string
 {
     /** GET */

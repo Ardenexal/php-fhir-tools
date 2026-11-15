@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Links this graph makes rules about.
@@ -49,6 +50,7 @@ class GraphDefinitionLink extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\GraphDefinition\GraphDefinitionLinkTarget',
         )]
+        #[Valid]
         public array $target = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\Tests\Integration;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Integration;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageMetadata;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
@@ -51,7 +52,7 @@ class CommandIntegrationTest extends TestCase
         ));
 
         // Add commands to application
-        $this->application->addCommand(new FHIRModelGeneratorCommand($filesystem, $packageLoader));
+        self::register($this->application, new FHIRModelGeneratorCommand($filesystem, $packageLoader));
     }
 
     protected function tearDown(): void
@@ -95,7 +96,7 @@ class CommandIntegrationTest extends TestCase
         $packageLoader->method('installPackage')
             ->willThrowException(new \RuntimeException('Package not found: invalid.package.name'));
 
-        $application->addCommand(new FHIRModelGeneratorCommand($filesystem, $packageLoader));
+        self::register($application, new FHIRModelGeneratorCommand($filesystem, $packageLoader));
 
         $command       = $application->find('fhir:generate');
         $commandTester = new CommandTester($command);
@@ -156,5 +157,20 @@ class CommandIntegrationTest extends TestCase
         self::assertInstanceOf(FHIRModelGeneratorCommand::class, $command);
         self::assertSame('fhir:generate', $command->getName());
         self::assertStringContainsString('Generates FHIR model classes', $command->getDescription());
+    }
+
+    /**
+     * Registers a command on either supported console version.
+     *
+     * addCommand() arrived in symfony/console 7.4 and deprecated add(); this package supports
+     * ^6.4, so the component's own suite has to run on both.
+     */
+    private static function register(Application $application, Command $command): void
+    {
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
     }
 }

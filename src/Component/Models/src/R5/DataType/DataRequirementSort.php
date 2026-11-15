@@ -27,7 +27,13 @@ class DataRequirementSort extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $path = null,
         /** @var SortDirectionType|null direction ascending | descending */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/sort-direction|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/sort-direction|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\SortDirection',
+        )]
         public ?SortDirectionType $direction = null,
     ) {
         parent::__construct($id, $extension);

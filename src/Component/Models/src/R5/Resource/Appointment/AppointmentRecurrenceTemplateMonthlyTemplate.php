@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about monthly recurring appointments.
@@ -34,10 +35,22 @@ class AppointmentRecurrenceTemplateMonthlyTemplate extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $dayOfMonth = null,
         /** @var Coding|null nthWeekOfMonth Indicates which week of the month the appointment should occur */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/week-of-month|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/week-of-month|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\WeekOfMonth',
+        )]
         public ?Coding $nthWeekOfMonth = null,
         /** @var Coding|null dayOfWeek Indicates which day of the week the appointment should occur */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\DaysOfWeek',
+        )]
         public ?Coding $dayOfWeek = null,
         /** @var PositiveIntPrimitive|null monthInterval Recurs every nth month */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]

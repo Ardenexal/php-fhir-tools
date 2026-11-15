@@ -39,8 +39,8 @@ final class ExistsFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not set in context', 0, 0);
         }
 
-        foreach ($input as $item) {
-            $itemContext = $context->withCurrentNode($item);
+        foreach ($input as $index => $item) {
+            $itemContext = $context->withCurrentNode($item)->withBundleEntryScope($input->scopeAt($index))->withVariable('this', $item);
             $result      = $evaluator->evaluateWithContext($criteriaExpr, $itemContext);
 
             if (!$result->isEmpty() && $result->first() === true) {

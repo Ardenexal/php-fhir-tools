@@ -19,18 +19,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/vitalspanel', baseType: 'Observation', fhirVersion: 'R4')]
 #[FHIRProfileConstraint(
-    path: 'code.coding.system',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => 'http://loinc.org'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalspanel'],
-)]
-#[FHIRProfileConstraint(
-    path: 'code.coding.code',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => '85353-1'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalspanel'],
-)]
-#[FHIRProfileConstraint(
     path: 'value[x]',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
@@ -51,9 +39,21 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     max: '*',
     discriminatorType: 'value',
     discriminatorPath: 'code',
-    groups: ['http://hl7.org/fhir/StructureDefinition/vitalspanel'],
-    orderedIndex: 0,
     discriminatorValue: '85353-1',
+    orderedIndex: 0,
+    rules: [
+        [
+            'path'       => 'system',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => 'http://loinc.org'],
+        ],
+        [
+            'path'       => 'code',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+            'options'    => ['value' => '85353-1'],
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalspanel'],
 )]
 class ObservationVitalspanelProfile extends ObservationVitalsignsProfile
 {

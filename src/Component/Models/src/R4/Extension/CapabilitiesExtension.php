@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 
@@ -19,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://fhir-registry.smarthealthit.org/StructureDefinition/capabilities', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.security')]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://terminology.hl7.org/ValueSet/smart-capabilities', strength: 'required')]
 class CapabilitiesExtension extends Extension
 {
     /**

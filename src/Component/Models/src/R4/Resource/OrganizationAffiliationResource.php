@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Patient Administration)
@@ -39,7 +40,7 @@ class OrganizationAffiliationResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
@@ -50,13 +51,14 @@ class OrganizationAffiliationResource extends AbstractDomainResource
             valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
             strength: 'preferred',
             maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CommonLanguages',
         )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -71,18 +73,19 @@ class OrganizationAffiliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var bool|null active Whether this organization affiliation record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $active = null,
         /** @var Period|null period The period during which the participatingOrganization is affiliated with the primary organization */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,
         /** @var Reference|null organization Organization where the role is available */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $organization = null,
         /** @var Reference|null participatingOrganization Organization that provides/performs the role (e.g. providing services or is a member of) */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $participatingOrganization = null,
         /** @var array<Reference> network Health insurance provider network in which the participatingOrganization provides the role's services (if defined) at the indicated locations (if defined) */
         #[FhirProperty(
@@ -91,6 +94,7 @@ class OrganizationAffiliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $network = [],
         /** @var array<CodeableConcept> code Definition of the role the participatingOrganization plays */
@@ -100,6 +104,7 @@ class OrganizationAffiliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $code = [],
         /** @var array<CodeableConcept> specialty Specific specialty of the participatingOrganization in the context of the role */
         #[FhirProperty(
@@ -108,7 +113,12 @@ class OrganizationAffiliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/c80-practice-codes', strength: 'preferred')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/c80-practice-codes',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\PracticeSettingCodeValueSet',
+        )]
         public array $specialty = [],
         /** @var array<Reference> location The location(s) at which the role occurs */
         #[FhirProperty(
@@ -117,6 +127,7 @@ class OrganizationAffiliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public array $location = [],
         /** @var array<Reference> healthcareService Healthcare services provided through the role */
@@ -126,6 +137,7 @@ class OrganizationAffiliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/HealthcareService'])]
         public array $healthcareService = [],
         /** @var array<ContactPoint> telecom Contact details at the participatingOrganization relevant to this Affiliation */
@@ -135,6 +147,7 @@ class OrganizationAffiliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactPoint',
         )]
+        #[Valid]
         public array $telecom = [],
         /** @var array<Reference> endpoint Technical endpoints providing access to services operated for this role */
         #[FhirProperty(
@@ -143,6 +156,7 @@ class OrganizationAffiliationResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Endpoint'])]
         public array $endpoint = [],
     ) {

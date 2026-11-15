@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 
@@ -23,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.format')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.implementationGuide')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.imports')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.instantiates')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.patchFormat')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.interaction')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.operation')]
@@ -58,6 +60,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
     type: 'extension',
     expression: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-search-parameter-combination',
 )]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://terminology.hl7.org/ValueSet/conformance-expectation', strength: 'required')]
 class CSExpectationExtension extends Extension
 {
     /**

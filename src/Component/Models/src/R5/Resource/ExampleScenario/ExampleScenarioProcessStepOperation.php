@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The step represents a single operation invoked on receiver by sender.
@@ -45,7 +46,13 @@ class ExampleScenarioProcessStepOperation extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Coding|null type Kind of action */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-operation-codes', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-operation-codes',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\TestScriptOperationCode',
+        )]
         public ?Coding $type = null,
         /** @var StringPrimitive|string|null title Label for step */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -66,10 +73,10 @@ class ExampleScenarioProcessStepOperation extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $receiverActive = null,
         /** @var ExampleScenarioInstanceContainedInstance|null request Instance transmitted on invocation */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?ExampleScenarioInstanceContainedInstance $request = null,
         /** @var ExampleScenarioInstanceContainedInstance|null response Instance transmitted on invocation response */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?ExampleScenarioInstanceContainedInstance $response = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Physical location where the service is performed or applies.
@@ -38,6 +39,7 @@ class ExplanationOfBenefitItemBodySite extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[Count(min: 1)]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BodyStructure'])]
         public array $site = [],
@@ -48,6 +50,7 @@ class ExplanationOfBenefitItemBodySite extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $subSite = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

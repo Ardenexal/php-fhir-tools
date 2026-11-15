@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description List of the specific benefits under this category of benefit.
@@ -29,7 +30,7 @@ class InsurancePlanPlanSpecificCostBenefit extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Type of specific benefit */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var array<InsurancePlanPlanSpecificCostBenefitCost> cost List of the costs */
         #[FhirProperty(
@@ -38,6 +39,7 @@ class InsurancePlanPlanSpecificCostBenefit extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\InsurancePlan\InsurancePlanPlanSpecificCostBenefitCost',
         )]
+        #[Valid]
         public array $cost = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

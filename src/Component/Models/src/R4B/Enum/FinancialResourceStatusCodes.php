@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Financial Resource Status Codes
  * URL: http://hl7.org/fhir/ValueSet/fm-status
  * Version: 4.3.0
  * Description: This value set includes Status codes.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/fm-status', version: '4.3.0')]
 enum FinancialResourceStatusCodes: string
 {
     /** Active */

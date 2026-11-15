@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The results of the series of required setup operations before the tests were executed.
@@ -35,6 +36,7 @@ class TestReportSetup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportSetupAction',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $action = [],
     ) {

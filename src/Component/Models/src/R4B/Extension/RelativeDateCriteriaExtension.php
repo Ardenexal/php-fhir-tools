@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Duration;
@@ -25,18 +26,25 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/relative-date', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'date')]
 #[FHIRExtensionContext(type: 'element', expression: 'dateTime')]
+#[FHIRProfileInvariant(
+    path: '',
+    key: 'rdt-1',
+    severity: 'error',
+    expression: 'extension(\'targetReference\').exists() or extension(\'targetCode\').exists()',
+    human: 'At least one of targetReference or targetCode SHALL be present',
+)]
 class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(
-        /** @var Reference targetReference Specific event that the date is relative to */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-        public Reference $targetReference,
-        /** @var CodeableConcept targetCode Kind of event that the date is relative to */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-        public CodeableConcept $targetCode,
         /** @var Duration offset Duration before or after the event */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public Duration $offset,
+        /** @var Reference|null targetReference Specific event that the date is relative to */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $targetReference = null,
+        /** @var CodeableConcept|null targetCode Kind of event that the date is relative to */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $targetCode = null,
         /** @var StringPrimitive|null targetPath Relative to which element on the event */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public ?StringPrimitive $targetPath = null,
@@ -46,9 +54,13 @@ class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExte
         ?string $id = null,
     ) {
         $subExtensions   = [];
-        $subExtensions[] = new Extension(url: 'targetReference', value: $this->targetReference);
-        $subExtensions[] = new Extension(url: 'targetCode', value: $this->targetCode);
         $subExtensions[] = new Extension(url: 'offset', value: $this->offset);
+        if ($this->targetReference !== null) {
+            $subExtensions[] = new Extension(url: 'targetReference', value: $this->targetReference);
+        }
+        if ($this->targetCode !== null) {
+            $subExtensions[] = new Extension(url: 'targetCode', value: $this->targetCode);
+        }
         if ($this->targetPath !== null) {
             $subExtensions[] = new Extension(url: 'targetPath', value: $this->targetPath);
         }
@@ -70,22 +82,22 @@ class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExte
      */
     public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
+        $offset          = null;
         $targetReference = null;
         $targetCode      = null;
-        $offset          = null;
         $targetPath      = null;
         $relationship    = null;
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
+            if ($extUrl === 'offset' && $ext->value instanceof Duration) {
+                $offset = $ext->value;
+            }
             if ($extUrl === 'targetReference' && $ext->value instanceof Reference) {
                 $targetReference = $ext->value;
             }
             if ($extUrl === 'targetCode' && $ext->value instanceof CodeableConcept) {
                 $targetCode = $ext->value;
-            }
-            if ($extUrl === 'offset' && $ext->value instanceof Duration) {
-                $offset = $ext->value;
             }
             if ($extUrl === 'targetPath' && $ext->value instanceof StringPrimitive) {
                 $targetPath = $ext->value;
@@ -95,16 +107,10 @@ class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExte
             }
         }
 
-        if ($targetReference === null) {
-            throw new \InvalidArgumentException('Required sub-extension "targetReference" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
-        }
-        if ($targetCode === null) {
-            throw new \InvalidArgumentException('Required sub-extension "targetCode" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
-        }
         if ($offset === null) {
             throw new \InvalidArgumentException('Required sub-extension "offset" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new self($targetReference, $targetCode, $offset, $targetPath, $relationship, $id);
+        return new self($offset, $targetReference, $targetCode, $targetPath, $relationship, $id);
     }
 }

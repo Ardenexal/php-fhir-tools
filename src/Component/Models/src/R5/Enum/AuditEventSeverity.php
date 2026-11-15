@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Audit Event Severity
  * URL: http://hl7.org/fhir/ValueSet/audit-event-severity
  * Version: 5.0.0
  * Description: The severity of the audit entry.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/audit-event-severity', version: '5.0.0')]
 enum AuditEventSeverity: string
 {
     /** Emergency */

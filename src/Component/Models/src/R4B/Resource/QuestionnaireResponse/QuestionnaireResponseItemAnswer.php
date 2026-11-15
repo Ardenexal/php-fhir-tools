@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\TimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The respondent's answer(s) to the question.
@@ -110,6 +111,7 @@ class QuestionnaireResponseItemAnswer extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\QuestionnaireResponse\QuestionnaireResponseItem',
         )]
+        #[Valid]
         public array $item = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

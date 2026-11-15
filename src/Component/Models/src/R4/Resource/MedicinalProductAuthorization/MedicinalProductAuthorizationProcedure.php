@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The regulatory procedure for granting or amending a marketing authorization.
@@ -36,10 +37,10 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Identifier|null identifier Identifier for this procedure */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex'), Valid]
         public ?Identifier $identifier = null,
         /** @var CodeableConcept|null type Type of procedure */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var Period|DateTimePrimitive|null date Date of procedure */
         #[FhirProperty(
@@ -69,6 +70,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductAuthorization\MedicinalProductAuthorizationProcedure',
         )]
+        #[Valid]
         public array $application = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

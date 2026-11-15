@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Subscription Notification Type
  * URL: http://hl7.org/fhir/ValueSet/subscription-notification-type
  * Version: 5.0.0
  * Description: The type of notification represented by the status message.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/subscription-notification-type', version: '5.0.0')]
 enum SubscriptionNotificationType: string
 {
     /** Handshake */

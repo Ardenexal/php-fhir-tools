@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: EncounterStatus
  * URL: http://hl7.org/fhir/ValueSet/encounter-status
  * Version: 4.3.0
  * Description: Current state of the encounter.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/encounter-status', version: '4.3.0')]
 enum EncounterStatus: string
 {
     /** Planned */

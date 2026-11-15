@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Device Usage Status
  * URL: http://hl7.org/fhir/ValueSet/deviceusage-status
  * Version: 5.0.0
  * Description: A coded concept indicating the current status of the Device Usage.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/deviceusage-status', version: '5.0.0')]
 enum DeviceUsageStatus: string
 {
     /** Active */

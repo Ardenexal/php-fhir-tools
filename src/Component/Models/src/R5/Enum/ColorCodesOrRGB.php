@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Color Codes (Names or RGB Values)
  * URL: http://hl7.org/fhir/ValueSet/color-codes
  * Version: 5.0.0
  * Description: This value set includes color codes - either the color names as defined in [CSS4](https://www.w3.org/TR/css-color-4/), or any valid RGB code (```#RRGGBB``` in Hex).
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/color-codes', version: '5.0.0')]
 enum ColorCodesOrRGB: string
 {
     /** aliceblue */

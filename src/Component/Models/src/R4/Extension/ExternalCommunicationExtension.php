@@ -24,7 +24,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'VisionPrescription')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]

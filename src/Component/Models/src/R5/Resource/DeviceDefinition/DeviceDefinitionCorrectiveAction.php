@@ -13,6 +13,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\DeviceCorrectiveActionScope
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Tracking of latest field safety corrective action.
@@ -31,13 +33,18 @@ class DeviceDefinitionCorrectiveAction extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var bool|null recall Whether the corrective action was a recall */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
         public ?bool $recall = null,
         /** @var DeviceCorrectiveActionScopeType|null scope model | lot-numbers | serial-numbers */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-correctiveactionscope|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-correctiveactionscope|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\DeviceCorrectiveActionScope',
+        )]
         public ?DeviceCorrectiveActionScopeType $scope = null,
         /** @var Period|null period Start and end dates of the  corrective action */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Period $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\NamingSystemIdentifierType
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Indicates how the system may be identified when referenced in electronic exchange.
@@ -32,7 +33,13 @@ class NamingSystemUniqueId extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var NamingSystemIdentifierTypeType|null type oid | uuid | uri | other */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/namingsystem-identifier-type|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/namingsystem-identifier-type|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\NamingSystemIdentifierType',
+        )]
         public ?NamingSystemIdentifierTypeType $type = null,
         /** @var StringPrimitive|string|null value The unique identifier */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -44,7 +51,7 @@ class NamingSystemUniqueId extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $comment = null,
         /** @var Period|null period When is identifier valid? */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

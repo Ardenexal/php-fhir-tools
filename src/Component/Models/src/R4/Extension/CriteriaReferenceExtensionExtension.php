@@ -20,7 +20,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-criteriaReference', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure.group.population')]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure.group.stratifier')]
-#[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.supplementalData')]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.evaluatedResource')]
 #[FHIRExtensionContext(type: 'element', expression: 'Reference')]
 class CriteriaReferenceExtensionExtension extends Extension

@@ -47,7 +47,13 @@ class ElementDefinitionConstraint extends Element
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $requirements = null,
         /** @var ConstraintSeverityType|null severity error | warning */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/constraint-severity|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/constraint-severity|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConstraintSeverity',
+        )]
         public ?ConstraintSeverityType $severity = null,
         /** @var bool|null suppress Suppress warning or hint in profile */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

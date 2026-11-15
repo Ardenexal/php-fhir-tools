@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Country ValueSet
  * URL: http://hl7.org/fhir/ValueSet/country
@@ -12,6 +14,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  *
  *    Note: The codes for countries are taken from    [ISO 3166](https://www.iso.org/iso-3166-country-codes.html).
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/country', version: '5.0.0')]
 enum CountryValueSet
 {
 }

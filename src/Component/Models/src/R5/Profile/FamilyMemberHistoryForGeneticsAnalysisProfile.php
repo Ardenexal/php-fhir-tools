@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\FamilyMemberHistoryResource;
 
 /**
@@ -20,9 +21,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\FamilyMemberHistoryResource
     baseType: 'FamilyMemberHistory',
     fhirVersion: 'R5',
 )]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
 #[FHIRProfileMustSupport(path: 'relationship', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
 #[FHIRProfileMustSupport(path: 'sex', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
 #[FHIRProfileMustSupport(path: 'born[x]', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
@@ -32,6 +30,39 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\FamilyMemberHistoryResource
 #[FHIRProfileMustSupport(path: 'condition.code', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
 #[FHIRProfileMustSupport(path: 'condition.outcome', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
 #[FHIRProfileMustSupport(path: 'condition.onset[x]', groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'parent',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-parent',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'sibling',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-sibling',
+    orderedIndex: 1,
+    groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'observations',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation',
+    orderedIndex: 2,
+    groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'],
+)]
 class FamilyMemberHistoryForGeneticsAnalysisProfile extends FamilyMemberHistoryResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

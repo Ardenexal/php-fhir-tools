@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Describes the entity that is suspected to have caused the adverse event.
@@ -31,6 +32,7 @@ class AdverseEventSuspectEntity extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null instance Refers to the specific entity that caused the adverse event */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Immunization',
@@ -49,6 +51,7 @@ class AdverseEventSuspectEntity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\AdverseEvent\AdverseEventSuspectEntityCausality',
         )]
+        #[Valid]
         public array $causality = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

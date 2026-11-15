@@ -1,5 +1,22 @@
 {
     "errorCount": 0,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 4,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Search results must have ids",
+            "This is not a matching resource type for the specified search (OperationOutcome expecting [Observation, DocumentReference])",
+            "This is not an OperationOutcome (Immunization)",
+            "Wrong Display Name 'SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 100 mcg/0.5mL dose' for http://hl7.org/fhir/sid/cvx#207. Valid display is 'COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5mL dose or 50 mcg/0.25mL dose' (for the language(s) 'en-US')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

@@ -40,10 +40,14 @@ abstract class FHIRToolsException extends \Exception
      *
      * @param string               $message  The exception message
      * @param int                  $code     The exception code
-     * @param \Exception|null      $previous The previous exception for chaining
+     * @param \Throwable|null      $previous The previous throwable for chaining (an \Error too)
      * @param array<string, mixed> $context  Additional context information
      */
-    public function __construct(string $message = '', int $code = 0, ?\Exception $previous = null, array $context = [])
+    // $previous is \Throwable, not \Exception: an \Error (TypeError, ValueError, and every other
+    // engine error) is not an \Exception, so the narrower type made it impossible to chain exactly the
+    // causes worth keeping. A TypeError inside a normalizer was surfacing as a bare
+    // "Format error (json)" with its stack trace discarded.
+    public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null, array $context = [])
     {
         parent::__construct($message, $code, $previous);
         $this->context = $context;

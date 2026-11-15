@@ -36,7 +36,11 @@ class HealthcareServiceAvailableTime extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DaysOfWeekType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.3.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\DaysOfWeek',
+        )]
         public array $daysOfWeek = [],
         /** @var bool|null allDay Always available? e.g. 24 hour service */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

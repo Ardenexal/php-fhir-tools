@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ResourceTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Each resource and each version that is present in the workflow.
@@ -35,7 +36,13 @@ class ExampleScenarioInstance extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $resourceId = null,
         /** @var ResourceTypeType|null resourceType The type of the resource */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-types|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-types|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ResourceType',
+        )]
         public ?ResourceTypeType $resourceType = null,
         /** @var StringPrimitive|string|null name A short name for the resource instance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -50,6 +57,7 @@ class ExampleScenarioInstance extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ExampleScenario\ExampleScenarioInstanceVersion',
         )]
+        #[Valid]
         public array $version = [],
         /** @var array<ExampleScenarioInstanceContainedInstance> containedInstance Resources contained in the instance */
         #[FhirProperty(
@@ -58,6 +66,7 @@ class ExampleScenarioInstance extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ExampleScenario\ExampleScenarioInstanceContainedInstance',
         )]
+        #[Valid]
         public array $containedInstance = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

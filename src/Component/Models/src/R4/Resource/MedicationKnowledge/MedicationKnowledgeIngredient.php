@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Identifies a particular constituent of interest in the product.
@@ -59,7 +60,7 @@ class MedicationKnowledgeIngredient extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $isActive = null,
         /** @var Ratio|null strength Quantity of ingredient present */
-        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex'), Valid]
         public ?Ratio $strength = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

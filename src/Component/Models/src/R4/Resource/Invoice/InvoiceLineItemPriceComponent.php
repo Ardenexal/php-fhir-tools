@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\InvoicePriceComponentTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Money;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The price for a ChargeItem may be calculated as a base price with surcharges/deductions that apply in certain conditions. A ChargeItemDefinition resource that defines the prices, factors and conditions that apply to a billing code is currently under development. The priceComponent element can be used to offer transparency to the recipient of the Invoice as to how the prices have been calculated.
@@ -32,16 +33,22 @@ class InvoiceLineItemPriceComponent extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var InvoicePriceComponentTypeType|null type base | surcharge | deduction | discount | tax | informational */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/invoice-priceComponentType|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/invoice-priceComponentType|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\InvoicePriceComponentType',
+        )]
         public ?InvoicePriceComponentTypeType $type = null,
         /** @var CodeableConcept|null code Code identifying the specific component */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var numeric-string|null factor Factor used for calculating this component */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $factor = null,
         /** @var Money|null amount Monetary amount associated with this component */
-        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

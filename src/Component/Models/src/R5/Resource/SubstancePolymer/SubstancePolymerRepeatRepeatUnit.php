@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An SRU - Structural Repeat Unit.
@@ -32,7 +33,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $unit = null,
         /** @var CodeableConcept|null orientation The orientation of the polymerisation, e.g. head-tail, head-head, random */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $orientation = null,
         /** @var int|null amount Number of repeats of this unit */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
@@ -44,6 +45,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstancePolymer\SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation',
         )]
+        #[Valid]
         public array $degreeOfPolymerisation = [],
         /** @var array<SubstancePolymerRepeatRepeatUnitStructuralRepresentation> structuralRepresentation A graphical structure for this SRU */
         #[FhirProperty(
@@ -52,6 +54,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstancePolymer\SubstancePolymerRepeatRepeatUnitStructuralRepresentation',
         )]
+        #[Valid]
         public array $structuralRepresentation = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -4,41 +4,74 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: V3 Value SetConfidentialityClassification
  * URL: http://terminology.hl7.org/ValueSet/v3-ConfidentialityClassification
  * Version: 2014-03-26
  * Description:  Set of codes used to value Act.Confidentiality and Role.Confidentiality attribute in accordance with the definition for concept domain "Confidentiality".
  */
+#[FHIRValueSetSource(url: 'http://terminology.hl7.org/ValueSet/v3-ConfidentialityClassification', version: '2014-03-26')]
 enum V3ConfidentialityClassification: string
 {
     /** Confidentiality */
     case confidentiality = '_Confidentiality';
 
+    /** low */
+    case low = 'L';
+
+    /** moderate */
+    case moderate = 'M';
+
+    /** normal */
+    case normal = 'N';
+
+    /** restricted */
+    case restricted = 'R';
+
+    /** unrestricted */
+    case unrestricted = 'U';
+
+    /** very restricted */
+    case veryrestricted = 'V';
+
     /** ConfidentialityByAccessKind */
     case confidentialitybyaccesskind = '_ConfidentialityByAccessKind';
+
+    /** business */
+    case business = 'B';
+
+    /** clinician */
+    case clinician = 'D';
+
+    /** individual */
+    case individual = 'I';
 
     /** ConfidentialityByInfoType */
     case confidentialitybyinfotype = '_ConfidentialityByInfoType';
 
+    /** substance abuse related */
+    case substanceabuserelated = 'ETH';
+
+    /** HIV related */
+    case hivrelated = 'HIV';
+
+    /** psychiatry relate */
+    case psychiatryrelate = 'PSY';
+
+    /** sexual and domestic violence related */
+    case sexualanddomesticviolencerelated = 'SDV';
+
     /** ConfidentialityModifiers */
     case confidentialitymodifiers = '_ConfidentialityModifiers';
 
-    /** U */
-    case u = 'U';
+    /** celebrity */
+    case celebrity = 'C';
 
-    /** L */
-    case l = 'L';
+    /** sensitive */
+    case sensitive = 'S';
 
-    /** M */
-    case m = 'M';
-
-    /** N */
-    case n = 'N';
-
-    /** R */
-    case r = 'R';
-
-    /** V */
-    case v = 'V';
+    /** taboo */
+    case taboo = 'T';
 }

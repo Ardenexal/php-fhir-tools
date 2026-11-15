@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: MedicationStatement Status Codes
  * URL: http://hl7.org/fhir/ValueSet/medication-statement-status
  * Version: 4.3.0
  * Description: MedicationStatement Status Codes
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/medication-statement-status', version: '4.3.0')]
 enum MedicationStatementStatusCodes: string
 {
     /** Active */

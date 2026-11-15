@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Contract Resource Publication Status codes
  * URL: http://hl7.org/fhir/ValueSet/contract-publicationstatus
  * Version: 4.3.0
  * Description: This value set contract specific codes for status.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/contract-publicationstatus', version: '4.3.0')]
 enum ContractResourcePublicationStatusCodes: string
 {
     /** Amended */

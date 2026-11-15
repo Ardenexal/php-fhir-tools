@@ -15,18 +15,29 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 final class EvaluationContext
 {
     /**
-     * @param array<string, mixed> $variables         Variable storage ($this, $index, $total)
-     * @param array<string, mixed> $externalConstants External constants (%)
-     * @param string|null          $fhirVersion       Optional FHIR version hint, e.g. 'R4', 'R4B', 'R5'
-     * @param Collection|null      $collectionInput   set by visitMemberAccess when calling a function so that
-     *                                                visitFunctionCall receives the full collection as input
-     *                                                instead of a per-item single-item collection
-     * @param bool                 $strictMode        When true, runtime semantic validation is enabled
-     * @param mixed                $resourceNode      The node bound to `%resource`/`%rootResource` — the
-     *                                                resource containing the evaluation focus. When null,
-     *                                                these variables fall back to the root resource
-     *                                                (the focus), preserving single-node evaluation where
-     *                                                focus == resource.
+     * @param array<string, mixed>  $variables         Variable storage ($this, $index, $total)
+     * @param array<string, mixed>  $externalConstants External constants (%)
+     * @param string|null           $fhirVersion       Optional FHIR version hint, e.g. 'R4', 'R4B', 'R5'
+     * @param Collection|null       $collectionInput   set by visitMemberAccess when calling a function so that
+     *                                                 visitFunctionCall receives the full collection as input
+     *                                                 instead of a per-item single-item collection
+     * @param bool                  $strictMode        When true, runtime semantic validation is enabled
+     * @param mixed                 $containerResource The resource that CONTAINS $rootResource, set only when
+     *                                                 $rootResource is a contained resource. FHIR defines
+     *                                                 `%rootResource` as "the container resource for the resource
+     *                                                 that contains the original node", which differs from
+     *                                                 `%resource` exactly one level: inside `Patient.contained[0]`,
+     *                                                 `%resource` is the contained resource and `%rootResource` is
+     *                                                 the Patient. Leave null and `%rootResource` falls back to
+     *                                                 $rootResource, which is correct whenever the node is not
+     *                                                 inside a contained resource.
+     * @param BundleEntryScope|null $bundleEntryScope  The Bundle entry the current node was navigated out of
+     * @param mixed                 $resourceNode      The node bound to `%resource` — the resource containing the
+     *                                                 evaluation focus, when that differs from the focus itself
+     *                                                 (e.g. SDC evaluating a QuestionnaireResponse item while
+     *                                                 `%resource` stays the QR). When null, `%resource` falls
+     *                                                 back to $rootResource. `%rootResource` still prefers
+     *                                                 $containerResource when one is set.
      */
     public function __construct(
         private mixed $rootResource = null,
@@ -37,6 +48,8 @@ final class EvaluationContext
         private ?string $fhirVersion = null,
         private ?Collection $collectionInput = null,
         private bool $strictMode = false,
+        private mixed $containerResource = null,
+        private ?BundleEntryScope $bundleEntryScope = null,
         private mixed $resourceNode = null,
     ) {
     }
@@ -59,6 +72,16 @@ final class EvaluationContext
     public function getRootResource(): mixed
     {
         return $this->rootResource;
+    }
+
+    /**
+     * Get the resource containing the root resource, or null when the root is not contained.
+     *
+     * Only `%rootResource` reads this. `%resource` deliberately does not — see the constructor.
+     */
+    public function getContainerResource(): mixed
+    {
+        return $this->containerResource;
     }
 
     /**
@@ -143,7 +166,8 @@ final class EvaluationContext
             $this->fhirVersion,
             $input,
             $this->strictMode,
-            $this->resourceNode,
+            bundleEntryScope: $this->bundleEntryScope,
+            resourceNode: $this->resourceNode,
         );
     }
 
@@ -178,6 +202,30 @@ final class EvaluationContext
     }
 
     /**
+     * Get the Bundle entry the current node was navigated out of, if any.
+     */
+    public function getBundleEntryScope(): ?BundleEntryScope
+    {
+        return $this->bundleEntryScope;
+    }
+
+    /**
+     * Return an immutable copy of this context whose current node belongs to the given Bundle entry.
+     */
+    public function withBundleEntryScope(?BundleEntryScope $scope): self
+    {
+        // Runs for every item the evaluator iterates, and outside a Bundle nothing ever changes.
+        if ($scope === $this->bundleEntryScope) {
+            return $this;
+        }
+
+        $clone                   = clone $this;
+        $clone->bundleEntryScope = $scope;
+
+        return $clone;
+    }
+
+    /**
      * Get the current evaluation node
      */
     public function getCurrentNode(): mixed
@@ -199,7 +247,8 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
-            $this->resourceNode,
+            bundleEntryScope: $this->bundleEntryScope,
+            resourceNode: $this->resourceNode,
         );
     }
 
@@ -252,7 +301,33 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
-            $this->resourceNode,
+            bundleEntryScope: $this->bundleEntryScope,
+            resourceNode: $this->resourceNode,
+        );
+    }
+
+    /**
+     * Create a new context without the given variable, so that reading it yields an empty collection.
+     *
+     * withVariable($name, null) is different: it binds the variable to a null node, which reads as a
+     * single-item collection.
+     */
+    public function withoutVariable(string $name): self
+    {
+        $variables = $this->variables;
+        unset($variables[$name]);
+
+        return new self(
+            $this->rootResource,
+            $this->currentNode,
+            $variables,
+            $this->externalConstants,
+            $this->evaluator,
+            $this->fhirVersion,
+            null,
+            $this->strictMode,
+            bundleEntryScope: $this->bundleEntryScope,
+            resourceNode: $this->resourceNode,
         );
     }
 
@@ -297,7 +372,8 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
-            $this->resourceNode,
+            bundleEntryScope: $this->bundleEntryScope,
+            resourceNode: $this->resourceNode,
         );
     }
 
@@ -320,7 +396,8 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
-            $this->resourceNode,
+            bundleEntryScope: $this->bundleEntryScope,
+            resourceNode: $this->resourceNode,
         );
     }
 }

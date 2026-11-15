@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Guidelines for the administration of the medication.
@@ -36,6 +37,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicationKnowledge\MedicationKnowledgeAdministrationGuidelinesDosage',
         )]
+        #[Valid]
         public array $dosage = [],
         /** @var CodeableConcept|Reference|null indication Indication for use that apply to the specific administration guidelines */
         #[FhirProperty(
@@ -66,6 +68,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicationKnowledge\MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics',
         )]
+        #[Valid]
         public array $patientCharacteristics = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);
