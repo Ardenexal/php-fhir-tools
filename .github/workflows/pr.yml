@@ -244,6 +244,8 @@ jobs:
                     -   suite: integration-validation
                     -   suite: fhirpath-spec
                         extra: --functional --max-batch-size=50
+                    -   suite: sdc-extract-spec
+                    -   suite: sdc-populate-spec
         steps:
             -   uses: actions/checkout@v4
                 if: env.RUN_WORK == 'true'
