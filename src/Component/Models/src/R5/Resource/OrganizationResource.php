@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -79,9 +80,9 @@ class OrganizationResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $identifier = [],
-        /** @var bool|null active Whether the organization's record is still in active use */
+        /** @var BooleanPrimitive|bool|null active Whether the organization's record is still in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
-        public ?bool $active = null,
+        public BooleanPrimitive|bool|null $active = null,
         /** @var array<CodeableConcept> type Kind of organization */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ObservationDataTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationDefinition\ObservationDefinitionQualifiedInterval;
@@ -103,9 +104,9 @@ class ObservationDefinitionResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ObservationDataType',
         )]
         public array $permittedDataType = [],
-        /** @var bool|null multipleResultsAllowed Multiple results allowed */
+        /** @var BooleanPrimitive|bool|null multipleResultsAllowed Multiple results allowed */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $multipleResultsAllowed = null,
+        public BooleanPrimitive|bool|null $multipleResultsAllowed = null,
         /** @var CodeableConcept|null method Method used to produce the observation */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $method = null,

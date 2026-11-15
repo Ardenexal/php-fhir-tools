@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\GroupMeasureType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -86,9 +87,9 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         )]
         #[Valid]
         public array $usageContext = [],
-        /** @var bool|null exclude Whether the characteristic includes or excludes members */
+        /** @var BooleanPrimitive|bool|null exclude Whether the characteristic includes or excludes members */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $exclude = null,
+        public BooleanPrimitive|bool|null $exclude = null,
         /** @var CodeableConcept|null unitOfMeasure What unit is the outcome described in? */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         #[Valid]

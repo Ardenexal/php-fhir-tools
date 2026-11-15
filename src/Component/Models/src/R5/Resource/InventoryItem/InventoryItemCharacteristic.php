@@ -16,7 +16,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -42,7 +45,7 @@ class InventoryItemCharacteristic extends BackboneElement
         /** @var CodeableConcept|null characteristicType The characteristic that is being defined */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $characteristicType = null,
-        /** @var StringPrimitive|string|int|bool|UrlPrimitive|DateTimePrimitive|Quantity|Range|Ratio|Annotation|Address|Duration|CodeableConcept|null value The value of the attribute */
+        /** @var StringPrimitive|string|IntegerPrimitive|int|DecimalPrimitive|BooleanPrimitive|bool|UrlPrimitive|DateTimePrimitive|Quantity|Range|Ratio|Annotation|Address|Duration|CodeableConcept|null value The value of the attribute */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -115,7 +118,7 @@ class InventoryItemCharacteristic extends BackboneElement
             ],
         )]
         #[NotNull]
-        public StringPrimitive|string|int|bool|UrlPrimitive|DateTimePrimitive|Quantity|Range|Ratio|Annotation|Address|Duration|CodeableConcept|null $value = null,
+        public StringPrimitive|string|IntegerPrimitive|int|DecimalPrimitive|BooleanPrimitive|bool|UrlPrimitive|DateTimePrimitive|Quantity|Range|Ratio|Annotation|Address|Duration|CodeableConcept|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

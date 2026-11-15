@@ -16,8 +16,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemOperatorType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -57,7 +60,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\QuestionnaireItemOperator',
         )]
         public ?QuestionnaireItemOperatorType $operator = null,
-        /** @var bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null answer Value for question comparison based on operator */
+        /** @var BooleanPrimitive|bool|DecimalPrimitive|string|IntegerPrimitive|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null answer Value for question comparison based on operator */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -113,7 +116,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
         )]
         #[NotNull]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
-        public bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null $answer = null,
+        public BooleanPrimitive|bool|DecimalPrimitive|string|IntegerPrimitive|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null $answer = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

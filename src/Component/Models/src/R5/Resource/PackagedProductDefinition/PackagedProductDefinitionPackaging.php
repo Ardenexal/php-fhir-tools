@@ -14,6 +14,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ProductShelfLife;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -44,12 +46,12 @@ class PackagedProductDefinitionPackaging extends BackboneElement
         /** @var CodeableConcept|null type The physical type of the container of the items */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
-        /** @var bool|null componentPart Is this a part of the packaging (e.g. a cap or bottle stopper), rather than the packaging itself (e.g. a bottle or vial) */
+        /** @var BooleanPrimitive|bool|null componentPart Is this a part of the packaging (e.g. a cap or bottle stopper), rather than the packaging itself (e.g. a bottle or vial) */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $componentPart = null,
-        /** @var int|null quantity The quantity of this level of packaging in the package that contains it (with the outermost level being 1) */
+        public BooleanPrimitive|bool|null $componentPart = null,
+        /** @var IntegerPrimitive|int|null quantity The quantity of this level of packaging in the package that contains it (with the outermost level being 1) */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $quantity = null,
+        public IntegerPrimitive|int|null $quantity = null,
         /** @var array<CodeableConcept> material Material type of the package item */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

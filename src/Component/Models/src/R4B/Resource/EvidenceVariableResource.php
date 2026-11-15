@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
@@ -199,9 +200,9 @@ class EvidenceVariableResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $relatedArtifact = [],
-        /** @var bool|null actual Actual or conceptual */
+        /** @var BooleanPrimitive|bool|null actual Actual or conceptual */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $actual = null,
+        public BooleanPrimitive|bool|null $actual = null,
         /** @var CharacteristicCombinationType|null characteristicCombination intersection | union */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(

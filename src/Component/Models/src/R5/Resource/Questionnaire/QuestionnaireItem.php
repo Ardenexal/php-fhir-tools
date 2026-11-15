@@ -17,7 +17,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\QuestionnaireAnswerConstraintType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\QuestionnaireItemDisabledDisplayType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\QuestionnaireItemTypeType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -179,18 +181,18 @@ class QuestionnaireItem extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\QuestionnaireItemDisabledDisplay',
         )]
         public ?QuestionnaireItemDisabledDisplayType $disabledDisplay = null,
-        /** @var bool|null required Whether the item must be included in data results */
+        /** @var BooleanPrimitive|bool|null required Whether the item must be included in data results */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $required = null,
-        /** @var bool|null repeats Whether the item may repeat */
+        public BooleanPrimitive|bool|null $required = null,
+        /** @var BooleanPrimitive|bool|null repeats Whether the item may repeat */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $repeats = null,
-        /** @var bool|null readOnly Don't allow human editing */
+        public BooleanPrimitive|bool|null $repeats = null,
+        /** @var BooleanPrimitive|bool|null readOnly Don't allow human editing */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $readOnly = null,
-        /** @var int|null maxLength No more than these many characters */
+        public BooleanPrimitive|bool|null $readOnly = null,
+        /** @var IntegerPrimitive|int|null maxLength No more than these many characters */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $maxLength = null,
+        public IntegerPrimitive|int|null $maxLength = null,
         /** @var QuestionnaireAnswerConstraintType|null answerConstraint optionsOnly | optionsOrType | optionsOrString */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(

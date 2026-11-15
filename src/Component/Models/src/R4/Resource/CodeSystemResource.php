@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
@@ -116,9 +117,9 @@ class CodeSystemResource extends AbstractDomainResource
         )]
         #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
-        /** @var bool|null experimental For testing purposes, not real usage */
+        /** @var BooleanPrimitive|bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $experimental = null,
+        public BooleanPrimitive|bool|null $experimental = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,
@@ -166,9 +167,9 @@ class CodeSystemResource extends AbstractDomainResource
         /** @var MarkdownPrimitive|null copyright Use and/or publishing restrictions */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $copyright = null,
-        /** @var bool|null caseSensitive If code comparison is case sensitive */
+        /** @var BooleanPrimitive|bool|null caseSensitive If code comparison is case sensitive */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $caseSensitive = null,
+        public BooleanPrimitive|bool|null $caseSensitive = null,
         /** @var CanonicalPrimitive|null valueSet Canonical reference to the value set with entire code system */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $valueSet = null,
@@ -180,12 +181,12 @@ class CodeSystemResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\CodeSystemHierarchyMeaning',
         )]
         public ?CodeSystemHierarchyMeaningType $hierarchyMeaning = null,
-        /** @var bool|null compositional If code system defines a compositional grammar */
+        /** @var BooleanPrimitive|bool|null compositional If code system defines a compositional grammar */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $compositional = null,
-        /** @var bool|null versionNeeded If definitions are not stable */
+        public BooleanPrimitive|bool|null $compositional = null,
+        /** @var BooleanPrimitive|bool|null versionNeeded If definitions are not stable */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $versionNeeded = null,
+        public BooleanPrimitive|bool|null $versionNeeded = null,
         /** @var CodeSystemContentModeType|null content not-present | example | fragment | complete | supplement */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
         #[NotBlank]

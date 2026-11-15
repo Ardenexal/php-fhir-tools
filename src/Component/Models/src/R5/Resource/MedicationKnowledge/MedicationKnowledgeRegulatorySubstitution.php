@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -33,9 +34,9 @@ class MedicationKnowledgeRegulatorySubstitution extends BackboneElement
         /** @var CodeableConcept|null type Specifies the type of substitution allowed */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var bool|null allowed Specifies if regulation allows for changes in the medication when dispensing */
+        /** @var BooleanPrimitive|bool|null allowed Specifies if regulation allows for changes in the medication when dispensing */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $allowed = null,
+        public BooleanPrimitive|bool|null $allowed = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

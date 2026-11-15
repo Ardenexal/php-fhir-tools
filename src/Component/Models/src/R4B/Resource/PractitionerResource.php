@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\HumanName;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Practitioner\PractitionerQualification;
@@ -73,9 +74,9 @@ class PractitionerResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $identifier = [],
-        /** @var bool|null active Whether this practitioner's record is in active use */
+        /** @var BooleanPrimitive|bool|null active Whether this practitioner's record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $active = null,
+        public BooleanPrimitive|bool|null $active = null,
         /** @var array<HumanName> name The name(s) associated with the practitioner */
         #[FhirProperty(
             fhirType: 'HumanName',

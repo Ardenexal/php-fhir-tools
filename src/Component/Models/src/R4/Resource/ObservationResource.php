@@ -24,8 +24,10 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\SampledData;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\InstantPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
@@ -233,7 +235,7 @@ class ObservationResource extends AbstractDomainResource
             'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
         ])]
         public array $performer = [],
-        /** @var Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null value Actual result */
+        /** @var Quantity|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null value Actual result */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -297,7 +299,7 @@ class ObservationResource extends AbstractDomainResource
                 ],
             ],
         )]
-        public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null $value = null,
+        public Quantity|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null $value = null,
         /** @var CodeableConcept|null dataAbsentReason Why the result is missing */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         #[Valid]

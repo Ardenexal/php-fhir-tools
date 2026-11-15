@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -41,9 +42,9 @@ class CitationCitedArtifactStatusDate extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CitedArtifactStatusType',
         )]
         public ?CodeableConcept $activity = null,
-        /** @var bool|null actual Either occurred or expected */
+        /** @var BooleanPrimitive|bool|null actual Either occurred or expected */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $actual = null,
+        public BooleanPrimitive|bool|null $actual = null,
         /** @var Period|null period When the status started and/or ended */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Period $period = null,

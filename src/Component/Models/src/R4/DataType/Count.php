@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 
@@ -36,9 +37,9 @@ class Count extends Quantity
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var numeric-string|null value Numerical value (with implicit precision) */
+        /** @var DecimalPrimitive|numeric-string|null value Numerical value (with implicit precision) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $value = null,
+        public DecimalPrimitive|string|null $value = null,
         /** @var QuantityComparatorType|null comparator < | <= | >= | > - how to understand the value */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(

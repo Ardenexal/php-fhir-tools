@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\RelatedPerson\RelatedPersonCommunication;
@@ -77,9 +78,9 @@ class RelatedPersonResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $identifier = [],
-        /** @var bool|null active Whether this related person's record is in active use */
+        /** @var BooleanPrimitive|bool|null active Whether this related person's record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
-        public ?bool $active = null,
+        public BooleanPrimitive|bool|null $active = null,
         /** @var Reference|null patient The patient this person is related to */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
         public ?Reference $patient = null,

@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -41,9 +42,9 @@ class PatientCommunication extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\CommonLanguages',
         )]
         public ?CodeableConcept $language = null,
-        /** @var bool|null preferred Language preference indicator */
+        /** @var BooleanPrimitive|bool|null preferred Language preference indicator */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $preferred = null,
+        public BooleanPrimitive|bool|null $preferred = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -35,9 +36,9 @@ class ListEntry extends BackboneElement
         /** @var CodeableConcept|null flag Status/Workflow information about this item */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $flag = null,
-        /** @var bool|null deleted If this item is actually marked as deleted */
+        /** @var BooleanPrimitive|bool|null deleted If this item is actually marked as deleted */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'If deleted is true, then the item included in the list isn\'t actually part of the list anymore')]
-        public ?bool $deleted = null,
+        public BooleanPrimitive|bool|null $deleted = null,
         /** @var DateTimePrimitive|null date When item added to list */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,

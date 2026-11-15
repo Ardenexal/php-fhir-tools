@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
@@ -55,9 +56,9 @@ class ElementDefinitionConstraint extends Element
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConstraintSeverity',
         )]
         public ?ConstraintSeverityType $severity = null,
-        /** @var bool|null suppress Suppress warning or hint in profile */
+        /** @var BooleanPrimitive|bool|null suppress Suppress warning or hint in profile */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $suppress = null,
+        public BooleanPrimitive|bool|null $suppress = null,
         /** @var StringPrimitive|string|null human Human description of constraint */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $human = null,

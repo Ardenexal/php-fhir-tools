@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
@@ -173,9 +174,9 @@ class CoverageResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $costToBeneficiary = [],
-        /** @var bool|null subrogation Reimbursement to insurer */
+        /** @var BooleanPrimitive|bool|null subrogation Reimbursement to insurer */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $subrogation = null,
+        public BooleanPrimitive|bool|null $subrogation = null,
         /** @var array<Reference> contract Contract details */
         #[FhirProperty(
             fhirType: 'Reference',

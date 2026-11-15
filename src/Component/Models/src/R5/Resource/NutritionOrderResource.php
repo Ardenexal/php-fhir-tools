@@ -22,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestIntentType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -236,9 +237,9 @@ class NutritionOrderResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $excludeFoodModifier = [],
-        /** @var bool|null outsideFoodAllowed Capture when a food item is brought in by the patient and/or family */
+        /** @var BooleanPrimitive|bool|null outsideFoodAllowed Capture when a food item is brought in by the patient and/or family */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $outsideFoodAllowed = null,
+        public BooleanPrimitive|bool|null $outsideFoodAllowed = null,
         /** @var NutritionOrderOralDiet|null oralDiet Oral diet components */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?NutritionOrderOralDiet $oralDiet = null,

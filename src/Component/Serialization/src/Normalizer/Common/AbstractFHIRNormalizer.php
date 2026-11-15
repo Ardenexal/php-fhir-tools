@@ -129,6 +129,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /** @var array<class-string, array<string, array{0: string, 1: string, 2: string}>> */
     private static array $choiceKeyIndexCache = [];
 
+    /**
+     * Answers of wrappableScalarTypeOf(), by `class::property`; read on every scalar element.
+     *
+     * @var array<string, string|null>
+     */
+    private static array $wrappableScalarTypeCache = [];
+
     /** @var array<class-string, array<string, mixed>> */
     private static array $ctorDefaultsCache = [];
 
@@ -548,12 +555,24 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             $baseName = substr($elementName, 1);
             $meta     = $metaMap[$baseName] ?? null;
 
-            if ($meta === null || $meta->propertyKind !== 'primitive' || !$accessor->hasProperty($object, $baseName)) {
+            if ($meta === null) {
+                // `_valueString` names a choice variant, not a property, so the map has no entry for it.
+                $this->applyChoicePrimitiveExtension($object, $baseName, $extData, $metaMap, $format, $context);
+
+                continue;
+            }
+
+            // A boolean/integer/decimal element is a native scalar that also admits its primitive
+            // wrapper (#207); it reaches this pass as `scalar`, and only its single-valued form is
+            // wrapped here. A repeating one is not: its `array` type names no wrapper class.
+            $isWrappableScalar = $meta->propertyKind === 'scalar' && !$meta->isArray;
+
+            if (($meta->propertyKind !== 'primitive' && !$isWrappableScalar) || !$accessor->hasProperty($object, $baseName)) {
                 continue;
             }
 
             if (!$meta->isArray) {
-                if (!is_array($extData) || !isset($extData['extension']) || !is_array($extData['extension'])) {
+                if (!self::carriesPrimitiveExtensions($extData)) {
                     continue;
                 }
 
@@ -570,13 +589,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                     $accessor->writeValue($object, $baseName, $current);
                 }
 
-                // A class with no `extension` property is skipped by writeValue itself, which is what
-                // the absent-handle check did.
-                $accessor->writeValue(
-                    $current,
-                    'extension',
-                    $this->denormalizeExtensionArray($extData['extension'], $format, $context),
-                );
+                $this->writePrimitiveExtensions($current, $extData, $format, $context);
             } else {
                 if (!is_array($extData)) {
                     continue;
@@ -631,6 +644,159 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                 $accessor->writeValue($object, $baseName, $currentArray);
             }
         }
+    }
+
+    /**
+     * Attach a JSON `_<choiceKey>` extension (e.g. `_valueString`) to the choice property it names.
+     *
+     * The variant's value, if any, was written by the first pass. An extension-only variant has no
+     * value there, so its primitive class is built here from null. Nothing is attached when the
+     * variant is a builtin PHP type (which cannot hold an extension), or when the property already
+     * holds a different variant, since one choice element carries exactly one type.
+     *
+     * @param array<string, PropertyMetadata> $metaMap
+     * @param array<string, mixed>            $context
+     */
+    private function applyChoicePrimitiveExtension(
+        object $object,
+        string $choiceKey,
+        mixed $extData,
+        array $metaMap,
+        ?string $format,
+        array $context,
+    ): void {
+        if (!self::carriesPrimitiveExtensions($extData)) {
+            return;
+        }
+
+        $choiceMapping = $this->findChoicePropertyByKey($metaMap, $choiceKey, $object::class);
+        if ($choiceMapping === null || $this->denormalizer === null) {
+            return;
+        }
+
+        [$propertyName, $phpType, $fhirType] = $choiceMapping;
+        $accessor                            = self::modelAccessor();
+
+        if (!$accessor->hasProperty($object, $propertyName)) {
+            return;
+        }
+
+        // A boolean/integer/decimal variant is a builtin; its wrapper is the class in the property's
+        // union that declares the same FHIR primitive type (#207).
+        $wrapperClass = $this->isBuiltinType($phpType)
+            ? $this->primitiveWrapperInUnion($object, $propertyName, $fhirType)
+            : $phpType;
+
+        if ($wrapperClass === null || !class_exists($wrapperClass)) {
+            return;
+        }
+
+        $current = $accessor->readInitializedValue($object, $propertyName);
+
+        if ($current === null || ($this->isBuiltinType($phpType) && is_scalar($current))) {
+            $current = $this->denormalizer->denormalize($current, $wrapperClass, $format, $context);
+            $accessor->writeValue($object, $propertyName, $current);
+        }
+
+        if (!$current instanceof $wrapperClass) {
+            return;
+        }
+
+        $this->writePrimitiveExtensions($current, $extData, $format, $context);
+    }
+
+    /**
+     * Whether a JSON `_x` object carries an extension list for its primitive.
+     *
+     * @phpstan-assert-if-true array{extension: array<mixed>} $extData
+     */
+    private static function carriesPrimitiveExtensions(mixed $extData): bool
+    {
+        return is_array($extData) && isset($extData['extension']) && is_array($extData['extension']);
+    }
+
+    /**
+     * Copy a JSON `_x` object's extensions onto the primitive wrapper it describes.
+     *
+     * @param array{extension: array<mixed>} $extData
+     * @param array<string, mixed>           $context
+     */
+    private function writePrimitiveExtensions(object $primitive, array $extData, ?string $format, array $context): void
+    {
+        // A class with no `extension` property is skipped by writeValue itself.
+        self::modelAccessor()->writeValue($primitive, 'extension', $this->denormalizeExtensionArray($extData['extension'], $format, $context));
+    }
+
+    /**
+     * Read an XML boolean/integer/decimal element that carries an extension into its wrapper.
+     *
+     * Such an element is a native scalar unless it carries one (#207), so the scalar
+     * branches of the XML normalizers would drop them. Call this ahead of those branches.
+     *
+     * @param array{0: string, 1: string, 2: string}|null $choiceMapping [propertyName, phpType, fhirType] when
+     *                                                                   `$elementName` is a choice variant
+     * @param array<string, mixed>                        $context
+     *
+     * @return array{0: string, 1: object}|null [property to write, wrapper], or null when not applicable
+     */
+    protected function denormalizeExtendedXmlScalar(
+        object $object,
+        string $elementName,
+        ?array $choiceMapping,
+        mixed $value,
+        array $context,
+    ): ?array {
+        // Captured before the impure calls below, which PHPStan treats as resetting it to nullable.
+        $denormalizer = $this->denormalizer;
+
+        if ($denormalizer === null || !is_array($value) || !isset($value['extension'])) {
+            return null;
+        }
+
+        if ($choiceMapping !== null) {
+            [$propertyName, $scalarType, $fhirType] = $choiceMapping;
+            $wrapper                                = $this->isBuiltinType($scalarType)
+                ? $this->primitiveWrapperInUnion($object, $propertyName, $fhirType)
+                : null;
+        } else {
+            $propertyName = $elementName;
+            $scalarType   = self::modelAccessor()->hasProperty($object, $propertyName)
+                ? $this->wrappableScalarTypeOf($object, $propertyName)
+                : null;
+            $wrapper = $scalarType !== null ? self::modelAccessor()->declaredClassOf($object, $propertyName) : null;
+        }
+
+        if ($wrapper === null) {
+            return null;
+        }
+
+        // The scalar branch this replaces recorded a malformed lexeme (`value="TRUE"`) for validation.
+        $this->recordMalformedScalar($object, $propertyName, $scalarType, $value, 'xml');
+
+        return [$propertyName, $denormalizer->denormalize($value, $wrapper, 'xml', $context)];
+    }
+
+    /**
+     * The class in a property's declared union whose `#[FHIRPrimitive]` names the given FHIR type.
+     */
+    private function primitiveWrapperInUnion(object $object, string $propertyName, string $fhirType): ?string
+    {
+        if (!self::modelAccessor()->hasProperty($object, $propertyName)) {
+            return null;
+        }
+
+        $type    = (new \ReflectionProperty($object, $propertyName))->getType();
+        $members = $type instanceof \ReflectionUnionType ? $type->getTypes() : [$type];
+
+        foreach ($members as $member) {
+            if ($member instanceof \ReflectionNamedType && !$member->isBuiltin()
+                                                        && $this->findFHIRPrimitiveAttribute($member->getName())?->primitiveType === $fhirType
+            ) {
+                return $member->getName();
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -1367,6 +1533,12 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                 if (gettype($value) === ($phpToGettype[$variant->phpType] ?? '')) {
                     return $variant;
                 }
+
+                // A boolean/integer/decimal variant holds its primitive wrapper when the value carries
+                // an extension (#207); the wrapper names the variant's FHIR type.
+                if (is_object($value) && $this->findFHIRPrimitiveAttribute($value::class)?->primitiveType === $variant->fhirType) {
+                    return $variant;
+                }
             } elseif (is_object($value) && $value instanceof $variant->phpType) {
                 return $variant;
             }
@@ -1418,9 +1590,63 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         return str_starts_with($propertyName, 'value') && strlen($propertyName) > 5;
     }
 
+    /**
+     * The property's declared type name, or null when it declares a union.
+     *
+     * One union answers with its scalar: a boolean/integer/decimal element, declared as its primitive
+     * wrapper plus a native scalar (`BooleanPrimitive|bool|null`, #207). Its value is read as the
+     * scalar, as it was before the wrapper joined the union; the wrapper is built only when the
+     * element carries an extension.
+     */
     protected function getPropertyType(object|string $subject, string $propertyName): ?string
     {
-        return self::modelAccessor()->declaredTypeOf($subject, $propertyName);
+        return self::modelAccessor()->declaredTypeOf($subject, $propertyName)
+            ?? $this->wrappableScalarTypeOf($subject, $propertyName);
+    }
+
+    /**
+     * The native scalar of a `<Wrapper>|<scalar>|null` boolean/integer/decimal property, or null.
+     */
+    protected function wrappableScalarTypeOf(object|string $subject, string $propertyName): ?string
+    {
+        $cacheKey = (is_object($subject) ? $subject::class : $subject) . '::' . $propertyName;
+
+        if (!array_key_exists($cacheKey, self::$wrappableScalarTypeCache)) {
+            self::$wrappableScalarTypeCache[$cacheKey] = $this->resolveWrappableScalarType($subject, $propertyName);
+        }
+
+        return self::$wrappableScalarTypeCache[$cacheKey];
+    }
+
+    private function resolveWrappableScalarType(object|string $subject, string $propertyName): ?string
+    {
+        $wrapper = self::modelAccessor()->declaredClassOf($subject, $propertyName);
+        if ($wrapper === null) {
+            return null;
+        }
+
+        $scalar = match ($this->findFHIRPrimitiveAttribute($wrapper)?->primitiveType) {
+            'boolean' => 'bool',
+            'integer' => 'int',
+            'decimal' => 'string',
+            default   => null,
+        };
+
+        if ($scalar === null || (is_string($subject) && !class_exists($subject))) {
+            return null;
+        }
+
+        $type    = (new \ReflectionProperty($subject, $propertyName))->getType();
+        $members = $type instanceof \ReflectionUnionType ? $type->getTypes() : [];
+        $names   = array_values(array_diff(
+            array_map(static fn (\ReflectionType $t): string => $t instanceof \ReflectionNamedType ? $t->getName() : '', $members),
+            ['null'],
+        ));
+        sort($names);
+        $expected = [$wrapper, $scalar];
+        sort($expected);
+
+        return $names === $expected ? $scalar : null;
     }
 
     /**

@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
@@ -148,9 +149,9 @@ class PackagedProductDefinitionResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $characteristic = [],
-        /** @var bool|null copackagedIndicator If the drug product is supplied with another item such as a diluent or adjuvant */
+        /** @var BooleanPrimitive|bool|null copackagedIndicator If the drug product is supplied with another item such as a diluent or adjuvant */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $copackagedIndicator = null,
+        public BooleanPrimitive|bool|null $copackagedIndicator = null,
         /** @var array<Reference> manufacturer Manufacturer of this package type (multiple means these are all possible manufacturers) */
         #[FhirProperty(
             fhirType: 'Reference',

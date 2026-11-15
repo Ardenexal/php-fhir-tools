@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ConformanceExpectationType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -55,9 +56,9 @@ class RequirementsStatement extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConformanceExpectation',
         )]
         public array $conformance = [],
-        /** @var bool|null conditionality Set to true if requirements statement is conditional */
+        /** @var BooleanPrimitive|bool|null conditionality Set to true if requirements statement is conditional */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $conditionality = null,
+        public BooleanPrimitive|bool|null $conditionality = null,
         /** @var MarkdownPrimitive|null requirement The actual requirement */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?MarkdownPrimitive $requirement = null,

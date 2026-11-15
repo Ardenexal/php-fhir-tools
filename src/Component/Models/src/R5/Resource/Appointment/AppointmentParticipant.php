@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ParticipationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -73,9 +74,9 @@ class AppointmentParticipant extends BackboneElement
             'http://hl7.org/fhir/StructureDefinition/Location',
         ])]
         public ?Reference $actor = null,
-        /** @var bool|null required The participant is required to attend (optional when false) */
+        /** @var BooleanPrimitive|bool|null required The participant is required to attend (optional when false) */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $required = null,
+        public BooleanPrimitive|bool|null $required = null,
         /** @var ParticipationStatusType|null status accepted | declined | tentative | needs-action */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
         #[NotBlank]

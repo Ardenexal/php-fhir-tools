@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -90,9 +91,9 @@ class ArtifactAssessmentContent extends BackboneElement
         )]
         #[Valid]
         public array $relatedArtifact = [],
-        /** @var bool|null freeToShare Acceptable to publicly share the resource content */
+        /** @var BooleanPrimitive|bool|null freeToShare Acceptable to publicly share the resource content */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $freeToShare = null,
+        public BooleanPrimitive|bool|null $freeToShare = null,
         /** @var array<ArtifactAssessmentContent> component Contained content */
         #[FhirProperty(
             fhirType: 'unknown',

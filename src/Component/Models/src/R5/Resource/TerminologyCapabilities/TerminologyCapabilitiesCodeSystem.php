@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeSystemContentModeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -72,9 +73,9 @@ class TerminologyCapabilitiesCodeSystem extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CodeSystemContentMode',
         )]
         public ?CodeSystemContentModeType $content = null,
-        /** @var bool|null subsumption Whether subsumption is supported */
+        /** @var BooleanPrimitive|bool|null subsumption Whether subsumption is supported */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $subsumption = null,
+        public BooleanPrimitive|bool|null $subsumption = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

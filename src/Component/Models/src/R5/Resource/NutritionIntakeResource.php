@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -196,7 +197,7 @@ class NutritionIntakeResource extends AbstractDomainResource
         /** @var DateTimePrimitive|null recorded When the intake was recorded */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $recorded = null,
-        /** @var bool|Reference|null reported Person or organization that provided the information about the consumption of this food or fluid */
+        /** @var BooleanPrimitive|bool|Reference|null reported Person or organization that provided the information about the consumption of this food or fluid */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -218,7 +219,7 @@ class NutritionIntakeResource extends AbstractDomainResource
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
             'http://hl7.org/fhir/StructureDefinition/Organization',
         ])]
-        public bool|Reference|null $reported = null,
+        public BooleanPrimitive|bool|Reference|null $reported = null,
         /** @var array<NutritionIntakeConsumedItem> consumedItem What food or fluid product or item was consumed */
         #[FhirProperty(
             fhirType: 'BackboneElement',

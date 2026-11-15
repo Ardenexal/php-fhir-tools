@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 
 /**
  * @description Whether the $closure operation is supported.
@@ -26,9 +27,9 @@ class TerminologyCapabilitiesClosure extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null translation If cross-system closure is supported */
+        /** @var BooleanPrimitive|bool|null translation If cross-system closure is supported */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $translation = null,
+        public BooleanPrimitive|bool|null $translation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

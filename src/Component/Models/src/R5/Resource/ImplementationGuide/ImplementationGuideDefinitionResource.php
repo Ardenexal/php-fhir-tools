@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRVersionType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
@@ -58,9 +59,9 @@ class ImplementationGuideDefinitionResource extends BackboneElement
         /** @var MarkdownPrimitive|null description Reason why included in guide */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
-        /** @var bool|null isExample Is this an example */
+        /** @var BooleanPrimitive|bool|null isExample Is this an example */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isExample = null,
+        public BooleanPrimitive|bool|null $isExample = null,
         /** @var array<CanonicalPrimitive> profile Profile(s) this is an example of */
         #[FhirProperty(
             fhirType: 'canonical',

@@ -15,7 +15,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\Base64BinaryPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -41,7 +43,7 @@ class AuditEventEntityDetail extends BackboneElement
         /** @var CodeableConcept|null type Name of the property */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|TimePrimitive|DateTimePrimitive|Period|Base64BinaryPrimitive|null value Property value */
+        /** @var Quantity|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Range|Ratio|TimePrimitive|DateTimePrimitive|Period|Base64BinaryPrimitive|null value Property value */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -107,7 +109,7 @@ class AuditEventEntityDetail extends BackboneElement
             ],
         )]
         #[NotNull]
-        public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|TimePrimitive|DateTimePrimitive|Period|Base64BinaryPrimitive|null $value = null,
+        public Quantity|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Range|Ratio|TimePrimitive|DateTimePrimitive|Period|Base64BinaryPrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

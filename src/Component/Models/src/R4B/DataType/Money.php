@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
 
 /**
  * @author HL7 FHIR Standard
@@ -25,9 +26,9 @@ class Money extends Element
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var numeric-string|null value Numerical value (with implicit precision) */
+        /** @var DecimalPrimitive|numeric-string|null value Numerical value (with implicit precision) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $value = null,
+        public DecimalPrimitive|string|null $value = null,
         /** @var CurrenciesType|null currency ISO 4217 Currency Code */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(

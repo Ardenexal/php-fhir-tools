@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Attachment;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -30,15 +31,15 @@ class SubstanceNucleicAcidSubunit extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var int|null subunit Index of linear sequences of nucleic acids in order of decreasing length. Sequences of the same length will be ordered by molecular weight. Subunits that have identical sequences will be repeated and have sequential subscripts */
+        /** @var IntegerPrimitive|int|null subunit Index of linear sequences of nucleic acids in order of decreasing length. Sequences of the same length will be ordered by molecular weight. Subunits that have identical sequences will be repeated and have sequential subscripts */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $subunit = null,
+        public IntegerPrimitive|int|null $subunit = null,
         /** @var StringPrimitive|string|null sequence Actual nucleotide sequence notation from 5' to 3' end using standard single letter codes. In addition to the base sequence, sugar and type of phosphate or non-phosphate linkage should also be captured */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $sequence = null,
-        /** @var int|null length The length of the sequence shall be captured */
+        /** @var IntegerPrimitive|int|null length The length of the sequence shall be captured */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $length = null,
+        public IntegerPrimitive|int|null $length = null,
         /** @var Attachment|null sequenceAttachment (TBC) */
         #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex'), Valid]
         public ?Attachment $sequenceAttachment = null,

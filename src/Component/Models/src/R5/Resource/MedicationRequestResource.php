@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestPriorityType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -149,9 +150,9 @@ class MedicationRequestResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\RequestPriority',
         )]
         public ?RequestPriorityType $priority = null,
-        /** @var bool|null doNotPerform True if patient is to stop taking or not to start taking the medication */
+        /** @var BooleanPrimitive|bool|null doNotPerform True if patient is to stop taking or not to start taking the medication */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labeled as a modifier because this element negates the request to occur (ie, this is a request for the medication not to be ordered or prescribed, etc.)')]
-        public ?bool $doNotPerform = null,
+        public BooleanPrimitive|bool|null $doNotPerform = null,
         /** @var CodeableReference|null medication Medication to be taken */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Medication'])]
         public ?CodeableReference $medication = null,
@@ -202,9 +203,9 @@ class MedicationRequestResource extends AbstractDomainResource
             'http://hl7.org/fhir/StructureDefinition/Device',
         ])]
         public ?Reference $requester = null,
-        /** @var bool|null reported Reported rather than primary record */
+        /** @var BooleanPrimitive|bool|null reported Reported rather than primary record */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $reported = null,
+        public BooleanPrimitive|bool|null $reported = null,
         /** @var CodeableConcept|null performerType Desired kind of performer of the medication administration */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         #[Valid]

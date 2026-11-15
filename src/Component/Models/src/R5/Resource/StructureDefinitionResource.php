@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\StructureDefinitionKindType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\TypeDerivationRuleType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
@@ -252,9 +253,9 @@ class StructureDefinitionResource extends AbstractDomainResource
         )]
         #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
-        /** @var bool|null experimental For testing purposes, not real usage */
+        /** @var BooleanPrimitive|bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $experimental = null,
+        public BooleanPrimitive|bool|null $experimental = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,
@@ -345,9 +346,9 @@ class StructureDefinitionResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\StructureDefinitionKind',
         )]
         public ?StructureDefinitionKindType $kind = null,
-        /** @var bool|null abstract Whether the structure is abstract */
+        /** @var BooleanPrimitive|bool|null abstract Whether the structure is abstract */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $abstract = null,
+        public BooleanPrimitive|bool|null $abstract = null,
         /** @var array<StructureDefinitionContext> context If an extension, where it can be used in instances */
         #[FhirProperty(
             fhirType: 'BackboneElement',

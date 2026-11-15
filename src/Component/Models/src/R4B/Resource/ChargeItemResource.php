@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ChargeItem\ChargeItemPerformer;
@@ -187,9 +188,9 @@ class ChargeItemResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $bodysite = [],
-        /** @var numeric-string|null factorOverride Factor overriding the associated rules */
+        /** @var DecimalPrimitive|numeric-string|null factorOverride Factor overriding the associated rules */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $factorOverride = null,
+        public DecimalPrimitive|string|null $factorOverride = null,
         /** @var Money|null priceOverride Price overriding the associated rules */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $priceOverride = null,

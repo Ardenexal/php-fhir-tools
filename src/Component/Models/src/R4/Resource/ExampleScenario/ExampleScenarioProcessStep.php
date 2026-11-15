@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -36,9 +37,9 @@ class ExampleScenarioProcessStep extends BackboneElement
         )]
         #[Valid]
         public array $process = [],
-        /** @var bool|null pause If there is a pause in the flow */
+        /** @var BooleanPrimitive|bool|null pause If there is a pause in the flow */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $pause = null,
+        public BooleanPrimitive|bool|null $pause = null,
         /** @var ExampleScenarioProcessStepOperation|null operation Each interaction or action */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ExampleScenarioProcessStepOperation $operation = null,

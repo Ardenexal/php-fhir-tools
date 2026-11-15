@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\InvoicePriceComponentTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Money;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -44,9 +45,9 @@ class InvoiceLineItemPriceComponent extends BackboneElement
         /** @var CodeableConcept|null code Code identifying the specific component */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
-        /** @var numeric-string|null factor Factor used for calculating this component */
+        /** @var DecimalPrimitive|numeric-string|null factor Factor used for calculating this component */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $factor = null,
+        public DecimalPrimitive|string|null $factor = null,
         /** @var Money|null amount Monetary amount associated with this component */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $amount = null,

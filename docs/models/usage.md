@@ -38,6 +38,12 @@ echo $patient->name[0]->family->value; // 'Doe'
 Some scalar properties (such as `id`) are plain PHP types (`?string`), while others (such as
 `family`) are primitive wrapper objects (`StringPrimitive`) so they can carry FHIR extensions. Check
 the generated class to see which a given property uses.
+
+`boolean`, `integer` and `decimal` elements accept both: `Patient::$active` is
+`BooleanPrimitive|bool|null`. After deserialization it holds a plain `bool` unless the element
+carries an extension, in which case it holds a `BooleanPrimitive` with the value in `->value`. Use
+`FHIRScalarPrimitive::unwrap($patient->active)` (namespace `Ardenexal\FHIRTools\Component\Metadata\Type`)
+to read the value either way.
 {% endhint %}
 
 ## Enums

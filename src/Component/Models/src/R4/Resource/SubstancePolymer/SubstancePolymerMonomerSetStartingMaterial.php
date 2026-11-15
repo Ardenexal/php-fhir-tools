@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\SubstanceAmount;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -35,9 +36,9 @@ class SubstancePolymerMonomerSetStartingMaterial extends BackboneElement
         /** @var CodeableConcept|null type Todo */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
-        /** @var bool|null isDefining Todo */
+        /** @var BooleanPrimitive|bool|null isDefining Todo */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isDefining = null,
+        public BooleanPrimitive|bool|null $isDefining = null,
         /** @var SubstanceAmount|null amount Todo */
         #[FhirProperty(fhirType: 'SubstanceAmount', propertyKind: 'complex'), Valid]
         public ?SubstanceAmount $amount = null,

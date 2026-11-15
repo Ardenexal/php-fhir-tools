@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -48,12 +49,12 @@ class ExampleScenarioProcessStepOperation extends BackboneElement
         /** @var MarkdownPrimitive|null description A comment to be inserted in the diagram */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
-        /** @var bool|null initiatorActive Whether the initiator is deactivated right after the transaction */
+        /** @var BooleanPrimitive|bool|null initiatorActive Whether the initiator is deactivated right after the transaction */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $initiatorActive = null,
-        /** @var bool|null receiverActive Whether the receiver is deactivated right after the transaction */
+        public BooleanPrimitive|bool|null $initiatorActive = null,
+        /** @var BooleanPrimitive|bool|null receiverActive Whether the receiver is deactivated right after the transaction */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $receiverActive = null,
+        public BooleanPrimitive|bool|null $receiverActive = null,
         /** @var ExampleScenarioInstanceContainedInstance|null request Each resource instance used by the initiator */
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?ExampleScenarioInstanceContainedInstance $request = null,

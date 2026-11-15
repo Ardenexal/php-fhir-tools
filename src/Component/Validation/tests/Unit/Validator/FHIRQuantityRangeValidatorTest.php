@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRQuantityRange;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRQuantityRangeValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -19,7 +20,7 @@ final class FHIRQuantityRangeValidatorTest extends ConstraintValidatorTestCase
         return new FHIRQuantityRangeValidator();
     }
 
-    private function makeQuantity(?string $value, ?string $system, ?string $code, mixed $comparator = null): object
+    private function makeQuantity(string|DecimalPrimitive|null $value, ?string $system, ?string $code, mixed $comparator = null): object
     {
         return new class ($value, $system, $code, $comparator) {
             public readonly mixed $value;
@@ -135,6 +136,28 @@ final class FHIRQuantityRangeValidatorTest extends ConstraintValidatorTestCase
             ->setParameters(['{{ value }}' => '1001', '{{ max }}' => '1000', '{{ unit }}' => 'mg'])
             ->setCode(FHIRViolationCode::ERROR)
             ->assertRaised();
+    }
+
+    /**
+     * A decimal carrying an extension is held as its wrapper and is compared by its value (#207).
+     */
+    public function testWrappedValueAboveMaxProducesError(): void
+    {
+        $qty = $this->makeQuantity(new DecimalPrimitive(value: '1001'), 'http://unitsofmeasure.org', 'mg');
+        $this->validator->validate($qty, new FHIRQuantityRange(minValue: null, maxValue: $this->mgBound(1000.0)));
+
+        $this->buildViolation('The value {{ value }} exceeds the maximum {{ max }} {{ unit }}.')
+            ->setParameters(['{{ value }}' => '1001', '{{ max }}' => '1000', '{{ unit }}' => 'mg'])
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testExtensionOnlyValueProducesNoViolation(): void
+    {
+        $qty = $this->makeQuantity(new DecimalPrimitive(), 'http://unitsofmeasure.org', 'mg');
+        $this->validator->validate($qty, new FHIRQuantityRange(minValue: $this->mgBound(2.0), maxValue: null));
+
+        $this->assertNoViolation();
     }
 
     // --- cross-unit (warning) ---

@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CommonLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -34,12 +35,12 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
         /** @var StringPrimitive|string|null code Version identifier for this version */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $code = null,
-        /** @var bool|null isDefault If this is the default version for this code system */
+        /** @var BooleanPrimitive|bool|null isDefault If this is the default version for this code system */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isDefault = null,
-        /** @var bool|null compositional If compositional grammar is supported */
+        public BooleanPrimitive|bool|null $isDefault = null,
+        /** @var BooleanPrimitive|bool|null compositional If compositional grammar is supported */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $compositional = null,
+        public BooleanPrimitive|bool|null $compositional = null,
         /** @var array<CommonLanguagesType> language Language Displays supported */
         #[FhirProperty(
             fhirType: 'code',

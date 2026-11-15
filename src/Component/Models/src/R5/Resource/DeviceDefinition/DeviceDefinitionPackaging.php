@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -35,9 +36,9 @@ class DeviceDefinitionPackaging extends BackboneElement
         /** @var CodeableConcept|null type A code that defines the specific type of packaging */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
-        /** @var int|null count The number of items contained in the package (devices or sub-packages) */
+        /** @var IntegerPrimitive|int|null count The number of items contained in the package (devices or sub-packages) */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $count = null,
+        public IntegerPrimitive|int|null $count = null,
         /** @var array<DeviceDefinitionPackagingDistributor> distributor An organization that distributes the packaged device */
         #[FhirProperty(
             fhirType: 'BackboneElement',

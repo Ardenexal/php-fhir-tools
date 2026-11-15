@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -41,9 +42,9 @@ class SubstanceSpecificationName extends BackboneElement
         /** @var CodeableConcept|null status The status of the name */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $status = null,
-        /** @var bool|null preferred If this is the preferred name for this substance */
+        /** @var BooleanPrimitive|bool|null preferred If this is the preferred name for this substance */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $preferred = null,
+        public BooleanPrimitive|bool|null $preferred = null,
         /** @var array<CodeableConcept> language Language of the name */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

@@ -10,8 +10,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -35,7 +38,7 @@ class ValueSetExpansionContainsPropertySubProperty extends BackboneElement
         /** @var CodePrimitive|null code Reference to ValueSet.expansion.property.code */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $code = null,
-        /** @var CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|null value Value of the subproperty for this concept */
+        /** @var CodePrimitive|Coding|StringPrimitive|string|IntegerPrimitive|int|BooleanPrimitive|bool|DateTimePrimitive|DecimalPrimitive|null value Value of the subproperty for this concept */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -72,7 +75,7 @@ class ValueSetExpansionContainsPropertySubProperty extends BackboneElement
             ],
         )]
         #[NotNull]
-        public CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|null $value = null,
+        public CodePrimitive|Coding|StringPrimitive|string|IntegerPrimitive|int|BooleanPrimitive|bool|DateTimePrimitive|DecimalPrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

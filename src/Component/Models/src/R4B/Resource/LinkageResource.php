@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Linkage\LinkageItem;
 use Symfony\Component\Validator\Constraints\Count;
@@ -61,9 +62,9 @@ class LinkageResource extends AbstractDomainResource
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null active Whether this linkage assertion is active or not */
+        /** @var BooleanPrimitive|bool|null active Whether this linkage assertion is active or not */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $active = null,
+        public BooleanPrimitive|bool|null $active = null,
         /** @var Reference|null author Who is responsible for linkages */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         #[Valid]

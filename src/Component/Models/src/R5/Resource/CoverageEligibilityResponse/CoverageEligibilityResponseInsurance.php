@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -34,9 +35,9 @@ class CoverageEligibilityResponseInsurance extends BackboneElement
         /** @var Reference|null coverage Insurance information */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Coverage'])]
         public ?Reference $coverage = null,
-        /** @var bool|null inforce Coverage inforce indicator */
+        /** @var BooleanPrimitive|bool|null inforce Coverage inforce indicator */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $inforce = null,
+        public BooleanPrimitive|bool|null $inforce = null,
         /** @var Period|null benefitPeriod When the benefits are applicable */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $benefitPeriod = null,

@@ -9,6 +9,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 
 /**
  * @description Receiver Operator Characteristic (ROC) Curve  to give sensitivity/specificity tradeoff.
@@ -26,25 +28,25 @@ class MolecularSequenceQualityRoc extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var array<int> score Genotype quality score */
+        /** @var array<IntegerPrimitive|int> score Genotype quality score */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isArray: true)]
         public array $score = [],
-        /** @var array<int> numTP Roc score true positive numbers */
+        /** @var array<IntegerPrimitive|int> numTP Roc score true positive numbers */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isArray: true)]
         public array $numTP = [],
-        /** @var array<int> numFP Roc score false positive numbers */
+        /** @var array<IntegerPrimitive|int> numFP Roc score false positive numbers */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isArray: true)]
         public array $numFP = [],
-        /** @var array<int> numFN Roc score false negative numbers */
+        /** @var array<IntegerPrimitive|int> numFN Roc score false negative numbers */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isArray: true)]
         public array $numFN = [],
-        /** @var array<numeric-string> precision Precision of the GQ score */
+        /** @var array<DecimalPrimitive|numeric-string> precision Precision of the GQ score */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true)]
         public array $precision = [],
-        /** @var array<numeric-string> sensitivity Sensitivity of the GQ score */
+        /** @var array<DecimalPrimitive|numeric-string> sensitivity Sensitivity of the GQ score */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true)]
         public array $sensitivity = [],
-        /** @var array<numeric-string> fMeasure FScore of the GQ score */
+        /** @var array<DecimalPrimitive|numeric-string> fMeasure FScore of the GQ score */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true)]
         public array $fMeasure = [],
     ) {

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Money;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -51,9 +52,9 @@ class AccountBalance extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AccountBalanceTerm',
         )]
         public ?CodeableConcept $term = null,
-        /** @var bool|null estimate Estimated balance */
+        /** @var BooleanPrimitive|bool|null estimate Estimated balance */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $estimate = null,
+        public BooleanPrimitive|bool|null $estimate = null,
         /** @var Money|null amount Calculated amount */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Money $amount = null,

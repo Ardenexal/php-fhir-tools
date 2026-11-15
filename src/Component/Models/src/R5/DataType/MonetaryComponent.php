@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DecimalPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -39,9 +40,9 @@ class MonetaryComponent extends DataType
         /** @var CodeableConcept|null code Codes may be used to differentiate between kinds of taxes, surcharges, discounts etc. */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
-        /** @var numeric-string|null factor Factor used for calculating this component */
+        /** @var DecimalPrimitive|numeric-string|null factor Factor used for calculating this component */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $factor = null,
+        public DecimalPrimitive|string|null $factor = null,
         /** @var Money|null amount Explicit value amount to be used */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $amount = null,

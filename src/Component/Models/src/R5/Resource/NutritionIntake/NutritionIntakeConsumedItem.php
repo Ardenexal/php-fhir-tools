@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -48,9 +49,9 @@ class NutritionIntakeConsumedItem extends BackboneElement
         /** @var Quantity|null rate Rate at which enteral feeding was administered */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $rate = null,
-        /** @var bool|null notConsumed Flag to indicate if the food or fluid item was refused or otherwise not consumed */
+        /** @var BooleanPrimitive|bool|null notConsumed Flag to indicate if the food or fluid item was refused or otherwise not consumed */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $notConsumed = null,
+        public BooleanPrimitive|bool|null $notConsumed = null,
         /** @var CodeableConcept|null notConsumedReason Reason food or fluid was not consumed */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $notConsumedReason = null,

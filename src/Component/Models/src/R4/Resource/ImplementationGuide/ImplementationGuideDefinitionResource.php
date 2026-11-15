@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRVersionType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -57,7 +58,7 @@ class ImplementationGuideDefinitionResource extends BackboneElement
         /** @var StringPrimitive|string|null description Reason why included in guide */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var bool|CanonicalPrimitive|null example Is an example/What is this an example of? */
+        /** @var BooleanPrimitive|bool|CanonicalPrimitive|null example Is an example/What is this an example of? */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -73,7 +74,7 @@ class ImplementationGuideDefinitionResource extends BackboneElement
             ],
         )]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
-        public bool|CanonicalPrimitive|null $example = null,
+        public BooleanPrimitive|bool|CanonicalPrimitive|null $example = null,
         /** @var IdPrimitive|null groupingId Grouping this is part of */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $groupingId = null,

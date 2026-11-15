@@ -243,6 +243,13 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $resolvedType)
                     : null;
 
+                // A boolean/integer/decimal element with an extension becomes its wrapper (#207).
+                $extendedScalar = $this->denormalizeExtendedXmlScalar($object, $elementName, $choiceMapping, $value, $context);
+                if ($extendedScalar !== null) {
+                    self::modelAccessor()->writeValue($object, $extendedScalar[0], $extendedScalar[1]);
+                    continue;
+                }
+
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
@@ -253,18 +260,17 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                             $this->recordMalformedScalar($object, $propertyName, $phpType, $value, 'xml');
                             $rawValue = $this->unwrapXmlValue($value, $phpType);
 
-                            // A choice variant the generator maps to a PHP scalar (boolean, integer,
-                            // decimal) has nowhere to put child elements, so an extension-only
-                            // occurrence — `<valueDecimal><extension url="…data-absent-reason"/></valueDecimal>`
-                            // — arrives here as the decoded array and raised "Cannot assign array to
-                            // property", aborting the document.
+                            // A scalar choice variant (boolean, integer, decimal) that carries an
+                            // extension never reaches here: denormalizeExtendedXmlScalar() reads it
+                            // into its primitive wrapper first (#207). One with neither a value nor an
+                            // extension, such as `<valueDecimal id="x"/>`, still arrives as the decoded
+                            // array, which raised "Cannot assign array to property" and aborted the
+                            // document.
                             //
                             // The placeholder records that the element was *present*, which is the
                             // part invariants read: `Parameters.parameter` inv-1 requires
                             // `value.exists()`, and null would fail it on an instance the reference
-                            // validator passes. The extension itself is unrepresentable here and is
-                            // lost — closing that needs the generator to emit these three variants as
-                            // primitive wrapper classes rather than bare bool/int/string.
+                            // validator passes.
                             $denormalizedValue = is_array($rawValue) ? match ($phpType) {
                                 'int'   => 0,
                                 'float' => 0.0,
@@ -581,9 +587,9 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             if ($isChoice && $meta !== null && !empty($meta->variants)) {
                 $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
                 if ($choiceMatch !== null) {
-                    [$resolvedKind, $resolvedKey] = $choiceMatch;
+                    [, $resolvedKey]              = $choiceMatch;
                     $xmlKey                       = $resolvedKey;
-                    if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
+                    if ($this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $childContext, $includeExtensions);
                         if ($normalizedValue !== null) {
                             $data[$xmlKey] = $normalizedValue;

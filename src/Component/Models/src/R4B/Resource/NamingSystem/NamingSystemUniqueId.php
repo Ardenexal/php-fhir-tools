@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\NamingSystemIdentifierTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -44,9 +45,9 @@ class NamingSystemUniqueId extends BackboneElement
         /** @var StringPrimitive|string|null value The unique identifier */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $value = null,
-        /** @var bool|null preferred Is this the id that should be used for this type */
+        /** @var BooleanPrimitive|bool|null preferred Is this the id that should be used for this type */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $preferred = null,
+        public BooleanPrimitive|bool|null $preferred = null,
         /** @var StringPrimitive|string|null comment Notes about identifier usage */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $comment = null,

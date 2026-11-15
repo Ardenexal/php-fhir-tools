@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestReportResultType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestReportStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportParticipant;
@@ -95,9 +96,9 @@ class TestReportResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\TestReportResult',
         )]
         public ?TestReportResultType $result = null,
-        /** @var numeric-string|null score The final score (percentage of tests passed) resulting from the execution of the TestScript */
+        /** @var DecimalPrimitive|numeric-string|null score The final score (percentage of tests passed) resulting from the execution of the TestScript */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $score = null,
+        public DecimalPrimitive|string|null $score = null,
         /** @var StringPrimitive|string|null tester Name of the tester producing this report (Organization or individual) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $tester = null,

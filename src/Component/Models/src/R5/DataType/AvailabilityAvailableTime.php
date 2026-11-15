@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive;
 
 /**
@@ -42,9 +43,9 @@ class AvailabilityAvailableTime extends Element
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\DaysOfWeek',
         )]
         public array $daysOfWeek = [],
-        /** @var bool|null allDay Always available? i.e. 24 hour service */
+        /** @var BooleanPrimitive|bool|null allDay Always available? i.e. 24 hour service */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $allDay = null,
+        public BooleanPrimitive|bool|null $allDay = null,
         /** @var TimePrimitive|null availableStartTime Opening time of day (ignored if allDay = true) */
         #[FhirProperty(fhirType: 'time', propertyKind: 'primitive')]
         public ?TimePrimitive $availableStartTime = null,

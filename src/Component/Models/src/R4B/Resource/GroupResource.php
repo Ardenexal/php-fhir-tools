@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
@@ -82,9 +83,9 @@ class GroupResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $identifier = [],
-        /** @var bool|null active Whether this group's record is in active use */
+        /** @var BooleanPrimitive|bool|null active Whether this group's record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $active = null,
+        public BooleanPrimitive|bool|null $active = null,
         /** @var GroupTypeType|null type person | animal | practitioner | device | medication | substance */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
         #[NotBlank]
@@ -94,9 +95,9 @@ class GroupResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\GroupType',
         )]
         public ?GroupTypeType $type = null,
-        /** @var bool|null actual Descriptive or actual */
+        /** @var BooleanPrimitive|bool|null actual Descriptive or actual */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $actual = null,
+        public BooleanPrimitive|bool|null $actual = null,
         /** @var CodeableConcept|null code Kind of Group members */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,

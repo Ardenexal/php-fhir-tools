@@ -14,6 +14,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -36,7 +38,7 @@ class PlanDefinitionGoalTarget extends BackboneElement
         /** @var CodeableConcept|null measure The parameter whose value is to be tracked */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $measure = null,
-        /** @var Quantity|Range|CodeableConcept|StringPrimitive|string|bool|int|Ratio|null detail The target value to be achieved */
+        /** @var Quantity|Range|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Ratio|null detail The target value to be achieved */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -76,7 +78,7 @@ class PlanDefinitionGoalTarget extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|Range|CodeableConcept|StringPrimitive|string|bool|int|Ratio|null $detail = null,
+        public Quantity|Range|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Ratio|null $detail = null,
         /** @var Duration|null due Reach goal within */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $due = null,

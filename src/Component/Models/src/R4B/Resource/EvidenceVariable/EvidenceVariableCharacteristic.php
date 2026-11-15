@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\GroupMeasureType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -90,9 +91,9 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'http://hl7.org/fhir/StructureDefinition/DeviceMetric',
         ])]
         public ?Reference $device = null,
-        /** @var bool|null exclude Whether the characteristic includes or excludes members */
+        /** @var BooleanPrimitive|bool|null exclude Whether the characteristic includes or excludes members */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $exclude = null,
+        public BooleanPrimitive|bool|null $exclude = null,
         /** @var EvidenceVariableCharacteristicTimeFromStart|null timeFromStart Observation time from study start */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?EvidenceVariableCharacteristicTimeFromStart $timeFromStart = null,

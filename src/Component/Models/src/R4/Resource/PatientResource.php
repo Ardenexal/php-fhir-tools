@@ -20,8 +20,10 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Patient\PatientCommunication;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Patient\PatientContact;
@@ -78,9 +80,9 @@ class PatientResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $identifier = [],
-        /** @var bool|null active Whether this patient's record is in active use */
+        /** @var BooleanPrimitive|bool|null active Whether this patient's record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
-        public ?bool $active = null,
+        public BooleanPrimitive|bool|null $active = null,
         /** @var array<HumanName> name A name associated with the patient */
         #[FhirProperty(
             fhirType: 'HumanName',
@@ -110,7 +112,7 @@ class PatientResource extends AbstractDomainResource
         /** @var DatePrimitive|null birthDate The date of birth for the individual */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $birthDate = null,
-        /** @var bool|DateTimePrimitive|null deceased Indicates if the individual is deceased or not */
+        /** @var BooleanPrimitive|bool|DateTimePrimitive|null deceased Indicates if the individual is deceased or not */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -126,7 +128,7 @@ class PatientResource extends AbstractDomainResource
             ],
         )]
         #[FHIRIsModifier(reason: 'This element is labeled as a modifier because once a patient is marked as deceased, the actions that are appropriate to perform on the patient may be significantly different.')]
-        public bool|DateTimePrimitive|null $deceased = null,
+        public BooleanPrimitive|bool|DateTimePrimitive|null $deceased = null,
         /** @var array<Address> address An address for the individual */
         #[FhirProperty(
             fhirType: 'Address',
@@ -145,7 +147,7 @@ class PatientResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\MaritalStatusCodes',
         )]
         public ?CodeableConcept $maritalStatus = null,
-        /** @var bool|int|null multipleBirth Whether patient is part of a multiple birth */
+        /** @var BooleanPrimitive|bool|IntegerPrimitive|int|null multipleBirth Whether patient is part of a multiple birth */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -155,7 +157,7 @@ class PatientResource extends AbstractDomainResource
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'multipleBirthInteger'],
             ],
         )]
-        public bool|int|null $multipleBirth = null,
+        public BooleanPrimitive|bool|IntegerPrimitive|int|null $multipleBirth = null,
         /** @var array<Attachment> photo Image of the patient */
         #[FhirProperty(
             fhirType: 'Attachment',

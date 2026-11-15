@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
@@ -114,9 +115,9 @@ class SubscriptionTopicResource extends AbstractDomainResource
         )]
         #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired SubscriptionTopic without due consideration')]
         public ?PublicationStatusType $status = null,
-        /** @var bool|null experimental If for testing purposes, not real usage */
+        /** @var BooleanPrimitive|bool|null experimental If for testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use an experimental SubscriptionTopic in production.')]
-        public ?bool $experimental = null,
+        public BooleanPrimitive|bool|null $experimental = null,
         /** @var DateTimePrimitive|null date Date status first applied */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,
