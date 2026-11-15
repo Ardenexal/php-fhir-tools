@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRScalarPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Questionnaire\QuestionnaireItem;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Questionnaire\QuestionnaireItemAnswerOption;
@@ -179,7 +180,7 @@ final class FHIRDerivedQuestionnaireValidator
         // Scope: only when both sides are explicit booleans. A derived item that omits `required`
         // (null) is treated as "not explicitly constrained", not as the FHIR implicit default
         // (false). Weakening-via-omission is a known gap deferred beyond M08.
-        if ($baseItem->required === true && $item->required === false) {
+        if (FHIRScalarPrimitive::unwrap($baseItem->required) === true && FHIRScalarPrimitive::unwrap($item->required) === false) {
             $violations[] = $this->violation(
                 $path . '.required',
                 "Item '{$linkId}' is required in base, cannot be made optional",
@@ -188,7 +189,7 @@ final class FHIRDerivedQuestionnaireValidator
 
         // Rule: repeats cannot be loosened (base=false → derived=true is forbidden).
         // Same null-omission scope as required above.
-        if ($baseItem->repeats === false && $item->repeats === true) {
+        if (FHIRScalarPrimitive::unwrap($baseItem->repeats) === false && FHIRScalarPrimitive::unwrap($item->repeats) === true) {
             $violations[] = $this->violation(
                 $path . '.repeats',
                 "Item '{$linkId}' does not repeat in base, cannot be set to repeat",
@@ -197,12 +198,12 @@ final class FHIRDerivedQuestionnaireValidator
 
         // Rule: every derived answerOption (system+code) must appear in the base.
         foreach ($item->answerOption as $option) {
-            if (!$option->value instanceof Coding) {
+            if (!FHIRScalarPrimitive::unwrap($option->value) instanceof Coding) {
                 continue;
             }
 
-            $code   = (string) ($option->value->code ?? '');
-            $system = (string) ($option->value->system ?? '');
+            $code   = (string) (FHIRScalarPrimitive::unwrap($option->value)->code ?? '');
+            $system = (string) (FHIRScalarPrimitive::unwrap($option->value)->system ?? '');
 
             if (!$this->baseHasOption($baseItem->answerOption, $code, $system)) {
                 $violations[] = $this->violation(

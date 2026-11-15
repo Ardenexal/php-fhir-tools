@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -151,6 +153,74 @@ class PrimitiveExtensionRoundTripTest extends TestCase
                 'valueQuantity' => ['_value' => self::EXTENSION],
             ]],
         ]];
+    }
+
+    /**
+     * A plain value stays a native scalar; only an extension brings in the wrapper.
+     *
+     * Wrapping every value would break each `=== true` and numeric read on these properties.
+     */
+    public function testPlainScalarValuesStayScalarAndExtendedOnesAreWrapped(): void
+    {
+        $service = FHIRSerializationService::createDefault();
+
+        $plain = $service->deserialize('{"resourceType":"Patient","active":false}');
+        self::assertInstanceOf(PatientResource::class, $plain);
+        self::assertFalse($plain->active);
+
+        $plainXml = $service->deserialize('<Patient xmlns="http://hl7.org/fhir"><active value="false"/></Patient>');
+        self::assertInstanceOf(PatientResource::class, $plainXml);
+        self::assertFalse($plainXml->active);
+
+        $extended = $service->deserialize(json_encode(
+            ['resourceType' => 'Patient', 'active' => false, '_active' => self::EXTENSION],
+            JSON_THROW_ON_ERROR,
+        ));
+        self::assertInstanceOf(PatientResource::class, $extended);
+        self::assertInstanceOf(BooleanPrimitive::class, $extended->active);
+        self::assertFalse($extended->active->value);
+        self::assertCount(1, $extended->active->extension);
+    }
+
+    /**
+     * XML keeps the extension on `boolean`, `integer` and `decimal` elements, choice variants included.
+     *
+     * An extension-only `<valueBoolean>` used to come back as `value="false"`: a value the document
+     * never had.
+     */
+    #[DataProvider('scalarPrimitiveXmlDocuments')]
+    public function testExtensionOnScalarBackedPrimitiveSurvivesXml(string $document): void
+    {
+        $service = FHIRSerializationService::createDefault();
+
+        self::assertXmlStringEqualsXmlString($document, $service->serializeToXml($service->deserialize($document)));
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function scalarPrimitiveXmlDocuments(): iterable
+    {
+        $extension = '<extension url="http://example.org/StructureDefinition/x"><valueString value="expr"/></extension>';
+        $obs       = '<status value="final"/><code><text value="x"/></code>';
+
+        yield 'boolean with value and extension' => [
+            '<Patient xmlns="http://hl7.org/fhir"><active value="true">' . $extension . '</active></Patient>',
+        ];
+
+        yield 'extension-only boolean choice variant' => [
+            '<Observation xmlns="http://hl7.org/fhir">' . $obs . '<valueBoolean>' . $extension . '</valueBoolean></Observation>',
+        ];
+
+        yield 'decimal in a complex type' => [
+            '<Observation xmlns="http://hl7.org/fhir">' . $obs
+            . '<valueQuantity><value value="1.50">' . $extension . '</value><unit value="cm"/></valueQuantity></Observation>',
+        ];
+
+        yield 'integer in a backbone element' => [
+            '<Questionnaire xmlns="http://hl7.org/fhir"><status value="draft"/><item><linkId value="q"/>'
+            . '<type value="string"/><maxLength value="3">' . $extension . '</maxLength></item></Questionnaire>',
+        ];
     }
 
     /**

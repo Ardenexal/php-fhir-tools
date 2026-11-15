@@ -206,9 +206,9 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
             if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
                 $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
                 if ($choiceMatch !== null) {
-                    [$resolvedKind, $resolvedKey, $resolvedFhirType] = $choiceMatch;
+                    [, $resolvedKey, $resolvedFhirType]              = $choiceMatch;
                     $jsonKey                                         = $resolvedKey;
-                    if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
+                    if ($this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context, $fhirContext->includeExtensions);
                         if ($normalizedValue !== null) {
                             // An extension-only primitive has no value: write only its `_` key, never `"key": null`.
