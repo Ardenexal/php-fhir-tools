@@ -2242,7 +2242,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     private function optionIsExclusive(object $option): bool
     {
         foreach ($option->extension as $extension) {
-            if ($extension->url === self::EXT_OPTION_EXCLUSIVE && isset($extension->value) && $extension->value === true) {
+            if ($extension->url === self::EXT_OPTION_EXCLUSIVE && FHIRScalarPrimitive::unwrap($extension->value ?? null) === true) {
                 return true;
             }
         }
