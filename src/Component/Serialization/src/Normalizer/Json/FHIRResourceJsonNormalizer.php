@@ -211,7 +211,10 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                     if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context, $fhirContext->includeExtensions);
                         if ($normalizedValue !== null) {
-                            $data[$jsonKey] = $normalizedValue['value'];
+                            // An extension-only primitive has no value: write only its `_` key, never `"key": null`.
+                            if (array_key_exists('value', $normalizedValue)) {
+                                $data[$jsonKey] = $normalizedValue['value'];
+                            }
                             if (isset($normalizedValue['extensions']) && $fhirContext->includeExtensions) {
                                 $data['_' . $jsonKey] = ['extension' => $normalizedValue['extensions']];
                             }
@@ -242,7 +245,10 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
             } elseif ($this->isPrimitiveWithExtensions($value)) {
                 $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context, $fhirContext->includeExtensions);
                 if ($normalizedValue !== null) {
-                    $data[$jsonKey] = $normalizedValue['value'];
+                    // An extension-only primitive has no value: write only its `_` key, never `"key": null`.
+                    if (array_key_exists('value', $normalizedValue)) {
+                        $data[$jsonKey] = $normalizedValue['value'];
+                    }
                     if (isset($normalizedValue['extensions']) && $fhirContext->includeExtensions) {
                         $data['_' . $jsonKey] = ['extension' => $normalizedValue['extensions']];
                     }

@@ -548,7 +548,14 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             $baseName = substr($elementName, 1);
             $meta     = $metaMap[$baseName] ?? null;
 
-            if ($meta === null || $meta->propertyKind !== 'primitive' || !$accessor->hasProperty($object, $baseName)) {
+            if ($meta === null) {
+                // `_valueString` names a choice variant, not a property, so the map has no entry for it.
+                $this->applyChoicePrimitiveExtension($object, $baseName, $extData, $metaMap, $format, $context);
+
+                continue;
+            }
+
+            if ($meta->propertyKind !== 'primitive' || !$accessor->hasProperty($object, $baseName)) {
                 continue;
             }
 
@@ -631,6 +638,55 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                 $accessor->writeValue($object, $baseName, $currentArray);
             }
         }
+    }
+
+    /**
+     * Attach a JSON `_<choiceKey>` extension (e.g. `_valueString`) to the choice property it names.
+     *
+     * The variant's value, if any, was written by the first pass. An extension-only variant has no
+     * value there, so its primitive class is built here from null. Nothing is attached when the
+     * variant is a builtin PHP type (which cannot hold an extension), or when the property already
+     * holds a different variant, since one choice element carries exactly one type.
+     *
+     * @param array<string, PropertyMetadata> $metaMap
+     * @param array<string, mixed>            $context
+     */
+    private function applyChoicePrimitiveExtension(
+        object $object,
+        string $choiceKey,
+        mixed $extData,
+        array $metaMap,
+        ?string $format,
+        array $context,
+    ): void {
+        if (!is_array($extData) || !isset($extData['extension']) || !is_array($extData['extension'])) {
+            return;
+        }
+
+        $choiceMapping = $this->findChoicePropertyByKey($metaMap, $choiceKey, $object::class);
+        if ($choiceMapping === null || $this->denormalizer === null) {
+            return;
+        }
+
+        [$propertyName, $phpType] = $choiceMapping;
+        $accessor                 = self::modelAccessor();
+
+        if ($this->isBuiltinType($phpType) || !class_exists($phpType) || !$accessor->hasProperty($object, $propertyName)) {
+            return;
+        }
+
+        $current = $accessor->readInitializedValue($object, $propertyName);
+
+        if ($current === null) {
+            $current = $this->denormalizer->denormalize(null, $phpType, $format, $context);
+            $accessor->writeValue($object, $propertyName, $current);
+        }
+
+        if (!$current instanceof $phpType) {
+            return;
+        }
+
+        $accessor->writeValue($current, 'extension', $this->denormalizeExtensionArray($extData['extension'], $format, $context));
     }
 
     /**
