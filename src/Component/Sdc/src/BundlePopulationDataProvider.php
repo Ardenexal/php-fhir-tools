@@ -54,13 +54,18 @@ final class BundlePopulationDataProvider implements PopulationDataProviderInterf
 
     /**
      * Whether a resource object is an `Observation`, by class basename (version-agnostic — matches
-     * `Models\R4\...\ObservationResource`, R4B, R5) rather than a hardcoded FQCN.
+     * `Models\R4\...\ObservationResource`, R4B, R5) rather than a hardcoded FQCN. Parent classes are
+     * checked too, so a profiled subclass of the Observation model still counts.
      */
     private function isObservation(object $resource): bool
     {
-        $class = $resource::class;
-        $short = ($pos = strrpos($class, '\\')) !== false ? substr($class, $pos + 1) : $class;
+        for ($class = $resource::class; $class !== false; $class = get_parent_class($class)) {
+            $short = ($pos = strrpos($class, '\\')) !== false ? substr($class, $pos + 1) : $class;
+            if ($short === 'ObservationResource' || $short === 'Observation') {
+                return true;
+            }
+        }
 
-        return $short === 'ObservationResource' || $short === 'Observation';
+        return false;
     }
 }
