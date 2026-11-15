@@ -73,6 +73,34 @@ class RepeatingPrimitiveFidelityTest extends TestCase
     }
 
     /**
+     * An occurrence that carries only an extension writes `null` in the value array.
+     *
+     * The JSON normalizer read the occurrence's `value` key, which an extension-only primitive does
+     * not have, and raised an "Undefined array key" warning on every such document.
+     */
+    public function testExtensionOnlyOccurrenceSerializesAsNullWithoutWarning(): void
+    {
+        $json = '{"resourceType":"Patient","name":[{"given":[null,"James"],'
+            . '"_given":[{"extension":[{"url":"http://example.org/ext","valueString":"note"}]},null]}]}';
+
+        $service  = FHIRSerializationService::createDefault(FhirVersion::R4);
+        $warnings = [];
+        set_error_handler(static function(int $errno, string $message) use (&$warnings): bool {
+            $warnings[] = $message;
+
+            return true;
+        });
+        try {
+            $out = $service->serializeToJson($service->deserialize($json));
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame([], $warnings);
+        self::assertJsonStringEqualsJsonString($json, $out);
+    }
+
+    /**
      * Serializing to XML first must not change the JSON that follows.
      *
      * FHIR requires `"profile": ["…"]`. Serializing the same service to XML first produced
