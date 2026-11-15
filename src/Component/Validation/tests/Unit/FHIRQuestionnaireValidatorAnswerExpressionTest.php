@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireResponseStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
@@ -192,6 +193,19 @@ final class FHIRQuestionnaireValidatorAnswerExpressionTest extends TestCase
         }
     }
 
+    public function testBindsVariablesInScope(): void
+    {
+        $questionnaire              = self::questionnaire('%allowed', 'string');
+        $questionnaire->extension[] = new Extension(
+            url: 'http://hl7.org/fhir/StructureDefinition/variable',
+            value: new Expression(name: new IdPrimitive(value: 'allowed'), language: 'text/fhirpath', expression: "'red'"),
+        );
+
+        $validator = new FHIRQuestionnaireValidator();
+        self::assertSame([], $validator->validate($questionnaire, self::response(new StringPrimitive(value: 'red')))->violations);
+        self::assertCount(1, $validator->validate($questionnaire, self::response(new StringPrimitive(value: 'blue')))->errors());
+    }
+
     public function testOpenChoiceAcceptsFreeTextOutsideTheExpressionResult(): void
     {
         $validator     = new FHIRQuestionnaireValidator();
@@ -222,9 +236,9 @@ final class FHIRQuestionnaireValidatorAnswerExpressionTest extends TestCase
         self::assertSame([], $report->violations);
     }
 
-    public function testSkipsExpressionThatRaisesAPhpError(): void
+    public function testSkipsExpressionWithAnExponentLiteral(): void
     {
-        // The evaluator hands the exponent literal to bcadd(), which throws a ValueError.
+        // FHIRPath has no exponent form, so 1e2 is a syntax error and the check is skipped.
         $report = (new FHIRQuestionnaireValidator())->validate(
             self::questionnaire('1e2 + 1', 'integer'),
             self::scalarResponse(7),

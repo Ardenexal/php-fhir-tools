@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeHierarchyResolverInterfa
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
@@ -37,6 +38,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledExtension;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledProfile;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileFailure;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -1361,6 +1363,37 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
+     * The definition URL an extension's versioned `url` names, when it names a known extension.
+     *
+     * An extension's definition fixes `Extension.url` to its canonical without a version, so
+     * `patient-congregation|4.0.0` cannot equal it. The reference validator resolves the definition
+     * from the unversioned URL and then reports the fixed-value mismatch on `url`; this finds that
+     * definition the same way, from a generated class or one loaded at runtime. An unknown URL yields
+     * null: with no definition there is no fixed value to break, and an unresolvable regular extension
+     * is not reported.
+     */
+    private function versionedExtensionDefinitionUrl(object $extension, string $url): ?string
+    {
+        $pipe = strpos($url, '|');
+        if ($pipe === false) {
+            return null;
+        }
+
+        $definitionUrl = substr($url, 0, $pipe);
+        $release       = $this->releaseOf($extension);
+
+        if ($this->registry?->resolveExtensionClass($definitionUrl, $release ?? '') !== null) {
+            return $definitionUrl;
+        }
+
+        if ($release !== null && $this->runtimeProfiles?->resolveExtension($definitionUrl, $release) !== null) {
+            return $definitionUrl;
+        }
+
+        return null;
+    }
+
+    /**
      * The FHIR release a model object belongs to, from its class's type attribute.
      */
     private function releaseOf(object $element): ?string
@@ -1532,6 +1565,15 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                         path: $extPath,
                         message: 'Extension.url must be an absolute URL',
                         constraintClass: self::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                    );
+                } elseif (!$insideExtension && ($definitionUrl = $this->versionedExtensionDefinitionUrl($ext, $url)) !== null) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'error',
+                        path: $extPath . '[' . $extIndex . '].url',
+                        message: strtr(FHIRFixedValueValidator::DEFAULT_MESSAGE, ['{{ value }}' => $url, '{{ fixed }}' => $definitionUrl]),
+                        constraintClass: FHIRFixedValue::class,
                         profileGroup: null,
                         invariantKey: null,
                     );

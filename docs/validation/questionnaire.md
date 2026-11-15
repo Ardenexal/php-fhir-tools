@@ -67,20 +67,40 @@ after merging.
 | `Attachment` answers must satisfy content-type / size / data-size constraints | `error` |
 | `Quantity` answers must satisfy `minQuantity`/`maxQuantity` bounds and unit-option constraints | `error` |
 | Answer value type must match the declared item type (an R5 `optionsOrString` item also accepts a string) | `warning` |
+| A read-only item's answers must equal the result of its SDC `calculatedExpression` (see below) | `error` |
 | Items present while their `enableWhen` conditions are unsatisfied | `warning` |
 | `enableWhen.question` must reference a known `linkId` | `warning` |
 
 {% hint style="warning" %}
-Calculated expressions (`calculatedExpression`) are not yet covered. SDC `answerExpression`
-is checked only when its language is `text/fhirpath`. It is evaluated with the response as
-`%resource`, the response item as its focus and `%context`, and the Questionnaire as
-`%questionnaire`; an expression that needs anything else (`%patient`, launch context, item
-`variable` extensions), fails, or returns no value comparable with an answer checks nothing. (`enableWhenExpression` —
-both the canonical SDC and Kanta PHR variants — `regex` constraints and R5 `answerConstraint`
-are also validated.) `enableWhen` answers are
+SDC `answerExpression` is checked only when its language is FHIRPath. It is evaluated like a
+`calculatedExpression` (see below), with the Questionnaire also bound as `%questionnaire`; an
+expression that needs anything else (`%patient` or other launch context), reads the clock, fails,
+or returns no value comparable with an answer checks nothing. (`enableWhenExpression` — both the
+canonical SDC and Kanta PHR variants — `calculatedExpression`, `regex` constraints and R5
+`answerConstraint` are also validated.) `enableWhen` answers are
 looked up response-globally — a documented approximation of the spec's nearest-occurrence
 resolution that is exact whenever the referenced question occurs once.
 {% endhint %}
+
+### Calculated answers
+
+An enabled item with `readOnly: true` and an SDC `calculatedExpression` must carry exactly the
+values its expression returns, in any order. Items inside a disabled group are not checked. The
+FHIRPath expression is evaluated with the response item as its focus and `%context`, and with
+`%resource` bound to the QuestionnaireResponse. `variable`
+extensions on the Questionnaire, on each enclosing item and on the item itself are bound first,
+in that order, as `%name` constants; a variable on a repeating group is evaluated against the
+group instance that contains the answer.
+
+Only read-only items are checked: SDC lets a user override the calculated value of an editable
+item. The check is skipped, not reported, when the expression or a variable is not
+`text/fhirpath`, calls `now()`, `today()` or `timeOfDay()` (the result depends on when it
+runs), fails to evaluate, or a variable returns more than one value; when the
+expression returns nothing; and when the calculated and answered values are different kinds,
+such as a number against a `Coding`. Numeric values are compared as exact decimals, so `5`, `5.0`
+and a string answer `'5'` are equal, and a quantity calculation such as `5 'mg'` compares with a
+`Quantity` answer by value and code. Because the comparison is exact, a decimal calculation
+should round to the precision the form stores (`(%weight / %height.power(2)).round(1)`).
 
 ## Derived Questionnaires
 
