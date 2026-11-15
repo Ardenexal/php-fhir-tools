@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -33,9 +34,9 @@ class GraphDefinitionLink extends BackboneElement
         /** @var StringPrimitive|string|null description Why this link is specified */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var int|null min Minimum occurrences for this link */
+        /** @var IntegerPrimitive|int|null min Minimum occurrences for this link */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $min = null,
+        public IntegerPrimitive|int|null $min = null,
         /** @var StringPrimitive|string|null max Maximum occurrences for this link */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $max = null,

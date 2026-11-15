@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -35,9 +36,9 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
         /** @var CodeableConcept|null orientation The orientation of the polymerisation, e.g. head-tail, head-head, random */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $orientation = null,
-        /** @var int|null amount Number of repeats of this unit */
+        /** @var IntegerPrimitive|int|null amount Number of repeats of this unit */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $amount = null,
+        public IntegerPrimitive|int|null $amount = null,
         /** @var array<SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation> degreeOfPolymerisation Applies to homopolymer and block co-polymers where the degree of polymerisation within a block can be described */
         #[FhirProperty(
             fhirType: 'BackboneElement',

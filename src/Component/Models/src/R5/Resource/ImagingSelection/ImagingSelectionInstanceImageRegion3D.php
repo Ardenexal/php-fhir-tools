@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ImagingSelection3DGraphicTypeType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DecimalPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -39,7 +40,7 @@ class ImagingSelectionInstanceImageRegion3D extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ImagingSelection3DGraphicType',
         )]
         public ?ImagingSelection3DGraphicTypeType $regionType = null,
-        /** @var array<numeric-string> coordinate Specifies the coordinates that define the image region */
+        /** @var array<DecimalPrimitive|numeric-string> coordinate Specifies the coordinates that define the image region */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true, isRequired: true), Count(min: 1)]
         public array $coordinate = [],
     ) {

@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -40,7 +41,7 @@ class MeasureReportGroupStratifierStratumComponent extends BackboneElement
         /** @var CodeableConcept|null code What stratifier component of the group */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
-        /** @var CodeableConcept|bool|Quantity|Range|Reference|null value The stratum component value, e.g. male */
+        /** @var CodeableConcept|BooleanPrimitive|bool|Quantity|Range|Reference|null value The stratum component value, e.g. male */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -75,7 +76,7 @@ class MeasureReportGroupStratifierStratumComponent extends BackboneElement
             ],
         )]
         #[NotNull]
-        public CodeableConcept|bool|Quantity|Range|Reference|null $value = null,
+        public CodeableConcept|BooleanPrimitive|bool|Quantity|Range|Reference|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

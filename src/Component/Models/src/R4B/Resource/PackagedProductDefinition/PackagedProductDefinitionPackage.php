@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -43,9 +44,9 @@ class PackagedProductDefinitionPackage extends BackboneElement
         /** @var CodeableConcept|null type The physical type of the container of the items */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
-        /** @var int|null quantity The quantity of this level of packaging in the package that contains it (with the outermost level being 1) */
+        /** @var IntegerPrimitive|int|null quantity The quantity of this level of packaging in the package that contains it (with the outermost level being 1) */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $quantity = null,
+        public IntegerPrimitive|int|null $quantity = null,
         /** @var array<CodeableConcept> material Material type of the package item */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

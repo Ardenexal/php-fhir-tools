@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\DeviceCorrectiveActionScopeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -32,9 +33,9 @@ class DeviceDefinitionCorrectiveAction extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null recall Whether the corrective action was a recall */
+        /** @var BooleanPrimitive|bool|null recall Whether the corrective action was a recall */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $recall = null,
+        public BooleanPrimitive|bool|null $recall = null,
         /** @var DeviceCorrectiveActionScopeType|null scope model | lot-numbers | serial-numbers */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(

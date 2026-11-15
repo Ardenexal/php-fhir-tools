@@ -23,8 +23,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestIntentType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestStatusType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceRequest\DeviceRequestParameter;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -149,9 +151,9 @@ class DeviceRequestResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\RequestPriority',
         )]
         public ?RequestPriorityType $priority = null,
-        /** @var bool|null doNotPerform True if the request is to stop or not to start using the device */
+        /** @var BooleanPrimitive|bool|null doNotPerform True if the request is to stop or not to start using the device */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labeled as a modifier because this element negates the request to occur (ie, this is a request for the medication not to be ordered or prescribed, etc.)')]
-        public ?bool $doNotPerform = null,
+        public BooleanPrimitive|bool|null $doNotPerform = null,
         /** @var CodeableReference|null code Device requested */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true)]
         #[Valid]
@@ -161,9 +163,9 @@ class DeviceRequestResource extends AbstractDomainResource
             'http://hl7.org/fhir/StructureDefinition/DeviceDefinition',
         ])]
         public ?CodeableReference $code = null,
-        /** @var int|null quantity Quantity of devices to supply */
+        /** @var IntegerPrimitive|int|null quantity Quantity of devices to supply */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $quantity = null,
+        public IntegerPrimitive|int|null $quantity = null,
         /** @var array<DeviceRequestParameter> parameter Device details */
         #[FhirProperty(
             fhirType: 'BackboneElement',
@@ -256,9 +258,9 @@ class DeviceRequestResource extends AbstractDomainResource
             'http://hl7.org/fhir/StructureDefinition/DocumentReference',
         ])]
         public array $reason = [],
-        /** @var bool|null asNeeded PRN status of request */
+        /** @var BooleanPrimitive|bool|null asNeeded PRN status of request */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $asNeeded = null,
+        public BooleanPrimitive|bool|null $asNeeded = null,
         /** @var CodeableConcept|null asNeededFor Device usage reason */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $asNeededFor = null,

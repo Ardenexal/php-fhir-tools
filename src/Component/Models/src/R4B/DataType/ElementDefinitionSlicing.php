@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -43,9 +44,9 @@ class ElementDefinitionSlicing extends Element
         /** @var StringPrimitive|string|null description Text description of how slicing works (or not) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var bool|null ordered If elements must be in same order as slices */
+        /** @var BooleanPrimitive|bool|null ordered If elements must be in same order as slices */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $ordered = null,
+        public BooleanPrimitive|bool|null $ordered = null,
         /** @var SlicingRulesType|null rules closed | open | openAtEnd */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
         #[NotBlank]

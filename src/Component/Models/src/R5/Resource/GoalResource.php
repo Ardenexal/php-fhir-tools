@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -103,9 +104,9 @@ class GoalResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $category = [],
-        /** @var bool|null continuous After meeting the goal, ongoing activity is needed to sustain the goal objective */
+        /** @var BooleanPrimitive|bool|null continuous After meeting the goal, ongoing activity is needed to sustain the goal objective */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $continuous = null,
+        public BooleanPrimitive|bool|null $continuous = null,
         /** @var CodeableConcept|null priority high-priority | medium-priority | low-priority */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         #[Valid]

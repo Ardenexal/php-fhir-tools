@@ -22,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestIntentType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\CommunicationRequest\CommunicationRequestPayload;
@@ -145,9 +146,9 @@ class CommunicationRequestResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\RequestPriority',
         )]
         public ?RequestPriorityType $priority = null,
-        /** @var bool|null doNotPerform True if request is prohibiting action */
+        /** @var BooleanPrimitive|bool|null doNotPerform True if request is prohibiting action */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'If true this element negates the specified action. For Example,  instead of a request for a communication, it is a request for the communication to not occur.')]
-        public ?bool $doNotPerform = null,
+        public BooleanPrimitive|bool|null $doNotPerform = null,
         /** @var array<CodeableConcept> medium A channel of communication */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

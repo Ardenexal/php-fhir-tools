@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
@@ -27,9 +28,9 @@ class TerminologyCapabilitiesTranslation extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null needsMap Whether the client must identify the map */
+        /** @var BooleanPrimitive|bool|null needsMap Whether the client must identify the map */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $needsMap = null,
+        public BooleanPrimitive|bool|null $needsMap = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

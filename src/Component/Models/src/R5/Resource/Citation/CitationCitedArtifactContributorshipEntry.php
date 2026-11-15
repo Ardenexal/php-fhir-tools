@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -91,9 +92,9 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
         )]
         #[Valid]
         public array $contributionInstance = [],
-        /** @var bool|null correspondingContact Whether the contributor is the corresponding contributor for the role */
+        /** @var BooleanPrimitive|bool|null correspondingContact Whether the contributor is the corresponding contributor for the role */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $correspondingContact = null,
+        public BooleanPrimitive|bool|null $correspondingContact = null,
         /** @var PositiveIntPrimitive|null rankingOrder Ranked order of contribution */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $rankingOrder = null,

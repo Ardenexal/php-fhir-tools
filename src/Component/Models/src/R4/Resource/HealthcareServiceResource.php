@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
@@ -80,9 +81,9 @@ class HealthcareServiceResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $identifier = [],
-        /** @var bool|null active Whether this HealthcareService record is in active use */
+        /** @var BooleanPrimitive|bool|null active Whether this HealthcareService record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
-        public ?bool $active = null,
+        public BooleanPrimitive|bool|null $active = null,
         /** @var Reference|null providedBy Organization that provides this service */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $providedBy = null,
@@ -219,9 +220,9 @@ class HealthcareServiceResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $referralMethod = [],
-        /** @var bool|null appointmentRequired If an appointment is required for access to this service */
+        /** @var BooleanPrimitive|bool|null appointmentRequired If an appointment is required for access to this service */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $appointmentRequired = null,
+        public BooleanPrimitive|bool|null $appointmentRequired = null,
         /** @var array<HealthcareServiceAvailableTime> availableTime Times the Service Site is available */
         #[FhirProperty(
             fhirType: 'BackboneElement',

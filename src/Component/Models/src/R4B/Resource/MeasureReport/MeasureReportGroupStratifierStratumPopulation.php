@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -40,9 +41,9 @@ class MeasureReportGroupStratifierStratumPopulation extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\MeasurePopulationType',
         )]
         public ?CodeableConcept $code = null,
-        /** @var int|null count Size of the population */
+        /** @var IntegerPrimitive|int|null count Size of the population */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $count = null,
+        public IntegerPrimitive|int|null $count = null,
         /** @var Reference|null subjectResults For subject-list reports, the subject results in this population */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/List'])]
         public ?Reference $subjectResults = null,

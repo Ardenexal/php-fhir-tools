@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\Base64BinaryPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -37,7 +38,7 @@ class NutritionProductCharacteristic extends BackboneElement
         /** @var CodeableConcept|null type Code specifying the type of characteristic */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|bool|null value The value of the characteristic */
+        /** @var CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|BooleanPrimitive|bool|null value The value of the characteristic */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -78,7 +79,7 @@ class NutritionProductCharacteristic extends BackboneElement
             ],
         )]
         #[NotNull]
-        public CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|bool|null $value = null,
+        public CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|BooleanPrimitive|bool|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

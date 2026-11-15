@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -28,9 +29,9 @@ class TestPlanTestCase extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var int|null sequence Sequence of test case in the test plan */
+        /** @var IntegerPrimitive|int|null sequence Sequence of test case in the test plan */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $sequence = null,
+        public IntegerPrimitive|int|null $sequence = null,
         /** @var array<Reference> scope The scope or artifact covered by the case */
         #[FhirProperty(
             fhirType: 'Reference',

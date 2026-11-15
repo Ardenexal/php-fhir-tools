@@ -25,6 +25,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RequestIntentType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RequestStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
@@ -177,9 +178,9 @@ class ServiceRequestResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\RequestPriority',
         )]
         public ?RequestPriorityType $priority = null,
-        /** @var bool|null doNotPerform True if service/procedure should not be performed */
+        /** @var BooleanPrimitive|bool|null doNotPerform True if service/procedure should not be performed */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'If true this element negates the specified action. For Example,  instead of a request for a procedure, it is a request for the procedure to not occur.')]
-        public ?bool $doNotPerform = null,
+        public BooleanPrimitive|bool|null $doNotPerform = null,
         /** @var CodeableConcept|null code What is being requested/ordered */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
@@ -260,7 +261,7 @@ class ServiceRequestResource extends AbstractDomainResource
             ],
         )]
         public DateTimePrimitive|Period|Timing|null $occurrence = null,
-        /** @var bool|CodeableConcept|null asNeeded Preconditions for service */
+        /** @var BooleanPrimitive|bool|CodeableConcept|null asNeeded Preconditions for service */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -275,7 +276,7 @@ class ServiceRequestResource extends AbstractDomainResource
                 ],
             ],
         )]
-        public bool|CodeableConcept|null $asNeeded = null,
+        public BooleanPrimitive|bool|CodeableConcept|null $asNeeded = null,
         /** @var DateTimePrimitive|null authoredOn Date request signed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $authoredOn = null,

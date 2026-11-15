@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
@@ -226,10 +227,10 @@ class FamilyMemberHistoryResource extends AbstractDomainResource
             ],
         )]
         public Age|Range|StringPrimitive|string|null $age = null,
-        /** @var bool|null estimatedAge Age is estimated? */
+        /** @var BooleanPrimitive|bool|null estimatedAge Age is estimated? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $estimatedAge = null,
-        /** @var bool|Age|Range|DatePrimitive|StringPrimitive|string|null deceased Dead? How old/when? */
+        public BooleanPrimitive|bool|null $estimatedAge = null,
+        /** @var BooleanPrimitive|bool|Age|Range|DatePrimitive|StringPrimitive|string|null deceased Dead? How old/when? */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -262,7 +263,7 @@ class FamilyMemberHistoryResource extends AbstractDomainResource
                 ],
             ],
         )]
-        public bool|Age|Range|DatePrimitive|StringPrimitive|string|null $deceased = null,
+        public BooleanPrimitive|bool|Age|Range|DatePrimitive|StringPrimitive|string|null $deceased = null,
         /** @var array<CodeableReference> reason Why was family member history performed? */
         #[FhirProperty(
             fhirType: 'CodeableReference',

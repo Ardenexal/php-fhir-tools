@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
 /**
@@ -27,12 +28,12 @@ class MolecularSequenceRelativeEdit extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var int|null start Start position of the edit on the starting sequence */
+        /** @var IntegerPrimitive|int|null start Start position of the edit on the starting sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $start = null,
-        /** @var int|null end End position of the edit on the starting sequence */
+        public IntegerPrimitive|int|null $start = null,
+        /** @var IntegerPrimitive|int|null end End position of the edit on the starting sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $end = null,
+        public IntegerPrimitive|int|null $end = null,
         /** @var StringPrimitive|string|null replacementSequence Allele that was observed */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $replacementSequence = null,

@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -48,9 +49,9 @@ class TerminologyCapabilitiesCodeSystem extends BackboneElement
         )]
         #[Valid]
         public array $version = [],
-        /** @var bool|null subsumption Whether subsumption is supported */
+        /** @var BooleanPrimitive|bool|null subsumption Whether subsumption is supported */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $subsumption = null,
+        public BooleanPrimitive|bool|null $subsumption = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

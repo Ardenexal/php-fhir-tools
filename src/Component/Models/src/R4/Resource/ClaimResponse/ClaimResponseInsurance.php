@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -36,9 +37,9 @@ class ClaimResponseInsurance extends BackboneElement
         /** @var PositiveIntPrimitive|null sequence Insurance instance identifier */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $sequence = null,
-        /** @var bool|null focal Coverage to be used for adjudication */
+        /** @var BooleanPrimitive|bool|null focal Coverage to be used for adjudication */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $focal = null,
+        public BooleanPrimitive|bool|null $focal = null,
         /** @var Reference|null coverage Insurance information */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Coverage'])]
         public ?Reference $coverage = null,

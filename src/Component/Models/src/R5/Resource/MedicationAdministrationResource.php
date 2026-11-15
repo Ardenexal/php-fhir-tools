@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationAdministration\MedicationAdministrationDosage;
@@ -185,9 +186,9 @@ class MedicationAdministrationResource extends AbstractDomainResource
         /** @var DateTimePrimitive|null recorded When the MedicationAdministration was first captured in the subject's record */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $recorded = null,
-        /** @var bool|null isSubPotent Full dose was not administered */
+        /** @var BooleanPrimitive|bool|null isSubPotent Full dose was not administered */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isSubPotent = null,
+        public BooleanPrimitive|bool|null $isSubPotent = null,
         /** @var array<CodeableConcept> subPotentReason Reason full dose was not administered */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

@@ -7,6 +7,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -30,9 +32,9 @@ class Dosage extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var int|null sequence The order of the dosage instructions */
+        /** @var IntegerPrimitive|int|null sequence The order of the dosage instructions */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $sequence = null,
+        public IntegerPrimitive|int|null $sequence = null,
         /** @var StringPrimitive|string|null text Free text dosage instructions e.g. SIG */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
@@ -51,7 +53,7 @@ class Dosage extends BackboneElement
         /** @var Timing|null timing When medication should be administered */
         #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex'), Valid]
         public ?Timing $timing = null,
-        /** @var bool|CodeableConcept|null asNeeded Take "as needed" (for x) */
+        /** @var BooleanPrimitive|bool|CodeableConcept|null asNeeded Take "as needed" (for x) */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -66,7 +68,7 @@ class Dosage extends BackboneElement
                 ],
             ],
         )]
-        public bool|CodeableConcept|null $asNeeded = null,
+        public BooleanPrimitive|bool|CodeableConcept|null $asNeeded = null,
         /** @var CodeableConcept|null site Body site to administer to */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $site = null,

@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -59,7 +60,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             'http://hl7.org/fhir/StructureDefinition/DeviceMetric',
         ])]
         public ?Reference $device = null,
-        /** @var CodeableConcept|bool|Quantity|Range|Reference|IdPrimitive|null value Defines the characteristic when coupled with characteristic.type */
+        /** @var CodeableConcept|BooleanPrimitive|bool|Quantity|Range|Reference|IdPrimitive|null value Defines the characteristic when coupled with characteristic.type */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -100,7 +101,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             ],
         )]
         #[NotNull]
-        public CodeableConcept|bool|Quantity|Range|Reference|IdPrimitive|null $value = null,
+        public CodeableConcept|BooleanPrimitive|bool|Quantity|Range|Reference|IdPrimitive|null $value = null,
         /** @var CodeableConcept|null offset Reference point for valueQuantity or valueRange */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $offset = null,

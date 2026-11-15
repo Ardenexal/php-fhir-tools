@@ -13,6 +13,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\QualityTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -44,42 +46,42 @@ class MolecularSequenceQuality extends BackboneElement
         /** @var CodeableConcept|null standardSequence Standard sequence for comparison */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $standardSequence = null,
-        /** @var int|null start Start position of the sequence */
+        /** @var IntegerPrimitive|int|null start Start position of the sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $start = null,
-        /** @var int|null end End position of the sequence */
+        public IntegerPrimitive|int|null $start = null,
+        /** @var IntegerPrimitive|int|null end End position of the sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $end = null,
+        public IntegerPrimitive|int|null $end = null,
         /** @var Quantity|null score Quality score for the comparison */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $score = null,
         /** @var CodeableConcept|null method Method to get quality */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $method = null,
-        /** @var numeric-string|null truthTP True positives from the perspective of the truth data */
+        /** @var DecimalPrimitive|numeric-string|null truthTP True positives from the perspective of the truth data */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $truthTP = null,
-        /** @var numeric-string|null queryTP True positives from the perspective of the query data */
+        public DecimalPrimitive|string|null $truthTP = null,
+        /** @var DecimalPrimitive|numeric-string|null queryTP True positives from the perspective of the query data */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $queryTP = null,
-        /** @var numeric-string|null truthFN False negatives */
+        public DecimalPrimitive|string|null $queryTP = null,
+        /** @var DecimalPrimitive|numeric-string|null truthFN False negatives */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $truthFN = null,
-        /** @var numeric-string|null queryFP False positives */
+        public DecimalPrimitive|string|null $truthFN = null,
+        /** @var DecimalPrimitive|numeric-string|null queryFP False positives */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $queryFP = null,
-        /** @var numeric-string|null gtFP False positives where the non-REF alleles in the Truth and Query Call Sets match */
+        public DecimalPrimitive|string|null $queryFP = null,
+        /** @var DecimalPrimitive|numeric-string|null gtFP False positives where the non-REF alleles in the Truth and Query Call Sets match */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $gtFP = null,
-        /** @var numeric-string|null precision Precision of comparison */
+        public DecimalPrimitive|string|null $gtFP = null,
+        /** @var DecimalPrimitive|numeric-string|null precision Precision of comparison */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $precision = null,
-        /** @var numeric-string|null recall Recall of comparison */
+        public DecimalPrimitive|string|null $precision = null,
+        /** @var DecimalPrimitive|numeric-string|null recall Recall of comparison */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $recall = null,
-        /** @var numeric-string|null fScore F-score */
+        public DecimalPrimitive|string|null $recall = null,
+        /** @var DecimalPrimitive|numeric-string|null fScore F-score */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $fScore = null,
+        public DecimalPrimitive|string|null $fScore = null,
         /** @var MolecularSequenceQualityRoc|null roc Receiver Operator Characteristic (ROC) Curve */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?MolecularSequenceQualityRoc $roc = null,

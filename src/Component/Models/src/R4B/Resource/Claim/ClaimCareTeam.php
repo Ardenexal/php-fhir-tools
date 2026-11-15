@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -45,9 +46,9 @@ class ClaimCareTeam extends BackboneElement
             'http://hl7.org/fhir/StructureDefinition/Organization',
         ])]
         public ?Reference $provider = null,
-        /** @var bool|null responsible Indicator of the lead practitioner */
+        /** @var BooleanPrimitive|bool|null responsible Indicator of the lead practitioner */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $responsible = null,
+        public BooleanPrimitive|bool|null $responsible = null,
         /** @var CodeableConcept|null role Function within the team */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $role = null,

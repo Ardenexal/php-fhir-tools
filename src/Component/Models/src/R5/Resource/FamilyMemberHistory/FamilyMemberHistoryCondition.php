@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -40,9 +41,9 @@ class FamilyMemberHistoryCondition extends BackboneElement
         /** @var CodeableConcept|null outcome deceased | permanent disability | etc */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $outcome = null,
-        /** @var bool|null contributedToDeath Whether the condition contributed to the cause of death */
+        /** @var BooleanPrimitive|bool|null contributedToDeath Whether the condition contributed to the cause of death */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $contributedToDeath = null,
+        public BooleanPrimitive|bool|null $contributedToDeath = null,
         /** @var Age|Range|Period|StringPrimitive|string|null onset When condition first manifested */
         #[FhirProperty(
             fhirType: 'choice',

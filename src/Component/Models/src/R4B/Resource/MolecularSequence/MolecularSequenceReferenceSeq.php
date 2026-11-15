@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\OrientationTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\StrandTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -78,12 +79,12 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\StrandType',
         )]
         public ?StrandTypeType $strand = null,
-        /** @var int|null windowStart Start position of the window on the  reference sequence */
+        /** @var IntegerPrimitive|int|null windowStart Start position of the window on the  reference sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $windowStart = null,
-        /** @var int|null windowEnd End position of the window on the reference sequence */
+        public IntegerPrimitive|int|null $windowStart = null,
+        /** @var IntegerPrimitive|int|null windowEnd End position of the window on the reference sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $windowEnd = null,
+        public IntegerPrimitive|int|null $windowEnd = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

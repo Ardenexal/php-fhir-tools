@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -77,9 +78,9 @@ class PersonResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $identifier = [],
-        /** @var bool|null active This person's record is in active use */
+        /** @var BooleanPrimitive|bool|null active This person's record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
-        public ?bool $active = null,
+        public BooleanPrimitive|bool|null $active = null,
         /** @var array<HumanName> name A name associated with the person */
         #[FhirProperty(
             fhirType: 'HumanName',
@@ -109,7 +110,7 @@ class PersonResource extends AbstractDomainResource
         /** @var DatePrimitive|null birthDate The date on which the person was born */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $birthDate = null,
-        /** @var bool|DateTimePrimitive|null deceased Indicates if the individual is deceased or not */
+        /** @var BooleanPrimitive|bool|DateTimePrimitive|null deceased Indicates if the individual is deceased or not */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -124,7 +125,7 @@ class PersonResource extends AbstractDomainResource
                 ],
             ],
         )]
-        public bool|DateTimePrimitive|null $deceased = null,
+        public BooleanPrimitive|bool|DateTimePrimitive|null $deceased = null,
         /** @var array<Address> address One or more addresses for the person */
         #[FhirProperty(
             fhirType: 'Address',

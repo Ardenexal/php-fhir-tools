@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
@@ -39,9 +40,9 @@ class Coding extends Element
         /** @var StringPrimitive|string|null display Representation defined by the system */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $display = null,
-        /** @var bool|null userSelected If this coding was chosen directly by the user */
+        /** @var BooleanPrimitive|bool|null userSelected If this coding was chosen directly by the user */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $userSelected = null,
+        public BooleanPrimitive|bool|null $userSelected = null,
     ) {
         parent::__construct($id, $extension);
     }

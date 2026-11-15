@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -66,12 +67,12 @@ class ExampleScenarioProcessStepOperation extends BackboneElement
         /** @var MarkdownPrimitive|null description Human-friendly description of the operation */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
-        /** @var bool|null initiatorActive Initiator stays active? */
+        /** @var BooleanPrimitive|bool|null initiatorActive Initiator stays active? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $initiatorActive = null,
-        /** @var bool|null receiverActive Receiver stays active? */
+        public BooleanPrimitive|bool|null $initiatorActive = null,
+        /** @var BooleanPrimitive|bool|null receiverActive Receiver stays active? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $receiverActive = null,
+        public BooleanPrimitive|bool|null $receiverActive = null,
         /** @var ExampleScenarioInstanceContainedInstance|null request Instance transmitted on invocation */
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex'), Valid]
         public ?ExampleScenarioInstanceContainedInstance $request = null,

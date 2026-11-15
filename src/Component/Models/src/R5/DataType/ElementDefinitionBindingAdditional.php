@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -54,9 +55,9 @@ class ElementDefinitionBindingAdditional extends Element
         )]
         #[Valid]
         public array $usage = [],
-        /** @var bool|null any Whether binding can applies to all repeats, or just one */
+        /** @var BooleanPrimitive|bool|null any Whether binding can applies to all repeats, or just one */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $any = null,
+        public BooleanPrimitive|bool|null $any = null,
     ) {
         parent::__construct($id, $extension);
     }

@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -35,9 +36,9 @@ class ImplementationGuideManifestResource extends BackboneElement
         /** @var Reference|null reference Location of the resource */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $reference = null,
-        /** @var bool|null isExample Is this an example */
+        /** @var BooleanPrimitive|bool|null isExample Is this an example */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isExample = null,
+        public BooleanPrimitive|bool|null $isExample = null,
         /** @var array<CanonicalPrimitive> profile Profile(s) this is an example of */
         #[FhirProperty(
             fhirType: 'canonical',

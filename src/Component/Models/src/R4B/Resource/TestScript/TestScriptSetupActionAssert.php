@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDefinedTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\MimeTypesType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestScriptRequestMethodCodeType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -95,9 +96,9 @@ class TestScriptSetupActionAssert extends BackboneElement
         /** @var StringPrimitive|string|null minimumId Fixture Id of minimum content resource */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $minimumId = null,
-        /** @var bool|null navigationLinks Perform validation on navigation links? */
+        /** @var BooleanPrimitive|bool|null navigationLinks Perform validation on navigation links? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $navigationLinks = null,
+        public BooleanPrimitive|bool|null $navigationLinks = null,
         /** @var AssertionOperatorTypeType|null operator equals | notEquals | in | notIn | greaterThan | lessThan | empty | notEmpty | contains | notContains | eval */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(
@@ -148,9 +149,9 @@ class TestScriptSetupActionAssert extends BackboneElement
         /** @var StringPrimitive|string|null value The value to compare to */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $value = null,
-        /** @var bool|null warningOnly Will this assert produce a warning only on error? */
+        /** @var BooleanPrimitive|bool|null warningOnly Will this assert produce a warning only on error? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $warningOnly = null,
+        public BooleanPrimitive|bool|null $warningOnly = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -11,6 +11,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -42,9 +44,9 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\RiskEstimateType',
         )]
         public ?CodeableConcept $type = null,
-        /** @var numeric-string|null value Point estimate */
+        /** @var DecimalPrimitive|numeric-string|null value Point estimate */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $value = null,
+        public DecimalPrimitive|string|null $value = null,
         /** @var CodeableConcept|null unitOfMeasure What unit is the outcome described in? */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         #[Valid]
@@ -54,12 +56,12 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\UCUMCodes',
         )]
         public ?CodeableConcept $unitOfMeasure = null,
-        /** @var int|null denominatorCount Sample size for group measured */
+        /** @var IntegerPrimitive|int|null denominatorCount Sample size for group measured */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $denominatorCount = null,
-        /** @var int|null numeratorCount Number with the outcome */
+        public IntegerPrimitive|int|null $denominatorCount = null,
+        /** @var IntegerPrimitive|int|null numeratorCount Number with the outcome */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $numeratorCount = null,
+        public IntegerPrimitive|int|null $numeratorCount = null,
         /** @var array<RiskEvidenceSynthesisRiskEstimatePrecisionEstimate> precisionEstimate How precise the estimate is */
         #[FhirProperty(
             fhirType: 'BackboneElement',

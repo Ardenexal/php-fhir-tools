@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -33,7 +34,7 @@ class DeviceRequestParameter extends BackboneElement
         /** @var CodeableConcept|null code Device detail */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
-        /** @var CodeableConcept|Quantity|Range|bool|null value Value of detail */
+        /** @var CodeableConcept|Quantity|Range|BooleanPrimitive|bool|null value Value of detail */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -60,7 +61,7 @@ class DeviceRequestParameter extends BackboneElement
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
             ],
         )]
-        public CodeableConcept|Quantity|Range|bool|null $value = null,
+        public CodeableConcept|Quantity|Range|BooleanPrimitive|bool|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

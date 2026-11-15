@@ -14,7 +14,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\MimeTypesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\TestScriptRequestMethodCodeType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -81,12 +83,12 @@ class TestScriptSetupActionOperation extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\MimeTypes',
         )]
         public ?MimeTypesType $contentType = null,
-        /** @var int|null destination Server responding to the request */
+        /** @var IntegerPrimitive|int|null destination Server responding to the request */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $destination = null,
-        /** @var bool|null encodeRequestUrl Whether or not to send the request url in encoded format */
+        public IntegerPrimitive|int|null $destination = null,
+        /** @var BooleanPrimitive|bool|null encodeRequestUrl Whether or not to send the request url in encoded format */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $encodeRequestUrl = null,
+        public BooleanPrimitive|bool|null $encodeRequestUrl = null,
         /** @var TestScriptRequestMethodCodeType|null method delete | get | options | patch | post | put | head */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(
@@ -95,9 +97,9 @@ class TestScriptSetupActionOperation extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\TestScriptRequestMethodCode',
         )]
         public ?TestScriptRequestMethodCodeType $method = null,
-        /** @var int|null origin Server initiating the request */
+        /** @var IntegerPrimitive|int|null origin Server initiating the request */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $origin = null,
+        public IntegerPrimitive|int|null $origin = null,
         /** @var StringPrimitive|string|null params Explicitly defined path parameters */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $params = null,

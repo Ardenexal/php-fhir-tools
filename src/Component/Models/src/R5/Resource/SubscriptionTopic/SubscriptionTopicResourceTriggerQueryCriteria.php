@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CriteriaNotExistsBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
 /**
@@ -51,9 +52,9 @@ class SubscriptionTopicResourceTriggerQueryCriteria extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CriteriaNotExistsBehavior',
         )]
         public ?CriteriaNotExistsBehaviorType $resultForDelete = null,
-        /** @var bool|null requireBoth Both must be true flag */
+        /** @var BooleanPrimitive|bool|null requireBoth Both must be true flag */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $requireBoth = null,
+        public BooleanPrimitive|bool|null $requireBoth = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 
 /**
@@ -27,27 +28,27 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null monday Recurs on Mondays */
+        /** @var BooleanPrimitive|bool|null monday Recurs on Mondays */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $monday = null,
-        /** @var bool|null tuesday Recurs on Tuesday */
+        public BooleanPrimitive|bool|null $monday = null,
+        /** @var BooleanPrimitive|bool|null tuesday Recurs on Tuesday */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $tuesday = null,
-        /** @var bool|null wednesday Recurs on Wednesday */
+        public BooleanPrimitive|bool|null $tuesday = null,
+        /** @var BooleanPrimitive|bool|null wednesday Recurs on Wednesday */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $wednesday = null,
-        /** @var bool|null thursday Recurs on Thursday */
+        public BooleanPrimitive|bool|null $wednesday = null,
+        /** @var BooleanPrimitive|bool|null thursday Recurs on Thursday */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $thursday = null,
-        /** @var bool|null friday Recurs on Friday */
+        public BooleanPrimitive|bool|null $thursday = null,
+        /** @var BooleanPrimitive|bool|null friday Recurs on Friday */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $friday = null,
-        /** @var bool|null saturday Recurs on Saturday */
+        public BooleanPrimitive|bool|null $friday = null,
+        /** @var BooleanPrimitive|bool|null saturday Recurs on Saturday */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $saturday = null,
-        /** @var bool|null sunday Recurs on Sunday */
+        public BooleanPrimitive|bool|null $saturday = null,
+        /** @var BooleanPrimitive|bool|null sunday Recurs on Sunday */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $sunday = null,
+        public BooleanPrimitive|bool|null $sunday = null,
         /** @var PositiveIntPrimitive|null weekInterval Recurs every nth week */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $weekInterval = null,

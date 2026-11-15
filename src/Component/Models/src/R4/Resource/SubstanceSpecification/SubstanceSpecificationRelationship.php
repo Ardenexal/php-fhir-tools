@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -59,9 +60,9 @@ class SubstanceSpecificationRelationship extends BackboneElement
         /** @var CodeableConcept|null relationship For example "salt to parent", "active moiety", "starting material" */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $relationship = null,
-        /** @var bool|null isDefining For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible substance relationships */
+        /** @var BooleanPrimitive|bool|null isDefining For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible substance relationships */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isDefining = null,
+        public BooleanPrimitive|bool|null $isDefining = null,
         /** @var Quantity|Range|Ratio|StringPrimitive|string|null amount A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other */
         #[FhirProperty(
             fhirType: 'choice',

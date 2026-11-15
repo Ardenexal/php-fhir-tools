@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -35,15 +36,15 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation extends BackboneEle
         /** @var CodeableConcept|null type The type of the degree of polymerisation shall be described, e.g. SRU/Polymer Ratio */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
-        /** @var int|null average An average amount of polymerisation */
+        /** @var IntegerPrimitive|int|null average An average amount of polymerisation */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $average = null,
-        /** @var int|null low A low expected limit of the amount */
+        public IntegerPrimitive|int|null $average = null,
+        /** @var IntegerPrimitive|int|null low A low expected limit of the amount */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $low = null,
-        /** @var int|null high A high expected limit of the amount */
+        public IntegerPrimitive|int|null $low = null,
+        /** @var IntegerPrimitive|int|null high A high expected limit of the amount */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $high = null,
+        public IntegerPrimitive|int|null $high = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Ingredient\IngredientManufacturer;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Ingredient\IngredientSubstance;
@@ -109,9 +110,9 @@ class IngredientResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $function = [],
-        /** @var bool|null allergenicIndicator If the ingredient is a known or suspected allergen */
+        /** @var BooleanPrimitive|bool|null allergenicIndicator If the ingredient is a known or suspected allergen */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $allergenicIndicator = null,
+        public BooleanPrimitive|bool|null $allergenicIndicator = null,
         /** @var array<IngredientManufacturer> manufacturer An organization that manufactures this ingredient */
         #[FhirProperty(
             fhirType: 'BackboneElement',

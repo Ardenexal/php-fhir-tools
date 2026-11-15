@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Ingredient\IngredientManufacturer;
@@ -113,9 +114,9 @@ class IngredientResource extends AbstractDomainResource
         /** @var CodeableConcept|null group A classification of the ingredient according to where in the physical item it tends to be used, such the outer shell of a tablet, inner body or ink */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $group = null,
-        /** @var bool|null allergenicIndicator If the ingredient is a known or suspected allergen */
+        /** @var BooleanPrimitive|bool|null allergenicIndicator If the ingredient is a known or suspected allergen */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $allergenicIndicator = null,
+        public BooleanPrimitive|bool|null $allergenicIndicator = null,
         /** @var MarkdownPrimitive|null comment A place for providing any notes that are relevant to the component, e.g. removed during process, adjusted for loss on drying */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $comment = null,

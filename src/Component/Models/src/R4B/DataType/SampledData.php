@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -31,18 +32,18 @@ class SampledData extends Element
         /** @var Quantity|null origin Zero value and units */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Quantity $origin = null,
-        /** @var numeric-string|null period Number of milliseconds between samples */
+        /** @var DecimalPrimitive|numeric-string|null period Number of milliseconds between samples */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?string $period = null,
-        /** @var numeric-string|null factor Multiply data by this before adding to origin */
+        public DecimalPrimitive|string|null $period = null,
+        /** @var DecimalPrimitive|numeric-string|null factor Multiply data by this before adding to origin */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $factor = null,
-        /** @var numeric-string|null lowerLimit Lower limit of detection */
+        public DecimalPrimitive|string|null $factor = null,
+        /** @var DecimalPrimitive|numeric-string|null lowerLimit Lower limit of detection */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $lowerLimit = null,
-        /** @var numeric-string|null upperLimit Upper limit of detection */
+        public DecimalPrimitive|string|null $lowerLimit = null,
+        /** @var DecimalPrimitive|numeric-string|null upperLimit Upper limit of detection */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $upperLimit = null,
+        public DecimalPrimitive|string|null $upperLimit = null,
         /** @var PositiveIntPrimitive|null dimensions Number of sample points at each time point */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $dimensions = null,

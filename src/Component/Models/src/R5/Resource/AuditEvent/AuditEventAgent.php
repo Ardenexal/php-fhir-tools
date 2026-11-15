@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -66,9 +67,9 @@ class AuditEventAgent extends BackboneElement
             'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
         ])]
         public ?Reference $who = null,
-        /** @var bool|null requestor Whether user is initiator */
+        /** @var BooleanPrimitive|bool|null requestor Whether user is initiator */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $requestor = null,
+        public BooleanPrimitive|bool|null $requestor = null,
         /** @var Reference|null location The agent location when the event occurred */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $location = null,

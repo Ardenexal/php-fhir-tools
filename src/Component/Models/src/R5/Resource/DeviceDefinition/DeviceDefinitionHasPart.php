@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -33,9 +34,9 @@ class DeviceDefinitionHasPart extends BackboneElement
         /** @var Reference|null reference Reference to the part */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DeviceDefinition'])]
         public ?Reference $reference = null,
-        /** @var int|null count Number of occurrences of the part */
+        /** @var IntegerPrimitive|int|null count Number of occurrences of the part */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $count = null,
+        public IntegerPrimitive|int|null $count = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

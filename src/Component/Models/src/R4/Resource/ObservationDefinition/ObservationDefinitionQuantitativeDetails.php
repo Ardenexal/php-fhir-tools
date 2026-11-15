@@ -11,6 +11,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -47,12 +49,12 @@ class ObservationDefinitionQuantitativeDetails extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\UCUMCodes',
         )]
         public ?CodeableConcept $unit = null,
-        /** @var numeric-string|null conversionFactor SI to Customary unit conversion factor */
+        /** @var DecimalPrimitive|numeric-string|null conversionFactor SI to Customary unit conversion factor */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $conversionFactor = null,
-        /** @var int|null decimalPrecision Decimal precision of observation quantitative results */
+        public DecimalPrimitive|string|null $conversionFactor = null,
+        /** @var IntegerPrimitive|int|null decimalPrecision Decimal precision of observation quantitative results */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $decimalPrecision = null,
+        public IntegerPrimitive|int|null $decimalPrecision = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

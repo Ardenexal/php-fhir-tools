@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -35,9 +36,9 @@ class SubstancePolymerMonomerSetStartingMaterial extends BackboneElement
         /** @var CodeableConcept|null category Substance high level category, e.g. chemical substance */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $category = null,
-        /** @var bool|null isDefining Used to specify whether the attribute described is a defining element for the unique identification of the polymer */
+        /** @var BooleanPrimitive|bool|null isDefining Used to specify whether the attribute described is a defining element for the unique identification of the polymer */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isDefining = null,
+        public BooleanPrimitive|bool|null $isDefining = null,
         /** @var Quantity|null amount A percentage */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $amount = null,

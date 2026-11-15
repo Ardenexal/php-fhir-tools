@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ReferenceHandlingPolicyType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ResourceTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ResourceVersionPolicyType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -86,15 +87,15 @@ class CapabilityStatementRestResource extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ResourceVersionPolicy',
         )]
         public ?ResourceVersionPolicyType $versioning = null,
-        /** @var bool|null readHistory Whether vRead can return past versions */
+        /** @var BooleanPrimitive|bool|null readHistory Whether vRead can return past versions */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $readHistory = null,
-        /** @var bool|null updateCreate If update can commit to a new identity */
+        public BooleanPrimitive|bool|null $readHistory = null,
+        /** @var BooleanPrimitive|bool|null updateCreate If update can commit to a new identity */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $updateCreate = null,
-        /** @var bool|null conditionalCreate If allows/uses conditional create */
+        public BooleanPrimitive|bool|null $updateCreate = null,
+        /** @var BooleanPrimitive|bool|null conditionalCreate If allows/uses conditional create */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $conditionalCreate = null,
+        public BooleanPrimitive|bool|null $conditionalCreate = null,
         /** @var ConditionalReadStatusType|null conditionalRead not-supported | modified-since | not-match | full-support */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(
@@ -103,9 +104,9 @@ class CapabilityStatementRestResource extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\ConditionalReadStatus',
         )]
         public ?ConditionalReadStatusType $conditionalRead = null,
-        /** @var bool|null conditionalUpdate If allows/uses conditional update */
+        /** @var BooleanPrimitive|bool|null conditionalUpdate If allows/uses conditional update */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $conditionalUpdate = null,
+        public BooleanPrimitive|bool|null $conditionalUpdate = null,
         /** @var ConditionalDeleteStatusType|null conditionalDelete not-supported | single | multiple - how conditional delete is supported */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(

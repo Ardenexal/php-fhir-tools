@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\TaskIntentType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\TaskStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -157,9 +158,9 @@ class TaskResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\RequestPriority',
         )]
         public ?RequestPriorityType $priority = null,
-        /** @var bool|null doNotPerform True if Task is prohibiting action */
+        /** @var BooleanPrimitive|bool|null doNotPerform True if Task is prohibiting action */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'If true, this element negates the Task. For example, instead of a request to perform a task, it is a request _not_ to perform a task.')]
-        public ?bool $doNotPerform = null,
+        public BooleanPrimitive|bool|null $doNotPerform = null,
         /** @var CodeableConcept|null code Task Type */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,

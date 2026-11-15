@@ -33,6 +33,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestResourceTypesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
@@ -155,9 +156,9 @@ class ActivityDefinitionResource extends AbstractDomainResource
         )]
         #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
-        /** @var bool|null experimental For testing purposes, not real usage */
+        /** @var BooleanPrimitive|bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $experimental = null,
+        public BooleanPrimitive|bool|null $experimental = null,
         /** @var CodeableConcept|Reference|CanonicalPrimitive|null subject Type of individual the activity definition is intended for */
         #[FhirProperty(
             fhirType: 'choice',
@@ -354,9 +355,9 @@ class ActivityDefinitionResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\RequestPriority',
         )]
         public ?RequestPriorityType $priority = null,
-        /** @var bool|null doNotPerform True if the activity should not be performed */
+        /** @var BooleanPrimitive|bool|null doNotPerform True if the activity should not be performed */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'If true this element negates the specified action. For Example,  instead of a request for a procedure, it is a request for the procedure to not occur.')]
-        public ?bool $doNotPerform = null,
+        public BooleanPrimitive|bool|null $doNotPerform = null,
         /** @var Timing|Age|Range|Duration|null timing When activity is to occur */
         #[FhirProperty(
             fhirType: 'choice',
@@ -390,7 +391,7 @@ class ActivityDefinitionResource extends AbstractDomainResource
             ],
         )]
         public Timing|Age|Range|Duration|null $timing = null,
-        /** @var bool|CodeableConcept|null asNeeded Preconditions for service */
+        /** @var BooleanPrimitive|bool|CodeableConcept|null asNeeded Preconditions for service */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -405,7 +406,7 @@ class ActivityDefinitionResource extends AbstractDomainResource
                 ],
             ],
         )]
-        public bool|CodeableConcept|null $asNeeded = null,
+        public BooleanPrimitive|bool|CodeableConcept|null $asNeeded = null,
         /** @var CodeableReference|null location Where it should happen */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?CodeableReference $location = null,

@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -244,7 +245,7 @@ class ProcedureResource extends AbstractDomainResource
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
         ])]
         public ?Reference $recorder = null,
-        /** @var bool|Reference|null reported Reported rather than primary record */
+        /** @var BooleanPrimitive|bool|Reference|null reported Reported rather than primary record */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -266,7 +267,7 @@ class ProcedureResource extends AbstractDomainResource
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
             'http://hl7.org/fhir/StructureDefinition/Organization',
         ])]
-        public bool|Reference|null $reported = null,
+        public BooleanPrimitive|bool|Reference|null $reported = null,
         /** @var array<ProcedurePerformer> performer Who performed the procedure and what they did */
         #[FhirProperty(
             fhirType: 'BackboneElement',

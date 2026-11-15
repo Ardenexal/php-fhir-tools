@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -43,7 +44,7 @@ class ConceptMapGroupElementTargetDependsOn extends BackboneElement
         /** @var CodePrimitive|null attribute A reference to a mapping attribute defined in ConceptMap.additionalAttribute */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $attribute = null,
-        /** @var CodePrimitive|Coding|StringPrimitive|string|bool|Quantity|null value Value of the referenced data element */
+        /** @var CodePrimitive|Coding|StringPrimitive|string|BooleanPrimitive|bool|Quantity|null value Value of the referenced data element */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -76,7 +77,7 @@ class ConceptMapGroupElementTargetDependsOn extends BackboneElement
                 ],
             ],
         )]
-        public CodePrimitive|Coding|StringPrimitive|string|bool|Quantity|null $value = null,
+        public CodePrimitive|Coding|StringPrimitive|string|BooleanPrimitive|bool|Quantity|null $value = null,
         /** @var CanonicalPrimitive|null valueSet The mapping depends on a data element with a value from this value set */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $valueSet = null,

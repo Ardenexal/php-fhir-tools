@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\SlotStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -138,9 +139,9 @@ class SlotResource extends AbstractDomainResource
         /** @var InstantPrimitive|null end Date/Time that the slot is to conclude */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?InstantPrimitive $end = null,
-        /** @var bool|null overbooked This slot has already been overbooked, appointments are unlikely to be accepted for this time */
+        /** @var BooleanPrimitive|bool|null overbooked This slot has already been overbooked, appointments are unlikely to be accepted for this time */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $overbooked = null,
+        public BooleanPrimitive|bool|null $overbooked = null,
         /** @var StringPrimitive|string|null comment Comments on the slot to describe any extended information. Such as custom constraints on the slot */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $comment = null,

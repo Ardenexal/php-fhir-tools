@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -42,15 +43,15 @@ class EffectEvidenceSynthesisEffectEstimatePrecisionEstimate extends BackboneEle
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\PrecisionEstimateType',
         )]
         public ?CodeableConcept $type = null,
-        /** @var numeric-string|null level Level of confidence interval */
+        /** @var DecimalPrimitive|numeric-string|null level Level of confidence interval */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $level = null,
-        /** @var numeric-string|null from Lower bound */
+        public DecimalPrimitive|string|null $level = null,
+        /** @var DecimalPrimitive|numeric-string|null from Lower bound */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $from = null,
-        /** @var numeric-string|null to Upper bound */
+        public DecimalPrimitive|string|null $from = null,
+        /** @var DecimalPrimitive|numeric-string|null to Upper bound */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $to = null,
+        public DecimalPrimitive|string|null $to = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

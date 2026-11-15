@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -64,9 +65,9 @@ class AccountDiagnosis extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\EncounterDiagnosisUse',
         )]
         public array $type = [],
-        /** @var bool|null onAdmission Diagnosis present on Admission */
+        /** @var BooleanPrimitive|bool|null onAdmission Diagnosis present on Admission */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $onAdmission = null,
+        public BooleanPrimitive|bool|null $onAdmission = null,
         /** @var array<CodeableConcept> packageCode Package Code specific for billing */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

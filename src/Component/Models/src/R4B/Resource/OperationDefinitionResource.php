@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\OperationKindType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ResourceTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
@@ -114,9 +115,9 @@ class OperationDefinitionResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\OperationKind',
         )]
         public ?OperationKindType $kind = null,
-        /** @var bool|null experimental For testing purposes, not real usage */
+        /** @var BooleanPrimitive|bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $experimental = null,
+        public BooleanPrimitive|bool|null $experimental = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,
@@ -161,9 +162,9 @@ class OperationDefinitionResource extends AbstractDomainResource
         /** @var MarkdownPrimitive|null purpose Why this operation definition is defined */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $purpose = null,
-        /** @var bool|null affectsState Whether content is changed by the operation */
+        /** @var BooleanPrimitive|bool|null affectsState Whether content is changed by the operation */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $affectsState = null,
+        public BooleanPrimitive|bool|null $affectsState = null,
         /** @var CodePrimitive|null code Name used to invoke the operation */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $code = null,
@@ -186,15 +187,15 @@ class OperationDefinitionResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ResourceType',
         )]
         public array $resource = [],
-        /** @var bool|null system Invoke at the system level? */
+        /** @var BooleanPrimitive|bool|null system Invoke at the system level? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $system = null,
-        /** @var bool|null type Invoke at the type level? */
+        public BooleanPrimitive|bool|null $system = null,
+        /** @var BooleanPrimitive|bool|null type Invoke at the type level? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $type = null,
-        /** @var bool|null instance Invoke on an instance? */
+        public BooleanPrimitive|bool|null $type = null,
+        /** @var BooleanPrimitive|bool|null instance Invoke on an instance? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $instance = null,
+        public BooleanPrimitive|bool|null $instance = null,
         /** @var CanonicalPrimitive|null inputProfile Validation information for in parameters */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public ?CanonicalPrimitive $inputProfile = null,

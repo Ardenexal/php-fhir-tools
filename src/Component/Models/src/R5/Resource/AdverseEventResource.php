@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\AdverseEvent\AdverseEventContributingFactor;
@@ -219,9 +220,9 @@ class AdverseEventResource extends AbstractDomainResource
         #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ResearchStudy'])]
         public array $study = [],
-        /** @var bool|null expectedInResearchStudy Considered likely or probable or anticipated in the research study */
+        /** @var BooleanPrimitive|bool|null expectedInResearchStudy Considered likely or probable or anticipated in the research study */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $expectedInResearchStudy = null,
+        public BooleanPrimitive|bool|null $expectedInResearchStudy = null,
         /** @var array<AdverseEventSuspectEntity> suspectEntity The suspected agent causing the adverse event */
         #[FhirProperty(
             fhirType: 'BackboneElement',

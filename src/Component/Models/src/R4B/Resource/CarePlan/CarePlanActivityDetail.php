@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
@@ -121,9 +122,9 @@ class CarePlanActivityDetail extends BackboneElement
         /** @var CodeableConcept|null statusReason Reason for current status */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $statusReason = null,
-        /** @var bool|null doNotPerform If true, activity is prohibiting action */
+        /** @var BooleanPrimitive|bool|null doNotPerform If true, activity is prohibiting action */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'If true this element negates the specified action. For example, instead of a request for a procedure, it is a request for the procedure to not occur.')]
-        public ?bool $doNotPerform = null,
+        public BooleanPrimitive|bool|null $doNotPerform = null,
         /** @var Timing|Period|StringPrimitive|string|null scheduled When activity is to occur */
         #[FhirProperty(
             fhirType: 'choice',

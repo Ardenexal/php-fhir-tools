@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
@@ -210,9 +211,9 @@ class MediaResource extends AbstractDomainResource
         /** @var PositiveIntPrimitive|null frames Number of frames if > 1 (photo) */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $frames = null,
-        /** @var numeric-string|null duration Length in seconds (audio / video) */
+        /** @var DecimalPrimitive|numeric-string|null duration Length in seconds (audio / video) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $duration = null,
+        public DecimalPrimitive|string|null $duration = null,
         /** @var Attachment|null content Actual Media - reference or data */
         #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Attachment $content = null,

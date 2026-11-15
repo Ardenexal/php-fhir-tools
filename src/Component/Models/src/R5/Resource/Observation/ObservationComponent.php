@@ -19,7 +19,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\SampledData;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -44,7 +46,7 @@ class ObservationComponent extends BackboneElement
         /** @var CodeableConcept|null code Type of component observation (code / type) */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
-        /** @var Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|Attachment|Reference|null value Actual component result */
+        /** @var Quantity|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|Attachment|Reference|null value Actual component result */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -121,7 +123,7 @@ class ObservationComponent extends BackboneElement
             ],
         )]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MolecularSequence'])]
-        public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|Attachment|Reference|null $value = null,
+        public Quantity|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|Attachment|Reference|null $value = null,
         /** @var CodeableConcept|null dataAbsentReason Why the component result is missing */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         #[Valid]
