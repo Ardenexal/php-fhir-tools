@@ -40,7 +40,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResource as R5
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\QuestionnaireResponseItem as R5ResponseItem;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\QuestionnaireResponseItemAnswer as R5Answer;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResource as R5Response;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
+use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Ucum\UcumConverter;
 use Brick\DateTime\LocalDate;
@@ -174,6 +177,18 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     /** Canonical SDC enableWhenExpression — carries the expression as `valueExpression.expression`. */
     private const string EXT_ENABLE_WHEN_EXPRESSION_SDC = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression';
 
+    /** SDC calculatedExpression — a `valueExpression` whose result is the item's expected answer. */
+    private const string EXT_CALCULATED_EXPRESSION_SDC = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression';
+
+    /**
+     * Named `valueExpression` on the Questionnaire or an item; its result is bound as `%<name>` for
+     * expressions on that element and its descendants.
+     */
+    private const string EXT_VARIABLE = 'http://hl7.org/fhir/StructureDefinition/variable';
+
+    /** Expression.language code for FHIRPath, the only expression language evaluated here. */
+    private const string LANGUAGE_FHIRPATH = 'text/fhirpath';
+
     /**
      * Item types that carry no answer value of their own: `display` is presentational and the
      * abstract `question` root is never a concrete answerable type. A `group` is intentionally
@@ -192,6 +207,17 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     /** @var AnyQuestionnaire|null */
     private R4Questionnaire|R4BQuestionnaire|R5Questionnaire|null $currentQuestionnaire = null;
+
+    /**
+     * Response items enclosing the item currently being walked, outermost first. Used to find the
+     * response instance an ancestor's `variable` extensions are evaluated against.
+     *
+     * @var list<R4ResponseItem|R4BResponseItem|R5ResponseItem>
+     */
+    private array $responseAncestors = [];
+
+    /** Whether an enclosing response item is disabled; calculations inside it are not checked. */
+    private bool $insideDisabledItem = false;
 
     public function __construct(
         private readonly UcumConverter $ucum = new UcumConverter(),
@@ -268,6 +294,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             $this->currentQuestionnaire = null;
             $this->currentItemIndex     = [];
             $this->currentParentOf      = [];
+            $this->responseAncestors    = [];
+            $this->insideDisabledItem   = false;
         }
     }
 
@@ -359,9 +387,10 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
             // Context for this item's children; unmatched or linkId-less items suspend
             // placement checking below them but pass the required gate through unchanged.
-            $childParentLinkId  = $parentLinkId;
-            $childParentKnown   = false;
-            $childCheckRequired = $checkRequired;
+            $childParentLinkId   = $parentLinkId;
+            $childParentKnown    = false;
+            $childCheckRequired  = $checkRequired;
+            $childInsideDisabled = $this->insideDisabledItem;
 
             if ($linkId !== '') {
                 $questionnaireItem = $itemIndex[$linkId] ?? null;
@@ -398,6 +427,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                             $path,
                             sprintf("Item '%s' is present but its enableWhen conditions are not satisfied.", $linkId),
                         );
+                    } elseif (!$this->insideDisabledItem) {
+                        $this->checkCalculatedExpression($item, $questionnaireItem, $linkId, $path, $violations);
                     }
 
                     if ($checkRequired && $enabled && $questionnaireItem->item !== []) {
@@ -411,11 +442,17 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                         );
                     }
 
-                    $childParentLinkId  = $linkId;
-                    $childParentKnown   = true;
-                    $childCheckRequired = $checkRequired && $enabled;
+                    $childParentLinkId   = $linkId;
+                    $childParentKnown    = true;
+                    $childCheckRequired  = $checkRequired && $enabled;
+                    $childInsideDisabled = $this->insideDisabledItem || !$enabled;
                 }
             }
+
+            // Children see this item as their innermost enclosing response instance.
+            $this->responseAncestors[] = $item;
+            $insideDisabled            = $this->insideDisabledItem;
+            $this->insideDisabledItem  = $childInsideDisabled;
 
             $this->walkResponseItems(
                 $item->item,
@@ -444,6 +481,9 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                     $violations,
                 );
             }
+
+            array_pop($this->responseAncestors);
+            $this->insideDisabledItem = $insideDisabled;
         }
     }
 
@@ -2340,6 +2380,345 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         return false;
+    }
+
+    /**
+     * SDC calculatedExpression: a readOnly item's answers must equal the result of its calculated
+     * expression. Only readOnly items are checked, because SDC lets a user override the calculated
+     * value of an editable item. The expression is evaluated with the response item as both focus
+     * and `%context`, with `%resource` bound to the QuestionnaireResponse, and with every in-scope
+     * `variable` bound as a `%name` constant. Items inside a disabled ancestor are not checked.
+     *
+     * Anything that cannot be evaluated with confidence skips the check rather than reporting:
+     * a non-FHIRPath language, an evaluation error, a variable that fails or yields several values,
+     * a calculation that reads the clock, an empty result (inputs not answered yet), or values that
+     * do not compare as the same kind (for example a calculated string against a Coding answer).
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     * @param R4Item|R4BItem|R5Item                         $questionnaireItem
+     * @param list<FHIRValidationViolation>                 $violations
+     */
+    private function checkCalculatedExpression(object $item, object $questionnaireItem, string $linkId, string $path, array &$violations): void
+    {
+        $response = $this->currentResponse;
+
+        if ($response === null || $questionnaireItem->readOnly !== true) {
+            return;
+        }
+
+        $expression = null;
+        foreach ($questionnaireItem->extension as $extension) {
+            if ($extension->url === self::EXT_CALCULATED_EXPRESSION_SDC) {
+                $expression = $this->fhirPathExpression(isset($extension->value) ? $extension->value : null);
+                break;
+            }
+        }
+
+        if ($expression === null || $this->readsClock($expression)) {
+            return;
+        }
+
+        $constants = $this->variablesInScope($linkId, $item, $response);
+        if ($constants === null) {
+            return;
+        }
+
+        try {
+            $result = $this->pathService->evaluate($expression, $item, $this->expressionContext($response, $item, $constants));
+        } catch (FHIRPathException) {
+            return;
+        }
+
+        $expected = $this->calculationComparables($result);
+        if ($expected === null || $expected === []) {
+            return;
+        }
+
+        $answerValues = [];
+        foreach ($item->answer as $answer) {
+            if ($answer->value !== null) {
+                $answerValues[] = $answer->value;
+            }
+        }
+
+        $actual = $this->calculationComparables($answerValues);
+        if ($actual === null) {
+            return;
+        }
+
+        // Compare only like with like; a kind mismatch means the calculation is not comparable.
+        $kinds = array_unique(array_column([...$expected, ...$actual], 0));
+        if (\count($kinds) > 1) {
+            return;
+        }
+
+        $expectedKeys = array_column($expected, 1);
+        $actualKeys   = array_column($actual, 1);
+        sort($expectedKeys, \SORT_STRING);
+        sort($actualKeys, \SORT_STRING);
+
+        if ($expectedKeys === $actualKeys) {
+            return;
+        }
+
+        $violations[] = $this->violation(
+            'error',
+            $path,
+            sprintf(
+                "Answer for read-only item '%s' (%s) does not match its calculatedExpression result (%s).",
+                $linkId,
+                $actual === [] ? 'no answer' : implode(', ', array_column($actual, 1)),
+                implode(', ', array_column($expected, 1)),
+            ),
+        );
+    }
+
+    /**
+     * Evaluates the `variable` extensions in scope for an item, in declaration order: the
+     * Questionnaire root (focus: the response), then each ancestor item (focus: its enclosing
+     * response instance), then the item itself (focus: its response item). Each variable can use
+     * the ones bound before it.
+     *
+     * Returns null when any in-scope variable cannot be bound — not FHIRPath, reads the clock, an
+     * evaluation error, more than one value, or an ancestor with no matching response instance — so
+     * the caller skips
+     * the check instead of evaluating against an incomplete environment.
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     * @param object                                        $response the QuestionnaireResponse being validated, bound as `%resource`
+     *
+     * @return array<string, mixed>|null
+     */
+    private function variablesInScope(string $linkId, object $item, object $response): ?array
+    {
+        if ($this->currentQuestionnaire === null) {
+            return null;
+        }
+
+        // Ancestor linkIds, innermost first, then reversed so variables bind outermost first.
+        $ancestorLinkIds = [];
+        for ($parent = $this->currentParentOf[$linkId] ?? null; $parent !== null; $parent = $this->currentParentOf[$parent] ?? null) {
+            $ancestorLinkIds[] = $parent;
+        }
+
+        $scopes = [[$this->currentQuestionnaire->extension, $response]];
+
+        foreach (array_reverse($ancestorLinkIds) as $ancestorLinkId) {
+            $ancestorItem = $this->currentItemIndex[$ancestorLinkId] ?? null;
+            if ($ancestorItem === null) {
+                return null;
+            }
+
+            $ancestorResponse = null;
+            foreach (array_reverse($this->responseAncestors) as $candidate) {
+                if ($candidate->linkId !== null && (string) $candidate->linkId === $ancestorLinkId) {
+                    $ancestorResponse = $candidate;
+                    break;
+                }
+            }
+
+            if ($ancestorResponse === null) {
+                return null;
+            }
+
+            $scopes[] = [$ancestorItem->extension, $ancestorResponse];
+        }
+
+        $itemDefinition = $this->currentItemIndex[$linkId] ?? null;
+        if ($itemDefinition !== null) {
+            $scopes[] = [$itemDefinition->extension, $item];
+        }
+
+        $constants = [];
+
+        foreach ($scopes as [$extensions, $focus]) {
+            foreach ($extensions as $extension) {
+                if ($extension->url !== self::EXT_VARIABLE) {
+                    continue;
+                }
+
+                $valueExpression = isset($extension->value) ? $extension->value : null;
+                $name            = ($valueExpression !== null && isset($valueExpression->name)) ? $this->extensionString($valueExpression->name) : null;
+                $expression      = $this->fhirPathExpression($valueExpression);
+
+                if ($name === null || $name === '' || $expression === null || $this->readsClock($expression)) {
+                    return null;
+                }
+
+                try {
+                    $value = $this->pathService->evaluate($expression, $focus, $this->expressionContext($response, $focus, $constants));
+                } catch (FHIRPathException) {
+                    return null;
+                }
+
+                // An external constant holds a single node; a multi-valued variable cannot be bound.
+                if (\count($value) > 1) {
+                    return null;
+                }
+
+                $constants[$name] = \count($value) === 1 ? $value->first() : null;
+            }
+        }
+
+        return $constants;
+    }
+
+    /**
+     * Extracts the FHIRPath text from an Expression value. Returns null when the value is not an
+     * Expression, carries no expression text, or names a language other than FHIRPath. An absent
+     * language, which Expression requires, is read leniently as FHIRPath.
+     */
+    private function fhirPathExpression(mixed $valueExpression): ?string
+    {
+        if (!\is_object($valueExpression) || !isset($valueExpression->expression)) {
+            return null;
+        }
+
+        $language = isset($valueExpression->language) ? $this->extensionString($valueExpression->language) : null;
+        if ($language !== null && $language !== self::LANGUAGE_FHIRPATH) {
+            return null;
+        }
+
+        $expression = $this->extensionString($valueExpression->expression);
+
+        return $expression === null || trim($expression) === '' ? null : $expression;
+    }
+
+    /**
+     * Whether an expression calls now(), today() or timeOfDay(). Its result depends on when it runs,
+     * so a value calculated when the form was filled in cannot be recalculated at validation time.
+     */
+    private function readsClock(string $expression): bool
+    {
+        // Tokens, not raw text: comments and string literals neither hide nor imitate a call.
+        try {
+            $tokens = array_values((new FHIRPathLexer())->tokenize($expression));
+        } catch (FHIRPathException) {
+            return true; // unreadable: evaluation would fail too, so skip either way
+        }
+
+        foreach ($tokens as $i => $token) {
+            if (
+                $token->type === TokenType::IDENTIFIER
+                && \in_array($token->value, ['now', 'today', 'timeOfDay'], true)
+                && ($tokens[$i + 1] ?? null)?->type === TokenType::LPAREN
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * A fresh context for one evaluation (evaluate() writes into the context it is given), with
+     * `%resource` bound to the response and `%context` to the response item the expression belongs
+     * to, as SDC defines them. The evaluator would otherwise resolve `%context` to the response.
+     * A variable the form itself names `context` takes precedence.
+     *
+     * @param array<string, mixed> $constants
+     */
+    private function expressionContext(object $response, object $focus, array $constants): EvaluationContext
+    {
+        return new EvaluationContext(rootResource: $response, externalConstants: $constants + ['context' => $focus]);
+    }
+
+    /**
+     * Reduces calculated or answered values to `[kind, key]` pairs for comparison; null when any
+     * value has no comparable form. The key doubles as the value's display in the mismatch message.
+     *
+     * @param iterable<mixed> $values
+     *
+     * @return list<array{0: string, 1: string}>|null
+     */
+    private function calculationComparables(iterable $values): ?array
+    {
+        $comparables = [];
+
+        foreach ($values as $value) {
+            $comparable = $this->calculationComparable($value);
+            if ($comparable === null) {
+                return null;
+            }
+
+            $comparables[] = $comparable;
+        }
+
+        return $comparables;
+    }
+
+    /**
+     * The kind comes from the value's type, never from its text, so a string answer that happens
+     * to read `coding:…` stays text. Numbers are compared as exact decimal strings, without float
+     * conversion, so `5`, `5.0`, `'5'` and a StringPrimitive `'5'` are equal and
+     * `1.00000000001` differs from `1.00000000002`. Primitives and FHIRPath values
+     * (FHIRPathDecimal, dates) are read through their string form. FHIRPath quantities arrive as
+     * `value` / `code` arrays and compare with Quantity answers by value and code.
+     *
+     * @return array{0: string, 1: string}|null
+     */
+    private function calculationComparable(mixed $value): ?array
+    {
+        if (\is_bool($value)) {
+            return ['boolean', $value ? 'true' : 'false'];
+        }
+
+        if ($value instanceof R4Coding || $value instanceof R4BCoding || $value instanceof R5Coding) {
+            return ['coding', sprintf('%s|%s', (string) ($value->system ?? ''), (string) ($value->code ?? ''))];
+        }
+
+        if ($value instanceof R4Reference || $value instanceof R4BReference || $value instanceof R5Reference) {
+            return ['reference', (string) ($value->reference ?? '')];
+        }
+
+        if ($value instanceof R4Quantity || $value instanceof R4BQuantity || $value instanceof R5Quantity) {
+            return $this->quantityComparable($value->value, $value->code ?? $value->unit ?? null);
+        }
+
+        if (\is_array($value) && \array_key_exists('value', $value)) {
+            return $this->quantityComparable($value['value'], $value['code'] ?? $value['unit'] ?? null);
+        }
+
+        if (\is_int($value) || \is_float($value) || \is_string($value) || $value instanceof \Stringable) {
+            $string = (string) $value;
+            $number = $this->canonicalDecimal($string);
+
+            return $number !== null ? ['number', $number] : ['text', $string];
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array{0: string, 1: string}|null
+     */
+    private function quantityComparable(mixed $magnitude, mixed $code): ?array
+    {
+        $number = \is_scalar($magnitude) || $magnitude instanceof \Stringable ? $this->canonicalDecimal((string) $magnitude) : null;
+        if ($number === null) {
+            return null;
+        }
+
+        $unit = \is_scalar($code) || $code instanceof \Stringable ? (string) $code : '';
+
+        return ['quantity', trim($number . ' ' . $unit)];
+    }
+
+    /**
+     * Canonical text for a plain decimal literal (`-01.50` → `-1.5`, `5.0` → `5`, `-0` → `0`), or
+     * null when the string is not one. Exponent forms are not decimal literals in FHIR and stay text.
+     */
+    private function canonicalDecimal(string $value): ?string
+    {
+        if (preg_match('/^([+-]?)(\d+)(?:\.(\d+))?$/', trim($value), $parts) !== 1) {
+            return null;
+        }
+
+        $integer  = ltrim($parts[2], '0');
+        $fraction = rtrim($parts[3] ?? '', '0');
+        $number   = ($integer === '' ? '0' : $integer) . ($fraction === '' ? '' : '.' . $fraction);
+
+        return $parts[1] === '-' && $number !== '0' ? '-' . $number : $number;
     }
 
     /**
