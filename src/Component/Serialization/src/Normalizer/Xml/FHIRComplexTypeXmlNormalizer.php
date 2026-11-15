@@ -260,18 +260,17 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                             $this->recordMalformedScalar($object, $propertyName, $phpType, $value, 'xml');
                             $rawValue = $this->unwrapXmlValue($value, $phpType);
 
-                            // A choice variant the generator maps to a PHP scalar (boolean, integer,
-                            // decimal) has nowhere to put child elements, so an extension-only
-                            // occurrence — `<valueDecimal><extension url="…data-absent-reason"/></valueDecimal>`
-                            // — arrives here as the decoded array and raised "Cannot assign array to
-                            // property", aborting the document.
+                            // A scalar choice variant (boolean, integer, decimal) that carries an
+                            // extension never reaches here: denormalizeExtendedXmlScalar() reads it
+                            // into its primitive wrapper first (#207). One with neither a value nor an
+                            // extension, such as `<valueDecimal id="x"/>`, still arrives as the decoded
+                            // array, which raised "Cannot assign array to property" and aborted the
+                            // document.
                             //
                             // The placeholder records that the element was *present*, which is the
                             // part invariants read: `Parameters.parameter` inv-1 requires
                             // `value.exists()`, and null would fail it on an instance the reference
-                            // validator passes. The extension itself is unrepresentable here and is
-                            // lost — closing that needs the generator to emit these three variants as
-                            // primitive wrapper classes rather than bare bool/int/string.
+                            // validator passes.
                             $denormalizedValue = is_array($rawValue) ? match ($phpType) {
                                 'int'   => 0,
                                 'float' => 0.0,

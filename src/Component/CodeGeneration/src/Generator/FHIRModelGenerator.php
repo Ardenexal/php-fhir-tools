@@ -1379,7 +1379,8 @@ class FHIRModelGenerator implements GeneratorInterface
             return 'resource';
         }
 
-        // boolean/integer/decimal resolve to PHP scalars via resolveClassFromType() early exits
+        // boolean/integer/decimal hold a PHP scalar unless they carry an extension, when the
+        // serializer builds the wrapper that resolveClassFromType() adds to the union (#207)
         if (in_array($code, ['boolean', 'integer', 'decimal'], true)) {
             return 'scalar';
         }
@@ -1410,8 +1411,9 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     private function resolvePhpTypeForCode(string $code, string $version, BuilderContextInterface $builderContext): string
     {
-        // FHIRPath system types and FHIR scalars → PHP scalar builtins
-        // (mirrors the early-exit logic in resolveClassFromType())
+        // FHIRPath system types and FHIR scalars → PHP scalar builtins. A choice variant names the
+        // builtin; the serializer finds a boolean/integer/decimal variant's wrapper in the
+        // property's union (#207).
         switch ($code) {
             case 'http://hl7.org/fhirpath/System.Boolean':
             case 'boolean':

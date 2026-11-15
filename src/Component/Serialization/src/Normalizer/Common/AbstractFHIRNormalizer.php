@@ -129,6 +129,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /** @var array<class-string, array<string, array{0: string, 1: string, 2: string}>> */
     private static array $choiceKeyIndexCache = [];
 
+    /**
+     * Answers of wrappableScalarTypeOf(), by `class::property`; read on every scalar element.
+     *
+     * @var array<string, string|null>
+     */
+    private static array $wrappableScalarTypeCache = [];
+
     /** @var array<class-string, array<string, mixed>> */
     private static array $ctorDefaultsCache = [];
 
@@ -739,27 +746,34 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         mixed $value,
         array $context,
     ): ?array {
-        if ($this->denormalizer === null || !is_array($value) || !isset($value['extension'])) {
+        // Captured before the impure calls below, which PHPStan treats as resetting it to nullable.
+        $denormalizer = $this->denormalizer;
+
+        if ($denormalizer === null || !is_array($value) || !isset($value['extension'])) {
             return null;
         }
 
         if ($choiceMapping !== null) {
-            [$propertyName, $phpType, $fhirType] = $choiceMapping;
-            $wrapper                             = $this->isBuiltinType($phpType)
+            [$propertyName, $scalarType, $fhirType] = $choiceMapping;
+            $wrapper                                = $this->isBuiltinType($scalarType)
                 ? $this->primitiveWrapperInUnion($object, $propertyName, $fhirType)
                 : null;
         } else {
             $propertyName = $elementName;
-            $wrapper      = self::modelAccessor()->hasProperty($object, $propertyName) && $this->wrappableScalarTypeOf($object, $propertyName) !== null
-                ? self::modelAccessor()->declaredClassOf($object, $propertyName)
+            $scalarType   = self::modelAccessor()->hasProperty($object, $propertyName)
+                ? $this->wrappableScalarTypeOf($object, $propertyName)
                 : null;
+            $wrapper = $scalarType !== null ? self::modelAccessor()->declaredClassOf($object, $propertyName) : null;
         }
 
         if ($wrapper === null) {
             return null;
         }
 
-        return [$propertyName, $this->denormalizer->denormalize($value, $wrapper, 'xml', $context)];
+        // The scalar branch this replaces recorded a malformed lexeme (`value="TRUE"`) for validation.
+        $this->recordMalformedScalar($object, $propertyName, $scalarType, $value, 'xml');
+
+        return [$propertyName, $denormalizer->denormalize($value, $wrapper, 'xml', $context)];
     }
 
     /**
@@ -1594,6 +1608,17 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * The native scalar of a `<Wrapper>|<scalar>|null` boolean/integer/decimal property, or null.
      */
     protected function wrappableScalarTypeOf(object|string $subject, string $propertyName): ?string
+    {
+        $cacheKey = (is_object($subject) ? $subject::class : $subject) . '::' . $propertyName;
+
+        if (!array_key_exists($cacheKey, self::$wrappableScalarTypeCache)) {
+            self::$wrappableScalarTypeCache[$cacheKey] = $this->resolveWrappableScalarType($subject, $propertyName);
+        }
+
+        return self::$wrappableScalarTypeCache[$cacheKey];
+    }
+
+    private function resolveWrappableScalarType(object|string $subject, string $propertyName): ?string
     {
         $wrapper = self::modelAccessor()->declaredClassOf($subject, $propertyName);
         if ($wrapper === null) {

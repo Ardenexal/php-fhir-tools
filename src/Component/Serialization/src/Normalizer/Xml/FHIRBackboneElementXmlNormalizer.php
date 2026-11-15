@@ -115,12 +115,12 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                             $this->recordMalformedScalar($object, $propertyName, $phpType, $value, 'xml');
                             $rawValue = $this->unwrapXmlValue($value, $phpType);
 
-                            // A choice variant the generator maps to a PHP scalar (boolean, integer,
-                            // decimal) has nowhere to put child elements, so an extension-only
-                            // occurrence — `<valueDecimal><extension url="…data-absent-reason"/></valueDecimal>`
-                            // — arrives here as the decoded array and raised "Cannot assign array to
-                            // property", aborting the document. See the twin guard in
-                            // FHIRComplexTypeXmlNormalizer for why the placeholder is not null.
+                            // A scalar choice variant with neither a value nor an extension, such as
+                            // `<valueDecimal id="x"/>`, arrives as the decoded array, which raised
+                            // "Cannot assign array to property" and aborted the document. One that
+                            // carries an extension was read into its wrapper above (#207). See the
+                            // twin guard in FHIRComplexTypeXmlNormalizer for why the placeholder is
+                            // not null.
                             $denormalizedValue = is_array($rawValue) ? match ($phpType) {
                                 'int'   => 0,
                                 'float' => 0.0,

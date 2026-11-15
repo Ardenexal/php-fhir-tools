@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\Metadata\MalformedPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\MalformedPrimitiveRecorder;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
@@ -221,6 +223,27 @@ class PrimitiveExtensionRoundTripTest extends TestCase
             '<Questionnaire xmlns="http://hl7.org/fhir"><status value="draft"/><item><linkId value="q"/>'
             . '<type value="string"/><maxLength value="3">' . $extension . '</maxLength></item></Questionnaire>',
         ];
+    }
+
+    /**
+     * A malformed XML boolean is still recorded for validation when it carries an extension.
+     *
+     * The extended element skips the scalar branch that records it, so `value="TRUE"` would pass
+     * validation only because an extension sat beside it.
+     */
+    public function testMalformedXmlBooleanWithExtensionIsStillRecorded(): void
+    {
+        $patient = FHIRSerializationService::createDefault()->deserialize(
+            '<Patient xmlns="http://hl7.org/fhir"><active value="TRUE">'
+            . '<extension url="http://example.org/StructureDefinition/x"><valueString value="expr"/></extension>'
+            . '</active></Patient>',
+        );
+
+        $recorded = MalformedPrimitiveRecorder::forObject($patient);
+
+        self::assertCount(1, $recorded);
+        self::assertSame(MalformedPrimitive::KIND_BOOLEAN, $recorded[0]->kind);
+        self::assertSame('TRUE', $recorded[0]->lexeme);
     }
 
     /**
