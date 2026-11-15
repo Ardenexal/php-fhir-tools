@@ -338,7 +338,10 @@ class FHIRPathLexer
     }
 
     /**
-     * Scan a number literal (integer, decimal, or scientific notation).
+     * Scan a number literal (integer or decimal), optionally followed by a quantity unit.
+     *
+     * The FHIRPath grammar has no exponent form (NUMBER: [0-9]+('.' [0-9]+)?), so a trailing 'e2'
+     * is left for the next token and the parser rejects it.
      */
     private function scanNumber(string $firstChar, int $startLine, int $startColumn, int $start): void
     {
@@ -352,20 +355,6 @@ class FHIRPathLexer
         // Check for decimal part
         if ($this->peek() === '.' && $this->isDigit($this->peek(1))) {
             $value .= $this->advance(); // consume '.'
-            while ($this->isDigit($this->peek())) {
-                $value .= $this->advance();
-            }
-        }
-
-        // Check for scientific notation
-        if ($this->peek() === 'e' || $this->peek() === 'E') {
-            $value .= $this->advance(); // consume 'e' or 'E'
-            if ($this->peek() === '+' || $this->peek() === '-') {
-                $value .= $this->advance();
-            }
-            if (!$this->isDigit($this->peek())) {
-                throw TokenException::invalidNumber($value, $startLine, $startColumn, $this->getContext($start));
-            }
             while ($this->isDigit($this->peek())) {
                 $value .= $this->advance();
             }
