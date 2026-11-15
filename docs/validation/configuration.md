@@ -26,19 +26,19 @@ flag plus an optional corrected display string).
 | `HttpFHIRTerminologyClientFactory` | Builds `HttpFHIRTerminologyClient` instances per server base URL (`createForServer()`), wrapping in a caching decorator when a pool is configured. |
 
 {% hint style="warning" %}
-`HttpFHIRTerminologyClient`'s constructor takes the HTTP client **first**, then the server URL:
-`__construct(HttpClientInterface $httpClient, string $serverUrl, bool $usePost = false)`. There
-is no `baseUrl` parameter.
+`HttpFHIRTerminologyClient` takes a `FHIRHttpClientInterface`, not a Symfony HTTP client and a URL:
+`__construct(FHIRHttpClientInterface $httpClient, bool $usePost = false)`. The server URL lives on
+the `FHIRHttpClient` you pass in: `new FHIRHttpClient($symfonyHttpClient, 'https://tx.fhir.org/r4')`.
 {% endhint %}
 
 {% tabs %}
 {% tab title="Production (HTTP)" %}
 ```php
+use Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient;
 use Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient;
 
 $terminologyClient = new HttpFHIRTerminologyClient(
-    httpClient: $symfonyHttpClient,
-    serverUrl: 'https://tx.fhir.org/r4',
+    new FHIRHttpClient($symfonyHttpClient, 'https://tx.fhir.org/r4'),
 );
 ```
 {% endtab %}
@@ -55,10 +55,11 @@ $terminologyClient = new NullFHIRTerminologyClient();
 {% tab title="Cached" %}
 ```php
 use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient;
 use Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient;
 
 $terminologyClient = new CachingFHIRTerminologyClient(
-    new HttpFHIRTerminologyClient($symfonyHttpClient, 'https://tx.fhir.org/r4'),
+    new HttpFHIRTerminologyClient(new FHIRHttpClient($symfonyHttpClient, 'https://tx.fhir.org/r4')),
     cache: $psr6Pool, // optional; in-process cache always active without it
     ttl: 3600,        // 0 = no expiry
 );
@@ -68,18 +69,19 @@ $terminologyClient = new CachingFHIRTerminologyClient(
 {% tab title="Preferred + fallback" %}
 ```php
 use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient;
 use Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Validation\PreferredServerAwareTerminologyClient;
 
 $terminologyClient = new PreferredServerAwareTerminologyClient(
     preferred: [
         new CachingFHIRTerminologyClient(
-            new HttpFHIRTerminologyClient($symfonyHttpClient, 'https://preferred.example.org/r4'),
+            new HttpFHIRTerminologyClient(new FHIRHttpClient($symfonyHttpClient, 'https://preferred.example.org/r4')),
             cache: $psr6Pool,
         ),
     ],
     fallback: new CachingFHIRTerminologyClient(
-        new HttpFHIRTerminologyClient($symfonyHttpClient, 'https://tx.fhir.org/r4'),
+        new HttpFHIRTerminologyClient(new FHIRHttpClient($symfonyHttpClient, 'https://tx.fhir.org/r4')),
         cache: $psr6Pool,
     ),
 );

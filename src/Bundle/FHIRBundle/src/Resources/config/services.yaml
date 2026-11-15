@@ -136,10 +136,13 @@ services:
     # To use a real terminology server, override the FHIRTerminologyClientInterface alias in your
     # application's services.yaml and wire HttpFHIRTerminologyClient over a FHIRHttpClient for your server:
     #
-    #   Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient:
+    #   app.terminology_http_client:
+    #       class: Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient
     #       arguments:
     #           $baseUrl: '%env(FHIR_TERMINOLOGY_SERVER_URL)%'
-    #   Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient: ~
+    #   Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient:
+    #       arguments:
+    #           $httpClient: '@app.terminology_http_client'
     #   Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface:
     #       alias: 'Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient'
     Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface:
