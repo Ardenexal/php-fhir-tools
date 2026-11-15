@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Integration;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
@@ -38,9 +39,9 @@ final class XmlPrimitiveWithExtensionTest extends TestCase
      * <active> with only extension children (data-absent pattern, no value attribute).
      * Reproduces the patient-value-present-bad / patient-value-alternative-* failures.
      *
-     * Expected: $patient->active === null (no value present), no TypeError.
+     * Expected: a BooleanPrimitive with no value that keeps the extension (#207), no TypeError.
      */
-    public function testPatientActiveBoolExtensionOnlyDeserializesToNull(): void
+    public function testPatientActiveBoolExtensionOnlyKeepsExtensionWithoutValue(): void
     {
         $xml = <<<'XML'
 <Patient xmlns="http://hl7.org/fhir">
@@ -56,16 +57,18 @@ XML;
         $patient = $this->service->deserialize($xml);
 
         self::assertInstanceOf(PatientResource::class, $patient);
-        self::assertNull($patient->active, '<active> with extension-only and no value attribute must deserialize to null');
+        self::assertInstanceOf(BooleanPrimitive::class, $patient->active);
+        self::assertNull($patient->active->value, '<active> with extension-only and no value attribute must have no value');
+        self::assertCount(1, $patient->active->extension);
     }
 
     /**
      * <active value="false"> with both a value attribute and child extensions.
-     * The scalar value must be extracted; extensions on a ?bool property are discarded.
+     * Both survive: the property holds a BooleanPrimitive wrapping the value and the extension (#207).
      *
-     * Expected: $patient->active === false, no TypeError.
+     * Expected: $patient->active->value === false with one extension, no TypeError.
      */
-    public function testPatientActiveBoolWithValueAndExtensionExtractsBool(): void
+    public function testPatientActiveBoolWithValueAndExtensionKeepsBoth(): void
     {
         $xml = <<<'XML'
 <Patient xmlns="http://hl7.org/fhir">
@@ -81,7 +84,9 @@ XML;
         $patient = $this->service->deserialize($xml);
 
         self::assertInstanceOf(PatientResource::class, $patient);
-        self::assertFalse($patient->active, '<active value="false"> with extensions must deserialize to false');
+        self::assertInstanceOf(BooleanPrimitive::class, $patient->active);
+        self::assertFalse($patient->active->value, '<active value="false"> with extensions must keep the value false');
+        self::assertCount(1, $patient->active->extension);
     }
 
     /**

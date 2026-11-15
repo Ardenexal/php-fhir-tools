@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Money;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -50,9 +51,9 @@ class ExplanationOfBenefitAddItemDetailSubDetail extends BackboneElement
         /** @var Money|null unitPrice Fee, charge or cost per item */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $unitPrice = null,
-        /** @var numeric-string|null factor Price scaling factor */
+        /** @var DecimalPrimitive|numeric-string|null factor Price scaling factor */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $factor = null,
+        public DecimalPrimitive|string|null $factor = null,
         /** @var Money|null net Total item cost */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $net = null,

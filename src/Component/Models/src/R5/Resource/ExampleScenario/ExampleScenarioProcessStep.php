@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -64,9 +65,9 @@ class ExampleScenarioProcessStep extends BackboneElement
         )]
         #[Valid]
         public array $alternative = [],
-        /** @var bool|null pause Pause in the flow? */
+        /** @var BooleanPrimitive|bool|null pause Pause in the flow? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $pause = null,
+        public BooleanPrimitive|bool|null $pause = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

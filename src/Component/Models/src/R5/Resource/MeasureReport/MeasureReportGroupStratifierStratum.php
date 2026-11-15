@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -34,7 +35,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var CodeableConcept|bool|Quantity|Range|Reference|null value The stratum value, e.g. male */
+        /** @var CodeableConcept|BooleanPrimitive|bool|Quantity|Range|Reference|null value The stratum value, e.g. male */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -67,7 +68,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|bool|Quantity|Range|Reference|null $value = null,
+        public CodeableConcept|BooleanPrimitive|bool|Quantity|Range|Reference|null $value = null,
         /** @var array<MeasureReportGroupStratifierStratumComponent> component Stratifier component values */
         #[FhirProperty(
             fhirType: 'BackboneElement',

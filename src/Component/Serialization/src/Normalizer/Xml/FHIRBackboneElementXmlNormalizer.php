@@ -98,6 +98,13 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $type)
                     : null;
 
+                // A boolean/integer/decimal element with an extension becomes its wrapper (#207).
+                $extendedScalar = $this->denormalizeExtendedXmlScalar($object, $elementName, $choiceMapping, $value, $context);
+                if ($extendedScalar !== null) {
+                    self::modelAccessor()->writeValue($object, $extendedScalar[0], $extendedScalar[1]);
+                    continue;
+                }
+
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
@@ -108,12 +115,12 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                             $this->recordMalformedScalar($object, $propertyName, $phpType, $value, 'xml');
                             $rawValue = $this->unwrapXmlValue($value, $phpType);
 
-                            // A choice variant the generator maps to a PHP scalar (boolean, integer,
-                            // decimal) has nowhere to put child elements, so an extension-only
-                            // occurrence — `<valueDecimal><extension url="…data-absent-reason"/></valueDecimal>`
-                            // — arrives here as the decoded array and raised "Cannot assign array to
-                            // property", aborting the document. See the twin guard in
-                            // FHIRComplexTypeXmlNormalizer for why the placeholder is not null.
+                            // A scalar choice variant with neither a value nor an extension, such as
+                            // `<valueDecimal id="x"/>`, arrives as the decoded array, which raised
+                            // "Cannot assign array to property" and aborted the document. One that
+                            // carries an extension was read into its wrapper above (#207). See the
+                            // twin guard in FHIRComplexTypeXmlNormalizer for why the placeholder is
+                            // not null.
                             $denormalizedValue = is_array($rawValue) ? match ($phpType) {
                                 'int'   => 0,
                                 'float' => 0.0,
@@ -270,9 +277,9 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
             if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
                 $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
                 if ($choiceMatch !== null) {
-                    [$resolvedKind, $resolvedKey] = $choiceMatch;
+                    [, $resolvedKey]              = $choiceMatch;
                     $xmlKey                       = $resolvedKey;
-                    if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
+                    if ($this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context, $includeExtensions);
                         if ($normalizedValue !== null) {
                             $data[$xmlKey] = $normalizedValue;

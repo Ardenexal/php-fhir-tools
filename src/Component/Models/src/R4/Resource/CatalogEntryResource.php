@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\CatalogEntry\CatalogEntryRelatedEntry;
@@ -77,9 +78,9 @@ class CatalogEntryResource extends AbstractDomainResource
         /** @var CodeableConcept|null type The type of item - medication, device, service, protocol or other */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
-        /** @var bool|null orderable Whether the entry represents an orderable item */
+        /** @var BooleanPrimitive|bool|null orderable Whether the entry represents an orderable item */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $orderable = null,
+        public BooleanPrimitive|bool|null $orderable = null,
         /** @var Reference|null referencedItem The item that is being defined */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
         #[Valid]

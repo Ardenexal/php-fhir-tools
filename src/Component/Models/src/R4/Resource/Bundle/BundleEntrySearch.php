@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\SearchEntryModeType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 
 /**
  * @description Information about the search process that lead to the creation of this entry.
@@ -36,9 +37,9 @@ class BundleEntrySearch extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\SearchEntryMode',
         )]
         public ?SearchEntryModeType $mode = null,
-        /** @var numeric-string|null score Search ranking (between 0 and 1) */
+        /** @var DecimalPrimitive|numeric-string|null score Search ranking (between 0 and 1) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $score = null,
+        public DecimalPrimitive|string|null $score = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

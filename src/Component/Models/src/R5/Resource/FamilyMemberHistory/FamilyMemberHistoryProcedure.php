@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -41,9 +42,9 @@ class FamilyMemberHistoryProcedure extends BackboneElement
         /** @var CodeableConcept|null outcome What happened following the procedure */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $outcome = null,
-        /** @var bool|null contributedToDeath Whether the procedure contributed to the cause of death */
+        /** @var BooleanPrimitive|bool|null contributedToDeath Whether the procedure contributed to the cause of death */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $contributedToDeath = null,
+        public BooleanPrimitive|bool|null $contributedToDeath = null,
         /** @var Age|Range|Period|StringPrimitive|string|DateTimePrimitive|null performed When the procedure was performed */
         #[FhirProperty(
             fhirType: 'choice',

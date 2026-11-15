@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -127,9 +128,9 @@ class ImmunizationResource extends AbstractDomainResource
         /** @var DateTimePrimitive|null recorded When the immunization was first captured in the subject's record */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $recorded = null,
-        /** @var bool|null primarySource Indicates context the data was recorded in */
+        /** @var BooleanPrimitive|bool|null primarySource Indicates context the data was recorded in */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $primarySource = null,
+        public BooleanPrimitive|bool|null $primarySource = null,
         /** @var CodeableConcept|null reportOrigin Indicates the source of a secondarily reported record */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $reportOrigin = null,
@@ -195,9 +196,9 @@ class ImmunizationResource extends AbstractDomainResource
             'http://hl7.org/fhir/StructureDefinition/DiagnosticReport',
         ])]
         public array $reasonReference = [],
-        /** @var bool|null isSubpotent Dose potency */
+        /** @var BooleanPrimitive|bool|null isSubpotent Dose potency */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labeled as a modifier because an immunization event with a subpotent vaccine doesn\'t protect the patient the same way as a potent dose.')]
-        public ?bool $isSubpotent = null,
+        public BooleanPrimitive|bool|null $isSubpotent = null,
         /** @var array<CodeableConcept> subpotentReason Reason for being subpotent */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

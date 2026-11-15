@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -29,7 +30,7 @@ class MedicationRequestSubstitution extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|CodeableConcept|null allowed Whether substitution is allowed or not */
+        /** @var BooleanPrimitive|bool|CodeableConcept|null allowed Whether substitution is allowed or not */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -46,7 +47,7 @@ class MedicationRequestSubstitution extends BackboneElement
             ],
         )]
         #[NotNull]
-        public bool|CodeableConcept|null $allowed = null,
+        public BooleanPrimitive|bool|CodeableConcept|null $allowed = null,
         /** @var CodeableConcept|null reason Why should (not) substitution be made */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $reason = null,

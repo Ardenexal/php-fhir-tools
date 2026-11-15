@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\SequenceTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\MolecularSequence\MolecularSequenceQuality;
@@ -96,9 +97,9 @@ class MolecularSequenceResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\SequenceType',
         )]
         public ?SequenceTypeType $type = null,
-        /** @var int|null coordinateSystem Base number of coordinate system (0 for 0-based numbering or coordinates, inclusive start, exclusive end, 1 for 1-based numbering, inclusive start, inclusive end) */
+        /** @var IntegerPrimitive|int|null coordinateSystem Base number of coordinate system (0 for 0-based numbering or coordinates, inclusive start, exclusive end, 1 for 1-based numbering, inclusive start, inclusive end) */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?int $coordinateSystem = null,
+        public IntegerPrimitive|int|null $coordinateSystem = null,
         /** @var Reference|null patient Who and/or what this is about */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
         public ?Reference $patient = null,
@@ -138,9 +139,9 @@ class MolecularSequenceResource extends AbstractDomainResource
         )]
         #[Valid]
         public array $quality = [],
-        /** @var int|null readCoverage Average number of reads representing a given nucleotide in the reconstructed sequence */
+        /** @var IntegerPrimitive|int|null readCoverage Average number of reads representing a given nucleotide in the reconstructed sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $readCoverage = null,
+        public IntegerPrimitive|int|null $readCoverage = null,
         /** @var array<MolecularSequenceRepository> repository External repository which contains detailed report related with observedSeq in this resource */
         #[FhirProperty(
             fhirType: 'BackboneElement',

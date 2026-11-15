@@ -25,6 +25,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\SearchParamTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\SearchProcessingModeTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\VersionIndependentResourceTypesAllType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
@@ -165,9 +166,9 @@ class SearchParameterResource extends AbstractDomainResource
         )]
         #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
-        /** @var bool|null experimental For testing purposes, not real usage */
+        /** @var BooleanPrimitive|bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $experimental = null,
+        public BooleanPrimitive|bool|null $experimental = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,
@@ -272,12 +273,12 @@ class SearchParameterResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\VersionIndependentResourceTypesAll',
         )]
         public array $target = [],
-        /** @var bool|null multipleOr Allow multiple values per parameter (or) */
+        /** @var BooleanPrimitive|bool|null multipleOr Allow multiple values per parameter (or) */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $multipleOr = null,
-        /** @var bool|null multipleAnd Allow multiple parameters (and) */
+        public BooleanPrimitive|bool|null $multipleOr = null,
+        /** @var BooleanPrimitive|bool|null multipleAnd Allow multiple parameters (and) */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $multipleAnd = null,
+        public BooleanPrimitive|bool|null $multipleAnd = null,
         /** @var array<SearchComparatorType> comparator eq | ne | gt | lt | ge | le | sa | eb | ap */
         #[FhirProperty(
             fhirType: 'code',

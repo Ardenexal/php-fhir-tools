@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -162,9 +163,9 @@ class ImmunizationResource extends AbstractDomainResource
         )]
         #[NotBlank]
         public DateTimePrimitive|StringPrimitive|string|null $occurrence = null,
-        /** @var bool|null primarySource Indicates context the data was captured in */
+        /** @var BooleanPrimitive|bool|null primarySource Indicates context the data was captured in */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $primarySource = null,
+        public BooleanPrimitive|bool|null $primarySource = null,
         /** @var CodeableReference|null informationSource Indicates the source of a  reported record */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
         #[Valid]
@@ -220,9 +221,9 @@ class ImmunizationResource extends AbstractDomainResource
             'http://hl7.org/fhir/StructureDefinition/DiagnosticReport',
         ])]
         public array $reason = [],
-        /** @var bool|null isSubpotent Dose potency */
+        /** @var BooleanPrimitive|bool|null isSubpotent Dose potency */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labeled as a modifier because an immunization event with a subpotent vaccine doesn\'t protect the patient the same way as a potent dose.')]
-        public ?bool $isSubpotent = null,
+        public BooleanPrimitive|bool|null $isSubpotent = null,
         /** @var array<CodeableConcept> subpotentReason Reason for being subpotent */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

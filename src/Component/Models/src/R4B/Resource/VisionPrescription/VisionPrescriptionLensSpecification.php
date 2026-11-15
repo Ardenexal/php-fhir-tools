@@ -14,6 +14,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\VisionEyesType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -46,15 +48,15 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\VisionEyes',
         )]
         public ?VisionEyesType $eye = null,
-        /** @var numeric-string|null sphere Power of the lens */
+        /** @var DecimalPrimitive|numeric-string|null sphere Power of the lens */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $sphere = null,
-        /** @var numeric-string|null cylinder Lens power for astigmatism */
+        public DecimalPrimitive|string|null $sphere = null,
+        /** @var DecimalPrimitive|numeric-string|null cylinder Lens power for astigmatism */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $cylinder = null,
-        /** @var int|null axis Lens meridian which contain no power for astigmatism */
+        public DecimalPrimitive|string|null $cylinder = null,
+        /** @var IntegerPrimitive|int|null axis Lens meridian which contain no power for astigmatism */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $axis = null,
+        public IntegerPrimitive|int|null $axis = null,
         /** @var array<VisionPrescriptionLensSpecificationPrism> prism Eye alignment compensation */
         #[FhirProperty(
             fhirType: 'BackboneElement',
@@ -64,18 +66,18 @@ class VisionPrescriptionLensSpecification extends BackboneElement
         )]
         #[Valid]
         public array $prism = [],
-        /** @var numeric-string|null add Added power for multifocal levels */
+        /** @var DecimalPrimitive|numeric-string|null add Added power for multifocal levels */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $add = null,
-        /** @var numeric-string|null power Contact lens power */
+        public DecimalPrimitive|string|null $add = null,
+        /** @var DecimalPrimitive|numeric-string|null power Contact lens power */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $power = null,
-        /** @var numeric-string|null backCurve Contact lens back curvature */
+        public DecimalPrimitive|string|null $power = null,
+        /** @var DecimalPrimitive|numeric-string|null backCurve Contact lens back curvature */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $backCurve = null,
-        /** @var numeric-string|null diameter Contact lens diameter */
+        public DecimalPrimitive|string|null $backCurve = null,
+        /** @var DecimalPrimitive|numeric-string|null diameter Contact lens diameter */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $diameter = null,
+        public DecimalPrimitive|string|null $diameter = null,
         /** @var Quantity|null duration Lens wear duration */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $duration = null,

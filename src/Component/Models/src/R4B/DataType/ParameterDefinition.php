@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -42,9 +43,9 @@ class ParameterDefinition extends Element
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\OperationParameterUse',
         )]
         public ?OperationParameterUseType $use = null,
-        /** @var int|null min Minimum cardinality */
+        /** @var IntegerPrimitive|int|null min Minimum cardinality */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $min = null,
+        public IntegerPrimitive|int|null $min = null,
         /** @var StringPrimitive|string|null max Maximum cardinality (a number of *) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $max = null,

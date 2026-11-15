@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\TriggerDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -106,9 +107,9 @@ class EvidenceVariableCharacteristic extends BackboneElement
         )]
         #[Valid]
         public array $usageContext = [],
-        /** @var bool|null exclude Whether the characteristic includes or excludes members */
+        /** @var BooleanPrimitive|bool|null exclude Whether the characteristic includes or excludes members */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $exclude = null,
+        public BooleanPrimitive|bool|null $exclude = null,
         /** @var DateTimePrimitive|Period|Duration|Timing|null participantEffective What time period do participants cover */
         #[FhirProperty(
             fhirType: 'choice',

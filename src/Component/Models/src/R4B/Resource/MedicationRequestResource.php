@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RequestPriorityType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
@@ -123,10 +124,10 @@ class MedicationRequestResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\RequestPriority',
         )]
         public ?RequestPriorityType $priority = null,
-        /** @var bool|null doNotPerform True if request is prohibiting action */
+        /** @var BooleanPrimitive|bool|null doNotPerform True if request is prohibiting action */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labeled as a modifier because this element negates the request to occur (ie, this is a request for the medication not to be ordered or prescribed, etc)')]
-        public ?bool $doNotPerform = null,
-        /** @var bool|Reference|null reported Reported rather than primary record */
+        public BooleanPrimitive|bool|null $doNotPerform = null,
+        /** @var BooleanPrimitive|bool|Reference|null reported Reported rather than primary record */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -148,7 +149,7 @@ class MedicationRequestResource extends AbstractDomainResource
             'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
             'http://hl7.org/fhir/StructureDefinition/Organization',
         ])]
-        public bool|Reference|null $reported = null,
+        public BooleanPrimitive|bool|Reference|null $reported = null,
         /** @var CodeableConcept|Reference|null medication Medication to be taken */
         #[FhirProperty(
             fhirType: 'choice',

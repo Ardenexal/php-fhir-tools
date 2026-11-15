@@ -8,6 +8,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -37,9 +39,9 @@ class Dosage extends BackboneType
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var int|null sequence The order of the dosage instructions */
+        /** @var IntegerPrimitive|int|null sequence The order of the dosage instructions */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $sequence = null,
+        public IntegerPrimitive|int|null $sequence = null,
         /** @var StringPrimitive|string|null text Free text dosage instructions e.g. SIG */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
@@ -58,9 +60,9 @@ class Dosage extends BackboneType
         /** @var Timing|null timing When medication should be administered */
         #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex'), Valid]
         public ?Timing $timing = null,
-        /** @var bool|null asNeeded Take "as needed" */
+        /** @var BooleanPrimitive|bool|null asNeeded Take "as needed" */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $asNeeded = null,
+        public BooleanPrimitive|bool|null $asNeeded = null,
         /** @var array<CodeableConcept> asNeededFor Take "as needed" (for x) */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

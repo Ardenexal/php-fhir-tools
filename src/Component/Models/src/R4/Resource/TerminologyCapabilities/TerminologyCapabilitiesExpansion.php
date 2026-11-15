@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -28,15 +29,15 @@ class TerminologyCapabilitiesExpansion extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null hierarchical Whether the server can return nested value sets */
+        /** @var BooleanPrimitive|bool|null hierarchical Whether the server can return nested value sets */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $hierarchical = null,
-        /** @var bool|null paging Whether the server supports paging on expansion */
+        public BooleanPrimitive|bool|null $hierarchical = null,
+        /** @var BooleanPrimitive|bool|null paging Whether the server supports paging on expansion */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $paging = null,
-        /** @var bool|null incomplete Allow request for incomplete expansions? */
+        public BooleanPrimitive|bool|null $paging = null,
+        /** @var BooleanPrimitive|bool|null incomplete Allow request for incomplete expansions? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $incomplete = null,
+        public BooleanPrimitive|bool|null $incomplete = null,
         /** @var array<TerminologyCapabilitiesExpansionParameter> parameter Supported expansion parameter */
         #[FhirProperty(
             fhirType: 'BackboneElement',

@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 
 /**
  * @description Structural variant outer.
@@ -26,12 +27,12 @@ class MolecularSequenceStructureVariantOuter extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var int|null start Structural variant outer start */
+        /** @var IntegerPrimitive|int|null start Structural variant outer start */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $start = null,
-        /** @var int|null end Structural variant outer end */
+        public IntegerPrimitive|int|null $start = null,
+        /** @var IntegerPrimitive|int|null end Structural variant outer end */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $end = null,
+        public IntegerPrimitive|int|null $end = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -41,9 +42,9 @@ class ResearchStudyProgressStatus extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ResearchStudyStatus',
         )]
         public ?CodeableConcept $state = null,
-        /** @var bool|null actual Actual if true else anticipated */
+        /** @var BooleanPrimitive|bool|null actual Actual if true else anticipated */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $actual = null,
+        public BooleanPrimitive|bool|null $actual = null,
         /** @var Period|null period Date range */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,

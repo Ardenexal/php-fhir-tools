@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\MimeTypesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\TestScriptRequestMethodCodeType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -105,9 +106,9 @@ class TestScriptSetupActionAssert extends BackboneElement
         /** @var StringPrimitive|string|null minimumId Fixture Id of minimum content resource */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $minimumId = null,
-        /** @var bool|null navigationLinks Perform validation on navigation links? */
+        /** @var BooleanPrimitive|bool|null navigationLinks Perform validation on navigation links? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $navigationLinks = null,
+        public BooleanPrimitive|bool|null $navigationLinks = null,
         /** @var AssertionOperatorTypeType|null operator equals | notEquals | in | notIn | greaterThan | lessThan | empty | notEmpty | contains | notContains | eval | manualEval */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(
@@ -152,18 +153,18 @@ class TestScriptSetupActionAssert extends BackboneElement
         /** @var IdPrimitive|null sourceId Fixture Id of source expression or headerField */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $sourceId = null,
-        /** @var bool|null stopTestOnFail If this assert fails, will the current test execution stop? */
+        /** @var BooleanPrimitive|bool|null stopTestOnFail If this assert fails, will the current test execution stop? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $stopTestOnFail = null,
+        public BooleanPrimitive|bool|null $stopTestOnFail = null,
         /** @var IdPrimitive|null validateProfileId Profile Id of validation profile reference */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $validateProfileId = null,
         /** @var StringPrimitive|string|null value The value to compare to */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $value = null,
-        /** @var bool|null warningOnly Will this assert produce a warning only on error? */
+        /** @var BooleanPrimitive|bool|null warningOnly Will this assert produce a warning only on error? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?bool $warningOnly = null,
+        public BooleanPrimitive|bool|null $warningOnly = null,
         /** @var array<TestScriptSetupActionAssertRequirement> requirement Links or references to the testing requirements */
         #[FhirProperty(
             fhirType: 'BackboneElement',

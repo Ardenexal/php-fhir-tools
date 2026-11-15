@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -53,9 +54,9 @@ class ConceptMapGroupElement extends BackboneElement
         /** @var CanonicalPrimitive|null valueSet Identifies the set of concepts being mapped */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $valueSet = null,
-        /** @var bool|null noMap No mapping to a target concept for this source concept */
+        /** @var BooleanPrimitive|bool|null noMap No mapping to a target concept for this source concept */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $noMap = null,
+        public BooleanPrimitive|bool|null $noMap = null,
         /** @var array<ConceptMapGroupElementTarget> target Concept in target system for element */
         #[FhirProperty(
             fhirType: 'BackboneElement',

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -35,7 +36,7 @@ class ManufacturedItemDefinitionProperty extends BackboneElement
         /** @var CodeableConcept|null type A code expressing the type of characteristic */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null value A value for the characteristic */
+        /** @var CodeableConcept|Quantity|DatePrimitive|BooleanPrimitive|bool|Attachment|null value A value for the characteristic */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -68,7 +69,7 @@ class ManufacturedItemDefinitionProperty extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null $value = null,
+        public CodeableConcept|Quantity|DatePrimitive|BooleanPrimitive|bool|Attachment|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

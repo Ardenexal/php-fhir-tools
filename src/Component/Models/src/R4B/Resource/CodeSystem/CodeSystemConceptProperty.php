@@ -10,8 +10,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -35,7 +38,7 @@ class CodeSystemConceptProperty extends BackboneElement
         /** @var CodePrimitive|null code Reference to CodeSystem.property.code */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $code = null,
-        /** @var CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|null value Value of the property for this concept */
+        /** @var CodePrimitive|Coding|StringPrimitive|string|IntegerPrimitive|int|BooleanPrimitive|bool|DateTimePrimitive|DecimalPrimitive|null value Value of the property for this concept */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -72,7 +75,7 @@ class CodeSystemConceptProperty extends BackboneElement
             ],
         )]
         #[NotNull]
-        public CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|null $value = null,
+        public CodePrimitive|Coding|StringPrimitive|string|IntegerPrimitive|int|BooleanPrimitive|bool|DateTimePrimitive|DecimalPrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

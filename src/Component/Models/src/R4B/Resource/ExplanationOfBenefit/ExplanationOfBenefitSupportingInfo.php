@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
@@ -68,7 +69,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             ],
         )]
         public DatePrimitive|Period|null $timing = null,
-        /** @var bool|StringPrimitive|string|Quantity|Attachment|Reference|null value Data to be provided */
+        /** @var BooleanPrimitive|bool|StringPrimitive|string|Quantity|Attachment|Reference|null value Data to be provided */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -102,7 +103,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             ],
         )]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
-        public bool|StringPrimitive|string|Quantity|Attachment|Reference|null $value = null,
+        public BooleanPrimitive|bool|StringPrimitive|string|Quantity|Attachment|Reference|null $value = null,
         /** @var Coding|null reason Explanation for the information */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid]
         public ?Coding $reason = null,

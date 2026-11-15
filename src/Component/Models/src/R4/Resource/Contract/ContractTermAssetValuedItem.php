@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Money;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -70,12 +71,12 @@ class ContractTermAssetValuedItem extends BackboneElement
         /** @var Money|null unitPrice Contract Valued Item fee, charge, or cost */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $unitPrice = null,
-        /** @var numeric-string|null factor Contract Valued Item Price Scaling Factor */
+        /** @var DecimalPrimitive|numeric-string|null factor Contract Valued Item Price Scaling Factor */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $factor = null,
-        /** @var numeric-string|null points Contract Valued Item Difficulty Scaling Factor */
+        public DecimalPrimitive|string|null $factor = null,
+        /** @var DecimalPrimitive|numeric-string|null points Contract Valued Item Difficulty Scaling Factor */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $points = null,
+        public DecimalPrimitive|string|null $points = null,
         /** @var Money|null net Total Contract Valued Item Value */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex'), Valid]
         public ?Money $net = null,

@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -57,9 +58,9 @@ class EvidenceStatisticAttributeEstimate extends BackboneElement
         /** @var Quantity|null quantity The singular quantity of the attribute estimate, for attribute estimates represented as single values; also used to report unit of measure */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
-        /** @var numeric-string|null level Level of confidence interval, e.g., 0.95 for 95% confidence interval */
+        /** @var DecimalPrimitive|numeric-string|null level Level of confidence interval, e.g., 0.95 for 95% confidence interval */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $level = null,
+        public DecimalPrimitive|string|null $level = null,
         /** @var Range|null range Lower and upper bound values of the attribute estimate */
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $range = null,

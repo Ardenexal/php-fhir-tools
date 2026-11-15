@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,15 +28,15 @@ class LocationPosition extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var numeric-string|null longitude Longitude with WGS84 datum */
+        /** @var DecimalPrimitive|numeric-string|null longitude Longitude with WGS84 datum */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?string $longitude = null,
-        /** @var numeric-string|null latitude Latitude with WGS84 datum */
+        public DecimalPrimitive|string|null $longitude = null,
+        /** @var DecimalPrimitive|numeric-string|null latitude Latitude with WGS84 datum */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?string $latitude = null,
-        /** @var numeric-string|null altitude Altitude with WGS84 datum */
+        public DecimalPrimitive|string|null $latitude = null,
+        /** @var DecimalPrimitive|numeric-string|null altitude Altitude with WGS84 datum */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $altitude = null,
+        public DecimalPrimitive|string|null $altitude = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

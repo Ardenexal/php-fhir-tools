@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
@@ -144,9 +145,9 @@ class SpecimenDefinitionResource extends AbstractDomainResource
         )]
         #[FHIRIsModifier(reason: 'Not known why this is labelled a modifier')]
         public ?PublicationStatusType $status = null,
-        /** @var bool|null experimental If this SpecimenDefinition is not for real usage */
+        /** @var BooleanPrimitive|bool|null experimental If this SpecimenDefinition is not for real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $experimental = null,
+        public BooleanPrimitive|bool|null $experimental = null,
         /** @var CodeableConcept|Reference|null subject Type of subject for specimen collection */
         #[FhirProperty(
             fhirType: 'choice',

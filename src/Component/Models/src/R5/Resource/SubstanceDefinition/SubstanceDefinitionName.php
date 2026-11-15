@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -48,9 +49,9 @@ class SubstanceDefinitionName extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\PublicationStatus',
         )]
         public ?CodeableConcept $status = null,
-        /** @var bool|null preferred If this is the preferred name for this substance */
+        /** @var BooleanPrimitive|bool|null preferred If this is the preferred name for this substance */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $preferred = null,
+        public BooleanPrimitive|bool|null $preferred = null,
         /** @var array<CodeableConcept> language Human language that the name is written in */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

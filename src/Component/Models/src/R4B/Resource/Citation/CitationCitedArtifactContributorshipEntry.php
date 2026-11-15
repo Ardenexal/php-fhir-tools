@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactPoint;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\HumanName;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -112,9 +113,9 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
         )]
         #[Valid]
         public array $contributionInstance = [],
-        /** @var bool|null correspondingContact Indication of which contributor is the corresponding contributor for the role */
+        /** @var BooleanPrimitive|bool|null correspondingContact Indication of which contributor is the corresponding contributor for the role */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $correspondingContact = null,
+        public BooleanPrimitive|bool|null $correspondingContact = null,
         /** @var PositiveIntPrimitive|null listOrder Used to code order of authors */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $listOrder = null,

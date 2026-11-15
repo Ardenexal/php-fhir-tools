@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -46,7 +47,7 @@ class EvidenceReportSubjectCharacteristic extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\FocusCharacteristicCode',
         )]
         public ?CodeableConcept $code = null,
-        /** @var Reference|CodeableConcept|bool|Quantity|Range|null value Characteristic value */
+        /** @var Reference|CodeableConcept|BooleanPrimitive|bool|Quantity|Range|null value Characteristic value */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -82,10 +83,10 @@ class EvidenceReportSubjectCharacteristic extends BackboneElement
         )]
         #[NotNull]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
-        public Reference|CodeableConcept|bool|Quantity|Range|null $value = null,
-        /** @var bool|null exclude Is used to express not the characteristic */
+        public Reference|CodeableConcept|BooleanPrimitive|bool|Quantity|Range|null $value = null,
+        /** @var BooleanPrimitive|bool|null exclude Is used to express not the characteristic */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $exclude = null,
+        public BooleanPrimitive|bool|null $exclude = null,
         /** @var Period|null period Timeframe for the characteristic */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,

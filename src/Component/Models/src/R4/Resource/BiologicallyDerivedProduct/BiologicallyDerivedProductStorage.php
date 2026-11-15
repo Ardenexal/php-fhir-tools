@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BiologicallyDerivedProductStorageScaleType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -34,9 +35,9 @@ class BiologicallyDerivedProductStorage extends BackboneElement
         /** @var StringPrimitive|string|null description Description of storage */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var numeric-string|null temperature Storage temperature */
+        /** @var DecimalPrimitive|numeric-string|null temperature Storage temperature */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $temperature = null,
+        public DecimalPrimitive|string|null $temperature = null,
         /** @var BiologicallyDerivedProductStorageScaleType|null scale farenheit | celsius | kelvin */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(

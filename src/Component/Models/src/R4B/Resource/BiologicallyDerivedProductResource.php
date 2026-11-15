@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedProduct\BiologicallyDerivedProductCollection;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedProduct\BiologicallyDerivedProductManipulation;
@@ -109,9 +110,9 @@ class BiologicallyDerivedProductResource extends AbstractDomainResource
         #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ServiceRequest'])]
         public array $request = [],
-        /** @var int|null quantity The amount of this biologically derived product */
+        /** @var IntegerPrimitive|int|null quantity The amount of this biologically derived product */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $quantity = null,
+        public IntegerPrimitive|int|null $quantity = null,
         /** @var array<Reference> parent BiologicallyDerivedProduct parent */
         #[FhirProperty(
             fhirType: 'Reference',

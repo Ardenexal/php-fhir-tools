@@ -1179,6 +1179,14 @@ class FHIRModelGenerator implements GeneratorInterface
     private const RESOURCE_ID_PATTERN = '[A-Za-z0-9\-\.]{1,64}';
 
     /**
+     * The native PHP type a FHIR boolean, integer or decimal element holds when it carries no
+     * extension. Decimals are strings so the lexical form (`1.50`) survives.
+     *
+     * @var array<string, string>
+     */
+    private const SCALAR_PHP_TYPES = ['boolean' => 'bool', 'integer' => 'int', 'decimal' => 'string'];
+
+    /**
      * Wrap a raw FHIR regex as a delimited, whole-value-anchored PCRE pattern.
      *
      * StructureDefinitions carry regexes in an undelimited dialect (`true|false`,
@@ -1371,7 +1379,8 @@ class FHIRModelGenerator implements GeneratorInterface
             return 'resource';
         }
 
-        // boolean/integer/decimal resolve to PHP scalars via resolveClassFromType() early exits
+        // boolean/integer/decimal hold a PHP scalar unless they carry an extension, when the
+        // serializer builds the wrapper that resolveClassFromType() adds to the union (#207)
         if (in_array($code, ['boolean', 'integer', 'decimal'], true)) {
             return 'scalar';
         }
@@ -1402,8 +1411,9 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     private function resolvePhpTypeForCode(string $code, string $version, BuilderContextInterface $builderContext): string
     {
-        // FHIRPath system types and FHIR scalars → PHP scalar builtins
-        // (mirrors the early-exit logic in resolveClassFromType())
+        // FHIRPath system types and FHIR scalars → PHP scalar builtins. A choice variant names the
+        // builtin; the serializer finds a boolean/integer/decimal variant's wrapper in the
+        // property's union (#207).
         switch ($code) {
             case 'http://hl7.org/fhirpath/System.Boolean':
             case 'boolean':
@@ -1926,17 +1936,28 @@ class FHIRModelGenerator implements GeneratorInterface
 
                 continue;
             }
-            if ($code === 'http://hl7.org/fhirpath/System.Boolean' || $code === 'boolean') {
+            // A FHIR boolean/integer/decimal element is a native scalar, plus its primitive wrapper so
+            // the element can carry an `extension` (#207). The serializer builds the wrapper only
+            // when the document gives the element one; a plain value stays a scalar.
+            // The FHIRPath System.* codes are the wrapper's own `value` and stay scalar-only.
+            if (in_array($code, ['boolean', 'integer', 'decimal'], true)) {
+                $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
+                $types[]          = '\\' . $correctNamespace . '\\' . StringCase::pascal($code) . 'Primitive';
+                $types[]          = self::SCALAR_PHP_TYPES[$code];
+
+                continue;
+            }
+            if ($code === 'http://hl7.org/fhirpath/System.Boolean') {
                 $types[] = 'bool';
 
                 continue;
             }
-            if ($code === 'http://hl7.org/fhirpath/System.Integer' || $code === 'integer') {
+            if ($code === 'http://hl7.org/fhirpath/System.Integer') {
                 $types[] = 'int';
 
                 continue;
             }
-            if ($code === 'http://hl7.org/fhirpath/System.Decimal' || $code === 'decimal') {
+            if ($code === 'http://hl7.org/fhirpath/System.Decimal') {
                 $types[] = 'string';
 
                 continue;

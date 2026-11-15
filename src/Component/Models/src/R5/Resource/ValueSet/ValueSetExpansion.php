@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -39,12 +40,12 @@ class ValueSetExpansion extends BackboneElement
         /** @var DateTimePrimitive|null timestamp Time ValueSet expansion happened */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?DateTimePrimitive $timestamp = null,
-        /** @var int|null total Total number of codes in the expansion */
+        /** @var IntegerPrimitive|int|null total Total number of codes in the expansion */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $total = null,
-        /** @var int|null offset Offset at which this resource starts */
+        public IntegerPrimitive|int|null $total = null,
+        /** @var IntegerPrimitive|int|null offset Offset at which this resource starts */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $offset = null,
+        public IntegerPrimitive|int|null $offset = null,
         /** @var array<ValueSetExpansionParameter> parameter Parameter that controlled the expansion process */
         #[FhirProperty(
             fhirType: 'BackboneElement',

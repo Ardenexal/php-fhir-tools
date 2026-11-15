@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -34,9 +35,9 @@ class MolecularSequenceRelative extends BackboneElement
         /** @var CodeableConcept|null coordinateSystem Ways of identifying nucleotides or amino acids within a sequence */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://loinc.org/LL5323-2/', strength: 'extensible')]
         public ?CodeableConcept $coordinateSystem = null,
-        /** @var int|null ordinalPosition Indicates the order in which the sequence should be considered when putting multiple 'relative' elements together */
+        /** @var IntegerPrimitive|int|null ordinalPosition Indicates the order in which the sequence should be considered when putting multiple 'relative' elements together */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $ordinalPosition = null,
+        public IntegerPrimitive|int|null $ordinalPosition = null,
         /** @var Range|null sequenceRange Indicates the nucleotide range in the composed sequence when multiple 'relative' elements are used together */
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex'), Valid]
         public ?Range $sequenceRange = null,

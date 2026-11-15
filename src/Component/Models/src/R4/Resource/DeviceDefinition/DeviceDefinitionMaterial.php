@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -32,12 +33,12 @@ class DeviceDefinitionMaterial extends BackboneElement
         /** @var CodeableConcept|null substance The substance */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $substance = null,
-        /** @var bool|null alternate Indicates an alternative material of the device */
+        /** @var BooleanPrimitive|bool|null alternate Indicates an alternative material of the device */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $alternate = null,
-        /** @var bool|null allergenicIndicator Whether the substance is a known or suspected allergen */
+        public BooleanPrimitive|bool|null $alternate = null,
+        /** @var BooleanPrimitive|bool|null allergenicIndicator Whether the substance is a known or suspected allergen */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $allergenicIndicator = null,
+        public BooleanPrimitive|bool|null $allergenicIndicator = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\OperationParameterUseType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\SearchParamTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -89,9 +90,9 @@ class OperationDefinitionParameter extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\OperationParameterScope',
         )]
         public array $scope = [],
-        /** @var int|null min Minimum Cardinality */
+        /** @var IntegerPrimitive|int|null min Minimum Cardinality */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotNull]
-        public ?int $min = null,
+        public IntegerPrimitive|int|null $min = null,
         /** @var StringPrimitive|string|null max Maximum Cardinality (a number or *) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $max = null,

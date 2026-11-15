@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -66,9 +67,9 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
         ])]
         public ?Reference $provider = null,
-        /** @var bool|null excluded Excluded from the plan */
+        /** @var BooleanPrimitive|bool|null excluded Excluded from the plan */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $excluded = null,
+        public BooleanPrimitive|bool|null $excluded = null,
         /** @var StringPrimitive|string|null name Short name for the benefit */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
@@ -93,9 +94,9 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
         )]
         #[Valid]
         public array $benefit = [],
-        /** @var bool|null authorizationRequired Authorization required flag */
+        /** @var BooleanPrimitive|bool|null authorizationRequired Authorization required flag */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $authorizationRequired = null,
+        public BooleanPrimitive|bool|null $authorizationRequired = null,
         /** @var array<CodeableConcept> authorizationSupporting Type of required supporting materials */
         #[FhirProperty(
             fhirType: 'CodeableConcept',

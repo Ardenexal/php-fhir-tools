@@ -22,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\VirtualServiceDetail;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
@@ -344,9 +345,9 @@ class AppointmentResource extends AbstractDomainResource
         /** @var PositiveIntPrimitive|null recurrenceId The sequence number in the recurrence */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $recurrenceId = null,
-        /** @var bool|null occurrenceChanged Indicates that this appointment varies from a recurrence pattern */
+        /** @var BooleanPrimitive|bool|null occurrenceChanged Indicates that this appointment varies from a recurrence pattern */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $occurrenceChanged = null,
+        public BooleanPrimitive|bool|null $occurrenceChanged = null,
         /** @var array<AppointmentRecurrenceTemplate> recurrenceTemplate Details of the recurrence pattern/template used to generate occurrences */
         #[FhirProperty(
             fhirType: 'BackboneElement',

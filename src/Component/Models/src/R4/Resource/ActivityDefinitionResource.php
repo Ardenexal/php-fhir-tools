@@ -30,6 +30,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\RequestResourceTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
@@ -127,9 +128,9 @@ class ActivityDefinitionResource extends AbstractDomainResource
         )]
         #[FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
-        /** @var bool|null experimental For testing purposes, not real usage */
+        /** @var BooleanPrimitive|bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $experimental = null,
+        public BooleanPrimitive|bool|null $experimental = null,
         /** @var CodeableConcept|Reference|null subject Type of individual the activity definition is intended for */
         #[FhirProperty(
             fhirType: 'choice',
@@ -309,9 +310,9 @@ class ActivityDefinitionResource extends AbstractDomainResource
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\RequestPriority',
         )]
         public ?RequestPriorityType $priority = null,
-        /** @var bool|null doNotPerform True if the activity should not be performed */
+        /** @var BooleanPrimitive|bool|null doNotPerform True if the activity should not be performed */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'If true this element negates the specified action. For Example,  instead of a request for a procedure, it is a request for the procedure to not occur.')]
-        public ?bool $doNotPerform = null,
+        public BooleanPrimitive|bool|null $doNotPerform = null,
         /** @var Timing|DateTimePrimitive|Age|Period|Range|Duration|null timing When activity is to occur */
         #[FhirProperty(
             fhirType: 'choice',

@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -38,9 +39,9 @@ class NutritionOrderOralDietSchedule extends BackboneElement
         )]
         #[Valid]
         public array $timing = [],
-        /** @var bool|null asNeeded Take 'as needed' */
+        /** @var BooleanPrimitive|bool|null asNeeded Take 'as needed' */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $asNeeded = null,
+        public BooleanPrimitive|bool|null $asNeeded = null,
         /** @var CodeableConcept|null asNeededFor Take 'as needed' for x */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $asNeededFor = null,

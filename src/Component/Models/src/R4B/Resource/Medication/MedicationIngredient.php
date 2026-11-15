@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -59,9 +60,9 @@ class MedicationIngredient extends BackboneElement
             'http://hl7.org/fhir/StructureDefinition/Medication',
         ])]
         public CodeableConcept|Reference|null $item = null,
-        /** @var bool|null isActive Active ingredient indicator */
+        /** @var BooleanPrimitive|bool|null isActive Active ingredient indicator */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isActive = null,
+        public BooleanPrimitive|bool|null $isActive = null,
         /** @var Ratio|null strength Quantity of ingredient present */
         #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex'), Valid]
         public ?Ratio $strength = null,

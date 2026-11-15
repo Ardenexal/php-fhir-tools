@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
@@ -112,12 +113,12 @@ class TimingRepeat extends Element
         /** @var PositiveIntPrimitive|null countMax Maximum number of times to repeat */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $countMax = null,
-        /** @var numeric-string|null duration How long when it happens */
+        /** @var DecimalPrimitive|numeric-string|null duration How long when it happens */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $duration = null,
-        /** @var numeric-string|null durationMax How long when it happens (Max) */
+        public DecimalPrimitive|string|null $duration = null,
+        /** @var DecimalPrimitive|numeric-string|null durationMax How long when it happens (Max) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $durationMax = null,
+        public DecimalPrimitive|string|null $durationMax = null,
         /** @var UnitsOfTimeType|null durationUnit s | min | h | d | wk | mo | a - unit of time (UCUM) */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(
@@ -132,12 +133,12 @@ class TimingRepeat extends Element
         /** @var PositiveIntPrimitive|null frequencyMax Event occurs up to frequencyMax times per period */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $frequencyMax = null,
-        /** @var numeric-string|null period Event occurs frequency times per period */
+        /** @var DecimalPrimitive|numeric-string|null period Event occurs frequency times per period */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $period = null,
-        /** @var numeric-string|null periodMax Upper limit of period (3-4 hours) */
+        public DecimalPrimitive|string|null $period = null,
+        /** @var DecimalPrimitive|numeric-string|null periodMax Upper limit of period (3-4 hours) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $periodMax = null,
+        public DecimalPrimitive|string|null $periodMax = null,
         /** @var UnitsOfTimeType|null periodUnit s | min | h | d | wk | mo | a - unit of time (UCUM) */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         #[FHIRValueSetBinding(

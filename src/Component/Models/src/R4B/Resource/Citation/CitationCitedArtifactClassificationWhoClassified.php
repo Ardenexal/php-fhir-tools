@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -47,9 +48,9 @@ class CitationCitedArtifactClassificationWhoClassified extends BackboneElement
         /** @var StringPrimitive|string|null classifierCopyright Rights management statement for the classification */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $classifierCopyright = null,
-        /** @var bool|null freeToShare Acceptable to re-use the classification */
+        /** @var BooleanPrimitive|bool|null freeToShare Acceptable to re-use the classification */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $freeToShare = null,
+        public BooleanPrimitive|bool|null $freeToShare = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

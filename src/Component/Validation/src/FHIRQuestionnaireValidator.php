@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRScalarPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment as R4Attachment;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding as R4Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity as R4Quantity;
@@ -526,7 +527,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
             $questionnaireItem = $itemIndex[$linkId] ?? null;
 
-            if ($questionnaireItem !== null && $questionnaireItem->repeats !== true) {
+            if ($questionnaireItem !== null && FHIRScalarPrimitive::unwrap($questionnaireItem->repeats) !== true) {
                 $violations[] = $this->violation(
                     'error',
                     sprintf('%s[%d]', $pathPrefix, $indexes[1]),
@@ -669,7 +670,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     ): void {
         $answerCount = \count($item->answer);
 
-        if ($questionnaireItem->repeats !== true && $answerCount > 1) {
+        if (FHIRScalarPrimitive::unwrap($questionnaireItem->repeats) !== true && $answerCount > 1) {
             $violations[] = $this->violation(
                 $isInProgress ? 'warning' : 'error',
                 $path . '.answer',
@@ -708,13 +709,13 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         $answerConstraint = $this->answerConstraint($questionnaireItem);
 
         foreach (array_values($item->answer) as $j => $answer) {
-            if ($answer->value === null) {
+            if (FHIRScalarPrimitive::unwrap($answer->value) === null) {
                 continue;
             }
 
-            $actual = $this->answerTypeName($answer->value);
+            $actual = $this->answerTypeName(FHIRScalarPrimitive::unwrap($answer->value));
 
-            if (!\in_array($actual, $expected, true) && !$this->answerConstraintAdmits($answer->value, $type, $answerConstraint)) {
+            if (!\in_array($actual, $expected, true) && !$this->answerConstraintAdmits(FHIRScalarPrimitive::unwrap($answer->value), $type, $answerConstraint)) {
                 $violations[] = $this->violation(
                     'warning',
                     sprintf('%s.answer[%d].value', $path, $j),
@@ -728,9 +729,9 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             }
 
             if ($type === 'string'
-                && \is_object($answer->value)
-                && $answer->value instanceof \Stringable
-                && preg_match('/[\r\n]/', (string) $answer->value) === 1
+                && \is_object(FHIRScalarPrimitive::unwrap($answer->value))
+                && FHIRScalarPrimitive::unwrap($answer->value) instanceof \Stringable
+                && preg_match('/[\r\n]/', (string) FHIRScalarPrimitive::unwrap($answer->value)) === 1
             ) {
                 $violations[] = $this->violation(
                     'error',
@@ -777,16 +778,16 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         $this->checkOccurs($item, $constraints, $linkId, $path, $violations);
 
         foreach (array_values($item->answer) as $j => $answer) {
-            if ($answer->value === null) {
+            if (FHIRScalarPrimitive::unwrap($answer->value) === null) {
                 continue;
             }
 
             $valuePath = sprintf('%s.answer[%d].value', $path, $j);
-            $this->checkValueBounds($answer->value, $constraints, $linkId, $valuePath, $violations);
-            $this->checkLength($answer->value, $constraints, $linkId, $valuePath, $violations);
-            $this->checkDecimalPlaces($answer->value, $constraints, $linkId, $valuePath, $violations);
-            $this->checkRegex($answer->value, $constraints, $linkId, $valuePath, $violations);
-            $this->checkQuantityConstraints($answer->value, $constraints, $linkId, $valuePath, $violations);
+            $this->checkValueBounds(FHIRScalarPrimitive::unwrap($answer->value), $constraints, $linkId, $valuePath, $violations);
+            $this->checkLength(FHIRScalarPrimitive::unwrap($answer->value), $constraints, $linkId, $valuePath, $violations);
+            $this->checkDecimalPlaces(FHIRScalarPrimitive::unwrap($answer->value), $constraints, $linkId, $valuePath, $violations);
+            $this->checkRegex(FHIRScalarPrimitive::unwrap($answer->value), $constraints, $linkId, $valuePath, $violations);
+            $this->checkQuantityConstraints(FHIRScalarPrimitive::unwrap($answer->value), $constraints, $linkId, $valuePath, $violations);
         }
     }
 
@@ -804,8 +805,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     {
         $constraints = [];
 
-        if ($questionnaireItem->maxLength !== null) {
-            $constraints['maxLength'] = (int) $questionnaireItem->maxLength;
+        if (FHIRScalarPrimitive::unwrap($questionnaireItem->maxLength) !== null) {
+            $constraints['maxLength'] = (int) FHIRScalarPrimitive::unwrap($questionnaireItem->maxLength);
         }
 
         foreach ($questionnaireItem->extension as $extension) {
@@ -1252,8 +1253,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
         // Deserialization leaves absent optional properties uninitialized (not null), so each is
         // read through isset() — a bare property access on an unset typed property would throw.
-        $magnitude = isset($value->value) ? $value->value : null;
-        if ($magnitude === null) {
+        $magnitude = isset($value->value) ? FHIRScalarPrimitive::unwrap($value->value) : null;
+        if (!is_numeric($magnitude)) {
             return null;
         }
 
@@ -1355,7 +1356,9 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         if ($value instanceof R4Quantity || $value instanceof R4BQuantity || $value instanceof R5Quantity) {
-            return $value->value !== null ? (float) $value->value : null;
+            $magnitude = FHIRScalarPrimitive::unwrap($value->value);
+
+            return is_numeric($magnitude) ? (float) $magnitude : null;
         }
 
         if (
@@ -1437,7 +1440,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         if ($value instanceof R4Quantity || $value instanceof R4BQuantity || $value instanceof R5Quantity) {
-            $magnitude = $value->value !== null ? (string) (float) $value->value : '';
+            $magnitude = FHIRScalarPrimitive::unwrap($value->value);
+            $magnitude = is_numeric($magnitude) ? (string) (float) $magnitude : '';
 
             return sprintf('quantity:%s|%s|%s', $magnitude, (string) ($value->system ?? ''), (string) ($value->code ?? ''));
         }
@@ -1605,7 +1609,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         foreach (array_values($item->answer) as $j => $answer) {
-            $value = $answer->value;
+            $value = FHIRScalarPrimitive::unwrap($answer->value);
             if ($value === null) {
                 continue;
             }
@@ -1633,7 +1637,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     private function hasAnswerValue(object $item): bool
     {
         foreach ($item->answer as $answer) {
-            if ($answer->value !== null) {
+            if (FHIRScalarPrimitive::unwrap($answer->value) !== null) {
                 return true;
             }
         }
@@ -1675,7 +1679,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         $answerConstraint = $this->answerConstraint($questionnaireItem);
 
         foreach (array_values($item->answer) as $j => $answer) {
-            $value = $answer->value;
+            $value = FHIRScalarPrimitive::unwrap($answer->value);
             if ($value === null || $this->answerConstraintAdmits($value, $type, $answerConstraint)) {
                 continue;
             }
@@ -1791,7 +1795,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         $client = $this->resolveClientForItem($linkId);
 
         foreach (array_values($item->answer) as $j => $answer) {
-            $value = $answer->value;
+            $value = FHIRScalarPrimitive::unwrap($answer->value);
             if ($value === null) {
                 continue;
             }
@@ -1934,7 +1938,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         $exclusive = [];
 
         foreach ($questionnaireItem->answerOption as $option) {
-            $identity = $this->normalizeValue($option->value);
+            $identity = $this->normalizeValue(FHIRScalarPrimitive::unwrap($option->value));
             if ($identity === null) {
                 continue;
             }
@@ -1955,7 +1959,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         $answerConstraint = $this->answerConstraint($questionnaireItem);
 
         foreach (array_values($item->answer) as $j => $answer) {
-            $identity = $this->normalizeValue($answer->value);
+            $identity = $this->normalizeValue(FHIRScalarPrimitive::unwrap($answer->value));
             if ($identity === null) {
                 continue;
             }
@@ -1963,11 +1967,11 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             $key            = $this->identityKey($identity);
             $answeredKeys[] = $key;
 
-            if (!isset($permitted[$key]) && !$this->answerConstraintAdmits($answer->value, $type, $answerConstraint)) {
+            if (!isset($permitted[$key]) && !$this->answerConstraintAdmits(FHIRScalarPrimitive::unwrap($answer->value), $type, $answerConstraint)) {
                 $violations[] = $this->violation(
                     'error',
                     sprintf('%s.answer[%d].value', $path, $j),
-                    sprintf("Answer '%s' for item '%s' is not among the permitted answerOption values.", $this->displayValue($answer->value), $linkId),
+                    sprintf("Answer '%s' for item '%s' is not among the permitted answerOption values.", $this->displayValue(FHIRScalarPrimitive::unwrap($answer->value)), $linkId),
                 );
             }
         }
@@ -2024,23 +2028,23 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         $answerConstraint = $this->answerConstraint($questionnaireItem);
 
         foreach (array_values($item->answer) as $j => $answer) {
-            $key = $this->expressionKey($answer->value, $type);
+            $key = $this->expressionKey(FHIRScalarPrimitive::unwrap($answer->value), $type);
             if ($key === null || isset($permitted[$key])) {
                 continue;
             }
 
-            if ($type === 'open-choice' && $this->answerTypeName($answer->value) === 'StringPrimitive') {
+            if ($type === 'open-choice' && $this->answerTypeName(FHIRScalarPrimitive::unwrap($answer->value)) === 'StringPrimitive') {
                 continue;
             }
 
-            if ($this->answerConstraintAdmits($answer->value, $type, $answerConstraint)) {
+            if ($this->answerConstraintAdmits(FHIRScalarPrimitive::unwrap($answer->value), $type, $answerConstraint)) {
                 continue;
             }
 
             $violations[] = $this->violation(
                 'error',
                 sprintf('%s.answer[%d].value', $path, $j),
-                sprintf("Answer '%s' for item '%s' is not among the answers its answerExpression allows.", $this->displayValue($answer->value), $linkId),
+                sprintf("Answer '%s' for item '%s' is not among the answers its answerExpression allows.", $this->displayValue(FHIRScalarPrimitive::unwrap($answer->value)), $linkId),
             );
         }
     }
@@ -2238,7 +2242,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     private function optionIsExclusive(object $option): bool
     {
         foreach ($option->extension as $extension) {
-            if ($extension->url === self::EXT_OPTION_EXCLUSIVE && isset($extension->value) && $extension->value === true) {
+            if ($extension->url === self::EXT_OPTION_EXCLUSIVE && FHIRScalarPrimitive::unwrap($extension->value ?? null) === true) {
                 return true;
             }
         }
@@ -2601,7 +2605,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     {
         $response = $this->currentResponse;
 
-        if ($response === null || $questionnaireItem->readOnly !== true) {
+        if ($response === null || FHIRScalarPrimitive::unwrap($questionnaireItem->readOnly) !== true) {
             return;
         }
 
@@ -2635,8 +2639,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
         $answerValues = [];
         foreach ($item->answer as $answer) {
-            if ($answer->value !== null) {
-                $answerValues[] = $answer->value;
+            if (FHIRScalarPrimitive::unwrap($answer->value) !== null) {
+                $answerValues[] = FHIRScalarPrimitive::unwrap($answer->value);
             }
         }
 
@@ -2938,17 +2942,17 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         $answers = $this->answersForQuestion($question, $itemIndex, $responseIndex, $evaluating);
 
         if ($operator === 'exists') {
-            $expected = \is_bool($condition->answer) ? $condition->answer : true;
+            $expected = \is_bool(FHIRScalarPrimitive::unwrap($condition->answer)) ? FHIRScalarPrimitive::unwrap($condition->answer) : true;
 
             return ($answers !== []) === $expected;
         }
 
-        if ($answers === [] || $condition->answer === null) {
+        if ($answers === [] || FHIRScalarPrimitive::unwrap($condition->answer) === null) {
             return false;
         }
 
         foreach ($answers as $value) {
-            if ($this->compareValues($value, $condition->answer, $operator)) {
+            if ($this->compareValues($value, FHIRScalarPrimitive::unwrap($condition->answer), $operator)) {
                 return true;
             }
         }
@@ -2986,8 +2990,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
         foreach ($responseIndex[$question] ?? [] as $entry) {
             foreach ($entry['item']->answer as $answer) {
-                if ($answer->value !== null) {
-                    $values[] = $answer->value;
+                if (FHIRScalarPrimitive::unwrap($answer->value) !== null) {
+                    $values[] = FHIRScalarPrimitive::unwrap($answer->value);
                 }
             }
         }
@@ -3065,7 +3069,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         foreach ($questionnaireChildren as $child) {
             $linkId = $child->linkId !== null ? (string) $child->linkId : '';
 
-            if ($linkId === '' || $child->required !== true) {
+            if ($linkId === '' || FHIRScalarPrimitive::unwrap($child->required) !== true) {
                 continue;
             }
 

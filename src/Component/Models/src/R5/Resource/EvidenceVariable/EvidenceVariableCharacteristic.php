@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
@@ -59,9 +60,9 @@ class EvidenceVariableCharacteristic extends BackboneElement
         )]
         #[Valid]
         public array $note = [],
-        /** @var bool|null exclude Whether the characteristic is an inclusion criterion or exclusion criterion */
+        /** @var BooleanPrimitive|bool|null exclude Whether the characteristic is an inclusion criterion or exclusion criterion */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $exclude = null,
+        public BooleanPrimitive|bool|null $exclude = null,
         /** @var Reference|null definitionReference Defines the characteristic (without using type and value) by a Reference */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         #[Valid]

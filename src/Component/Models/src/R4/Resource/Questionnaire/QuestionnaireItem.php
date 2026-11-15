@@ -15,7 +15,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\EnableWhenBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -151,18 +153,18 @@ class QuestionnaireItem extends BackboneElement
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\EnableWhenBehavior',
         )]
         public ?EnableWhenBehaviorType $enableBehavior = null,
-        /** @var bool|null required Whether the item must be included in data results */
+        /** @var BooleanPrimitive|bool|null required Whether the item must be included in data results */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $required = null,
-        /** @var bool|null repeats Whether the item may repeat */
+        public BooleanPrimitive|bool|null $required = null,
+        /** @var BooleanPrimitive|bool|null repeats Whether the item may repeat */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $repeats = null,
-        /** @var bool|null readOnly Don't allow human editing */
+        public BooleanPrimitive|bool|null $repeats = null,
+        /** @var BooleanPrimitive|bool|null readOnly Don't allow human editing */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $readOnly = null,
-        /** @var int|null maxLength No more than this many characters */
+        public BooleanPrimitive|bool|null $readOnly = null,
+        /** @var IntegerPrimitive|int|null maxLength No more than this many characters */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $maxLength = null,
+        public IntegerPrimitive|int|null $maxLength = null,
         /** @var CanonicalPrimitive|null answerValueSet Valueset containing permitted answers */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $answerValueSet = null,

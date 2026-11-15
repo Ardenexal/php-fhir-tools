@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
@@ -89,9 +90,9 @@ class AppointmentResponseResource extends AbstractDomainResource
         /** @var Reference|null appointment Appointment this response relates to */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), Valid, NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Appointment'])]
         public ?Reference $appointment = null,
-        /** @var bool|null proposedNewTime Indicator for a counter proposal */
+        /** @var BooleanPrimitive|bool|null proposedNewTime Indicator for a counter proposal */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $proposedNewTime = null,
+        public BooleanPrimitive|bool|null $proposedNewTime = null,
         /** @var InstantPrimitive|null start Time from appointment, or requested new start time */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
         public ?InstantPrimitive $start = null,
@@ -139,9 +140,9 @@ class AppointmentResponseResource extends AbstractDomainResource
         /** @var MarkdownPrimitive|null comment Additional comments */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $comment = null,
-        /** @var bool|null recurring This response is for all occurrences in a recurring request */
+        /** @var BooleanPrimitive|bool|null recurring This response is for all occurrences in a recurring request */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $recurring = null,
+        public BooleanPrimitive|bool|null $recurring = null,
         /** @var DatePrimitive|null occurrenceDate Original date within a recurring request */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $occurrenceDate = null,

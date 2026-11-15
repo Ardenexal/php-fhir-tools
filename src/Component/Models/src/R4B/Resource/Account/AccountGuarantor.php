@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -41,9 +42,9 @@ class AccountGuarantor extends BackboneElement
             'http://hl7.org/fhir/StructureDefinition/Organization',
         ])]
         public ?Reference $party = null,
-        /** @var bool|null onHold Credit or other hold applied */
+        /** @var BooleanPrimitive|bool|null onHold Credit or other hold applied */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $onHold = null,
+        public BooleanPrimitive|bool|null $onHold = null,
         /** @var Period|null period Guarantee account during */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,

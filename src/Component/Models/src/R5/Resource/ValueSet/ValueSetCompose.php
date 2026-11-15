@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
@@ -33,9 +34,9 @@ class ValueSetCompose extends BackboneElement
         /** @var DatePrimitive|null lockedDate Fixed date for references with no specified version (transitive) */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $lockedDate = null,
-        /** @var bool|null inactive Whether inactive codes are in the value set */
+        /** @var BooleanPrimitive|bool|null inactive Whether inactive codes are in the value set */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $inactive = null,
+        public BooleanPrimitive|bool|null $inactive = null,
         /** @var array<ValueSetComposeInclude> include Include one or more codes from a code system or other value set(s) */
         #[FhirProperty(
             fhirType: 'BackboneElement',
