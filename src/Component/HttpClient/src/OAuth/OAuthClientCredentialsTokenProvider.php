@@ -20,13 +20,13 @@ use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
  * raw response are never included in any exception message, so this can be safely surfaced in a
  * user-facing error (see {@see OAuthTokenException}'s own docblock).
  *
- * When a PSR-6 cache pool is supplied, the token is cached keyed by token-URL + client-id, with a TTL of
- * the server's own `expires_in` minus a 60s safety margin — mirrors
- * {@see CachingFHIRTerminologyClient}'s in-process-then-PSR-6
- * layering, simplified to a single cached value per provider instance (no per-call variation exists here
- * the way it does for terminology lookups). A margin-adjusted TTL at or below zero is never persisted to
- * the pool at all (see {@see self::getAccessToken()}) — only served from the in-process token for the
- * remainder of this instance's lifetime.
+ * When a PSR-6 cache pool is supplied, the token is cached under a key derived from every token-issuance
+ * input (see {@see self::cacheKey()}), with a TTL of the server's own `expires_in` minus a 60s safety
+ * margin. This mirrors {@see CachingFHIRTerminologyClient}'s in-process-then-PSR-6 layering, simplified
+ * to a single cached value per provider instance (no per-call variation exists here the way it does for
+ * terminology lookups). A margin-adjusted TTL at or below zero is never persisted to the pool at all (see
+ * {@see self::getAccessToken()}); it is only served from the in-process token for the remainder of this
+ * instance's lifetime.
  */
 final class OAuthClientCredentialsTokenProvider
 {
@@ -92,9 +92,18 @@ final class OAuthClientCredentialsTokenProvider
         return $token;
     }
 
+    /**
+     * A PSR-6 pool is usually shared across provider instances, so the key must cover every input that
+     * changes which token the endpoint issues: token URL, client id, client secret and scope. Otherwise
+     * two callers with the same client id but different secrets (or scopes) would read each other's
+     * token. The secret is the HMAC key rather than part of the hashed message, so the cache key can't
+     * be used to test guesses at the secret without also knowing it.
+     */
     private function cacheKey(): string
     {
-        return 'oauth_client_credentials_' . md5($this->tokenUrl . '|' . $this->clientId);
+        $issuanceInputs = json_encode([$this->tokenUrl, $this->clientId, $this->scope ?? ''], \JSON_THROW_ON_ERROR);
+
+        return 'oauth_client_credentials_' . hash_hmac('sha256', $issuanceInputs, $this->clientSecret);
     }
 
     /**

@@ -227,4 +227,50 @@ final class OAuthClientCredentialsTokenProviderTest extends TestCase
             }
         }
     }
+
+    /**
+     * A shared PSR-6 pool must not hand one caller's token to another caller who shares only the token
+     * URL and client id: the secret and scope change which token is issued, so they belong in the key.
+     */
+    public function testCacheKeyCoversClientSecretAndScope(): void
+    {
+        $base          = $this->cacheKeyFor(self::CLIENT_SECRET, null);
+        $sameInputs    = $this->cacheKeyFor(self::CLIENT_SECRET, null);
+        $otherSecret   = $this->cacheKeyFor('a-different-secret', null);
+        $withScope     = $this->cacheKeyFor(self::CLIENT_SECRET, 'system/*.read');
+        $otherScope    = $this->cacheKeyFor(self::CLIENT_SECRET, 'system/*.write');
+
+        self::assertSame($base, $sameInputs);
+        self::assertNotSame($base, $otherSecret);
+        self::assertNotSame($base, $withScope);
+        self::assertNotSame($withScope, $otherScope);
+        self::assertStringNotContainsString(self::CLIENT_SECRET, $base);
+    }
+
+    /** Returns the PSR-6 key a provider with the given secret and scope reads its token from. */
+    private function cacheKeyFor(string $clientSecret, ?string $scope): string
+    {
+        $requestedKeys = [];
+
+        $item = $this->createStub(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(true);
+        $item->method('get')->willReturn('cached-token');
+
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturnCallback(static function(string $key) use (&$requestedKeys, $item): CacheItemInterface {
+            $requestedKeys[] = $key;
+
+            return $item;
+        });
+
+        $mockClient = new MockHttpClient(static function(): MockResponse {
+            self::fail('HTTP client should not be called on a PSR-6 cache hit.');
+        });
+
+        (new OAuthClientCredentialsTokenProvider($mockClient, self::TOKEN_URL, self::CLIENT_ID, $clientSecret, $scope, $pool))->getAccessToken();
+
+        self::assertCount(1, $requestedKeys);
+
+        return $requestedKeys[0];
+    }
 }
