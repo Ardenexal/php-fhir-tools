@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\HttpClient\OAuth;
 
-use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
@@ -18,9 +17,9 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  * entirely transparent to the transport layer above it.
  *
  * A token-fetch failure ({@see OAuthTokenException}, always a fixed, secret-free message per its own
- * docblock) is rethrown as a Symfony {@see TransportException} so it flows through `FHIRHttpClient`'s
- * existing `catch (HttpClientExceptionInterface)` graceful-null handling unchanged — no new failure mode
- * for callers to handle.
+ * docblock) is rethrown as an {@see OAuthTransportException}, a contracts `TransportExceptionInterface`,
+ * so it flows through `FHIRHttpClient`'s existing `catch (HttpClientExceptionInterface)` graceful-null
+ * handling unchanged. No new failure mode for callers to handle.
  */
 final class OAuthHttpClient implements HttpClientInterface
 {
@@ -38,7 +37,7 @@ final class OAuthHttpClient implements HttpClientInterface
         try {
             $options['auth_bearer'] = $this->tokenProvider->getAccessToken();
         } catch (OAuthTokenException $e) {
-            throw new TransportException($e->getMessage(), previous: $e);
+            throw new OAuthTransportException($e->getMessage(), previous: $e);
         }
 
         return $this->inner->request($method, $url, $options);
