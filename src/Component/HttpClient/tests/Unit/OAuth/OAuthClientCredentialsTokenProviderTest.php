@@ -20,6 +20,9 @@ final class OAuthClientCredentialsTokenProviderTest extends TestCase
 
     private const string CLIENT_SECRET = 'super-secret-value';
 
+    /** An arbitrary fixed "now" for tests that pin the clock. */
+    private const int NOW = 1_700_000_000;
+
     public function testFetchesTokenViaClientCredentialsGrantFormBody(): void
     {
         $capturedBody = null;
@@ -83,12 +86,12 @@ final class OAuthClientCredentialsTokenProviderTest extends TestCase
 
         $item = $this->createStub(CacheItemInterface::class);
         $item->method('isHit')->willReturn(true);
-        $item->method('get')->willReturn('cached-token');
+        $item->method('get')->willReturn(['token' => 'cached-token', 'expires_at' => self::NOW + 600]);
 
         $pool = $this->createStub(CacheItemPoolInterface::class);
         $pool->method('getItem')->willReturn($item);
 
-        $provider = new OAuthClientCredentialsTokenProvider($mockClient, self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, cache: $pool);
+        $provider = new OAuthClientCredentialsTokenProvider($mockClient, self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, cache: $pool, clock: self::clockAt(self::NOW));
 
         self::assertSame('cached-token', $provider->getAccessToken());
     }
@@ -99,13 +102,13 @@ final class OAuthClientCredentialsTokenProviderTest extends TestCase
 
         $item = $this->createMock(CacheItemInterface::class);
         $item->method('isHit')->willReturn(false);
-        $item->expects(self::once())->method('set')->with('fresh-tok');
+        $item->expects(self::once())->method('set')->with(['token' => 'fresh-tok', 'expires_at' => self::NOW + 3600 - 60]);
         $item->expects(self::once())->method('expiresAfter')->with(3600 - 60);
 
         $pool = $this->createStub(CacheItemPoolInterface::class);
         $pool->method('getItem')->willReturn($item);
 
-        $provider = new OAuthClientCredentialsTokenProvider($mockClient, self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, cache: $pool);
+        $provider = new OAuthClientCredentialsTokenProvider($mockClient, self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, cache: $pool, clock: self::clockAt(self::NOW));
 
         self::assertSame('fresh-tok', $provider->getAccessToken());
     }
@@ -114,8 +117,7 @@ final class OAuthClientCredentialsTokenProviderTest extends TestCase
      * A margin-adjusted TTL at or below zero (a token whose `expires_in` is already inside, or below,
      * the 60s safety margin) must never be persisted to the PSR-6 pool at all — passing `null` to
      * `expiresAfter()` means "never expires", which would cache an already-near-expiry token forever
-     * instead of not caching it. The in-process token still serves this one `getAccessToken()` call (and
-     * any further calls on this same provider instance); only the pool write is skipped.
+     * instead of not caching it. The fetched token still serves this one `getAccessToken()` call.
      */
     public function testExpiresInAtOrBelowSafetyMarginIsNeverPersistedToTheCachePool(): void
     {
@@ -147,6 +149,37 @@ final class OAuthClientCredentialsTokenProviderTest extends TestCase
 
         $provider = new OAuthClientCredentialsTokenProvider($mockClient, self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, cache: $pool);
         $provider->getAccessToken();
+    }
+
+    /** Some token endpoints send `expires_in` as a numeric string; it must still set the expiry. */
+    public function testNumericStringExpiresInIsHonoured(): void
+    {
+        $item = $this->createMock(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(false);
+        $item->expects(self::once())->method('expiresAfter')->with(300 - 60);
+
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturn($item);
+
+        $mockClient = new MockHttpClient(new MockResponse(json_encode(['access_token' => 'tok', 'expires_in' => '300']) ?: '{}'));
+        $provider   = new OAuthClientCredentialsTokenProvider($mockClient, self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, cache: $pool, clock: self::clockAt(self::NOW));
+        $provider->getAccessToken();
+    }
+
+    /** An absurd `expires_in` is capped at one year instead of overflowing the expiry timestamp. */
+    public function testHugeExpiresInIsCappedAtOneYear(): void
+    {
+        $item = $this->createMock(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(false);
+        $item->expects(self::once())->method('expiresAfter')->with(31_536_000 - 60);
+
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturn($item);
+
+        $mockClient = new MockHttpClient(new MockResponse(json_encode(['access_token' => 'tok', 'expires_in' => \PHP_INT_MAX]) ?: '{}'));
+        $provider   = new OAuthClientCredentialsTokenProvider($mockClient, self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, cache: $pool, clock: self::clockAt(self::NOW));
+
+        self::assertSame('tok', $provider->getAccessToken());
     }
 
     public function testHttpErrorStatusThrowsGenericMessage(): void
@@ -247,6 +280,101 @@ final class OAuthClientCredentialsTokenProviderTest extends TestCase
         self::assertStringNotContainsString(self::CLIENT_SECRET, $base);
     }
 
+    /**
+     * The long-running-worker case: a provider that lives longer than its token must fetch a new one
+     * once `expires_in` minus the 60s safety margin has passed, not keep returning the first token.
+     */
+    public function testFetchesNewTokenOnceSafetyMarginIsReached(): void
+    {
+        $clock    = self::clockAt(self::NOW);
+        $provider = new OAuthClientCredentialsTokenProvider($this->countingTokenEndpoint(3600), self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, clock: $clock);
+
+        self::assertSame('tok-1', $provider->getAccessToken());
+
+        $clock->now = self::NOW + 3600 - 61;
+        self::assertSame('tok-1', $provider->getAccessToken(), 'Token must be reused while outside the safety margin.');
+
+        $clock->now = self::NOW + 3600 - 60;
+        self::assertSame('tok-2', $provider->getAccessToken(), 'Token must be replaced once the safety margin is reached.');
+        self::assertSame('tok-2', $provider->getAccessToken());
+    }
+
+    /** A token whose `expires_in` is already inside the margin serves the call that fetched it, and no other. */
+    public function testTokenInsideSafetyMarginIsNotReused(): void
+    {
+        $provider = new OAuthClientCredentialsTokenProvider($this->countingTokenEndpoint(30), self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, clock: self::clockAt(self::NOW));
+
+        self::assertSame('tok-1', $provider->getAccessToken());
+        self::assertSame('tok-2', $provider->getAccessToken());
+    }
+
+    /** A pool entry past its stored expiry (a pool that returns items late) is treated as a miss. */
+    public function testExpiredPsr6EntryIsIgnored(): void
+    {
+        $item = $this->createStub(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(true);
+        $item->method('get')->willReturn(['token' => 'stale-token', 'expires_at' => self::NOW]);
+
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturn($item);
+
+        $provider = new OAuthClientCredentialsTokenProvider($this->countingTokenEndpoint(3600), self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, cache: $pool, clock: self::clockAt(self::NOW));
+
+        self::assertSame('tok-1', $provider->getAccessToken());
+    }
+
+    public function testInvalidateForcesNewFetchAndDeletesMatchingPoolEntry(): void
+    {
+        $item = $this->createStub(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(true);
+        $item->method('get')->willReturn(['token' => 'tok-1', 'expires_at' => self::NOW + 600]);
+
+        $pool = $this->createMock(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturn($item);
+        $pool->expects(self::once())->method('deleteItem');
+
+        $provider = new OAuthClientCredentialsTokenProvider($this->countingTokenEndpoint(3600), self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, clock: self::clockAt(self::NOW));
+        $provider->getAccessToken();
+        $provider->invalidate('tok-1');
+        self::assertSame('tok-2', $provider->getAccessToken());
+
+        $pooled = new OAuthClientCredentialsTokenProvider($this->countingTokenEndpoint(3600), self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, cache: $pool, clock: self::clockAt(self::NOW));
+        $pooled->invalidate('tok-1');
+    }
+
+    /** Another worker may already have replaced the pooled token; invalidating an older one must not delete it. */
+    public function testInvalidateLeavesADifferentPooledTokenAlone(): void
+    {
+        $item = $this->createStub(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(true);
+        $item->method('get')->willReturn(['token' => 'newer-token', 'expires_at' => self::NOW + 600]);
+
+        $pool = $this->createMock(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturn($item);
+        $pool->expects(self::never())->method('deleteItem');
+
+        $provider = new OAuthClientCredentialsTokenProvider($this->countingTokenEndpoint(3600), self::TOKEN_URL, self::CLIENT_ID, self::CLIENT_SECRET, cache: $pool, clock: self::clockAt(self::NOW));
+        $provider->invalidate('older-token');
+    }
+
+    /** A token endpoint that issues `tok-1`, `tok-2`, ... with the given `expires_in`. */
+    private function countingTokenEndpoint(int $expiresIn): MockHttpClient
+    {
+        $issued = 0;
+
+        return new MockHttpClient(static function() use (&$issued, $expiresIn): MockResponse {
+            ++$issued;
+
+            return new MockResponse(json_encode(['access_token' => 'tok-' . $issued, 'expires_in' => $expiresIn]) ?: '{}');
+        });
+    }
+
+    /** A clock whose current Unix time is the public, writable `$now`. */
+    private static function clockAt(int $now): MutableClock
+    {
+        return new MutableClock($now);
+    }
+
     /** Returns the PSR-6 key a provider with the given secret and scope reads its token from. */
     private function cacheKeyFor(string $clientSecret, ?string $scope): string
     {
@@ -254,7 +382,7 @@ final class OAuthClientCredentialsTokenProviderTest extends TestCase
 
         $item = $this->createStub(CacheItemInterface::class);
         $item->method('isHit')->willReturn(true);
-        $item->method('get')->willReturn('cached-token');
+        $item->method('get')->willReturn(['token' => 'cached-token', 'expires_at' => \PHP_INT_MAX]);
 
         $pool = $this->createStub(CacheItemPoolInterface::class);
         $pool->method('getItem')->willReturnCallback(static function(string $key) use (&$requestedKeys, $item): CacheItemInterface {

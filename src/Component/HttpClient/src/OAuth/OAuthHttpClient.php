@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\HttpClient\OAuth;
 
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
@@ -20,6 +21,13 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  * docblock) is rethrown as an {@see OAuthTransportException}, a contracts `TransportExceptionInterface`,
  * so it flows through `FHIRHttpClient`'s existing `catch (HttpClientExceptionInterface)` graceful-null
  * handling unchanged. No new failure mode for callers to handle.
+ *
+ * When the server answers HTTP 401, the token is dropped from the provider's caches and the request is
+ * sent once more with a new token. This covers a token the authorisation server revoked, or one that
+ * expired early because of clock skew. A second 401 is returned to the caller as is. To see the status,
+ * `request()` waits for the response headers before returning, so responses from this client are not
+ * fully lazy. A request whose body cannot be sent twice (a stream, generator or closure, or a form
+ * array holding a stream) is never retried, and its 401 is returned as is.
  */
 final class OAuthHttpClient implements HttpClientInterface
 {
@@ -34,13 +42,28 @@ final class OAuthHttpClient implements HttpClientInterface
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        try {
-            $options['auth_bearer'] = $this->tokenProvider->getAccessToken();
-        } catch (OAuthTokenException $e) {
-            throw new OAuthTransportException($e->getMessage(), previous: $e);
+        $token    = $this->accessToken();
+        $response = $this->inner->request($method, $url, [...$options, 'auth_bearer' => $token]);
+
+        if (!self::isReplayable($options)) {
+            return $response;
         }
 
-        return $this->inner->request($method, $url, $options);
+        try {
+            $status = $response->getStatusCode();
+        } catch (TransportExceptionInterface) {
+            // The caller sees the same exception when it reads the response, exactly as without the retry.
+            return $response;
+        }
+
+        if ($status !== 401) {
+            return $response;
+        }
+
+        $response->cancel();
+        $this->tokenProvider->invalidate($token);
+
+        return $this->inner->request($method, $url, [...$options, 'auth_bearer' => $this->accessToken()]);
     }
 
     public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
@@ -54,5 +77,45 @@ final class OAuthHttpClient implements HttpClientInterface
     public function withOptions(array $options): static
     {
         return new self($this->inner->withOptions($options), $this->tokenProvider);
+    }
+
+    /**
+     * @throws OAuthTransportException
+     */
+    private function accessToken(): string
+    {
+        try {
+            return $this->tokenProvider->getAccessToken();
+        } catch (OAuthTokenException $e) {
+            throw new OAuthTransportException($e->getMessage(), previous: $e);
+        }
+    }
+
+    /**
+     * A string body, a form array of scalar values, or the `json` option can be sent again as is. A
+     * resource, generator or closure body is consumed by the first attempt, and so is a form array
+     * holding one, because Symfony sends that as a multipart upload read from the stream.
+     *
+     * @param array<string, mixed> $options
+     */
+    private static function isReplayable(array $options): bool
+    {
+        $body = $options['body'] ?? null;
+
+        return $body === null || \is_string($body) || (\is_array($body) && self::holdsOnlyScalars($body));
+    }
+
+    /**
+     * @param array<mixed> $values
+     */
+    private static function holdsOnlyScalars(array $values): bool
+    {
+        foreach ($values as $value) {
+            if (\is_array($value) ? !self::holdsOnlyScalars($value) : !($value === null || \is_scalar($value))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

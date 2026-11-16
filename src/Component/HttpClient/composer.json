@@ -18,6 +18,7 @@
         "ardenexal/fhir-path": "^0.6.2",
         "ardenexal/fhir-serialization": "^0.6.2",
         "psr/cache": "^3.0",
+        "psr/clock": "^1.0",
         "symfony/http-client-contracts": "^3.4"
     },
     "require-dev": {
