@@ -88,7 +88,7 @@ Two decorators in the `OAuth\` namespace cover the cases `withOptions()` does no
 
 | Class | Use it for |
 |---|---|
-| `OAuth\OAuthHttpClient` with `OAuth\OAuthClientCredentialsTokenProvider` | An OAuth 2.0 client-credentials token fetched from a token endpoint. Pass a PSR-6 pool to the provider to share the token across requests, cached until 60 seconds before the server's `expires_in` |
+| `OAuth\OAuthHttpClient` with `OAuth\OAuthClientCredentialsTokenProvider` | An OAuth 2.0 client-credentials token fetched from a token endpoint and reused until 60 seconds before the server's `expires_in`. Pass a PSR-6 pool to the provider to share the token between provider instances |
 | `OAuth\StaticHeaderHttpClient` | One fixed header on every request, such as a token you already hold or `X-Api-Key` |
 
 ```php
@@ -107,10 +107,16 @@ $client = new FHIRHttpClient(
 );
 ```
 
-A provider fetches its token once and then keeps it for its own lifetime. It does not check expiry
-and does not retry on a `401`, so a provider that lives longer than its token keeps sending the
-expired one. Build the provider and its `OAuthHttpClient` per request or job, and pass a PSR-6 pool
-so that each new provider reuses the cached token until it is due to expire.
+A provider reuses its token until 60 seconds before the server's `expires_in`, then fetches a new
+one, so a client that lives longer than one token, such as a Messenger consumer, keeps working. Pass a
+PSR-20 clock as the provider's last argument to control the time it checks against.
+
+When a server answers `401`, `OAuthHttpClient` drops the token and sends the request once more with a
+new one. A second `401` is returned as is. A body that cannot be sent twice, such as a stream, a
+generator or a form upload holding a stream, is not resent, but the token is still dropped so the next
+request gets a new one. Set body defaults through `OAuthHttpClient::withOptions()` rather than on the
+client it wraps, so it can tell. To read the status, `request()` waits for the response headers before
+it returns.
 
 When a token cannot be fetched, the request fails like any other transport error, so the
 `FHIRHttpClient` method returns `null`. The error message never contains the client secret.
