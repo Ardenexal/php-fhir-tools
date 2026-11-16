@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
 
 /**
  * XML normalizer for FHIR backbone elements.
@@ -29,6 +31,7 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
         ?DenormalizerInterface $denormalizer = null,
         string $fhirVersion = 'R4',
         ?FHIRIGTypeRegistry $igTypeRegistry = null,
+        private readonly FHIRStructureKindProviderInterface $structureKinds = new FHIRStructureKindProvider(),
     ) {
         parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
     }
@@ -71,13 +74,18 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        // A present-but-empty element (`<entry/>`) is a backbone with no children, not a missing one.
+        // Reading it as such keeps the rest of the document available; ele-1 reports it.
+        if (self::isEmptyXmlElement($data)) {
+            $data = [];
+        }
+
         if (!is_array($data)) {
             throw new NotNormalizableValueException('Expected array, got ' . gettype($data));
         }
 
         try {
-            $reflection = self::reflClass($type);
-            $object     = $this->instantiateWithConstructorDefaults($reflection);
+            $object     = $this->instantiateWithConstructorDefaults($type);
             $metaMap    = $this->getPropertyMetadataMap($object);
 
             foreach ($data as $elementName => $value) {
@@ -85,21 +93,40 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                     continue;
                 }
 
-                $property      = self::reflProp($type, $elementName);
-                $choiceMapping = $property === null
+                $hasProperty   = self::modelAccessor()->hasProperty($type, $elementName);
+                $choiceMapping = !$hasProperty
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $type)
                     : null;
+
+                // A boolean/integer/decimal element with an extension becomes its wrapper (#207).
+                $extendedScalar = $this->denormalizeExtendedXmlScalar($object, $elementName, $choiceMapping, $value, $context);
+                if ($extendedScalar !== null) {
+                    self::modelAccessor()->writeValue($object, $extendedScalar[0], $extendedScalar[1]);
+                    continue;
+                }
 
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
-                    $choiceProp = self::reflProp($type, $propertyName);
-                    if ($choiceProp !== null) {
+                    if (self::modelAccessor()->hasProperty($type, $propertyName)) {
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
                         } else {
-                            $rawValue          = $this->unwrapXmlValue($value, $phpType);
-                            $denormalizedValue = match ($phpType) {
+                            $this->recordMalformedScalar($object, $propertyName, $phpType, $value, 'xml');
+                            $rawValue = $this->unwrapXmlValue($value, $phpType);
+
+                            // A scalar choice variant with neither a value nor an extension, such as
+                            // `<valueDecimal id="x"/>`, arrives as the decoded array, which raised
+                            // "Cannot assign array to property" and aborted the document. One that
+                            // carries an extension was read into its wrapper above (#207). See the
+                            // twin guard in FHIRComplexTypeXmlNormalizer for why the placeholder is
+                            // not null.
+                            $denormalizedValue = is_array($rawValue) ? match ($phpType) {
+                                'int'   => 0,
+                                'float' => 0.0,
+                                'bool'  => false,
+                                default => '',
+                            } : match ($phpType) {
                                 'int'   => (int) $rawValue,
                                 'float' => (float) $rawValue,
                                 'bool'  => filter_var($rawValue, FILTER_VALIDATE_BOOLEAN),
@@ -107,12 +134,12 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                             };
                         }
 
-                        $choiceProp->setValue($object, $denormalizedValue);
+                        self::modelAccessor()->writeValue($object, $propertyName, $denormalizedValue);
                         continue;
                     }
                 }
 
-                if ($property === null) {
+                if (!$hasProperty) {
                     continue;
                 }
                 $meta     = $metaMap[$elementName] ?? null;
@@ -126,7 +153,7 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                         $resolvedClass = $this->typeResolver->resolveResourceType(['resourceType' => $resourceElementName]);
                         if ($resolvedClass !== null) {
                             $denormalizedValue = $this->denormalizer->denormalize($value[$resourceElementName], $resolvedClass, 'xml', $context);
-                            $property->setValue($object, $denormalizedValue);
+                            self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                             continue;
                         }
                     }
@@ -137,16 +164,22 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                     if (is_array($items) && !array_is_list($items)) {
                         $items = [$items];
                     }
+                    // Present yet strips to nothing: one occurrence that was empty, not zero.
+                    // See self::isEmptyXmlElement().
+                    if ($items === []) {
+                        $items = [''];
+                    }
                     $denormalizedValue = [];
                     foreach ((array) $items as $item) {
                         /** @var class-string $phpItemClass */
                         $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $context);
                     }
                 } elseif ($this->denormalizer !== null) {
-                    $propertyType = $this->getPropertyType($property);
+                    $propertyType = $this->getPropertyType($type, $elementName);
                     if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                         $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
                     } else {
+                        $this->recordMalformedScalar($object, $elementName, $propertyType, $value, 'xml');
                         $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
                         if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {
                             $denormalizedValue = $denormalizedValue['@value'];
@@ -159,13 +192,13 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                         // backbone scalar primitives need coercion on this XML path at all.
                     }
                 } else {
-                    $propertyType      = $this->getPropertyType($property);
+                    $propertyType      = $this->getPropertyType($type, $elementName);
                     $denormalizedValue = ($propertyType !== null && !$this->isBuiltinType($propertyType))
                         ? null
                         : $this->denormalizeBasicValue($value, 'xml', $context);
                 }
 
-                $property->setValue($object, $denormalizedValue);
+                self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
             }
 
             return $object;
@@ -180,7 +213,9 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
             return false;
         }
 
-        if (!is_array($data)) {
+        // An empty element still claims its backbone type: refusing it here left Symfony with no
+        // normalizer at all and aborted the whole document. See self::isEmptyXmlElement().
+        if (!is_array($data) && !self::isEmptyXmlElement($data)) {
             return false;
         }
 
@@ -190,7 +225,7 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            return $cache[$type] = !empty(self::reflClass($type)->getAttributes(FHIRBackboneElement::class));
+            return $cache[$type] = $this->structureKinds->declaredKindOf($type) === FHIRStructureKind::BackboneElement;
         } catch (\ReflectionException) {
             return $cache[$type] = false;
         }
@@ -215,16 +250,12 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
         $metaMap           = $this->getPropertyMetadataMap($object);
         $includeExtensions = $fhirContext->includeExtensions;
 
-        $properties = self::reflPublicProps($object);
+        // One read of the instance instead of a reflection lookup per declared property.
+        $values = self::modelAccessor()->initializedPublicValues($object);
 
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-
-            if (!$property->isInitialized($object)) {
-                continue;
-            }
-
-            $value = $property->getValue($object);
+        foreach (self::modelAccessor()->publicPropertyNames($object) as $propertyName) {
+            // Unwritten and explicitly null both read as null here, and the skip below catches both.
+            $value = $values[$propertyName] ?? null;
 
             if ($value === null || (is_array($value) && empty($value))) {
                 continue;
@@ -246,9 +277,9 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
             if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
                 $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
                 if ($choiceMatch !== null) {
-                    [$resolvedKind, $resolvedKey] = $choiceMatch;
+                    [, $resolvedKey]              = $choiceMatch;
                     $xmlKey                       = $resolvedKey;
-                    if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
+                    if ($this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context, $includeExtensions);
                         if ($normalizedValue !== null) {
                             $data[$xmlKey] = $normalizedValue;

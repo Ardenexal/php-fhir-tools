@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Guidelines or protocols that are applicable for the administration of the medication based on indication.
@@ -35,6 +36,7 @@ class MedicationKnowledgeIndicationGuideline extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ClinicalUseDefinition'])]
         public array $indication = [],
         /** @var array<MedicationKnowledgeIndicationGuidelineDosingGuideline> dosingGuideline Guidelines for dosage of the medication */
@@ -44,6 +46,7 @@ class MedicationKnowledgeIndicationGuideline extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeIndicationGuidelineDosingGuideline',
         )]
+        #[Valid]
         public array $dosingGuideline = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

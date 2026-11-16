@@ -32,7 +32,13 @@ class TestReportSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var TestReportActionResultType|null result pass | skip | fail | warning | error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/report-action-result-codes|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/report-action-result-codes|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\TestReportActionResult',
+        )]
         public ?TestReportActionResultType $result = null,
         /** @var MarkdownPrimitive|null message A message associated with the result */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

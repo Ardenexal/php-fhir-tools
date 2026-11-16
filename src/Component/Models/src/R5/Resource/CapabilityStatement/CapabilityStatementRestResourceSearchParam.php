@@ -40,7 +40,13 @@ class CapabilityStatementRestResourceSearchParam extends BackboneElement
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SearchParameter'])]
         public ?CanonicalPrimitive $definition = null,
         /** @var SearchParamTypeType|null type number | date | string | token | reference | composite | quantity | uri | special */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-param-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-param-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\SearchParamType',
+        )]
         public ?SearchParamTypeType $type = null,
         /** @var MarkdownPrimitive|null documentation Server-specific usage */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

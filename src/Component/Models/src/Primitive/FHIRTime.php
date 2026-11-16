@@ -16,8 +16,9 @@ use Brick\DateTime\LocalTime;
 final readonly class FHIRTime implements FHIRTemporalValue
 {
     private function __construct(
-        private LocalTime $value,
+        private ?LocalTime $value,
         private string $originalString,
+        private ?string $parseError = null,
     ) {
     }
 
@@ -27,9 +28,19 @@ final readonly class FHIRTime implements FHIRTemporalValue
         return new self(LocalTime::parse(ltrim($raw, 'T')), $raw);
     }
 
-    public function getValue(): LocalTime
+    public static function unparsed(string $raw, string $error): static
+    {
+        return new self(null, $raw, $error);
+    }
+
+    public function getValue(): ?LocalTime
     {
         return $this->value;
+    }
+
+    public function getParseError(): ?string
+    {
+        return $this->parseError;
     }
 
     /**

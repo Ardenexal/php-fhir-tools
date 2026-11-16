@@ -11,7 +11,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Fixture in the test script - by reference (uri). All fixtures are required for the test script to execute.
@@ -29,14 +31,14 @@ class TestScriptFixture extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null autocreate Whether or not to implicitly create the fixture during setup */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?bool $autocreate = null,
-        /** @var bool|null autodelete Whether or not to implicitly delete the fixture during teardown */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?bool $autodelete = null,
+        /** @var BooleanPrimitive|bool|null autocreate Whether or not to implicitly create the fixture during setup */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
+        public BooleanPrimitive|bool|null $autocreate = null,
+        /** @var BooleanPrimitive|bool|null autodelete Whether or not to implicitly delete the fixture during teardown */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
+        public BooleanPrimitive|bool|null $autodelete = null,
         /** @var Reference|null resource Reference of the resource */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $resource = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

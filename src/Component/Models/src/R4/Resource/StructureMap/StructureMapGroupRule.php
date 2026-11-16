@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Transform Rule from source to target.
@@ -41,6 +42,7 @@ class StructureMapGroupRule extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureMap\StructureMapGroupRuleSource',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $source = [],
         /** @var array<StructureMapGroupRuleTarget> target Content to create because of this mapping rule */
@@ -50,6 +52,7 @@ class StructureMapGroupRule extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureMap\StructureMapGroupRuleTarget',
         )]
+        #[Valid]
         public array $target = [],
         /** @var array<StructureMapGroupRule> rule Rules contained in this rule */
         #[FhirProperty(
@@ -58,6 +61,7 @@ class StructureMapGroupRule extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureMap\StructureMapGroupRule',
         )]
+        #[Valid]
         public array $rule = [],
         /** @var array<StructureMapGroupRuleDependent> dependent Which other rules to apply in the context of this rule */
         #[FhirProperty(
@@ -66,6 +70,7 @@ class StructureMapGroupRule extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureMap\StructureMapGroupRuleDependent',
         )]
+        #[Valid]
         public array $dependent = [],
         /** @var StringPrimitive|string|null documentation Documentation for this instance of data */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

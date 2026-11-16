@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Measure","url":"http://hl7.org/fhir/StructureDefinition/Measure","version":"4.0.1","name":"Measure","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Measure","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The anatomical location(s) or region(s) of the specimen, lesion, or body structure.
@@ -31,10 +32,10 @@ class BodyStructureIncludedStructure extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null structure Code that represents the included structure */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $structure = null,
         /** @var CodeableConcept|null laterality Code that represents the included structure laterality */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $laterality = null,
         /** @var array<BodyStructureIncludedStructureBodyLandmarkOrientation> bodyLandmarkOrientation Landmark relative location */
         #[FhirProperty(
@@ -43,6 +44,7 @@ class BodyStructureIncludedStructure extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\BodyStructure\BodyStructureIncludedStructureBodyLandmarkOrientation',
         )]
+        #[Valid]
         public array $bodyLandmarkOrientation = [],
         /** @var array<Reference> spatialReference Cartesian reference for structure */
         #[FhirProperty(
@@ -51,6 +53,7 @@ class BodyStructureIncludedStructure extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ImagingSelection'])]
         public array $spatialReference = [],
         /** @var array<CodeableConcept> qualifier Code that represents the included structure qualifier */
@@ -60,6 +63,7 @@ class BodyStructureIncludedStructure extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $qualifier = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

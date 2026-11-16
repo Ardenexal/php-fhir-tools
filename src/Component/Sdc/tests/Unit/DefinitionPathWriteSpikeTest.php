@@ -11,9 +11,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProviderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProviderInterface;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 

@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ConsentProvisionTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An exception to the base policy of this consent. An exception can be an addition or removal of access permissions.
@@ -32,10 +33,15 @@ class ConsentProvision extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var ConsentProvisionTypeType|null type deny | permit */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-provision-type|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-provision-type|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ConsentProvisionType',
+        )]
         public ?ConsentProvisionTypeType $type = null,
         /** @var Period|null period Timeframe for this rule */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,
         /** @var array<ConsentProvisionActor> actor Who|what controlled by this rule (or group, by role) */
         #[FhirProperty(
@@ -44,6 +50,7 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentProvisionActor',
         )]
+        #[Valid]
         public array $actor = [],
         /** @var array<CodeableConcept> action Actions controlled by this rule */
         #[FhirProperty(
@@ -52,6 +59,7 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $action = [],
         /** @var array<Coding> securityLabel Security Labels that define affected resources */
         #[FhirProperty(
@@ -60,7 +68,12 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\AllSecurityLabels',
+        )]
         public array $securityLabel = [],
         /** @var array<Coding> purpose Context of activities covered by this rule */
         #[FhirProperty(
@@ -69,7 +82,12 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-PurposeOfUse', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-PurposeOfUse',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\PurposeOfUse',
+        )]
         public array $purpose = [],
         /** @var array<Coding> class e.g. Resource Type, Profile, CDA, etc. */
         #[FhirProperty(
@@ -78,7 +96,12 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-content-class', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-content-class',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ConsentContentClass',
+        )]
         public array $class = [],
         /** @var array<CodeableConcept> code e.g. LOINC or SNOMED CT code, etc. in the content */
         #[FhirProperty(
@@ -87,9 +110,10 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $code = [],
         /** @var Period|null dataPeriod Timeframe for data controlled by this rule */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $dataPeriod = null,
         /** @var array<ConsentProvisionData> data Data controlled by this rule */
         #[FhirProperty(
@@ -98,6 +122,7 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentProvisionData',
         )]
+        #[Valid]
         public array $data = [],
         /** @var array<ConsentProvision> provision Nested Exception Rules */
         #[FhirProperty(
@@ -106,6 +131,7 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentProvision',
         )]
+        #[Valid]
         public array $provision = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

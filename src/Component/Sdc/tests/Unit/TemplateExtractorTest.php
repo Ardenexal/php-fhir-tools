@@ -12,7 +12,7 @@ use Ardenexal\FHIRTools\Component\Sdc\Extract\ExtractModelFactory;
 use Ardenexal\FHIRTools\Component\Sdc\Extract\TemplateExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**

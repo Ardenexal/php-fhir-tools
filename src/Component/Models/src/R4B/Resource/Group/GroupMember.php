@@ -12,7 +12,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Identifies the resource instances that are members of the group.
@@ -32,6 +34,7 @@ class GroupMember extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null entity Reference to the group member */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
@@ -45,11 +48,11 @@ class GroupMember extends BackboneElement
         ])]
         public ?Reference $entity = null,
         /** @var Period|null period Period member belonged to the group */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $period = null,
-        /** @var bool|null inactive If member is no longer in group */
+        /** @var BooleanPrimitive|bool|null inactive If member is no longer in group */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $inactive = null,
+        public BooleanPrimitive|bool|null $inactive = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

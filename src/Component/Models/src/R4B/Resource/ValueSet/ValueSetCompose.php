@@ -9,8 +9,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A set of criteria that define the contents of the value set by including or excluding codes selected from the specified code system(s) that the value set draws from. This is also known as the Content Logical Definition (CLD).
@@ -31,9 +33,9 @@ class ValueSetCompose extends BackboneElement
         /** @var DatePrimitive|null lockedDate Fixed date for references with no specified version (transitive) */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $lockedDate = null,
-        /** @var bool|null inactive Whether inactive codes are in the value set */
+        /** @var BooleanPrimitive|bool|null inactive Whether inactive codes are in the value set */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $inactive = null,
+        public BooleanPrimitive|bool|null $inactive = null,
         /** @var array<ValueSetComposeInclude> include Include one or more codes from a code system or other value set(s) */
         #[FhirProperty(
             fhirType: 'BackboneElement',
@@ -42,6 +44,7 @@ class ValueSetCompose extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ValueSet\ValueSetComposeInclude',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $include = [],
         /** @var array<ValueSetComposeInclude> exclude Explicitly exclude codes from a code system or other value sets */
@@ -51,6 +54,7 @@ class ValueSetCompose extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ValueSet\ValueSetComposeInclude',
         )]
+        #[Valid]
         public array $exclude = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

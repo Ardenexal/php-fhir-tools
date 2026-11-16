@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -31,7 +32,13 @@ class DataRequirement extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var FHIRAllTypesType|null type The type of the required data */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-types|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-types|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRAllTypes',
+        )]
         public ?FHIRAllTypesType $type = null,
         /** @var array<CanonicalPrimitive> profile The profile of the required data */
         #[FhirProperty(
@@ -62,7 +69,11 @@ class DataRequirement extends Element
                 ],
             ],
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subject-type', strength: 'extensible')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/subject-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SubjectType',
+        )]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
         public CodeableConcept|Reference|null $subject = null,
         /** @var array<StringPrimitive|string> mustSupport Indicates specific structure elements that are referenced by the knowledge module */
@@ -80,6 +91,7 @@ class DataRequirement extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirementCodeFilter',
         )]
+        #[Valid]
         public array $codeFilter = [],
         /** @var array<DataRequirementDateFilter> dateFilter What dates/date ranges are expected */
         #[FhirProperty(
@@ -88,6 +100,7 @@ class DataRequirement extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirementDateFilter',
         )]
+        #[Valid]
         public array $dateFilter = [],
         /** @var PositiveIntPrimitive|null limit Number of results */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
@@ -99,6 +112,7 @@ class DataRequirement extends Element
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirementSort',
         )]
+        #[Valid]
         public array $sort = [],
     ) {
         parent::__construct($id, $extension);

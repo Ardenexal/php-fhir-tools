@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: DeviceMetricCalibrationState
  * URL: http://hl7.org/fhir/ValueSet/metric-calibration-state
  * Version: 4.3.0
  * Description: Describes the state of a metric calibration.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/metric-calibration-state', version: '4.3.0')]
 enum DeviceMetricCalibrationState: string
 {
     /** Not Calibrated */

@@ -10,9 +10,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The codes that are contained in the value set expansion.
@@ -51,12 +53,12 @@ class ValueSetExpansionContains extends BackboneElement
         /** @var UriPrimitive|null system System value for the code */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $system = null,
-        /** @var bool|null abstract If user cannot select this entry */
+        /** @var BooleanPrimitive|bool|null abstract If user cannot select this entry */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $abstract = null,
-        /** @var bool|null inactive If concept is inactive in the code system */
+        public BooleanPrimitive|bool|null $abstract = null,
+        /** @var BooleanPrimitive|bool|null inactive If concept is inactive in the code system */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $inactive = null,
+        public BooleanPrimitive|bool|null $inactive = null,
         /** @var StringPrimitive|string|null version Version in which this code/display is defined */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $version = null,
@@ -73,6 +75,7 @@ class ValueSetExpansionContains extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ValueSet\ValueSetComposeIncludeConceptDesignation',
         )]
+        #[Valid]
         public array $designation = [],
         /** @var array<ValueSetExpansionContainsProperty> property Property value for the concept */
         #[FhirProperty(
@@ -81,6 +84,7 @@ class ValueSetExpansionContains extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ValueSet\ValueSetExpansionContainsProperty',
         )]
+        #[Valid]
         public array $property = [],
         /** @var array<ValueSetExpansionContains> contains Codes contained under this entry */
         #[FhirProperty(
@@ -89,6 +93,7 @@ class ValueSetExpansionContains extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ValueSet\ValueSetExpansionContains',
         )]
+        #[Valid]
         public array $contains = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

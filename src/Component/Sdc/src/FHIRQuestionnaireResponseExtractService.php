@@ -31,8 +31,8 @@ use Ardenexal\FHIRTools\Component\Sdc\Extract\DefinitionPathWriter;
 use Ardenexal\FHIRTools\Component\Sdc\Extract\ExtractModelFactory;
 use Ardenexal\FHIRTools\Component\Sdc\Extract\QuestionnaireResponseReader;
 use Ardenexal\FHIRTools\Component\Sdc\Extract\TemplateExtractor;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
 
 /**
  * Observation- and definition-based `QuestionnaireResponse/$extract` across R4/R4B/R5.
@@ -163,10 +163,11 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
         $allocatedIds = $this->collectAllocatedIds($questionnaire);
         // Bind %resource/%rootResource to the QR root once, up front. `definitionExtractValue`
         // expressions are then evaluated with the current QR response *item* as focus (%context)
-        // while %resource stays the QR root. resourceNode is never mutated by the evaluator's
-        // per-call setRootResource(), so it remains a stable QR-root handle for the whole walk.
+        // while %resource stays the QR root. The root resource is left unset on purpose: the
+        // evaluator only defaults it to the focus when it is null, and each call works on its own
+        // clone of this context (a non-null fhirVersion forces one), so every expression's
+        // %context is its own focus item.
         $evalContext = new EvaluationContext(
-            rootResource: $questionnaireResponse,
             externalConstants: $allocatedIds,
             resourceNode: $questionnaireResponse,
         );

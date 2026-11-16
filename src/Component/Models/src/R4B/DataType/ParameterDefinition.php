@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -34,11 +35,17 @@ class ParameterDefinition extends Element
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?CodePrimitive $name = null,
         /** @var OperationParameterUseType|null use in | out */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-parameter-use|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-parameter-use|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\OperationParameterUse',
+        )]
         public ?OperationParameterUseType $use = null,
-        /** @var int|null min Minimum cardinality */
+        /** @var IntegerPrimitive|int|null min Minimum cardinality */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $min = null,
+        public IntegerPrimitive|int|null $min = null,
         /** @var StringPrimitive|string|null max Maximum cardinality (a number of *) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $max = null,
@@ -46,7 +53,13 @@ class ParameterDefinition extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $documentation = null,
         /** @var FHIRAllTypesType|null type What type of value */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-types|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-types|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRAllTypes',
+        )]
         public ?FHIRAllTypesType $type = null,
         /** @var CanonicalPrimitive|null profile What profile the value is expected to be */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]

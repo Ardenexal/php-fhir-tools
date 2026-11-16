@@ -1,5 +1,19 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 1
+    "warningCount": 0,
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Error generating Snapshot: The path must be 'Observation.value[x]' not 'Observation.valueBla' when the type list is not constrained (this usually arises from a problem in the differential)"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

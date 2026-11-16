@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Authorization in areas within a country.
@@ -40,9 +41,10 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization extends BackboneE
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null country Country of authorization */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $country = null,
         /** @var array<CodeableConcept> jurisdiction Jurisdiction within a country */
         #[FhirProperty(
@@ -51,12 +53,13 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization extends BackboneE
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $jurisdiction = [],
         /** @var CodeableConcept|null legalStatusOfSupply The legal status of supply in a jurisdiction or region */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $legalStatusOfSupply = null,
         /** @var Period|null validityPeriod The start and expected end date of the authorization */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $validityPeriod = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

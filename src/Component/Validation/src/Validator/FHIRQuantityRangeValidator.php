@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRQuantityRange;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRScalarPrimitive;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -56,8 +57,10 @@ final class FHIRQuantityRangeValidator extends ConstraintValidator
             return;
         }
 
-        $numericStr = $value->value ?? null;
-        if ($numericStr === null) {
+        // A decimal carrying an extension arrives as its DecimalPrimitive wrapper; an extension-only
+        // one has no magnitude to compare.
+        $numericStr = FHIRScalarPrimitive::unwrap($value->value ?? null);
+        if (!is_numeric($numericStr)) {
             return;
         }
 

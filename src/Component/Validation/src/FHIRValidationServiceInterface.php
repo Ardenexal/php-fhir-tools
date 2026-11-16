@@ -12,16 +12,26 @@ interface FHIRValidationServiceInterface
      * Base (Default group) constraints are always evaluated. Profile constraints are evaluated only
      * when the matching profile URL is passed in $profileUrls.
      *
-     * @param list<string>               $profileUrls            Profile canonical URLs to validate against (empty = base only)
-     * @param bool                       $includeMustSupportInfo Emit info-level violations for null/empty must-support properties
-     * @param FHIRObligationContext|null $obligationContext      When set, population-class obligations matching the actor produce violations
+     * @param list<string>               $profileUrls             Profile canonical URLs to validate against (empty = base only)
+     * @param bool                       $includeMustSupportInfo  Emit info-level violations for null/empty must-support properties
+     * @param FHIRObligationContext|null $obligationContext       When set, population-class obligations matching the actor produce violations
+     * @param bool                       $deriveProfilesFromClass Also evaluate every profile the resource's own class declares, inherited ones included
      */
     public function validate(
         object $resource,
         array $profileUrls = [],
         bool $includeMustSupportInfo = false,
         ?FHIRObligationContext $obligationContext = null,
+        bool $deriveProfilesFromClass = false,
     ): FHIRValidationReport;
+
+    /**
+     * Validate a FHIR model object with settings {@see validate()} does not take, such as checking
+     * each resource against the profiles in its own `meta.profile`.
+     *
+     * New settings are added to {@see FHIRValidationOptions} rather than to a method signature.
+     */
+    public function validateWithOptions(object $resource, FHIRValidationOptions $options): FHIRValidationReport;
 
     /**
      * Validate a FHIR resource and return a standards-compliant OperationOutcome.

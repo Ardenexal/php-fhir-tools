@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Related Artifact Type All
  * URL: http://hl7.org/fhir/ValueSet/related-artifact-type-all
  * Version: 5.0.0
  * Description: The type of relationship to the cited artifact.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/related-artifact-type-all', version: '5.0.0')]
 enum RelatedArtifactTypeExpanded: string
 {
     /** Documentation */

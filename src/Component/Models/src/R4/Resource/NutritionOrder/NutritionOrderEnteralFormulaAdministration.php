@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Formula administration instructions as structured data.  This repeating structure allows for changing the administration rate or volume over time for both bolus and continuous feeding.  An example of this would be an instruction to increase the rate of continuous feeding every 2 hours.
@@ -30,10 +31,10 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Timing|null schedule Scheduled frequency of enteral feeding */
-        #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex'), Valid]
         public ?Timing $schedule = null,
         /** @var Quantity|null quantity The volume of formula to provide */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Quantity|Ratio|null rate Speed with which the formula is provided per period of time */
         #[FhirProperty(

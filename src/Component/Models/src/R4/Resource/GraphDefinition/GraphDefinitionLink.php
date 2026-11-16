@@ -9,7 +9,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Links this graph makes rules about.
@@ -33,9 +35,9 @@ class GraphDefinitionLink extends BackboneElement
         /** @var StringPrimitive|string|null sliceName Which slice (if profiled) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $sliceName = null,
-        /** @var int|null min Minimum occurrences for this link */
+        /** @var IntegerPrimitive|int|null min Minimum occurrences for this link */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $min = null,
+        public IntegerPrimitive|int|null $min = null,
         /** @var StringPrimitive|string|null max Maximum occurrences for this link */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $max = null,
@@ -49,6 +51,7 @@ class GraphDefinitionLink extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\GraphDefinition\GraphDefinitionLinkTarget',
         )]
+        #[Valid]
         public array $target = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

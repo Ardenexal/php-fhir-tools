@@ -18,11 +18,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\HumanName;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Practitioner\PractitionerCommunication;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Practitioner\PractitionerQualification;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Health Level Seven International (Patient Administration)
@@ -39,19 +41,24 @@ class PractitionerResource extends AbstractDomainResource
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex'), Valid]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AllLanguages',
+        )]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex'), Valid]
         public ?Narrative $text = null,
         /** @var array<AbstractResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true), Valid]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -66,10 +73,11 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
-        /** @var bool|null active Whether this practitioner's record is in active use */
+        /** @var BooleanPrimitive|bool|null active Whether this practitioner's record is in active use */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that can indicate that a record should not be treated as valid')]
-        public ?bool $active = null,
+        public BooleanPrimitive|bool|null $active = null,
         /** @var array<HumanName> name The name(s) associated with the practitioner */
         #[FhirProperty(
             fhirType: 'HumanName',
@@ -77,6 +85,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\HumanName',
         )]
+        #[Valid]
         public array $name = [],
         /** @var array<ContactPoint> telecom A contact detail for the practitioner (that apply to all roles) */
         #[FhirProperty(
@@ -85,14 +94,20 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactPoint',
         )]
+        #[Valid]
         public array $telecom = [],
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\AdministrativeGender',
+        )]
         public ?AdministrativeGenderType $gender = null,
         /** @var DatePrimitive|null birthDate The date  on which the practitioner was born */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $birthDate = null,
-        /** @var bool|DateTimePrimitive|null deceased Indicates if the practitioner is deceased or not */
+        /** @var BooleanPrimitive|bool|DateTimePrimitive|null deceased Indicates if the practitioner is deceased or not */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -107,7 +122,7 @@ class PractitionerResource extends AbstractDomainResource
                 ],
             ],
         )]
-        public bool|DateTimePrimitive|null $deceased = null,
+        public BooleanPrimitive|bool|DateTimePrimitive|null $deceased = null,
         /** @var array<Address> address Address(es) of the practitioner that are not role specific (typically home address) */
         #[FhirProperty(
             fhirType: 'Address',
@@ -115,6 +130,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Address',
         )]
+        #[Valid]
         public array $address = [],
         /** @var array<Attachment> photo Image of the person */
         #[FhirProperty(
@@ -123,6 +139,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Attachment',
         )]
+        #[Valid]
         public array $photo = [],
         /** @var array<PractitionerQualification> qualification Qualifications, certifications, accreditations, licenses, training, etc. pertaining to the provision of care */
         #[FhirProperty(
@@ -131,6 +148,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Practitioner\PractitionerQualification',
         )]
+        #[Valid]
         public array $qualification = [],
         /** @var array<PractitionerCommunication> communication A language which may be used to communicate with the practitioner */
         #[FhirProperty(
@@ -139,6 +157,7 @@ class PractitionerResource extends AbstractDomainResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Practitioner\PractitionerCommunication',
         )]
+        #[Valid]
         public array $communication = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

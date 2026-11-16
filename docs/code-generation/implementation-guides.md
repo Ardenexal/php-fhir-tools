@@ -108,4 +108,16 @@ IG-generated classes live in an isolated namespace tree so they never overlap wi
 Serializing them requires an IG-aware service — see [IG-Aware Serialization](../serialization/ig-aware.md).
 {% endhint %}
 
+## Not generated: OperationDefinitions
+
+`fhir:generate-ig` emits extensions, profiles and constrained complex types. It does **not** emit
+typed [operation classes](operations.md), so an `OperationDefinition` published by an IG — or authored
+locally — produces nothing today. Operation generation runs only under
+[`fhir:generate`](base-models.md), over the core packages.
+
+The obstacle is wiring rather than design: the operation generator needs a type index built from the
+full `BuilderContext` to classify parameter types and resolve allowed-type variants, and this command
+does not build one. Until that changes, the workable path for your own operations is to include the
+`OperationDefinition` in a package that `fhir:generate` loads.
+
 See also [Generated Output Structure](output-structure.md).

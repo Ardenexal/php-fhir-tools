@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The distance in centimeters a certain observation is made from a body landmark.
@@ -40,6 +41,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark 
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Device'])]
         public array $device = [],
         /** @var array<Quantity> value Measured distance from body landmark */
@@ -49,6 +51,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark 
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity',
         )]
+        #[Valid]
         public array $value = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

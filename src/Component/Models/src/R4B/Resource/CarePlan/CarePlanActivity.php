@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Identifies a planned action to occur as part of the plan.  For example, a medication to be used, lab tests to perform, self-monitoring, education, etc.
@@ -44,6 +45,7 @@ class CarePlanActivity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $outcomeCodeableConcept = [],
         /** @var array<Reference> outcomeReference Appointment, Encounter, Procedure, etc. */
         #[FhirProperty(
@@ -52,6 +54,7 @@ class CarePlanActivity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $outcomeReference = [],
         /** @var array<Annotation> progress Comments about the activity status/progress */
@@ -61,9 +64,11 @@ class CarePlanActivity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
         )]
+        #[Valid]
         public array $progress = [],
         /** @var Reference|null reference Activity details defined in specific resource */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Appointment',
             'http://hl7.org/fhir/StructureDefinition/CommunicationRequest',
@@ -77,7 +82,7 @@ class CarePlanActivity extends BackboneElement
         ])]
         public ?Reference $reference = null,
         /** @var CarePlanActivityDetail|null detail In-line definition of activity */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?CarePlanActivityDetail $detail = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

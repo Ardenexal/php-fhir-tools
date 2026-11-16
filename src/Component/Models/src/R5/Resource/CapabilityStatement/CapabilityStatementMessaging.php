@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A description of the messaging capabilities of the solution.
@@ -35,6 +36,7 @@ class CapabilityStatementMessaging extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CapabilityStatement\CapabilityStatementMessagingEndpoint',
         )]
+        #[Valid]
         public array $endpoint = [],
         /** @var UnsignedIntPrimitive|null reliableCache Reliable Message Cache Length (min) */
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
@@ -49,6 +51,7 @@ class CapabilityStatementMessaging extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CapabilityStatement\CapabilityStatementMessagingSupportedMessage',
         )]
+        #[Valid]
         public array $supportedMessage = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

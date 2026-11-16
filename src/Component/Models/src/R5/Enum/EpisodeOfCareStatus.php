@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Episode Of Care Status
  * URL: http://hl7.org/fhir/ValueSet/episode-of-care-status
  * Version: 5.0.0
  * Description: The status of the episode of care.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/episode-of-care-status', version: '5.0.0')]
 enum EpisodeOfCareStatus: string
 {
     /** Planned */

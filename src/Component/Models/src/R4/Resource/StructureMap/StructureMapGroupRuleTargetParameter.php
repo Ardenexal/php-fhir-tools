@@ -9,9 +9,12 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description Parameters to the transform.
@@ -29,7 +32,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var IdPrimitive|StringPrimitive|string|bool|int|null value Parameter value - variable or literal */
+        /** @var IdPrimitive|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|DecimalPrimitive|null value Parameter value - variable or literal */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -53,8 +56,8 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
                 ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
             ],
         )]
-        #[NotBlank]
-        public IdPrimitive|StringPrimitive|string|bool|int|null $value = null,
+        #[NotNull]
+        public IdPrimitive|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|DecimalPrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

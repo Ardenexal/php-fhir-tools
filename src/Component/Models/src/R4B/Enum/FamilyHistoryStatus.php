@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: FamilyHistoryStatus
  * URL: http://hl7.org/fhir/ValueSet/history-status
  * Version: 4.3.0
  * Description: A code that identifies the status of the family history record.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/history-status', version: '4.3.0')]
 enum FamilyHistoryStatus: string
 {
     /** Partial */

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Explanation Of Benefit Status
  * URL: http://hl7.org/fhir/ValueSet/explanationofbenefit-status
  * Version: 5.0.0
  * Description: A code specifying the state of the resource instance.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/explanationofbenefit-status', version: '5.0.0')]
 enum ExplanationOfBenefitStatus: string
 {
     /** Active */

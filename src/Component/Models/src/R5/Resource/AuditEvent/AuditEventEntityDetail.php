@@ -15,10 +15,14 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\Base64BinaryPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Tagged value pairs for conveying additional information about the entity.
@@ -37,9 +41,9 @@ class AuditEventEntityDetail extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Name of the property */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|TimePrimitive|DateTimePrimitive|Period|Base64BinaryPrimitive|null value Property value */
+        /** @var Quantity|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Range|Ratio|TimePrimitive|DateTimePrimitive|Period|Base64BinaryPrimitive|null value Property value */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -104,8 +108,8 @@ class AuditEventEntityDetail extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
-        public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|TimePrimitive|DateTimePrimitive|Period|Base64BinaryPrimitive|null $value = null,
+        #[NotNull]
+        public Quantity|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Range|Ratio|TimePrimitive|DateTimePrimitive|Period|Base64BinaryPrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

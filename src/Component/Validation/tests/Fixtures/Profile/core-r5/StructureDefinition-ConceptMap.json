@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"ConceptMap","url":"http://hl7.org/fhir/StructureDefinition/ConceptMap","version":"5.0.0","name":"ConceptMap","status":"draft","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"ConceptMap","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

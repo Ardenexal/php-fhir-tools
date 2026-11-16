@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\AbstractResource;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An entry in a bundle resource - will either contain a resource or information about a resource (transactions and history only).
@@ -48,21 +49,22 @@ class BundleEntry extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Bundle\BundleLink',
         )]
+        #[Valid]
         public array $link = [],
         /** @var UriPrimitive|null fullUrl URI for resource (e.g. the absolute URL server address, URI for UUID/OID, etc.) */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $fullUrl = null,
         /** @var AbstractResource|null resource A resource in the bundle */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource')]
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource'), Valid]
         public ?AbstractResource $resource = null,
         /** @var BundleEntrySearch|null search Search related information */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?BundleEntrySearch $search = null,
         /** @var BundleEntryRequest|null request Additional execution information (transaction/batch/history) */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?BundleEntryRequest $request = null,
         /** @var BundleEntryResponse|null response Results of execution (transaction/batch/history) */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?BundleEntryResponse $response = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

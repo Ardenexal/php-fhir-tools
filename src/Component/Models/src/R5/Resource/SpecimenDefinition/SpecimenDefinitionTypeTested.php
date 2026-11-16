@@ -13,8 +13,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\SpecimenContainedPreferenceType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specimen conditioned in a container as expected by the testing laboratory.
@@ -32,27 +34,33 @@ class SpecimenDefinitionTypeTested extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null isDerived Primary or secondary specimen */
+        /** @var BooleanPrimitive|bool|null isDerived Primary or secondary specimen */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isDerived = null,
+        public BooleanPrimitive|bool|null $isDerived = null,
         /** @var CodeableConcept|null type Type of intended specimen */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var SpecimenContainedPreferenceType|null preference preferred | alternate */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/specimen-contained-preference|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/specimen-contained-preference|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\SpecimenContainedPreference',
+        )]
         public ?SpecimenContainedPreferenceType $preference = null,
         /** @var SpecimenDefinitionTypeTestedContainer|null container The specimen's container */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?SpecimenDefinitionTypeTestedContainer $container = null,
         /** @var MarkdownPrimitive|null requirement Requirements for specimen delivery and special handling */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $requirement = null,
         /** @var Duration|null retentionTime The usual time for retaining this kind of specimen */
-        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $retentionTime = null,
-        /** @var bool|null singleUse Specimen for single use only */
+        /** @var BooleanPrimitive|bool|null singleUse Specimen for single use only */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $singleUse = null,
+        public BooleanPrimitive|bool|null $singleUse = null,
         /** @var array<CodeableConcept> rejectionCriterion Criterion specified for specimen rejection */
         #[FhirProperty(
             fhirType: 'CodeableConcept',
@@ -60,6 +68,7 @@ class SpecimenDefinitionTypeTested extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $rejectionCriterion = [],
         /** @var array<SpecimenDefinitionTypeTestedHandling> handling Specimen handling before testing */
         #[FhirProperty(
@@ -68,6 +77,7 @@ class SpecimenDefinitionTypeTested extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SpecimenDefinition\SpecimenDefinitionTypeTestedHandling',
         )]
+        #[Valid]
         public array $handling = [],
         /** @var array<CodeableConcept> testingDestination Where the specimen will be tested */
         #[FhirProperty(
@@ -76,6 +86,7 @@ class SpecimenDefinitionTypeTested extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $testingDestination = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -13,8 +13,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Static or essentially fixed characteristics or features of this kind of device that are otherwise not captured in more specific attributes, e.g., time or timing attributes, resolution, accuracy, and physical attributes.
@@ -33,9 +37,9 @@ class DeviceDefinitionProperty extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Code that specifies the property being represented */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Attachment|null value Value of the property */
+        /** @var Quantity|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Range|Attachment|null value Value of the property */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -76,8 +80,8 @@ class DeviceDefinitionProperty extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
-        public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Attachment|null $value = null,
+        #[NotNull]
+        public Quantity|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Range|Attachment|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

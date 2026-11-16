@@ -32,7 +32,7 @@ class PositiveIntPrimitive extends IntegerPrimitive implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var int|null value Primitive value for positiveInt */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '[1-9][0-9]*')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '~\A(?:[1-9][0-9]*)\z~')]
         public ?int $value = null,
     ) {
         parent::__construct($id, $extension, $value);

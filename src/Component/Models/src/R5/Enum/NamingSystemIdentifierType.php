@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Naming System Identifier Type
  * URL: http://hl7.org/fhir/ValueSet/namingsystem-identifier-type
  * Version: 5.0.0
  * Description: Identifies the style of unique identifier used to identify a namespace.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/namingsystem-identifier-type', version: '5.0.0')]
 enum NamingSystemIdentifierType: string
 {
     /** OID */

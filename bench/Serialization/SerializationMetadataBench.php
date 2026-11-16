@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Benchmarks\Serialization;
 
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractor;
 use PhpBench\Attributes as Bench;
 
 /**

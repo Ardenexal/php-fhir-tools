@@ -21,10 +21,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\TriggerDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A characteristic that defines the members of the evidence element. Multiple characteristics are applied with "and" semantics.
@@ -103,10 +105,11 @@ class EvidenceVariableCharacteristic extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext',
         )]
+        #[Valid]
         public array $usageContext = [],
-        /** @var bool|null exclude Whether the characteristic includes or excludes members */
+        /** @var BooleanPrimitive|bool|null exclude Whether the characteristic includes or excludes members */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $exclude = null,
+        public BooleanPrimitive|bool|null $exclude = null,
         /** @var DateTimePrimitive|Period|Duration|Timing|null participantEffective What time period do participants cover */
         #[FhirProperty(
             fhirType: 'choice',
@@ -141,10 +144,15 @@ class EvidenceVariableCharacteristic extends BackboneElement
         )]
         public DateTimePrimitive|Period|Duration|Timing|null $participantEffective = null,
         /** @var Duration|null timeFromStart Observation time from study start */
-        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $timeFromStart = null,
         /** @var GroupMeasureType|null groupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-measure|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-measure|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\GroupMeasure',
+        )]
         public ?GroupMeasureType $groupMeasure = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

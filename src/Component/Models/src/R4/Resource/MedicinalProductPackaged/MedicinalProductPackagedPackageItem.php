@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\ProductShelfLife;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A packaging item, as a contained for medicine, possibly with other packaging items within.
@@ -41,12 +42,13 @@ class MedicinalProductPackagedPackageItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var CodeableConcept|null type The physical type of the container of the medicine */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var Quantity|null quantity The quantity of this package in the medicinal product, at the current level of packaging. The outermost is always 1 */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Quantity $quantity = null,
         /** @var array<CodeableConcept> material Material type of the package item */
         #[FhirProperty(
@@ -55,6 +57,7 @@ class MedicinalProductPackagedPackageItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $material = [],
         /** @var array<CodeableConcept> alternateMaterial A possible alternate material for the packaging */
         #[FhirProperty(
@@ -63,6 +66,7 @@ class MedicinalProductPackagedPackageItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $alternateMaterial = [],
         /** @var array<Reference> device A device accompanying a medicinal product */
         #[FhirProperty(
@@ -71,6 +75,7 @@ class MedicinalProductPackagedPackageItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DeviceDefinition'])]
         public array $device = [],
         /** @var array<Reference> manufacturedItem The manufactured item as contained in the packaged medicinal product */
@@ -80,6 +85,7 @@ class MedicinalProductPackagedPackageItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicinalProductManufactured'])]
         public array $manufacturedItem = [],
         /** @var array<MedicinalProductPackagedPackageItem> packageItem Allows containers within containers */
@@ -89,9 +95,10 @@ class MedicinalProductPackagedPackageItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductPackaged\MedicinalProductPackagedPackageItem',
         )]
+        #[Valid]
         public array $packageItem = [],
         /** @var ProdCharacteristic|null physicalCharacteristics Dimensions, color etc. */
-        #[FhirProperty(fhirType: 'ProdCharacteristic', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'ProdCharacteristic', propertyKind: 'complex'), Valid]
         public ?ProdCharacteristic $physicalCharacteristics = null,
         /** @var array<CodeableConcept> otherCharacteristics Other codeable characteristics */
         #[FhirProperty(
@@ -100,6 +107,7 @@ class MedicinalProductPackagedPackageItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $otherCharacteristics = [],
         /** @var array<ProductShelfLife> shelfLifeStorage Shelf Life and storage information */
         #[FhirProperty(
@@ -108,6 +116,7 @@ class MedicinalProductPackagedPackageItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ProductShelfLife',
         )]
+        #[Valid]
         public array $shelfLifeStorage = [],
         /** @var array<Reference> manufacturer Manufacturer of this Package Item */
         #[FhirProperty(
@@ -116,6 +125,7 @@ class MedicinalProductPackagedPackageItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $manufacturer = [],
     ) {

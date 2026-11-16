@@ -50,13 +50,19 @@ final class ChildrenFunction extends AbstractFunction
         }
 
         $children = [];
-        foreach ($input as $item) {
+        $scopes   = [];
+        foreach ($input as $index => $item) {
+            $scope = $this->getChildScope($item, $input->scopeAt($index), $context);
+
             // Get all direct child values from this item
             foreach ($this->getNodeChildren($item) as $child) {
+                if ($scope !== null) {
+                    $scopes[count($children)] = $scope;
+                }
                 $children[] = $child;
             }
         }
 
-        return Collection::unordered($children);
+        return Collection::unordered($children)->withScopes($scopes);
     }
 }

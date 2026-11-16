@@ -10,7 +10,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A substance used to create the material(s) of which the device is made.
@@ -29,14 +31,14 @@ class DeviceDefinitionMaterial extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null substance The substance */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $substance = null,
-        /** @var bool|null alternate Indicates an alternative material of the device */
+        /** @var BooleanPrimitive|bool|null alternate Indicates an alternative material of the device */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $alternate = null,
-        /** @var bool|null allergenicIndicator Whether the substance is a known or suspected allergen */
+        public BooleanPrimitive|bool|null $alternate = null,
+        /** @var BooleanPrimitive|bool|null allergenicIndicator Whether the substance is a known or suspected allergen */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $allergenicIndicator = null,
+        public BooleanPrimitive|bool|null $allergenicIndicator = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

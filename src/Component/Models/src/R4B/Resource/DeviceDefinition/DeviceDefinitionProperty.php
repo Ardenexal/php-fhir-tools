@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The actual configuration settings of a device as it actually operates, e.g., regulation status, time properties.
@@ -30,7 +31,7 @@ class DeviceDefinitionProperty extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Code that specifies the property DeviceDefinitionPropetyCode (Extensible) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var array<Quantity> valueQuantity Property value as a quantity */
         #[FhirProperty(
@@ -39,6 +40,7 @@ class DeviceDefinitionProperty extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity',
         )]
+        #[Valid]
         public array $valueQuantity = [],
         /** @var array<CodeableConcept> valueCode Property value as a code, e.g., NTP4 (synced to NTP) */
         #[FhirProperty(
@@ -47,6 +49,7 @@ class DeviceDefinitionProperty extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $valueCode = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

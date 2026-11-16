@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: SortDirection
  * URL: http://hl7.org/fhir/ValueSet/sort-direction
  * Version: 4.3.0
  * Description: The possible sort directions, ascending or descending.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/sort-direction', version: '4.3.0')]
 enum SortDirection: string
 {
     /** Ascending */

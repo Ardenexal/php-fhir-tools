@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Each imaging selection includes one or more selected DICOM SOP instances.
@@ -40,6 +41,7 @@ class ImagingSelectionInstance extends BackboneElement
         public ?UnsignedIntPrimitive $number = null,
         /** @var Coding|null sopClass DICOM SOP Class UID */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRValueSetBinding(
             valueSetUrl: 'http://dicom.nema.org/medical/dicom/current/output/chtml/part04/sect_B.5.html#table_B.5-1',
             strength: 'extensible',
@@ -60,6 +62,7 @@ class ImagingSelectionInstance extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImagingSelection\ImagingSelectionInstanceImageRegion2D',
         )]
+        #[Valid]
         public array $imageRegion2D = [],
         /** @var array<ImagingSelectionInstanceImageRegion3D> imageRegion3D A specific 3D region in a DICOM frame of reference */
         #[FhirProperty(
@@ -68,6 +71,7 @@ class ImagingSelectionInstance extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImagingSelection\ImagingSelectionInstanceImageRegion3D',
         )]
+        #[Valid]
         public array $imageRegion3D = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

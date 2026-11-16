@@ -1,5 +1,19 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 1
+    "warningCount": 0,
+    "infoCount": 1,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 2,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "BodyTempCode: magic LOINC code 8310-5 required, but not found (from http://hl7.org/fhir/StructureDefinition/bodytemp|4.0.1). Note that other Observation codes are allowed in addition to this required magic code"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

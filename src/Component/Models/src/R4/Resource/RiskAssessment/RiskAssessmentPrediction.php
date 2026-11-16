@@ -13,7 +13,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Range;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Describes the expected outcome for the subject.
@@ -38,9 +40,9 @@ class RiskAssessmentPrediction extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null outcome Possible outcome for the subject */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $outcome = null,
-        /** @var string|Range|null probability Likelihood of specified outcome */
+        /** @var DecimalPrimitive|string|Range|null probability Likelihood of specified outcome */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -55,13 +57,13 @@ class RiskAssessmentPrediction extends BackboneElement
                 ],
             ],
         )]
-        public string|Range|null $probability = null,
+        public DecimalPrimitive|string|Range|null $probability = null,
         /** @var CodeableConcept|null qualitativeRisk Likelihood of specified outcome as a qualitative value */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $qualitativeRisk = null,
-        /** @var numeric-string|null relativeRisk Relative likelihood */
+        /** @var DecimalPrimitive|numeric-string|null relativeRisk Relative likelihood */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $relativeRisk = null,
+        public DecimalPrimitive|string|null $relativeRisk = null,
         /** @var Period|Range|null when Timeframe or age range */
         #[FhirProperty(
             fhirType: 'choice',

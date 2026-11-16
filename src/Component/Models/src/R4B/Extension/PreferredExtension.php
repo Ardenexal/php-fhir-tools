@@ -19,7 +19,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-preferred', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Address')]
 #[FHIRExtensionContext(type: 'element', expression: 'ContactPoint')]
-#[FHIRExtensionContext(type: 'element', expression: 'ExtendedContactDetail')]
 class PreferredExtension extends Extension
 {
     /**

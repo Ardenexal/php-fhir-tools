@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\SubstanceAmount;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Todo.
@@ -33,10 +34,10 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation extends BackboneEle
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null degree Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $degree = null,
         /** @var SubstanceAmount|null amount Todo */
-        #[FhirProperty(fhirType: 'SubstanceAmount', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'SubstanceAmount', propertyKind: 'complex'), Valid]
         public ?SubstanceAmount $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

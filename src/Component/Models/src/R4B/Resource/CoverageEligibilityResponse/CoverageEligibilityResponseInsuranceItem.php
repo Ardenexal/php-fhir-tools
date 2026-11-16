@@ -13,8 +13,10 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Benefits and optionally current balances, and authorization details by category or service.
@@ -43,10 +45,10 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null category Benefit classification */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $category = null,
         /** @var CodeableConcept|null productOrService Billing, service, product, or drug code */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $productOrService = null,
         /** @var array<CodeableConcept> modifier Product or service billing modifiers */
         #[FhirProperty(
@@ -55,17 +57,19 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $modifier = [],
         /** @var Reference|null provider Performing practitioner */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
         ])]
         public ?Reference $provider = null,
-        /** @var bool|null excluded Excluded from the plan */
+        /** @var BooleanPrimitive|bool|null excluded Excluded from the plan */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $excluded = null,
+        public BooleanPrimitive|bool|null $excluded = null,
         /** @var StringPrimitive|string|null name Short name for the benefit */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
@@ -73,13 +77,13 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var CodeableConcept|null network In or out of network */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $network = null,
         /** @var CodeableConcept|null unit Individual or family */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $unit = null,
         /** @var CodeableConcept|null term Annual or lifetime */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $term = null,
         /** @var array<CoverageEligibilityResponseInsuranceItemBenefit> benefit Benefit Summary */
         #[FhirProperty(
@@ -88,10 +92,11 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CoverageEligibilityResponse\CoverageEligibilityResponseInsuranceItemBenefit',
         )]
+        #[Valid]
         public array $benefit = [],
-        /** @var bool|null authorizationRequired Authorization required flag */
+        /** @var BooleanPrimitive|bool|null authorizationRequired Authorization required flag */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $authorizationRequired = null,
+        public BooleanPrimitive|bool|null $authorizationRequired = null,
         /** @var array<CodeableConcept> authorizationSupporting Type of required supporting materials */
         #[FhirProperty(
             fhirType: 'CodeableConcept',
@@ -99,6 +104,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $authorizationSupporting = [],
         /** @var UriPrimitive|null authorizationUrl Preauthorization requirements endpoint */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]

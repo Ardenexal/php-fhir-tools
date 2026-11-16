@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A claim line. Either a simple (a product or service) or a 'group' of details which can also be a simple items or groups of sub-details.
@@ -39,6 +40,7 @@ class ClaimResponseItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
         )]
+        #[Valid]
         public array $traceNumber = [],
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
         #[FhirProperty(
@@ -49,7 +51,7 @@ class ClaimResponseItem extends BackboneElement
         )]
         public array $noteNumber = [],
         /** @var ClaimResponseItemReviewOutcome|null reviewOutcome Adjudication results */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?ClaimResponseItemReviewOutcome $reviewOutcome = null,
         /** @var array<ClaimResponseItemAdjudication> adjudication Adjudication details */
         #[FhirProperty(
@@ -58,6 +60,7 @@ class ClaimResponseItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ClaimResponse\ClaimResponseItemAdjudication',
         )]
+        #[Valid]
         public array $adjudication = [],
         /** @var array<ClaimResponseItemDetail> detail Adjudication for claim details */
         #[FhirProperty(
@@ -66,6 +69,7 @@ class ClaimResponseItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ClaimResponse\ClaimResponseItemDetail',
         )]
+        #[Valid]
         public array $detail = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The product's name, including full name and possibly coded parts.
@@ -38,6 +39,7 @@ class MedicinalProductName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProduct\MedicinalProductNameNamePart',
         )]
+        #[Valid]
         public array $namePart = [],
         /** @var array<MedicinalProductNameCountryLanguage> countryLanguage Country where the name applies */
         #[FhirProperty(
@@ -46,6 +48,7 @@ class MedicinalProductName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProduct\MedicinalProductNameCountryLanguage',
         )]
+        #[Valid]
         public array $countryLanguage = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

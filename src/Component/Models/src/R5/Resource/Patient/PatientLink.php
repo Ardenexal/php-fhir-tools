@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\LinkTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Link to a Patient or RelatedPerson resource that concerns the same actual individual.
@@ -33,6 +34,7 @@ class PatientLink extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null other The other patient or related person resource that the link refers to */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
@@ -40,7 +42,13 @@ class PatientLink extends BackboneElement
         ])]
         public ?Reference $other = null,
         /** @var LinkTypeType|null type replaced-by | replaces | refer | seealso */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/link-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/link-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\LinkType',
+        )]
         public ?LinkTypeType $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

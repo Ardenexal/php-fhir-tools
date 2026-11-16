@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A species for which this route applies.
@@ -33,7 +34,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies extends B
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null code Coded expression for the species */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
         /** @var array<AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawalPeriod> withdrawalPeriod A species specific time during which consumption of animal product is not appropriate */
         #[FhirProperty(
@@ -42,6 +43,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies extends B
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\AdministrableProductDefinition\AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawalPeriod',
         )]
+        #[Valid]
         public array $withdrawalPeriod = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

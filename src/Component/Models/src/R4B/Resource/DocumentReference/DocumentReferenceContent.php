@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The document and format referenced. There may be multiple content element repetitions, each with a different format.
@@ -31,10 +32,16 @@ class DocumentReferenceContent extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Attachment|null attachment Where to access the document */
-        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Attachment $attachment = null,
         /** @var Coding|null format Format/content rules for the document */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/formatcodes', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/formatcodes',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\DocumentReferenceFormatCodeSet',
+        )]
         public ?Coding $format = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

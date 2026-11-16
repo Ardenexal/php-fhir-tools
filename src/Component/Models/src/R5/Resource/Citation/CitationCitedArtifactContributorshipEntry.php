@@ -13,9 +13,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description An individual entity named as a contributor, for example in the author list or contributor list.
@@ -35,6 +37,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null contributor The identity of the individual contributor */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -51,6 +54,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -63,10 +67,21 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/artifact-contribution-type', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/artifact-contribution-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ArtifactContributionType',
+        )]
         public array $contributionType = [],
         /** @var CodeableConcept|null role The role of the contributor (e.g. author, editor, reviewer, funder) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contributor-role', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/contributor-role',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ContributorRole',
+        )]
         public ?CodeableConcept $role = null,
         /** @var array<CitationCitedArtifactContributorshipEntryContributionInstance> contributionInstance Contributions with accounting for time or number */
         #[FhirProperty(
@@ -75,10 +90,11 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Citation\CitationCitedArtifactContributorshipEntryContributionInstance',
         )]
+        #[Valid]
         public array $contributionInstance = [],
-        /** @var bool|null correspondingContact Whether the contributor is the corresponding contributor for the role */
+        /** @var BooleanPrimitive|bool|null correspondingContact Whether the contributor is the corresponding contributor for the role */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $correspondingContact = null,
+        public BooleanPrimitive|bool|null $correspondingContact = null,
         /** @var PositiveIntPrimitive|null rankingOrder Ranked order of contribution */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $rankingOrder = null,

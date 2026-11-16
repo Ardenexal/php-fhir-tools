@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Metadata\UnknownInput;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKind;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
 
 /**
  * JSON normalizer for FHIR resource classes.
@@ -31,6 +34,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
         ?DenormalizerInterface $denormalizer = null,
         string $fhirVersion = 'R4',
         ?FHIRIGTypeRegistry $igTypeRegistry = null,
+        private readonly FHIRStructureKindProviderInterface $structureKinds = new FHIRStructureKindProvider(),
     ) {
         parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
     }
@@ -123,7 +127,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                 throw $e;
             }
 
-            throw FHIRSerializationException::formatError('json', $e->getMessage(), ['target_type' => $type, 'data_keys' => array_keys($data)]);
+            throw FHIRSerializationException::formatError('json', $e->getMessage(), ['target_type' => $type, 'data_keys' => array_keys($data)], $e);
         }
     }
 
@@ -148,15 +152,11 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
 
         try {
             /** @var class-string $type */
-            $refl = new \ReflectionClass($type);
 
-            do {
-                if (!empty($refl->getAttributes(FhirResource::class))) {
-                    return $cache[$type] = true;
-                }
-
-                $refl = $refl->getParentClass();
-            } while ($refl !== false);
+            // Walks past any other kind: only a resource ancestor answers this question.
+            if ($this->structureKinds->nearestKindAmong($type, FHIRStructureKind::Resource) !== null) {
+                return $cache[$type] = true;
+            }
 
             return $cache[$type] = false;
         } catch (\ReflectionException) {
@@ -182,21 +182,19 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
         $data                 = [];
         $data['resourceType'] = $resourceType;
 
-        $properties = self::reflPublicProps($object);
-        $metaMap    = $this->getPropertyMetadataMap($object);
+        $metaMap = $this->getPropertyMetadataMap($object);
 
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
+        // One read of the instance instead of a reflection lookup per declared property.
+        $values = self::modelAccessor()->initializedPublicValues($object);
 
+        foreach (self::modelAccessor()->publicPropertyNames($object) as $propertyName) {
             if ($propertyName === 'resourceType') {
                 continue;
             }
 
-            if (!$property->isInitialized($object)) {
-                continue;
-            }
-
-            $value = $property->getValue($object);
+            // Unwritten and explicitly null both read as null, and shouldOmitValue below treats them
+            // the same: every emit branch guards against null regardless of the omitNullValues option.
+            $value = $values[$propertyName] ?? null;
 
             if ($this->shouldOmitValue($value, $fhirContext)) {
                 continue;
@@ -208,12 +206,15 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
             if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
                 $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
                 if ($choiceMatch !== null) {
-                    [$resolvedKind, $resolvedKey, $resolvedFhirType] = $choiceMatch;
+                    [, $resolvedKey, $resolvedFhirType]              = $choiceMatch;
                     $jsonKey                                         = $resolvedKey;
-                    if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
+                    if ($this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context, $fhirContext->includeExtensions);
                         if ($normalizedValue !== null) {
-                            $data[$jsonKey] = $normalizedValue['value'];
+                            // An extension-only primitive has no value: write only its `_` key, never `"key": null`.
+                            if (array_key_exists('value', $normalizedValue)) {
+                                $data[$jsonKey] = $normalizedValue['value'];
+                            }
                             if (isset($normalizedValue['extensions']) && $fhirContext->includeExtensions) {
                                 $data['_' . $jsonKey] = ['extension' => $normalizedValue['extensions']];
                             }
@@ -244,7 +245,10 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
             } elseif ($this->isPrimitiveWithExtensions($value)) {
                 $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context, $fhirContext->includeExtensions);
                 if ($normalizedValue !== null) {
-                    $data[$jsonKey] = $normalizedValue['value'];
+                    // An extension-only primitive has no value: write only its `_` key, never `"key": null`.
+                    if (array_key_exists('value', $normalizedValue)) {
+                        $data[$jsonKey] = $normalizedValue['value'];
+                    }
                     if (isset($normalizedValue['extensions']) && $fhirContext->includeExtensions) {
                         $data['_' . $jsonKey] = ['extension' => $normalizedValue['extensions']];
                     }
@@ -290,40 +294,47 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
         }
 
         try {
-            $reflection            = self::reflClass($resolvedType);
-            $object                = $reflection->newInstanceWithoutConstructor();
+            $object                = $this->instantiateWithDefaults($resolvedType);
             $metaMap               = $this->getPropertyMetadataMap($object);
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
 
             foreach ($data as $elementName => $value) {
-                if (str_starts_with($elementName, '_') || str_starts_with($elementName, '@')) {
+                // `resourceType` is the JSON type discriminator, already consumed to choose this
+                // class, and no model declares it. Skipping it explicitly matters because the
+                // fall-through is the unknown-property path, which records what it drops.
+                //
+                // XML needs no equivalent: there the type is the element name, not a child.
+                if ($elementName === 'resourceType'
+                    || str_starts_with($elementName, '_')
+                    || str_starts_with($elementName, '@')
+                ) {
                     continue;
                 }
 
-                $property      = self::reflProp($resolvedType, $elementName);
-                $choiceMapping = $property === null
+                $hasProperty   = self::modelAccessor()->hasProperty($resolvedType, $elementName);
+                $choiceMapping = !$hasProperty
                     ? $this->findChoicePropertyByKey($metaMap, $elementName, $resolvedType)
                     : null;
 
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
-                    $choiceProp = self::reflProp($resolvedType, $propertyName);
-                    if ($choiceProp !== null) {
+                    if (self::modelAccessor()->hasProperty($resolvedType, $propertyName)) {
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'json', $context);
                         } else {
+                            $this->recordMalformedScalar($object, $propertyName, $phpType, $value, 'json');
                             $denormalizedValue = ($fhirType === 'decimal' || $fhirType === 'http://hl7.org/fhirpath/System.Decimal') && is_numeric($value)
-                                ? (string) $value
+                                ? self::decimalToLexicalString($value)
                                 : $value;
                         }
 
-                        $choiceProp->setValue($object, $denormalizedValue);
+                        self::modelAccessor()->writeValue($object, $propertyName, $denormalizedValue);
                         continue;
                     }
                 }
 
-                if ($property !== null) {
+                if ($hasProperty) {
                     $meta         = $metaMap[$elementName] ?? null;
                     $phpItemClass = $meta?->phpItemClass;
 
@@ -334,17 +345,69 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                         && ($meta->propertyKind === 'extension' || $meta->propertyKind === 'modifierExtension')
                     ) {
                         $denormalizedValue = $this->denormalizeExtensionArray($value, 'json', $context);
-                    } elseif (is_array($value) && $phpItemClass !== null && $this->denormalizer !== null) {
+                    } elseif (is_array($value)
+                        && $meta !== null
+                        && $meta->isArray
+                        && $meta->propertyKind === 'resource'
+                        && $this->denormalizer !== null
+                    ) {
+                        // A polymorphic resource array — `contained`. The generator cannot emit a
+                        // phpItemClass for it (there is no single class to name for `Resource`), so
+                        // without this branch it falls through to the generic branch, where the
+                        // declared type is the builtin `array` and every item stays a raw array.
+                        // The whole constraint cascade then walks past it, as it did for JSON
+                        // documents for the life of the project. FHIRResourceXmlNormalizer has
+                        // always resolved these; this is the JSON half of that parity.
+                        //
+                        // Resolve each item from its OWN resourceType through the type resolver —
+                        // never by interpolating a Models\{version}\… FQCN, which resolves only
+                        // base-spec classes and silently defeats profiles.
+                        $denormalizer = $this->denormalizer;
+                        self::assertRepeatingElementIsArray($elementName, $value, $resolvedType);
                         $denormalizedValue = [];
                         foreach ($value as $item) {
-                            $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'json', $context);
+                            $itemClass = is_array($item) ? $this->typeResolver->resolveResourceType($item) : null;
+                            // An unresolvable resourceType keeps the raw array rather than dropping
+                            // the item: losing a contained resource silently is worse than leaving
+                            // it opaque, which is exactly the behaviour that held here before.
+                            $denormalizedValue[] = $itemClass !== null
+                                ? $denormalizer->denormalize($item, $itemClass, 'json', $context)
+                                : $item;
+                        }
+                    } elseif (is_array($value) && $phpItemClass !== null && $this->denormalizer !== null) {
+                        // A repeating element MUST be a JSON array. Do not be lenient here: the HL7
+                        // Java reference validator reports "The property reasonCode must be a JSON
+                        // Array, not an Object" as an error, so silently wrapping a lone object would
+                        // accept malformed FHIR that the oracle rejects.
+                        //
+                        // Rejecting explicitly also replaces a TypeError: iterating the object walked
+                        // its *fields* into the item normalizer, where str_starts_with() received an
+                        // integer key and surfaced only as an opaque "Format error (json)".
+                        // Captured before the guard, which PHPStan treats as impure.
+                        $denormalizer = $this->denormalizer;
+                        self::assertRepeatingElementIsArray($elementName, $value, $resolvedType);
+                        $denormalizedValue = [];
+                        foreach ($value as $item) {
+                            $denormalizedValue[] = $denormalizer->denormalize($item, $phpItemClass, 'json', $context);
                         }
                     } elseif ($this->denormalizer !== null && $meta !== null && $meta->propertyKind === 'primitive') {
-                        $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'json', $context, $metaMap);
+                        $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $resolvedType, $elementName, $value, 'json', $context, $metaMap);
                     } elseif ($this->denormalizer !== null) {
-                        $propertyType = $this->getPropertyType($property);
+                        $propertyType = $this->getPropertyType($resolvedType, $elementName);
                         if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                            $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
+                            // Captured before the cardinality guard, which PHPStan treats as impure.
+                            $denormalizer = $this->denormalizer;
+                            // A JSON array on a 0..1 element exceeds its maximum cardinality. Without
+                            // this the array reached the complex normalizer, whose element loop assumes
+                            // string keys, and str_starts_with() raised a TypeError reported only as an
+                            // opaque "Format error (json)".
+                            self::assertSingleValuedElement($elementName, $value, $resolvedType);
+                            // A null on a complex element is malformed FHIR JSON, and without this it
+                            // reached the complex normalizer, which claimed nothing and surfaced as
+                            // "no supporting normalizer found" — losing the rest of the document.
+                            // Complex branch only: the primitive path above relies on null placeholders.
+                            self::assertComplexPropertyIsNotNull($elementName, $value, $resolvedType);
+                            $denormalizedValue = $denormalizer->denormalize($value, $propertyType, 'json', $context);
                         } else {
                             $denormalizedValue = $value;
                         }
@@ -352,13 +415,13 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                         $denormalizedValue = $value;
                     }
 
-                    $property->setValue($object, $denormalizedValue);
+                    self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                 } else {
-                    $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, $object, $elementName);
+                    $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, UnknownInput::FORMAT_JSON, $object, $elementName);
                 }
             }
 
-            $this->applyPrimitiveExtensions($reflection, $object, $data, $metaMap, 'json', $context);
+            $this->applyPrimitiveExtensions($object, $data, $metaMap, 'json', $context);
 
             return $object;
         } catch (\ReflectionException $e) {

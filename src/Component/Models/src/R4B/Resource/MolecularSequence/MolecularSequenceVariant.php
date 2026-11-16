@@ -11,7 +11,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The definition of variant here originates from Sequence ontology ([variant_of](http://www.sequenceontology.org/browser/current_svn/term/variant_of)). This element can represent amino acid or nucleic sequence change(including insertion,deletion,SNP,etc.)  It can represent some complex mutation or segment variation with the assist of CIGAR string.
@@ -29,12 +31,12 @@ class MolecularSequenceVariant extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var int|null start Start position of the variant on the  reference sequence */
+        /** @var IntegerPrimitive|int|null start Start position of the variant on the  reference sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $start = null,
-        /** @var int|null end End position of the variant on the reference sequence */
+        public IntegerPrimitive|int|null $start = null,
+        /** @var IntegerPrimitive|int|null end End position of the variant on the reference sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $end = null,
+        public IntegerPrimitive|int|null $end = null,
         /** @var StringPrimitive|string|null observedAllele Allele that was observed */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $observedAllele = null,
@@ -45,7 +47,7 @@ class MolecularSequenceVariant extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $cigar = null,
         /** @var Reference|null variantPointer Pointer to observed variant information */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Observation'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Observation'])]
         public ?Reference $variantPointer = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

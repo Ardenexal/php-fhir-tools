@@ -10,9 +10,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -38,23 +40,29 @@ class SampledData extends DataType
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var Quantity|null origin Zero value and units */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?Quantity $origin = null,
-        /** @var numeric-string|null interval Number of intervalUnits between samples */
+        /** @var DecimalPrimitive|numeric-string|null interval Number of intervalUnits between samples */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $interval = null,
+        public DecimalPrimitive|string|null $interval = null,
         /** @var UCUMCodesType|null intervalUnit The measurement unit of the interval between samples */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\UCUMCodes',
+        )]
         public ?UCUMCodesType $intervalUnit = null,
-        /** @var numeric-string|null factor Multiply data by this before adding to origin */
+        /** @var DecimalPrimitive|numeric-string|null factor Multiply data by this before adding to origin */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $factor = null,
-        /** @var numeric-string|null lowerLimit Lower limit of detection */
+        public DecimalPrimitive|string|null $factor = null,
+        /** @var DecimalPrimitive|numeric-string|null lowerLimit Lower limit of detection */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $lowerLimit = null,
-        /** @var numeric-string|null upperLimit Upper limit of detection */
+        public DecimalPrimitive|string|null $lowerLimit = null,
+        /** @var DecimalPrimitive|numeric-string|null upperLimit Upper limit of detection */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $upperLimit = null,
+        public DecimalPrimitive|string|null $upperLimit = null,
         /** @var PositiveIntPrimitive|null dimensions Number of sample points at each time point */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $dimensions = null,

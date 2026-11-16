@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Code System Hierarchy Meaning
  * URL: http://hl7.org/fhir/ValueSet/codesystem-hierarchy-meaning
  * Version: 5.0.0
  * Description: The meaning of the hierarchy of concepts in a code system.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/codesystem-hierarchy-meaning', version: '5.0.0')]
 enum CodeSystemHierarchyMeaning: string
 {
     /** Grouped By */

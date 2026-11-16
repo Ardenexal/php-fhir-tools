@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
@@ -19,6 +20,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/rendering-xhtml', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'string')]
+#[FHIRProfileInvariant(
+    path: 'value[x]',
+    key: 'xhtml-ext-1',
+    severity: 'error',
+    expression: 'htmlChecks()',
+    human: 'The XHTML contained here SHALL abide by the same constraints as narrative.  I.e. contain only the basic html formatting elements and attributes described in chapters 7-11 (except section 4 of chapter 9) and 15 of the HTML 4.0 standard, <a> elements (either name or href), images and internally contained style attributes',
+)]
 class XhtmlRepresentationExtension extends Extension
 {
     /**

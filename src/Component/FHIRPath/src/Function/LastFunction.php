@@ -32,6 +32,6 @@ final class LastFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        return Collection::single($input->last());
+        return $input->only([$input->count() - 1]);
     }
 }

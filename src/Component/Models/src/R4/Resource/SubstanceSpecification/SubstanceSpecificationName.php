@@ -12,8 +12,10 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Names applicable to this substance.
@@ -35,14 +37,14 @@ class SubstanceSpecificationName extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $name = null,
         /** @var CodeableConcept|null type Name type */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null status The status of the name */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $status = null,
-        /** @var bool|null preferred If this is the preferred name for this substance */
+        /** @var BooleanPrimitive|bool|null preferred If this is the preferred name for this substance */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $preferred = null,
+        public BooleanPrimitive|bool|null $preferred = null,
         /** @var array<CodeableConcept> language Language of the name */
         #[FhirProperty(
             fhirType: 'CodeableConcept',
@@ -50,6 +52,7 @@ class SubstanceSpecificationName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $language = [],
         /** @var array<CodeableConcept> domain The use context of this name for example if there is a different name a drug active ingredient as opposed to a food colour additive */
         #[FhirProperty(
@@ -58,6 +61,7 @@ class SubstanceSpecificationName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $domain = [],
         /** @var array<CodeableConcept> jurisdiction The jurisdiction where this name applies */
         #[FhirProperty(
@@ -66,6 +70,7 @@ class SubstanceSpecificationName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $jurisdiction = [],
         /** @var array<SubstanceSpecificationName> synonym A synonym of this name */
         #[FhirProperty(
@@ -74,6 +79,7 @@ class SubstanceSpecificationName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstanceSpecification\SubstanceSpecificationName',
         )]
+        #[Valid]
         public array $synonym = [],
         /** @var array<SubstanceSpecificationName> translation A translation for this name */
         #[FhirProperty(
@@ -82,6 +88,7 @@ class SubstanceSpecificationName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstanceSpecification\SubstanceSpecificationName',
         )]
+        #[Valid]
         public array $translation = [],
         /** @var array<SubstanceSpecificationNameOfficial> official Details of the official nature of this name */
         #[FhirProperty(
@@ -90,6 +97,7 @@ class SubstanceSpecificationName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstanceSpecification\SubstanceSpecificationNameOfficial',
         )]
+        #[Valid]
         public array $official = [],
         /** @var array<Reference> source Supporting literature */
         #[FhirProperty(
@@ -98,6 +106,7 @@ class SubstanceSpecificationName extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DocumentReference'])]
         public array $source = [],
     ) {

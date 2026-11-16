@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"GuidanceResponse","url":"http://hl7.org/fhir/StructureDefinition/GuidanceResponse","version":"5.0.0","name":"GuidanceResponse","status":"draft","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"GuidanceResponse","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

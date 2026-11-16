@@ -29,16 +29,21 @@ class DistinctFunction extends AbstractFunction
 
         $distinct = [];
         $seen     = [];
+        $origins  = [];
+        $tracked  = $input->getScopes() !== [];
 
-        foreach ($input as $item) {
+        foreach ($input as $index => $item) {
             $key = $this->getItemKey($item, $context);
             if (!isset($seen[$key])) {
-                $seen[$key] = true;
+                $seen[$key] = count($distinct);
                 $distinct[] = $item;
+            }
+            if ($tracked) {
+                $origins[$seen[$key]][] = $input->scopeAt($index);
             }
         }
 
-        return Collection::from($distinct);
+        return Collection::from($distinct)->withScopes(Collection::mergeOrigins($origins));
     }
 
     private function getItemKey(mixed $item, EvaluationContext $context): string

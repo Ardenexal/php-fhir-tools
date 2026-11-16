@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Code Search Support
  * URL: http://hl7.org/fhir/ValueSet/code-search-support
  * Version: 5.0.0
  * Description: The degree to which the server supports the code search parameter on ValueSet, if it is supported.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/code-search-support', version: '5.0.0')]
 enum CodeSearchSupport: string
 {
     /** In Compose */

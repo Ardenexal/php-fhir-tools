@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Questionnaire answer constraints value set
  * URL: http://hl7.org/fhir/ValueSet/questionnaire-answer-constraint
  * Version: 5.0.0
  * Description: Codes that describe the types of constraints possible on a question item that has a list of permitted answers
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/questionnaire-answer-constraint', version: '5.0.0')]
 enum QuestionnaireAnswerConstraint: string
 {
     /** Options only */

@@ -28,7 +28,13 @@ class Narrative extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var NarrativeStatusType|null status generated | extensions | additional | empty */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/narrative-status|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/narrative-status|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\NarrativeStatus',
+        )]
         public ?NarrativeStatusType $status = null,
         /** @var XhtmlPrimitive|null div Limited xhtml content */
         #[FhirProperty(fhirType: 'xhtml', propertyKind: 'primitive', isRequired: true), NotBlank]

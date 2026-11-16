@@ -12,8 +12,10 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The members of the team who provided the products and services.
@@ -36,6 +38,7 @@ class ClaimCareTeam extends BackboneElement
         public ?PositiveIntPrimitive $sequence = null,
         /** @var Reference|null provider Practitioner or organization */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -43,14 +46,14 @@ class ClaimCareTeam extends BackboneElement
             'http://hl7.org/fhir/StructureDefinition/Organization',
         ])]
         public ?Reference $provider = null,
-        /** @var bool|null responsible Indicator of the lead practitioner */
+        /** @var BooleanPrimitive|bool|null responsible Indicator of the lead practitioner */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $responsible = null,
+        public BooleanPrimitive|bool|null $responsible = null,
         /** @var CodeableConcept|null role Function within the team */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $role = null,
         /** @var CodeableConcept|null qualification Practitioner credential or specialization */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $qualification = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

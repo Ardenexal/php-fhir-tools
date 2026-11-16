@@ -18,11 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
  * @description This indicates a separate conformance resource instance that is superseded by the current instance.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/replaces', fhirVersion: 'R4B')]
-#[FHIRExtensionContext(type: 'element', expression: 'ActorDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'ChargeItemDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'CompartmentDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ExampleScenario')]
 #[FHIRExtensionContext(type: 'element', expression: 'GraphDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide')]
@@ -30,7 +28,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
-#[FHIRExtensionContext(type: 'element', expression: 'Requirements')]
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter')]
 #[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]

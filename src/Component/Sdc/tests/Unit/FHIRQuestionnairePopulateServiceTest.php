@@ -387,6 +387,75 @@ final class FHIRQuestionnairePopulateServiceTest extends TestCase
         self::assertSame(['Jack', 'Jane', 'John'], $answers, 'Each given across each name must populate a leaf answer.');
     }
 
+    public function testR5CodingItemTakesCodingAnswer(): void
+    {
+        // R5 renamed `choice`/`open-choice` to `coding`; a Coding source must populate it like R4 choice.
+        $result = $this->populateWithPatient(FhirVersion::R5, [
+            $this->itemArray('marital', 'coding', '%patient.maritalStatus.coding.first()'),
+        ]);
+
+        $answerValue = $result->getResponse()->item[0]->answer[0]->value ?? null;
+        self::assertIsObject($answerValue);
+        self::assertSame('Coding', (new \ReflectionClass($answerValue))->getShortName());
+        self::assertSame('M', $this->stringify($answerValue->code ?? null));
+    }
+
+    public function testComplexItemRejectsAnswerOfTheWrongDatatype(): void
+    {
+        // A HumanName is an object but not a Quantity or a Coding: it must be a type mismatch (warning,
+        // item omitted), not passed through to be serialized under the wrong value[x] key.
+        $result = $this->populateWithPatient(FhirVersion::R4, [
+            $this->itemArray('weight', 'quantity', '%patient.name.first()'),
+            $this->itemArray('marital', 'choice', '%patient.name.first()'),
+        ]);
+
+        $response = $result->getResponse();
+        self::assertInstanceOf(QuestionnaireResponseResource::class, $response);
+        self::assertSame([], $response->item);
+
+        $issues = $result->getIssues();
+        self::assertNotNull($issues);
+        self::assertSame(['warning', 'warning'], $this->issueSeverities($issues));
+    }
+
+    /**
+     * Populate a Questionnaire with a `patient` launch context against a Patient carrying a marital status.
+     *
+     * @param list<array<string, mixed>> $items
+     */
+    private function populateWithPatient(FhirVersion $version, array $items): PopulateResult
+    {
+        $serializer                          = FHIRSerializationService::createDefault($version);
+        [$questionnaireClass, $patientClass] = $version === FhirVersion::R5
+            ? [R5QuestionnaireResource::class, R5PatientResource::class]
+            : [QuestionnaireResource::class, PatientResource::class];
+
+        $questionnaire = $serializer->deserializeFromJson(json_encode([
+            'resourceType' => 'Questionnaire',
+            'status'       => 'active',
+            'extension'    => [[
+                'url'       => 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext',
+                'extension' => [
+                    ['url' => 'name', 'valueCoding' => ['system' => 'http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext', 'code' => 'patient']],
+                    ['url' => 'type', 'valueCode' => 'Patient'],
+                ],
+            ]],
+            'item' => $items,
+        ], JSON_THROW_ON_ERROR), $questionnaireClass);
+
+        $patient = $serializer->deserializeFromJson(json_encode([
+            'resourceType'  => 'Patient',
+            'id'            => 'p1',
+            'name'          => [['family' => 'Chalmers', 'given' => ['Peter']]],
+            'maritalStatus' => ['coding' => [['system' => 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus', 'code' => 'M']]],
+        ], JSON_THROW_ON_ERROR), $patientClass);
+
+        return (new FHIRQuestionnairePopulateService())->populate(
+            $questionnaire,
+            new PopulateContext(fhirVersion: $version, launchContextResources: ['patient' => $patient]),
+        );
+    }
+
     private function populateQuestionnaire(object $questionnaire): PopulateResult
     {
         return (new FHIRQuestionnairePopulateService())->populate(

@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\SearchEntryModeType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
 
 /**
  * @description Information about the search process that lead to the creation of this entry.
@@ -29,11 +30,16 @@ class BundleEntrySearch extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var SearchEntryModeType|null mode match | include | outcome - why this is in the result set */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-entry-mode|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-entry-mode|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SearchEntryMode',
+        )]
         public ?SearchEntryModeType $mode = null,
-        /** @var numeric-string|null score Search ranking (between 0 and 1) */
+        /** @var DecimalPrimitive|numeric-string|null score Search ranking (between 0 and 1) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $score = null,
+        public DecimalPrimitive|string|null $score = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

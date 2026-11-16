@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ResourceType
  * URL: http://hl7.org/fhir/ValueSet/resource-types
  * Version: 4.0.1
  * Description: One of the resource types defined as part of this version of FHIR.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/resource-types', version: '4.0.1')]
 enum ResourceType: string
 {
     /** Account */

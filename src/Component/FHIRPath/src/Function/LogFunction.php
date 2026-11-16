@@ -38,12 +38,7 @@ class LogFunction extends AbstractFunction
         // Resolve optional base parameter
         $base = null;
         if (!empty($parameters)) {
-            $evaluator = $context->getEvaluator();
-            if ($evaluator === null) {
-                throw new EvaluationException('Evaluator not available in context');
-            }
-
-            $baseResult = $evaluator->evaluate($parameters[0], $context);
+            $baseResult = $this->evaluateParameter($parameters[0], $context);
             if (!$baseResult->isEmpty()) {
                 $baseValue   = $baseResult->first();
                 $baseNumeric = $this->extractNumeric($baseValue);

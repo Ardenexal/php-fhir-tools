@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Target or actual group of participants enrolled in study.
@@ -37,13 +38,14 @@ class ResearchStudyRecruitment extends BackboneElement
         public ?UnsignedIntPrimitive $actualNumber = null,
         /** @var Reference|null eligibility Inclusion and exclusion criteria */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Group',
             'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
         ])]
         public ?Reference $eligibility = null,
         /** @var Reference|null actualGroup Group of participants who were enrolled in study */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
         public ?Reference $actualGroup = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

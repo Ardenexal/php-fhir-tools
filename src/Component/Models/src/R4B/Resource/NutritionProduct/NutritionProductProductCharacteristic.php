@@ -13,8 +13,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\Base64BinaryPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specifies descriptive properties of the nutrition product.
@@ -33,9 +36,9 @@ class NutritionProductProductCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Code specifying the type of characteristic */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|bool|null value The value of the characteristic */
+        /** @var CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|BooleanPrimitive|bool|null value The value of the characteristic */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -75,8 +78,8 @@ class NutritionProductProductCharacteristic extends BackboneElement
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
             ],
         )]
-        #[NotBlank]
-        public CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|bool|null $value = null,
+        #[NotNull]
+        public CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|BooleanPrimitive|bool|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

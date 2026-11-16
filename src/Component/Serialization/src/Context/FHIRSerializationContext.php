@@ -15,6 +15,15 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Context;
  */
 class FHIRSerializationContext
 {
+    /**
+     * The settings the last fromSymfonyContext() call was built from, and the instance it built.
+     *
+     * @var array<string, mixed>|null
+     */
+    private static ?array $lastSymfonyArguments = null;
+
+    private static ?self $lastFromSymfonyContext = null;
+
     public const FORMAT_JSON = 'json';
 
     public const FORMAT_XML = 'xml';
@@ -360,21 +369,42 @@ class FHIRSerializationContext
      */
     public static function fromSymfonyContext(array $context): self
     {
-        return new self(
-            format: $context['fhir_format']                                            ?? self::FORMAT_JSON,
-            validationMode: $context['fhir_validation_mode']                           ?? self::VALIDATION_STRICT,
-            unknownElementPolicy: $context['fhir_unknown_element_policy']              ?? $context['unknown_property_policy'] ?? self::UNKNOWN_POLICY_IGNORE,
-            includeExtensions: $context['fhir_include_extensions']                     ?? true,
-            includeMetadata: $context['fhir_include_metadata']                         ?? true,
-            skipNonEssentialValidation: $context['fhir_skip_non_essential_validation'] ?? false,
-            enableDebugInfo: $context['fhir_enable_debug_info']                        ?? false,
-            validateReferences: $context['fhir_validate_references']                   ?? false,
-            omitNullValues: $context['fhir_omit_null_values']                          ?? true,
-            omitEmptyArrays: $context['fhir_omit_empty_arrays']                        ?? true,
-            enableXmlNamespaces: $context['fhir_enable_xml_namespaces']                ?? true,
-            enableXmlSchemaValidation: $context['fhir_enable_xml_schema_validation']   ?? false,
-            customOptions: $context['fhir_custom_options']                             ?? [],
-        );
+        $arguments = [
+            'format'                     => $context['fhir_format']                        ?? self::FORMAT_JSON,
+            'validationMode'             => $context['fhir_validation_mode']               ?? self::VALIDATION_STRICT,
+            'unknownElementPolicy'       => $context['fhir_unknown_element_policy']        ?? $context['unknown_property_policy'] ?? self::UNKNOWN_POLICY_IGNORE,
+            'includeExtensions'          => $context['fhir_include_extensions']            ?? true,
+            'includeMetadata'            => $context['fhir_include_metadata']              ?? true,
+            'skipNonEssentialValidation' => $context['fhir_skip_non_essential_validation'] ?? false,
+            'enableDebugInfo'            => $context['fhir_enable_debug_info']             ?? false,
+            'validateReferences'         => $context['fhir_validate_references']           ?? false,
+            'omitNullValues'             => $context['fhir_omit_null_values']              ?? true,
+            'omitEmptyArrays'            => $context['fhir_omit_empty_arrays']             ?? true,
+            'enableXmlNamespaces'        => $context['fhir_enable_xml_namespaces']         ?? true,
+            'enableXmlSchemaValidation'  => $context['fhir_enable_xml_schema_validation']  ?? false,
+            'customOptions'              => $context['fhir_custom_options']                ?? [],
+        ];
+
+        // Every normalizer rebuilds this from the Symfony context on every object it visits, and the
+        // settings almost never change within one document. The context is immutable, so the instance
+        // built from the previous identical settings is handed back instead of constructing and
+        // re-validating a new one. Only settings without custom options are remembered: comparing
+        // caller-supplied option arrays deeply can throw on a self-referencing array, and a context
+        // with custom options is then simply built fresh, as it always was.
+        $memoizable = $arguments['customOptions'] === [];
+
+        if ($memoizable && self::$lastSymfonyArguments === $arguments && self::$lastFromSymfonyContext !== null) {
+            return self::$lastFromSymfonyContext;
+        }
+
+        $created = new self(...$arguments);
+
+        if ($memoizable) {
+            self::$lastSymfonyArguments   = $arguments;
+            self::$lastFromSymfonyContext = $created;
+        }
+
+        return $created;
     }
 
     /**

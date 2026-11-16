@@ -48,7 +48,12 @@ class Expression extends DataType
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?CodePrimitive $name = null,
         /** @var string|null language text/cql | text/fhirpath | application/x-fhir-query | etc. */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/expression-language', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/expression-language',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ExpressionLanguage',
+        )]
         public ?string $language = null,
         /** @var StringPrimitive|string|null expression Expression in specified language */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

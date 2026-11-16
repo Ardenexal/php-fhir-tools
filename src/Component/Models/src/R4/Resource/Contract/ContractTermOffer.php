@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The matter of concern in the context of this provision of the agrement.
@@ -40,6 +41,7 @@ class ContractTermOffer extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
         )]
+        #[Valid]
         public array $identifier = [],
         /** @var array<ContractTermOfferParty> party Offer Recipient */
         #[FhirProperty(
@@ -48,15 +50,22 @@ class ContractTermOffer extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Contract\ContractTermOfferParty',
         )]
+        #[Valid]
         public array $party = [],
         /** @var Reference|null topic Negotiable offer asset */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $topic = null,
         /** @var CodeableConcept|null type Contract Offer Type or Form */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null decision Accepting party choice */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActConsentDirective', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActConsentDirective',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\V3ActConsentDirective',
+        )]
         public ?CodeableConcept $decision = null,
         /** @var array<CodeableConcept> decisionMode How decision is conveyed */
         #[FhirProperty(
@@ -65,6 +74,7 @@ class ContractTermOffer extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $decisionMode = [],
         /** @var array<ContractTermOfferAnswer> answer Response to offer text */
         #[FhirProperty(
@@ -73,6 +83,7 @@ class ContractTermOffer extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Contract\ContractTermOfferAnswer',
         )]
+        #[Valid]
         public array $answer = [],
         /** @var StringPrimitive|string|null text Human readable offer text */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

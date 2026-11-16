@@ -12,6 +12,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specific parameters for the ordered item.  For example, the size of the indicated item.
@@ -30,9 +32,9 @@ class SupplyRequestParameter extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null code Item detail */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
-        /** @var CodeableConcept|Quantity|Range|bool|null value Value of detail */
+        /** @var CodeableConcept|Quantity|Range|BooleanPrimitive|bool|null value Value of detail */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -59,7 +61,7 @@ class SupplyRequestParameter extends BackboneElement
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
             ],
         )]
-        public CodeableConcept|Quantity|Range|bool|null $value = null,
+        public CodeableConcept|Quantity|Range|BooleanPrimitive|bool|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

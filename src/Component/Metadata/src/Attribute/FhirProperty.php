@@ -20,6 +20,30 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute;
  *   'extension'         — Extension array (named 'extension')
  *   'modifierExtension' — ModifierExtension array (named 'modifierExtension')
  *   'choice'            — Polymorphic value[x] / deceased[x] — must set isChoice: true and variants
+ *   'choiceGroup'       — Transparent (wrapper-less) XML choice group (FHIR tooling extension
+ *                         xml-choice-group). The property is an ordered list<ChoiceGroupItem> whose
+ *                         heterogeneous children emit directly under the parent, in document order
+ *                         (e.g. CDA AD: streetAddressLine, city, streetAddressLine). Set
+ *                         isArray: true, phpType: ChoiceGroupItem::class, and variants keyed by
+ *                         child element name (jsonKey = element name, phpType = the item value's
+ *                         FQCN or 'string'). Unlike 'choice', isChoice stays FALSE — every variant
+ *                         maps to the one list property and appends, rather than selecting a single
+ *                         value[x] slot.
+ *   'enum'              — Backed enum (CDA coded property bound to a generated enum, e.g. NullFlavor);
+ *                         the property type IS the enum and its ->value is the code string
+ *   'openEnum'          — Like 'enum', but a CDA profile rebinds the element to a wider ValueSet, so the
+ *                         property is typed `Enum|string` (list items likewise) and a code the enum
+ *                         lacks is held as the bare string. phpType on a list stays the enum FQCN
+ *   'polymorphic'       — CDA element admitting several datatypes, discriminated on the wire by an
+ *                         `xsi:type` attribute rather than by the element name (an observation's value
+ *                         admits 29). The property is typed to the nearest datatype all of them derive
+ *                         from, and each variant carries `typeName`, the published CDA type name to
+ *                         write. Unlike 'choice', isChoice stays FALSE and every variant shares one
+ *                         element name; unlike 'choiceGroup', one value occupies the slot rather than
+ *                         a list of heterogeneous children. Variants MUST be ordered
+ *                         subclass-before-superclass: a reader takes the first `instanceof` match, and
+ *                         the definitions publish the opposite order (an observation's value lists
+ *                         `CD` ahead of `CE`, `CO`, `CS`, `CV`).
  *
  * @author Ardenexal
  */
@@ -27,8 +51,12 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute;
 final class FhirProperty
 {
     /**
-     * @param list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}>|null $variants
-     *                                                                                                             Populated only when isChoice is true. Each variant describes one concrete type in the union.
+     * @param list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, typeName?: string}>|null $variants
+     *                                                                                                                                Per-variant metadata. Populated when isChoice is true (one entry per value[x] type), when
+     *                                                                                                                                propertyKind is 'choiceGroup' (one entry per allowed child element name, jsonKey =
+     *                                                                                                                                element name, phpType = the item value's FQCN or 'string'), or when propertyKind is
+     *                                                                                                                                'polymorphic' (one entry per admitted CDA datatype, every jsonKey the same element name,
+     *                                                                                                                                typeName the published CDA type name). Null otherwise.
      */
     public function __construct(
         /** FHIR type code: 'date', 'HumanName', 'BackboneElement', 'choice', etc. */
@@ -41,7 +69,7 @@ final class FhirProperty
         public readonly bool $isRequired = false,
         /** True for choice elements (value[x], deceased[x]). Requires variants to be set. */
         public readonly bool $isChoice = false,
-        /** Per-variant metadata for choice elements; null for non-choice properties. */
+        /** Per-variant metadata for 'choice' (value[x]) and 'choiceGroup' properties; null otherwise. */
         public readonly ?array $variants = null,
         /**
          * JSON/XML key override. Null means use the PHP property name as-is.
@@ -61,6 +89,14 @@ final class FhirProperty
          * Used by the serializer to denormalize array items into typed objects.
          */
         public readonly ?string $phpType = null,
+        /**
+         * XML namespace URI for this element when it differs from its owning class's namespace.
+         * Null means inherit the class namespace. CDA AU extension elements carry the ADHA
+         * extension namespace (e.g. 'http://ns.electronichealth.net.au/Ci/Cda/Extensions/3.0')
+         * here, sourced from the element's FHIR-tooling xml-namespace extension. The XML serializer
+         * applies it when emitting the element (serialization wiring is CDA M5).
+         */
+        public readonly ?string $xmlNamespace = null,
     ) {
     }
 }

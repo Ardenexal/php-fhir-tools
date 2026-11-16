@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\IssueSeverityType as R4IssueSeverityType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\IssueTypeType as R4IssueTypeType;
@@ -124,9 +126,9 @@ final class FHIRValidationReportMapper
         }
 
         return match ($violation->constraintClass) {
-            FHIRPathInvariant::class   => 'invariant',
-            FHIRValueSetBinding::class => 'value',
-            default                    => 'invalid',
+            FHIRPathInvariant::class, FHIRProfileInvariant::class  => 'invariant',
+            FHIRValueSetBinding::class, FHIRProfileBinding::class  => 'value',
+            default                                                => 'invalid',
         };
     }
 }

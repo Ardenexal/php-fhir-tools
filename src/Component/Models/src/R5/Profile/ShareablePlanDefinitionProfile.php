@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinitionResource;
 
 /**
@@ -45,9 +46,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinitionResource;
     options: ['min' => 1, 'max' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'],
 )]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'])]
-#[FHIRProfileMustSupport(path: 'extension', groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'])]
 #[FHIRProfileMustSupport(path: 'url', groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'])]
 #[FHIRProfileMustSupport(path: 'version', groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'])]
 #[FHIRProfileMustSupport(path: 'versionAlgorithm[x]', groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'])]
@@ -56,6 +54,39 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinitionResource;
 #[FHIRProfileMustSupport(path: 'experimental', groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'])]
 #[FHIRProfileMustSupport(path: 'publisher', groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'])]
 #[FHIRProfileMustSupport(path: 'description', groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'])]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'knowledgeCapability',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeCapability',
+    orderedIndex: 0,
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'knowledgeRepresentationLevel',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeRepresentationLevel',
+    orderedIndex: 1,
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'],
+)]
+#[FHIRSliceConstraint(
+    property: 'extension',
+    sliceName: 'artifactComment',
+    min: 0,
+    max: '*',
+    discriminatorType: 'value',
+    discriminatorPath: 'url',
+    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-artifactComment',
+    orderedIndex: 2,
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableplandefinition'],
+)]
 class ShareablePlanDefinitionProfile extends PlanDefinitionResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Provenance","url":"http://hl7.org/fhir/StructureDefinition/Provenance","version":"4.0.1","name":"Provenance","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Provenance","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

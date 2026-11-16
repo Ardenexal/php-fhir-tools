@@ -21,6 +21,8 @@ enum TestStatusEnum: string
  */
 final class FHIRValueSetBindingValidatorTest extends ConstraintValidatorTestCase
 {
+    use BindsValidatorContext;
+
     private const string TEST_VALUE_SET_URL = 'http://test.example/ValueSet/test-status-enum';
 
     protected function createValidator(): FHIRValueSetBindingValidator
@@ -93,7 +95,7 @@ final class FHIRValueSetBindingValidatorTest extends ConstraintValidatorTestCase
         $registry->setOverride('FHIRValueSetBinding', 'Custom binding message.');
 
         $validator = new FHIRValueSetBindingValidator($registry, [__NAMESPACE__]);
-        $validator->initialize($this->context);
+        $this->bindContext($validator);
 
         $validator->validate('not-valid', new FHIRValueSetBinding(self::TEST_VALUE_SET_URL));
 

@@ -7,9 +7,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\Base64BinaryPrimitive;
 
 /**
  * @author HL7 International / FHIR Infrastructure
@@ -20,62 +19,23 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\Base64BinaryPrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/dosage-minimumGapBetweenDose', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Dosage')]
-class DosageMinimumGapBetweenDoseExtension extends Extension implements FHIRComplexExtensionInterface
+class DosageMinimumGapBetweenDoseExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
-        /** @var array<Base64BinaryPrimitive> meetGoal Extension */
-        #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive', isArray: true)]
-        public array $meetGoal = [],
-        /** @var array<Base64BinaryPrimitive> whenTrigger Extension */
-        #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive', isArray: true)]
-        public array $whenTrigger = [],
-        /** @var array<Base64BinaryPrimitive> precondition Extension */
-        #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive', isArray: true)]
-        public array $precondition = [],
+        /** @var Duration|null valueDuration Value of extension */
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        public ?Duration $valueDuration = null,
         ?string $id = null,
+        array $extension = [],
     ) {
-        $subExtensions = [];
-        foreach ($this->meetGoal as $v) {
-            $subExtensions[] = new Extension(url: 'meetGoal', value: $v);
-        }
-        foreach ($this->whenTrigger as $v) {
-            $subExtensions[] = new Extension(url: 'whenTrigger', value: $v);
-        }
-        foreach ($this->precondition as $v) {
-            $subExtensions[] = new Extension(url: 'precondition', value: $v);
-        }
         parent::__construct(
             id: $id,
-            extension: $subExtensions,
+            extension: $extension,
             url: 'http://hl7.org/fhir/StructureDefinition/dosage-minimumGapBetweenDose',
+            value: $this->valueDuration,
         );
-    }
-
-    /**
-     * Reconstruct from an array of already-denormalized sub-extension objects.
-     *
-     * @param array<Extension> $subExtensions
-     * @param string|null      $id
-     */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
-    {
-        $meetGoal     = [];
-        $whenTrigger  = [];
-        $precondition = [];
-
-        foreach ($subExtensions as $ext) {
-            $extUrl = $ext->getExtensionUrl();
-            if ($extUrl === 'meetGoal' && $ext->value instanceof Base64BinaryPrimitive) {
-                $meetGoal[] = $ext->value;
-            }
-            if ($extUrl === 'whenTrigger' && $ext->value instanceof Base64BinaryPrimitive) {
-                $whenTrigger[] = $ext->value;
-            }
-            if ($extUrl === 'precondition' && $ext->value instanceof Base64BinaryPrimitive) {
-                $precondition[] = $ext->value;
-            }
-        }
-
-        return new self($meetGoal, $whenTrigger, $precondition, $id);
     }
 }

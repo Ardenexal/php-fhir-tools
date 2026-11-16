@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specifies and quantifies the repeated units and their configuration.
@@ -32,7 +33,7 @@ class SubstancePolymerRepeat extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $averageMolecularFormula = null,
         /** @var CodeableConcept|null repeatUnitAmountType How the quantitative amount of Structural Repeat Units is captured (e.g. Exact, Numeric, Average) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $repeatUnitAmountType = null,
         /** @var array<SubstancePolymerRepeatRepeatUnit> repeatUnit An SRU - Structural Repeat Unit */
         #[FhirProperty(
@@ -41,6 +42,7 @@ class SubstancePolymerRepeat extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SubstancePolymer\SubstancePolymerRepeatRepeatUnit',
         )]
+        #[Valid]
         public array $repeatUnit = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: EligibilityResponsePurpose
  * URL: http://hl7.org/fhir/ValueSet/eligibilityresponse-purpose
  * Version: 4.0.1
  * Description: A code specifying the types of information being requested.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/eligibilityresponse-purpose', version: '4.0.1')]
 enum EligibilityResponsePurpose: string
 {
     /** Coverage auth-requirements */

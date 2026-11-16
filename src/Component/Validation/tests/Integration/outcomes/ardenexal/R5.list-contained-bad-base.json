@@ -1,5 +1,28 @@
 {
-    "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 0
+    "errorCount": 2,
+    "warningCount": 0,
+    "infoCount": 0,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Constraint failed: ref-1: 'SHALL have a contained resource if a local reference is provided' (defined in http://hl7.org/fhir/StructureDefinition/Reference) (url: pat; ids: pat1) (log:  (url: pat; ids: pat1))",
+            "The contained resource 'pat1' is not referenced to from elsewhere in the containing resource nor does it refer to the containing resource (dom-3)",
+            "Unable to resolve resource with reference '#pat'"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "invariant:dom-3": [
+                "(root) — If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource"
+            ],
+            "invariant:ref-1": [
+                "subject[0] — SHALL have a contained resource if a local reference is provided"
+            ]
+        },
+        "warnings": {}
+    }
 }

@@ -9,8 +9,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description For the code system, a list of versions that are supported by the server.
@@ -31,12 +33,12 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
         /** @var StringPrimitive|string|null code Version identifier for this version */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $code = null,
-        /** @var bool|null isDefault If this is the default version for this code system */
+        /** @var BooleanPrimitive|bool|null isDefault If this is the default version for this code system */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isDefault = null,
-        /** @var bool|null compositional If compositional grammar is supported */
+        public BooleanPrimitive|bool|null $isDefault = null,
+        /** @var BooleanPrimitive|bool|null compositional If compositional grammar is supported */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $compositional = null,
+        public BooleanPrimitive|bool|null $compositional = null,
         /** @var array<CodePrimitive> language Language Displays supported */
         #[FhirProperty(
             fhirType: 'code',
@@ -52,6 +54,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\TerminologyCapabilities\TerminologyCapabilitiesCodeSystemVersionFilter',
         )]
+        #[Valid]
         public array $filter = [],
         /** @var array<CodePrimitive> property Properties supported for $lookup */
         #[FhirProperty(

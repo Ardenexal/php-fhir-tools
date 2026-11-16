@@ -1,5 +1,19 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 0
+    "warningCount": 0,
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 1,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Wrong Display Name 'Within the past 12 months the food we bought just didn't last and we didn't have money to get more [U.S. FSS]' for http://loinc.org#88123-5. Valid display is one of 2 choices: 'Within the past 12 months the food we bought just didn't last and we didn't have money to get more' (en-US) or 'Within the past 12 months the food we bought just didn't last and we didn't have money to get more' (en-US) (for the language(s) 'en-US')"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

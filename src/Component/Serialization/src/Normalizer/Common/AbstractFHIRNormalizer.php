@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common;
 
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
@@ -12,17 +13,30 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRConformanceViolationException;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Metadata\ComplexExtensionSubExtensions;
+use Ardenexal\FHIRTools\Component\Metadata\IncompleteComplexExtension;
+use Ardenexal\FHIRTools\Component\Metadata\UnknownInput;
+use Ardenexal\FHIRTools\Component\Metadata\MalformedPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\MalformedPrimitiveRecorder;
+use Ardenexal\FHIRTools\Component\Metadata\UnknownInputRecorder;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyVariantMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyVariantMetadata;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIROperationMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIROperationMetadataProviderInterface;
 
 /**
  * Abstract base class for FHIR normalizers providing shared utility methods.
@@ -31,6 +45,80 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, SerializerAwareInterface
 {
+    /**
+     * Reads generated model shape so this hierarchy never holds a reflection handle itself.
+     *
+     * Shared and lazily built rather than injected: every subclass in this hierarchy has its own
+     * constructor and not all of them chain to a parent, so a constructor-assigned property would be
+     * uninitialised on some paths. The accessor is stateless apart from its caches.
+     */
+    private static ?FHIRModelAccessorInterface $sharedModelAccessor = null;
+
+    /** Shared for the same reason as the accessor above: derived from class shape, so stateless. */
+    private static ?FHIRStructureKindProviderInterface $sharedStructureKinds = null;
+
+    /** Shared operation-metadata reader; stateless apart from its caches. */
+    private static ?FHIROperationMetadataProviderInterface $sharedOperationMetadata = null;
+
+    /**
+     * The shared operation-metadata provider.
+     *
+     * @return FHIROperationMetadataProviderInterface Reader for operation attributes
+     */
+    protected static function operationMetadata(): FHIROperationMetadataProviderInterface
+    {
+        return self::$sharedOperationMetadata ??= new FHIROperationMetadataProvider();
+    }
+
+    /**
+     * The shared model accessor.
+     *
+     * @return FHIRModelAccessorInterface Reader for generated model shape
+     */
+    protected static function modelAccessor(): FHIRModelAccessorInterface
+    {
+        return self::$sharedModelAccessor ??= new FHIRModelAccessor();
+    }
+
+    /**
+     * The public properties a normalizer writes as FHIR elements.
+     *
+     * A typed complex extension declares one constructor property per sub-extension, and its
+     * constructor also builds that sub-extension from it. Only the sub-extension is FHIR - the typed
+     * property is not an element of Extension - so the properties the complex extension class itself
+     * declares are left out, and the sub-extensions carry their values.
+     *
+     * @param object $object The model being written
+     *
+     * @return list<string> Property names, in declaration order
+     */
+    protected static function serializedPropertyNames(object $object): array
+    {
+        $names = self::modelAccessor()->publicPropertyNames($object);
+        if (!$object instanceof FHIRComplexExtensionInterface) {
+            return $names;
+        }
+
+        return array_values(array_filter(
+            $names,
+            static fn (string $name): bool => !is_a((string) self::modelAccessor()->owningClassOf($object, $name), FHIRComplexExtensionInterface::class, true),
+        ));
+    }
+
+    /**
+     * The shared structure-kind provider.
+     *
+     * The concrete normalizers take one by constructor injection, but methods on this base class are
+     * reached from paths that never see it, so they share this one instead. Its caches are derived
+     * from generated class shape, so two instances cannot disagree.
+     *
+     * @return FHIRStructureKindProviderInterface Reader for structural attributes
+     */
+    protected static function structureKinds(): FHIRStructureKindProviderInterface
+    {
+        return self::$sharedStructureKinds ??= new FHIRStructureKindProvider();
+    }
+
     protected ?NormalizerInterface $normalizer = null;
 
     protected ?DenormalizerInterface $denormalizer = null;
@@ -38,17 +126,18 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /** @var array<string, FHIRPrimitive|null> */
     private array $primitiveAttributeCache = [];
 
-    /** @var array<class-string, \ReflectionClass<object>> */
-    private static array $reflClassCache = [];
-
-    /** @var array<class-string, list<\ReflectionProperty>> */
-    private static array $reflPropsCache = [];
-
-    /** @var array<class-string, array<string, \ReflectionProperty>> */
-    private static array $reflPropByNameCache = [];
-
     /** @var array<class-string, array<string, array{0: string, 1: string, 2: string}>> */
     private static array $choiceKeyIndexCache = [];
+
+    /**
+     * Answers of wrappableScalarTypeOf(), by `class::property`; read on every scalar element.
+     *
+     * @var array<string, string|null>
+     */
+    private static array $wrappableScalarTypeCache = [];
+
+    /** @var array<class-string, array<string, mixed>> */
+    private static array $ctorDefaultsCache = [];
 
     private readonly string $baseExtensionClass;
 
@@ -79,56 +168,6 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     // -------------------------------------------------------------------------
-    // Reflection cache helpers
-    // -------------------------------------------------------------------------
-
-    /**
-     * @param string|object $subject class-string or object instance
-     *
-     * @return \ReflectionClass<object>
-     */
-    protected static function reflClass(string|object $subject): \ReflectionClass
-    {
-        /** @var class-string $name */
-        $name = is_object($subject) ? get_class($subject) : $subject;
-
-        return self::$reflClassCache[$name] ??= new \ReflectionClass($name);
-    }
-
-    /**
-     * @param string|object $subject class-string or object instance
-     *
-     * @return list<\ReflectionProperty>
-     */
-    protected static function reflPublicProps(string|object $subject): array
-    {
-        /** @var class-string $name */
-        $name = is_object($subject) ? get_class($subject) : $subject;
-
-        return self::$reflPropsCache[$name]
-            ??= self::reflClass($name)->getProperties(\ReflectionProperty::IS_PUBLIC);
-    }
-
-    /**
-     * @param string|object $subject class-string or object instance
-     */
-    protected static function reflProp(string|object $subject, string $propName): ?\ReflectionProperty
-    {
-        /** @var class-string $name */
-        $name = is_object($subject) ? get_class($subject) : $subject;
-
-        if (!array_key_exists($name, self::$reflPropByNameCache)) {
-            $map = [];
-            foreach (self::reflPublicProps($name) as $p) {
-                $map[$p->getName()] = $p;
-            }
-            self::$reflPropByNameCache[$name] = $map;
-        }
-
-        return self::$reflPropByNameCache[$name][$propName] ?? null;
-    }
-
-    // -------------------------------------------------------------------------
     // Primitive detection
     // -------------------------------------------------------------------------
 
@@ -150,23 +189,9 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return $this->primitiveAttributeCache[$type];
         }
 
-        try {
-            $reflection = self::reflClass($type);
-
-            do {
-                $attributes = $reflection->getAttributes(FHIRPrimitive::class);
-                if (!empty($attributes)) {
-                    /** @var FHIRPrimitive */
-                    return $this->primitiveAttributeCache[$type] = $attributes[0]->newInstance();
-                }
-
-                $reflection = $reflection->getParentClass();
-            } while ($reflection !== false);
-
-            return $this->primitiveAttributeCache[$type] = null;
-        } catch (\ReflectionException) {
-            return $this->primitiveAttributeCache[$type] = null;
-        }
+        // An unloadable name answers null here rather than throwing, which is what the caught
+        // ReflectionException produced when this walked the chain itself.
+        return $this->primitiveAttributeCache[$type] = self::structureKinds()->nearestPrimitiveAttribute($type);
     }
 
     protected function hasFHIRPrimitiveAttribute(string $type): bool
@@ -189,46 +214,44 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return null;
         }
 
-        $result        = [];
-        $valueProperty = self::reflProp($value, 'value');
+        $result = [];
+        $raw    = self::modelAccessor()->readInitializedValue($value, 'value');
 
-        if ($valueProperty !== null && $valueProperty->isInitialized($value)) {
-            $raw = $valueProperty->getValue($value);
+        // Each conversion below tests its own input, so running them on a null read is a no-op and
+        // the guarded read needs no initialisation branch of its own.
+        if ($raw instanceof FHIRTemporalValue) {
+            $raw = (string) $raw;
+        }
 
-            if ($raw instanceof FHIRTemporalValue) {
-                $raw = (string) $raw;
-            }
+        // XmlEncoder casts PHP booleans to int; FHIR XML requires "true"/"false".
+        if (is_bool($raw) && $format === 'xml') {
+            $raw = $raw ? 'true' : 'false';
+        }
 
-            // XmlEncoder casts PHP booleans to int; FHIR XML requires "true"/"false".
-            if (is_bool($raw) && $format === 'xml') {
-                $raw = $raw ? 'true' : 'false';
-            }
-
-            if (is_string($raw) && is_numeric($raw) && $format !== 'xml') {
-                if ($this->isDecimalPrimitive($value)) {
-                    $raw = (float) $raw;
-                }
-            }
-
-            if ($raw !== null) {
-                $valueKey          = ($format === 'xml') ? '@value' : 'value';
-                $result[$valueKey] = $raw;
+        if (is_string($raw) && is_numeric($raw) && $format !== 'xml') {
+            if ($this->isDecimalPrimitive($value)) {
+                $raw = (float) $raw;
             }
         }
 
+        if ($raw !== null) {
+            $valueKey          = ($format === 'xml') ? '@value' : 'value';
+            $result[$valueKey] = $raw;
+        }
+
         if ($includeExtensions) {
-            $extensionProperty = self::reflProp($value, 'extension');
-            if ($extensionProperty !== null) {
-                $extensions = $extensionProperty->isInitialized($value) ? $extensionProperty->getValue($value) : null;
-                if ($extensions !== null && !empty($extensions)) {
-                    if ($this->normalizer !== null) {
-                        $normalizedExtensions = $this->normalizer->normalize($extensions, $format, $context);
-                    } else {
-                        $normalizedExtensions = $extensions;
-                    }
-                    $extensionKey          = ($format === 'xml') ? 'extension' : 'extensions';
-                    $result[$extensionKey] = $normalizedExtensions;
+            // A class with no `extension` property and one whose slot is unwritten both read as null,
+            // which is the same skip the absent-property branch used to make separately.
+            $extensions = self::modelAccessor()->readInitializedValue($value, 'extension');
+
+            if ($extensions !== null && !empty($extensions)) {
+                if ($this->normalizer !== null) {
+                    $normalizedExtensions = $this->normalizer->normalize($extensions, $format, $context);
+                } else {
+                    $normalizedExtensions = $extensions;
                 }
+                $extensionKey          = ($format === 'xml') ? 'extension' : 'extensions';
+                $result[$extensionKey] = $normalizedExtensions;
             }
         }
 
@@ -291,7 +314,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             if (is_object($item) && $this->metadataExtractor->isPrimitiveType($item)) {
                 $primitiveResult = $this->normalizePrimitiveWithExtensions($item, 'json', $context, $fhirContext->includeExtensions);
                 if ($primitiveResult !== null) {
-                    $normalizedValues[$index] = $primitiveResult['value'];
+                    // An extension-only occurrence has no value key; FHIR JSON writes null in its slot.
+                    $normalizedValues[$index] = $primitiveResult['value'] ?? null;
                     if (isset($primitiveResult['extensions']) && $fhirContext->includeExtensions) {
                         $extensions[$index] = ['extension' => $primitiveResult['extensions']];
                         $hasExtensions      = true;
@@ -415,16 +439,12 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         if (is_object($value)) {
-            $result     = [];
-            $properties = self::reflPublicProps($value);
+            $result   = [];
+            $accessor = self::modelAccessor();
 
-            foreach ($properties as $property) {
-                if (!$property->isInitialized($value)) {
-                    continue;
-                }
-                $propertyValue = $property->getValue($value);
+            foreach ($accessor->initializedPublicValues($value) as $propertyName => $propertyValue) {
                 if ($propertyValue !== null) {
-                    $result[$property->getName()] = $this->normalizeBasicValue($propertyValue, $format, $context);
+                    $result[$propertyName] = $this->normalizeBasicValue($propertyValue, $format, $context);
                 }
             }
 
@@ -447,14 +467,15 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
-     * @param \ReflectionClass<object>        $reflection
+     * @param object|string                   $owner        An instance or class name owning the property
+     * @param string                          $propertyName Property being filled
      * @param array<string, PropertyMetadata> $metaMap
      * @param array<string, mixed>            $context
      */
     protected function denormalizePrimitiveProperty(
         PropertyMetadata $meta,
-        \ReflectionProperty $property,
-        \ReflectionClass $reflection,
+        object|string $owner,
+        string $propertyName,
         mixed $value,
         ?string $format,
         array $context,
@@ -465,13 +486,28 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         if ($meta->isArray && is_array($value)) {
-            $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
+            $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($owner, $meta->fhirType, $metaMap);
             if ($primitiveClass === null) {
                 return $value;
             }
 
+            // One occurrence of a repeating element is not a list. `XmlEncoder` decodes
+            // `<profile value="X"/>` to the element's own map, `['@value' => 'X', '#' => '']`, and
+            // only decodes two or more occurrences to a list of such maps. Iterating the
+            // single-occurrence map walks its *keys*, so `Meta.profile` came back holding two
+            // primitives from one element: 'X' from `@value`, then '' from `#`. Two occurrences in
+            // yielded two out, which is why this read as correct for so long.
+            //
+            // Wrapping is what every sibling branch in FHIRComplexTypeXmlNormalizer already does
+            // (search: `!array_is_list`); this one was the omission. It also restores the child
+            // extension of a lone occurrence, which the key walk dropped along with the count.
+            //
+            // JSON is unaffected: a repeating primitive is always a JSON array, so it is always a
+            // list here and takes the same path it did before.
+            $items = array_is_list($value) ? $value : [$value];
+
             $result = [];
-            foreach ($value as $item) {
+            foreach ($items as $item) {
                 $result[] = $this->denormalizer->denormalize($item, $primitiveClass, $format, $context);
             }
 
@@ -479,7 +515,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         if (!$meta->isArray) {
-            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property);
+            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($owner, $propertyName);
             if ($primitiveClass === null) {
                 // XML encodes primitive values as attributes: <lang value="x"/> → ['@value' => 'x'].
                 // Builtin PHP types can't hold extensions, so extract the scalar or return null.
@@ -499,19 +535,19 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /**
      * Second-pass: attach underscore-prefixed extension data to already-denormalized primitive properties.
      *
-     * @param \ReflectionClass<object>        $reflection
      * @param array<string, mixed>            $data
      * @param array<string, PropertyMetadata> $metaMap
      * @param array<string, mixed>            $context
      */
     protected function applyPrimitiveExtensions(
-        \ReflectionClass $reflection,
         object $object,
         array $data,
         array $metaMap,
         ?string $format,
         array $context,
     ): void {
+        $accessor = self::modelAccessor();
+
         foreach ($data as $elementName => $extData) {
             if (!str_starts_with($elementName, '_')) {
                 continue;
@@ -520,41 +556,53 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             $baseName = substr($elementName, 1);
             $meta     = $metaMap[$baseName] ?? null;
 
-            if ($meta === null || $meta->propertyKind !== 'primitive' || !$reflection->hasProperty($baseName)) {
+            if ($meta === null) {
+                // `_valueString` names a choice variant, not a property, so the map has no entry for it.
+                $this->applyChoicePrimitiveExtension($object, $baseName, $extData, $metaMap, $format, $context);
+
                 continue;
             }
 
-            $property = $reflection->getProperty($baseName);
+            // A boolean/integer/decimal element is a native scalar that also admits its primitive
+            // wrapper (#207); it reaches this pass as `scalar`, and only its single-valued form is
+            // wrapped here. A repeating one is not: its `array` type names no wrapper class.
+            $isWrappableScalar = $meta->propertyKind === 'scalar' && !$meta->isArray;
+
+            if (($meta->propertyKind !== 'primitive' && !$isWrappableScalar) || !$accessor->hasProperty($object, $baseName)) {
+                continue;
+            }
 
             if (!$meta->isArray) {
-                if (!is_array($extData) || !isset($extData['extension']) || !is_array($extData['extension'])) {
+                if (!self::carriesPrimitiveExtensions($extData)) {
                     continue;
                 }
 
-                $current = $property->isInitialized($object) ? $property->getValue($object) : null;
+                $current = $accessor->readInitializedValue($object, $baseName);
 
                 if (!is_object($current)) {
-                    $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property);
+                    $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($object, $baseName);
                     if ($primitiveClass === null || $this->denormalizer === null) {
                         continue;
                     }
 
                     $rawValue = is_scalar($current) ? $current : null;
                     $current  = $this->denormalizer->denormalize($rawValue, $primitiveClass, $format, $context);
-                    $property->setValue($object, $current);
+                    $accessor->writeValue($object, $baseName, $current);
                 }
 
-                $extensionProp = self::reflProp($current, 'extension');
-                if ($extensionProp !== null) {
-                    $denormalizedExtensions = $this->denormalizeExtensionArray($extData['extension'], $format, $context);
-                    $extensionProp->setValue($current, $denormalizedExtensions);
-                }
+                $this->writePrimitiveExtensions($current, $extData, $format, $context);
             } else {
                 if (!is_array($extData)) {
                     continue;
                 }
 
-                $currentArray = $property->isInitialized($object) ? $property->getValue($object) : [];
+                // Not a plain guarded read: an unwritten slot must continue as an empty array while
+                // an initialised null must fall through to the is_array skip below, and one null
+                // answer cannot express both.
+                $currentArray = $accessor->isPropertyInitialized($object, $baseName)
+                    ? $accessor->readInitializedValue($object, $baseName)
+                    : [];
+
                 if (!is_array($currentArray)) {
                     continue;
                 }
@@ -570,7 +618,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                             continue;
                         }
 
-                        $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
+                        $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($object, $meta->fhirType, $metaMap);
                         if ($primitiveClass === null || $this->denormalizer === null) {
                             continue;
                         }
@@ -578,24 +626,189 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                         $currentArray[$i] = $this->denormalizer->denormalize(null, $primitiveClass, $format, $context);
                     }
 
-                    $extensionProp = self::reflProp($currentArray[$i], 'extension');
-
-                    if ($extensionProp === null) {
+                    if (!$accessor->hasProperty($currentArray[$i], 'extension')) {
                         continue;
                     }
 
                     if ($hasExtensionData) {
-                        $denormalizedExtensions = $this->denormalizeExtensionArray($extEntry['extension'], $format, $context);
-                        $extensionProp->setValue($currentArray[$i], $denormalizedExtensions);
-                    } elseif (!$extensionProp->isInitialized($currentArray[$i])) {
-                        $extensionProp->setValue($currentArray[$i], []);
+                        $accessor->writeValue(
+                            $currentArray[$i],
+                            'extension',
+                            $this->denormalizeExtensionArray($extEntry['extension'], $format, $context),
+                        );
+                    } elseif (!$accessor->isPropertyInitialized($currentArray[$i], 'extension')) {
+                        // Only an unwritten slot gets the default; an explicit null is left alone.
+                        $accessor->writeValue($currentArray[$i], 'extension', []);
                     }
                 }
 
-                $property->setValue($object, $currentArray);
+                $accessor->writeValue($object, $baseName, $currentArray);
             }
         }
     }
+
+    /**
+     * Attach a JSON `_<choiceKey>` extension (e.g. `_valueString`) to the choice property it names.
+     *
+     * The variant's value, if any, was written by the first pass. An extension-only variant has no
+     * value there, so its primitive class is built here from null. Nothing is attached when the
+     * variant is a builtin PHP type (which cannot hold an extension), or when the property already
+     * holds a different variant, since one choice element carries exactly one type.
+     *
+     * @param array<string, PropertyMetadata> $metaMap
+     * @param array<string, mixed>            $context
+     */
+    private function applyChoicePrimitiveExtension(
+        object $object,
+        string $choiceKey,
+        mixed $extData,
+        array $metaMap,
+        ?string $format,
+        array $context,
+    ): void {
+        if (!self::carriesPrimitiveExtensions($extData)) {
+            return;
+        }
+
+        $choiceMapping = $this->findChoicePropertyByKey($metaMap, $choiceKey, $object::class);
+        if ($choiceMapping === null || $this->denormalizer === null) {
+            return;
+        }
+
+        [$propertyName, $phpType, $fhirType] = $choiceMapping;
+        $accessor                            = self::modelAccessor();
+
+        if (!$accessor->hasProperty($object, $propertyName)) {
+            return;
+        }
+
+        // A boolean/integer/decimal variant is a builtin; its wrapper is the class in the property's
+        // union that declares the same FHIR primitive type (#207).
+        $wrapperClass = $this->isBuiltinType($phpType)
+            ? $this->primitiveWrapperInUnion($object, $propertyName, $fhirType)
+            : $phpType;
+
+        if ($wrapperClass === null || !class_exists($wrapperClass)) {
+            return;
+        }
+
+        $current = $accessor->readInitializedValue($object, $propertyName);
+
+        if ($current === null || ($this->isBuiltinType($phpType) && is_scalar($current))) {
+            $current = $this->denormalizer->denormalize($current, $wrapperClass, $format, $context);
+            $accessor->writeValue($object, $propertyName, $current);
+        }
+
+        if (!$current instanceof $wrapperClass) {
+            return;
+        }
+
+        $this->writePrimitiveExtensions($current, $extData, $format, $context);
+    }
+
+    /**
+     * Whether a JSON `_x` object carries an extension list for its primitive.
+     *
+     * @phpstan-assert-if-true array{extension: array<mixed>} $extData
+     */
+    private static function carriesPrimitiveExtensions(mixed $extData): bool
+    {
+        return is_array($extData) && isset($extData['extension']) && is_array($extData['extension']);
+    }
+
+    /**
+     * Copy a JSON `_x` object's extensions onto the primitive wrapper it describes.
+     *
+     * @param array{extension: array<mixed>} $extData
+     * @param array<string, mixed>           $context
+     */
+    private function writePrimitiveExtensions(object $primitive, array $extData, ?string $format, array $context): void
+    {
+        // A class with no `extension` property is skipped by writeValue itself.
+        self::modelAccessor()->writeValue($primitive, 'extension', $this->denormalizeExtensionArray($extData['extension'], $format, $context));
+    }
+
+    /**
+     * Read an XML boolean/integer/decimal element that carries an extension into its wrapper.
+     *
+     * Such an element is a native scalar unless it carries one (#207), so the scalar
+     * branches of the XML normalizers would drop them. Call this ahead of those branches.
+     *
+     * @param array{0: string, 1: string, 2: string}|null $choiceMapping [propertyName, phpType, fhirType] when
+     *                                                                   `$elementName` is a choice variant
+     * @param array<string, mixed>                        $context
+     *
+     * @return array{0: string, 1: object}|null [property to write, wrapper], or null when not applicable
+     */
+    protected function denormalizeExtendedXmlScalar(
+        object $object,
+        string $elementName,
+        ?array $choiceMapping,
+        mixed $value,
+        array $context,
+    ): ?array {
+        // Captured before the impure calls below, which PHPStan treats as resetting it to nullable.
+        $denormalizer = $this->denormalizer;
+
+        if ($denormalizer === null || !is_array($value) || !isset($value['extension'])) {
+            return null;
+        }
+
+        if ($choiceMapping !== null) {
+            [$propertyName, $scalarType, $fhirType] = $choiceMapping;
+            $wrapper                                = $this->isBuiltinType($scalarType)
+                ? $this->primitiveWrapperInUnion($object, $propertyName, $fhirType)
+                : null;
+        } else {
+            $propertyName = $elementName;
+            $scalarType   = self::modelAccessor()->hasProperty($object, $propertyName)
+                ? $this->wrappableScalarTypeOf($object, $propertyName)
+                : null;
+            $wrapper = $scalarType !== null ? self::modelAccessor()->declaredClassOf($object, $propertyName) : null;
+        }
+
+        if ($wrapper === null) {
+            return null;
+        }
+
+        // The scalar branch this replaces recorded a malformed lexeme (`value="TRUE"`) for validation.
+        $this->recordMalformedScalar($object, $propertyName, $scalarType, $value, 'xml');
+
+        return [$propertyName, $denormalizer->denormalize($value, $wrapper, 'xml', $context)];
+    }
+
+    /**
+     * The class in a property's declared union whose `#[FHIRPrimitive]` names the given FHIR type.
+     */
+    private function primitiveWrapperInUnion(object $object, string $propertyName, string $fhirType): ?string
+    {
+        if (!self::modelAccessor()->hasProperty($object, $propertyName)) {
+            return null;
+        }
+
+        $type    = (new \ReflectionProperty($object, $propertyName))->getType();
+        $members = $type instanceof \ReflectionUnionType ? $type->getTypes() : [$type];
+
+        foreach ($members as $member) {
+            if ($member instanceof \ReflectionNamedType && !$member->isBuiltin()
+                                                        && $this->findFHIRPrimitiveAttribute($member->getName())?->primitiveType === $fhirType
+            ) {
+                return $member->getName();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Context flag: the object being read fills one entry of an `extension` list.
+     *
+     * Such a slot holds any `Extension`, so a typed complex extension that cannot be built may be
+     * read there as plain `Extension` instead. The declared type cannot say this on its own, because
+     * the list resolves each entry to its typed class before denormalizing it. Each denormalize()
+     * consumes the flag, so it never reaches the element's children.
+     */
+    protected const EXTENSION_LIST_ENTRY_CONTEXT_KEY = '__fhir_extension_list_entry';
 
     /**
      * Denormalize an extension array, using the IG registry for typed extension resolution.
@@ -627,7 +840,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                 $targetClass = $this->igTypeRegistry->resolveExtensionClass($url, $this->fhirVersion) ?? $this->baseExtensionClass;
             }
 
-            $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $targetClass, $format, $context);
+            $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $targetClass, $format, [...$context, self::EXTENSION_LIST_ENTRY_CONTEXT_KEY => true]);
         }
 
         return $denormalizedExtensions;
@@ -635,9 +848,22 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
 
     /**
      * Handle unknown properties according to the configured policy.
+     *
+     * The record is written whatever the policy says, because recording is not a behaviour: it
+     * neither places the value nor rejects the document, so every existing policy reads as it did
+     * before. Only validation decides whether a record becomes a finding.
+     *
+     * @param string $propertyName the element or property name as the document spelled it
+     * @param mixed  $value        the value that could not be placed
+     * @param string $policy       one of FHIRSerializationContext::UNKNOWN_POLICY_*
+     * @param string $format       UnknownInput::FORMAT_JSON or FORMAT_XML, which decides the wording
+     * @param object $object       the model object being read into, and the record's key
+     * @param string $elementPath  path for the error message, when the policy throws
      */
-    protected function handleUnknownProperty(string $propertyName, mixed $value, string $policy, object $object, ?string $elementPath = null): void
+    protected function handleUnknownProperty(string $propertyName, mixed $value, string $policy, string $format, object $object, ?string $elementPath = null): void
     {
+        UnknownInputRecorder::record($object, new UnknownInput($propertyName, $format));
+
         switch ($policy) {
             case FHIRSerializationContext::UNKNOWN_POLICY_ERROR:
                 throw FHIRSerializationException::unknownElementError($propertyName, $policy, $elementPath, ['property_value' => $value]);
@@ -654,6 +880,91 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
     }
 
+    /**
+     * Record `boolean` and `integer` text that the property's PHP type cannot hold as written.
+     *
+     * Those FHIR types are generated as bare `bool` and `int`, so coercion loses the text before
+     * validation could see it: `TRUE` and `yes` both become a boolean, and an out-of-range integer
+     * saturates. This changes nothing about the coerced value; it only keeps the original text in
+     * {@see MalformedPrimitiveRecorder}, where validation reports it.
+     *
+     * XML arrives as the decoded element: the bare `value` text, or an array carrying `@value`
+     * alongside children. An array with neither `@value` nor `extension` is an element with nothing
+     * in it, like `<valueInteger><value value="0"/></valueInteger>` in `R4.Observation-ex-pain.xml`.
+     *
+     * JSON types its own scalars, so only a `boolean` written as something other than `true` or
+     * `false` is recorded, such as `"valueBoolean": 1` in `R5.group-choice-bad3`. Integer text is out
+     * of reach there: `json_decode()` has already turned it into a number.
+     *
+     * @param object      $object       the model object being read into, and the record's key
+     * @param string      $propertyName the model property the value is written to
+     * @param string|null $phpType      the property's PHP type; anything but `bool` or `int` is ignored
+     * @param mixed       $rawValue     the decoded value before any coercion
+     * @param string      $format       'json' or 'xml'
+     */
+    protected function recordMalformedScalar(object $object, string $propertyName, ?string $phpType, mixed $rawValue, string $format): void
+    {
+        if ($phpType !== 'bool' && $phpType !== 'int') {
+            return;
+        }
+
+        if ($format === 'json') {
+            if ($phpType === 'bool' && $rawValue !== null && !is_bool($rawValue)) {
+                MalformedPrimitiveRecorder::record(
+                    $object,
+                    new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_BOOLEAN, (string) json_encode($rawValue)),
+                );
+            }
+
+            return;
+        }
+
+        // A bare `<valueInteger/>` decodes to an empty string, not an array: an element with nothing
+        // in it. An explicit `value=""` arrives as `['@value' => '']` and is judged as text below.
+        if ($rawValue === '') {
+            MalformedPrimitiveRecorder::record($object, new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_NO_VALUE, null));
+
+            return;
+        }
+
+        $lexeme = $rawValue;
+
+        if (is_array($rawValue)) {
+            if (!array_key_exists('@value', $rawValue)) {
+                if (!array_key_exists('extension', $rawValue)) {
+                    MalformedPrimitiveRecorder::record($object, new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_NO_VALUE, null));
+                }
+
+                return;
+            }
+
+            $lexeme = $rawValue['@value'];
+        }
+
+        if (!is_string($lexeme)) {
+            return;
+        }
+
+        if ($phpType === 'bool') {
+            if ($lexeme !== 'true' && $lexeme !== 'false') {
+                MalformedPrimitiveRecorder::record($object, new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_BOOLEAN, $lexeme));
+            }
+
+            return;
+        }
+
+        // FHIR's integer is a signed 32-bit value with no leading zeros; positiveInt and unsignedInt
+        // narrow the range further, which is a separate rule this does not judge.
+        $isInteger = preg_match('/\A(0|[-+]?[1-9][0-9]*)\z/', $lexeme) === 1
+            && strlen(ltrim($lexeme, '+-')) <= 10
+            && (int) $lexeme >= -2147483648
+            && (int) $lexeme <= 2147483647;
+
+        if (!$isInteger) {
+            MalformedPrimitiveRecorder::record($object, new MalformedPrimitive($propertyName, MalformedPrimitive::KIND_INTEGER, $lexeme));
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Primitive value validation (used by FHIRPrimitiveType{Json,Xml}Normalizer)
     // -------------------------------------------------------------------------
@@ -666,26 +977,25 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     protected function createPrimitiveInstance(string $type, mixed $value, mixed $extensions, ?string $format = null, array $context = []): mixed
     {
         try {
-            $reflection = self::reflClass($type);
+            // Constructor-defaulted, not bare: a primitive wrapper carries inherited `id` and
+            // `extension` slots that this method never assigns when the payload omits them, and an
+            // unassigned slot throws on read rather than reading back as the declared default.
+            //
+            // Built before the value is validated so an unloadable type still raises
+            // ReflectionException first, as reflecting the class up front used to.
+            $instance = $this->instantiateWithDefaults($type);
+            $accessor = self::modelAccessor();
 
-            $validatedValue = $this->validateAndConvertValue($value, $type);
-
-            $instance = $reflection->newInstanceWithoutConstructor();
-
-            $valueProp = self::reflProp($type, 'value');
-            if ($valueProp !== null) {
-                $valueProp->setValue($instance, $validatedValue);
-            }
+            $accessor->writeValue($instance, 'value', $this->validateAndConvertValue($value, $type));
 
             if ($extensions !== null) {
-                $extensionProp = self::reflProp($type, 'extension');
-                if ($extensionProp !== null) {
-                    if ($this->denormalizer !== null && is_array($extensions)) {
-                        $extensionProp->setValue($instance, $this->denormalizeExtensionArray($extensions, $format, $context));
-                    } else {
-                        $extensionProp->setValue($instance, $extensions);
-                    }
-                }
+                $accessor->writeValue(
+                    $instance,
+                    'extension',
+                    $this->denormalizer !== null && is_array($extensions)
+                        ? $this->denormalizeExtensionArray($extensions, $format, $context)
+                        : $extensions,
+                );
             }
 
             return $instance;
@@ -824,6 +1134,16 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Read a temporal lexeme, retaining it rather than aborting the document when it will not parse.
+     *
+     * Malformed primitive syntax is a FHIR *validation* finding, not a reason to refuse the
+     * document: the reference validator reads `primitive-bad.xml` end to end and reports forty
+     * located errors, one per bad primitive. Throwing here surfaced only the first bad temporal and
+     * lost the other thirty-nine — the document never reached the validator at all.
+     *
+     * The lexeme is therefore kept on the value object ({@see FHIRTemporalValue::unparsed()}), where
+     * validation locates it and reports it, and serialization writes it back exactly as supplied.
+     *
      * @param class-string<FHIRTemporalValue> $class
      */
     protected function parseTemporalValue(mixed $value, string $class): ?FHIRTemporalValue
@@ -844,11 +1164,94 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             try {
                 return $class::parse($value);
             } catch (\Throwable $e) {
-                throw new NotNormalizableValueException(sprintf('Expected %s string, got invalid value: %s', $class, $value), 0, $e);
+                return $class::unparsed($value, $e->getMessage());
             }
         }
 
         throw new NotNormalizableValueException(sprintf('Expected %s value, got %s', $class, gettype($value)));
+    }
+
+    /**
+     * Build a typed complex extension, or say why it cannot be built so the caller can read it plain.
+     *
+     * A typed complex extension needs every required sub-extension, so `fromSubExtensions()` refuses
+     * a document that omits one. That is a validation finding, not a reason to refuse the document:
+     * the reference validator reads `patient-extension-complex-bad1.xml` and reports the missing
+     * slice. Throwing here lost every other finding in the document.
+     *
+     * Sub-extensions the typed class does not declare are kept on it, after its own.
+     *
+     * @param class-string<FHIRComplexExtensionInterface> $class         the typed class the element resolved to
+     * @param array<FHIRExtensionInterface>               $subExtensions the element's sub-extensions, already read
+     * @param string|null                                 $id            the element's id
+     *
+     * @return FHIRComplexExtensionInterface|IncompleteComplexExtension the typed extension, or the
+     *                                                                  record of why the caller must
+     *                                                                  read the element as plain
+     *                                                                  `Extension` instead
+     */
+    protected function buildComplexExtension(string $class, array $subExtensions, ?string $id): FHIRComplexExtensionInterface|IncompleteComplexExtension
+    {
+        try {
+            $built = $class::fromSubExtensions($subExtensions, $id);
+        } catch (\InvalidArgumentException $e) {
+            // The generated guard names the slice in a fixed form (FHIRExtensionGenerator,
+            // buildFromSubExtensionsMethod). Any other refusal is still recorded, without a slice.
+            $sliceName = preg_match('/^Required sub-extension "([^"]+)"/', $e->getMessage(), $m) === 1 ? $m[1] : null;
+
+            return new IncompleteComplexExtension($class, $sliceName, $e->getMessage());
+        }
+
+        // The constructor rebuilt the extension list from the slices it declares. Put back what it
+        // did not take, so it is written out again and validation can see it.
+        /** @var list<FHIRExtensionInterface> $declared */
+        $declared = self::modelAccessor()->readInitializedValue($built, 'extension') ?? [];
+        $leftOver = ComplexExtensionSubExtensions::undeclared(array_values($subExtensions), $declared);
+
+        if ($leftOver !== []) {
+            self::modelAccessor()->writeValue($built, 'extension', [...$declared, ...$leftOver]);
+        }
+
+        return $built;
+    }
+
+    /**
+     * The nearest ancestor of a typed complex extension that is not itself one: the version's `Extension`.
+     *
+     * Reading the element as this class keeps its url, id and sub-extensions exactly as written. It
+     * is only a valid substitute where the slot takes any extension: an entry of an `extension` list,
+     * or a caller that asked for `Extension` or `FHIRExtensionInterface`. A caller that asked for the
+     * typed class itself gets the original refusal instead of an object of the wrong class.
+     *
+     * @param class-string               $class            the typed complex extension class
+     * @param string                     $declaredType     the type the caller asked to denormalize into
+     * @param bool                       $isExtensionEntry whether the object fills an `extension` list
+     *                                                     entry ({@see self::EXTENSION_LIST_ENTRY_CONTEXT_KEY})
+     * @param IncompleteComplexExtension $why              why the typed class could not be built
+     *
+     * @return class-string the plain extension class to read the element as instead
+     *
+     * @throws NotNormalizableValueException when the slot cannot hold the plain class
+     */
+    protected static function plainExtensionClassOf(string $class, string $declaredType, bool $isExtensionEntry, IncompleteComplexExtension $why): string
+    {
+        $plain = $class;
+
+        while (is_a($plain, FHIRComplexExtensionInterface::class, true)) {
+            $parent = get_parent_class($plain);
+
+            if ($parent === false) {
+                break;
+            }
+
+            $plain = $parent;
+        }
+
+        if (is_a($plain, FHIRComplexExtensionInterface::class, true) || (!$isExtensionEntry && !is_a($plain, $declaredType, true))) {
+            throw new NotNormalizableValueException($why->reason);
+        }
+
+        return $plain;
     }
 
     // -------------------------------------------------------------------------
@@ -879,6 +1282,125 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /**
      * Unwrap a FHIR XML value encoded as ['@value' => '...', '#' => ''] by Symfony's XmlEncoder.
      */
+    /**
+     * Reject a repeated XML element landing on a single-valued property.
+     *
+     * XML has no array syntax: repetition is expressed by repeating the element, so
+     * `<subject/><subject/>` decodes to a *list* while one `<subject/>` decodes to a map. A property
+     * the model declares as `0..1` therefore receives a list only when the document exceeds its
+     * maximum cardinality — `Composition.subject` is `0..1`, and `bundle-dual-subject.xml` supplies
+     * two.
+     *
+     * Without this guard the list reached the complex-type normalizer, whose element loop assumes
+     * string keys, and `str_starts_with(0, '@')` raised a `TypeError`. That surfaced as an opaque
+     * "Format error (xml)" naming neither the element nor the real problem — and because a failed
+     * deserialization is seeded as one error, it coincidentally matched the Java reference validator's
+     * single cardinality error and looked correct.
+     *
+     * The model cannot hold both values, so this is fatal for the document rather than something
+     * validation can report later. The message says which element and how many, mirroring Java's
+     * "max allowed = 1, but found 2".
+     *
+     * @throws FHIRSerializationException when $value repeats and the property cannot hold a list
+     */
+    protected static function assertSingleValuedElement(string $elementName, mixed $value, string $ownerType): void
+    {
+        if (!is_array($value) || !array_is_list($value) || count($value) < 2) {
+            return;
+        }
+
+        throw FHIRConformanceViolationException::inFormat('xml', sprintf('%s.%s: max allowed = 1, but found %d', self::shortTypeName($ownerType), $elementName, count($value)));
+    }
+
+    /**
+     * Reject a repeating element supplied as a JSON object instead of an array.
+     *
+     * FHIR JSON represents a `0..*` element as an array, always — even for a single occurrence. An
+     * object there is malformed, and the HL7 Java reference validator reports it as an error ("The
+     * property reasonCode must be a JSON Array, not an Object"), so accepting it leniently would make
+     * us pass documents the oracle rejects.
+     *
+     * The alternative is worse than a wrong answer: iterating the object walks its *fields* into the
+     * item normalizer, where an integer key reaches `str_starts_with()` and raises a `TypeError`
+     * reported only as an opaque "Format error (json)".
+     *
+     * @throws FHIRSerializationException when $value is an object rather than a list
+     */
+    protected static function assertRepeatingElementIsArray(string $elementName, mixed $value, string $ownerType): void
+    {
+        if (!is_array($value) || array_is_list($value)) {
+            return;
+        }
+
+        throw FHIRConformanceViolationException::inFormat('json', sprintf('The property %s must be a JSON Array, not an Object (at %s)', $elementName, self::shortTypeName($ownerType)));
+    }
+
+    /**
+     * Was this XML element present in the document but carrying nothing an element can hold?
+     *
+     * Symfony's XmlEncoder decodes `<entry/>` and `<code>\n</code>` to the empty or whitespace-only
+     * string, and `<entry><!-- c --></entry>` to the empty array — three spellings of the same fact.
+     *
+     * That is a *validation* finding, not a reason to refuse the document: the reference validator
+     * reads `list-empty1.xml` end to end and reports ele-1 ("Element must have some content") at the
+     * offending path. Refusing it lost the whole file. Callers therefore substitute `[]` — an element
+     * that is present with no children — and let `ele-1` on {@see Element} report it.
+     */
+    protected static function isEmptyXmlElement(mixed $value): bool
+    {
+        return $value === [] || (is_string($value) && trim($value) === '');
+    }
+
+    /**
+     * Reject a complex-valued JSON property supplied as `null`.
+     *
+     * FHIR JSON has no null for a complex element: an element is either present as an object or
+     * absent. The HL7 Java reference validator reports the null as an error ("The property meta must
+     * be an Object, not a Null (at Bundle.meta)") rather than reading it, so accepting it leniently
+     * would make us pass documents the oracle rejects.
+     *
+     * This is deliberately *not* applied on the primitive path: FHIR legitimately uses `null`
+     * placeholders inside a primitive array to align it with its `_x` extension array.
+     *
+     * @throws FHIRSerializationException when $value is null
+     */
+    protected static function assertComplexPropertyIsNotNull(string $elementName, mixed $value, string $ownerType): void
+    {
+        if ($value !== null) {
+            return;
+        }
+
+        throw FHIRConformanceViolationException::inFormat('json', sprintf('The property %s must be an Object, not a Null (at %s.%s)', $elementName, self::shortTypeName($ownerType), $elementName));
+    }
+
+    /**
+     * The FHIR type name for a generated class, for messages a reader can match against the spec.
+     *
+     * Reads the class's own structural attribute, so the message says `Composition.subject` rather
+     * than `CompositionResource.subject`, `Dosage.doseAndRate.type` rather than
+     * `DosageDoseAndRate.type`, and `Group.member` rather than `ActualGroupProfile.member` -- lining
+     * up with the reference validator's wording, which is what the conformance corpus compares
+     * against.
+     *
+     * Do not be tempted to drop this and use the short class name: it is right only for the ordinary
+     * complex types (`Coding` really is `Coding`), which is precisely why a version of this that
+     * always fell through to the class name went unnoticed.
+     */
+    private static function shortTypeName(string $fqcn): string
+    {
+        $declared = self::structureKinds()->declaredFhirTypeName($fqcn);
+
+        if ($declared !== null) {
+            return $declared;
+        }
+
+        // No declared name: an unloadable string, or a subclass carrying no structural attribute of
+        // its own. Both fall back to the class's short name.
+        $tail = strrchr($fqcn, '\\');
+
+        return $tail === false ? $fqcn : substr($tail, 1);
+    }
+
     protected function unwrapXmlValue(mixed $value, ?string $propertyType = null): mixed
     {
         if (is_array($value) && array_key_exists('@value', $value)) {
@@ -900,12 +1422,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return (float) $value;
         }
 
-        if ($propertyType === 'array' && !is_array($value)) {
-            $value = [$value];
-        }
-
-        if ($propertyType === 'array' && is_array($value)) {
-            $value = $this->stripXmlMetaKeys($value);
+        if ($propertyType === 'array') {
+            $value = $this->stripXmlMetaKeys(is_array($value) ? $value : [$value]);
         }
 
         return $value;
@@ -918,15 +1436,26 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      */
     protected function stripXmlMetaKeys(array $data): array
     {
-        $result = [];
+        // Edits in place rather than rebuilding: every nesting level of an XML array property passes
+        // its whole subtree through here again, and most subtrees carry no '#' key at all. Leaving
+        // those untouched lets PHP's copy-on-write share them instead of copying them at each level.
         foreach ($data as $key => $value) {
             if (is_string($key) && str_starts_with($key, '#')) {
+                unset($data[$key]);
+
                 continue;
             }
-            $result[$key] = is_array($value) ? $this->stripXmlMetaKeys($value) : $value;
+
+            if (is_array($value) && $value !== []) {
+                $stripped = $this->stripXmlMetaKeys($value);
+
+                if ($stripped !== $value) {
+                    $data[$key] = $stripped;
+                }
+            }
         }
 
-        return $result;
+        return $data;
     }
 
     /**
@@ -975,16 +1504,44 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      */
     protected function resolveChoiceVariant(mixed $value, array $variants): ?array
     {
+        $variant = $this->resolveVariant($value, $variants);
+
+        return $variant === null ? null : [$variant->propertyKind, $variant->jsonKey, $variant->fhirType];
+    }
+
+    /**
+     * The first variant this value satisfies, walking the list in order.
+     *
+     * Order is load-bearing and belongs to whoever built the list: the walk returns the FIRST match,
+     * so a supertype listed ahead of its subtype steals the match and the value serializes under the
+     * wrong variant — silently, with structurally valid output. Both callers depend on this, which is
+     * why the walk lives in one place: `resolveChoiceVariant()` needs the FHIR element name for a
+     * `value[x]` choice, and the CDA polymorphic path needs the published type name for an `xsi:type`
+     * attribute.
+     *
+     * @param mixed                         $value    The value occupying the polymorphic slot
+     * @param list<PropertyVariantMetadata> $variants Candidate variants, ordered subclass-before-superclass
+     *
+     * @return PropertyVariantMetadata|null The matched variant, or null when the value fits none
+     */
+    protected function resolveVariant(mixed $value, array $variants): ?PropertyVariantMetadata
+    {
         /** @var array<string, string> */
         static $phpToGettype = ['bool' => 'boolean', 'int' => 'integer', 'float' => 'double', 'string' => 'string'];
 
         foreach ($variants as $variant) {
             if ($variant->isBuiltin) {
                 if (gettype($value) === ($phpToGettype[$variant->phpType] ?? '')) {
-                    return [$variant->propertyKind, $variant->jsonKey, $variant->fhirType];
+                    return $variant;
+                }
+
+                // A boolean/integer/decimal variant holds its primitive wrapper when the value carries
+                // an extension (#207); the wrapper names the variant's FHIR type.
+                if (is_object($value) && $this->findFHIRPrimitiveAttribute($value::class)?->primitiveType === $variant->fhirType) {
+                    return $variant;
                 }
             } elseif (is_object($value) && $value instanceof $variant->phpType) {
-                return [$variant->propertyKind, $variant->jsonKey, $variant->fhirType];
+                return $variant;
             }
         }
 
@@ -1034,14 +1591,63 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         return str_starts_with($propertyName, 'value') && strlen($propertyName) > 5;
     }
 
-    protected function getPropertyType(\ReflectionProperty $property): ?string
+    /**
+     * The property's declared type name, or null when it declares a union.
+     *
+     * One union answers with its scalar: a boolean/integer/decimal element, declared as its primitive
+     * wrapper plus a native scalar (`BooleanPrimitive|bool|null`, #207). Its value is read as the
+     * scalar, as it was before the wrapper joined the union; the wrapper is built only when the
+     * element carries an extension.
+     */
+    protected function getPropertyType(object|string $subject, string $propertyName): ?string
     {
-        $type = $property->getType();
-        if ($type instanceof \ReflectionNamedType) {
-            return $type->getName();
+        return self::modelAccessor()->declaredTypeOf($subject, $propertyName)
+            ?? $this->wrappableScalarTypeOf($subject, $propertyName);
+    }
+
+    /**
+     * The native scalar of a `<Wrapper>|<scalar>|null` boolean/integer/decimal property, or null.
+     */
+    protected function wrappableScalarTypeOf(object|string $subject, string $propertyName): ?string
+    {
+        $cacheKey = (is_object($subject) ? $subject::class : $subject) . '::' . $propertyName;
+
+        if (!array_key_exists($cacheKey, self::$wrappableScalarTypeCache)) {
+            self::$wrappableScalarTypeCache[$cacheKey] = $this->resolveWrappableScalarType($subject, $propertyName);
         }
 
-        return null;
+        return self::$wrappableScalarTypeCache[$cacheKey];
+    }
+
+    private function resolveWrappableScalarType(object|string $subject, string $propertyName): ?string
+    {
+        $wrapper = self::modelAccessor()->declaredClassOf($subject, $propertyName);
+        if ($wrapper === null) {
+            return null;
+        }
+
+        $scalar = match ($this->findFHIRPrimitiveAttribute($wrapper)?->primitiveType) {
+            'boolean' => 'bool',
+            'integer' => 'int',
+            'decimal' => 'string',
+            default   => null,
+        };
+
+        if ($scalar === null || (is_string($subject) && !class_exists($subject))) {
+            return null;
+        }
+
+        $type    = (new \ReflectionProperty($subject, $propertyName))->getType();
+        $members = $type instanceof \ReflectionUnionType ? $type->getTypes() : [];
+        $names   = array_values(array_diff(
+            array_map(static fn (\ReflectionType $t): string => $t instanceof \ReflectionNamedType ? $t->getName() : '', $members),
+            ['null'],
+        ));
+        sort($names);
+        $expected = [$wrapper, $scalar];
+        sort($expected);
+
+        return $names === $expected ? $scalar : null;
     }
 
     /**
@@ -1051,41 +1657,27 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * FHIRString|null), returns the first non-builtin, non-null member. Returns null when the
      * property has no usable class type — typically a primitive whose value cannot hold extensions.
      */
-    protected function getFirstNonBuiltinTypeFromProperty(\ReflectionProperty $property): ?string
+    protected function getFirstNonBuiltinTypeFromProperty(object|string $subject, string $propertyName): ?string
     {
-        $type = $property->getType();
-
-        if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
-            return $type->getName();
-        }
-
-        if ($type instanceof \ReflectionUnionType) {
-            foreach ($type->getTypes() as $member) {
-                if ($member instanceof \ReflectionNamedType && !$member->isBuiltin() && $member->getName() !== 'null') {
-                    return $member->getName();
-                }
-            }
-        }
-
-        return null;
+        return self::modelAccessor()->declaredClassOf($subject, $propertyName);
     }
 
     /**
-     * @param \ReflectionClass<object>        $class
+     * @param object|string                   $subject An instance or class name owning the sibling properties
      * @param array<string, PropertyMetadata> $metaMap
      */
-    protected function resolvePrimitiveArrayItemClass(\ReflectionClass $class, string $fhirType, array $metaMap): ?string
+    protected function resolvePrimitiveArrayItemClass(object|string $subject, string $fhirType, array $metaMap): ?string
     {
         foreach ($metaMap as $siblingName => $siblingMeta) {
             if ($siblingMeta->propertyKind !== 'primitive' || $siblingMeta->isArray || $siblingMeta->fhirType !== $fhirType) {
                 continue;
             }
 
-            if (!$class->hasProperty($siblingName)) {
+            if (!self::modelAccessor()->hasProperty($subject, $siblingName)) {
                 continue;
             }
 
-            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($class->getProperty($siblingName));
+            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($subject, $siblingName);
             if ($primitiveClass !== null) {
                 return $primitiveClass;
             }
@@ -1095,48 +1687,114 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
-     * Instantiate an object of the given class, providing constructor default values if a constructor exists.
+     * Render a JSON-decoded number as the FHIR `decimal` lexical form it was written in.
      *
-     * @param \ReflectionClass<object> $reflection
+     * Generated models store `decimal` as a string precisely to keep the author's precision, but
+     * `json_decode()` has already turned `101.0` into PHP float `101.0`, and `(string)` on that float
+     * loses two things:
+     *
+     *  - the decimal point — `(string) 101.0` is `"101"`, which reads as an integer. FHIRPath type
+     *    detection for choice elements sniffs for a `.` to tell `decimal` from `integer`
+     *    (`FHIRPathEvaluator::resolveChoiceVariantType()`), so `probability is decimal` came out false
+     *    and `ras-2` (`probability is decimal implies (probability as decimal) <= 100`) short-circuited
+     *    to a silent pass on a probability of 101;
+     *  - significant digits — the cast honours `precision` (14), so `1.23456789012345678` became
+     *    `"1.2345678901235"`.
+     *
+     * `JSON_PRESERVE_ZERO_FRACTION` keeps the `.0` that both the cast and a plain `json_encode()` drop,
+     * and `serialize_precision = -1` makes it the shortest representation that round-trips exactly.
+     * Integers are left as written: JSON `101` for a decimal element is lexically `"101"`, and inventing
+     * a fraction there would change serialized output.
      */
-    protected function instantiateWithConstructorDefaults(\ReflectionClass $reflection): object
+    protected static function decimalToLexicalString(mixed $value): string
     {
-        $constructor = $reflection->getConstructor();
-        if ($constructor !== null) {
-            $args = [];
-            foreach ($constructor->getParameters() as $param) {
-                $args[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
+        if (is_float($value)) {
+            $encoded = json_encode($value, JSON_PRESERVE_ZERO_FRACTION);
+            if (is_string($encoded)) {
+                return $encoded;
             }
-
-            return $reflection->newInstanceArgs($args);
         }
 
-        return $reflection->newInstanceWithoutConstructor();
+        return is_scalar($value) ? (string) $value : '';
+    }
+
+    /**
+     * Instantiate a class the way `newInstanceWithoutConstructor()` cannot: in the state PHP's own
+     * constructor would have produced.
+     *
+     * The denormalizers bypass the constructor, so every property the constructor would have
+     * defaulted is left *uninitialized* instead — a third state the model never declared, and the
+     * only one that throws on read:
+     *
+     *  - reading `$resource->item` or `$patient->gender` raises "must not be accessed before
+     *    initialization" for consumers, and `?->` does not help (null-safe guards against null,
+     *    which uninitialized is not);
+     *  - Symfony's `PropertyMetadata::getPropertyValue()` maps the uninitialized slot to `null`, and
+     *    `CountValidator` returns early on null, so every generated `#[Count(min: 1)]` was dead.
+     *
+     * The guarantee made here is a single one — *a denormalized instance is in the same state the
+     * constructor would have produced* — rather than a list of per-type special cases: every
+     * uninitialized public property whose constructor parameter declares a default gets that
+     * default. Generated models declare repeating elements as `public array $x = []` and optional
+     * elements as `public ?T $x = null`, so both come out right from the same rule. Matching is by
+     * parameter *name*, resolved across the whole class hierarchy rather than the most-derived
+     * constructor alone; see `constructorDefaults()` for which parameters a child constructor hides.
+     *
+     * Where no constructor default exists the property is left uninitialized — that is genuinely the
+     * model's choice and not an artefact. The one exception is a non-nullable `array`, which is
+     * still filled with `[]`: FHIR has no representation for an absent repeating element, so `[]` is
+     * the only state it can be in.
+     *
+     * @param object|string $subject An instance or class name to build from
+     */
+    protected function instantiateWithDefaults(object|string $subject): object
+    {
+        return self::modelAccessor()->instantiateWithDefaults($subject);
+    }
+
+    /**
+     * Constructor parameter name → default value, for every parameter that declares one anywhere in
+     * the class hierarchy.
+     *
+     * The whole chain is walked because generated subclasses narrow their signature and forward the
+     * rest to `parent::__construct()`, and which parameters that hides depends on the kind. A
+     * code-type wrapper declares only `__construct(?string $value = null)`, so its ancestor's `id`
+     * and `extension` are the invisible ones. A typed extension declares `id` and its own
+     * `value<Type>`, but supplies `url` as a computed argument, and does the same for the inherited
+     * `value` whenever it narrows to a typed one. Ancestors are merged first so the most-derived
+     * declaration wins on any name they share.
+     *
+     * Cached per concrete class: defaults are constant expressions (null, scalars, arrays, enum
+     * cases), all of which are immutable or copied on assignment, so one resolved value is safely
+     * shared across instances.
+     *
+     * @param object|string $subject An instance or class name to read constructor defaults from
+     *
+     * @return array<string, mixed>
+     */
+    private static function constructorDefaults(object|string $subject): array
+    {
+        return self::modelAccessor()->constructorDefaults($subject);
+    }
+
+    /**
+     * Instantiate an object of the given class, providing constructor default values if a constructor exists.
+     *
+     * @param object|string $subject An instance or class name to build from
+     */
+    protected function instantiateWithConstructorDefaults(object|string $subject): object
+    {
+        return self::modelAccessor()->instantiateWithConstructorDefaults($subject);
     }
 
     /**
      * For simple typed extensions, copy the first initialised `value*` property back to the inherited `value` slot.
      *
-     * @param \ReflectionClass<object> $reflection
+     * @param object $object The extension instance to normalize in place
      */
-    protected function copyTypedExtensionValueBack(\ReflectionClass $reflection, object $object): void
+    protected function copyTypedExtensionValueBack(object $object): void
     {
-        if (!$reflection->hasProperty('value')) {
-            return;
-        }
-
-        $valueProperty = $reflection->getProperty('value');
-        foreach (self::reflPublicProps($reflection->getName()) as $prop) {
-            $propName = $prop->getName();
-            if ($propName !== 'value'
-                && str_starts_with($propName, 'value')
-                && $prop->isInitialized($object)
-                && $prop->getValue($object) !== null
-            ) {
-                $valueProperty->setValue($object, $prop->getValue($object));
-                break;
-            }
-        }
+        self::modelAccessor()->copyTypedExtensionValueBack($object);
     }
 
     /**

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: ActionGroupingBehavior
  * URL: http://hl7.org/fhir/ValueSet/action-grouping-behavior
  * Version: 4.0.1
  * Description: Defines organization behavior of a group.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/action-grouping-behavior', version: '4.0.1')]
 enum ActionGroupingBehavior: string
 {
     /** Visual Group */

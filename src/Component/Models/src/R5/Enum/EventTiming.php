@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: EventTiming
  * URL: http://hl7.org/fhir/ValueSet/event-timing
  * Version: 5.0.0
  * Description: Real-world event relating to the schedule.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/event-timing', version: '5.0.0')]
 enum EventTiming: string
 {
     /** Morning */
@@ -66,6 +69,15 @@ enum EventTiming: string
     /** C */
     case c = 'C';
 
+    /** CD */
+    case cd = 'CD';
+
+    /** CM */
+    case cm = 'CM';
+
+    /** CV */
+    case cv = 'CV';
+
     /** HS */
     case hs = 'HS';
 
@@ -95,13 +107,4 @@ enum EventTiming: string
 
     /** WAKE */
     case wake = 'WAKE';
-
-    /** CM */
-    case cm = 'CM';
-
-    /** CD */
-    case cd = 'CD';
-
-    /** CV */
-    case cv = 'CV';
 }

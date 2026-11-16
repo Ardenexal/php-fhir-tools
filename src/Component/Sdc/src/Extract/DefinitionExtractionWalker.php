@@ -9,7 +9,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
 use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnaireResponseExtractService;
 
 /**
@@ -76,7 +76,7 @@ final class DefinitionExtractionWalker
             $sourceItem = $linkId     !== null ? ($itemIndex[$linkId] ?? null) : null;
             $canonical  = $sourceItem !== null ? $this->definitionExtractCanonical($sourceItem) : null;
 
-            if ($canonical === null || $sourceItem === null) {
+            if ($canonical === null) {
                 // Not an extraction root — descend looking for nested definitionExtract roots.
                 $this->collect($this->qrReader->childItems($responseItem), $itemIndex, $factory, $evalContext, $entries, $issues);
                 continue;

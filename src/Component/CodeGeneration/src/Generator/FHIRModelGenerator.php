@@ -11,11 +11,14 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
+use Nette\PhpGenerator\PromotedParameter;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\Valid;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Parser\ObligationExtensionParser;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
@@ -37,6 +40,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\CanonicalUrl;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;
 
@@ -368,12 +373,7 @@ class FHIRModelGenerator implements GeneratorInterface
             if ($constraintSource !== null && $constraintSource !== $sdUrl) {
                 continue;
             }
-            $class->addAttribute(FHIRPathInvariant::class, [
-                'key'        => $constraint['key'],
-                'severity'   => $constraint['severity'],
-                'expression' => $expression,
-                'human'      => $constraint['human'],
-            ]);
+            $class->addAttribute(FHIRPathInvariant::class, self::invariantAttributeArgs($constraint, $expression));
         }
 
         // Inject FHIRExtensionsTrait into Element and DomainResource base classes so that all
@@ -476,7 +476,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 // Track ValueSet dependencies for complex elements with bindings
                 $this->trackValueSetDependencies($element, $builderContext);
 
-                $className = u($element['path'])->pascal()->toString();
+                $className = StringCase::pascal($element['path']);
 
                 // Determine if this is a backbone element or regular element
                 $isBackboneElement = isset($element['type'][0]['code']) && $element['type'][0]['code'] === 'BackboneElement';
@@ -561,12 +561,7 @@ class FHIRModelGenerator implements GeneratorInterface
                     if ($constraintSource !== null && $constraintSource !== $sdUrl) {
                         continue;
                     }
-                    $childClass->addAttribute(FHIRPathInvariant::class, [
-                        'key'        => $constraint['key'],
-                        'severity'   => $constraint['severity'],
-                        'expression' => $expression,
-                        'human'      => $constraint['human'],
-                    ]);
+                    $childClass->addAttribute(FHIRPathInvariant::class, self::invariantAttributeArgs($constraint, $expression));
                 }
 
                 if (isset($propertyElement['_properties'])) {
@@ -597,6 +592,57 @@ class FHIRModelGenerator implements GeneratorInterface
      * @param BuilderContextInterface $builderContext The builder context for tracking dependencies
      *
      * @return void
+     */
+    /**
+     * The generated enum class name backing a value set, or null when there is not one.
+     *
+     * Bindings carry a version-suffixed URL (`.../ValueSet/item-type|4.0.1`) while the context is
+     * keyed by the bare URL, so the suffix is stripped before lookup.
+     *
+     * Only materialised enums count, and deliberately so. The pending register (`getPendingEnums()`)
+     * is keyed by URL but holds a name derived through `ClassNameResolver`, and two different value
+     * sets can resolve to the *same* name: `.../ValueSet/medication-statement-status` and
+     * `.../ValueSet/medication-status` both yield `MedicationStatusCodes`, whose generated enum holds
+     * only the latter's three codes. Trusting the pending name bound `MedicationStatement.status` to
+     * the wrong enum and rejected the legal code `unknown` — a false positive that `ABOVE` could not
+     * catch, because both affected cases were already `BELOW`.
+     *
+     * Resolution goes through the ValueSet *definition*, not the generated-enum register, because
+     * `getEnum()` is still empty while models are being written — value sets are registered in the
+     * command's own later loop. Definitions are loaded up front, so this is order-independent.
+     *
+     * The name this produces is **not** trusted on its own. `ClassNameResolver` can map two value sets
+     * to one name (`medication-statement-status` and `medication-status` both give
+     * `MedicationStatusCodes`), and `resolveValueSetDefinition()` may itself fall back to an
+     * alternative URL. Both are caught at validation time by comparing the enum's own
+     * `#[FHIRValueSetSource]` URL against the binding's, so a mismatch degrades to the existing
+     * "no enum class generated" warning rather than rejecting legal codes.
+     */
+    private function resolveBoundEnumName(
+        string $valueSetUrl,
+        string $version,
+        BuilderContextInterface $builderContext,
+    ): ?string {
+        $bareUrl    = $this->extractBaseValueSetUrl($valueSetUrl);
+        $definition = $this->resolveValueSetDefinition($bareUrl, $builderContext);
+
+        if ($definition === null || !isset($definition['name']) || !is_string($definition['name'])) {
+            return null;
+        }
+
+        $className = ClassNameResolver::resolveClassName($bareUrl, $definition['name']);
+
+        // Fully qualified, not a bare name. The validator is wired with every version's enum
+        // namespace at once (services.yaml lists R4, R4B and R5), and probing them in order returns
+        // whichever matches first — always R4. An R5 binding therefore resolved to R4's enum, where
+        // the code sets genuinely differ: `coding` is legal in R5 and absent from R4 (so it was
+        // rejected), while `choice` was removed in R5 and present in R4 (so it was accepted). The
+        // corpus harness cannot see this, because its factory wires a single namespace per version.
+        return $builderContext->getEnumNamespace($version)->getName() . '\\' . $className;
+    }
+
+    /**
+     * @param array<string, mixed> $element
      */
     private function trackValueSetDependencies(array $element, BuilderContextInterface $builderContext): void
     {
@@ -704,6 +750,10 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     private function trackProfileBindings(string $profileUrl, BuilderContextInterface $builderContext): void
     {
+        // Definitions are indexed under the bare canonical URL. A versioned `type.profile`
+        // reference misses silently, dropping every binding the profile declares.
+        $profileUrl = CanonicalUrl::stripVersion($profileUrl);
+
         // Try to resolve the profile StructureDefinition
         $profileDefinition = $builderContext->getDefinition($profileUrl);
 
@@ -811,13 +861,20 @@ class FHIRModelGenerator implements GeneratorInterface
                     ->setType('array')
                     ->addComment('@var  array<' . $typeHint . '> ' . $parameterName . ' ' . $shortDescription);
                 $param->addAttribute(FhirProperty::class, $attributeArgs);
+                $this->addCascadeIfNested($param, $propertyKind);
             } else {
                 $param = $method->addPromotedParameter($parameterName, null)
                     ->setType(implode('|', $types))
                     ->addComment('@var null|' . implode('|', array_unique($docblockTypes)) . ' ' . $parameterName . ' ' . $shortDescription);
                 $param->addAttribute(FhirProperty::class, $attributeArgs);
+                $this->addCascadeIfNested($param, $propertyKind);
                 if ($isNullable === false) {
-                    $param->addAttribute(NotBlank::class);
+                    // NotBlank treats `false`, `0` and `''` as blank, but for FHIR "required" means
+                    // present, not truthy. A required boolean legitimately carries false —
+                    // `Questionnaire.item.enableWhen.answerBoolean: false` is a valid answer — and
+                    // NotBlank rejected every one of them. NotNull is the correct constraint wherever
+                    // the property can hold a falsy scalar.
+                    $param->addAttribute(self::requiresNotNullRatherThanNotBlank($types) ? NotNull::class : NotBlank::class);
                 }
             }
 
@@ -860,7 +917,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 $maxSuffix        = $rangeMax !== null ? $rangeMax['type'] : null;
                 $suffix           = $minSuffix ?? $maxSuffix;
 
-                if ($suffix !== null && in_array($suffix, $temporalSuffixes, true)) {
+                if (in_array($suffix, $temporalSuffixes, true)) {
                     $temporalTypeMap = [
                         'Date'     => 'date',
                         'DateTime' => 'dateTime',
@@ -910,7 +967,32 @@ class FHIRModelGenerator implements GeneratorInterface
             // Regex pattern from primitive type extension.
             $regexPattern = $this->extractPrimitiveRegexPattern($element);
             if ($regexPattern !== null) {
-                $param->addAttribute(Regex::class, ['pattern' => $regexPattern]);
+                $param->addAttribute(Regex::class, ['pattern' => self::toDelimitedAnchoredPattern($regexPattern)]);
+            } elseif (($element['path'] ?? null) === 'Resource.id') {
+                // `Resource.id` is the one element whose lexical rule lives nowhere in its own
+                // definition: its type is `http://hl7.org/fhirpath/System.String` with no `regex`
+                // extension, so nothing above emits anything and every resource id was unconstrained.
+                //
+                // Constraining `IdPrimitive` instead does not work — the property is generated as a
+                // bare `?string`, so the primitive wrapper class is never consulted.
+                //
+                // Matched on `path`, not `base.path`: `base.path` is `Resource.id` on *every* concrete
+                // resource's `id` too (Patient.id, Observation.id, …), and Symfony merges a parent's
+                // property constraints into a child that redeclares the property, so emitting on both
+                // AbstractResource::$id and PatientResource::$id yields two violations where the
+                // reference validator reports one. Matching `path` emits exactly once, on the
+                // `Resource` StructureDefinition, and all 146 generated resource classes inherit it.
+                //
+                // Not to be confused with `Element.id` (Narrative.id, Coding.id, …), which has the
+                // identical `System.String` shape but carries no such rule and must stay unconstrained.
+                //
+                // One constraint, not Regex + Length: the length limit is inside the quantifier, so an
+                // over-long id fails exactly once, matching the reference validator's single issue.
+                $param->addAttribute(Regex::class, [
+                    'pattern' => self::toDelimitedAnchoredPattern(self::RESOURCE_ID_PATTERN),
+                    // `{{ value }}` is already rendered quoted by Symfony — no quotes around it here.
+                    'message' => 'Invalid Resource id: {{ value }} must be 1-64 characters of A-Z, a-z, 0-9, "-" or ".".',
+                ]);
             }
 
             // FHIRValueSetBinding for required/extensible/preferred-strength bindings.
@@ -925,6 +1007,16 @@ class FHIRModelGenerator implements GeneratorInterface
                     $maxValueSetUrl = $this->extractMaxValueSetUrl($element['binding']['extension'] ?? []);
                     if ($maxValueSetUrl !== null) {
                         $args['maxValueSetUrl'] = $maxValueSetUrl;
+                    }
+
+                    // Record which generated enum backs this value set. The validator cannot work it
+                    // out from the URL: class names come from the ValueSet's `name` via
+                    // ClassNameResolver, so `.../ValueSet/item-type` is `QuestionnaireItemType` and
+                    // `http-verb` is `HTTPVerb`. Guessing from the slug missed 27 of 28 value sets and
+                    // silently downgraded 19 core required bindings to an unenforced warning.
+                    $enumClass = $this->resolveBoundEnumName($valueSetUrl, $version, $builderContext);
+                    if ($enumClass !== null) {
+                        $args['enumClass'] = $enumClass;
                     }
 
                     $param->addAttribute(FHIRValueSetBinding::class, $args);
@@ -1013,10 +1105,40 @@ class FHIRModelGenerator implements GeneratorInterface
     }
 
     /**
+     * Corrections for `regex` extensions that ship defective in the published StructureDefinitions.
+     *
+     * Keyed on the **exact** upstream string, so a correction stops applying the moment HL7 ships a
+     * package that no longer contains the defect. That is deliberate: a correction keyed on type name
+     * would silently keep overriding a pattern that had since been fixed — or worse, revised — upstream.
+     *
+     * Every entry needs the defect named and the replacement sourced from something other than our own
+     * judgement. Do not add one for a pattern that is merely stricter or looser than we would like.
+     *
+     * @var array<string, string>
+     */
+    private const REGEX_CORRECTIONS = [
+        // R5 `decimal`. `hl7.fhir.r5.core#5.0.0`'s StructureDefinition-decimal.json carries a stray
+        // closing brace in the exponent group — `[0-9]{1,9}}` — which is a literal `}` to PCRE, not a
+        // typo it can see through. The emitted constraint therefore rejects the legal `1e1`, `1.0e-1`,
+        // `0.1e11` and `0.12e3`, and accepts the malformed `1e1}`.
+        //
+        // The replacement is the HL7 Java reference validator's own decimal pattern, quoted verbatim
+        // from its output in `outcomes/java` (search: `does not meet decimal regex`) rather than
+        // hand-repaired here. It differs from upstream-minus-the-brace in one further respect: the
+        // exponent may not carry a leading zero. That is not our embellishment — Java flags `1e09` on
+        // `R5.primitive-good`, so spec-minus-the-brace would put the generated constraint in direct
+        // conflict with both the reference validator and `PrimitiveFormatChecker`, which already
+        // reports against this exact pattern.
+        '-?(0|[1-9][0-9]{0,17})(\.[0-9]{1,17})?([eE][+-]?[0-9]{1,9}})?' => '-?(0|[1-9][0-9]{0,17})(\.[0-9]{1,17})?([eE](0|[+\-]?[1-9][0-9]{0,9}))?',
+    ];
+
+    /**
      * Extract a regex pattern from a primitive element's type extension.
      *
      * Looks for the `http://hl7.org/fhir/StructureDefinition/regex` extension on element.type[0].
      * Returns null when the extension is absent.
+     *
+     * A published pattern is not automatically a correct one — see {@see self::REGEX_CORRECTIONS}.
      *
      * @param array<string, mixed> $element The FHIR element definition
      */
@@ -1024,11 +1146,89 @@ class FHIRModelGenerator implements GeneratorInterface
     {
         foreach ($element['type'][0]['extension'] ?? [] as $ext) {
             if (($ext['url'] ?? '') === 'http://hl7.org/fhir/StructureDefinition/regex') {
-                return $ext['valueString'] ?? null;
+                $pattern = $ext['valueString'] ?? null;
+
+                if (!is_string($pattern)) {
+                    return null;
+                }
+
+                return self::REGEX_CORRECTIONS[$pattern] ?? $pattern;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Delimiters tried, in order, when wrapping a FHIR regex for PCRE.
+     *
+     * None of these is a PCRE metacharacter, so an unescaped occurrence inside the pattern is always
+     * a literal and the "first candidate absent from the pattern" rule is safe. `/` is deliberately
+     * absent: two core patterns (`base64Binary`, and R5's `base64Binary`) contain it literally.
+     *
+     * @var list<string>
+     */
+    private const REGEX_DELIMITER_CANDIDATES = ['~', '#', '%', '!', '@'];
+
+    /**
+     * The lexical rule for `Resource.id`, identical in R4, R4B and R5.
+     *
+     * Sourced from the `id` primitive's own `regex` extension rather than invented here; the
+     * `Resource.id` element itself carries no `regex` extension to read it from.
+     */
+    private const RESOURCE_ID_PATTERN = '[A-Za-z0-9\-\.]{1,64}';
+
+    /**
+     * The native PHP type a FHIR boolean, integer or decimal element holds when it carries no
+     * extension. Decimals are strings so the lexical form (`1.50`) survives.
+     *
+     * @var array<string, string>
+     */
+    private const SCALAR_PHP_TYPES = ['boolean' => 'bool', 'integer' => 'int', 'decimal' => 'string'];
+
+    /**
+     * Wrap a raw FHIR regex as a delimited, whole-value-anchored PCRE pattern.
+     *
+     * StructureDefinitions carry regexes in an undelimited dialect (`true|false`,
+     * `(\s*([0-9a-zA-Z\+/=]){4}\s*)+`). Handing those straight to `Symfony\...\Regex` is a silent
+     * inversion of the constraint: `preg_match()` raises ("Delimiter must not be alphanumeric…",
+     * "Unknown modifier '+'") and returns `false`, which `RegexValidator` reads as "did not match",
+     * so the constraint rejects *every* value including the valid ones.
+     *
+     * Anchored with `\A`/`\z` rather than `^`/`$`: FHIR regexes constrain the entire lexical value,
+     * and `$` also matches immediately before a trailing newline, so `^…$` would accept `"abc\n"`
+     * for `code`, `id`, `oid` and friends. The body is wrapped in a non-capturing group so a
+     * top-level alternation (`true|false`) cannot escape the anchors.
+     */
+    private static function toDelimitedAnchoredPattern(string $fhirRegex): string
+    {
+        foreach (self::REGEX_DELIMITER_CANDIDATES as $candidate) {
+            if (! str_contains($fhirRegex, $candidate)) {
+                return $candidate . '\A(?:' . $fhirRegex . ')\z' . $candidate;
+            }
+        }
+
+        // Every candidate occurs literally in the pattern. Escape the occurrences of the first one
+        // rather than assuming this cannot happen — a future FHIR version only has to ship one regex
+        // containing all five characters to turn an unchecked assumption into a silent inversion.
+        $delimiter = self::REGEX_DELIMITER_CANDIDATES[0];
+        $escaped   = '';
+        $length    = strlen($fhirRegex);
+        for ($i = 0; $i < $length; ++$i) {
+            $char = $fhirRegex[$i];
+            // Preserve existing escape sequences verbatim so `\~` is not turned into `\\~`.
+            if ($char === '\\' && $i + 1 < $length) {
+                $escaped .= $char . $fhirRegex[$i + 1];
+                ++$i;
+                continue;
+            }
+            if ($char === $delimiter) {
+                $escaped .= '\\';
+            }
+            $escaped .= $char;
+        }
+
+        return $delimiter . '\A(?:' . $escaped . ')\z' . $delimiter;
     }
 
     /**
@@ -1060,6 +1260,106 @@ class FHIRModelGenerator implements GeneratorInterface
     }
 
     /**
+     * Whether a required property must use `NotNull` instead of `NotBlank`.
+     *
+     * Symfony's `NotBlank` rejects `false`, `0`, `'0'` and `''`. FHIR cardinality means *present*, not
+     * *truthy*, so any property whose PHP type admits a falsy scalar needs `NotNull`. Booleans are the
+     * common case — `enableWhen.answerBoolean: false` is a perfectly valid answer that `NotBlank`
+     * rejected — and choice types are included because a `value[x]` can resolve to `bool` or `int`.
+     *
+     * @param array<int|string, string> $types PHP type names for the property
+     */
+    private static function requiresNotNullRatherThanNotBlank(array $types): bool
+    {
+        foreach ($types as $type) {
+            if (in_array(ltrim($type, '?'), ['bool', 'int', 'float', 'mixed'], true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Build the `#[FHIRPathInvariant]` arguments for one StructureDefinition constraint.
+     *
+     * `bestPractice` is emitted only when true, so the vast majority of invariants keep their
+     * existing three-argument form and the regen diff stays readable. The flag comes from the
+     * `elementdefinition-bestpractice` extension, which marks a constraint as a recommendation
+     * rather than a conformance rule — the HL7 Java reference validator does not report those by
+     * default, and reporting them buried real findings (475 of our 767 R4 warnings were `dom-6`).
+     * In R4 only `dom-6` and `con-3` carry it, over 189 declarations.
+     *
+     * @param array<string, mixed> $constraint
+     *
+     * @return array<string, mixed>
+     */
+    private static function invariantAttributeArgs(array $constraint, string $expression): array
+    {
+        $args = [
+            'key'        => $constraint['key'],
+            'severity'   => $constraint['severity'],
+            'expression' => $expression,
+            'human'      => $constraint['human'],
+        ];
+
+        foreach ($constraint['extension'] ?? [] as $extension) {
+            if (!is_array($extension)) {
+                continue;
+            }
+
+            $url = $extension['url'] ?? '';
+            if (is_string($url)
+                && str_ends_with($url, '/elementdefinition-bestpractice')
+                && ($extension['valueBoolean'] ?? false) === true) {
+                $args['bestPractice'] = true;
+                break;
+            }
+        }
+
+        return $args;
+    }
+
+    /**
+     * Emit `#[Assert\Valid]` on properties holding nested FHIR objects, so their constraints run.
+     *
+     * Symfony's validator descends into a nested object **only** where the referring property carries
+     * this attribute. Without it, every constraint declared on a backbone element or datatype is
+     * unreachable when a resource is validated as a whole: measured before this was added, a
+     * `Parameters.parameter` violating `inv-1` reported zero errors nested inside its
+     * `ParametersResource` and one error when passed as the validation root. 117 / 123 / 179 invariant
+     * declarations in R4 / R4B / R5 were dead for that reason, against 110 / 114 / 147 resource-level
+     * ones that worked.
+     *
+     * The set is deliberately narrow, and each exclusion is load-bearing rather than cautious:
+     *
+     *  - **`choice`** — excluded because it is the one kind that can hold a raw scalar. A `value[x]`
+     *    legitimately carries `bool`, `int` or `string`, and `Assert\Valid` on a non-object throws
+     *    `NoSuchMetadataException` ("Cannot create metadata for non-objects"), verified directly. This
+     *    would be a fatal error at validation time, not a missed check.
+     *  - **`extension`** — excluded because `FHIRValidationService` already walks extensions itself
+     *    (`validateExtensionContexts`, `validateModifierExtensions`). Cascading as well would report
+     *    the same violation twice.
+     *  - **`primitive`** — excluded because the primitive wrapper classes carry no constraints of their
+     *    own (measured: 0 across `Primitive/` in R4), so cascading into them is pure traversal cost.
+     *  - **`scalar`** — never an object.
+     *
+     * Verified before emitting: of 2560 `complex`/`backbone`/`resource` properties in the R4 tree,
+     * **zero** declare a scalar in their PHP type, so this cannot hit the non-object throw.
+     *
+     * If a future FHIR version gives primitives or extensions real constraints, revisit — but revisit
+     * `choice` only with a guard, because that exclusion is about a runtime exception, not coverage.
+     */
+    private function addCascadeIfNested(PromotedParameter $param, string $propertyKind): void
+    {
+        if (!in_array($propertyKind, ['backbone', 'complex', 'resource'], true)) {
+            return;
+        }
+
+        $param->addAttribute(Valid::class);
+    }
+
+    /**
      * Map a single FHIR type code to a propertyKind string.
      *
      * @param string $code The FHIR type code (e.g. 'boolean', 'dateTime', 'HumanName')
@@ -1079,7 +1379,8 @@ class FHIRModelGenerator implements GeneratorInterface
             return 'resource';
         }
 
-        // boolean/integer/decimal resolve to PHP scalars via resolveClassFromType() early exits
+        // boolean/integer/decimal hold a PHP scalar unless they carry an extension, when the
+        // serializer builds the wrapper that resolveClassFromType() adds to the union (#207)
         if (in_array($code, ['boolean', 'integer', 'decimal'], true)) {
             return 'scalar';
         }
@@ -1110,8 +1411,9 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     private function resolvePhpTypeForCode(string $code, string $version, BuilderContextInterface $builderContext): string
     {
-        // FHIRPath system types and FHIR scalars → PHP scalar builtins
-        // (mirrors the early-exit logic in resolveClassFromType())
+        // FHIRPath system types and FHIR scalars → PHP scalar builtins. A choice variant names the
+        // builtin; the serializer finds a boolean/integer/decimal variant's wrapper in the
+        // property's union (#207).
         switch ($code) {
             case 'http://hl7.org/fhirpath/System.Boolean':
             case 'boolean':
@@ -1151,7 +1453,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 'oid', 'id', 'markdown', 'unsignedInt', 'positiveInt', 'uuid', 'xhtml',
             ];
             $suffix    = in_array($code, $primitiveTypes, true) ? 'Primitive' : '';
-            $className = u($code)->pascal()->toString() . $suffix;
+            $className = StringCase::pascal($code) . $suffix;
 
             return $correctNamespace . '\\' . $className;
         } catch (\Throwable) {
@@ -1234,7 +1536,7 @@ class FHIRModelGenerator implements GeneratorInterface
     {
         // First, check if this type has already been generated and stored in the builder context
         // This ensures we use the actual namespace where the type was generated
-        $className  = u($code)->pascal()->toString();
+        $className  = StringCase::pascal($code);
         $storedType = $builderContext->getType($className);
         if ($storedType !== null) {
             return $storedType->namespace;
@@ -1480,10 +1782,7 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     private function extractBaseValueSetUrl(string $valueSetUrl): string
     {
-        // Split on pipe character to separate URL from version
-        $urlParts = explode('|', $valueSetUrl);
-
-        return $urlParts[0];
+        return CanonicalUrl::stripVersion($valueSetUrl);
     }
 
     /**
@@ -1637,17 +1936,28 @@ class FHIRModelGenerator implements GeneratorInterface
 
                 continue;
             }
-            if ($code === 'http://hl7.org/fhirpath/System.Boolean' || $code === 'boolean') {
+            // A FHIR boolean/integer/decimal element is a native scalar, plus its primitive wrapper so
+            // the element can carry an `extension` (#207). The serializer builds the wrapper only
+            // when the document gives the element one; a plain value stays a scalar.
+            // The FHIRPath System.* codes are the wrapper's own `value` and stay scalar-only.
+            if (in_array($code, ['boolean', 'integer', 'decimal'], true)) {
+                $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
+                $types[]          = '\\' . $correctNamespace . '\\' . StringCase::pascal($code) . 'Primitive';
+                $types[]          = self::SCALAR_PHP_TYPES[$code];
+
+                continue;
+            }
+            if ($code === 'http://hl7.org/fhirpath/System.Boolean') {
                 $types[] = 'bool';
 
                 continue;
             }
-            if ($code === 'http://hl7.org/fhirpath/System.Integer' || $code === 'integer') {
+            if ($code === 'http://hl7.org/fhirpath/System.Integer') {
                 $types[] = 'int';
 
                 continue;
             }
-            if ($code === 'http://hl7.org/fhirpath/System.Decimal' || $code === 'decimal') {
+            if ($code === 'http://hl7.org/fhirpath/System.Decimal') {
                 $types[] = 'string';
 
                 continue;
@@ -1675,7 +1985,7 @@ class FHIRModelGenerator implements GeneratorInterface
 
             if ($code === 'string') {
                 $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
-                $types[]          = '\\' . $correctNamespace . '\\' . u($code)->pascal() . 'Primitive';
+                $types[]          = '\\' . $correctNamespace . '\\' . StringCase::pascal($code) . 'Primitive';
                 $types[]          = 'string';
 
                 continue;
@@ -1738,7 +2048,7 @@ class FHIRModelGenerator implements GeneratorInterface
                         'oid', 'id', 'markdown', 'unsignedInt', 'positiveInt', 'uuid', 'xhtml',
                     ];
                     $suffix    = in_array($code, $primitiveTypes, true) ? 'Primitive' : '';
-                    $className = u($code)->pascal()->toString() . $suffix;
+                    $className = StringCase::pascal($code) . $suffix;
                     $types[]   = '\\' . $correctNamespace . '\\' . $className;
                 } catch (\Throwable $e) {
                     // Log the error but don't fail generation - the type may be resolved later

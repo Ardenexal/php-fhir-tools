@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description When a measure includes multiple stratifiers, there will be a stratifier group for each stratifier defined by the measure.
@@ -34,6 +35,7 @@ class MeasureReportGroupStratifier extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $code = [],
         /** @var array<MeasureReportGroupStratifierStratum> stratum Stratum results, one for each unique value, or set of values, in the stratifier, or stratifier components */
         #[FhirProperty(
@@ -42,6 +44,7 @@ class MeasureReportGroupStratifier extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MeasureReport\MeasureReportGroupStratifierStratum',
         )]
+        #[Valid]
         public array $stratum = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

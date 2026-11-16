@@ -52,17 +52,19 @@ final class DescendantsFunction extends AbstractFunction
         }
 
         $result     = [];
+        $scopes     = [];
         $seenHashes = []; // Tracks objects we've already visited to prevent infinite loops
 
-        foreach ($input as $root) {
+        foreach ($input as $index => $root) {
             // Breadth-first traversal of children, grandchildren, etc.
             // The root itself is not added — only its descendants.
-            $queue = $this->getNodeChildren($root);
+            $rootScope = $this->getChildScope($root, $input->scopeAt($index), $context);
+            $queue     = array_map(static fn (mixed $child): array => [$child, $rootScope], $this->getNodeChildren($root));
 
             while (!empty($queue)) {
                 $next = []; // Items to process in the next iteration
 
-                foreach ($queue as $node) {
+                foreach ($queue as [$node, $scope]) {
                     // Cycle guard for PHP objects (only type that can form true cycles)
                     if (is_object($node)) {
                         $hash = spl_object_hash($node); // Unique ID for this object instance
@@ -74,12 +76,16 @@ final class DescendantsFunction extends AbstractFunction
                         $seenHashes[$hash] = true; // Mark as visited
                     }
 
+                    if ($scope !== null) {
+                        $scopes[count($result)] = $scope;
+                    }
                     $result[] = $node;
 
                     // Queue this node's own children for the next pass
                     // This creates a breadth-first traversal (all children, then all grandchildren, etc.)
+                    $childScope = $this->getChildScope($node, $scope, $context);
                     foreach ($this->getNodeChildren($node) as $child) {
-                        $next[] = $child;
+                        $next[] = [$child, $childScope];
                     }
                 }
 
@@ -87,6 +93,6 @@ final class DescendantsFunction extends AbstractFunction
             }
         }
 
-        return Collection::unordered($result);
+        return Collection::unordered($result)->withScopes($scopes);
     }
 }

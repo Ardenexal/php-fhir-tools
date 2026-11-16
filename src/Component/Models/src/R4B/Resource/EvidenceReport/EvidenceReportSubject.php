@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specifies the subject or focus of the report. Answers "What is this report about?".
@@ -34,6 +35,7 @@ class EvidenceReportSubject extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\EvidenceReport\EvidenceReportSubjectCharacteristic',
         )]
+        #[Valid]
         public array $characteristic = [],
         /** @var array<Annotation> note Footnotes and/or explanatory notes */
         #[FhirProperty(
@@ -42,6 +44,7 @@ class EvidenceReportSubject extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -66,6 +66,9 @@ fhir:
         message_overrides: []      # map of simple constraint class name => message template
         terminology_cache_pool: null   # PSR-6 pool for terminology results; null disables
         terminology_cache_ttl: 3600    # seconds; 0 = no expiry
+        runtime_profiles:              # StructureDefinitions to validate against without generated classes
+            package_dirs: []           # extracted FHIR package directories
+            files: []                  # single StructureDefinition JSON files
 
     serialization:
         metadata_cache_pool: 'cache.app'   # PSR-6 pool for property metadata; null disables

@@ -15,8 +15,10 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemOperatorType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireResponseStatusType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItem;
@@ -1075,5 +1077,47 @@ final class FHIRQuestionnaireValidatorTest extends TestCase
 
         self::assertCount(1, $report->errors(), 'value-bound violations are NOT downgraded for in-progress QR');
         self::assertStringContainsString('less than the allowed minimum', $report->errors()[0]->message);
+    }
+
+    /**
+     * A boolean or integer that carries an extension arrives as its primitive wrapper (#207), and
+     * is read as its value: `repeats` and integer answers behave as the scalars do.
+     */
+    public function testWrappedBooleanAndIntegerValuesAreReadAsTheirValues(): void
+    {
+        $extension     = [new Extension(url: 'http://example.org/StructureDefinition/note', value: new StringPrimitive(value: 'x'))];
+        $questionnaire = new QuestionnaireResource(item: [
+            new QuestionnaireItem(
+                linkId: 'q1',
+                type: new QuestionnaireItemTypeType('string'),
+                required: new BooleanPrimitive(extension: $extension, value: false),
+                repeats: new BooleanPrimitive(extension: $extension, value: true),
+            ),
+            new QuestionnaireItem(linkId: 'age', type: new QuestionnaireItemTypeType('integer')),
+            new QuestionnaireItem(
+                linkId: 'followUp',
+                type: new QuestionnaireItemTypeType('string'),
+                required: true,
+                enableWhen: [new QuestionnaireItemEnableWhen(
+                    question: 'age',
+                    operator: new QuestionnaireItemOperatorType('>'),
+                    answer: new IntegerPrimitive(extension: $extension, value: 17),
+                )],
+            ),
+        ]);
+        $response = self::response(
+            'completed',
+            new QuestionnaireResponseItem(linkId: 'q1', answer: [self::stringAnswer('a'), self::stringAnswer('b')]),
+            new QuestionnaireResponseItem(
+                linkId: 'age',
+                answer: [new QuestionnaireResponseItemAnswer(value: new IntegerPrimitive(extension: $extension, value: 18))],
+            ),
+        );
+
+        $messages = array_map(static fn ($violation): string => $violation->message, $this->validator->validate($questionnaire, $response)->errors());
+
+        // q1 repeats, so two answers are fine; age 18 > 17 enables the required followUp.
+        self::assertCount(1, $messages, implode("\n", $messages));
+        self::assertStringContainsString("Required item 'followUp' has no answer", $messages[0]);
     }
 }

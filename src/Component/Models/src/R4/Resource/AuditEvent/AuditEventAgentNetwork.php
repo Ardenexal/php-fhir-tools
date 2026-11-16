@@ -33,7 +33,12 @@ class AuditEventAgentNetwork extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $address = null,
         /** @var AuditEventAgentNetworkTypeType|null type The type of network access point */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/network-type|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/network-type|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\AuditEventAgentNetworkType',
+        )]
         public ?AuditEventAgentNetworkTypeType $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

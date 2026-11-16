@@ -9,12 +9,15 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description Parameters to the transform.
@@ -32,7 +35,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var IdPrimitive|StringPrimitive|string|bool|int|DatePrimitive|TimePrimitive|DateTimePrimitive|null value Parameter value - variable or literal */
+        /** @var IdPrimitive|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|DecimalPrimitive|DatePrimitive|TimePrimitive|DateTimePrimitive|null value Parameter value - variable or literal */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -74,8 +77,8 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
-        public IdPrimitive|StringPrimitive|string|bool|int|DatePrimitive|TimePrimitive|DateTimePrimitive|null $value = null,
+        #[NotNull]
+        public IdPrimitive|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|DecimalPrimitive|DatePrimitive|TimePrimitive|DateTimePrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

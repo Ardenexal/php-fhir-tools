@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: repositoryType
  * URL: http://hl7.org/fhir/ValueSet/repository-type
  * Version: 4.0.1
  * Description: Type for access of external URI.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/repository-type', version: '4.0.1')]
 enum RepositoryType: string
 {
     /** Click and see */

@@ -6,7 +6,7 @@ name: Package Integrity
 #                      autoload + root vendor mask missing requires; this installs each
 #                      component in isolation and statically checks for used-but-undeclared symbols.
 #  - php-matrix       (B6-class): the suite must run on the declared PHP floor (8.3) AND the
-#                      latest (8.4), so a too-low floor or version-specific syntax fails CI.
+#                      latest (8.5), so a too-low floor or version-specific syntax fails CI.
 
 on:
     pull_request:
@@ -17,15 +17,70 @@ permissions:
     contents: read
 
 jobs:
+    # See the long note on the identical job in pr.yml for why this is a job and not a
+    # workflow-level `paths:` filter. No check here is required by the "Protect Main" ruleset
+    # today, but package-integrity-passed below exists to be required, and a `paths:` filter
+    # would quietly make that impossible.
+    changes:
+        # Distinct from pr.yml's `changes` so the two check runs are not ambiguous by name.
+        name: Detect changed areas (package integrity)
+        runs-on: ubuntu-latest
+        outputs:
+            code: ${{ steps.classify.outputs.code }}
+            packages: ${{ steps.classify.outputs.packages }}
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Classify the changed paths
+                id: classify
+                env:
+                    GH_TOKEN: ${{ github.token }}
+                # Push events fall through to "every area": this workflow also runs on pushes to
+                # main, where there is no pull request to ask for a file list and the
+                # belt-and-braces re-run is the point. See the longer note on the same job in
+                # pr.yml for why each failure path here resolves to running everything.
+                run: |
+                    if [ "${{ github.event_name }}" = 'pull_request' ]; then
+                      .github/scripts/changed-paths.sh \
+                        '${{ github.repository }}' '${{ github.event.number }}' \
+                        > changed-paths.txt || : > changed-paths.txt
+                      echo 'Changed paths:'
+                      sed 's/^/  /' changed-paths.txt
+                    else
+                      : > changed-paths.txt
+                    fi
+
+                    if ! .github/scripts/changed-areas.sh < changed-paths.txt > areas.txt; then
+                      echo 'change detection failed; treating every area as changed' >&2
+                      printf 'code=true\ncodegen=true\ndeps=true\npackages=true\n' > areas.txt
+                    fi
+
+                    tee -a "$GITHUB_OUTPUT" < areas.txt
+
     undeclared-deps:
         name: Undeclared deps (${{ matrix.repo }})
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # Seven isolation installs, and what they check is a manifest against its own source.
+        # Gated together rather than per leg because a job-level `if:` cannot see `matrix`;
+        # splitting them would mean generating the matrix dynamically, which is not worth it.
+        #
+        # Gating a matrix job at job level is safe HERE and not in pr.yml: no leg of this
+        # workflow is a required check, so no context is left pending when the matrix never
+        # expands. If `package-integrity-passed` is ever added to the ruleset, this stays fine —
+        # it is not matrixed — but these two jobs must not be required leg by leg.
+        if: ${{ !cancelled() && needs.changes.outputs.packages != 'false' }}
         env:
             COMPOSER_NO_INTERACTION: 1
         strategy:
             fail-fast: false
             matrix:
-                # Generated Models/ is intentionally excluded (regenerated, not hand-authored).
+                # Generated source is not itself a reason to skip this check: what it verifies is the
+                # hand-authored composer.json, and a generated tree drifting away from a manifest
+                # nobody regenerates is exactly the failure mode. So CdaModels IS checked even though
+                # `generate-models-cda` emits its src/ — its isolation install is cheap.
+                # Models/ is excluded only for cost: ~6,000 files across R4/R4B/R5 make an isolation
+                # install per leg disproportionate, and it declares one sibling plus brick/date-time.
                 include:
                     -   path: src/Component/Metadata
                         repo: fhir-metadata
@@ -41,6 +96,8 @@ jobs:
                         repo: fhir-http-client
                     -   path: src/Component/Sdc
                         repo: fhir-sdc
+                    -   path: src/Component/CdaModels
+                        repo: cda-sd-models
                     -   path: src/Bundle/FHIRBundle
                         repo: fhir-bundle
         steps:
@@ -53,11 +110,11 @@ jobs:
                     extensions: ctype, iconv, zip
                     tools: composer-require-checker
 
-            # Sibling ardenexal/* packages are released together and the new (0.4.x) versions are
+            # Sibling ardenexal/* packages are released together and the new (0.6.x) versions are
             # not on Packagist yet, so resolve them from the in-repo source via path repositories.
-            # Each sibling carries a dev-main -> 0.4.x-dev branch-alias, so relax stability for this
+            # Each sibling carries a dev-main -> 0.6.x-dev branch-alias, so relax stability for this
             # isolation install only (the edits below land on the ephemeral CI checkout, never the
-            # committed manifest). Once 0.4.0 is tagged, siblings resolve as stable and these are no-ops.
+            # committed manifest). Once 0.6.2 is tagged, siblings resolve as stable and these are no-ops.
             -   name: Wire sibling path repositories
                 working-directory: ${{ matrix.path }}
                 run: |
@@ -73,8 +130,8 @@ jobs:
                         composer config "repositories.$key" path "$dir"
                         # Pin an explicit dev version on the sibling so detached-HEAD CI checkouts
                         # don't fall back to dev-<sha> (which the dev-main branch-alias can't match)
-                        # and the ^0.4 sibling constraints resolve. No-op once 0.4.0 is tagged.
-                        composer config version 0.4.x-dev --working-dir="$dir"
+                        # and the ^0.6.2 sibling constraints resolve. No-op once 0.6.2 is tagged.
+                        composer config version 0.6.x-dev --working-dir="$dir"
                     done
 
             -   name: Install in isolation (declared production deps only)
@@ -88,13 +145,15 @@ jobs:
     php-matrix:
         name: PHP ${{ matrix.php }}
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
         env:
             XDEBUG_MODE: off
             COMPOSER_NO_INTERACTION: 1
         strategy:
             fail-fast: false
             matrix:
-                php: [ '8.3', '8.4' ]
+                php: [ '8.3', '8.4', '8.5' ]
         steps:
             -   uses: actions/checkout@v4
                 with:
@@ -123,8 +182,16 @@ jobs:
         if: ${{ always() }}
         steps:
             -   name: Check matrix results
+                # `skipped` passes: change detection found nothing either matrix could react to.
                 run: |
-                    if [ "${{ needs.undeclared-deps.result }}" != "success" ] || [ "${{ needs.php-matrix.result }}" != "success" ]; then
-                      echo "undeclared-deps: ${{ needs.undeclared-deps.result }}, php-matrix: ${{ needs.php-matrix.result }}"
-                      exit 1
-                    fi
+                    status=0
+                    for pair in "undeclared-deps:${{ needs.undeclared-deps.result }}" \
+                                "php-matrix:${{ needs.php-matrix.result }}"; do
+                      job=${pair%%:*}
+                      result=${pair#*:}
+                      echo "$job: $result"
+                      if [ "$result" != 'success' ] && [ "$result" != 'skipped' ]; then
+                        status=1
+                      fi
+                    done
+                    exit "$status"

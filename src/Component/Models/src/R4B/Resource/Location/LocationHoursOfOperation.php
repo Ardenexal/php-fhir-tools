@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DaysOfWeekType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\TimePrimitive;
 
 /**
@@ -36,11 +37,15 @@ class LocationHoursOfOperation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DaysOfWeekType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.3.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\DaysOfWeek',
+        )]
         public array $daysOfWeek = [],
-        /** @var bool|null allDay The Location is open all day */
+        /** @var BooleanPrimitive|bool|null allDay The Location is open all day */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $allDay = null,
+        public BooleanPrimitive|bool|null $allDay = null,
         /** @var TimePrimitive|null openingTime Time that the Location opens */
         #[FhirProperty(fhirType: 'time', propertyKind: 'primitive')]
         public ?TimePrimitive $openingTime = null,

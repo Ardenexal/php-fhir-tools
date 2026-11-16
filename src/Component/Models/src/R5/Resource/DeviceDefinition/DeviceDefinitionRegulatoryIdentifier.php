@@ -32,7 +32,13 @@ class DeviceDefinitionRegulatoryIdentifier extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var DeviceDefinitionRegulatoryIdentifierTypeType|null type basic | master | license */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/devicedefinition-regulatory-identifier-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/devicedefinition-regulatory-identifier-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\DeviceDefinitionRegulatoryIdentifierType',
+        )]
         public ?DeviceDefinitionRegulatoryIdentifierTypeType $type = null,
         /** @var StringPrimitive|string|null deviceIdentifier The identifier itself */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

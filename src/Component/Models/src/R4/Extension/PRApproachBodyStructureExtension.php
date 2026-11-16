@@ -21,7 +21,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen.collection')]
 class PRApproachBodyStructureExtension extends Extension

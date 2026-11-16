@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Appointment Response Status
  * URL: http://hl7.org/fhir/ValueSet/appointmentresponse-status
  * Version: 5.0.0
  * Description: The Participation status for a participant in response to a request for an appointment.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/appointmentresponse-status', version: '5.0.0')]
 enum AppointmentResponseStatus: string
 {
     /** Accepted */

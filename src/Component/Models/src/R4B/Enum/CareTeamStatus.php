@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: CareTeamStatus
  * URL: http://hl7.org/fhir/ValueSet/care-team-status
  * Version: 4.3.0
  * Description: Indicates the status of the care team.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/care-team-status', version: '4.3.0')]
 enum CareTeamStatus: string
 {
     /** Proposed */

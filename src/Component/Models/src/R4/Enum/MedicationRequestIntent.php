@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Medication request  intent
  * URL: http://hl7.org/fhir/ValueSet/medicationrequest-intent
  * Version: 4.0.1
  * Description: MedicationRequest Intent Codes
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/medicationrequest-intent', version: '4.0.1')]
 enum MedicationRequestIntent: string
 {
     /** Proposal */

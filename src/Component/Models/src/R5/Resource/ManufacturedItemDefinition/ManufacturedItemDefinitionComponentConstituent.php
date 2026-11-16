@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A reference to a constituent of the manufactured item as a whole, linked here so that its component location within the item can be indicated. This not where the item's ingredient are primarily stated (for which see Ingredient.for or ManufacturedItemDefinition.ingredient).
@@ -41,6 +42,7 @@ class ManufacturedItemDefinitionComponentConstituent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity',
         )]
+        #[Valid]
         public array $amount = [],
         /** @var array<CodeableConcept> location The physical location of the constituent/ingredient within the component */
         #[FhirProperty(
@@ -49,6 +51,7 @@ class ManufacturedItemDefinitionComponentConstituent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $location = [],
         /** @var array<CodeableConcept> function The function of this constituent within the component e.g. binder */
         #[FhirProperty(
@@ -57,6 +60,7 @@ class ManufacturedItemDefinitionComponentConstituent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $function = [],
         /** @var array<CodeableReference> hasIngredient The ingredient that is the constituent of the given component */
         #[FhirProperty(
@@ -65,6 +69,7 @@ class ManufacturedItemDefinitionComponentConstituent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Ingredient'])]
         public array $hasIngredient = [],
     ) {

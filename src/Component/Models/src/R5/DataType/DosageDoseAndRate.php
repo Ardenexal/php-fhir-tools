@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Depending on the resource,this is the amount of medication administered, to  be administered or typical amount to be administered.
@@ -21,7 +22,7 @@ class DosageDoseAndRate extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var CodeableConcept|null type The kind of dose or rate specified */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var Range|Quantity|null dose Amount of medication per dose */
         #[FhirProperty(

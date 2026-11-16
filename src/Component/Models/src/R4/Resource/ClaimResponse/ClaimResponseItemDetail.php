@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A claim detail. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
@@ -47,6 +48,7 @@ class ClaimResponseItemDetail extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ClaimResponse\ClaimResponseItemAdjudication',
         )]
+        #[Valid]
         public array $adjudication = [],
         /** @var array<ClaimResponseItemDetailSubDetail> subDetail Adjudication for claim sub-details */
         #[FhirProperty(
@@ -55,6 +57,7 @@ class ClaimResponseItemDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ClaimResponse\ClaimResponseItemDetailSubDetail',
         )]
+        #[Valid]
         public array $subDetail = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A group of population criteria for the measure.
@@ -29,7 +30,7 @@ class MeasureGroup extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null code Meaning of the group */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var StringPrimitive|string|null description Summary description */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -41,6 +42,7 @@ class MeasureGroup extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Measure\MeasureGroupPopulation',
         )]
+        #[Valid]
         public array $population = [],
         /** @var array<MeasureGroupStratifier> stratifier Stratifier criteria for the measure */
         #[FhirProperty(
@@ -49,6 +51,7 @@ class MeasureGroup extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Measure\MeasureGroupStratifier',
         )]
+        #[Valid]
         public array $stratifier = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

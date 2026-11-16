@@ -28,7 +28,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'ExplanationOfBenefit')]
 #[FHIRExtensionContext(type: 'element', expression: 'FamilyMemberHistory')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImmunizationEvaluation')]
-#[FHIRExtensionContext(type: 'element', expression: 'InventoryReport')]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'PaymentNotice')]
 #[FHIRExtensionContext(type: 'element', expression: 'PaymentReconciliation')]

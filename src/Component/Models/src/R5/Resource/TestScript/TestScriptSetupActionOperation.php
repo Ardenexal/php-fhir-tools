@@ -14,10 +14,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\MimeTypesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\TestScriptRequestMethodCodeType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The operation to perform.
@@ -42,10 +45,21 @@ class TestScriptSetupActionOperation extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Coding|null type The operation code type that will be executed */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-operation-codes', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-operation-codes',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\TestScriptOperationCode',
+        )]
         public ?Coding $type = null,
         /** @var UriPrimitive|null resource Resource type */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concrete-fhir-types', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/concrete-fhir-types',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConcreteFHIRTypes',
+        )]
         public ?UriPrimitive $resource = null,
         /** @var StringPrimitive|string|null label Tracking/logging operation label */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -54,23 +68,38 @@ class TestScriptSetupActionOperation extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var MimeTypesType|null accept Mime type to accept in the payload of the response, with charset etc */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\MimeTypes',
+        )]
         public ?MimeTypesType $accept = null,
         /** @var MimeTypesType|null contentType Mime type of the request payload contents, with charset etc */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\MimeTypes',
+        )]
         public ?MimeTypesType $contentType = null,
-        /** @var int|null destination Server responding to the request */
+        /** @var IntegerPrimitive|int|null destination Server responding to the request */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $destination = null,
-        /** @var bool|null encodeRequestUrl Whether or not to send the request url in encoded format */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?bool $encodeRequestUrl = null,
+        public IntegerPrimitive|int|null $destination = null,
+        /** @var BooleanPrimitive|bool|null encodeRequestUrl Whether or not to send the request url in encoded format */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
+        public BooleanPrimitive|bool|null $encodeRequestUrl = null,
         /** @var TestScriptRequestMethodCodeType|null method delete | get | options | patch | post | put | head */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/http-operations|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/http-operations|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\TestScriptRequestMethodCode',
+        )]
         public ?TestScriptRequestMethodCodeType $method = null,
-        /** @var int|null origin Server initiating the request */
+        /** @var IntegerPrimitive|int|null origin Server initiating the request */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $origin = null,
+        public IntegerPrimitive|int|null $origin = null,
         /** @var StringPrimitive|string|null params Explicitly defined path parameters */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $params = null,
@@ -81,6 +110,7 @@ class TestScriptSetupActionOperation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestScript\TestScriptSetupActionOperationRequestHeader',
         )]
+        #[Valid]
         public array $requestHeader = [],
         /** @var IdPrimitive|null requestId Fixture Id of mapped request */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]

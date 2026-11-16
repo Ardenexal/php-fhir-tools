@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Signature;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about the entity attesting to information.
@@ -34,6 +35,7 @@ class VerificationResultAttestation extends BackboneElement
         public array $modifierExtension = [],
         /** @var Reference|null who The individual or organization attesting to information */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
             'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -42,6 +44,7 @@ class VerificationResultAttestation extends BackboneElement
         public ?Reference $who = null,
         /** @var Reference|null onBehalfOf When the who is asserting on behalf of another (organization or individual) */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Organization',
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -49,7 +52,7 @@ class VerificationResultAttestation extends BackboneElement
         ])]
         public ?Reference $onBehalfOf = null,
         /** @var CodeableConcept|null communicationMethod The method by which attested information was submitted/retrieved */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $communicationMethod = null,
         /** @var DatePrimitive|null date The date the information was attested to */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
@@ -61,10 +64,10 @@ class VerificationResultAttestation extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $proxyIdentityCertificate = null,
         /** @var Signature|null proxySignature Proxy signature */
-        #[FhirProperty(fhirType: 'Signature', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Signature', propertyKind: 'complex'), Valid]
         public ?Signature $proxySignature = null,
         /** @var Signature|null sourceSignature Attester signature */
-        #[FhirProperty(fhirType: 'Signature', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Signature', propertyKind: 'complex'), Valid]
         public ?Signature $sourceSignature = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -37,18 +37,23 @@ class SelectFunction extends AbstractFunction
         }
 
         $results = [];
+        $scopes  = [];
 
         foreach ($input as $index => $item) {
             $itemContext = $context
                 ->withCurrentNode($item)
+                ->withBundleEntryScope($input->scopeAt($index))
                 ->withIterationVariables($item, $index, $input->count());
 
             $result = $evaluator->evaluateWithContext($projection, $itemContext);
+            foreach ($result->getScopes() as $position => $scope) {
+                $scopes[count($results) + $position] = $scope;
+            }
             foreach ($result as $value) {
                 $results[] = $value;
             }
         }
 
-        return Collection::from($results);
+        return Collection::from($results)->withScopes($scopes);
     }
 }

@@ -11,7 +11,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The estimated risk of the outcome.
@@ -33,20 +36,32 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var CodeableConcept|null type Type of risk estimate */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/risk-estimate-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/risk-estimate-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\RiskEstimateType',
+        )]
         public ?CodeableConcept $type = null,
-        /** @var numeric-string|null value Point estimate */
+        /** @var DecimalPrimitive|numeric-string|null value Point estimate */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $value = null,
+        public DecimalPrimitive|string|null $value = null,
         /** @var CodeableConcept|null unitOfMeasure What unit is the outcome described in? */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\UCUMCodes',
+        )]
         public ?CodeableConcept $unitOfMeasure = null,
-        /** @var int|null denominatorCount Sample size for group measured */
+        /** @var IntegerPrimitive|int|null denominatorCount Sample size for group measured */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $denominatorCount = null,
-        /** @var int|null numeratorCount Number with the outcome */
+        public IntegerPrimitive|int|null $denominatorCount = null,
+        /** @var IntegerPrimitive|int|null numeratorCount Number with the outcome */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $numeratorCount = null,
+        public IntegerPrimitive|int|null $numeratorCount = null,
         /** @var array<RiskEvidenceSynthesisRiskEstimatePrecisionEstimate> precisionEstimate How precise the estimate is */
         #[FhirProperty(
             fhirType: 'BackboneElement',
@@ -54,6 +69,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\RiskEvidenceSynthesis\RiskEvidenceSynthesisRiskEstimatePrecisionEstimate',
         )]
+        #[Valid]
         public array $precisionEstimate = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

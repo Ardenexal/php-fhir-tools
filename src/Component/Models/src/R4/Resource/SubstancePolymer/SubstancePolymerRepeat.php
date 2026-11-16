@@ -10,7 +10,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Todo.
@@ -28,14 +30,14 @@ class SubstancePolymerRepeat extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var int|null numberOfUnits Todo */
+        /** @var IntegerPrimitive|int|null numberOfUnits Todo */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $numberOfUnits = null,
+        public IntegerPrimitive|int|null $numberOfUnits = null,
         /** @var StringPrimitive|string|null averageMolecularFormula Todo */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $averageMolecularFormula = null,
         /** @var CodeableConcept|null repeatUnitAmountType Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $repeatUnitAmountType = null,
         /** @var array<SubstancePolymerRepeatRepeatUnit> repeatUnit Todo */
         #[FhirProperty(
@@ -44,6 +46,7 @@ class SubstancePolymerRepeat extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstancePolymer\SubstancePolymerRepeatRepeatUnit',
         )]
+        #[Valid]
         public array $repeatUnit = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

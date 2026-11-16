@@ -6,7 +6,6 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
-use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 
@@ -52,12 +51,7 @@ final class LowBoundaryFunction extends AbstractFunction
         // Resolve optional precision parameter
         $precision = null;
         if (count($parameters) === 1) {
-            $evaluator = $context->getEvaluator();
-            if ($evaluator === null) {
-                throw new EvaluationException('Evaluator not available in context');
-            }
-
-            $precResult = $evaluator->evaluate($parameters[0], $context);
+            $precResult = $this->evaluateParameter($parameters[0], $context);
             if (!$precResult->isEmpty()) {
                 $precValue = $precResult->first();
                 if (is_int($precValue)) {

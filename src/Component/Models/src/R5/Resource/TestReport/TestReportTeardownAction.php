@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The teardown action will only contain an operation.
@@ -28,7 +29,7 @@ class TestReportTeardownAction extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var TestReportSetupActionOperation|null operation The teardown operation performed */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?TestReportSetupActionOperation $operation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

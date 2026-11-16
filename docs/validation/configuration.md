@@ -18,27 +18,27 @@ flag plus an optional corrected display string).
 
 | Class | Role |
 |---|---|
-| `HttpFHIRTerminologyClient` | Calls a terminology server's `ValueSet/$validate-code` operation (GET by default, POST optional). Returns `false` / invalid on any HTTP, transport, or parse error (graceful degradation). |
-| `CachingFHIRTerminologyClient` | Decorator caching results. An in-process array cache is always active; a PSR-6 pool is optional for cross-request persistence. |
+| `HttpFHIRTerminologyClient` | Calls a terminology server's `ValueSet/$validate-code` operation (GET by default, POST optional). The bool methods return `false` / invalid on any HTTP, transport, or parse error; `checkCode()` and `checkCoding()` (from `FHIRTerminologyMembershipClientInterface`) return `null` instead, which the binding validator reports as `fhir:unchecked-binding`. |
+| `CachingFHIRTerminologyClient` | Decorator caching results. An in-process array cache is always active; a PSR-6 pool is optional for cross-request persistence. Only verdicts are cached: a check the inner client gave no answer to is asked again next time. |
 | `NullFHIRTerminologyClient` | Null object — treats every code as valid. Equivalent to having no client: extensible/preferred checks are skipped. |
-| `InMemoryFHIRTerminologyClient` | Validates against a pre-loaded code map for offline and test use. Codes not in the map fall back to a configurable default (allow or deny). |
+| `InMemoryFHIRTerminologyClient` | Validates against a pre-loaded code map for offline and test use, keyed `system\|code` (`\|code` for a code with no system). Codes not in the map fall back to a configurable default (allow or deny). |
 | `PreferredServerAwareTerminologyClient` | Tries an ordered list of preferred clients, failing over to a fallback. Only a `\Throwable` triggers failover — a definitive `false` is final. |
 | `HttpFHIRTerminologyClientFactory` | Builds `HttpFHIRTerminologyClient` instances per server base URL (`createForServer()`), wrapping in a caching decorator when a pool is configured. |
 
 {% hint style="warning" %}
-`HttpFHIRTerminologyClient`'s constructor takes the HTTP client **first**, then the server URL:
-`__construct(HttpClientInterface $httpClient, string $serverUrl, bool $usePost = false)`. There
-is no `baseUrl` parameter.
+`HttpFHIRTerminologyClient` takes a `FHIRHttpClientInterface`, not a Symfony HTTP client and a URL:
+`__construct(FHIRHttpClientInterface $httpClient, bool $usePost = false)`. The server URL lives on
+the `FHIRHttpClient` you pass in: `new FHIRHttpClient($symfonyHttpClient, 'https://tx.fhir.org/r4')`.
 {% endhint %}
 
 {% tabs %}
 {% tab title="Production (HTTP)" %}
 ```php
-use Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient;
+use Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient;
 
 $terminologyClient = new HttpFHIRTerminologyClient(
-    httpClient: $symfonyHttpClient,
-    serverUrl: 'https://tx.fhir.org/r4',
+    new FHIRHttpClient($symfonyHttpClient, 'https://tx.fhir.org/r4'),
 );
 ```
 {% endtab %}
@@ -54,11 +54,12 @@ $terminologyClient = new NullFHIRTerminologyClient();
 
 {% tab title="Cached" %}
 ```php
-use Ardenexal\FHIRTools\Component\Validation\CachingFHIRTerminologyClient;
-use Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient;
+use Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient;
 
 $terminologyClient = new CachingFHIRTerminologyClient(
-    new HttpFHIRTerminologyClient($symfonyHttpClient, 'https://tx.fhir.org/r4'),
+    new HttpFHIRTerminologyClient(new FHIRHttpClient($symfonyHttpClient, 'https://tx.fhir.org/r4')),
     cache: $psr6Pool, // optional; in-process cache always active without it
     ttl: 3600,        // 0 = no expiry
 );
@@ -67,19 +68,20 @@ $terminologyClient = new CachingFHIRTerminologyClient(
 
 {% tab title="Preferred + fallback" %}
 ```php
-use Ardenexal\FHIRTools\Component\Validation\CachingFHIRTerminologyClient;
-use Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient;
+use Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Validation\PreferredServerAwareTerminologyClient;
 
 $terminologyClient = new PreferredServerAwareTerminologyClient(
     preferred: [
         new CachingFHIRTerminologyClient(
-            new HttpFHIRTerminologyClient($symfonyHttpClient, 'https://preferred.example.org/r4'),
+            new HttpFHIRTerminologyClient(new FHIRHttpClient($symfonyHttpClient, 'https://preferred.example.org/r4')),
             cache: $psr6Pool,
         ),
     ],
     fallback: new CachingFHIRTerminologyClient(
-        new HttpFHIRTerminologyClient($symfonyHttpClient, 'https://tx.fhir.org/r4'),
+        new HttpFHIRTerminologyClient(new FHIRHttpClient($symfonyHttpClient, 'https://tx.fhir.org/r4')),
         cache: $psr6Pool,
     ),
 );
@@ -148,7 +150,7 @@ type of the element they apply to. It exposes `resolvePropertyType()` and `resol
 
 ```php
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
-use Ardenexal\FHIRTools\Component\Validation\NullFHIRTypeHierarchyResolver;
+use Ardenexal\FHIRTools\Component\Metadata\Type\NullFHIRTypeHierarchyResolver;
 
 // Default resolver is used when typeResolver is omitted.
 $service = new FHIRValidationService(

@@ -29,12 +29,7 @@ final class TakeFunction extends AbstractFunction
             throw new FHIRPathSemanticException("Function 'take' requires an ordered collection");
         }
 
-        $evaluator = $context->getEvaluator();
-        if ($evaluator === null) {
-            throw new EvaluationException('Evaluator not available in context');
-        }
-
-        $numCollection = $evaluator->evaluate($parameters[0], $context);
+        $numCollection = $this->evaluateParameter($parameters[0], $context);
         if ($numCollection->isEmpty()) {
             throw EvaluationException::invalidFunctionParameter('take', 'num', 'non-empty integer collection');
         }
@@ -48,16 +43,14 @@ final class TakeFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $items = [];
-        $count = 0;
-        foreach ($input as $item) {
-            if ($count >= $num) {
+        $indexes = [];
+        foreach ($input as $index => $item) {
+            if ($index >= $num) {
                 break;
             }
-            $items[] = $item;
-            ++$count;
+            $indexes[] = $index;
         }
 
-        return Collection::from($items);
+        return $input->only($indexes);
     }
 }

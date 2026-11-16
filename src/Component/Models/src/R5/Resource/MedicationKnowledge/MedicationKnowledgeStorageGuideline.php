@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information on how the medication should be stored, for example, refrigeration temperatures and length of stability at a given temperature.
@@ -39,9 +40,10 @@ class MedicationKnowledgeStorageGuideline extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
         )]
+        #[Valid]
         public array $note = [],
         /** @var Duration|null stabilityDuration Duration remains stable */
-        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex'), Valid]
         public ?Duration $stabilityDuration = null,
         /** @var array<MedicationKnowledgeStorageGuidelineEnvironmentalSetting> environmentalSetting Setting or value of environment for adequate storage */
         #[FhirProperty(
@@ -50,6 +52,7 @@ class MedicationKnowledgeStorageGuideline extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeStorageGuidelineEnvironmentalSetting',
         )]
+        #[Valid]
         public array $environmentalSetting = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

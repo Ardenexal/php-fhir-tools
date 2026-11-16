@@ -18,9 +18,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\OperationParameterUseType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\SearchParamTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The parameters for the operation/query.
@@ -66,7 +69,13 @@ class OperationDefinitionParameter extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $name = null,
         /** @var OperationParameterUseType|null use in | out */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-parameter-use|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-parameter-use|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\OperationParameterUse',
+        )]
         public ?OperationParameterUseType $use = null,
         /** @var array<OperationParameterScopeType> scope instance | type | system */
         #[FhirProperty(
@@ -75,11 +84,15 @@ class OperationDefinitionParameter extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\OperationParameterScopeType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-parameter-scope|5.0.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-parameter-scope|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\OperationParameterScope',
+        )]
         public array $scope = [],
-        /** @var int|null min Minimum Cardinality */
-        #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?int $min = null,
+        /** @var IntegerPrimitive|int|null min Minimum Cardinality */
+        #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotNull]
+        public IntegerPrimitive|int|null $min = null,
         /** @var StringPrimitive|string|null max Maximum Cardinality (a number or *) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $max = null,
@@ -87,7 +100,12 @@ class OperationDefinitionParameter extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $documentation = null,
         /** @var FHIRTypesType|null type What type this parameter has */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fhir-types|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/fhir-types|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRTypes',
+        )]
         public ?FHIRTypesType $type = null,
         /** @var array<FHIRTypesType> allowedType Allowed sub-type this parameter can have (if type is abstract) */
         #[FhirProperty(
@@ -96,7 +114,11 @@ class OperationDefinitionParameter extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRTypesType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fhir-types|5.0.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/fhir-types|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRTypes',
+        )]
         public array $allowedType = [],
         /** @var array<CanonicalPrimitive> targetProfile If type is Reference | canonical, allowed targets. If type is 'Resource', then this constrains the allowed resource types */
         #[FhirProperty(
@@ -108,10 +130,15 @@ class OperationDefinitionParameter extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public array $targetProfile = [],
         /** @var SearchParamTypeType|null searchType number | date | string | token | reference | composite | quantity | uri | special */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-param-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-param-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\SearchParamType',
+        )]
         public ?SearchParamTypeType $searchType = null,
         /** @var OperationDefinitionParameterBinding|null binding ValueSet details if this is coded */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?OperationDefinitionParameterBinding $binding = null,
         /** @var array<OperationDefinitionParameterReferencedFrom> referencedFrom References to this parameter */
         #[FhirProperty(
@@ -120,6 +147,7 @@ class OperationDefinitionParameter extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\OperationDefinition\OperationDefinitionParameterReferencedFrom',
         )]
+        #[Valid]
         public array $referencedFrom = [],
         /** @var array<OperationDefinitionParameter> part Parts of a nested Parameter */
         #[FhirProperty(
@@ -128,6 +156,7 @@ class OperationDefinitionParameter extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\OperationDefinition\OperationDefinitionParameter',
         )]
+        #[Valid]
         public array $part = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

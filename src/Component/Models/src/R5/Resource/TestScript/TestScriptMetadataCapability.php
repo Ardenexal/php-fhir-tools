@@ -10,10 +10,13 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description Capabilities that must exist and are assumed to function correctly on the FHIR server being tested.
@@ -31,21 +34,21 @@ class TestScriptMetadataCapability extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null required Are the capabilities required? */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?bool $required = null,
-        /** @var bool|null validated Are the capabilities validated? */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?bool $validated = null,
+        /** @var BooleanPrimitive|bool|null required Are the capabilities required? */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
+        public BooleanPrimitive|bool|null $required = null,
+        /** @var BooleanPrimitive|bool|null validated Are the capabilities validated? */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotNull]
+        public BooleanPrimitive|bool|null $validated = null,
         /** @var StringPrimitive|string|null description The expected capabilities of the server */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var array<int> origin Which origin server these requirements apply to */
+        /** @var array<IntegerPrimitive|int> origin Which origin server these requirements apply to */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isArray: true)]
         public array $origin = [],
-        /** @var int|null destination Which server these requirements apply to */
+        /** @var IntegerPrimitive|int|null destination Which server these requirements apply to */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $destination = null,
+        public IntegerPrimitive|int|null $destination = null,
         /** @var array<UriPrimitive> link Links to the FHIR specification */
         #[FhirProperty(
             fhirType: 'uri',

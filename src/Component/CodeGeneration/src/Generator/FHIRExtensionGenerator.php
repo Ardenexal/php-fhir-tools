@@ -7,12 +7,12 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Profile\StructureDefinitionCompiler;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Method;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;
 
@@ -88,6 +88,11 @@ class FHIRExtensionGenerator
         'positiveInt', 'uuid', 'xhtml', 'decimal',
     ];
 
+    public function __construct(
+        private readonly StructureDefinitionCompiler $compiler = new StructureDefinitionCompiler(),
+    ) {
+    }
+
     /**
      * Generate a typed extension class from a FHIR extension StructureDefinition.
      *
@@ -116,23 +121,16 @@ class FHIRExtensionGenerator
             'fhirVersion' => $version,
         ]);
 
-        foreach ($structureDefinition['context'] ?? [] as $ctx) {
-            if (!is_array($ctx) || !isset($ctx['type'], $ctx['expression'])) {
-                continue;
-            }
-            $class->addAttribute(FHIRExtensionContext::class, [
-                'type'       => (string) $ctx['type'],
-                'expression' => (string) $ctx['expression'],
-            ]);
+        // Contexts, context invariants, and the differential's invariants and bindings come from the
+        // shared compiler, so a plain Extension validated against this definition at runtime is held
+        // to the same rules
+        $compiled = $this->compiler->compileExtension($structureDefinition);
+        foreach ([...$compiled->contexts, ...$compiled->constraints] as $attribute) {
+            $class->addAttribute($attribute->class, $attribute->arguments);
         }
 
-        foreach ($structureDefinition['contextInvariant'] ?? [] as $invariant) {
-            if (!is_string($invariant) || $invariant === '') {
-                continue;
-            }
-            $class->addAttribute(FHIRContextInvariant::class, [
-                'expression' => $invariant,
-            ]);
+        foreach ($compiled->diagnostics as $diagnostic) {
+            $errorCollector?->addWarning($diagnostic->message, $diagnostic->elementId, $diagnostic->context);
         }
 
         if (isset($structureDefinition['publisher'])) {
@@ -216,7 +214,7 @@ class FHIRExtensionGenerator
                 // Single concrete type: generate a named, typed property
                 $code      = $types[0]['code'] ?? 'string';
                 $phpType   = $this->resolvePhpType($code, $version, $context, $errorCollector);
-                $paramName = 'value' . u($code)->pascal()->toString();
+                $paramName = 'value' . StringCase::pascal($code);
                 $shortDesc = $valueElement['short'] ?? 'Value of extension';
 
                 if ($phpType !== 'bool' && $phpType !== 'int' && $phpType !== 'string') {
@@ -317,7 +315,7 @@ class FHIRExtensionGenerator
                 'fhirType'     => $code,
                 'propertyKind' => $this->resolvePropertyKindFromCode($code),
                 'phpType'      => ltrim($phpType, '\\'),
-                'jsonKey'      => 'value' . u($code)->pascal()->toString(),
+                'jsonKey'      => 'value' . StringCase::pascal($code),
             ];
         }
 
@@ -758,14 +756,14 @@ class FHIRExtensionGenerator
         $baseNs = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
 
         if (in_array($code, self::PRIMITIVE_TYPES, true)) {
-            $className = u($code)->pascal()->toString() . 'Primitive';
+            $className = StringCase::pascal($code) . 'Primitive';
 
             return "\\{$baseNs}\\Primitive\\{$className}";
         }
 
         // Fallback: produce a valid pascal-cased PHP identifier and warn so the user knows
         // this type could not be resolved (the package providing it may not be installed).
-        $className    = u($code)->pascal()->toString();
+        $className    = StringCase::pascal($code);
         $fallbackFqcn = "\\{$baseNs}\\DataType\\{$className}";
 
         $errorCollector?->addWarning(

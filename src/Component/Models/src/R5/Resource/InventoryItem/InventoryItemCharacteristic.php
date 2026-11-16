@@ -16,10 +16,15 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The descriptive or identifying characteristics of the item.
@@ -38,9 +43,9 @@ class InventoryItemCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null characteristicType The characteristic that is being defined */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $characteristicType = null,
-        /** @var StringPrimitive|string|int|bool|UrlPrimitive|DateTimePrimitive|Quantity|Range|Ratio|Annotation|Address|Duration|CodeableConcept|null value The value of the attribute */
+        /** @var StringPrimitive|string|IntegerPrimitive|int|DecimalPrimitive|BooleanPrimitive|bool|UrlPrimitive|DateTimePrimitive|Quantity|Range|Ratio|Annotation|Address|Duration|CodeableConcept|null value The value of the attribute */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -112,8 +117,8 @@ class InventoryItemCharacteristic extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
-        public StringPrimitive|string|int|bool|UrlPrimitive|DateTimePrimitive|Quantity|Range|Ratio|Annotation|Address|Duration|CodeableConcept|null $value = null,
+        #[NotNull]
+        public StringPrimitive|string|IntegerPrimitive|int|DecimalPrimitive|BooleanPrimitive|bool|UrlPrimitive|DateTimePrimitive|Quantity|Range|Ratio|Annotation|Address|Duration|CodeableConcept|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

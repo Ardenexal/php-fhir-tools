@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: FHIRSubstanceStatus
  * URL: http://hl7.org/fhir/ValueSet/substance-status
  * Version: 4.3.0
  * Description: A code to indicate if the substance is actively used.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/substance-status', version: '4.3.0')]
 enum FHIRSubstanceStatus: string
 {
     /** Active */

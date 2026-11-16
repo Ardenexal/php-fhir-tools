@@ -14,8 +14,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The parameter details for the service being requested.
@@ -34,9 +37,9 @@ class ServiceRequestOrderDetailParameter extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null code The detail of the order being requested */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $code = null,
-        /** @var Quantity|Ratio|Range|bool|CodeableConcept|StringPrimitive|string|Period|null value The value for the order detail */
+        /** @var Quantity|Ratio|Range|BooleanPrimitive|bool|CodeableConcept|StringPrimitive|string|Period|null value The value for the order detail */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -82,8 +85,8 @@ class ServiceRequestOrderDetailParameter extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
-        public Quantity|Ratio|Range|bool|CodeableConcept|StringPrimitive|string|Period|null $value = null,
+        #[NotNull]
+        public Quantity|Ratio|Range|BooleanPrimitive|bool|CodeableConcept|StringPrimitive|string|Period|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

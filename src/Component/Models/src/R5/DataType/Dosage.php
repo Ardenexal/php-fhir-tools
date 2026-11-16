@@ -8,7 +8,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author HL7 FHIR Standard
@@ -36,9 +39,9 @@ class Dosage extends BackboneType
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var int|null sequence The order of the dosage instructions */
+        /** @var IntegerPrimitive|int|null sequence The order of the dosage instructions */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $sequence = null,
+        public IntegerPrimitive|int|null $sequence = null,
         /** @var StringPrimitive|string|null text Free text dosage instructions e.g. SIG */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
@@ -49,16 +52,17 @@ class Dosage extends BackboneType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $additionalInstruction = [],
         /** @var StringPrimitive|string|null patientInstruction Patient or consumer oriented instructions */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $patientInstruction = null,
         /** @var Timing|null timing When medication should be administered */
-        #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex'), Valid]
         public ?Timing $timing = null,
-        /** @var bool|null asNeeded Take "as needed" */
+        /** @var BooleanPrimitive|bool|null asNeeded Take "as needed" */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $asNeeded = null,
+        public BooleanPrimitive|bool|null $asNeeded = null,
         /** @var array<CodeableConcept> asNeededFor Take "as needed" (for x) */
         #[FhirProperty(
             fhirType: 'CodeableConcept',
@@ -66,15 +70,16 @@ class Dosage extends BackboneType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $asNeededFor = [],
         /** @var CodeableConcept|null site Body site to administer to */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $site = null,
         /** @var CodeableConcept|null route How drug should enter body */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $route = null,
         /** @var CodeableConcept|null method Technique for administering medication */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $method = null,
         /** @var array<DosageDoseAndRate> doseAndRate Amount of medication administered, to be administered or typical amount to be administered */
         #[FhirProperty(
@@ -83,6 +88,7 @@ class Dosage extends BackboneType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\DosageDoseAndRate',
         )]
+        #[Valid]
         public array $doseAndRate = [],
         /** @var array<Ratio> maxDosePerPeriod Upper limit on medication per unit of time */
         #[FhirProperty(
@@ -91,12 +97,13 @@ class Dosage extends BackboneType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio',
         )]
+        #[Valid]
         public array $maxDosePerPeriod = [],
         /** @var Quantity|null maxDosePerAdministration Upper limit on medication per administration */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $maxDosePerAdministration = null,
         /** @var Quantity|null maxDosePerLifetime Upper limit on medication per lifetime of the patient */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $maxDosePerLifetime = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -15,7 +15,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Identifies a particular constituent of interest in the product.
@@ -35,15 +37,16 @@ class MedicationIngredient extends BackboneElement
         public array $modifierExtension = [],
         /** @var CodeableReference|null item The ingredient (substance or medication) that the ingredient.strength relates to */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Substance',
             'http://hl7.org/fhir/StructureDefinition/Medication',
         ])]
         public ?CodeableReference $item = null,
-        /** @var bool|null isActive Active ingredient indicator */
+        /** @var BooleanPrimitive|bool|null isActive Active ingredient indicator */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $isActive = null,
+        public BooleanPrimitive|bool|null $isActive = null,
         /** @var Ratio|CodeableConcept|Quantity|null strength Quantity of ingredient present */
         #[FhirProperty(
             fhirType: 'choice',
@@ -70,7 +73,11 @@ class MedicationIngredient extends BackboneElement
                 ],
             ],
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-ingredientstrength', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-ingredientstrength',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\MedicationIngredientStrengthCodes',
+        )]
         public Ratio|CodeableConcept|Quantity|null $strength = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

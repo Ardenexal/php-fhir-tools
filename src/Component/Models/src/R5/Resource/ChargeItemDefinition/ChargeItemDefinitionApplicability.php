@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Expressions that describe applicability criteria for the billing code.
@@ -30,13 +31,13 @@ class ChargeItemDefinitionApplicability extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Expression|null condition Boolean-valued expression */
-        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex'), Valid]
         public ?Expression $condition = null,
         /** @var Period|null effectivePeriod When the charge item definition is expected to be used */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $effectivePeriod = null,
         /** @var RelatedArtifact|null relatedArtifact Reference to / quotation of the external source of the group of properties */
-        #[FhirProperty(fhirType: 'RelatedArtifact', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'RelatedArtifact', propertyKind: 'complex'), Valid]
         public ?RelatedArtifact $relatedArtifact = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Group","url":"http://hl7.org/fhir/StructureDefinition/Group","version":"5.0.0","name":"Group","status":"draft","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"Group","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

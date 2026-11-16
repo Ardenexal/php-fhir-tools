@@ -12,10 +12,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @description One of the permitted answers for a "choice" or "open-choice" question.
@@ -33,7 +35,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var int|DatePrimitive|TimePrimitive|StringPrimitive|string|Coding|Reference|null value Answer value */
+        /** @var IntegerPrimitive|int|DatePrimitive|TimePrimitive|StringPrimitive|string|Coding|Reference|null value Answer value */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -73,12 +75,12 @@ class QuestionnaireItemAnswerOption extends BackboneElement
                 ],
             ],
         )]
-        #[NotBlank]
+        #[NotNull]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
-        public int|DatePrimitive|TimePrimitive|StringPrimitive|string|Coding|Reference|null $value = null,
-        /** @var bool|null initialSelected Whether option is selected by default */
+        public IntegerPrimitive|int|DatePrimitive|TimePrimitive|StringPrimitive|string|Coding|Reference|null $value = null,
+        /** @var BooleanPrimitive|bool|null initialSelected Whether option is selected by default */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $initialSelected = null,
+        public BooleanPrimitive|bool|null $initialSelected = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

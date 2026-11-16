@@ -66,7 +66,13 @@ class ConceptMapGroupUnmapped extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var ConceptMapGroupUnmappedModeType|null mode use-source-code | fixed | other-map */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conceptmap-unmapped-mode|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/conceptmap-unmapped-mode|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConceptMapGroupUnmappedMode',
+        )]
         public ?ConceptMapGroupUnmappedModeType $mode = null,
         /** @var CodePrimitive|null code Fixed code when mode = fixed */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
@@ -78,7 +84,13 @@ class ConceptMapGroupUnmapped extends BackboneElement
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $valueSet = null,
         /** @var ConceptMapRelationshipType|null relationship related-to | equivalent | source-is-narrower-than-target | source-is-broader-than-target | not-related-to */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-relationship|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'The \'not-related-to\' relationship means that there is no mapping from the source to the target, and the mapping cannot be interpreted without knowing this value as it could mean the elements are equivalent, totally mismatched or anything in between')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-relationship|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ConceptMapRelationship',
+        )]
+        #[FHIRIsModifier(reason: 'The \'not-related-to\' relationship means that there is no mapping from the source to the target, and the mapping cannot be interpreted without knowing this value as it could mean the elements are equivalent, totally mismatched or anything in between')]
         public ?ConceptMapRelationshipType $relationship = null,
         /** @var CanonicalPrimitive|null otherMap canonical reference to an additional ConceptMap to use for mapping if the source concept is unmapped */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ConceptMap'])]

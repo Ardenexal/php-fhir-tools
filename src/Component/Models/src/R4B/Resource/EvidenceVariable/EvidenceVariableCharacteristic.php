@@ -15,9 +15,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\GroupMeasureType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A characteristic that defines the members of the evidence element. Multiple characteristics are applied with "and" semantics.
@@ -79,23 +81,29 @@ class EvidenceVariableCharacteristic extends BackboneElement
         ])]
         public Reference|CanonicalPrimitive|CodeableConcept|Expression|null $definition = null,
         /** @var CodeableConcept|null method Method used for describing characteristic */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $method = null,
         /** @var Reference|null device Device used for determining characteristic */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Device',
             'http://hl7.org/fhir/StructureDefinition/DeviceMetric',
         ])]
         public ?Reference $device = null,
-        /** @var bool|null exclude Whether the characteristic includes or excludes members */
+        /** @var BooleanPrimitive|bool|null exclude Whether the characteristic includes or excludes members */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $exclude = null,
+        public BooleanPrimitive|bool|null $exclude = null,
         /** @var EvidenceVariableCharacteristicTimeFromStart|null timeFromStart Observation time from study start */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone'), Valid]
         public ?EvidenceVariableCharacteristicTimeFromStart $timeFromStart = null,
         /** @var GroupMeasureType|null groupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-measure|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-measure|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\GroupMeasure',
+        )]
         public ?GroupMeasureType $groupMeasure = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

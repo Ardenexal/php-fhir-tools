@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: UnitsOfTime
  * URL: http://hl7.org/fhir/ValueSet/units-of-time
  * Version: 4.0.1
  * Description: A unit of time (units from UCUM).
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/units-of-time', version: '4.0.1')]
 enum UnitsOfTime: string
 {
     /** second */

@@ -1,5 +1,24 @@
 {
     "errorCount": 1,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 2,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "BELOW",
+        "warningClassification": "EQUAL",
+        "errors": [
+            "Content is not allowed in prolog.",
+            "The XML encoding is invalid (must be UTF-8, not 'UTF-1')"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "unreadable:deserialization": [
+                "(root) — Unable to parse XML: Document labelled UTF-16 but has UTF-8 content at line 1 column 38"
+            ]
+        },
+        "warnings": {}
+    }
 }

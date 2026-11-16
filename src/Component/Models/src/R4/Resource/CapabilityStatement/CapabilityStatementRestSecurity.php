@@ -11,7 +11,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Information about security implementation from an interface perspective - what a client needs to know.
@@ -29,9 +31,9 @@ class CapabilityStatementRestSecurity extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null cors Adds CORS Headers (http://enable-cors.org/) */
+        /** @var BooleanPrimitive|bool|null cors Adds CORS Headers (http://enable-cors.org/) */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $cors = null,
+        public BooleanPrimitive|bool|null $cors = null,
         /** @var array<CodeableConcept> service OAuth | SMART-on-FHIR | NTLM | Basic | Kerberos | Certificates */
         #[FhirProperty(
             fhirType: 'CodeableConcept',
@@ -39,7 +41,12 @@ class CapabilityStatementRestSecurity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/restful-security-service', strength: 'extensible')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/restful-security-service',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\RestfulSecurityService',
+        )]
         public array $service = [],
         /** @var MarkdownPrimitive|null description General description of how security works */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

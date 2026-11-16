@@ -1,5 +1,19 @@
 {
     "errorCount": 0,
-    "warningCount": 1,
-    "infoCount": 1
+    "warningCount": 0,
+    "infoCount": 2,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 3,
+        "infoCount": 6,
+        "classification": "BELOW",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Value is '2.81' but is fixed to '2.71' in the profile https://fhir.kbv.de/StructureDefinition/KBV_PR_MIO_DIGA_Observation_Body_Weight|1.0.0#Observation.code.coding:loinc.version"
+        ]
+    },
+    "outcome": {
+        "errors": {},
+        "warnings": {}
+    }
 }

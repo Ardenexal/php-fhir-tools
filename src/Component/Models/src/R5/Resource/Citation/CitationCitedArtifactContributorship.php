@@ -9,6 +9,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description This element is used to list authors and other contributors, their contact information, specific contributions, and summary statements.
@@ -26,9 +28,9 @@ class CitationCitedArtifactContributorship extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
-        /** @var bool|null complete Indicates if the list includes all authors and/or contributors */
+        /** @var BooleanPrimitive|bool|null complete Indicates if the list includes all authors and/or contributors */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $complete = null,
+        public BooleanPrimitive|bool|null $complete = null,
         /** @var array<CitationCitedArtifactContributorshipEntry> entry An individual entity named as a contributor */
         #[FhirProperty(
             fhirType: 'BackboneElement',
@@ -36,6 +38,7 @@ class CitationCitedArtifactContributorship extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Citation\CitationCitedArtifactContributorshipEntry',
         )]
+        #[Valid]
         public array $entry = [],
         /** @var array<CitationCitedArtifactContributorshipSummary> summary Used to record a display of the author/contributor list without separate data element for each list member */
         #[FhirProperty(
@@ -44,6 +47,7 @@ class CitationCitedArtifactContributorship extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Citation\CitationCitedArtifactContributorshipSummary',
         )]
+        #[Valid]
         public array $summary = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

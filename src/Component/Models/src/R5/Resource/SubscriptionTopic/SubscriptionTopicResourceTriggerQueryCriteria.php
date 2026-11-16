@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CriteriaNotExistsBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
 /**
@@ -33,17 +34,27 @@ class SubscriptionTopicResourceTriggerQueryCriteria extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $previous = null,
         /** @var CriteriaNotExistsBehaviorType|null resultForCreate test-passes | test-fails */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscriptiontopic-cr-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscriptiontopic-cr-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CriteriaNotExistsBehavior',
+        )]
         public ?CriteriaNotExistsBehaviorType $resultForCreate = null,
         /** @var StringPrimitive|string|null current Rule applied to current resource state */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $current = null,
         /** @var CriteriaNotExistsBehaviorType|null resultForDelete test-passes | test-fails */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscriptiontopic-cr-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscriptiontopic-cr-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\CriteriaNotExistsBehavior',
+        )]
         public ?CriteriaNotExistsBehaviorType $resultForDelete = null,
-        /** @var bool|null requireBoth Both must be true flag */
+        /** @var BooleanPrimitive|bool|null requireBoth Both must be true flag */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $requireBoth = null,
+        public BooleanPrimitive|bool|null $requireBoth = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

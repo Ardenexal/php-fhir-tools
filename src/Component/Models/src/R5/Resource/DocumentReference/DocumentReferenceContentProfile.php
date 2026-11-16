@@ -59,7 +59,11 @@ class DocumentReferenceContentProfile extends BackboneElement
             ],
         )]
         #[NotBlank]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-HL7FormatCodes', strength: 'preferred')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-HL7FormatCodes',
+            strength: 'preferred',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\HL7FormatCodes',
+        )]
         public Coding|UriPrimitive|CanonicalPrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

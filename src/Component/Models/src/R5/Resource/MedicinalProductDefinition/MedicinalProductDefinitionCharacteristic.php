@@ -12,9 +12,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Allows the key product features to be recorded, such as "sugar free", "modified release", "parallel import".
@@ -37,9 +40,9 @@ class MedicinalProductDefinitionCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type A code expressing the type of characteristic */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|MarkdownPrimitive|Quantity|int|DatePrimitive|bool|Attachment|null value A value for the characteristic */
+        /** @var CodeableConcept|MarkdownPrimitive|Quantity|IntegerPrimitive|int|DatePrimitive|BooleanPrimitive|bool|Attachment|null value A value for the characteristic */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -79,7 +82,7 @@ class MedicinalProductDefinitionCharacteristic extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|MarkdownPrimitive|Quantity|int|DatePrimitive|bool|Attachment|null $value = null,
+        public CodeableConcept|MarkdownPrimitive|Quantity|IntegerPrimitive|int|DatePrimitive|BooleanPrimitive|bool|Attachment|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

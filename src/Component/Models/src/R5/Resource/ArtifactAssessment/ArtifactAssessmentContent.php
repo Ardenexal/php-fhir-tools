@@ -16,8 +16,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A component comment, classifier, or rating of the artifact.
@@ -36,13 +38,18 @@ class ArtifactAssessmentContent extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var ArtifactAssessmentInformationTypeType|null informationType comment | classifier | rating | container | response | change-request */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/artifactassessment-information-type|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/artifactassessment-information-type|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ArtifactAssessmentInformationType',
+        )]
         public ?ArtifactAssessmentInformationTypeType $informationType = null,
         /** @var MarkdownPrimitive|null summary Brief summary of the content */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $summary = null,
         /** @var CodeableConcept|null type What type of content */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> classifier Rating, classifier, or assessment */
         #[FhirProperty(
@@ -51,12 +58,14 @@ class ArtifactAssessmentContent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $classifier = [],
         /** @var Quantity|null quantity Quantitative rating */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var Reference|null author Who authored the content */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/Patient',
             'http://hl7.org/fhir/StructureDefinition/Practitioner',
@@ -80,10 +89,11 @@ class ArtifactAssessmentContent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $relatedArtifact = [],
-        /** @var bool|null freeToShare Acceptable to publicly share the resource content */
+        /** @var BooleanPrimitive|bool|null freeToShare Acceptable to publicly share the resource content */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $freeToShare = null,
+        public BooleanPrimitive|bool|null $freeToShare = null,
         /** @var array<ArtifactAssessmentContent> component Contained content */
         #[FhirProperty(
             fhirType: 'unknown',
@@ -91,6 +101,7 @@ class ArtifactAssessmentContent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ArtifactAssessment\ArtifactAssessmentContent',
         )]
+        #[Valid]
         public array $component = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

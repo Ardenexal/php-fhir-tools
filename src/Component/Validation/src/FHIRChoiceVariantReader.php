@@ -1,0 +1,258 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Validation;
+
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProviderInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+
+/**
+ * Reads a FHIR element path that may name a choice variant rather than a property.
+ *
+ * @author Ardenexal
+ */
+final class FHIRChoiceVariantReader
+{
+    /** Takes the accessor used for ordinary property reads; choice variants are resolved by reflection. */
+    public function __construct(
+        private readonly PropertyAccessorInterface $propertyAccessor,
+        private readonly PropertyMetadataProviderInterface $properties = new PropertyMetadataProvider(),
+        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+    ) {
+    }
+
+    /**
+     * Every value reachable at $path, following repeating elements and choice variants.
+     *
+     * A profile constrains a choice by naming the concrete variant: the blood-pressure profile says
+     * `Observation.valueQuantity` has max 0, meaning a blood pressure must not carry a plain value. The
+     * generator emits that faithfully as a `Count(max: 0)` on path `valueQuantity` — but there is no
+     * `$valueQuantity` property. The model has one polymorphic `$value` whose `#[FhirProperty]` metadata
+     * lists each variant with the JSON key the specification uses. So the path has to be resolved through
+     * that metadata, and the value counted only when it is actually of the variant's type: an Observation
+     * holding a CodeableConcept has zero `valueQuantity` occurrences, not one.
+     *
+     * Without this the read simply fails, the rule is skipped, and a resource the profile forbids
+     * validates cleanly.
+     *
+     * Grouped by parent, never flattened, because cardinality is per occurrence of the element's own
+     * parent. `Observation.component.value[x]` has max 1 meaning *each* component carries at most one
+     * value — a blood pressure with a systolic and a diastolic component holds two values in total and
+     * breaks nothing. Flattening the two into one list reports a conforming document as invalid.
+     *
+     * @param object|array<string, mixed> $subject Object to read from
+     * @param string                      $path    Element path, choice markers and variants included
+     *
+     * Each group carries both readings of the element, because rules want different ones. `occurrences`
+     * is the cardinality view — one entry per occurrence, so a Count can size it. `value` is the
+     * property as it stands, which is what every other rule inspects: `All` needs the array itself, and
+     * a fixed-value rule needs the object, not a list wrapping it.
+     *
+     * `path` is the element's concrete property path under that parent, with the index of each
+     * repeating ancestor ("identifier[1].type.coding"), so a finding can name the occurrence it is
+     * about.
+     *
+     * @return list<array{value: mixed, occurrences: list<mixed>, path: string}> One entry per parent the final
+     *                                                                           segment hangs off; empty when no
+     *                                                                           parent exists, which means an
+     *                                                                           ancestor is absent rather than the
+     *                                                                           element occurring zero times
+     */
+    public function readGroups(object|array $subject, string $path): array
+    {
+        if ($path === '') {
+            return [];
+        }
+
+        $segments = explode('.', FHIRElementPath::toPropertyPath($path));
+        $leaf     = array_pop($segments);
+
+        /** @var list<array{0: mixed, 1: string}> $parents node and its concrete path */
+        $parents = [[$subject, '']];
+
+        foreach ($segments as $segment) {
+            $next = [];
+
+            foreach ($parents as [$node, $nodePath]) {
+                if (!is_object($node) && !is_array($node)) {
+                    continue;
+                }
+
+                foreach ($this->readSegmentWithPaths($node, $segment, $nodePath) as $entry) {
+                    $next[] = $entry;
+                }
+            }
+
+            $parents = $next;
+        }
+
+        $groups = [];
+
+        foreach ($parents as [$parent, $parentPath]) {
+            if (!is_object($parent) && !is_array($parent)) {
+                continue;
+            }
+
+            $groups[] = [
+                'value'       => $this->readLeafValue($parent, (string) $leaf),
+                'occurrences' => $this->readSegment($parent, (string) $leaf, preserveNulls: true),
+                'path'        => self::join($parentPath, (string) $leaf),
+            ];
+        }
+
+        return $groups;
+    }
+
+    /**
+     * The values at one segment, as readSegment() finds them, each with its concrete path: an entry
+     * of a repeating element carries its index, "identifier[1]".
+     *
+     * @param object|array<string, mixed> $node     Node reached so far
+     * @param string                      $segment  One dot-separated step of the element path
+     * @param string                      $nodePath Concrete path of $node, '' for the subject
+     *
+     * @return list<array{0: mixed, 1: string}>
+     */
+    private function readSegmentWithPaths(object|array $node, string $segment, string $nodePath): array
+    {
+        $path = self::join($nodePath, $segment);
+
+        try {
+            $value = $this->propertyAccessor->getValue($node, $segment);
+        } catch (\Throwable) {
+            return is_object($node)
+                ? array_map(static fn (mixed $variant): array => [$variant, $path], $this->readChoiceVariant($node, $segment))
+                : [];
+        }
+
+        if (!is_array($value)) {
+            return $value === null ? [] : [[$value, $path]];
+        }
+
+        $found = [];
+        // The array's own keys, as every other finding path uses them
+        foreach ($value as $index => $entry) {
+            if ($entry !== null) {
+                $found[] = [$entry, "{$path}[{$index}]"];
+            }
+        }
+
+        return $found;
+    }
+
+    private static function join(string $base, string $segment): string
+    {
+        return $base === '' ? $segment : "{$base}.{$segment}";
+    }
+
+    /**
+     * The element exactly as the model holds it, with no list wrapping and no null filtering.
+     *
+     * @param object|array<string, mixed> $parent Node the element hangs off
+     * @param string                      $leaf   Final step of the element path
+     *
+     * @return mixed The property value, or the choice variant's value when the path names one
+     */
+    private function readLeafValue(object|array $parent, string $leaf): mixed
+    {
+        try {
+            return $this->propertyAccessor->getValue($parent, $leaf);
+        } catch (\Throwable) {
+            if (!is_object($parent)) {
+                return null;
+            }
+
+            return $this->readChoiceVariant($parent, $leaf)[0] ?? null;
+        }
+    }
+
+    /**
+     * @param object|array<string, mixed> $node          Node reached so far
+     * @param string                      $segment       One dot-separated step of the element path
+     * @param bool                        $preserveNulls Keep null entries, for the final segment only
+     *
+     * @return list<mixed> Values at this segment, flattened
+     */
+    private function readSegment(object|array $node, string $segment, bool $preserveNulls = false): array
+    {
+        try {
+            $value = $this->propertyAccessor->getValue($node, $segment);
+        } catch (\Throwable) {
+            return is_object($node) ? $this->readChoiceVariant($node, $segment) : [];
+        }
+
+        // A null single value is an absent element: zero occurrences, whatever the caller asked for.
+        // A null *entry inside a repeating element* is different — the element occurs, it just holds
+        // nothing — so at the final segment those entries are kept for the rule to judge.
+        if (!is_array($value)) {
+            return $value === null ? [] : [$value];
+        }
+
+        $found = [];
+        foreach ($value as $entry) {
+            if ($entry !== null || $preserveNulls) {
+                $found[] = $entry;
+            }
+        }
+
+        return $found;
+    }
+
+    /**
+     * Resolve $segment as the JSON key of a choice variant, returning the value only when it is of that
+     * variant's type.
+     *
+     * @param object $node    Node whose class carries the choice metadata
+     * @param string $segment Candidate variant JSON key, e.g. `valueQuantity`
+     *
+     * @return list<mixed> One value when the variant is present, empty otherwise
+     */
+    private function readChoiceVariant(object $node, string $segment): array
+    {
+        foreach ($this->properties->getPropertyMetadata($node::class) as $name => $meta) {
+            foreach ($meta->variants ?? [] as $variant) {
+                if ($variant->jsonKey !== $segment) {
+                    continue;
+                }
+
+                if (!$this->models->isPropertyInitialized($node, $name)) {
+                    return [];
+                }
+
+                $held    = $this->models->readInitializedValue($node, $name);
+                $phpType = $variant->phpType;
+
+                // The property holds whichever variant the document used. Counting it for a
+                // different variant's rule would report a Quantity as a CodeableConcept.
+                if ($held === null || !self::holdsVariantType($held, $phpType, $variant->isBuiltin)) {
+                    return [];
+                }
+
+                return [$held];
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Whether $held is a value of the variant's PHP type.
+     *
+     * Boolean, integer and decimal variants are held as bare scalars with a builtin phpType ('bool',
+     * 'int', and 'string' for a decimal, which keeps its lexical form), and `instanceof` never
+     * matches a builtin. No choice element has two builtin variants of one PHP type, so the type alone
+     * identifies the variant.
+     *
+     * @param mixed  $held      Value the choice property holds
+     * @param string $phpType   Variant's PHP type: an FQCN, or a builtin such as 'bool'
+     * @param bool   $isBuiltin Whether $phpType is a builtin scalar type
+     */
+    private static function holdsVariantType(mixed $held, string $phpType, bool $isBuiltin): bool
+    {
+        return $isBuiltin ? get_debug_type($held) === $phpType : $held instanceof $phpType;
+    }
+}

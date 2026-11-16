@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
+use Ardenexal\FHIRTools\Component\Validation\ComplexExtensionChecker;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\OracleValidationServiceFactory;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Fixture\CountConstraintFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Fixture\ProfileConstraintFixture;
@@ -50,6 +55,26 @@ final class FHIRValidationServiceIntegrationTest extends TestCase
             ->setConstraintValidatorFactory($factory)
             ->getValidator();
         $this->service = new FHIRValidationService($validator, new FHIRPathService());
+    }
+
+    /**
+     * An incomplete complex extension is read as plain Extension, which declares no contexts. Its
+     * placement is still checked against the typed class it could not become, so a misplaced one
+     * reports both the missing slice and the wrong context.
+     */
+    public function testIncompleteComplexExtensionIsStillCheckedAgainstItsContext(): void
+    {
+        $json = '{"resourceType":"Observation","status":"final","code":{"text":"x"},'
+            . '"extension":[{"url":"http://hl7.org/fhir/StructureDefinition/patient-animal",'
+            . '"extension":[{"url":"breed","valueCodeableConcept":{"text":"Poodle"}}]}]}';
+
+        $resource = FHIRSerializationService::createDefault(FhirVersion::R4)->deserialize($json);
+        $report   = OracleValidationServiceFactory::create(FhirVersion::R4)->validate($resource);
+
+        $classes = array_map(static fn ($v): string => $v->constraintClass, $report->errors());
+
+        self::assertContains(ComplexExtensionChecker::class, $classes);
+        self::assertContains(FHIRExtensionContext::class, $classes);
     }
 
     public function testBuiltInCountViolationLandsInErrorBucket(): void

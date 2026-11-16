@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
 /**
@@ -30,12 +31,12 @@ class RiskEvidenceSynthesisSampleSize extends BackboneElement
         /** @var StringPrimitive|string|null description Description of sample size */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var int|null numberOfStudies How many studies? */
+        /** @var IntegerPrimitive|int|null numberOfStudies How many studies? */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $numberOfStudies = null,
-        /** @var int|null numberOfParticipants How many participants? */
+        public IntegerPrimitive|int|null $numberOfStudies = null,
+        /** @var IntegerPrimitive|int|null numberOfParticipants How many participants? */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $numberOfParticipants = null,
+        public IntegerPrimitive|int|null $numberOfParticipants = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

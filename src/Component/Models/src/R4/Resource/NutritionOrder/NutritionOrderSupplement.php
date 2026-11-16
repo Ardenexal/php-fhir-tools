@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Oral nutritional products given in order to add further nutritional value to the patient's diet.
@@ -31,7 +32,7 @@ class NutritionOrderSupplement extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Type of supplement product requested */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $type = null,
         /** @var StringPrimitive|string|null productName Product or brand name of the nutritional supplement */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -43,9 +44,10 @@ class NutritionOrderSupplement extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
         )]
+        #[Valid]
         public array $schedule = [],
         /** @var Quantity|null quantity Amount of the nutritional supplement */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex'), Valid]
         public ?Quantity $quantity = null,
         /** @var StringPrimitive|string|null instruction Instructions or additional information about the oral supplement */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

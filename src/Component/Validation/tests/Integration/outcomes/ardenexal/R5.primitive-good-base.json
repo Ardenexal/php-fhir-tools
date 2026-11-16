@@ -1,5 +1,27 @@
 {
-    "errorCount": 1,
+    "errorCount": 3,
     "warningCount": 0,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 3,
+        "warningCount": 2,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "BELOW",
+        "errors": [
+            "Element value '-0.00000000000000000000000023' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'",
+            "Element value '121233786234234234234234.12323' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'",
+            "Element value '1e09' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "constraint:PrimitiveFormatChecker": [
+                "parameter[6].value — Element value '-0.00000000000000000000000023' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'",
+                "parameter[7].value — Element value '121233786234234234234234.12323' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'",
+                "parameter[11].value — Element value '1e09' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'"
+            ]
+        },
+        "warnings": {}
+    }
 }

@@ -15,10 +15,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\EnableWhenBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\QuestionnaireItemTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A particular question, question grouping or display text that is part of the questionnaire.
@@ -127,6 +130,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
+        #[Valid]
         public array $code = [],
         /** @var StringPrimitive|string|null prefix E.g. "1(a)", "2.5.3" */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -135,7 +139,13 @@ class QuestionnaireItem extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
         /** @var QuestionnaireItemTypeType|null type group | display | boolean | decimal | integer | date | dateTime + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/item-type|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/item-type|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\QuestionnaireItemType',
+        )]
         public ?QuestionnaireItemTypeType $type = null,
         /** @var array<QuestionnaireItemEnableWhen> enableWhen Only allow data when */
         #[FhirProperty(
@@ -144,23 +154,29 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Questionnaire\QuestionnaireItemEnableWhen',
         )]
+        #[Valid]
         #[FHIRIsModifier(reason: 'If enableWhen is present and the condition evaluates to false, then the Questionnaire behaves as though the elements weren\'t actually present')]
         public array $enableWhen = [],
         /** @var EnableWhenBehaviorType|null enableBehavior all | any */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-enable-behavior|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-enable-behavior|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\EnableWhenBehavior',
+        )]
         public ?EnableWhenBehaviorType $enableBehavior = null,
-        /** @var bool|null required Whether the item must be included in data results */
+        /** @var BooleanPrimitive|bool|null required Whether the item must be included in data results */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $required = null,
-        /** @var bool|null repeats Whether the item may repeat */
+        public BooleanPrimitive|bool|null $required = null,
+        /** @var BooleanPrimitive|bool|null repeats Whether the item may repeat */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $repeats = null,
-        /** @var bool|null readOnly Don't allow human editing */
+        public BooleanPrimitive|bool|null $repeats = null,
+        /** @var BooleanPrimitive|bool|null readOnly Don't allow human editing */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $readOnly = null,
-        /** @var int|null maxLength No more than this many characters */
+        public BooleanPrimitive|bool|null $readOnly = null,
+        /** @var IntegerPrimitive|int|null maxLength No more than this many characters */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $maxLength = null,
+        public IntegerPrimitive|int|null $maxLength = null,
         /** @var CanonicalPrimitive|null answerValueSet Valueset containing permitted answers */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $answerValueSet = null,
@@ -171,6 +187,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Questionnaire\QuestionnaireItemAnswerOption',
         )]
+        #[Valid]
         public array $answerOption = [],
         /** @var array<QuestionnaireItemInitial> initial Initial value(s) when item is first rendered */
         #[FhirProperty(
@@ -179,6 +196,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Questionnaire\QuestionnaireItemInitial',
         )]
+        #[Valid]
         public array $initial = [],
         /** @var array<QuestionnaireItem> item Nested questionnaire items */
         #[FhirProperty(
@@ -187,6 +205,7 @@ class QuestionnaireItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Questionnaire\QuestionnaireItem',
         )]
+        #[Valid]
         public array $item = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

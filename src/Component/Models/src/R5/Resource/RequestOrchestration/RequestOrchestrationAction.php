@@ -32,6 +32,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description The actions, if any, produced by the evaluation of the artifact.
@@ -71,7 +72,12 @@ class RequestOrchestrationAction extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $textEquivalent = null,
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\RequestPriority',
+        )]
         public ?RequestPriorityType $priority = null,
         /** @var array<CodeableConcept> code Code representing the meaning of the action or sub-actions */
         #[FhirProperty(
@@ -80,6 +86,7 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[Valid]
         public array $code = [],
         /** @var array<RelatedArtifact> documentation Supporting documentation for the intended performer of the action */
         #[FhirProperty(
@@ -88,6 +95,7 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
         )]
+        #[Valid]
         public array $documentation = [],
         /** @var array<Reference> goal What goals */
         #[FhirProperty(
@@ -96,6 +104,7 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[Valid]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Goal'])]
         public array $goal = [],
         /** @var array<RequestOrchestrationActionCondition> condition Whether or not the action is applicable */
@@ -105,6 +114,7 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionCondition',
         )]
+        #[Valid]
         public array $condition = [],
         /** @var array<RequestOrchestrationActionInput> input Input data requirements */
         #[FhirProperty(
@@ -113,6 +123,7 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionInput',
         )]
+        #[Valid]
         public array $input = [],
         /** @var array<RequestOrchestrationActionOutput> output Output data definition */
         #[FhirProperty(
@@ -121,6 +132,7 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionOutput',
         )]
+        #[Valid]
         public array $output = [],
         /** @var array<RequestOrchestrationActionRelatedAction> relatedAction Relationship to another action */
         #[FhirProperty(
@@ -129,6 +141,7 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionRelatedAction',
         )]
+        #[Valid]
         public array $relatedAction = [],
         /** @var DateTimePrimitive|Age|Period|Duration|Range|Timing|null timing When the action should take place */
         #[FhirProperty(
@@ -176,7 +189,7 @@ class RequestOrchestrationAction extends BackboneElement
         )]
         public DateTimePrimitive|Age|Period|Duration|Range|Timing|null $timing = null,
         /** @var CodeableReference|null location Where it should happen */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?CodeableReference $location = null,
         /** @var array<RequestOrchestrationActionParticipant> participant Who should perform the action */
         #[FhirProperty(
@@ -185,27 +198,59 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionParticipant',
         )]
+        #[Valid]
         public array $participant = [],
         /** @var CodeableConcept|null type create | update | remove | fire-event */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionType',
+        )]
         public ?CodeableConcept $type = null,
         /** @var ActionGroupingBehaviorType|null groupingBehavior visual-group | logical-group | sentence-group */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-grouping-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-grouping-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionGroupingBehavior',
+        )]
         public ?ActionGroupingBehaviorType $groupingBehavior = null,
         /** @var ActionSelectionBehaviorType|null selectionBehavior any | all | all-or-none | exactly-one | at-most-one | one-or-more */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-selection-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-selection-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionSelectionBehavior',
+        )]
         public ?ActionSelectionBehaviorType $selectionBehavior = null,
         /** @var ActionRequiredBehaviorType|null requiredBehavior must | could | must-unless-documented */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-required-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-required-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionRequiredBehavior',
+        )]
         public ?ActionRequiredBehaviorType $requiredBehavior = null,
         /** @var ActionPrecheckBehaviorType|null precheckBehavior yes | no */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-precheck-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-precheck-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionPrecheckBehavior',
+        )]
         public ?ActionPrecheckBehaviorType $precheckBehavior = null,
         /** @var ActionCardinalityBehaviorType|null cardinalityBehavior single | multiple */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-cardinality-behavior|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-cardinality-behavior|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionCardinalityBehavior',
+        )]
         public ?ActionCardinalityBehaviorType $cardinalityBehavior = null,
         /** @var Reference|null resource The target of the action */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), Valid, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $resource = null,
         /** @var CanonicalPrimitive|UriPrimitive|null definition Description of the activity to be performed */
         #[FhirProperty(
@@ -245,6 +290,7 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionDynamicValue',
         )]
+        #[Valid]
         public array $dynamicValue = [],
         /** @var array<RequestOrchestrationAction> action Sub action */
         #[FhirProperty(
@@ -253,6 +299,7 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationAction',
         )]
+        #[Valid]
         public array $action = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

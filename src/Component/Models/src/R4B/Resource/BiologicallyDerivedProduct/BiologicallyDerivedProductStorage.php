@@ -12,7 +12,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BiologicallyDerivedProductStorageScaleType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DecimalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Product storage.
@@ -33,14 +35,19 @@ class BiologicallyDerivedProductStorage extends BackboneElement
         /** @var StringPrimitive|string|null description Description of storage */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var numeric-string|null temperature Storage temperature */
+        /** @var DecimalPrimitive|numeric-string|null temperature Storage temperature */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?string $temperature = null,
+        public DecimalPrimitive|string|null $temperature = null,
         /** @var BiologicallyDerivedProductStorageScaleType|null scale farenheit | celsius | kelvin */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-storage-scale|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-storage-scale|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\BiologicallyDerivedProductStorageScale',
+        )]
         public ?BiologicallyDerivedProductStorageScaleType $scale = null,
         /** @var Period|null duration Storage timeperiod */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex'), Valid]
         public ?Period $duration = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

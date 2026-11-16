@@ -1,0 +1,3829 @@
+{
+  "http://hl7.org/fhir/OperationDefinition/ActivityDefinition-apply": {
+    "code": "apply",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "activityDefinition",
+        "searchType": null,
+        "type": "ActivityDefinition",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 1,
+        "name": "subject",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "encounter",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "practitioner",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "organization",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "userType",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "userLanguage",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "userTaskContext",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "setting",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "settingContext",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "ActivityDefinition"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/ActivityDefinition-apply"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ActivityDefinition-data-requirements": {
+    "code": "data-requirements",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Library",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "ActivityDefinition"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/ActivityDefinition-data-requirements"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CanonicalResource-current-canonical": {
+    "code": "current-canonical",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "url",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "status",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "result",
+        "searchType": null,
+        "type": "CanonicalResource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "CanonicalResource"
+    ],
+    "system": true,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/CanonicalResource-current-canonical"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-conforms": {
+    "code": "conforms",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "left",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "right",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "mode",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "issues",
+        "searchType": null,
+        "type": "OperationOutcome",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "union",
+        "searchType": null,
+        "type": "CapabilityStatement",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "intersection",
+        "searchType": null,
+        "type": "CapabilityStatement",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "CapabilityStatement"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-conforms"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-implements": {
+    "code": "implements",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "server",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "client",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "resource",
+        "searchType": null,
+        "type": "CapabilityStatement",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "OperationOutcome",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "CapabilityStatement"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-implements"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-subset": {
+    "code": "subset",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "server",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 1,
+        "name": "resource",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "CapabilityStatement",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "CapabilityStatement"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-subset"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-versions": {
+    "code": "versions",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "*",
+        "min": 1,
+        "name": "version",
+        "searchType": null,
+        "type": "code",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "default",
+        "searchType": null,
+        "type": "code",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "CapabilityStatement"
+    ],
+    "system": true,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/CapabilityStatement-versions"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ChargeItemDefinition-apply": {
+    "code": "apply",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "chargeItem",
+        "searchType": null,
+        "type": "Reference",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "account",
+        "searchType": null,
+        "type": "Reference",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "ChargeItemDefinition"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/ChargeItemDefinition-apply"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Claim-submit": {
+    "code": "submit",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "resource",
+        "searchType": null,
+        "type": "Resource",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Claim"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Claim-submit"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CodeSystem-find-matches": {
+    "code": "find-matches",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "system",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "property",
+        "part": [
+          {
+            "max": "1",
+            "min": 1,
+            "name": "code",
+            "searchType": null,
+            "type": "code",
+            "use": "in"
+          },
+          {
+            "max": "1",
+            "min": 0,
+            "name": "value",
+            "searchType": null,
+            "type": "Element",
+            "use": "in"
+          },
+          {
+            "max": "*",
+            "min": 0,
+            "name": "subproperty",
+            "part": [
+              {
+                "max": "1",
+                "min": 1,
+                "name": "code",
+                "searchType": null,
+                "type": "code",
+                "use": "in"
+              },
+              {
+                "max": "1",
+                "min": 1,
+                "name": "value",
+                "searchType": null,
+                "type": "Element",
+                "use": "in"
+              }
+            ],
+            "searchType": null,
+            "type": null,
+            "use": "in"
+          }
+        ],
+        "searchType": null,
+        "type": null,
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "exact",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "compositional",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "match",
+        "part": [
+          {
+            "max": "1",
+            "min": 1,
+            "name": "code",
+            "searchType": null,
+            "type": "Coding",
+            "use": "out"
+          },
+          {
+            "max": "*",
+            "min": 0,
+            "name": "unmatched",
+            "part": [
+              {
+                "max": "1",
+                "min": 1,
+                "name": "code",
+                "searchType": null,
+                "type": "code",
+                "use": "out"
+              },
+              {
+                "max": "1",
+                "min": 1,
+                "name": "value",
+                "searchType": null,
+                "type": "Element",
+                "use": "out"
+              },
+              {
+                "max": "*",
+                "min": 0,
+                "name": "property",
+                "part": [
+                  {
+                    "max": "1",
+                    "min": 1,
+                    "name": "code",
+                    "searchType": null,
+                    "type": "code",
+                    "use": "out"
+                  },
+                  {
+                    "max": "1",
+                    "min": 1,
+                    "name": "value",
+                    "searchType": null,
+                    "type": "Element",
+                    "use": "out"
+                  }
+                ],
+                "searchType": null,
+                "type": null,
+                "use": "out"
+              }
+            ],
+            "searchType": null,
+            "type": null,
+            "use": "out"
+          },
+          {
+            "max": "1",
+            "min": 0,
+            "name": "comment",
+            "searchType": null,
+            "type": "string",
+            "use": "out"
+          }
+        ],
+        "searchType": null,
+        "type": null,
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "CodeSystem"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/CodeSystem-find-matches"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CodeSystem-lookup": {
+    "code": "lookup",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "code",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "system",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "coding",
+        "searchType": null,
+        "type": "Coding",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "date",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "displayLanguage",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "property",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "useSupplement",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "name",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "display",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "definition",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "designation",
+        "part": [
+          {
+            "max": "1",
+            "min": 0,
+            "name": "language",
+            "searchType": null,
+            "type": "code",
+            "use": "out"
+          },
+          {
+            "max": "1",
+            "min": 0,
+            "name": "use",
+            "searchType": null,
+            "type": "Coding",
+            "use": "out"
+          },
+          {
+            "max": "*",
+            "min": 0,
+            "name": "additionalUse",
+            "searchType": null,
+            "type": "Coding",
+            "use": "out"
+          },
+          {
+            "max": "1",
+            "min": 1,
+            "name": "value",
+            "searchType": null,
+            "type": "string",
+            "use": "out"
+          }
+        ],
+        "searchType": null,
+        "type": null,
+        "use": "out"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "property",
+        "part": [
+          {
+            "max": "1",
+            "min": 1,
+            "name": "code",
+            "searchType": null,
+            "type": "code",
+            "use": "out"
+          },
+          {
+            "max": "1",
+            "min": 0,
+            "name": "value",
+            "searchType": null,
+            "type": "Element",
+            "use": "out"
+          },
+          {
+            "max": "1",
+            "min": 0,
+            "name": "description",
+            "searchType": null,
+            "type": "string",
+            "use": "out"
+          },
+          {
+            "max": "1",
+            "min": 0,
+            "name": "source",
+            "searchType": null,
+            "type": "canonical",
+            "use": "out"
+          },
+          {
+            "max": "*",
+            "min": 0,
+            "name": "subproperty",
+            "part": [
+              {
+                "max": "1",
+                "min": 1,
+                "name": "code",
+                "searchType": null,
+                "type": "code",
+                "use": "out"
+              },
+              {
+                "max": "1",
+                "min": 1,
+                "name": "value",
+                "searchType": null,
+                "type": "Element",
+                "use": "out"
+              },
+              {
+                "max": "1",
+                "min": 0,
+                "name": "description",
+                "searchType": null,
+                "type": "string",
+                "use": "out"
+              },
+              {
+                "max": "1",
+                "min": 0,
+                "name": "source",
+                "searchType": null,
+                "type": "canonical",
+                "use": "out"
+              }
+            ],
+            "searchType": null,
+            "type": null,
+            "use": "out"
+          }
+        ],
+        "searchType": null,
+        "type": null,
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "CodeSystem"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/CodeSystem-lookup"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CodeSystem-subsumes": {
+    "code": "subsumes",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "codeA",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "codeB",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "system",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "codingA",
+        "searchType": null,
+        "type": "Coding",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "codingB",
+        "searchType": null,
+        "type": "Coding",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "outcome",
+        "searchType": null,
+        "type": "code",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "CodeSystem"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/CodeSystem-subsumes"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CodeSystem-validate-code": {
+    "code": "validate-code",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "url",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "codeSystem",
+        "searchType": null,
+        "type": "CodeSystem",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "code",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "display",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "coding",
+        "searchType": null,
+        "type": "Coding",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "codeableConcept",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "date",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "abstract",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "displayLanguage",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "result",
+        "searchType": null,
+        "type": "boolean",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "message",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "display",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "code",
+        "searchType": null,
+        "type": "code",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "system",
+        "searchType": null,
+        "type": "uri",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "codeableConcept",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "issues",
+        "searchType": null,
+        "type": "OperationOutcome",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "CodeSystem"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/CodeSystem-validate-code"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Composition-document": {
+    "code": "document",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "persist",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "graph",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Composition"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Composition-document"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ConceptMap-closure": {
+    "code": "closure",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "name",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "concept",
+        "searchType": null,
+        "type": "Coding",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "ConceptMap",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "ConceptMap"
+    ],
+    "system": true,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/ConceptMap-closure"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ConceptMap-translate": {
+    "code": "translate",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "url",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "conceptMap",
+        "searchType": null,
+        "type": "ConceptMap",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "conceptMapVersion",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "sourceCode",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "system",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "sourceScope",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "sourceCoding",
+        "searchType": null,
+        "type": "Coding",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "sourceCodeableConcept",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "targetCode",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "targetCoding",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "targetCodeableConcept",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "targetScope",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "targetSystem",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "dependency",
+        "part": [
+          {
+            "max": "1",
+            "min": 0,
+            "name": "attribute",
+            "searchType": null,
+            "type": "uri",
+            "use": "in"
+          },
+          {
+            "max": "1",
+            "min": 0,
+            "name": "value",
+            "searchType": null,
+            "type": "Element",
+            "use": "in"
+          }
+        ],
+        "searchType": null,
+        "type": null,
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "result",
+        "searchType": null,
+        "type": "boolean",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "message",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "match",
+        "part": [
+          {
+            "max": "1",
+            "min": 0,
+            "name": "relationship",
+            "searchType": null,
+            "type": "code",
+            "use": "out"
+          },
+          {
+            "max": "1",
+            "min": 0,
+            "name": "concept",
+            "searchType": null,
+            "type": "Coding",
+            "use": "out"
+          },
+          {
+            "max": "*",
+            "min": 0,
+            "name": "property",
+            "part": [
+              {
+                "max": "1",
+                "min": 1,
+                "name": "uri",
+                "searchType": null,
+                "type": "uri",
+                "use": "out"
+              },
+              {
+                "max": "1",
+                "min": 1,
+                "name": "value",
+                "searchType": null,
+                "type": "Element",
+                "use": "out"
+              }
+            ],
+            "searchType": null,
+            "type": null,
+            "use": "out"
+          },
+          {
+            "max": "*",
+            "min": 0,
+            "name": "product",
+            "part": [
+              {
+                "max": "1",
+                "min": 1,
+                "name": "attribute",
+                "searchType": null,
+                "type": "uri",
+                "use": "out"
+              },
+              {
+                "max": "1",
+                "min": 1,
+                "name": "value",
+                "searchType": null,
+                "type": "Element",
+                "use": "out"
+              }
+            ],
+            "searchType": null,
+            "type": null,
+            "use": "out"
+          },
+          {
+            "max": "*",
+            "min": 0,
+            "name": "dependsOn",
+            "part": [
+              {
+                "max": "1",
+                "min": 1,
+                "name": "attribute",
+                "searchType": null,
+                "type": "uri",
+                "use": "out"
+              },
+              {
+                "max": "1",
+                "min": 1,
+                "name": "value",
+                "searchType": null,
+                "type": "Element",
+                "use": "out"
+              }
+            ],
+            "searchType": null,
+            "type": null,
+            "use": "out"
+          },
+          {
+            "max": "1",
+            "min": 0,
+            "name": "originMap",
+            "searchType": null,
+            "type": "uri",
+            "use": "out"
+          }
+        ],
+        "searchType": null,
+        "type": null,
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "ConceptMap"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/ConceptMap-translate"
+  },
+  "http://hl7.org/fhir/OperationDefinition/CoverageEligibilityRequest-submit": {
+    "code": "submit",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "resource",
+        "searchType": null,
+        "type": "Resource",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "CoverageEligibilityRequest"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/CoverageEligibilityRequest-submit"
+  },
+  "http://hl7.org/fhir/OperationDefinition/DocumentReference-docref": {
+    "code": "docref",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "patient",
+        "searchType": null,
+        "type": "id",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "start",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "end",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "type",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "on-demand",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "DocumentReference"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/DocumentReference-docref"
+  },
+  "http://hl7.org/fhir/OperationDefinition/DocumentReference-generate": {
+    "code": "generate",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "url",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "persist",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "DocumentReference"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/DocumentReference-generate"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Encounter-everything": {
+    "code": "everything",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "_since",
+        "searchType": null,
+        "type": "instant",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "_type",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "_count",
+        "searchType": null,
+        "type": "integer",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Encounter"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Encounter-everything"
+  },
+  "http://hl7.org/fhir/OperationDefinition/EpisodeOfCare-everything": {
+    "code": "everything",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "_since",
+        "searchType": null,
+        "type": "instant",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "_type",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "_count",
+        "searchType": null,
+        "type": "integer",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "EpisodeOfCare"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/EpisodeOfCare-everything"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Group-everything": {
+    "code": "everything",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "start",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "end",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "_since",
+        "searchType": null,
+        "type": "instant",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "_type",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "_count",
+        "searchType": null,
+        "type": "integer",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Group"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Group-everything"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Library-data-requirements": {
+    "code": "data-requirements",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "target",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Library",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Library"
+    ],
+    "system": true,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Library-data-requirements"
+  },
+  "http://hl7.org/fhir/OperationDefinition/List-find": {
+    "code": "find",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "patient",
+        "searchType": null,
+        "type": "id",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "name",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      }
+    ],
+    "resource": [
+      "List"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/List-find"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Measure-care-gaps": {
+    "code": "care-gaps",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "periodStart",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "periodEnd",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "topic",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "subject",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Measure"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Measure-care-gaps"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Measure-collect-data": {
+    "code": "collect-data",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "periodStart",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "periodEnd",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "measure",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "subject",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "practitioner",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "lastReceivedOn",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "measureReport",
+        "searchType": null,
+        "type": "MeasureReport",
+        "use": "out"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "resource",
+        "searchType": null,
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Measure"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Measure-collect-data"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Measure-data-requirements": {
+    "code": "data-requirements",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "periodStart",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "periodEnd",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Library",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Measure"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Measure-data-requirements"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Measure-evaluate-measure": {
+    "code": "evaluate-measure",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "measure",
+        "searchType": null,
+        "type": "Measure",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "url",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "subject",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "periodStart",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "periodEnd",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "reportType",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "provider",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "location",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "lastReceivedOn",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "parameters",
+        "searchType": null,
+        "type": "Parameters",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Measure"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Measure-evaluate-measure"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Measure-submit-data": {
+    "code": "submit-data",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "measureReport",
+        "searchType": null,
+        "type": "MeasureReport",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "resource",
+        "searchType": null,
+        "type": "Resource",
+        "use": "in"
+      }
+    ],
+    "resource": [
+      "Measure"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Measure-submit-data"
+  },
+  "http://hl7.org/fhir/OperationDefinition/MedicinalProductDefinition-everything": {
+    "code": "everything",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "_since",
+        "searchType": null,
+        "type": "instant",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "_count",
+        "searchType": null,
+        "type": "integer",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "MedicinalProductDefinition"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/MedicinalProductDefinition-everything"
+  },
+  "http://hl7.org/fhir/OperationDefinition/MessageHeader-process-message": {
+    "code": "process-message",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "content",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "async",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "response-url",
+        "searchType": null,
+        "type": "url",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "MessageHeader"
+    ],
+    "system": true,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/MessageHeader-process-message"
+  },
+  "http://hl7.org/fhir/OperationDefinition/NamingSystem-preferred-id": {
+    "code": "preferred-id",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "id",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "type",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "date",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "result",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "NamingSystem"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/NamingSystem-preferred-id"
+  },
+  "http://hl7.org/fhir/OperationDefinition/NamingSystem-translate-id": {
+    "code": "translate-id",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "id",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "sourceType",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "targetType",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "preferredOnly",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "date",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "result",
+        "searchType": null,
+        "type": "boolean",
+        "use": "out"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "targetIdentifier",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "targetIdentifer.preferred",
+        "searchType": null,
+        "type": "boolean",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "targetIdentifier.period",
+        "searchType": null,
+        "type": "Period",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "NamingSystem"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/NamingSystem-translate-id"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Observation-lastn": {
+    "code": "lastn",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "max",
+        "searchType": null,
+        "type": "positiveInt",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Observation"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Observation-lastn"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Observation-stats": {
+    "code": "stats",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "subject",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "code",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "system",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "coding",
+        "searchType": null,
+        "type": "Coding",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "duration",
+        "searchType": null,
+        "type": "decimal",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "period",
+        "searchType": null,
+        "type": "Period",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 1,
+        "name": "statistic",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "include",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "limit",
+        "searchType": null,
+        "type": "positiveInt",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 1,
+        "name": "statistics",
+        "searchType": null,
+        "type": "Observation",
+        "use": "out"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "source",
+        "searchType": null,
+        "type": "Observation",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Observation"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Observation-stats"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Patient-everything": {
+    "code": "everything",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "start",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "end",
+        "searchType": null,
+        "type": "date",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "_since",
+        "searchType": null,
+        "type": "instant",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "_type",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "_count",
+        "searchType": null,
+        "type": "integer",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Patient"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Patient-everything"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Patient-match": {
+    "code": "match",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "resource",
+        "searchType": null,
+        "type": "Resource",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "onlyCertainMatches",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "count",
+        "searchType": null,
+        "type": "integer",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Patient"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Patient-match"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Patient-merge": {
+    "code": "merge",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "source-patient",
+        "searchType": null,
+        "type": "Reference",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "source-patient-identifier",
+        "searchType": null,
+        "type": "Identifier",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "target-patient",
+        "searchType": null,
+        "type": "Reference",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "target-patient-identifier",
+        "searchType": null,
+        "type": "Identifier",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "result-patient",
+        "searchType": null,
+        "type": "Patient",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "preview",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Parameters",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Patient"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Patient-merge"
+  },
+  "http://hl7.org/fhir/OperationDefinition/PlanDefinition-apply": {
+    "code": "apply",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "planDefinition",
+        "searchType": null,
+        "type": "PlanDefinition",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "url",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 1,
+        "name": "subject",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "encounter",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "practitioner",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "organization",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "userType",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "userLanguage",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "userTaskContext",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "setting",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "settingContext",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "PlanDefinition"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/PlanDefinition-apply"
+  },
+  "http://hl7.org/fhir/OperationDefinition/PlanDefinition-data-requirements": {
+    "code": "data-requirements",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Library",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "PlanDefinition"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/PlanDefinition-data-requirements"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-add": {
+    "code": "add",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "additions",
+        "searchType": null,
+        "type": "Resource",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "return",
+        "searchType": null,
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Resource"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-add"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-convert": {
+    "code": "convert",
+    "instance": false,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "resource",
+        "searchType": null,
+        "type": "Resource",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Resource"
+    ],
+    "system": true,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-convert"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-filter": {
+    "code": "filter",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "probes",
+        "searchType": null,
+        "type": "Resource",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "return",
+        "searchType": null,
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Resource"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-filter"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-graph": {
+    "code": "graph",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "graph",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "result",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Resource"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-graph"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-graphql": {
+    "code": "graphql",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "query",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "result",
+        "searchType": null,
+        "type": "Binary",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Resource"
+    ],
+    "system": true,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-graphql"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-meta": {
+    "code": "meta",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Meta",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Resource"
+    ],
+    "system": true,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-meta"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-meta-add": {
+    "code": "meta-add",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "meta",
+        "searchType": null,
+        "type": "Meta",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Meta",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Resource"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-meta-add"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-meta-delete": {
+    "code": "meta-delete",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "meta",
+        "searchType": null,
+        "type": "Meta",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Meta",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Resource"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-meta-delete"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-remove": {
+    "code": "remove",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "removals",
+        "searchType": null,
+        "type": "Resource",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "return",
+        "searchType": null,
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Resource"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-remove"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Resource-validate": {
+    "code": "validate",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "resource",
+        "searchType": null,
+        "type": "Resource",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "mode",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "profile",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "usageContext",
+        "searchType": null,
+        "type": "UsageContext",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "OperationOutcome",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Resource"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Resource-validate"
+  },
+  "http://hl7.org/fhir/OperationDefinition/SpecimenDefinition-apply": {
+    "code": "apply",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "specimenDefinition",
+        "searchType": null,
+        "type": "SpecimenDefinition",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 1,
+        "name": "subject",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "collector",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "userType",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "userLanguage",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "userTaskContext",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "setting",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "settingContext",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Specimen",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "SpecimenDefinition"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/SpecimenDefinition-apply"
+  },
+  "http://hl7.org/fhir/OperationDefinition/StructureDefinition-questionnaire": {
+    "code": "questionnaire",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "identifier",
+        "searchType": null,
+        "type": "Identifier",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "profile",
+        "searchType": null,
+        "type": "StructureDefinition",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "url",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "supportedOnly",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Questionnaire",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "StructureDefinition"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/StructureDefinition-questionnaire"
+  },
+  "http://hl7.org/fhir/OperationDefinition/StructureDefinition-snapshot": {
+    "code": "snapshot",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "definition",
+        "searchType": null,
+        "type": "StructureDefinition",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "url",
+        "searchType": "token",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "StructureDefinition",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "StructureDefinition"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/StructureDefinition-snapshot"
+  },
+  "http://hl7.org/fhir/OperationDefinition/StructureMap-transform": {
+    "code": "transform",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "source",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "sourceMap",
+        "searchType": null,
+        "type": "StructureMap",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "supportingMap",
+        "searchType": null,
+        "type": "StructureMap",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "srcMap",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "content",
+        "searchType": null,
+        "type": "Resource",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Resource",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "StructureMap"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/StructureMap-transform"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Subscription-events": {
+    "code": "events",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "eventsSinceNumber",
+        "searchType": null,
+        "type": "integer64",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "eventsUntilNumber",
+        "searchType": null,
+        "type": "integer64",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "content",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Subscription"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/Subscription-events"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Subscription-get-ws-binding-token": {
+    "code": "get-ws-binding-token",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "*",
+        "min": 0,
+        "name": "id",
+        "searchType": null,
+        "type": "id",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "token",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "expiration",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "out"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "subscription",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "websocket-url",
+        "searchType": null,
+        "type": "url",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Subscription"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Subscription-get-ws-binding-token"
+  },
+  "http://hl7.org/fhir/OperationDefinition/Subscription-status": {
+    "code": "status",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "*",
+        "min": 0,
+        "name": "id",
+        "searchType": null,
+        "type": "id",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "status",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Subscription"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/Subscription-status"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ValueSet-expand": {
+    "code": "expand",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "url",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "valueSet",
+        "searchType": null,
+        "type": "ValueSet",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "valueSetVersion",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "context",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "contextDirection",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "filter",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "date",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "offset",
+        "searchType": null,
+        "type": "integer",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "count",
+        "searchType": null,
+        "type": "integer",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "includeDesignations",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "designation",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "includeDefinition",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "activeOnly",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "useSupplement",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "excludeNested",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "excludeNotForUI",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "excludePostCoordinated",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "displayLanguage",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "property",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "exclude-system",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "system-version",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "check-system-version",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "force-system-version",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "ValueSet",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "ValueSet"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/ValueSet-expand"
+  },
+  "http://hl7.org/fhir/OperationDefinition/ValueSet-validate-code": {
+    "code": "validate-code",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 0,
+        "name": "url",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "context",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "valueSet",
+        "searchType": null,
+        "type": "ValueSet",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "valueSetVersion",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "code",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "system",
+        "searchType": null,
+        "type": "uri",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "systemVersion",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "display",
+        "searchType": null,
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "coding",
+        "searchType": null,
+        "type": "Coding",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "codeableConcept",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "date",
+        "searchType": null,
+        "type": "dateTime",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "abstract",
+        "searchType": null,
+        "type": "boolean",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "displayLanguage",
+        "searchType": null,
+        "type": "code",
+        "use": "in"
+      },
+      {
+        "max": "*",
+        "min": 0,
+        "name": "useSupplement",
+        "searchType": null,
+        "type": "canonical",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "result",
+        "searchType": null,
+        "type": "boolean",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "message",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "display",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "code",
+        "searchType": null,
+        "type": "code",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "system",
+        "searchType": null,
+        "type": "uri",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "version",
+        "searchType": null,
+        "type": "string",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "codeableConcept",
+        "searchType": null,
+        "type": "CodeableConcept",
+        "use": "out"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "issues",
+        "searchType": null,
+        "type": "OperationOutcome",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "ValueSet"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/ValueSet-validate-code"
+  },
+  "http://hl7.org/fhir/OperationDefinition/example": {
+    "code": "populate",
+    "instance": true,
+    "kind": "operation",
+    "parameter": [
+      {
+        "max": "1",
+        "min": 1,
+        "name": "subject",
+        "searchType": null,
+        "type": "Reference",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 0,
+        "name": "local",
+        "searchType": null,
+        "type": "Reference",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "return",
+        "searchType": null,
+        "type": "QuestionnaireResponse",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Questionnaire"
+    ],
+    "system": false,
+    "type": false,
+    "url": "http://hl7.org/fhir/OperationDefinition/example"
+  },
+  "http://hl7.org/fhir/OperationDefinition/example-query-high-risk": {
+    "code": "example-query-high-risk",
+    "instance": false,
+    "kind": "query",
+    "parameter": [
+      {
+        "max": "*",
+        "min": 0,
+        "name": "ward",
+        "searchType": "reference",
+        "type": "string",
+        "use": "in"
+      },
+      {
+        "max": "1",
+        "min": 1,
+        "name": "result",
+        "searchType": null,
+        "type": "Bundle",
+        "use": "out"
+      }
+    ],
+    "resource": [
+      "Patient"
+    ],
+    "system": false,
+    "type": true,
+    "url": "http://hl7.org/fhir/OperationDefinition/example-query-high-risk"
+  }
+}

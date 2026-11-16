@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Observation Range Category
  * URL: http://hl7.org/fhir/ValueSet/observation-range-category
  * Version: 5.0.0
  * Description: Codes identifying the category of observation range.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/observation-range-category', version: '5.0.0')]
 enum ObservationRangeCategory: string
 {
     /** reference range */

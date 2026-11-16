@@ -95,24 +95,28 @@ final class AnswerValueCoercer
                     : $this->mismatch($itemType, $linkId, $factory, $issues);
             case 'choice':
             case 'open-choice':
+            case 'coding':
                 if (\is_object($value)) {
-                    return $value;
+                    return $this->complexAnswer($value, 'Coding', $itemType, $linkId, $factory, $issues);
                 }
 
+                // `coding` is the R5 name for the R4 `choice`/`open-choice` types.
                 $promoted = $this->promoteToOptionCoding($value, $answerOptions);
 
                 return $promoted ?? $this->mismatch($itemType, $linkId, $factory, $issues);
             case 'quantity':
+                return $this->complexAnswer($value, 'Quantity', $itemType, $linkId, $factory, $issues);
             case 'reference':
+                return $this->complexAnswer($value, 'Reference', $itemType, $linkId, $factory, $issues);
             case 'attachment':
                 // Strict-by-source-datatype (matching the reference engine): the expression must already
                 // resolve to the right FHIR datatype OBJECT (`Quantity`/`Reference`/`Attachment`). The
                 // answer choice normalizer maps the object's class to the correct `value[x]` key, so the
-                // object is passed through intact. A bare scalar for a complex item is a mismatch (the
-                // engine rejects it), never silently coerced. There is no fixed, per-item option list to
-                // match a bare scalar against for these types (unlike `choice`'s `answerOption`), so no
-                // promotion path exists here.
-                return \is_object($value) ? $value : $this->mismatch($itemType, $linkId, $factory, $issues);
+                // object is passed through intact. A bare scalar, or an object of another datatype, is a
+                // mismatch (the engine rejects it), never silently coerced. There is no fixed, per-item
+                // option list to match a bare scalar against for these types (unlike `choice`'s
+                // `answerOption`), so no promotion path exists here.
+                return $this->complexAnswer($value, 'Attachment', $itemType, $linkId, $factory, $issues);
             default:
                 return $this->unsupportedTypeIssue($itemType, $linkId, $factory, $issues);
         }
@@ -173,6 +177,27 @@ final class AnswerValueCoercer
         }
 
         return null;
+    }
+
+    /**
+     * Pass a complex answer through when it is an object of the expected FHIR datatype, or record a
+     * mismatch. The check is by class basename up the parent chain, so it is version-agnostic and accepts
+     * datatype specialisations (`Age`, `Duration`, ... are `Quantity` subclasses).
+     *
+     * @param list<object> $issues
+     */
+    private function complexAnswer(mixed $value, string $expected, string $itemType, string $linkId, PopulateModelFactory $factory, array &$issues): ?object
+    {
+        if (\is_object($value)) {
+            for ($class = $value::class; $class !== false; $class = get_parent_class($class)) {
+                $pos = strrpos($class, '\\');
+                if (($pos !== false ? substr($class, $pos + 1) : $class) === $expected) {
+                    return $value;
+                }
+            }
+        }
+
+        return $this->mismatch($itemType, $linkId, $factory, $issues);
     }
 
     /**

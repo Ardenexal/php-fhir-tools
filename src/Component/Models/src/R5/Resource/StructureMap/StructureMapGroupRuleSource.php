@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\StructureMapSourceListModeType;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -34,9 +35,9 @@ class StructureMapGroupRuleSource extends BackboneElement
         /** @var IdPrimitive|null context Type or variable this rule applies to */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?IdPrimitive $context = null,
-        /** @var int|null min Specified minimum cardinality */
+        /** @var IntegerPrimitive|int|null min Specified minimum cardinality */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $min = null,
+        public IntegerPrimitive|int|null $min = null,
         /** @var StringPrimitive|string|null max Specified maximum cardinality (number or *) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $max = null,
@@ -50,7 +51,12 @@ class StructureMapGroupRuleSource extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $element = null,
         /** @var StructureMapSourceListModeType|null listMode first | not_first | last | not_last | only_one */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-source-list-mode|5.0.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-source-list-mode|5.0.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\StructureMapSourceListMode',
+        )]
         public ?StructureMapSourceListModeType $listMode = null,
         /** @var IdPrimitive|null variable Named context for field, if a field is specified */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]

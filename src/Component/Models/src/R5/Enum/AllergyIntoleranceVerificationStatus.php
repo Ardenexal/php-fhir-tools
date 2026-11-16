@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: AllergyIntolerance Verification Status
  * URL: http://hl7.org/fhir/ValueSet/allergyintolerance-verification
  * Version: 5.0.0
  * Description: The verification status to support or decline the clinical status of the allergy or intolerance.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/allergyintolerance-verification', version: '5.0.0')]
 enum AllergyIntoleranceVerificationStatus: string
 {
     /** Unconfirmed */
     case unconfirmed = 'unconfirmed';
+
+    /** Presumed */
+    case presumed = 'presumed';
 
     /** Confirmed */
     case confirmed = 'confirmed';

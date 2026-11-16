@@ -16,10 +16,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
@@ -41,10 +43,10 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $sequence = null,
         /** @var CodeableConcept|null category Classification of the supplied information */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $category = null,
         /** @var CodeableConcept|null code Type of information */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $code = null,
         /** @var DatePrimitive|Period|null timing When it occurred */
         #[FhirProperty(
@@ -67,7 +69,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             ],
         )]
         public DatePrimitive|Period|null $timing = null,
-        /** @var bool|StringPrimitive|string|Quantity|Attachment|Reference|null value Data to be provided */
+        /** @var BooleanPrimitive|bool|StringPrimitive|string|Quantity|Attachment|Reference|null value Data to be provided */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -101,9 +103,9 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             ],
         )]
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
-        public bool|StringPrimitive|string|Quantity|Attachment|Reference|null $value = null,
+        public BooleanPrimitive|bool|StringPrimitive|string|Quantity|Attachment|Reference|null $value = null,
         /** @var Coding|null reason Explanation for the information */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), Valid]
         public ?Coding $reason = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

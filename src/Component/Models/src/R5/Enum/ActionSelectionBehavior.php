@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Action Selection Behavior
  * URL: http://hl7.org/fhir/ValueSet/action-selection-behavior
  * Version: 5.0.0
  * Description: Defines selection behavior of a group.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/action-selection-behavior', version: '5.0.0')]
 enum ActionSelectionBehavior: string
 {
     /** Any */

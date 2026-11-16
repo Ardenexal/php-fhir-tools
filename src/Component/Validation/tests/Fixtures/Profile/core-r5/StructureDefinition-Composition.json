@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Composition","url":"http://hl7.org/fhir/StructureDefinition/Composition","version":"5.0.0","name":"Composition","status":"draft","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"Composition","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

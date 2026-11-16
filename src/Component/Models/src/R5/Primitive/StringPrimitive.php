@@ -34,7 +34,7 @@ class StringPrimitive extends PrimitiveType implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var string|null value Primitive value for string */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Length(max: 1048576), Regex(pattern: '^[\s\S]+$')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Length(max: 1048576), Regex(pattern: '~\A(?:^[\s\S]+$)\z~')]
         public ?string $value = null,
     ) {
         parent::__construct($id, $extension);

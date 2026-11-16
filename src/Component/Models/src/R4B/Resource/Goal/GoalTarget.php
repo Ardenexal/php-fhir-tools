@@ -15,8 +15,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Ratio;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Indicates what should be done by when.
@@ -41,9 +44,9 @@ class GoalTarget extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null measure The parameter whose value is being tracked */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
         public ?CodeableConcept $measure = null,
-        /** @var Quantity|Range|CodeableConcept|StringPrimitive|string|bool|int|Ratio|null detail The target value to be achieved */
+        /** @var Quantity|Range|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Ratio|null detail The target value to be achieved */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -83,7 +86,7 @@ class GoalTarget extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|Range|CodeableConcept|StringPrimitive|string|bool|int|Ratio|null $detail = null,
+        public Quantity|Range|CodeableConcept|StringPrimitive|string|BooleanPrimitive|bool|IntegerPrimitive|int|Ratio|null $detail = null,
         /** @var DatePrimitive|Duration|null due Reach goal on or before */
         #[FhirProperty(
             fhirType: 'choice',

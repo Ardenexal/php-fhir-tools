@@ -34,7 +34,7 @@ class IntegerPrimitive extends Element implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var int|null value Primitive value for integer */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Integer', propertyKind: 'scalar', xmlSerializedName: '@value'), Range(min: '-2147483648', max: '2147483647'), Regex(pattern: '-?([0]|([1-9][0-9]*))')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Integer', propertyKind: 'scalar', xmlSerializedName: '@value'), Range(min: '-2147483648', max: '2147483647'), Regex(pattern: '~\A(?:-?([0]|([1-9][0-9]*)))\z~')]
         public ?int $value = null,
     ) {
         parent::__construct($id, $extension);

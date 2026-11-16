@@ -19,7 +19,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/subject-locationClassification', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter.location')]
-#[FHIRExtensionContext(type: 'element', expression: 'EncounterHistory.location')]
 class EncounterSubjectLocationClassificationExtension extends Extension
 {
     /**

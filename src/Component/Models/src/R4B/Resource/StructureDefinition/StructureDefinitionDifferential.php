@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ElementDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A differential view is expressed relative to the base StructureDefinition - a statement of differences that it applies.
@@ -49,6 +50,7 @@ class StructureDefinitionDifferential extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ElementDefinition',
         )]
+        #[Valid]
         #[Count(min: 1)]
         public array $element = [],
     ) {

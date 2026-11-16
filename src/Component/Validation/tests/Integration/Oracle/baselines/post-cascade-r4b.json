@@ -1,0 +1,88 @@
+{
+    "version": "R4B",
+    "above": 1,
+    "equal": 3,
+    "below": 3,
+    "compared": 7,
+    "skipped": 0,
+    "skipsByReason": {
+        "no-oracle": 0,
+        "unreadable": 0,
+        "deserialize-threw": 0,
+        "validate-crashed": 0
+    },
+    "crashedCases": [],
+    "wallClockSeconds": 0.03,
+    "aboveFamilies": {
+        "invariant:sdf-8": 1,
+        "invariant:sdf-8a": 1
+    },
+    "cases": [
+        {
+            "name": "structureDefinition-11179-objectClass-R4B",
+            "class": "ABOVE",
+            "ours": 2,
+            "oursUnfiltered": 3,
+            "java": 0,
+            "families": [
+                "invariant:sdf-8",
+                "invariant:sdf-8a"
+            ],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-id-bad-1 / R4B",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-id-bad-3 / R4B",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "patient-id-bad-2 / R4B",
+            "class": "BELOW",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 1,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "extension-version-restriction-range-r4b",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "extension-version-restriction-range-ctxt-r4b",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        },
+        {
+            "name": "standards-status-r4b",
+            "class": "EQUAL",
+            "ours": 0,
+            "oursUnfiltered": 0,
+            "java": 0,
+            "families": [],
+            "skewedByFilter": false
+        }
+    ]
+}

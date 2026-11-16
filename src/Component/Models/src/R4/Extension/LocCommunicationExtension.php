@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
@@ -19,9 +20,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/location-communication', fhirVersion: 'R4')]
 #[FHIRExtensionContext(type: 'element', expression: 'Location')]
-#[FHIRExtensionContext(type: 'element', expression: 'ExtendedContactDetail')]
 #[FHIRExtensionContext(type: 'element', expression: 'Organization')]
 #[FHIRExtensionContext(type: 'element', expression: 'OrganizationAffiliation')]
+#[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages', strength: 'required')]
 class LocCommunicationExtension extends Extension
 {
     /**

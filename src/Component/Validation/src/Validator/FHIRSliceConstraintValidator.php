@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
+use Ardenexal\FHIRTools\Component\Validation\FHIRChoiceVariantReader;
+use Ardenexal\FHIRTools\Component\Validation\FHIRElementPath;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
+use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -40,15 +45,34 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
      *
      * @var \WeakMap<ExecutionContextInterface, array<string, true>>
      */
-    private \WeakMap $processedKeys;
+    private static ?\WeakMap $processedKeys = null;
+
+    private readonly FHIRChoiceVariantReader $reader;
 
     public function __construct(
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly SliceDiscriminatorMatcher $matcher,
+        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
+        ?FHIRChoiceVariantReader $reader = null,
     ) {
-        /** @var \WeakMap<ExecutionContextInterface, array<string, true>> $processedKeys */
-        $processedKeys       = new \WeakMap();
-        $this->processedKeys = $processedKeys;
+        $this->reader = $reader ?? new FHIRChoiceVariantReader($propertyAccessor);
+    }
+
+    /**
+     * Static on purpose. A ConstraintValidatorFactory is free to return a fresh validator for every
+     * constraint it is asked about, and the common ones do — so per-instance dedup state is always
+     * empty and never dedups anything. `bp` declares two slices on `component`, which meant the
+     * property was matched twice and every finding reported twice over. Keying on the
+     * ExecutionContext keeps runs isolated, and the WeakMap lets each entry go when its context does.
+     *
+     * @return \WeakMap<ExecutionContextInterface, array<string, true>>
+     */
+    private static function processedKeys(): \WeakMap
+    {
+        /** @var \WeakMap<ExecutionContextInterface, array<string, true>> $map */
+        $map = self::$processedKeys ??= new \WeakMap();
+
+        return $map;
     }
 
     public function validate(mixed $value, Constraint $constraint): void
@@ -72,36 +96,42 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         // Only process each (property, group) combination once per $validator->validate() call.
         // Keyed on the ExecutionContext so the dedup resets when a new call creates a fresh context.
         $ctx       = $this->context;
-        $processed = $this->processedKeys[$ctx] ?? [];
+        $keys      = self::processedKeys();
+        $processed = $keys[$ctx] ?? [];
         if (isset($processed[$dedupKey])) {
             return;
         }
-        $processed[$dedupKey]      = true;
-        $this->processedKeys[$ctx] = $processed;
+        $processed[$dedupKey] = true;
+        $keys[$ctx]           = $processed;
 
-        // Read the property value (must be an array for sliced properties)
-        if (!$this->propertyAccessor->isReadable($value, $property)) {
+        // One list of items per parent the sliced element hangs off. A path through a repeating
+        // element ("identifier.type.coding", from a data-type profile inlined under `identifier`)
+        // reaches one coding list per identifier, and slice cardinality holds for each of them, never
+        // for their union. A path with no repeating ancestor reaches exactly one list. No groups means
+        // an ancestor is absent, which is that ancestor's rule to report.
+        $groups = $this->reader->readGroups($value, FHIRElementPath::toPropertyPath($property));
+        if ($groups === []) {
             return;
         }
-
-        $items = $this->propertyAccessor->getValue($value, $property);
-        if (!is_array($items)) {
-            return;
-        }
-
-        $refl = new \ReflectionClass($value);
 
         // Collect all slice constraints for this property + active group
-        $sliceConstraints = $this->collectSliceConstraints($refl, $property, $activeGroup);
+        $sliceConstraints = $this->collectSliceConstraints($value, $property, $activeGroup);
         if ($sliceConstraints === []) {
             return;
         }
 
         // Read slicing rules for this property (if any)
-        $slicingRules = $this->readSlicingRules($refl, $property, $activeGroup);
+        $slicingRules = $this->readSlicingRules($value, $property, $activeGroup);
 
-        // Match items → slices
-        $this->validateSlices($items, $sliceConstraints, $slicingRules, $property);
+        // Match items → slices, per parent. A finding names the parent's occurrence
+        // ("identifier[1].type.coding") only when the path crosses a repeating element; a path that
+        // does not keeps the property as declared, as it always has.
+        $repeats = count($groups) > 1 || str_contains($groups[0]['path'], '[');
+        foreach ($groups as $group) {
+            if (is_array($group['value'])) {
+                $this->validateSlices($group['value'], $sliceConstraints, $slicingRules, $repeats ? $group['path'] : $property);
+            }
+        }
     }
 
     /**
@@ -126,9 +156,17 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             }
         }
 
+        // Items of a slice no item can match would be judged unmatched, which closed and openAtEnd
+        // rules reject; current classes are generated with open rules for such slicing
+        if (array_filter($namedSlices, self::isUndecidedExistsSlice(...)) !== []) {
+            $rules = 'open';
+        }
+
         // Track match counts per slice and which items matched any slice
         /** @var array<int, int> $matchCounts  sliceConstraints index → count */
         $matchCounts        = array_fill(0, count($namedSlices), 0);
+        /** @var array<int, array<int|string, object|array<mixed>>> $matchedItems sliceConstraints index → item index → item */
+        $matchedItems       = [];
         $unmatchedItems     = [];
         $openAtEndViolation = false;
 
@@ -146,7 +184,8 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                     $sc->discriminatorValue,
                 )) {
                     ++$matchCounts[$sliceIdx];
-                    $matched = true;
+                    $matchedItems[$sliceIdx][$itemIndex] = $item;
+                    $matched                             = true;
 
                     // openAtEnd: a matched item after any unmatched item violates ordering
                     if ($rules === 'openAtEnd' && $unmatchedItems !== []) {
@@ -165,7 +204,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         foreach ($namedSlices as $sliceIdx => $sc) {
             $count = $matchCounts[$sliceIdx];
 
-            if ($count < $sc->min) {
+            if ($count < $sc->min && !self::isUndecidedExistsSlice($sc)) {
                 $this->context->buildViolation(
                     'Slice "{{ slice }}" on "{{ property }}" requires at least {{ min }} item(s), but {{ count }} matched.',
                 )->setParameters([
@@ -187,6 +226,13 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                     '{{ count }}'    => (string) $count,
                 ])->atPath($property)->setCode(FHIRViolationCode::ERROR)->addViolation();
             }
+
+            $this->validateSliceRules($sc, $matchedItems[$sliceIdx] ?? [], $property);
+        }
+
+        // The default slice holds the items no named slice matched, so its rules bind those
+        if ($defaultSlice !== null && $unmatchedItems !== []) {
+            $this->validateSliceRules($defaultSlice, array_intersect_key($items, array_flip($unmatchedItems)), $property);
         }
 
         // Closed slicing: unmatched items must go to @default or be rejected
@@ -235,46 +281,148 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     }
 
     /**
-     * @param \ReflectionClass<object> $refl
+     * True for an `exists` slice with no presence to test, which no item can match.
      *
+     * Classes generated before the generator read an `exists` slice's presence from its definition
+     * carry none, yet keep the slice's minimum and the slicing's closed or openAtEnd rules. Both
+     * would fail resources that conform, so neither is checked; current classes give such a slice
+     * no minimum and its slicing open rules in the first place.
+     */
+    private static function isUndecidedExistsSlice(FHIRSliceConstraint $slice): bool
+    {
+        return $slice->discriminatorType === 'exists' && !is_bool($slice->discriminatorValue);
+    }
+
+    /**
+     * Applies the rules a profile places beneath a slice to each item that matched that slice.
+     *
+     * Paths are read the way FHIRProfileConstraintValidator reads them: an absent ancestor is not
+     * this rule's violation, a Count sizes the occurrence list, and every other rule inspects the
+     * element itself. Violations are reported at the item, e.g. `component[1].valueQuantity.system`.
+     *
+     * Rules carrying a FHIRSliceConstraint or FHIRSlicingRules describe slicing beneath the slice
+     * (AU Core's `component:SystolicBP.code.coding:snomedSBP`). They are grouped by path, and each
+     * item's elements at that path are matched against them as a slicing of their own, recursively.
+     *
+     * @param array<int|string, object|array<mixed>> $items    Items that matched the slice, keyed by their index
+     * @param string                                 $property Sliced property, e.g. 'component'
+     */
+    private function validateSliceRules(FHIRSliceConstraint $slice, array $items, string $property): void
+    {
+        /** @var array<string, array{slices: list<FHIRSliceConstraint>, rules: FHIRSlicingRules|null}> $nested */
+        $nested = [];
+        $plain  = [];
+
+        foreach (self::rulesOf($slice) as $rule) {
+            if ($rule['constraint'] === FHIRSliceConstraint::class) {
+                $nested[$rule['path']]['slices'][] = new FHIRSliceConstraint(...$rule['options']);
+                $nested[$rule['path']]['rules'] ??= null;
+            } elseif ($rule['constraint'] === FHIRSlicingRules::class) {
+                $nested[$rule['path']]['slices'] ??= [];
+                $nested[$rule['path']]['rules'] = new FHIRSlicingRules(...$rule['options']);
+            } elseif (is_a($rule['constraint'], Constraint::class, true)) {
+                $plain[] = ['path' => $rule['path'], 'constraint' => $rule['constraint'], 'options' => $rule['options']];
+            }
+        }
+
+        // Slicing beneath the slice: match each item's own elements against the nested slices
+        foreach ($nested as $path => $definition) {
+            foreach ($items as $itemIndex => $item) {
+                foreach ($this->reader->readGroups($item, $path) as $group) {
+                    $this->validateSlices(
+                        $group['occurrences'],
+                        $definition['slices'],
+                        $definition['rules'],
+                        "{$property}[{$itemIndex}].{$path}",
+                    );
+                }
+            }
+        }
+
+        foreach ($plain as $rule) {
+            $innerConstraint = new ($rule['constraint'])(...$rule['options']);
+
+            foreach ($items as $itemIndex => $item) {
+                foreach ($this->reader->readGroups($item, $rule['path']) as $group) {
+                    $subject = $innerConstraint instanceof Count ? $group['occurrences'] : $group['value'];
+                    $base    = "{$property}[{$itemIndex}].{$rule['path']}";
+
+                    foreach ($this->context->getValidator()->validate($subject, $innerConstraint, ['Default']) as $v) {
+                        $innerPath = $v->getPropertyPath();
+                        $path      = match (true) {
+                            $innerPath    === ''  => $base,
+                            $innerPath[0] === '[' => $base . $innerPath,
+                            default               => $base . '.' . $innerPath,
+                        };
+
+                        $this->context->buildViolation($v->getMessageTemplate(), $v->getParameters())
+                            ->atPath($path)
+                            ->setCode($v->getCode() ?? FHIRViolationCode::ERROR)
+                            ->addViolation();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The slice's `rules`, or none when the installed fhir-metadata predates them.
+     *
+     * fhir-metadata before 0.6.2 has no `rules` property, and reading an unknown property on a
+     * Constraint throws, so a direct read would fail every sliced profile in a mixed install rather
+     * than skip what it cannot see. The property is read from the object's public state instead.
+     *
+     * @return list<array{path: string, constraint: class-string, options: array<string, mixed>}>
+     */
+    private static function rulesOf(FHIRSliceConstraint $slice): array
+    {
+        $rules = get_object_vars($slice)['rules'] ?? [];
+
+        return is_array($rules) ? array_values($rules) : [];
+    }
+
+    /**
      * @return list<FHIRSliceConstraint>
      */
     private function collectSliceConstraints(
-        \ReflectionClass $refl,
+        object $subject,
         string $property,
         string $activeGroup,
     ): array {
         $results = [];
-        foreach ($refl->getAttributes(FHIRSliceConstraint::class) as $attr) {
-            /** @var FHIRSliceConstraint $sc */
-            $sc = $attr->newInstance();
+        // Ancestors included: a derived profile inherits its parent's slices without re-declaring
+        // them. ObservationBpProfile extends ObservationVitalsignsProfile and the VSCat slice on
+        // category lives on the parent, so reading the instance class alone finds nothing and the
+        // required slice is silently never checked.
+        foreach ($this->attributes->classAttributesInHierarchy($subject, FHIRSliceConstraint::class) as $sc) {
             if ($sc->property !== $property) {
                 continue;
             }
+
             $groups = $sc->groups ?? [];
+
             if ($groups !== [] && !in_array($activeGroup, $groups, true)) {
                 continue;
             }
+
             $results[] = $sc;
         }
 
         return $results;
     }
 
-    /**
-     * @param \ReflectionClass<object> $refl
-     */
     private function readSlicingRules(
-        \ReflectionClass $refl,
+        object $subject,
         string $property,
         string $activeGroup,
     ): ?FHIRSlicingRules {
-        foreach ($refl->getAttributes(FHIRSlicingRules::class) as $attr) {
-            /** @var FHIRSlicingRules $rules */
-            $rules = $attr->newInstance();
+        // Ancestors too, for the same reason as collectSliceConstraints(): an inherited slice brings
+        // its inherited slicing rules with it, and losing them turns closed slicing into open.
+        foreach ($this->attributes->classAttributesInHierarchy($subject, FHIRSlicingRules::class) as $rules) {
             if ($rules->property !== $property) {
                 continue;
             }
+
             if ($rules->groups !== [] && !in_array($activeGroup, $rules->groups, true)) {
                 continue;
             }

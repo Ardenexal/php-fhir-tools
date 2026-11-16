@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Specific benefits under this type of coverage.
@@ -30,7 +31,7 @@ class InsurancePlanCoverageBenefit extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Type of benefit */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), Valid, NotBlank]
         public ?CodeableConcept $type = null,
         /** @var StringPrimitive|string|null requirement Referral requirements */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -42,6 +43,7 @@ class InsurancePlanCoverageBenefit extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\InsurancePlan\InsurancePlanCoverageBenefitLimit',
         )]
+        #[Valid]
         public array $limit = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

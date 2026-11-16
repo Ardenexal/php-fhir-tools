@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\DaysOfWeekType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive;
 
 /**
@@ -36,11 +37,15 @@ class HealthcareServiceAvailableTime extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\DaysOfWeekType',
         )]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.0.1', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.0.1',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4\Enum\DaysOfWeek',
+        )]
         public array $daysOfWeek = [],
-        /** @var bool|null allDay Always available? e.g. 24 hour service */
+        /** @var BooleanPrimitive|bool|null allDay Always available? e.g. 24 hour service */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $allDay = null,
+        public BooleanPrimitive|bool|null $allDay = null,
         /** @var TimePrimitive|null availableStartTime Opening time of day (ignored if allDay = true) */
         #[FhirProperty(fhirType: 'time', propertyKind: 'primitive')]
         public ?TimePrimitive $availableStartTime = null,

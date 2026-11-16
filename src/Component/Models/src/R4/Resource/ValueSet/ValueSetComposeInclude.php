@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Include one or more codes from a code system or other value set(s).
@@ -62,6 +63,7 @@ class ValueSetComposeInclude extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ValueSet\ValueSetComposeIncludeConcept',
         )]
+        #[Valid]
         public array $concept = [],
         /** @var array<ValueSetComposeIncludeFilter> filter Select codes/concepts by their properties (including relationships) */
         #[FhirProperty(
@@ -70,6 +72,7 @@ class ValueSetComposeInclude extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ValueSet\ValueSetComposeIncludeFilter',
         )]
+        #[Valid]
         public array $filter = [],
         /** @var array<CanonicalPrimitive> valueSet Select the contents included in this value set */
         #[FhirProperty(

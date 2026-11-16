@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: Clinical Impression Status
  * URL: http://hl7.org/fhir/ValueSet/clinicalimpression-status
  * Version: 4.3.0
  * Description: Codes that reflect the current state of a clinical impression within its overall lifecycle.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/clinicalimpression-status', version: '4.3.0')]
 enum ClinicalImpressionStatus: string
 {
     /** Preparation */

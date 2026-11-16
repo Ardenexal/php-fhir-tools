@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A single SOP instance within the series, e.g. an image, or presentation state.
@@ -37,6 +38,7 @@ class ImagingStudySeriesInstance extends BackboneElement
         public ?IdPrimitive $uid = null,
         /** @var Coding|null sopClass DICOM class type */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true)]
+        #[Valid]
         #[NotBlank]
         #[FHIRValueSetBinding(
             valueSetUrl: 'http://dicom.nema.org/medical/dicom/current/output/chtml/part04/sect_B.5.html#table_B.5-1',

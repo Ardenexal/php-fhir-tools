@@ -10,10 +10,15 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\BooleanPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DecimalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IntegerPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A property value for this concept.
@@ -34,7 +39,7 @@ class ValueSetExpansionContainsProperty extends BackboneElement
         /** @var CodePrimitive|null code Reference to ValueSet.expansion.property.code */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $code = null,
-        /** @var CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|null value Value of the property for this concept */
+        /** @var CodePrimitive|Coding|StringPrimitive|string|IntegerPrimitive|int|BooleanPrimitive|bool|DateTimePrimitive|DecimalPrimitive|null value Value of the property for this concept */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -70,8 +75,8 @@ class ValueSetExpansionContainsProperty extends BackboneElement
                 ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
             ],
         )]
-        #[NotBlank]
-        public CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|null $value = null,
+        #[NotNull]
+        public CodePrimitive|Coding|StringPrimitive|string|IntegerPrimitive|int|BooleanPrimitive|bool|DateTimePrimitive|DecimalPrimitive|null $value = null,
         /** @var array<ValueSetExpansionContainsPropertySubProperty> subProperty SubProperty value for the concept */
         #[FhirProperty(
             fhirType: 'BackboneElement',
@@ -79,6 +84,7 @@ class ValueSetExpansionContainsProperty extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ValueSet\ValueSetExpansionContainsPropertySubProperty',
         )]
+        #[Valid]
         public array $subProperty = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

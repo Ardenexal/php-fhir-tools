@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Sdc\Extract;
 
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProviderInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadata;
+use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProviderInterface;
 
 /**
  * Writes answer values into typed generated FHIR resources by canonical `definition` path, sourcing

@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactPoint;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\HumanName;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description Contact for the organization for a certain purpose.
@@ -32,10 +33,16 @@ class OrganizationContact extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null purpose The type of contact */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contactentity-type', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[Valid]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/contactentity-type',
+            strength: 'extensible',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\ContactEntityType',
+        )]
         public ?CodeableConcept $purpose = null,
         /** @var HumanName|null name A name associated with the contact */
-        #[FhirProperty(fhirType: 'HumanName', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'HumanName', propertyKind: 'complex'), Valid]
         public ?HumanName $name = null,
         /** @var array<ContactPoint> telecom Contact details (telephone, email, etc.)  for a contact */
         #[FhirProperty(
@@ -44,9 +51,10 @@ class OrganizationContact extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactPoint',
         )]
+        #[Valid]
         public array $telecom = [],
         /** @var Address|null address Visiting or postal addresses for the contact */
-        #[FhirProperty(fhirType: 'Address', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Address', propertyKind: 'complex'), Valid]
         public ?Address $address = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

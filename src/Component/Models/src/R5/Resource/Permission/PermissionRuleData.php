@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @description A description or definition of which activities are allowed to be done on the data.
@@ -36,6 +37,7 @@ class PermissionRuleData extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Permission\PermissionRuleDataResource',
         )]
+        #[Valid]
         public array $resource = [],
         /** @var array<Coding> security Security tag code on .meta.security */
         #[FhirProperty(
@@ -44,6 +46,7 @@ class PermissionRuleData extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
+        #[Valid]
         public array $security = [],
         /** @var array<Period> period Timeframe encompasing data create/update */
         #[FhirProperty(
@@ -52,9 +55,10 @@ class PermissionRuleData extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
         )]
+        #[Valid]
         public array $period = [],
         /** @var Expression|null expression Expression identifying the data */
-        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex'), Valid]
         public ?Expression $expression = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

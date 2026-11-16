@@ -1,5 +1,27 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 1,
-    "infoCount": 0
+    "infoCount": 0,
+    "java": {
+        "errorCount": 1,
+        "warningCount": 0,
+        "infoCount": 0,
+        "classification": "EQUAL",
+        "warningClassification": "ABOVE",
+        "errors": [
+            "Array cannot be empty - the property should not be present if it has no values"
+        ]
+    },
+    "outcome": {
+        "errors": {
+            "invariant:ele-1": [
+                "category[0] — All FHIR elements must have a @value or children"
+            ]
+        },
+        "warnings": {
+            "constraint:FHIRValueSetBinding": [
+                "content[0].attachment.contentType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
+            ]
+        }
+    }
 }

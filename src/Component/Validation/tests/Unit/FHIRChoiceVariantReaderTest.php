@@ -1,0 +1,181 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Validation\FHIRChoiceVariantReader;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
+/** Stand-in for a FHIR Quantity. */
+final class ReaderQuantityStub
+{
+    public function __construct(public ?string $value = null)
+    {
+    }
+}
+
+/** Stand-in for a FHIR CodeableConcept, so a variant can be present but of the wrong type. */
+final class ReaderConceptStub
+{
+    public function __construct(public ?string $text = null)
+    {
+    }
+}
+
+/** One repeat of a backbone element carrying its own choice. */
+final class ReaderComponentStub
+{
+    public function __construct(
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                ['fhirType' => 'Quantity', 'propertyKind' => 'complex', 'phpType' => ReaderQuantityStub::class, 'jsonKey' => 'valueQuantity'],
+            ],
+        )]
+        public ?ReaderQuantityStub $value = null,
+    ) {
+    }
+}
+
+/** Shaped like an Observation: a top-level choice plus a repeating backbone that carries one too. */
+final class ReaderObservationStub
+{
+    /** @param list<ReaderComponentStub> $component */
+    public function __construct(
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                ['fhirType' => 'Quantity', 'propertyKind' => 'complex', 'phpType' => ReaderQuantityStub::class, 'jsonKey' => 'valueQuantity'],
+                ['fhirType' => 'CodeableConcept', 'propertyKind' => 'complex', 'phpType' => ReaderConceptStub::class, 'jsonKey' => 'valueCodeableConcept'],
+            ],
+        )]
+        public ReaderQuantityStub|ReaderConceptStub|null $value = null,
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'complex', isArray: true)]
+        public array $component = [],
+    ) {
+    }
+}
+
+/** A choice whose boolean, integer and decimal variants are held as bare PHP scalars, as the models hold them. */
+final class ReaderScalarChoiceStub
+{
+    public function __construct(
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                ['fhirType' => 'Quantity', 'propertyKind' => 'complex', 'phpType' => ReaderQuantityStub::class, 'jsonKey' => 'valueQuantity'],
+                ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
+                ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'valueInteger'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
+            ],
+        )]
+        public ReaderQuantityStub|bool|int|string|null $value = null,
+    ) {
+    }
+}
+
+/**
+ * Covers reading element paths that name a choice variant, and the per-parent grouping that keeps
+ * cardinality on a repeating element from being judged against the flattened total.
+ */
+final class FHIRChoiceVariantReaderTest extends TestCase
+{
+    private FHIRChoiceVariantReader $reader;
+
+    protected function setUp(): void
+    {
+        $this->reader = new FHIRChoiceVariantReader(PropertyAccess::createPropertyAccessor());
+    }
+
+    /** A profile naming the concrete variant must reach the polymorphic property behind it. */
+    public function testAChoiceVariantResolvesToTheValueItHolds(): void
+    {
+        $observation = new ReaderObservationStub(value: new ReaderQuantityStub('120'));
+
+        self::assertSame([$observation->value], $this->reader->readGroups($observation, 'valueQuantity')[0]['occurrences']);
+    }
+
+    /** The property is populated, but with a different variant, so this one occurs zero times. */
+    public function testAVariantOfAnotherTypeCountsAsAbsent(): void
+    {
+        $observation = new ReaderObservationStub(value: new ReaderConceptStub('normal'));
+
+        self::assertSame([], $this->reader->readGroups($observation, 'valueQuantity')[0]['occurrences']);
+    }
+
+    public function testAnAbsentChoiceCountsAsZeroOccurrences(): void
+    {
+        self::assertSame([], $this->reader->readGroups(new ReaderObservationStub(), 'valueQuantity')[0]['occurrences']);
+    }
+
+    /**
+     * The regression this grouping exists for: a blood pressure has two components, each with one
+     * value. Flattened that reads as two values against a max of one, and a conforming document is
+     * reported as invalid.
+     */
+    public function testEachRepeatOfAParentGetsItsOwnOccurrenceList(): void
+    {
+        $observation = new ReaderObservationStub(component: [
+            new ReaderComponentStub(new ReaderQuantityStub('120')),
+            new ReaderComponentStub(new ReaderQuantityStub('80')),
+        ]);
+
+        $groups = $this->reader->readGroups($observation, 'component.valueQuantity');
+
+        self::assertCount(2, $groups);
+        self::assertCount(1, $groups[0]['occurrences']);
+        self::assertCount(1, $groups[1]['occurrences']);
+    }
+
+    /** No parent at all means an ancestor is absent, which is not the same as the element being absent. */
+    public function testAnAbsentAncestorYieldsNoGroupsRatherThanAnEmptyOne(): void
+    {
+        self::assertSame([], $this->reader->readGroups(new ReaderObservationStub(), 'component.valueQuantity'));
+    }
+
+    public function testTheChoiceMarkerFormResolvesToo(): void
+    {
+        $observation = new ReaderObservationStub(value: new ReaderQuantityStub('120'));
+
+        self::assertSame([$observation->value], $this->reader->readGroups($observation, 'value[x]')[0]['occurrences']);
+    }
+
+    /**
+     * Scalar variants carry a builtin phpType ('bool', 'int', and 'string' for a decimal), which `instanceof` never
+     * matches. A profile constraint on `valueBoolean` would read a held boolean as absent.
+     */
+    public function testAScalarVariantResolvesToTheScalarItHolds(): void
+    {
+        $choice = new ReaderScalarChoiceStub(value: true);
+
+        self::assertSame([true], $this->reader->readGroups($choice, 'valueBoolean')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups($choice, 'valueInteger')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups($choice, 'valueQuantity')[0]['occurrences']);
+    }
+
+    /** A decimal keeps its lexical form, so the models hold it as a string. */
+    public function testADecimalVariantResolvesToTheStringItHolds(): void
+    {
+        self::assertSame(['1.50'], $this->reader->readGroups(new ReaderScalarChoiceStub(value: '1.50'), 'valueDecimal')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups(new ReaderScalarChoiceStub(value: '1.50'), 'valueInteger')[0]['occurrences']);
+    }
+
+    /** The same reads against a generated model, so the stub cannot drift from the metadata the generator emits. */
+    public function testScalarVariantsResolveOnAGeneratedModel(): void
+    {
+        self::assertSame([true], $this->reader->readGroups(new Extension(url: 'http://example.org/b', value: true), 'valueBoolean')[0]['occurrences']);
+        self::assertSame([3], $this->reader->readGroups(new Extension(url: 'http://example.org/i', value: 3), 'valueInteger')[0]['occurrences']);
+        self::assertSame(['2'], $this->reader->readGroups(new Extension(url: 'http://example.org/d', value: '2'), 'valueDecimal')[0]['occurrences']);
+        self::assertSame([], $this->reader->readGroups(new Extension(url: 'http://example.org/d', value: '2'), 'valueInteger')[0]['occurrences']);
+    }
+}

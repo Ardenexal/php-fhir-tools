@@ -7,8 +7,72 @@ permissions:
     contents: read
     pull-requests: write
 jobs:
+    # Change detection for every job below. Deliberately a JOB rather than a workflow-level
+    # `paths:` filter, and it has to stay one. The "Protect Main" ruleset requires the individual
+    # `tests (...)`, `static-analysis (...)`, `style` and `recipe-validation` checks by name, and a
+    # required check belonging to a workflow that never ran stays *pending* forever — which blocks
+    # the pull request with nothing to click. A job skipped by an `if:` inside a workflow that DID
+    # run reports its status as success instead, which satisfies the requirement. GitHub documents
+    # exactly this split under "Handling skipped but required checks"; the whole design rests on it.
+    #
+    # Note that the two surfaces disagree on purpose: the check run reports success, while
+    # `needs.<job>.result` inside an expression reads `skipped`. That is why the fan-in gates below
+    # test for both 'success' and 'skipped' — they are reading the latter.
+    #
+    # For the same reason, never add, remove or rename a `matrix` key in this file: check names are
+    # the job id plus its matrix values, so `tests (unit)` would silently become `tests (unit, ...)`
+    # and all fourteen required checks would go missing at once.
+    changes:
+        # Named because package-integrity.yml has a `changes` job too, and two check runs
+        # sharing a name would be ambiguous if either were ever required.
+        name: Detect changed areas
+        runs-on: ubuntu-latest
+        outputs:
+            code: ${{ steps.classify.outputs.code }}
+            codegen: ${{ steps.classify.outputs.codegen }}
+            deps: ${{ steps.classify.outputs.deps }}
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Classify the changed paths
+                id: classify
+                env:
+                    GH_TOKEN: ${{ github.token }}
+                # An empty path list means "every area changed", and every failure here produces
+                # one. changed-paths.sh refuses to return a list it cannot prove complete, so a
+                # truncated page or the endpoint's silent 3000-file cap lands on running
+                # everything rather than on a list that is short by the one file that mattered.
+                #
+                # The classifier's fallback is written inline rather than by calling the script
+                # with --all, because a script that just failed is not a credible fallback for
+                # itself: the ways it dies (missing, not executable, CRLF, a syntax error) take
+                # both invocations with them. The consumers' `if:` conditions are the third layer
+                # — they test `!= 'false'`, so empty outputs run the job.
+                run: |
+                    if [ "${{ github.event_name }}" = 'pull_request' ]; then
+                      .github/scripts/changed-paths.sh \
+                        '${{ github.repository }}' '${{ github.event.number }}' \
+                        > changed-paths.txt || : > changed-paths.txt
+                      echo 'Changed paths:'
+                      sed 's/^/  /' changed-paths.txt
+                    else
+                      : > changed-paths.txt
+                    fi
+
+                    if ! .github/scripts/changed-areas.sh < changed-paths.txt > areas.txt; then
+                      echo 'change detection failed; treating every area as changed' >&2
+                      printf 'code=true\ncodegen=true\ndeps=true\npackages=true\n' > areas.txt
+                    fi
+
+                    tee -a "$GITHUB_OUTPUT" < areas.txt
+
     checks:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # composer audit reads the manifests and the advisory database, nothing else.
+        # `!= 'false'` rather than `== 'true'`: when the changes job fails its outputs are
+        # empty, and this has to run anyway. Every unknown resolves to running.
+        if: ${{ !cancelled() && needs.changes.outputs.deps != 'false' }}
         steps:
             -   uses: actions/checkout@v4
                 with:
@@ -36,6 +100,11 @@ jobs:
                 run: composer audit --abandoned=report
     style:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # Pint plus `composer validate --strict`.
+        # `!= 'false'` rather than `== 'true'`: when the changes job fails its outputs are
+        # empty, and this has to run anyway. Every unknown resolves to running.
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
         env:
             XDEBUG_MODE: off
             COMPOSER_NO_INTERACTION: 1
@@ -70,11 +139,37 @@ jobs:
             -   name: Check code style (Pint)
                 run: composer run lint -- --test
 
+            # Runs here rather than in the `changes` job on purpose. A failure in that job would
+            # skip everything downstream, and a skipped required check reads as success — so the
+            # one place these tests must not run is the job whose logic they cover.
+            -   name: Test the CI change detection
+                run: .github/scripts/changed-areas-test.sh
+
     static-analysis:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # This job MUST run even when it has nothing to do, which is why there is no
+        # `outputs.code` test here and why the work is gated per step instead.
+        #
+        # `tests` and `static-analysis` are the two jobs whose individual matrix legs the
+        # "Protect Main" ruleset requires by name (7 suites + 5 components = 12 of the 14
+        # required checks). GitHub skips a matrixed job at the top level, BEFORE the matrix is
+        # expanded, so a skipped `tests` publishes exactly one check run called `tests` and
+        # `tests (unit)` and its siblings are never created at all — they sit at "Expected"
+        # forever and the pull request cannot be merged. Verified on this repository:
+        # commit 0682460f skipped `fhir-generation-test` and produced a single bare
+        # `fhir-generation-test` check run, no `(R4)`/`(R4B)`/`(R5)`.
+        #
+        # The documented "a skipped job reports success" behaviour holds only for a job with no
+        # matrix. So the job runs, publishes its legs, and does nothing inside them.
+        if: ${{ !cancelled() }}
         env:
             XDEBUG_MODE: off
             COMPOSER_NO_INTERACTION: 1
+            # Every step below tests this. Gated as a whole rather than per component because
+            # phpstan:bundle analyses code that imports the other components, so a per-leg
+            # filter would report green over an unanalysed break.
+            RUN_WORK: ${{ needs.changes.outputs.code != 'false' }}
         strategy:
             fail-fast: false
             matrix:
@@ -82,17 +177,20 @@ jobs:
 
         steps:
             -   uses: actions/checkout@v4
+                if: env.RUN_WORK == 'true'
                 with:
                     # Fetch full history for better diff analysis
                     fetch-depth: 0
 
             -   name: Setup PHP
+                if: env.RUN_WORK == 'true'
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.3'
                     extensions: ctype, iconv, zip
 
             -   name: Cache Composer packages
+                if: env.RUN_WORK == 'true'
                 id: composer-cache
                 uses: actions/cache@v4
                 with:
@@ -102,16 +200,38 @@ jobs:
                         ${{ runner.os }}-php-8.3-
 
             -   name: Install dependencies
+                if: env.RUN_WORK == 'true'
                 run: composer install --prefer-dist --no-progress --no-suggest
 
             -   name: Run PHPStan static analysis
+                if: env.RUN_WORK == 'true'
                 run: composer run phpstan:${{ matrix.component }}
 
     tests:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # This job MUST run even when it has nothing to do, which is why there is no
+        # `outputs.code` test here and why the work is gated per step instead.
+        #
+        # `tests` and `static-analysis` are the two jobs whose individual matrix legs the
+        # "Protect Main" ruleset requires by name (7 suites + 5 components = 12 of the 14
+        # required checks). GitHub skips a matrixed job at the top level, BEFORE the matrix is
+        # expanded, so a skipped `tests` publishes exactly one check run called `tests` and
+        # `tests (unit)` and its siblings are never created at all — they sit at "Expected"
+        # forever and the pull request cannot be merged. Verified on this repository:
+        # commit 0682460f skipped `fhir-generation-test` and produced a single bare
+        # `fhir-generation-test` check run, no `(R4)`/`(R4B)`/`(R5)`.
+        #
+        # The documented "a skipped job reports success" behaviour holds only for a job with no
+        # matrix. So the job runs, publishes its legs, and does nothing inside them.
+        if: ${{ !cancelled() }}
         env:
             XDEBUG_MODE: coverage
             COMPOSER_NO_INTERACTION: 1
+            # Every step below tests this. Gated as a whole rather than per suite because the
+            # components are interdependent: a change in one suite's component can fail
+            # another's suite.
+            RUN_WORK: ${{ needs.changes.outputs.code != 'false' }}
         strategy:
             fail-fast: false
             matrix:
@@ -124,19 +244,24 @@ jobs:
                     -   suite: integration-validation
                     -   suite: fhirpath-spec
                         extra: --functional --max-batch-size=50
+                    -   suite: sdc-extract-spec
+                    -   suite: sdc-populate-spec
         steps:
             -   uses: actions/checkout@v4
+                if: env.RUN_WORK == 'true'
                 with:
                     # Fetch full history for better diff analysis
                     fetch-depth: 0
 
             -   name: Setup PHP
+                if: env.RUN_WORK == 'true'
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.3'
                     extensions: ctype, iconv, zip
 
             -   name: Cache Composer packages
+                if: env.RUN_WORK == 'true'
                 id: composer-cache
                 uses: actions/cache@v4
                 with:
@@ -146,13 +271,21 @@ jobs:
                         ${{ runner.os }}-php-8.3-
 
             -   name: Install dependencies
+                if: env.RUN_WORK == 'true'
                 run: composer install --prefer-dist --no-progress --no-suggest
 
+            # Only the integration-codegen suite reaches OperationFixturesMatchPackagesTest; see the
+            # action for why the packages are required rather than optional.
+            -   name: FHIR core packages
+                if: ${{ env.RUN_WORK == 'true' && matrix.suite == 'integration-codegen' }}
+                uses: ./.github/actions/fhir-core-packages
+
             -   name: Run ${{ matrix.suite }} tests
+                if: env.RUN_WORK == 'true'
                 run: php ./vendor/bin/paratest --testsuite=${{ matrix.suite }} ${{ matrix.extra }} --log-junit=./results/${{ matrix.suite }}-tests.xml --coverage-clover ./results/${{ matrix.suite }}-coverage.xml
 
             -   name: Upload test results to Codecov
-                if: ${{ !cancelled() }}
+                if: ${{ env.RUN_WORK == 'true' && (!cancelled()) }}
                 uses: codecov/codecov-action@v5
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
@@ -167,14 +300,126 @@ jobs:
         if: ${{ always() }}
         steps:
             -   name: Check test matrix result
+                # Strict again. `tests` is no longer gated at job level — it always runs and
+                # skips its own steps — so a skip here is not change detection doing its job,
+                # it is the matrix never having started.
                 run: |
-                    if [ "${{ needs.tests.result }}" != "success" ]; then
-                      echo "Test matrix result: ${{ needs.tests.result }}"
+                    result='${{ needs.tests.result }}'
+                    if [ "$result" != 'success' ]; then
+                      echo "Test matrix result: $result"
                       exit 1
                     fi
 
+    # Exercises the LOWEST version of every symfony/* package ardenexal/fhir-code-generation
+    # constrains to ^6.4. Nothing did before, which is how the generator commands came to be written in
+    # Symfony's 7.3-only invokable style: Composer was satisfied, autoloading was satisfied, and
+    # PHPStan on a 7.x checkout saw nothing, because PHP does not resolve attribute classes until
+    # they are reflected. The commands still appeared in `list fhir` and only failed when a 6.4
+    # consumer invoked them ("You must override the execute() method" / "The \"--package\" option
+    # does not exist").
+    #
+    # The first version of this job pinned only symfony/console, which left the same class of bug
+    # live one layer down: symfony/string floated to 7.4 under its own ^6.4|^7.0 constraint, so
+    # the generators' AbstractString::pascal() calls (7.3+) resolved here while throwing "Call to
+    # undefined method" for every 6.4 consumer, on every StructureDefinition. A partial pin tests
+    # the lower bound of one package and the upper bound of the rest, so the harness now pins all
+    # of them and the assertion below covers each.
+    #
+    # This cannot run in the monorepo root or the demo app: brianium/paratest requires
+    # symfony/console ^7.4.7, and demo/composer.json pins every Symfony package to 7.4.*. Hence
+    # the standalone consumer install under tests/Compat/symfony-6.4.
+    symfony-lower-bound:
+        runs-on: ubuntu-latest
+        needs: [ changes ]
+        # `!= 'false'` rather than `== 'true'`: when the changes job fails its outputs are
+        # empty, and this has to run anyway. Every unknown resolves to running.
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
+        env:
+            COMPOSER_NO_INTERACTION: 1
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip, curl
+
+            -   name: Install the Symfony 6.4 consumer harness
+                run: composer install --working-dir=tests/Compat/symfony-6.4 --prefer-dist --no-progress
+
+            -   name: Assert Symfony 6.4 was actually installed
+                # Guards the guard: if any constraint resolves to 7.x the acceptance checks below
+                # would pass while testing that package's upper bound instead of its lower one.
+                run: |
+                    status=0
+                    for package in console dependency-injection filesystem finder http-client intl string validator; do
+                      version="$(composer show --working-dir=tests/Compat/symfony-6.4 --format=json "symfony/${package}" | php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];')"
+                      case "$version" in
+                        v6.4.*) echo "ok   symfony/${package} ${version}" ;;
+                        *) echo "FAIL symfony/${package} ${version} — expected a 6.4 release"; status=1 ;;
+                      esac
+                    done
+                    exit "$status"
+
+            # --with-generation runs real R4B and IG generations into the harness's own vendor
+            # sandbox. A parse-only check would prove the options register but not that the
+            # pipeline behind them works on 6.4, and untested-lower-bound is exactly the failure
+            # being fixed.
+            #
+            # The IG run is not redundant with the R4B one: it is the only thing that exercises
+            # the profile and extension generators. Note that the R4B run alone would have caught
+            # pascal() too, once symfony/string was actually pinned — the version pin above, not
+            # the extra invocation, is what closed that hole.
+            -   name: Run the Symfony 6.4 acceptance checks
+                run: tests/Compat/symfony-6.4/acceptance.sh --with-generation
+
+    # The other end of the range. Every other job in this workflow runs on PHP 8.3, which Symfony 8
+    # does not support, so without this the generators would only meet 8.1 after merging. PHP 8.4
+    # is Symfony 8's floor. Package Integrity's 8.4 and 8.5 legs cover the unit suite on 8.1.
+    symfony-upper-bound:
+        runs-on: ubuntu-latest
+        needs: [ changes ]
+        # `!= 'false'` rather than `== 'true'`: see symfony-lower-bound.
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
+        env:
+            COMPOSER_NO_INTERACTION: 1
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.4'
+                    extensions: ctype, iconv, zip, curl
+
+            -   name: Install the Symfony 8.1 consumer harness
+                run: composer install --working-dir=tests/Compat/symfony-8.1 --prefer-dist --no-progress
+
+            -   name: Assert Symfony 8.1 was actually installed
+                run: |
+                    status=0
+                    for package in console dependency-injection filesystem finder http-client intl string validator; do
+                      version="$(composer show --working-dir=tests/Compat/symfony-8.1 --format=json "symfony/${package}" | php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];')"
+                      case "$version" in
+                        v8.1.*) echo "ok   symfony/${package} ${version}" ;;
+                        *) echo "FAIL symfony/${package} ${version} — expected an 8.1 release"; status=1 ;;
+                      esac
+                    done
+                    exit "$status"
+
+            -   name: Run the Symfony 8.1 acceptance checks
+                run: tests/Compat/symfony-8.1/acceptance.sh --with-generation
+
     recipe-validation:
         runs-on: ubuntu-latest
+        needs: [ changes ]
+        # `code`, not a recipe/-only filter: test-recipe installs the bundle and runs a test
+        # suite against it, so any source change can fail it. recipe/ markdown counts as a
+        # source change — scripts/validate-recipe.php reads the recipe's own README.md.
+        # `!= 'false'` rather than `== 'true'`: when the changes job fails its outputs are
+        # empty, and this has to run anyway. Every unknown resolves to running.
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
         env:
             XDEBUG_MODE: coverage
         steps:
@@ -203,10 +448,38 @@ jobs:
 
     fhir-generation-test:
         runs-on: ubuntu-latest
-        needs: [ tests ]
+        needs: [ changes, tests ]
+        # Three full R4/R4B/R5 generations plus a drift check — by far the most expensive job here,
+        # and only reachable by changes to what `fhir:generate` consumes. See changed-areas.sh for
+        # how that set is derived; it is not "the CodeGeneration component" alone.
+        #
+        # Safe to gate at job level, unlike `tests` and `static-analysis`: none of this job's
+        # matrix legs is a required check, so nobody is waiting on a context it will not publish.
+        if: ${{ !cancelled() && needs.changes.outputs.codegen != 'false' }}
         permissions:
             pull-requests: write
             contents: read
+
+        # Previously R4B only, which left a real gap: the operation and model generators run over all
+        # three versions, but only R4B was ever re-derived in CI. R5 has the largest and most
+        # divergent surface (60 operations vs 47, plus nested subproperty groups R4/R4B lack), so an
+        # R4- or R5-only generator regression could merge green and surface later as a surprise diff.
+        # Legs are independent (fail-fast: false) so one version's failure still reports the others.
+        strategy:
+            fail-fast: false
+            matrix:
+                # Versions must match the `script` named on each leg. Unpinned, a leg generates from
+                # the package's latest release and reports drift against models built from the pin.
+                include:
+                    -   version: R4
+                        packages: --package=hl7.fhir.r4.core#4.0.1 --package=hl7.fhir.uv.extensions.r4#5.4.0
+                        script: generate-models-r4
+                    -   version: R4B
+                        packages: --package=hl7.fhir.r4b.core#4.3.0 --package=hl7.fhir.uv.extensions.r4b#5.4.0
+                        script: generate-models-r4b
+                    -   version: R5
+                        packages: --package=hl7.fhir.r5.core#5.0.0 --package=hl7.fhir.uv.extensions.r5#5.4.0
+                        script: generate-models-r5
 
         steps:
             -   uses: actions/checkout@v4
@@ -230,18 +503,17 @@ jobs:
                       echo "🧪 Testing FHIR Model Generation..."
                       echo "================================="
                       echo ""
-                      echo "📦 Regenerating R4B FHIR models (hl7.fhir.r4b.core + hl7.fhir.uv.extensions.r4b)..."
+                      echo "📦 Regenerating ${{ matrix.version }} FHIR models (${{ matrix.packages }})..."
                       echo ""
                     } >> fhir_output.txt
 
-                    # Regenerate the full R4B set so the git-drift check below is meaningful:
+                    # Regenerate the full per-version set so the git-drift check below is meaningful:
                     # generating only the core package would delete the extension models and
-                    # produce a spurious diff. Must match `composer run generate-models-r4b`.
+                    # produce a spurious diff. Must match `composer run ${{ matrix.script }}`.
                     start_time=$(date +%s)
 
-                    if timeout 540 php demo/bin/console fhir:generate \
-                        --package=hl7.fhir.r4b.core \
-                        --package=hl7.fhir.uv.extensions.r4b -v >> fhir_output.txt 2>&1; then
+                    if timeout 900 php demo/bin/console fhir:generate \
+                        ${{ matrix.packages }} -v >> fhir_output.txt 2>&1; then
                       end_time=$(date +%s)
                       execution_time=$((end_time - start_time))
 
@@ -250,8 +522,8 @@ jobs:
                         echo "✅ **FHIR Generation Successful!**"
                         echo "⏱️ Execution time: ${execution_time} seconds"
                         echo ""
-                        file_count=$(find src/Component/Models/src/R4B -name "*.php" | wc -l)
-                        echo "📁 Generated ${file_count} R4B PHP model files"
+                        file_count=$(find src/Component/Models/src/${{ matrix.version }} -name "*.php" | wc -l)
+                        echo "📁 Generated ${file_count} ${{ matrix.version }} PHP model files"
                       } >> fhir_output.txt
 
                       echo "FHIR_SUCCESS=true" >> "$GITHUB_OUTPUT"
@@ -262,7 +534,7 @@ jobs:
                       {
                         echo ""
                         echo "❌ **FHIR Generation Failed**"
-                        echo "⏱️ Execution time: ${execution_time} seconds (timed out at 540s)"
+                        echo "⏱️ Execution time: ${execution_time} seconds (timed out at 900s)"
                         echo ""
                         echo "Please check the error output above for details."
                       } >> fhir_output.txt
@@ -296,8 +568,8 @@ jobs:
                         echo ""
                         echo "❌ **Generated models are out of date**"
                         echo ""
-                        echo "Regenerating the R4B models produced changes that are not committed."
-                        echo "Run \`composer run generate-models-r4b\` locally and commit the result."
+                        echo "Regenerating the ${{ matrix.version }} models produced changes that are not committed."
+                        echo "Run \`composer run ${{ matrix.script }}\` locally and commit the result."
                         echo ""
                         echo "<details>"
                         echo "<summary>📝 git status</summary>"
@@ -336,8 +608,11 @@ jobs:
                     script: |
                         const fs = require('fs');
                         // Stable marker so we can update this PR's existing comment in place
-                        // instead of posting a fresh one on every commit.
-                        const MARKER = '<!-- fhir-model-generation-test -->';
+                        // instead of posting a fresh one on every commit. Scoped per FHIR version:
+                        // the three matrix legs run concurrently, and a shared marker would have
+                        // them race to update one comment, so the last writer would erase the other
+                        // two versions' results.
+                        const MARKER = '<!-- fhir-model-generation-test-${{ matrix.version }} -->';
 
                         let fhirOutput;
                         try {
@@ -358,7 +633,7 @@ jobs:
                           footer = '⚠️ The FHIR model generation encountered issues. Please review the output above and fix any problems before merging.';
                         } else if (drift) {
                           status = 'OUT OF DATE';
-                          footer = '⚠️ Regenerating the FHIR models produced uncommitted changes. Run `composer run generate-models-r4b` locally and commit the result before merging.';
+                          footer = '⚠️ Regenerating the FHIR models produced uncommitted changes. Run `composer run ${{ matrix.script }}` locally and commit the result before merging.';
                         } else {
                           status = 'SUCCESS';
                           footer = '🎉 The FHIR model generation completed successfully and the committed models are up to date.';
@@ -368,9 +643,9 @@ jobs:
                         // rendered markdown (leading spaces would otherwise become code blocks).
                         const commentBody = [
                           MARKER,
-                          `## ${emoji} FHIR Model Generation Test ${status}`,
+                          `## ${emoji} FHIR Model Generation Test — ${{ matrix.version }} — ${status}`,
                           '',
-                          'This automated test regenerates the R4B FHIR models and verifies that the generation functionality works correctly with the changes in this PR, then checks that the committed models are up to date.',
+                          'This automated test regenerates the ${{ matrix.version }} FHIR models and verifies that the generation functionality works correctly with the changes in this PR, then checks that the committed models are up to date.',
                           '',
                           '<details>',
                           '<summary>📋 Click to view detailed output</summary>',
@@ -418,15 +693,54 @@ jobs:
             -   name: Fail if generation failed or models are out of date
                 if: steps.fhir-test.outputs.FHIR_SUCCESS != 'true' || steps.model-drift.outputs.MODELS_DRIFT == 'true'
                 run: |
-                    echo "FHIR model generation check failed (success=${{ steps.fhir-test.outputs.FHIR_SUCCESS }}, drift=${{ steps.model-drift.outputs.MODELS_DRIFT }})."
+                    echo "FHIR model generation check failed for ${{ matrix.version }} (success=${{ steps.fhir-test.outputs.FHIR_SUCCESS }}, drift=${{ steps.model-drift.outputs.MODELS_DRIFT }})."
+                    exit 1
+
+    # Fan-in gate for branch protection, mirroring `tests-passed`. Matrixing the job above renamed
+    # its checks from `fhir-generation-test` to `fhir-generation-test (R4)` and friends, so a ruleset
+    # requiring the old single name would never be satisfied again. Require this instead — it also
+    # survives future changes to the version matrix.
+    fhir-generation-passed:
+        runs-on: ubuntu-latest
+        needs: [ changes, fhir-generation-test ]
+        if: ${{ always() }}
+        steps:
+            -   name: Check FHIR generation matrix result
+                # A skip only passes when change detection is what turned the matrix off. The job
+                # also skips when its `needs: tests` fails, which says nothing about generation —
+                # accepting that unconditionally would turn this gate green on a red run.
+                run: |
+                    result='${{ needs.fhir-generation-test.result }}'
+                    codegen='${{ needs.changes.outputs.codegen }}'
+                    echo "result: $result, codegen changed: ${codegen:-unknown}"
+
+                    if [ "$result" = 'success' ]; then
+                      exit 0
+                    fi
+
+                    if [ "$result" = 'skipped' ] && [ "$codegen" = 'false' ]; then
+                      echo 'Generation inputs unchanged; nothing to verify.'
+                      exit 0
+                    fi
+
+                    echo "FHIR generation matrix result: $result"
                     exit 1
 
     benchmarks:
         runs-on: ubuntu-latest
-        needs: [ tests ]
+        needs: [ changes, tests ]
+        # Needs its own gate now. It used to inherit one by depending on `tests`, but `tests` is
+        # no longer skippable — it always runs so its required legs get published — so without
+        # this a documentation-only pull request would run a full phpbench pass.
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
         permissions:
             pull-requests: write
             contents: read
+
+        env:
+            # Defined once: the threshold phpbench asserts on and the one the PR
+            # comment explains have to be the same number.
+            REGRESSION_MULTIPLIER: '1.50'
 
         steps:
             -   uses: actions/checkout@v4
@@ -452,19 +766,58 @@ jobs:
                 id: bench
                 run: |
                     mkdir -p results
-                    php ./vendor/bin/phpbench run bench/ --report=aggregate --no-interaction > results/benchmarks.txt 2>&1 || true
+                    php ./vendor/bin/phpbench run bench/ \
+                        --report=aggregate \
+                        --progress=plain \
+                        --dump-file=results/suite.xml \
+                        --no-interaction > results/benchmarks.txt 2>&1 || true
+
+            # Re-renders the run dumped above rather than benchmarking again, so the
+            # markdown table and the raw log describe the same measurements and the
+            # suite is only executed once.
+            -   name: Render benchmark summary as JSON
+                if: ${{ !cancelled() }}
+                run: |
+                    php ./vendor/bin/phpbench report \
+                        --file=results/suite.xml \
+                        --report=ci_summary \
+                        --output=json \
+                        --no-interaction > results/benchmarks.json || true
 
             -   name: Assert no regression against baseline
                 id: regression
                 if: hashFiles('.phpbench/**/*.xml') != ''
                 run: |
+                    # `|| exit_code=$?` rather than reading `$?` on the next line: steps run
+                    # under `bash -e`, so a non-zero phpbench exit aborted the script before
+                    # the output was ever written -- and an unset output compares unequal to
+                    # '0', which reported every crash as a performance regression.
+                    # `ci_compare` has to be rendered by this run, not from the dump above:
+                    # the expression generator reads a single suite, so the baseline_* columns
+                    # only resolve where `--ref` attached one. phpbench keeps stdout to the
+                    # JSON alone -- even when the assertion fails -- and puts its own errors on
+                    # stderr, so the two streams separate cleanly into data and diagnosis.
+                    exit_code=0
                     php ./vendor/bin/phpbench run bench/ \
-                        --report=benchmark_compare \
+                        --report=ci_compare \
+                        --output=json \
+                        --progress=none \
                         --ref=baseline \
-                        --assert="mode(variant.time.avg) < mode(baseline.time.avg) * 1.50" \
+                        --assert="mode(variant.time.avg) < mode(baseline.time.avg) * ${REGRESSION_MULTIPLIER}" \
                         --no-interaction \
-                        > results/regression.txt 2>&1
-                    echo "exit_code=$?" >> $GITHUB_OUTPUT
+                        > results/regression.json 2> results/regression-error.txt || exit_code=$?
+
+                    # phpbench exits 2 when an assertion fails, 1 when a subject threw or the
+                    # tool itself could not run. Only 2 is a verdict about performance.
+                    case "$exit_code" in
+                        0) status=passed ;;
+                        2) status=regressed ;;
+                        *) status=error ;;
+                    esac
+
+                    echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+                    echo "status=$status" >> "$GITHUB_OUTPUT"
+                    echo "phpbench exited ${exit_code} -> ${status}"
                 continue-on-error: true
 
             -   name: Comment PR with benchmark results
@@ -473,41 +826,64 @@ jobs:
                 with:
                     script: |
                         const fs = require('fs');
+                        // Body construction lives in a module so it can be run against a
+                        // recorded phpbench payload outside of CI.
+                        const { MARKER, buildBody } = require('${{ github.workspace }}/.github/scripts/benchmark-comment.js');
 
-                        let benchOutput = '';
-                        try {
-                            benchOutput = fs.readFileSync('results/benchmarks.txt', 'utf8');
-                        } catch (e) {
-                            benchOutput = 'Could not read benchmark output.';
-                        }
+                        const readOrNull = (path) => {
+                          try {
+                            return fs.readFileSync(path, 'utf8');
+                          } catch (error) {
+                            return null;
+                          }
+                        };
 
                         const baselineExists = '${{ hashFiles('.phpbench/**/*.xml') }}' !== '';
-                        let regressionSection = '';
+                        const commentBody = buildBody({
+                          summaryJson: readOrNull('results/benchmarks.json'),
+                          rawOutput: readOrNull('results/benchmarks.txt'),
+                          baselineExists,
+                          regressionStatus: '${{ steps.regression.outputs.status }}',
+                          regressionExitCode: '${{ steps.regression.outputs.exit_code }}',
+                          comparisonJson: baselineExists ? readOrNull('results/regression.json') : null,
+                          regressionError: baselineExists ? readOrNull('results/regression-error.txt') : null,
+                          regressionMultiplier: Number('${{ env.REGRESSION_MULTIPLIER }}'),
+                          runUrl: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+                        });
 
-                        if (baselineExists) {
-                            let regressionOutput = '';
-                            try {
-                                regressionOutput = fs.readFileSync('results/regression.txt', 'utf8');
-                            } catch (e) {
-                                regressionOutput = 'Could not read regression output.';
-                            }
-                            const passed = '${{ steps.regression.outputs.exit_code }}' === '0';
-                            const icon = passed ? '✅' : '❌';
-                            const label = passed ? 'Regression check passed' : 'Regression detected (>50% slower than baseline)';
-                            regressionSection = `\n### ${icon} ${label}\n\n<details>\n<summary>Comparison vs baseline</summary>\n\n\`\`\`\n${regressionOutput}\n\`\`\`\n</details>`;
+                        // Find this workflow's previous comment (by marker) and update it; else create one.
+                        const comments = await github.paginate(github.rest.issues.listComments, {
+                          issue_number: context.issue.number,
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          per_page: 100,
+                        });
+                        const prior = comments.find(
+                          (c) => c.user?.type === 'Bot' && c.body?.includes(MARKER),
+                        );
+
+                        if (prior) {
+                          await github.rest.issues.updateComment({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            comment_id: prior.id,
+                            body: commentBody,
+                          });
                         } else {
-                            regressionSection = '\n> No baseline stored yet. Run `composer bench:baseline` and commit `.phpbench/` to enable regression checks.';
-                        }
-
-                        const commentBody = `## Benchmark Results\n\n<details>\n<summary>Serialization + FHIRPath benchmarks</summary>\n\n\`\`\`\n${benchOutput}\n\`\`\`\n</details>\n${regressionSection}\n\n*Run \`composer bench\` locally for full results.*`;
-
-                        github.rest.issues.createComment({
+                          await github.rest.issues.createComment({
                             issue_number: context.issue.number,
                             owner: context.repo.owner,
                             repo: context.repo.repo,
-                            body: commentBody
-                        });
+                            body: commentBody,
+                          });
+                        }
 
-            -   name: Fail if regression detected
-                if: steps.regression.outputs.exit_code != '0' && hashFiles('.phpbench/**/*.xml') != ''
-                run: exit 1
+            -   name: Fail if the regression check did not pass
+                if: hashFiles('.phpbench/**/*.xml') != '' && steps.regression.outputs.status != 'passed'
+                run: |
+                    if [ "${{ steps.regression.outputs.status }}" = "regressed" ]; then
+                        echo "::error::Benchmarks are more than 50% slower than the stored baseline. See the comparison in the PR comment."
+                    else
+                        echo "::error::The regression check produced no verdict (phpbench exit ${{ steps.regression.outputs.exit_code }}). This is a harness failure, not a measured regression -- see the 'Assert no regression against baseline' step log."
+                    fi
+                    exit 1

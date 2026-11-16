@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetSource;
+
 /**
  * ValueSet: RequestResourceType
  * URL: http://hl7.org/fhir/ValueSet/request-resource-types
  * Version: 4.3.0
  * Description: A list of all the request resource types defined in this version of the FHIR specification.
  */
+#[FHIRValueSetSource(url: 'http://hl7.org/fhir/ValueSet/request-resource-types', version: '4.3.0')]
 enum RequestResourceType: string
 {
     /** Appointment */

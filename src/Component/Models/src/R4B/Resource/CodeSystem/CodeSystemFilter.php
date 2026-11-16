@@ -47,7 +47,11 @@ class CodeSystemFilter extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\FilterOperatorType',
         )]
         #[Count(min: 1)]
-        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/filter-operator|4.3.0', strength: 'required')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/filter-operator|4.3.0',
+            strength: 'required',
+            enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\FilterOperator',
+        )]
         public array $operator = [],
         /** @var StringPrimitive|string|null value What to use for the value */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

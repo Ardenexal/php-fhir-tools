@@ -930,7 +930,7 @@ final class ComparisonService
 
     private function readObjectProperty(object $value, string $property, bool $existsOnly = false): mixed
     {
-        if (property_exists($value, $property)) {
+        if (property_exists($value, $property) && self::isDirectlyReadable($value, $property)) {
             if ($existsOnly) {
                 return true;
             }
@@ -948,6 +948,38 @@ final class ComparisonService
         }
 
         return $existsOnly ? false : null;
+    }
+
+    /**
+     * Whether a declared property can actually be read off this instance.
+     *
+     * `property_exists()` answers "is it declared", not "can it be read". A typed property with no
+     * default that was never assigned is declared but **uninitialized**, and reading it raises
+     * `Error: Typed property ... must not be accessed before initialization` rather than returning
+     * null. Generated resources are full of these: `ObservationResource::$value` backs a `value[x]`
+     * choice and stays uninitialized whenever the instance carries no value, so probing an
+     * Observation for a Quantity shape used to kill the whole validation run.
+     *
+     * Returning false here falls through to the getter path, which is strictly better than throwing,
+     * and finally to "absent" — the correct answer for a property that holds nothing.
+     *
+     * Initialized-but-null is deliberately still "readable", so a property explicitly set to null
+     * keeps its existing meaning; only never-assigned properties change behaviour.
+     */
+    private static function isDirectlyReadable(object $value, string $property): bool
+    {
+        try {
+            $reflection = new \ReflectionProperty($value, $property);
+        } catch (\ReflectionException) {
+            // property_exists() was true, so this is a dynamic property — always readable.
+            return true;
+        }
+
+        if (!$reflection->isPublic() || $reflection->isStatic()) {
+            return false;
+        }
+
+        return $reflection->isInitialized($value);
     }
 
     /**
