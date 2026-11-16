@@ -19,7 +19,7 @@ flag plus an optional corrected display string).
 `FHIRTerminologyClientInterface` and `CodingValidationResult` live in `fhir-metadata`
 (`Ardenexal\FHIRTools\Component\Metadata\Contract\`). `HttpFHIRTerminologyClient`,
 `CachingFHIRTerminologyClient` and `HttpFHIRTerminologyClientFactory` ship in `fhir-http-client`
-(`composer require ardenexal/fhir-http-client`). The in-memory, null and preferred-server clients stay
+(`composer require ardenexal/fhir-http-client`). The in-memory, null and preferred-server clients ship
 in `fhir-validation`.
 
 | Class | Role |
