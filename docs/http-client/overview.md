@@ -108,15 +108,16 @@ $client = new FHIRHttpClient(
 ```
 
 A provider reuses its token until 60 seconds before the server's `expires_in`, then fetches a new
-one, so a client that lives longer than one token, such as a Messenger consumer, keeps working. Pass a
-PSR-20 clock as the provider's last argument to control the time it checks against.
+one, so a client that lives longer than one token, such as a Messenger consumer, keeps working. A token
+whose `expires_in` is 60 seconds or less is used for one request only. To control the time the provider
+checks against, pass a PSR-20 clock as its `clock` argument.
 
 When a server answers `401`, `OAuthHttpClient` drops the token and sends the request once more with a
 new one. A second `401` is returned as is. A body that cannot be sent twice, such as a stream, a
 generator or a form upload holding a stream, is not resent, but the token is still dropped so the next
-request gets a new one. Set body defaults through `OAuthHttpClient::withOptions()` rather than on the
-client it wraps, so it can tell. To read the status, `request()` waits for the response headers before
-it returns.
+request gets a new one. Set body defaults through `OAuthHttpClient::withOptions()`, not on the client it
+wraps: a default set on the wrapped client can't be seen, so its body is treated as safe to resend. To
+read the status, `request()` waits for the response headers before it returns.
 
 When a token cannot be fetched, the request fails like any other transport error, so the
 `FHIRHttpClient` method returns `null`. The error message never contains the client secret.
