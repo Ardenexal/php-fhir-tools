@@ -1,0 +1,23 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "meta": {
+    "lastUpdated": "2026-07-12T23:22:39.6890271+00:00"
+  },
+  "questionnaire": "http://example.org/Questionnaire/probe-coerce-quantity",
+  "status": "in-progress",
+  "item": [
+    {
+      "linkId": "q-qty",
+      "answer": [
+        {
+          "valueQuantity": {
+            "value": 72.5,
+            "unit": "kg",
+            "system": "http://unitsofmeasure.org",
+            "code": "kg"
+          }
+        }
+      ]
+    }
+  ]
+}

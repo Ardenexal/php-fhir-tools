@@ -1,0 +1,21 @@
+{
+    "resourceType": "QuestionnaireResponse",
+    "id": "definition-extract-basic-qr",
+    "questionnaire": "http://fhirtools.dev/Questionnaire/definition-extract-basic",
+    "status": "completed",
+    "item": [
+        {
+            "linkId": "patient",
+            "item": [
+                {
+                    "linkId": "name",
+                    "item": [
+                        { "linkId": "given", "answer": [ { "valueString": "Peter" }, { "valueString": "James" } ] },
+                        { "linkId": "family", "answer": [ { "valueString": "Chalmers" } ] }
+                    ]
+                },
+                { "linkId": "dob", "answer": [ { "valueDate": "1974-12-25" } ] }
+            ]
+        }
+    ]
+}

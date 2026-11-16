@@ -1,0 +1,37 @@
+{
+    "resourceType": "Questionnaire",
+    "id": "definition-extract-put",
+    "url": "http://fhirtools.dev/Questionnaire/definition-extract-put",
+    "status": "active",
+    "item": [
+        {
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract",
+                    "extension": [
+                        { "url": "definition", "valueCanonical": "http://hl7.org/fhir/StructureDefinition/Patient" }
+                    ]
+                }
+            ],
+            "linkId": "patient",
+            "text": "Patient",
+            "type": "group",
+            "item": [
+                {
+                    "extension": [
+                        { "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden", "valueBoolean": true }
+                    ],
+                    "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.id",
+                    "linkId": "patient-id",
+                    "text": "Existing Patient logical id (retained for update)",
+                    "type": "string"
+                },
+                {
+                    "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.family",
+                    "linkId": "family",
+                    "type": "string"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,26 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:d2e268a3-30d2-4d67-b7d8-1762a41fe28a",
+      "resource": {
+        "resourceType": "Patient",
+        "name": [
+          {
+            "family": "Chalmers",
+            "given": [
+              "Peter",
+              "James"
+            ]
+          }
+        ],
+        "birthDate": "1974-12-25"
+      },
+      "request": {
+        "method": "POST",
+        "url": "Patient"
+      }
+    }
+  ]
+}

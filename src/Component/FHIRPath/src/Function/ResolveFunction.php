@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleIndex;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -55,16 +56,24 @@ use Psr\Http\Message\RequestFactoryInterface;
  *
  *  2. Absolute URL (`https?://...`):
  *       a. Canonical URL (contains `|`, or `isCanonical=true`):
- *            Queries `{fhirServerUrl}/{refType}?url={url}&version={version}` as
- *            a FHIR search, then extracts `entry[0].resource`.
- *            Requires fhirServerUrl + httpClient + refType.
+ *            Queries `{refType}?url={url}&version={version}` via the configured
+ *            FHIRHttpClientInterface, then extracts `entry[0].resource`.
+ *            Requires fhirHttpClient + refType.
  *       b. Plain absolute URL:
- *            Fetches the URL directly via the HTTP client.
- *            Requires httpClient.
+ *            Fetches the URL directly via the raw PSR-18 HTTP client — a
+ *            FHIRHttpClientInterface implementation cannot be used here since
+ *            it is bound to one configured base URL, and this URL may name a
+ *            different host entirely.
+ *            Requires httpClient (PSR-18) + requestFactory (PSR-17).
+ *       c. Absolute URL without a raw PSR-18 client configured, but with a
+ *          type hint and a fhirHttpClient: falls back to the canonical-search
+ *          strategy (2a) — this only resolves the URL if it happens to share
+ *          fhirHttpClient's base URL and server-side canonical matching finds it.
  *
  *  3. Relative URL (`ResourceType/id`):
- *       Prepends the FHIR server URL and fetches.
- *       Requires fhirServerUrl + httpClient.
+ *       Fetched via the configured FHIRHttpClientInterface, which joins the
+ *       path onto its own configured base URL.
+ *       Requires fhirHttpClient.
  *       Only attempted when the URL starts with an uppercase letter (FHIR
  *       resource type convention), mirroring the JS `baseResourceTypes` check.
  *
@@ -73,8 +82,8 @@ use Psr\Http\Message\RequestFactoryInterface;
  *       contained resource with matching `id`.
  *
  * Configuration on FHIRPathEvaluator:
- *   $evaluator->setFhirServerUrl('https://r4.smarthealthit.org');
- *   $evaluator->setHttpClient($psr18Client, $psr17RequestFactory);
+ *   $evaluator->setFhirHttpClient($fhirHttpClient); // for relative + canonical resolution
+ *   $evaluator->setHttpClient($psr18Client, $psr17RequestFactory); // for absolute-URL resolution
  *
  * Does NOT depend on Models or CodeGeneration.
  *
@@ -115,7 +124,7 @@ final class ResolveFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not available in context', 0, 0);
         }
 
-        $fhirServerUrl  = $evaluator->getFhirServerUrl();
+        $fhirHttpClient = $evaluator->getFhirHttpClient();
         $httpClient     = $evaluator->getHttpClient();
         $requestFactory = $evaluator->getRequestFactory();
 
@@ -124,7 +133,7 @@ final class ResolveFunction extends AbstractFunction
         $resolved = [];
         $scopes   = [];
         foreach ($input as $index => $item) {
-            $match = $this->resolveItem($item, $input->scopeAt($index), $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
+            $match = $this->resolveItem($item, $input->scopeAt($index), $rootIndex, $context, $fhirHttpClient, $httpClient, $requestFactory);
             // Model objects are only ever read from `contained` and `Bundle.entry.resource`, which
             // hold nothing but resources.
             if ($match !== null && (is_object($match[0]) || isset($match[0]['resourceType']))) {
@@ -149,13 +158,13 @@ final class ResolveFunction extends AbstractFunction
      * @param BundleEntryScope|null        $scope          The Bundle entry the item was navigated out of
      * @param BundleIndex|null             $rootIndex      The root resource, when that is a Bundle
      * @param EvaluationContext            $context        Evaluation context (root resource, value normalisation)
-     * @param string|null                  $fhirServerUrl  Base FHIR server URL (may be null)
-     * @param ClientInterface|null         $httpClient     PSR-18 HTTP client (may be null)
+     * @param FHIRHttpClientInterface|null $fhirHttpClient FHIR HTTP client for relative/canonical resolution (may be null)
+     * @param ClientInterface|null         $httpClient     PSR-18 HTTP client for absolute-URL resolution (may be null)
      * @param RequestFactoryInterface|null $requestFactory PSR-17 request factory (may be null)
      *
      * @return ResolvedResource|null FHIR resource and the Bundle entry it was found in, or null if unresolvable
      */
-    private function resolveItem(mixed $item, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
+    private function resolveItem(mixed $item, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?FHIRHttpClientInterface $fhirHttpClient, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
     {
         // Sees through StringPrimitive/UriPrimitive (a plain reference string on a model) and
         // FHIRTypedCollection (a raw Reference reached through a polymorphic `value`).
@@ -165,7 +174,7 @@ final class ResolveFunction extends AbstractFunction
         if (is_array($item) && isset($item['reference']) && is_string($item['reference'])) {
             $refType = isset($item['type']) && is_string($item['type']) ? $item['type'] : null;
 
-            return $this->resolveUrl($item['reference'], false, $refType, $scope, $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
+            return $this->resolveUrl($item['reference'], false, $refType, $scope, $rootIndex, $context, $fhirHttpClient, $httpClient, $requestFactory);
         }
 
         if (is_object($item)) {
@@ -174,13 +183,13 @@ final class ResolveFunction extends AbstractFunction
                 $refType = $context->normalizeValue($this->getObjectProperty($item, 'type'));
                 $refType = is_string($refType) ? $refType : null;
 
-                return $this->resolveUrl($ref, false, $refType, $scope, $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
+                return $this->resolveUrl($ref, false, $refType, $scope, $rootIndex, $context, $fhirHttpClient, $httpClient, $requestFactory);
             }
         }
 
         // Plain string: uri, canonical, or System.String
         if (is_string($item)) {
-            return $this->resolveUrl($item, false, null, $scope, $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
+            return $this->resolveUrl($item, false, null, $scope, $rootIndex, $context, $fhirHttpClient, $httpClient, $requestFactory);
         }
 
         return null;
@@ -197,16 +206,16 @@ final class ResolveFunction extends AbstractFunction
      * @param BundleEntryScope|null        $scope          The Bundle entry the reference was navigated out of
      * @param BundleIndex|null             $rootIndex      The root resource, when that is a Bundle
      * @param EvaluationContext            $context        Evaluation context (root resource, value normalisation)
-     * @param string|null                  $fhirServerUrl  Base FHIR server URL
-     * @param ClientInterface|null         $httpClient     PSR-18 HTTP client
+     * @param FHIRHttpClientInterface|null $fhirHttpClient FHIR HTTP client for relative/canonical resolution
+     * @param ClientInterface|null         $httpClient     PSR-18 HTTP client for absolute-URL resolution
      * @param RequestFactoryInterface|null $requestFactory PSR-17 request factory
      *
      * @return ResolvedResource|null
      */
-    private function resolveUrl(string $url, bool $isCanonical, ?string $refType, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
+    private function resolveUrl(string $url, bool $isCanonical, ?string $refType, ?BundleEntryScope $scope, ?BundleIndex $rootIndex, EvaluationContext $context, ?FHIRHttpClientInterface $fhirHttpClient, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
     {
         if ($scope?->origins !== null) {
-            return $this->resolveInEveryOrigin($url, $isCanonical, $refType, $scope->origins, $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
+            return $this->resolveInEveryOrigin($url, $isCanonical, $refType, $scope->origins, $rootIndex, $context, $fhirHttpClient, $httpClient, $requestFactory);
         }
 
         // Split on first '#' to separate base URL from fragment (contained resource ID)
@@ -240,13 +249,13 @@ final class ResolveFunction extends AbstractFunction
             if (str_contains($baseUrl, '|') || $isCanonical) {
                 // Canonical URL: query FHIR server with ?url=...&version=...
                 if ($refType !== null) {
-                    $resource = $this->fetchCanonical($baseUrl, $refType, $fhirServerUrl, $httpClient, $requestFactory);
+                    $resource = $this->fetchCanonical($baseUrl, $refType, $fhirHttpClient);
                 }
             } elseif ($refType !== null && $httpClient !== null) {
                 // Absolute URL with known resource type: fetch directly, fall back to canonical
                 $resource = $this->fetch($baseUrl, $httpClient, $requestFactory);
                 if ($resource === null) {
-                    $resource = $this->fetchCanonical($baseUrl, $refType, $fhirServerUrl, $httpClient, $requestFactory);
+                    $resource = $this->fetchCanonical($baseUrl, $refType, $fhirHttpClient);
                 }
             } else {
                 // Absolute URL without type hint: fetch directly
@@ -257,8 +266,8 @@ final class ResolveFunction extends AbstractFunction
             // Only resolve relative URLs that look like FHIR resource references
             // (start with an uppercase letter — the FHIR ResourceType convention).
             // This mirrors the JS `ctx.model.type2Parent[type] in baseResourceTypes` check.
-            if (preg_match('/^[A-Z][A-Za-z]+\//', $baseUrl) === 1 && $fhirServerUrl !== null && $httpClient !== null) {
-                $resource = $this->fetch($fhirServerUrl . '/' . ltrim($baseUrl, '/'), $httpClient, $requestFactory);
+            if (preg_match('/^[A-Z][A-Za-z]+\//', $baseUrl) === 1 && $fhirHttpClient !== null) {
+                $resource = $this->fetchViaClient($baseUrl, $fhirHttpClient);
             }
         }
         // else: fragment-only URL — handled below
@@ -298,7 +307,7 @@ final class ResolveFunction extends AbstractFunction
      *
      * @return ResolvedResource|null
      */
-    private function resolveInEveryOrigin(string $url, bool $isCanonical, ?string $refType, array $origins, ?BundleIndex $rootIndex, EvaluationContext $context, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
+    private function resolveInEveryOrigin(string $url, bool $isCanonical, ?string $refType, array $origins, ?BundleIndex $rootIndex, EvaluationContext $context, ?FHIRHttpClientInterface $fhirHttpClient, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
     {
         $isAbsolute = preg_match(self::ABSOLUTE_REFERENCE, $url) === 1;
         $asked      = [];
@@ -312,7 +321,7 @@ final class ResolveFunction extends AbstractFunction
             }
             $asked[$key] = true;
 
-            $match = $this->resolveUrl($url, $isCanonical, $refType, $origin, $rootIndex, $context, $fhirServerUrl, $httpClient, $requestFactory);
+            $match = $this->resolveUrl($url, $isCanonical, $refType, $origin, $rootIndex, $context, $fhirHttpClient, $httpClient, $requestFactory);
             if ($match === null || ($resource !== null && $match[0] !== $resource)) {
                 return null;
             }
@@ -552,20 +561,19 @@ final class ResolveFunction extends AbstractFunction
      *
      * Mirrors the JS `requestResourceByCanonicalUrl()` function.
      *
-     * Builds the query `{fhirServerUrl}/{refType}?url={canonicalUrl}&version={version}`,
-     * fetches it (which returns a searchset Bundle), then extracts `entry[0].resource`.
+     * Builds the search path `{refType}?url={canonicalUrl}&version={version}` and dispatches it
+     * via the configured FHIRHttpClientInterface (which joins the path onto its own configured
+     * base URL), then extracts `entry[0].resource` from the returned searchset Bundle.
      *
      * @param string                       $url            Canonical URL, optionally with `|version` suffix
      * @param string                       $refType        FHIR resource type (e.g. 'ValueSet')
-     * @param string|null                  $fhirServerUrl  Base FHIR server URL
-     * @param ClientInterface|null         $httpClient     PSR-18 HTTP client
-     * @param RequestFactoryInterface|null $requestFactory PSR-17 request factory
+     * @param FHIRHttpClientInterface|null $fhirHttpClient FHIR HTTP client
      *
      * @return array<string,mixed>|null
      */
-    private function fetchCanonical(string $url, string $refType, ?string $fhirServerUrl, ?ClientInterface $httpClient, ?RequestFactoryInterface $requestFactory): ?array
+    private function fetchCanonical(string $url, string $refType, ?FHIRHttpClientInterface $fhirHttpClient): ?array
     {
-        if ($fhirServerUrl === null || $httpClient === null) {
+        if ($fhirHttpClient === null) {
             return null;
         }
 
@@ -582,8 +590,8 @@ final class ResolveFunction extends AbstractFunction
             $params['version'] = $version;
         }
 
-        $searchUrl = $fhirServerUrl . '/' . $refType . '?' . http_build_query($params);
-        $bundle    = $this->fetch($searchUrl, $httpClient, $requestFactory);
+        $searchPath = $refType . '?' . http_build_query($params);
+        $bundle     = $this->fetchViaClient($searchPath, $fhirHttpClient);
 
         // Extract the first entry resource from the searchset Bundle
         if (is_array($bundle) && isset($bundle['entry'][0]['resource']) && is_array($bundle['entry'][0]['resource'])) {
@@ -591,6 +599,26 @@ final class ResolveFunction extends AbstractFunction
         }
 
         return null;
+    }
+
+    /**
+     * Send a GET request via the configured FHIRHttpClientInterface and decode the JSON response body.
+     *
+     * Returns null on any transport/HTTP error (per FHIRHttpClientInterface's graceful-degradation
+     * contract) or a non-JSON-array body.
+     *
+     * @return array<string,mixed>|null
+     */
+    private function fetchViaClient(string $path, FHIRHttpClientInterface $fhirHttpClient): ?array
+    {
+        $body = $fhirHttpClient->request('GET', $path);
+        if ($body === null) {
+            return null;
+        }
+
+        $data = json_decode($body, true);
+
+        return is_array($data) ? $data : null;
     }
 
     /**

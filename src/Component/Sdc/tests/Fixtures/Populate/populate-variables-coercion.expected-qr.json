@@ -1,0 +1,42 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "meta": {
+    "lastUpdated": "2026-07-12T23:08:46.994726+00:00"
+  },
+  "questionnaire": "http://example.org/Questionnaire/probe-var-coerce",
+  "status": "in-progress",
+  "item": [
+    {
+      "linkId": "q-given",
+      "answer": [
+        {
+          "valueString": "Peter"
+        }
+      ]
+    },
+    {
+      "linkId": "q-bd",
+      "answer": [
+        {
+          "valueDate": "1974-12-25"
+        }
+      ]
+    },
+    {
+      "linkId": "q-active",
+      "answer": [
+        {
+          "valueBoolean": true
+        }
+      ]
+    },
+    {
+      "linkId": "q-count",
+      "answer": [
+        {
+          "valueInteger": 2
+        }
+      ]
+    }
+  ]
+}

@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDate;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDateTime;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
@@ -159,25 +160,28 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private ?LoggerInterface $logger = null;
 
     /**
-     * Base FHIR server URL used by resolve() for relative and canonical references.
-     * e.g. "https://r4.smarthealthit.org"
+     * Shared FHIR HTTP client used by resolve() for relative (`Type/id`) and canonical-search
+     * references against the configured FHIR server.
      */
-    private ?string $fhirServerUrl = null;
+    private ?FHIRHttpClientInterface $fhirHttpClient = null;
 
     /**
-     * Terminology server URL used by memberOf() to call ValueSet/$validate-code.
-     * Falls back to fhirServerUrl when not explicitly set.
-     * e.g. "https://tx.fhir.org/r4"
+     * Shared FHIR HTTP client used by memberOf() to call ValueSet/$validate-code against a
+     * terminology server. Falls back to fhirHttpClient when not explicitly set (mirrors a
+     * single server serving both roles).
      */
-    private ?string $terminologyUrl = null;
+    private ?FHIRHttpClientInterface $terminologyHttpClient = null;
 
     /**
-     * PSR-18 HTTP client used by resolve() to fetch remote FHIR resources.
+     * PSR-18 HTTP client used by resolve() to fetch a reference's own absolute URL directly.
+     * Distinct from fhirHttpClient/terminologyHttpClient, which are bound to one configured
+     * base URL: an absolute reference may point at a different host entirely, which a
+     * base-URL-bound FHIRHttpClientInterface implementation cannot express.
      */
     private ?ClientInterface $httpClient = null;
 
     /**
-     * PSR-17 request factory used by resolve() to build GET requests.
+     * PSR-17 request factory used alongside httpClient to build GET requests.
      * Must be provided together with the HTTP client.
      */
     private ?RequestFactoryInterface $requestFactory = null;
@@ -220,47 +224,44 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
-     * Set the base FHIR server URL used by resolve() when resolving relative
-     * references (e.g. "Patient/123") and canonical search queries.
-     *
-     * Must not have a trailing slash — e.g. "https://r4.smarthealthit.org".
+     * Set the shared FHIR HTTP client used by resolve() for relative (`Type/id`) and
+     * canonical-search references against the configured FHIR server.
      */
-    public function setFhirServerUrl(string $url): void
+    public function setFhirHttpClient(FHIRHttpClientInterface $client): void
     {
-        $this->fhirServerUrl = rtrim($url, '/');
+        $this->fhirHttpClient = $client;
     }
 
     /**
-     * Return the configured FHIR server URL, or null if not set.
+     * Return the configured FHIR HTTP client, or null if not set.
      */
-    public function getFhirServerUrl(): ?string
+    public function getFhirHttpClient(): ?FHIRHttpClientInterface
     {
-        return $this->fhirServerUrl;
+        return $this->fhirHttpClient;
     }
 
     /**
-     * Set the terminology server URL used by memberOf() for ValueSet/$validate-code calls.
-     * When not set, memberOf() falls back to the fhirServerUrl.
-     *
-     * Must not have a trailing slash — e.g. "https://tx.fhir.org/r4".
+     * Set the FHIR HTTP client used by memberOf() for ValueSet/$validate-code calls.
+     * When not set, memberOf() falls back to the fhirHttpClient.
      */
-    public function setTerminologyUrl(string $url): void
+    public function setTerminologyHttpClient(FHIRHttpClientInterface $client): void
     {
-        $this->terminologyUrl = rtrim($url, '/');
+        $this->terminologyHttpClient = $client;
     }
 
     /**
-     * Return the terminology server URL.
-     * Falls back to fhirServerUrl if terminologyUrl was not explicitly set.
+     * Return the terminology HTTP client.
+     * Falls back to fhirHttpClient if terminologyHttpClient was not explicitly set.
      */
-    public function getTerminologyUrl(): ?string
+    public function getTerminologyHttpClient(): ?FHIRHttpClientInterface
     {
-        return $this->terminologyUrl ?? $this->fhirServerUrl;
+        return $this->terminologyHttpClient ?? $this->fhirHttpClient;
     }
 
     /**
-     * Set the PSR-18 HTTP client and PSR-17 request factory used by resolve()
-     * to fetch remote FHIR resources.
+     * Set the PSR-18 HTTP client and PSR-17 request factory used by resolve() to fetch a
+     * reference's own absolute URL directly (a host that may differ from fhirHttpClient's
+     * configured base URL).
      *
      * Both are required together: the factory creates GET requests, the client
      * sends them. Any PSR-18 compatible client works (Guzzle, Symfony HttpClient
@@ -933,33 +934,39 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      *   - FHIR R4 FHIRPath supplement: %resource, %rootResource, %sct, %loinc,
      *     %vs-<name>, %ext-<name>
      *
-     * %resource and %rootResource differ by exactly one level inside a contained
-     * resource: FHIR defines %resource as the resource containing the node and
-     * %rootResource as *that* resource's container. The evaluation context carries
-     * the container separately and only when there is one, so %rootResource falls
-     * back to %resource everywhere else — which is the spec's own equivalence for
-     * a node that is not inside a contained resource.
+     * %context is the evaluation focus. %resource is the resource containing the focus:
+     * normally the focus itself, but a caller can bind a distinct node with
+     * EvaluationContext::withResourceNode() (e.g. SDC evaluating a QuestionnaireResponse
+     * item as focus while %resource stays the QR).
      *
-     * %context is left resolving from the enclosing resource. That is not the
-     * spec's definition (it should be the constraint's context node) but it is
-     * pre-existing behaviour reachable from every variable-using invariant, so it
-     * is deliberately not changed here.
+     * %resource and %rootResource differ by exactly one level inside a contained
+     * resource: FHIR defines %rootResource as the container of %resource. The evaluation
+     * context carries the container separately and only when there is one, so
+     * %rootResource falls back to %resource everywhere else — which is the spec's own
+     * equivalence for a node that is not inside a contained resource.
      */
     private function resolveEnvironmentVariable(string $name): Collection|string|null
     {
-        // Node references
-        if ($name === 'rootResource') {
-            // The container, when the enclosing resource is contained; otherwise the
-            // enclosing resource itself.
-            $node = $this->context->getContainerResource() ?? $this->context->getRootResource();
+        // %context — the evaluation focus.
+        if ($name === 'context') {
+            $focus = $this->context->getRootResource();
 
-            return $node !== null ? Collection::single($node) : Collection::empty();
+            return $focus !== null ? Collection::single($focus) : Collection::empty();
         }
 
-        if ($name === 'context' || $name === 'resource') {
-            $root = $this->context->getRootResource();
+        // %resource — the bound resource node when one is set, otherwise the focus.
+        $resource = $this->context->getResourceNode() ?? $this->context->getRootResource();
 
-            return $root !== null ? Collection::single($root) : Collection::empty();
+        if ($name === 'resource') {
+            return $resource !== null ? Collection::single($resource) : Collection::empty();
+        }
+
+        // %rootResource — the container, when the enclosing resource is contained;
+        // otherwise the same node as %resource.
+        if ($name === 'rootResource') {
+            $node = $this->context->getContainerResource() ?? $resource;
+
+            return $node !== null ? Collection::single($node) : Collection::empty();
         }
 
         // Static URL constants

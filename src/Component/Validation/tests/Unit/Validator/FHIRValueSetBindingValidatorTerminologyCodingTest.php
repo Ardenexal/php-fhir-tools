@@ -9,10 +9,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
-use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
-use Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient;
+use Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Validation\InMemoryFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRValueSetBindingValidator;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -130,10 +131,10 @@ final class FHIRValueSetBindingValidatorTerminologyCodingTest extends Constraint
      */
     public function testRefusedRequestIsUncheckedNotAMembershipFailure(): void
     {
-        $this->useClient(new HttpFHIRTerminologyClient(
+        $this->useClient(new HttpFHIRTerminologyClient(new FHIRHttpClient(
             new MockHttpClient(static fn (): MockResponse => new MockResponse('{"resourceType":"OperationOutcome"}', ['http_code' => 500])),
             'https://tx.example.org/fhir',
-        ));
+        )));
 
         $this->validator->validate($this->coding(self::MEMBER, self::SNOMED), new FHIRValueSetBinding(self::VALUE_SET, 'required'));
 
@@ -148,7 +149,7 @@ final class FHIRValueSetBindingValidatorTerminologyCodingTest extends Constraint
     {
         $max = 'http://example.org/ValueSet/max';
 
-        $this->useClient(new HttpFHIRTerminologyClient(
+        $this->useClient(new HttpFHIRTerminologyClient(new FHIRHttpClient(
             new MockHttpClient(static function(string $method, string $url) use ($max): MockResponse {
                 parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
 
@@ -157,7 +158,7 @@ final class FHIRValueSetBindingValidatorTerminologyCodingTest extends Constraint
                     : new MockResponse('{"resourceType":"Parameters","parameter":[{"name":"result","valueBoolean":true}]}');
             }),
             'https://tx.example.org/fhir',
-        ));
+        )));
 
         $this->validator->validate(
             $this->coding(self::MEMBER, self::SNOMED),
@@ -201,7 +202,7 @@ final class FHIRValueSetBindingValidatorTerminologyCodingTest extends Constraint
             );
         });
 
-        return new HttpFHIRTerminologyClient($http, 'https://ontoserver.example.org/fhir');
+        return new HttpFHIRTerminologyClient(new FHIRHttpClient($http, 'https://ontoserver.example.org/fhir'));
     }
 
     private function snomedMemberOnly(): InMemoryFHIRTerminologyClient

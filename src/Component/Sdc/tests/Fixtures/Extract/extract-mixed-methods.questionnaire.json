@@ -1,0 +1,82 @@
+{
+    "resourceType": "Questionnaire",
+    "id": "extract-mixed-methods",
+    "status": "active",
+    "title": "Mixed-method extraction — one form exercising observation-, definition-, and template-based extraction",
+    "contained": [
+        {
+            "resourceType": "Observation",
+            "id": "noteObsTemplate",
+            "status": "final",
+            "code": {
+                "text": "Clinical note"
+            },
+            "valueString": "placeholder",
+            "_valueString": {
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-templateExtractValue",
+                        "valueString": "answer.value.first()"
+                    }
+                ]
+            }
+        }
+    ],
+    "item": [
+        {
+            "linkId": "weight",
+            "type": "quantity",
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
+                    "valueBoolean": true
+                }
+            ],
+            "code": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "29463-7"
+                }
+            ]
+        },
+        {
+            "linkId": "patient",
+            "type": "group",
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract",
+                    "extension": [
+                        {
+                            "url": "definition",
+                            "valueUri": "http://hl7.org/fhir/StructureDefinition/Patient"
+                        }
+                    ]
+                }
+            ],
+            "item": [
+                {
+                    "linkId": "family",
+                    "type": "string",
+                    "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.family"
+                }
+            ]
+        },
+        {
+            "linkId": "note",
+            "type": "string",
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-templateExtract",
+                    "extension": [
+                        {
+                            "url": "template",
+                            "valueReference": {
+                                "reference": "#noteObsTemplate"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

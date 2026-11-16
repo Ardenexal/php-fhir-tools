@@ -1,0 +1,14 @@
+{
+    "resourceType": "QuestionnaireResponse",
+    "id": "defnvalue-probe-qr",
+    "questionnaire": "http://fhirtools.dev/Questionnaire/defnvalue-probe",
+    "status": "completed",
+    "item": [
+        {
+            "linkId": "patient",
+            "item": [
+                { "linkId": "mrn", "answer": [ { "valueString": "12345" } ] }
+            ]
+        }
+    ]
+}

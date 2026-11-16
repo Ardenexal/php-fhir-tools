@@ -1,0 +1,11 @@
+{
+  "resourceType": "Patient",
+  "id": "pt",
+  "active": true,
+  "name": [
+    { "family": "Chalmers", "given": ["Peter", "James"] },
+    { "family": "Windsor", "given": ["Pete"] }
+  ],
+  "gender": "male",
+  "birthDate": "1974-12-25"
+}

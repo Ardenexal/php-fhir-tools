@@ -1,0 +1,28 @@
+{
+    "resourceType": "QuestionnaireResponse",
+    "id": "observation-extract-basic-qr",
+    "questionnaire": "http://fhirtools.dev/Questionnaire/observation-extract-basic",
+    "status": "completed",
+    "subject": {
+        "reference": "Patient/example"
+    },
+    "authored": "2026-07-09T10:00:00Z",
+    "author": {
+        "reference": "Practitioner/example"
+    },
+    "item": [
+        {
+            "linkId": "body-weight",
+            "answer": [
+                {
+                    "valueQuantity": {
+                        "value": 72.5,
+                        "unit": "kg",
+                        "system": "http://unitsofmeasure.org",
+                        "code": "kg"
+                    }
+                }
+            ]
+        }
+    ]
+}

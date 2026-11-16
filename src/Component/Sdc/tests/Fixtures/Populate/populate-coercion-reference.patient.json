@@ -1,0 +1,9 @@
+{
+  "resourceType": "Patient",
+  "id": "pt",
+  "active": true,
+  "gender": "male",
+  "name": [ { "family": "Chalmers", "given": ["Peter"] } ],
+  "birthDate": "1974-12-25",
+  "managingOrganization": { "reference": "Organization/org1", "display": "Good Health Clinic" }
+}

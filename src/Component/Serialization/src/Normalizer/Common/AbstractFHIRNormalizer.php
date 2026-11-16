@@ -314,7 +314,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             if (is_object($item) && $this->metadataExtractor->isPrimitiveType($item)) {
                 $primitiveResult = $this->normalizePrimitiveWithExtensions($item, 'json', $context, $fhirContext->includeExtensions);
                 if ($primitiveResult !== null) {
-                    $normalizedValues[$index] = $primitiveResult['value'];
+                    // An extension-only occurrence has no value key; FHIR JSON writes null in its slot.
+                    $normalizedValues[$index] = $primitiveResult['value'] ?? null;
                     if (isset($primitiveResult['extensions']) && $fhirContext->includeExtensions) {
                         $extensions[$index] = ['extension' => $primitiveResult['extensions']];
                         $hasExtensions      = true;

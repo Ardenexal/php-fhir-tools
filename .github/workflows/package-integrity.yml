@@ -92,6 +92,10 @@ jobs:
                         repo: fhir-code-generation
                     -   path: src/Component/Validation
                         repo: fhir-validation
+                    -   path: src/Component/HttpClient
+                        repo: fhir-http-client
+                    -   path: src/Component/Sdc
+                        repo: fhir-sdc
                     -   path: src/Component/CdaModels
                         repo: cda-sd-models
                     -   path: src/Bundle/FHIRBundle

@@ -1,0 +1,47 @@
+{
+    "resourceType": "Questionnaire",
+    "id": "definition-extract-basic",
+    "url": "http://fhirtools.dev/Questionnaire/definition-extract-basic",
+    "status": "active",
+    "item": [
+        {
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract",
+                    "extension": [
+                        { "url": "definition", "valueCanonical": "http://hl7.org/fhir/StructureDefinition/Patient" }
+                    ]
+                }
+            ],
+            "linkId": "patient",
+            "text": "Patient",
+            "type": "group",
+            "item": [
+                {
+                    "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+                    "linkId": "name",
+                    "text": "Name",
+                    "type": "group",
+                    "item": [
+                        {
+                            "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+                            "linkId": "given",
+                            "type": "string",
+                            "repeats": true
+                        },
+                        {
+                            "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.family",
+                            "linkId": "family",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+                    "linkId": "dob",
+                    "type": "date"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,65 @@
+{
+    "resourceType": "Questionnaire",
+    "id": "allocateid-probe",
+    "url": "http://fhirtools.dev/Questionnaire/allocateid-probe",
+    "status": "active",
+    "extension": [
+        {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId",
+            "valueString": "NewPatientId"
+        }
+    ],
+    "item": [
+        {
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract",
+                    "extension": [
+                        { "url": "definition", "valueCanonical": "http://hl7.org/fhir/StructureDefinition/Patient" },
+                        { "url": "fullUrl", "valueString": "%NewPatientId" }
+                    ]
+                }
+            ],
+            "linkId": "patient",
+            "text": "Patient",
+            "type": "group",
+            "item": [
+                {
+                    "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.family",
+                    "linkId": "patient-family",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract",
+                    "extension": [
+                        { "url": "definition", "valueCanonical": "http://hl7.org/fhir/StructureDefinition/RelatedPerson" }
+                    ]
+                },
+                {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue",
+                    "extension": [
+                        { "url": "definition", "valueUri": "http://hl7.org/fhir/StructureDefinition/RelatedPerson#RelatedPerson.patient.reference" },
+                        {
+                            "url": "expression",
+                            "valueExpression": { "language": "text/fhirpath", "expression": "%NewPatientId" }
+                        }
+                    ]
+                }
+            ],
+            "linkId": "contact",
+            "text": "Contact",
+            "type": "group",
+            "item": [
+                {
+                    "definition": "http://hl7.org/fhir/StructureDefinition/RelatedPerson#RelatedPerson.name.text",
+                    "linkId": "contact-name",
+                    "type": "string"
+                }
+            ]
+        }
+    ]
+}

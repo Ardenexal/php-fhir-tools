@@ -1,0 +1,22 @@
+{
+    "resourceType": "Bundle",
+    "type": "transaction",
+    "entry": [
+        {
+            "fullUrl": "urn:uuid:3ab6bebf-656f-4f5c-9d5d-927cf6421289",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "pat-42",
+                "name": [
+                    {
+                        "family": "Chalmers"
+                    }
+                ]
+            },
+            "request": {
+                "method": "PUT",
+                "url": "Patient/pat-42"
+            }
+        }
+    ]
+}

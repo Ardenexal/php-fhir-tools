@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface;
 
 /**
  * High-level service for FHIRPath expression evaluation.
@@ -36,14 +37,21 @@ class FHIRPathService
     /**
      * Create a new FHIRPath service.
      *
-     * @param ExpressionCacheInterface|null $cache Optional cache implementation (defaults to in-memory cache)
+     * @param ExpressionCacheInterface|null $cache          Optional cache implementation (defaults to in-memory cache)
+     * @param FHIRHttpClientInterface|null  $fhirHttpClient Optional FHIR HTTP client wired into the evaluator for
+     *                                                      resolve()/memberOf() (defaults to unconfigured — both
+     *                                                      functions then behave per their no-client fallback)
      */
-    public function __construct(?ExpressionCacheInterface $cache = null)
+    public function __construct(?ExpressionCacheInterface $cache = null, ?FHIRHttpClientInterface $fhirHttpClient = null)
     {
         $this->lexer     = new FHIRPathLexer();
         $this->parser    = new FHIRPathParser();
         $this->evaluator = new FHIRPathEvaluator();
         $this->cache     = $cache ?? new InMemoryExpressionCache();
+
+        if ($fhirHttpClient !== null) {
+            $this->evaluator->setFhirHttpClient($fhirHttpClient);
+        }
     }
 
     /**

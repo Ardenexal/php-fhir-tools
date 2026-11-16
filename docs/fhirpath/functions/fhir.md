@@ -26,21 +26,26 @@ registered in `FunctionRegistry` and implemented under
 Three functions need runtime configuration on the `FHIRPathEvaluator` before they
 return useful results:
 
-* **`resolve()`** — for references that cannot be answered locally, needs a FHIR
-  server URL and a PSR-18 HTTP client, and omits the reference when they are missing.
-  Fragment-only (`#id`) references resolve against `contained`, and references between
-  the entries of a Bundle resolve against those entries, without any HTTP setup.
-* **`memberOf()`** — requires a terminology URL (falls back to the FHIR server URL)
-  **and** a PSR-18 HTTP client / PSR-17 request factory; otherwise it throws.
+* **`resolve()`** — for references that cannot be answered locally, needs a FHIR HTTP
+  client (relative `Type/id` and canonical references) and a PSR-18 HTTP client with a
+  PSR-17 request factory (a reference's own absolute URL), and omits the reference when
+  the client it needs is missing. Fragment-only (`#id`) references resolve against
+  `contained`, and references between the entries of a Bundle resolve against those
+  entries, without any HTTP setup.
+* **`memberOf()`** — requires a terminology FHIR HTTP client (falls back to the FHIR HTTP
+  client); otherwise it throws.
 * **`conformsTo()`** — requires a validator callback; profile validation has no
   universal HTTP pattern, so it delegates to your engine and throws when no
   callback is set.
 
+A FHIR HTTP client is any `Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface`,
+bound to one server's base URL.
+
 ```php
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 
-$evaluator->setFhirServerUrl('https://r4.smarthealthit.org');
-$evaluator->setTerminologyUrl('https://tx.fhir.org/r4');
+$evaluator->setFhirHttpClient($fhirHttpClient);             // e.g. bound to https://r4.smarthealthit.org
+$evaluator->setTerminologyHttpClient($terminologyHttpClient); // e.g. bound to https://tx.fhir.org/r4
 $evaluator->setHttpClient($psr18Client, $psr17RequestFactory);
 $evaluator->setConformsToValidator(
     fn (mixed $resource, string $url): bool => $myProfileEngine->validate($resource, $url),

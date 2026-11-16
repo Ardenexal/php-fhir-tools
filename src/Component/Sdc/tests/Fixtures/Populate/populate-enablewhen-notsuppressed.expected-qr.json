@@ -1,0 +1,26 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "meta": {
+    "lastUpdated": "2026-07-12T23:11:34.0816002+00:00"
+  },
+  "questionnaire": "http://example.org/Questionnaire/probe-enablewhen",
+  "status": "in-progress",
+  "item": [
+    {
+      "linkId": "trigger",
+      "answer": [
+        {
+          "valueBoolean": false
+        }
+      ]
+    },
+    {
+      "linkId": "dependent",
+      "answer": [
+        {
+          "valueString": "Peter"
+        }
+      ]
+    }
+  ]
+}

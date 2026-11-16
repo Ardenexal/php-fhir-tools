@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
@@ -138,8 +139,42 @@ final class ResolveBundleReferenceTest extends TestCase
             }
         };
 
-        $this->evaluator->setFhirServerUrl('https://server.example/fhir');
+        $this->evaluator->setFhirHttpClient($this->serverClient($client, $factory));
         $this->evaluator->setHttpClient($client, $factory);
+    }
+
+    /**
+     * A FHIR HTTP client bound to `https://server.example/fhir` that sends through the given PSR-18
+     * client and factory, so relative and canonical requests show up in $requested as absolute URLs.
+     */
+    private function serverClient(ClientInterface $client, RequestFactoryInterface $factory): FHIRHttpClientInterface
+    {
+        return new class ($client, $factory) implements FHIRHttpClientInterface {
+            public function __construct(private readonly ClientInterface $client, private readonly RequestFactoryInterface $factory)
+            {
+            }
+
+            public function search(string $search, string $fhirVersion): ?object
+            {
+                return null;
+            }
+
+            public function request(string $method, string $path, ?string $body = null, array $headers = []): ?string
+            {
+                try {
+                    $response = $this->client->sendRequest($this->factory->createRequest($method, 'https://server.example/fhir/' . ltrim($path, '/')));
+                } catch (ClientExceptionInterface) {
+                    return null;
+                }
+
+                return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300 ? (string) $response->getBody() : null;
+            }
+
+            public function followLink(string $url, string $fhirVersion): ?object
+            {
+                return null;
+            }
+        };
     }
 
     private function evaluate(string $expression, mixed $resource, ?EvaluationContext $context = null): Collection
@@ -999,7 +1034,7 @@ final class ResolveBundleReferenceTest extends TestCase
             }
         };
 
-        $this->evaluator->setFhirServerUrl('https://server.example/fhir');
+        $this->evaluator->setFhirHttpClient($this->serverClient($client, $factory));
         $this->evaluator->setHttpClient($client, $factory);
     }
 

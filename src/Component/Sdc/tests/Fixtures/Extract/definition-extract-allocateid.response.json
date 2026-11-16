@@ -1,0 +1,20 @@
+{
+    "resourceType": "QuestionnaireResponse",
+    "id": "allocateid-probe-qr",
+    "questionnaire": "http://fhirtools.dev/Questionnaire/allocateid-probe",
+    "status": "completed",
+    "item": [
+        {
+            "linkId": "patient",
+            "item": [
+                { "linkId": "patient-family", "answer": [ { "valueString": "Chalmers" } ] }
+            ]
+        },
+        {
+            "linkId": "contact",
+            "item": [
+                { "linkId": "contact-name", "answer": [ { "valueString": "Jane Doe" } ] }
+            ]
+        }
+    ]
+}

@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -23,8 +24,8 @@ use Psr\Http\Message\UriInterface;
  * resolve() resolves Reference.reference or URI strings to FHIR resources.
  * Resolution strategies:
  *  1. Fragment-only (#id)     → searches rootResource.contained
- *  2. Absolute URL (https://) → fetched via PSR-18 HTTP client
- *  3. Relative URL (Type/id)  → prepends fhirServerUrl, fetched via PSR-18 HTTP client
+ *  2. Absolute URL (https://) → fetched via a raw PSR-18 HTTP client (may point at any host)
+ *  3. Relative URL (Type/id)  → fetched via the configured FHIRHttpClientInterface
  *
  * @author FHIR Tools Contributors
  */
@@ -54,6 +55,27 @@ final class ResolveFunctionTest extends TestCase
         $ast    = $this->parser->parse($tokens);
 
         return $this->evaluator->evaluate($ast, $resource);
+    }
+
+    /**
+     * Build a FHIRHttpClientInterface stub backed by a server-relative-path→body map.
+     *
+     * The $pathMap keys are exact paths passed to request() (no base URL). A missing path
+     * or a null value returns null, mirroring the interface's graceful-degradation contract.
+     *
+     * @param array<string, array<string, mixed>|null> $pathMap
+     */
+    private function makeFhirHttpClient(array $pathMap): FHIRHttpClientInterface
+    {
+        $client = $this->createStub(FHIRHttpClientInterface::class);
+        $client->method('request')
+            ->willReturnCallback(function(string $method, string $path) use ($pathMap): ?string {
+                $body = $pathMap[$path] ?? null;
+
+                return $body !== null ? json_encode($body) : null;
+            });
+
+        return $client;
     }
 
     /**
@@ -170,16 +192,13 @@ final class ResolveFunctionTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // Relative URL resolution via fhirServerUrl + PSR-18 client
+    // Relative URL resolution via the configured FHIRHttpClientInterface
     // -------------------------------------------------------------------------
 
     public function testResolveRelativeUrl(): void
     {
-        $fetched            = ['resourceType' => 'Patient', 'id' => 'abc'];
-        [$client, $factory] = $this->makeHttpStack(['https://fhir.example.com/Patient/abc' => $fetched]);
-
-        $this->evaluator->setFhirServerUrl('https://fhir.example.com');
-        $this->evaluator->setHttpClient($client, $factory);
+        $fetched = ['resourceType' => 'Patient', 'id' => 'abc'];
+        $this->evaluator->setFhirHttpClient($this->makeFhirHttpClient(['Patient/abc' => $fetched]));
 
         $resource = ['reference' => ['reference' => 'Patient/abc']];
         $result   = $this->evaluate('reference.resolve()', $resource);
@@ -188,23 +207,9 @@ final class ResolveFunctionTest extends TestCase
         self::assertSame('Patient', $result->first()['resourceType']);
     }
 
-    public function testResolveRelativeUrlWithoutServerUrlReturnsEmpty(): void
+    public function testResolveRelativeUrlWithoutFhirHttpClientReturnsEmpty(): void
     {
-        // No fhirServerUrl configured — relative references cannot be resolved
-        [$client, $factory] = $this->makeHttpStack([]);
-        $this->evaluator->setHttpClient($client, $factory);
-
-        $resource = ['reference' => ['reference' => 'Patient/abc']];
-        $result   = $this->evaluate('reference.resolve()', $resource);
-
-        self::assertTrue($result->isEmpty());
-    }
-
-    public function testResolveRelativeUrlWithoutHttpClientReturnsEmpty(): void
-    {
-        $this->evaluator->setFhirServerUrl('https://fhir.example.com');
-        // No httpClient configured
-
+        // No fhirHttpClient configured — relative references cannot be resolved
         $resource = ['reference' => ['reference' => 'Patient/abc']];
         $result   = $this->evaluate('reference.resolve()', $resource);
 
@@ -214,9 +219,7 @@ final class ResolveFunctionTest extends TestCase
     public function testRelativeUrlMustStartWithUppercaseLetter(): void
     {
         // Lowercase-prefixed paths must NOT be treated as FHIR resource references
-        [$client, $factory] = $this->makeHttpStack([]);
-        $this->evaluator->setFhirServerUrl('https://fhir.example.com');
-        $this->evaluator->setHttpClient($client, $factory);
+        $this->evaluator->setFhirHttpClient($this->makeFhirHttpClient([]));
 
         $resource = ['ref' => ['reference' => 'urn:oid:1.2.3']];
         $result   = $this->evaluate('ref.resolve()', $resource);
@@ -265,11 +268,8 @@ final class ResolveFunctionTest extends TestCase
             ],
         ];
 
-        $searchUrl          = 'https://fhir.example.com/ValueSet?' . http_build_query(['url' => 'http://example.com/vs', 'version' => '1.0.0']);
-        [$client, $factory] = $this->makeHttpStack([$searchUrl => $bundle]);
-
-        $this->evaluator->setFhirServerUrl('https://fhir.example.com');
-        $this->evaluator->setHttpClient($client, $factory);
+        $searchPath = 'ValueSet?' . http_build_query(['url' => 'http://example.com/vs', 'version' => '1.0.0']);
+        $this->evaluator->setFhirHttpClient($this->makeFhirHttpClient([$searchPath => $bundle]));
 
         // Canonical URL with pipe-version separator triggers canonical search
         $resource = ['ref' => ['reference' => 'http://example.com/vs|1.0.0', 'type' => 'ValueSet']];
@@ -285,11 +285,8 @@ final class ResolveFunctionTest extends TestCase
 
     public function testResolveFromReferenceArrayWithReferenceKey(): void
     {
-        $fetched            = ['resourceType' => 'Practitioner', 'id' => 'p1'];
-        [$client, $factory] = $this->makeHttpStack(['https://fhir.example.com/Practitioner/p1' => $fetched]);
-
-        $this->evaluator->setFhirServerUrl('https://fhir.example.com');
-        $this->evaluator->setHttpClient($client, $factory);
+        $fetched = ['resourceType' => 'Practitioner', 'id' => 'p1'];
+        $this->evaluator->setFhirHttpClient($this->makeFhirHttpClient(['Practitioner/p1' => $fetched]));
 
         $result = $this->evaluate('$this.resolve()', ['reference' => 'Practitioner/p1']);
 
@@ -299,11 +296,8 @@ final class ResolveFunctionTest extends TestCase
 
     public function testResolveFromPlainStringInCollection(): void
     {
-        $fetched            = ['resourceType' => 'Patient', 'id' => '99'];
-        [$client, $factory] = $this->makeHttpStack(['https://fhir.example.com/Patient/99' => $fetched]);
-
-        $this->evaluator->setFhirServerUrl('https://fhir.example.com');
-        $this->evaluator->setHttpClient($client, $factory);
+        $fetched = ['resourceType' => 'Patient', 'id' => '99'];
+        $this->evaluator->setFhirHttpClient($this->makeFhirHttpClient(['Patient/99' => $fetched]));
 
         $resource = ['refString' => 'Patient/99'];
         $result   = $this->evaluate('refString.resolve()', $resource);
@@ -319,12 +313,9 @@ final class ResolveFunctionTest extends TestCase
     public function testResolveSilentlyOmitsResultsWithoutResourceType(): void
     {
         // HTTP client returns a payload without 'resourceType' → silently omitted
-        [$client, $factory] = $this->makeHttpStack([
-            'https://fhir.example.com/Patient/bad' => ['id' => 'bad', 'data' => []],
-        ]);
-
-        $this->evaluator->setFhirServerUrl('https://fhir.example.com');
-        $this->evaluator->setHttpClient($client, $factory);
+        $this->evaluator->setFhirHttpClient($this->makeFhirHttpClient([
+            'Patient/bad' => ['id' => 'bad', 'data' => []],
+        ]));
 
         $resource = ['ref' => ['reference' => 'Patient/bad']];
         $result   = $this->evaluate('ref.resolve()', $resource);

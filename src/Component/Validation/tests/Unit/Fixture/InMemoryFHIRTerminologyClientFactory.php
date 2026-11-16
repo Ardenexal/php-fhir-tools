@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture;
 
-use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientFactoryInterface;
-use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientFactoryInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\InMemoryFHIRTerminologyClient;
 
 /**

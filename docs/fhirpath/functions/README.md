@@ -26,5 +26,5 @@ The evaluator implements ~100 functions. They are grouped by category for naviga
 All functions listed across these pages are implemented in
 `src/Component/FHIRPath/src/Function/` and registered in `FunctionRegistry`. A few
 FHIR-specific functions (`resolve()`, `memberOf()`, `conformsTo()`) require runtime
-configuration (an HTTP client, terminology URL, or validator callback) before they
+configuration (an HTTP client, a terminology client, or a validator callback) before they
 return useful results — see [FHIR-Specific](fhir.md) for details.

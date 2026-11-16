@@ -1,0 +1,39 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:2ff8e244-a609-42d8-9947-4fa01b3a07c9",
+      "resource": {
+        "resourceType": "Patient",
+        "name": [
+          {
+            "family": "Chalmers"
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "Patient"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:7f1da65c-62e3-45be-b79c-b19b7996e94a",
+      "resource": {
+        "resourceType": "RelatedPerson",
+        "patient": {
+          "reference": "urn:uuid:2ff8e244-a609-42d8-9947-4fa01b3a07c9"
+        },
+        "name": [
+          {
+            "text": "Jane Doe"
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "RelatedPerson"
+      }
+    }
+  ]
+}

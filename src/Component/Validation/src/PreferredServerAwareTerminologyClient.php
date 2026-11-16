@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
+use Ardenexal\FHIRTools\Component\Metadata\Contract\CodingValidationResult;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
+
 /**
  * Delegates terminology calls to a list of preferred servers in declaration order, falling
  * back to a default client when the list is empty or all preferred servers throw. A definitive

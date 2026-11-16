@@ -6,7 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
 
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface;
-use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 
 /**

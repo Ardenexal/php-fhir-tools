@@ -1,0 +1,186 @@
+{
+  "resourceType": "Bundle",
+  "id": "sdc-template-extract-23e9a5f9e28d",
+  "meta": {
+    "tag": [
+      {
+        "code": "@aehrc/sdc-template-extract:generated",
+        "system": "urn:aehrc:sdc-template-extract"
+      }
+    ]
+  },
+  "type": "transaction",
+  "timestamp": "2026-07-11T09:57:41.165Z",
+  "entry": [
+    {
+      "fullUrl": "835102db-ccf7-48cd-8b13-b70ab36939ba",
+      "resource": {
+        "resourceType": "Patient",
+        "identifier": [
+          {
+            "type": {
+              "text": "National Identifier (IHI)"
+            },
+            "system": "http://example.org/nhio",
+            "value": "92304872038472"
+          }
+        ],
+        "name": [
+          {
+            "text": "Carlos Ramirez",
+            "family": "Ramirez",
+            "given": [
+              "Carlos"
+            ]
+          }
+        ],
+        "gender": "male",
+        "telecom": [
+          {
+            "use": "mobile",
+            "system": "phone",
+            "value": "109348180293810"
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "Patient"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5b6dba63-3b0e-4abe-b86a-90a7cc90ff3b",
+      "resource": {
+        "resourceType": "RelatedPerson",
+        "patient": {
+          "reference": "835102db-ccf7-48cd-8b13-b70ab36939ba"
+        },
+        "relationship": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0131",
+                "code": "CP",
+                "display": "Contact person"
+              }
+            ]
+          }
+        ],
+        "name": [
+          {
+            "text": "Alex"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "use": "mobile",
+            "value": "0427343456"
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "RelatedPerson"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e40991c8-650b-44a4-83d5-a4856161feb2",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2",
+              "display": "Body height"
+            }
+          ]
+        },
+        "effectiveDateTime": "1900-01-01",
+        "valueQuantity": {
+          "system": "http://unitsofmeasure.org",
+          "unit": "cm",
+          "code": "cm",
+          "value": 17300
+        },
+        "subject": "835102db-ccf7-48cd-8b13-b70ab36939ba"
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4721d33f-71ad-4434-a35d-9bfca0af99c5",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7",
+              "display": "Weight"
+            }
+          ]
+        },
+        "effectiveDateTime": "1900-01-01",
+        "valueQuantity": {
+          "system": "http://unitsofmeasure.org",
+          "unit": "kg",
+          "code": "kg",
+          "value": 110
+        },
+        "subject": "835102db-ccf7-48cd-8b13-b70ab36939ba"
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4bca070b-62b1-48e0-960f-9078e4262446",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/sdh/demo/CodeSystem/cc-screening-codes",
+              "code": "sigmoidoscopy-complication"
+            }
+          ]
+        },
+        "effectiveDateTime": "1900-01-01",
+        "subject": "835102db-ccf7-48cd-8b13-b70ab36939ba",
+        "valueBoolean": false
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation"
+      }
+    }
+  ]
+}
