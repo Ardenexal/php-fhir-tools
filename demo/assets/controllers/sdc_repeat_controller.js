@@ -4,7 +4,9 @@ import { Controller } from '@hotwired/stimulus';
  * "Add another" / "Remove" for repeating Questionnaire items and groups. No hidden `<template>` element
  * is used — the last rendered `[data-repeat-instance]` row for the target linkId is cloned directly
  * (its structure is already correct, including any nested repeat/enableWhen wiring), its form values are
- * cleared, and its index-bearing `name` attributes are bumped to the next free index.
+ * cleared, and its index-bearing `name` attributes are bumped to the next free index. Element `id`s in
+ * the clone get a per-index suffix, and `label[for]`/`aria-*` references inside the clone follow them, so
+ * the page never holds duplicate ids and each label still points at its own row's field.
  *
  * Indices are read from the DOM at add-time, not tracked in JS state, and are never re-numbered after a
  * remove — {@see \App\Sdc\QuestionnaireResponseBuilder} is deliberately sparse-index-tolerant (removing
@@ -63,6 +65,39 @@ export default class extends Controller {
 
         clone.querySelectorAll('[name]').forEach((field) => {
             field.setAttribute('name', field.getAttribute('name').replace(pattern, `$1[${newIndex}]`));
+        });
+
+        this.reindexIds(clone, newIndex);
+    }
+
+    /**
+     * Gives every id in the clone (including the clone root) a `-r<index>` suffix, replacing any suffix a
+     * previously cloned row carried, and rewrites the clone's `for`/`aria-*` references to match.
+     */
+    reindexIds(clone, newIndex) {
+        const renamed = new Map();
+        const withIds = [clone, ...clone.querySelectorAll('[id]')].filter((el) => el.hasAttribute('id'));
+
+        withIds.forEach((el) => {
+            const oldId = el.getAttribute('id');
+            const newId = `${oldId.replace(/-r\d+$/, '')}-r${newIndex}`;
+            renamed.set(oldId, newId);
+            el.setAttribute('id', newId);
+        });
+
+        if (renamed.size === 0) {
+            return;
+        }
+
+        const refAttributes = ['for', 'aria-labelledby', 'aria-describedby', 'aria-controls'];
+        [clone, ...clone.querySelectorAll('*')].forEach((el) => {
+            refAttributes.forEach((attr) => {
+                const value = el.getAttribute(attr);
+                if (value === null) {
+                    return;
+                }
+                el.setAttribute(attr, value.split(/\s+/).map((ref) => renamed.get(ref) ?? ref).join(' '));
+            });
         });
     }
 

@@ -201,8 +201,9 @@ final class QuestionnaireFormRenderer
 
     /**
      * Normalize a posted answers scope (for a group or leaf linkId) into a list of per-instance scopes:
-     * a repeating item's scope is already `index => instance` (iterated as posted — sparse/non-numeric
-     * keys survive intact); a non-repeating item's scope is wrapped as the single instance; an
+     * a repeating item's scope is already `index => instance` and is re-keyed to a list in posted order
+     * (sparse or non-numeric keys are dropped, the order is kept); a non-repeating item's scope is wrapped
+     * as the single instance; an
      * absent/empty scope yields exactly one blank instance so there is always a row to render.
      *
      * @return list<mixed>
