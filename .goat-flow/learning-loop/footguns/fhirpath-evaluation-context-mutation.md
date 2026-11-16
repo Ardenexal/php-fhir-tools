@@ -1,6 +1,6 @@
 ---
 category: fhirpath-evaluation-context-mutation
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-16
 ---
 
 # Footguns: FHIRPath EvaluationContext mutation
@@ -23,6 +23,7 @@ with `new EvaluationContext($root)`. Do not reuse a rootless context, and do not
 it expecting the latest focus.
 
 Related: `%context` and `%resource` resolve to `getRootResource()`, while `%rootResource` resolves to
-`getContainerResource() ?? getRootResource()`. Most `with*` methods rebuild the context field by field
-and drop `containerResource`, so `%rootResource` can fall back to the root inside a function call (read
-in the code, not exercised by a test).
+`getContainerResource() ?? getRootResource()`. Every `with*` method now clones the context (search:
+`function derive`), so derived contexts keep `containerResource`; a positional `new self(...)` there
+would drop it again, which `EvaluationContextTest::testEveryDerivedContextKeepsTheContainerResource`
+catches (#211).

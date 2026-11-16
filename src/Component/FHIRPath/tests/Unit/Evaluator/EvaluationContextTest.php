@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleEntryScope;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\BundleIndex;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -133,5 +134,49 @@ final class EvaluationContextTest extends TestCase
         self::assertSame($scope, $context->withVariable('name', 'value')->getBundleEntryScope());
         self::assertSame($scope, $context->withExternalConstant('name', 'value')->getBundleEntryScope());
         self::assertSame($scope, $context->withIterationVariables('item', 0, 1)->getBundleEntryScope());
+    }
+
+    /**
+     * `%rootResource` reads the container resource, so every derived context must carry it.
+     * Losing it makes `%rootResource` fall back to `%resource` inside a contained resource.
+     *
+     * @param \Closure(EvaluationContext): EvaluationContext $derive
+     */
+    #[DataProvider('provideDerivedContexts')]
+    public function testEveryDerivedContextKeepsTheContainerResource(\Closure $derive): void
+    {
+        $container = ['resourceType' => 'Patient', 'id' => 'outer'];
+        $context   = new EvaluationContext(rootResource: ['resourceType' => 'Organization'], containerResource: $container);
+
+        self::assertSame($container, $derive($context)->getContainerResource());
+    }
+
+    /**
+     * @return iterable<string, array{\Closure(EvaluationContext): EvaluationContext}>
+     */
+    public static function provideDerivedContexts(): iterable
+    {
+        yield 'withResourceNode' => [static fn (EvaluationContext $c): EvaluationContext => $c->withResourceNode('node')];
+        yield 'withCollectionInput' => [static fn (EvaluationContext $c): EvaluationContext => $c->withCollectionInput(Collection::empty())];
+        yield 'withFhirVersion' => [static fn (EvaluationContext $c): EvaluationContext => $c->withFhirVersion('R4')];
+        yield 'withStrictMode' => [static fn (EvaluationContext $c): EvaluationContext => $c->withStrictMode(true)];
+        yield 'withBundleEntryScope' => [static fn (EvaluationContext $c): EvaluationContext => $c->withBundleEntryScope(new BundleEntryScope(new BundleIndex('bundle'), 'entry', '0'))];
+        yield 'withCurrentNode' => [static fn (EvaluationContext $c): EvaluationContext => $c->withCurrentNode('node')];
+        yield 'withVariable' => [static fn (EvaluationContext $c): EvaluationContext => $c->withVariable('name', 'value')];
+        yield 'withoutVariable' => [static fn (EvaluationContext $c): EvaluationContext => $c->withoutVariable('name')];
+        yield 'withExternalConstant' => [static fn (EvaluationContext $c): EvaluationContext => $c->withExternalConstant('name', 'value')];
+        yield 'withIterationVariables' => [static fn (EvaluationContext $c): EvaluationContext => $c->withIterationVariables('item', 0, 1)];
+    }
+
+    public function testDerivedContextsDropThePendingCollectionInput(): void
+    {
+        // The collection input is consumed by one function call; only withCollectionInput() may set it.
+        $context = (new EvaluationContext())->withCollectionInput(Collection::empty());
+
+        self::assertNull($context->withCurrentNode('node')->getCollectionInput());
+        self::assertNull($context->withVariable('name', 'value')->getCollectionInput());
+        self::assertNull($context->withoutVariable('name')->getCollectionInput());
+        self::assertNull($context->withExternalConstant('name', 'value')->getCollectionInput());
+        self::assertNull($context->withIterationVariables('item', 0, 1)->getCollectionInput());
     }
 }

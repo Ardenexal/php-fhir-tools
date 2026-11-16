@@ -105,9 +105,9 @@ final class EvaluationContext
      * Return an immutable copy of this context with the given `%resource`/`%rootResource` node.
      *
      * Lets a caller evaluate an expression against a focus node (e.g. a QuestionnaireResponse item)
-     * while binding `%resource` to a different containing resource (the QR root). Cloning — rather than
-     * a positional `new self(...)` — keeps the node stable across the mutating `setRootResource()`
-     * that {@see FHIRPathEvaluator::evaluate()} applies when it installs the focus.
+     * while binding `%resource` to a different containing resource (the QR root). The node is kept
+     * separate from the root, so the mutating `setRootResource()` that
+     * {@see FHIRPathEvaluator::evaluate()} applies when it installs the focus does not replace it.
      */
     public function withResourceNode(mixed $node): self
     {
@@ -157,18 +157,10 @@ final class EvaluationContext
      */
     public function withCollectionInput(?Collection $input): self
     {
-        return new self(
-            $this->rootResource,
-            $this->currentNode,
-            $this->variables,
-            $this->externalConstants,
-            $this->evaluator,
-            $this->fhirVersion,
-            $input,
-            $this->strictMode,
-            bundleEntryScope: $this->bundleEntryScope,
-            resourceNode: $this->resourceNode,
-        );
+        $clone                  = clone $this;
+        $clone->collectionInput = $input;
+
+        return $clone;
     }
 
     /**
@@ -238,18 +230,10 @@ final class EvaluationContext
      */
     public function withCurrentNode(mixed $node): self
     {
-        return new self(
-            $this->rootResource,
-            $node,
-            $this->variables,
-            $this->externalConstants,
-            $this->evaluator,
-            $this->fhirVersion,
-            null,
-            $this->strictMode,
-            bundleEntryScope: $this->bundleEntryScope,
-            resourceNode: $this->resourceNode,
-        );
+        $clone              = $this->derive();
+        $clone->currentNode = $node;
+
+        return $clone;
     }
 
     /**
@@ -289,21 +273,10 @@ final class EvaluationContext
      */
     public function withVariable(string $name, mixed $value): self
     {
-        $variables        = $this->variables;
-        $variables[$name] = $value;
+        $clone                   = $this->derive();
+        $clone->variables[$name] = $value;
 
-        return new self(
-            $this->rootResource,
-            $this->currentNode,
-            $variables,
-            $this->externalConstants,
-            $this->evaluator,
-            $this->fhirVersion,
-            null,
-            $this->strictMode,
-            bundleEntryScope: $this->bundleEntryScope,
-            resourceNode: $this->resourceNode,
-        );
+        return $clone;
     }
 
     /**
@@ -314,21 +287,10 @@ final class EvaluationContext
      */
     public function withoutVariable(string $name): self
     {
-        $variables = $this->variables;
-        unset($variables[$name]);
+        $clone = $this->derive();
+        unset($clone->variables[$name]);
 
-        return new self(
-            $this->rootResource,
-            $this->currentNode,
-            $variables,
-            $this->externalConstants,
-            $this->evaluator,
-            $this->fhirVersion,
-            null,
-            $this->strictMode,
-            bundleEntryScope: $this->bundleEntryScope,
-            resourceNode: $this->resourceNode,
-        );
+        return $clone;
     }
 
     /**
@@ -360,21 +322,10 @@ final class EvaluationContext
      */
     public function withExternalConstant(string $name, mixed $value): self
     {
-        $externalConstants        = $this->externalConstants;
-        $externalConstants[$name] = $value;
+        $clone                           = $this->derive();
+        $clone->externalConstants[$name] = $value;
 
-        return new self(
-            $this->rootResource,
-            $this->currentNode,
-            $this->variables,
-            $externalConstants,
-            $this->evaluator,
-            $this->fhirVersion,
-            null,
-            $this->strictMode,
-            bundleEntryScope: $this->bundleEntryScope,
-            resourceNode: $this->resourceNode,
-        );
+        return $clone;
     }
 
     /**
@@ -382,22 +333,27 @@ final class EvaluationContext
      */
     public function withIterationVariables(mixed $item, int $index, int $total): self
     {
-        $variables          = $this->variables;
-        $variables['this']  = $item;
-        $variables['index'] = $index;
-        $variables['total'] = $total;
+        $clone                     = $this->derive();
+        $clone->currentNode        = $item;
+        $clone->variables['this']  = $item;
+        $clone->variables['index'] = $index;
+        $clone->variables['total'] = $total;
 
-        return new self(
-            $this->rootResource,
-            $item,
-            $variables,
-            $this->externalConstants,
-            $this->evaluator,
-            $this->fhirVersion,
-            null,
-            $this->strictMode,
-            bundleEntryScope: $this->bundleEntryScope,
-            resourceNode: $this->resourceNode,
-        );
+        return $clone;
+    }
+
+    /**
+     * Copy this context for a derived evaluation step, dropping the pending collection input.
+     *
+     * Cloning carries every other field, including `$containerResource` and `$resourceNode`, so a
+     * field added later cannot be lost by a `with*` method that forgets to pass it. The collection
+     * input is cleared because one function call consumes it; only withCollectionInput() sets it.
+     */
+    private function derive(): self
+    {
+        $clone                  = clone $this;
+        $clone->collectionInput = null;
+
+        return $clone;
     }
 }

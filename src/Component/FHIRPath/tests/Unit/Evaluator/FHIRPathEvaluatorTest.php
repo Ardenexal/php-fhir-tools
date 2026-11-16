@@ -164,6 +164,37 @@ final class FHIRPathEvaluatorTest extends TestCase
         self::assertSame($focus, $this->evaluateWith('%rootResource', $focus, $context)->first());
     }
 
+    /**
+     * Inside a contained resource `%rootResource` is the container. It must stay the container after
+     * binding an external constant and inside functions that evaluate their argument per item.
+     */
+    #[DataProvider('provideRootResourceInsideDerivedContexts')]
+    public function testRootResourceStaysTheContainerInsideAContainedResource(string $expression, mixed $expected, bool $withConstant): void
+    {
+        $container = ['resourceType' => 'Patient', 'id' => 'outer', 'contained' => [['resourceType' => 'Organization', 'id' => 'inner']]];
+        $contained = $container['contained'][0];
+        $context   = new EvaluationContext(rootResource: $contained, containerResource: $container);
+
+        if ($withConstant) {
+            $context = $context->withExternalConstant('launch', 'value');
+        }
+
+        self::assertSame($expected, $this->evaluateWith($expression, $contained, $context)->toArray());
+    }
+
+    /**
+     * @return iterable<string, array{string, mixed, bool}>
+     */
+    public static function provideRootResourceInsideDerivedContexts(): iterable
+    {
+        yield 'external constant bound' => ['%rootResource.id', ['outer'], true];
+        yield 'select()' => ['id.select(%rootResource.id)', ['outer'], false];
+        yield 'where()' => ["id.where(%rootResource.id = 'outer')", ['inner'], false];
+        yield 'exists()' => ["id.exists(%rootResource.id = 'outer')", [true], false];
+        yield 'all()' => ["id.all(%rootResource.id = 'outer')", [true], false];
+        yield 'iif()' => ['iif(true, %rootResource.id)', ['outer'], false];
+    }
+
     public function testEmptyPropagation(): void
     {
         $resource = [];
