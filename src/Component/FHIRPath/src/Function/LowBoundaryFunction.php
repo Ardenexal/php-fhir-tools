@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 
@@ -157,8 +158,12 @@ final class LowBoundaryFunction extends AbstractFunction
             return [(string) $value, 0];
         }
 
-        // float — use PHP string representation
-        $str    = (string) $value;
+        // float — use PHP string representation. A non-finite float renders as INF/NAN, which bcmath
+        // cannot take, so it is an evaluation error rather than a boundary.
+        $str = sprintf('%s', $value);
+        if (!is_numeric($str)) {
+            throw new EvaluationException(sprintf('Cannot compute the boundary of non-finite value %s', $str));
+        }
         $dotPos = strpos($str, '.');
         $prec   = $dotPos !== false ? strlen($str) - $dotPos - 1 : 0;
 
