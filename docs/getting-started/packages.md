@@ -15,6 +15,7 @@ This is a library monorepo. Each component is published as a standalone Composer
 | `ardenexal/fhir-validation` | Validate resources against base and profile constraints |
 | `ardenexal/fhir-path` | Evaluate FHIRPath 2.0 expressions |
 | `ardenexal/fhir-sdc` | Run SDC `$populate` (pre-fill a `QuestionnaireResponse` from launch context) and `$extract` (turn a completed `QuestionnaireResponse` into a transaction Bundle of FHIR resources) |
+| `ardenexal/fhir-http-client` | Call a FHIR server: typed search results, OAuth, `application/x-fhir-query` templates, and the HTTP terminology clients for binding validation |
 | `ardenexal/fhir-models` | Use the pre-generated R4 / R4B / R5 model classes |
 | `ardenexal/cda-sd-models` | Use the pre-generated CDA R2 and AU CDA logical-model classes (XML only) |
 | `ardenexal/fhir-metadata` | Read FHIR attributes, type and property metadata, or the IG type registry (a dependency of the others) |

@@ -61,6 +61,11 @@ wires everything for you.
       <td><a href="sdc/overview.md">SDC</a></td>
     </tr>
     <tr>
+      <td>FHIR server client, OAuth, and x-fhir-query templates</td>
+      <td><code>ardenexal/fhir-http-client</code></td>
+      <td><a href="http-client/overview.md">FHIR HTTP Client</a></td>
+    </tr>
+    <tr>
       <td>Symfony integration</td>
       <td><code>ardenexal/fhir-bundle</code></td>
       <td><a href="bundle/configuration.md">Symfony Bundle</a></td>

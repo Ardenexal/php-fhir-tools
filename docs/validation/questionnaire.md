@@ -102,6 +102,15 @@ and a string answer `'5'` are equal, and a quantity calculation such as `5 'mg'`
 `Quantity` answer by value and code. Because the comparison is exact, a decimal calculation
 should round to the precision the form stores (`(%weight / %height.power(2)).round(1)`).
 
+## Checks on the Questionnaire itself
+
+`FHIRValidationService` checks the item tree of any Questionnaire it validates, including one
+inside a Bundle entry or `contained`. No `FHIRQuestionnaireValidator` call is needed.
+
+| Rule | Severity |
+|---|---|
+| An item's `enableWhen.question` must not name one of that item's own descendants (`Questions with an enableWhen cannot refer to an inner question for its enableWhen condition`). A descendant can only be answered while the item is enabled, so the condition would depend on its own outcome | `error` |
+
 ## Derived Questionnaires
 
 A derived `Questionnaire` declares a base via `derivedFrom`. The rules applied depend on the

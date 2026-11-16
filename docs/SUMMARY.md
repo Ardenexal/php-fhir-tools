@@ -67,6 +67,10 @@
 
 * [Overview](sdc/overview.md)
 
+## FHIR HTTP Client
+
+* [Overview](http-client/overview.md)
+
 ## Symfony Bundle
 
 * [Install and Configure the Bundle](bundle/configuration.md)
