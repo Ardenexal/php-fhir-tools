@@ -27,7 +27,10 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  * expired early because of clock skew. A second 401 is returned to the caller as is. To see the status,
  * `request()` waits for the response headers before returning, so responses from this client are not
  * fully lazy. A request whose body cannot be sent twice (a stream, generator or closure, or a form
- * array holding a stream) is never retried, and its 401 is returned as is.
+ * array holding a stream) is not resent: its token is still dropped, so the next request gets a new
+ * one, and its 401 is returned as is. That includes a body given as a default through this client's
+ * `withOptions()`. A body default set on the inner client before it was wrapped cannot be seen here,
+ * so set body defaults through this client instead.
  */
 final class OAuthHttpClient implements HttpClientInterface
 {
@@ -37,6 +40,9 @@ final class OAuthHttpClient implements HttpClientInterface
     ) {
     }
 
+    /** False once a body default that cannot be sent twice has been set through {@see self::withOptions()}. */
+    private bool $defaultBodyReplayable = true;
+
     /**
      * @param array<string, mixed> $options
      */
@@ -44,10 +50,6 @@ final class OAuthHttpClient implements HttpClientInterface
     {
         $token    = $this->accessToken();
         $response = $this->inner->request($method, $url, [...$options, 'auth_bearer' => $token]);
-
-        if (!self::isReplayable($options)) {
-            return $response;
-        }
 
         try {
             $status = $response->getStatusCode();
@@ -60,8 +62,14 @@ final class OAuthHttpClient implements HttpClientInterface
             return $response;
         }
 
-        $response->cancel();
         $this->tokenProvider->invalidate($token);
+
+        $replayable = \array_key_exists('body', $options) ? self::isReplayable($options) : $this->defaultBodyReplayable;
+        if (!$replayable) {
+            return $response;
+        }
+
+        $response->cancel();
 
         return $this->inner->request($method, $url, [...$options, 'auth_bearer' => $this->accessToken()]);
     }
@@ -76,7 +84,11 @@ final class OAuthHttpClient implements HttpClientInterface
      */
     public function withOptions(array $options): static
     {
-        return new self($this->inner->withOptions($options), $this->tokenProvider);
+        $client = new self($this->inner->withOptions($options), $this->tokenProvider);
+
+        $client->defaultBodyReplayable = \array_key_exists('body', $options) ? self::isReplayable($options) : $this->defaultBodyReplayable;
+
+        return $client;
     }
 
     /**

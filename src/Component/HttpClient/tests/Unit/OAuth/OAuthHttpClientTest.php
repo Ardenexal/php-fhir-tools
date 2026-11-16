@@ -112,14 +112,17 @@ final class OAuthHttpClientTest extends TestCase
         self::assertSame(2, $attempts);
     }
 
-    /** A generator body is consumed by the first attempt, so sending it again would send an empty body. */
-    public function testRequestWithNonReplayableBodyIsNotRetried(): void
+    /**
+     * A generator body is consumed by the first attempt, so sending it again would send an empty body.
+     * The rejected token is still dropped, so the next request does not repeat the 401.
+     */
+    public function testRequestWithNonReplayableBodyIsNotRetriedButItsTokenIsDropped(): void
     {
-        $attempts    = 0;
-        $innerClient = new MockHttpClient(function() use (&$attempts): MockResponse {
-            ++$attempts;
+        $authHeaders = [];
+        $innerClient = new MockHttpClient(function(string $_method, string $_url, array $options) use (&$authHeaders): MockResponse {
+            $authHeaders[] = self::authorizationHeader($options);
 
-            return new MockResponse('', ['http_code' => 401]);
+            return new MockResponse('', ['http_code' => \count($authHeaders) === 1 ? 401 : 200]);
         });
 
         $client = new OAuthHttpClient($innerClient, $this->tokenProvider($this->countingTokenEndpoint()));
@@ -128,7 +131,48 @@ final class OAuthHttpClientTest extends TestCase
         })();
 
         self::assertSame(401, $client->request('POST', 'https://fhir.example.org/Patient', ['body' => $body])->getStatusCode());
+        self::assertSame(['Authorization: Bearer tok-1'], $authHeaders);
+
+        self::assertSame(200, $client->request('GET', 'https://fhir.example.org/Patient')->getStatusCode());
+        self::assertSame(['Authorization: Bearer tok-1', 'Authorization: Bearer tok-2'], $authHeaders);
+    }
+
+    /** A stream given as a default body through withOptions() is consumed by the first attempt too. */
+    public function testBodyDefaultFromWithOptionsIsNotRetried(): void
+    {
+        $attempts    = 0;
+        $innerClient = new MockHttpClient(function() use (&$attempts): MockResponse {
+            ++$attempts;
+
+            return new MockResponse('', ['http_code' => 401]);
+        });
+
+        $stream = fopen('php://memory', 'r+');
+        self::assertIsResource($stream);
+
+        $client = (new OAuthHttpClient($innerClient, $this->tokenProvider($this->countingTokenEndpoint())))
+            ->withOptions(['body' => $stream]);
+
+        self::assertSame(401, $client->request('POST', 'https://fhir.example.org/Binary')->getStatusCode());
         self::assertSame(1, $attempts);
+    }
+
+    /** A transport failure is left for the caller to see when it reads the response; nothing is retried. */
+    public function testTransportFailureIsReturnedWithoutRetry(): void
+    {
+        $attempts    = 0;
+        $innerClient = new MockHttpClient(function() use (&$attempts): MockResponse {
+            ++$attempts;
+
+            return new MockResponse('', ['error' => 'Connection refused']);
+        });
+
+        $client   = new OAuthHttpClient($innerClient, $this->tokenProvider($this->countingTokenEndpoint()));
+        $response = $client->request('GET', 'https://fhir.example.org/Patient');
+
+        self::assertSame(1, $attempts);
+        $this->expectException(TransportExceptionInterface::class);
+        $response->getStatusCode();
     }
 
     /** A form array holding a stream is sent as a multipart upload that reads the stream, so it is not resent either. */
