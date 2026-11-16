@@ -158,12 +158,14 @@ final class LowBoundaryFunction extends AbstractFunction
             return [(string) $value, 0];
         }
 
-        // float — use PHP string representation. A non-finite float renders as INF/NAN, which bcmath
-        // cannot take, so it is an evaluation error rather than a boundary.
-        $str = sprintf('%s', $value);
-        if (!is_numeric($str)) {
-            throw new EvaluationException(sprintf('Cannot compute the boundary of non-finite value %s', $str));
+        // float — use PHP string representation. A non-finite float has no decimal form bcmath can
+        // take, so it is an evaluation error rather than a boundary. Check before converting: PHP 8.5
+        // warns when NAN is coerced to a string.
+        if (!is_finite($value)) {
+            throw new EvaluationException(sprintf('Cannot compute the boundary of non-finite value %s', is_nan($value) ? 'NAN' : ($value > 0 ? 'INF' : '-INF')));
         }
+
+        $str    = (string) $value;
         $dotPos = strpos($str, '.');
         $prec   = $dotPos !== false ? strlen($str) - $dotPos - 1 : 0;
 
