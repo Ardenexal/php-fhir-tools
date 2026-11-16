@@ -8,6 +8,7 @@ use App\Sdc\QuestionnaireItemCodec;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class QuestionnaireItemCodecTest extends TestCase
 {
@@ -84,5 +85,30 @@ final class QuestionnaireItemCodecTest extends TestCase
     {
         $codec = new QuestionnaireItemCodec();
         self::assertNull($codec->fromFormValue($this->answerValueSetItem(), ''));
+    }
+
+    public function testIntegerFormValueBecomesInt(): void
+    {
+        $item = ['linkId' => 'age', 'type' => 'integer'];
+
+        self::assertSame(42, (new QuestionnaireItemCodec())->fromFormValue($item, '42'));
+        self::assertSame(-3, (new QuestionnaireItemCodec())->fromFormValue($item, '-3'));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function malformedIntegers(): iterable
+    {
+        yield 'letters' => ['not-a-number'];
+        yield 'decimal' => ['1.5'];
+        yield 'trailing junk' => ['12abc'];
+        yield 'out of range' => ['99999999999999999999'];
+    }
+
+    #[DataProvider('malformedIntegers')]
+    public function testMalformedIntegerIsRejectedNotCastToZero(string $formValue): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        (new QuestionnaireItemCodec())->fromFormValue(['linkId' => 'age', 'type' => 'integer'], $formValue);
     }
 }

@@ -9,13 +9,14 @@ use App\Sdc\QuestionnaireFormRenderer;
 use App\Sdc\QuestionnaireResponseBuilder;
 use Ardenexal\FHIRTools\Component\HttpClient\NullFHIRHttpClient;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface;
+use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
+use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Sdc\Contract\ExtractServiceInterface;
 use Ardenexal\FHIRTools\Component\Sdc\Contract\PopulateServiceInterface;
 use Ardenexal\FHIRTools\Component\Sdc\ExtractContext;
 use Ardenexal\FHIRTools\Component\Sdc\PopulateContext;
 use Ardenexal\FHIRTools\Component\Sdc\XFhirQueryPopulationDataProvider;
-use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRVersionedSerializationServiceLocator;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
@@ -38,6 +39,8 @@ class SdcController extends AbstractController
 {
     private const string MODELS_BASE_NAMESPACE = 'Ardenexal\\FHIRTools\\Component\\Models';
 
+    private const string CREDENTIALS_CSRF_TOKEN_ID = 'sdc_credentials';
+
     private const string LAUNCH_CONTEXT_URL     = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext';
 
     public function __construct(
@@ -51,6 +54,7 @@ class SdcController extends AbstractController
         private readonly string $oauthClientIdEnv = '',
         private readonly string $authHeaderName = '',
         private readonly bool $authHeaderValueSetViaEnv = false,
+        private readonly string $terminologyServerUrl = '',
         private readonly string $samplesDir = __DIR__ . '/../../assets/sdc-samples',
     ) {
     }
@@ -198,9 +202,9 @@ class SdcController extends AbstractController
             $code        = $this->findAnsweredCode($items, $answers, $checkLinkId);
 
             $vars['codeCheckResults'][$checkLinkId] = match (true) {
-                $valueSetUrl === null || $code === null || $code === ''       => ['configured' => true, 'checked' => false],
-                $this->terminologyClient instanceof NullFHIRTerminologyClient => ['configured' => false, 'checked' => false],
-                default                                                       => ['configured' => true, 'checked' => true, 'valid' => $this->terminologyClient->validateCode($valueSetUrl, $code), 'code' => $code],
+                $valueSetUrl === null || $code === null || $code === ''        => ['configured' => true, 'checked' => false],
+                !$this->terminologyServerConfigured()                          => ['configured' => false, 'checked' => false],
+                default                                                        => ['configured' => true, 'checked' => true, 'valid' => $this->terminologyClient->validateCode($valueSetUrl, $code), 'code' => $code],
             };
         } catch (\Throwable $e) {
             $vars['error'] = $e->getMessage();
@@ -219,6 +223,7 @@ class SdcController extends AbstractController
     #[Route('/credentials', name: '_credentials_set', methods: ['POST'])]
     public function setCredentials(Request $request): Response
     {
+        $this->assertCredentialsCsrfToken($request);
         $session = $request->getSession();
 
         $oauthClientId     = trim((string) $request->request->get('oauthClientId', ''));
@@ -240,12 +245,44 @@ class SdcController extends AbstractController
     #[Route('/credentials/clear', name: '_credentials_clear', methods: ['POST'])]
     public function clearCredentials(Request $request): Response
     {
+        $this->assertCredentialsCsrfToken($request);
         $session = $request->getSession();
         $session->remove(ExternalClientFactory::SESSION_KEY_OAUTH_CLIENT_ID);
         $session->remove(ExternalClientFactory::SESSION_KEY_OAUTH_CLIENT_SECRET);
         $session->remove(ExternalClientFactory::SESSION_KEY_AUTH_HEADER_VALUE);
 
         return $this->renderCurrentQuestionnaire($request);
+    }
+
+    /**
+     * Whether a real terminology server is behind {@see $terminologyClient}.
+     *
+     * The env var is the source of truth for the normal wiring. The injected client's class can't be used
+     * for it on its own: FHIRBundle always decorates the interface with {@see CachingFHIRTerminologyClient},
+     * so the service is never a bare {@see NullFHIRTerminologyClient} even when no server is configured.
+     * A client that is neither of those two classes was swapped in directly (a test stub, or custom
+     * wiring that bypasses the decorator), and counts as configured.
+     */
+    private function terminologyServerConfigured(): bool
+    {
+        if ($this->terminologyServerUrl !== '') {
+            return true;
+        }
+
+        return !$this->terminologyClient instanceof CachingFHIRTerminologyClient
+            && !$this->terminologyClient instanceof NullFHIRTerminologyClient;
+    }
+
+    /**
+     * Both credential actions write to the visitor's session, and the browser sends the session cookie
+     * with any cross-site POST. Without a token, another site could overwrite or clear a visitor's stored
+     * credentials. The token id is not in `csrf.yaml`'s stateless list, so it is a session-bound token.
+     */
+    private function assertCredentialsCsrfToken(Request $request): void
+    {
+        if (!$this->isCsrfTokenValid(self::CREDENTIALS_CSRF_TOKEN_ID, (string) $request->request->get('_csrf_token', ''))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
     }
 
     /**
@@ -419,7 +456,7 @@ class SdcController extends AbstractController
             // Server-side only — read from env-configured DI, never a URL-entry field the visitor controls.
             'fhirServerConfigured'        => !$this->httpClient instanceof NullFHIRHttpClient,
             'fhirServerAuthMechanism'     => $this->fhirServerAuthMechanism(),
-            'terminologyServerConfigured' => !$this->terminologyClient instanceof NullFHIRTerminologyClient,
+            'terminologyServerConfigured' => $this->terminologyServerConfigured(),
             // M07: session-scoped credential entry — which fields (if any) a visitor could usefully
             // override for THIS deployment (only shown when the operator enabled the corresponding
             // mechanism via env vars), and whether this visitor's own session already has one set.

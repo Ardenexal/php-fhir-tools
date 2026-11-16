@@ -23,6 +23,8 @@ use Symfony\Component\BrowserKit\CookieJar;
  */
 final class SdcSessionCredentialIsolationTest extends WebTestCase
 {
+    use PostsCredentialForms;
+
     private function secondClient(): KernelBrowser
     {
         return new KernelBrowser(self::$kernel, [], null, new CookieJar());
@@ -52,7 +54,7 @@ final class SdcSessionCredentialIsolationTest extends WebTestCase
         $clientA = static::createClient();
         $clientB = $this->secondClient();
 
-        $clientA->request('POST', '/sdc/credentials', [
+        $this->postCredentialForm($clientA, '/sdc/credentials', [
             'oauthClientId'     => 'alice',
             'oauthClientSecret' => 'alice-test-credential',
         ]);
@@ -71,16 +73,16 @@ final class SdcSessionCredentialIsolationTest extends WebTestCase
         $clientA = static::createClient();
         $clientB = $this->secondClient();
 
-        $clientA->request('POST', '/sdc/credentials', [
+        $this->postCredentialForm($clientA, '/sdc/credentials', [
             'oauthClientId'     => 'alice',
             'oauthClientSecret' => 'alice-test-credential',
         ]);
-        $clientB->request('POST', '/sdc/credentials', [
+        $this->postCredentialForm($clientB, '/sdc/credentials', [
             'oauthClientId'     => 'bob',
             'oauthClientSecret' => 'bob-test-credential',
         ]);
 
-        $clientA->request('POST', '/sdc/credentials/clear');
+        $this->postCredentialForm($clientA, '/sdc/credentials/clear');
         $htmlA = (string) $clientA->getResponse()->getContent();
         self::assertStringContainsString('set your credentials below', $htmlA);
 
@@ -88,5 +90,27 @@ final class SdcSessionCredentialIsolationTest extends WebTestCase
         $htmlB = (string) $clientB->getResponse()->getContent();
         self::assertStringContainsString('your session credentials', $htmlB);
         self::assertStringContainsString('data-session-credentials-indicator', $htmlB);
+    }
+
+    /** A cross-site POST carries the session cookie but not the token, so it must change nothing. */
+    public function testCredentialActionsRejectAMissingOrForgedCsrfToken(): void
+    {
+        $client = static::createClient();
+        $this->postCredentialForm($client, '/sdc/credentials', [
+            'oauthClientId'     => 'alice',
+            'oauthClientSecret' => 'alice-test-credential',
+        ]);
+
+        $client->request('POST', '/sdc/credentials', [
+            'oauthClientId'     => 'mallory',
+            'oauthClientSecret' => 'mallory-test-credential',
+        ]);
+        self::assertResponseStatusCodeSame(403);
+
+        $client->request('POST', '/sdc/credentials/clear', ['_csrf_token' => 'forged']);
+        self::assertResponseStatusCodeSame(403);
+
+        $client->request('GET', '/sdc');
+        self::assertStringContainsString('your session credentials', (string) $client->getResponse()->getContent());
     }
 }

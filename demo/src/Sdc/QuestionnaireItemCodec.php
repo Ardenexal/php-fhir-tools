@@ -57,7 +57,7 @@ final class QuestionnaireItemCodec
         }
 
         return match ($type) {
-            'integer'  => (int) $formValue,
+            'integer'  => $this->integerValue($item, $formValue),
             'decimal'  => $formValue, // raw string -> valueDecimal; do not wrap, do not cast to float.
             'date'     => new DatePrimitive(value: FHIRDate::parse($formValue)),
             'dateTime' => new DateTimePrimitive(value: FHIRDateTime::parse($this->normalizeDateTime($formValue))),
@@ -240,5 +240,22 @@ final class QuestionnaireItemCodec
         }
 
         return null;
+    }
+
+    /**
+     * A plain `(int)` cast turns `'abc'` into 0 and clamps out-of-range numbers, so a crafted POST could
+     * extract an answer the user never gave. Reject anything that isn't a whole number in PHP's int range,
+     * the same way an unparseable date is rejected by `FHIRDate::parse()`.
+     *
+     * @param array<string, mixed> $item
+     */
+    private function integerValue(array $item, string $formValue): int
+    {
+        $value = filter_var(trim($formValue), \FILTER_VALIDATE_INT);
+        if ($value === false) {
+            throw new \InvalidArgumentException(\sprintf('Answer for item "%s" is not a valid integer.', (string) ($item['linkId'] ?? '')));
+        }
+
+        return $value;
     }
 }

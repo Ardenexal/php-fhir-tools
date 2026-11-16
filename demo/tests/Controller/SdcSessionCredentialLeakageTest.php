@@ -14,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 final class SdcSessionCredentialLeakageTest extends WebTestCase
 {
+    use PostsCredentialForms;
+
     private const string SESSION_SECRET = 'visitor-supplied-secret-must-never-leak';
 
     protected function setUp(): void
@@ -39,7 +41,7 @@ final class SdcSessionCredentialLeakageTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('POST', '/sdc/credentials', [
+        $this->postCredentialForm($client, '/sdc/credentials', [
             'oauthClientId'     => 'visitor-client',
             'oauthClientSecret' => self::SESSION_SECRET,
         ]);

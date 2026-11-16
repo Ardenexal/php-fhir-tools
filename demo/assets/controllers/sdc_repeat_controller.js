@@ -38,8 +38,25 @@ export default class extends Controller {
         lastRow.after(clone);
     }
 
+    /**
+     * Removes the clicked row, except when it is the only row left for its linkId: `add()` clones the
+     * last remaining row, so removing it would leave nothing to clone from. That row is cleared instead,
+     * which leaves it unanswered on submit just as removing it would.
+     */
     remove(event) {
-        event.target.closest('[data-repeat-instance]')?.remove();
+        const row = event.target.closest('[data-repeat-instance]');
+        if (!row) {
+            return;
+        }
+
+        const siblingRows = Array.from(row.parentElement?.children ?? [])
+            .filter((el) => el.hasAttribute('data-repeat-instance'));
+        if (siblingRows.length <= 1) {
+            this.clearValues(row);
+            return;
+        }
+
+        row.remove();
     }
 
     /** One past the highest `[<linkId>][<n>]` index currently present, so sparse removes never collide. */

@@ -37,6 +37,7 @@
 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6" data-session-credentials>
     <form action="{{ path('app_sdc_credentials_set') }}" method="POST" class="space-y-3">
         <input type="hidden" name="questionnaireJson" value="{{ questionnaireJson }}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('sdc_credentials') }}">
         <h2 class="text-sm font-semibold text-gray-700">Your test credentials (this session only)</h2>
         <p class="text-xs text-gray-500">
             Set your own credentials to test as a different user against the configured FHIR server.
@@ -78,6 +79,7 @@
     {% if sessionCredentialsSet %}
         <form action="{{ path('app_sdc_credentials_clear') }}" method="POST" class="mt-2">
             <input type="hidden" name="questionnaireJson" value="{{ questionnaireJson }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('sdc_credentials') }}">
             <button type="submit" class="text-xs text-red-600 hover:text-red-800">Clear my credentials</button>
         </form>
     {% endif %}

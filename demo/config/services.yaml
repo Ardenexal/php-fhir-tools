@@ -93,3 +93,4 @@ services:
             $oauthClientIdEnv: '%env(FHIR_SERVER_OAUTH_CLIENT_ID)%'
             $authHeaderName: '%env(FHIR_SERVER_AUTH_HEADER_NAME)%'
             $authHeaderValueSetViaEnv: '%env(bool:FHIR_SERVER_AUTH_HEADER_VALUE)%'
+            $terminologyServerUrl: '%env(FHIR_TERMINOLOGY_SERVER_URL)%'
