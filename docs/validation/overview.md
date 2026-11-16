@@ -74,7 +74,8 @@ generated model classes during code generation (`fhir:generate`). At runtime,
 `FHIRValidationService` calls Symfony Validator's `validate()` — which reads the attributes and
 dispatches each to its matching `ConstraintValidator` — then augments the result with
 FHIR-specific checks that Symfony cannot express: extension contexts and structure, narrative
-XHTML, primitive formats, `Coding.system`, input the reader could not place, Bundle `fullUrl`
+XHTML, primitive formats, `Coding.system` and `Identifier.system`, duplicate element ids, Attachment
+size and hash, a Questionnaire's own item tree, input the reader could not place, Bundle `fullUrl`
 rules, modifier extensions, must-support, and obligations.
 
 ### Validator map
@@ -102,9 +103,12 @@ rules, modifier extensions, must-support, and obligations.
 | Extension `contextInvariant` | `validateExtensionContexts()` | FHIRPath invariant on the extension's use context |
 | Extension structure | `validateExtensionStructure()` | Missing `url`, non-absolute top-level `url`, or a value type the definition does not allow → ERROR; the extension's own invariants and bindings at their usual severity |
 | Complex extension sub-extensions | `ComplexExtensionChecker` | Missing required or undeclared sub-extension → ERROR |
-| Narrative XHTML | `NarrativeXhtmlChecker` | Disallowed elements, attributes, DOCTYPE and undefined entities (`txt-1`) and unparsable markup (`txt-2`) on every `xhtml` value, with the offending element, attribute or entity named → ERROR |
-| Primitive formats | `PrimitiveFormatChecker` | Unparsable temporal and decimal lexemes; malformed `code`, `id`, `oid`, `uri`, `base64Binary` → ERROR |
-| `Coding.system` | `CodingSystemChecker` | A relative `system`, or one that names a ValueSet → ERROR |
+| Narrative XHTML | `NarrativeXhtmlChecker` | Disallowed elements, attributes, DOCTYPE and undefined entities (`txt-1`) and unparsable markup (`txt-2`) on every `xhtml` value, with the offending element, attribute or entity named; an `<a href>` holding characters a URL may not contain, such as `{` or `}` → ERROR |
+| Primitive formats | `PrimitiveFormatChecker` | Unparsable temporal and decimal lexemes; malformed `code`, `id`, `oid`, `uri`, `base64Binary`; an XML `boolean` other than `true`/`false` or a JSON `value[x]` boolean that is not `true`/`false`; an XML `integer` that is not a 32-bit whole number without leading zeros; an XML `boolean` or `integer` with neither a value nor an extension → ERROR |
+| `Coding.system` and `Identifier.system` | `CodingSystemChecker` | A relative `Coding.system`, or one that names a ValueSet; an `Identifier.system` that is not absolute, reported on the Identifier → ERROR |
+| Duplicate element ids | `DuplicateElementIdChecker` | An element `id` repeated within one resource (`Duplicate id value '2'`). Each resource, including one in a Bundle entry or `contained`, has its own ids; `Resource.id` and `ElementDefinition.id` are not counted → ERROR |
+| Attachment integrity | `AttachmentIntegrityChecker` | An `Attachment` with inline `data` whose `size` is not its byte count, or whose `hash` is not the base64 SHA-1 of it. An Attachment without `data` is not checked; nothing is fetched → ERROR |
+| Questionnaire item tree | `QuestionnaireDefinitionChecker` | A Questionnaire item whose `enableWhen.question` names one of its own descendants, in any Questionnaire being validated, including a contained one → ERROR |
 | Unknown input | `UnknownInputChecker` | Elements the deserializer read but could not place on the model → ERROR |
 | Bundle `fullUrl` | `BundleEntryFullUrlChecker` | `Bundle.entry.fullUrl` that is not an absolute URL; an `http(s)` `fullUrl` of the form `[base]/[type]/[id]` that does not end with the entry resource's type and id; a missing `fullUrl` outside `transaction`/`batch` bundles and their responses, or on any entry whose resource holds a relative reference → ERROR |
 | Bundle reference resolution | `BundleReferenceResolutionChecker` | Relative reference to an entry the bundle holds that the `fullUrl` rules cannot resolve → ERROR |
@@ -137,7 +141,8 @@ FHIRValidationService::validate($resource, $profileUrls, $includeMustSupportInfo
   ├─ collectMustSupportInfo()    (only when $includeMustSupportInfo = true)
   ├─ validateExtensionContexts() (always; recursive walk across the full resource tree)
   ├─ NarrativeXhtmlChecker, PrimitiveFormatChecker, CodingSystemChecker,
-  │  UnknownInputChecker, ComplexExtensionChecker,
+  │  DuplicateElementIdChecker, AttachmentIntegrityChecker,
+  │  QuestionnaireDefinitionChecker, UnknownInputChecker, ComplexExtensionChecker,
   │  BundleEntryFullUrlChecker, BundleReferenceResolutionChecker  (always)
   ├─ validateExtensionStructure() (always)
   ├─ validateModifierExtensions() (only when a FHIRIGTypeRegistry is provided)
@@ -164,7 +169,7 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Extension structure and sub-extensions | Supported | `url`, value type, missing and undeclared sub-extensions; generated or runtime definitions |
 | Modifier extensions (unknown URL) | Supported | Recursive walk; requires a `FHIRIGTypeRegistry` |
 | Extensible / preferred bindings | Conditional | Needs a real terminology client; otherwise `fhir:unchecked-binding` INFO |
-| Target profile references | Conditional | Needs a `FHIRReferenceResolverInterface`; null resolver skips silently |
+| Target profile references | Conditional | Profile conformance needs a `FHIRReferenceResolverInterface`; the null resolver skips it silently. The canonical-type and conditional-query rules always run; see [References](references.md) |
 | Quantity range | Supported | `FHIRQuantityRangeValidator` |
 | Temporal range | Supported | `FHIRTemporalRangeValidator`; handles partial dates (YYYY, YYYY-MM) |
 | MustSupport | Supported | Opt-in via `$includeMustSupportInfo = true`; INFO violations |
@@ -172,7 +177,7 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | `$validate` operation output | Supported | `validateForOperation()` → `OperationOutcomeResource` |
 | Questionnaire validation | Separate service | `FHIRQuestionnaireValidator`; see [Questionnaire](questionnaire.md) |
 | Narrative / XHTML | Partial | `NarrativeXhtmlChecker`: disallowed elements and attributes, DOCTYPE, undefined entities and unparsable markup. Empty or whitespace-only narratives, the XHTML namespace, link schemes and stray text are not checked |
-| Primitive formats | Partial | `PrimitiveFormatChecker`. Malformed `boolean` and `integer` values are lost when read, so they cannot be reported |
+| Primitive formats | Partial | `PrimitiveFormatChecker`. The original text of a JSON number is not checked: `json_decode()` turns `1.000000000000000000E-24` into a float before any check runs, and rejects `925.` outright |
 | Unknown elements | Partial | `UnknownInputChecker`; deserialized input only. XML element order is not checked |
 | Bundle `fullUrl` and references | Partial | Absolute, RESTful and missing `fullUrl`, and relative-reference resolution. Document reachability is not checked |
 

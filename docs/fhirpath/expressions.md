@@ -64,6 +64,35 @@ The parser and evaluator support the core FHIRPath 2.0 syntax:
 | External constants | `%context`, `%resource`, … |
 | Reserved identifiers | `$this`, `$index`, `$total` |
 
+### Environment variables
+
+| Variable | Resolves to |
+|----------|-------------|
+| `%context` | The evaluation focus: the `$resource` argument passed to `evaluate()` |
+| `%resource` | The resource bound with `EvaluationContext::withResourceNode()`, or the focus when none is bound |
+| `%rootResource` | The containing resource when the context carries one (constructor argument `containerResource`), otherwise the same node as `%resource` |
+| `%ucum`, `%sct`, `%loinc` | `http://unitsofmeasure.org`, `http://snomed.info/sct`, `http://loinc.org` |
+| ``%`vs-[name]` ``, ``%`ext-[name]` `` | `http://hl7.org/fhir/ValueSet/[name]`, `http://hl7.org/fhir/StructureDefinition/[name]`. Quote the name with backticks, because `-` is otherwise read as subtraction |
+
+An unknown name throws an `EvaluationException`. A constant you supply on the context with
+`withExternalConstant()` takes precedence over these built-ins.
+
+Bind `%resource` separately when the focus is a node inside a resource rather than the resource
+itself. SDC does this to evaluate an expression on a QuestionnaireResponse item while `%resource`
+stays the QuestionnaireResponse:
+
+```php
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+
+$context = (new EvaluationContext())
+    ->withResourceNode($questionnaireResponse)
+    ->withExternalConstant('patient', $patient);
+
+// Focus is the item; %resource is the QuestionnaireResponse; %patient is the launch-context Patient
+$result = $service->evaluate('answer.value', $item, $context);
+$status = $service->evaluate('%resource.status', $item, $context);
+```
+
 ### Type system
 
 The `is` operator tests whether an item conforms to a named type, and `as` filters the collection

@@ -7,7 +7,8 @@ icon: download
 
 {% hint style="info" %}
 **Requirements:** PHP 8.3 or newer and [Composer](https://getcomposer.org/). Packages that integrate
-with Symfony require Symfony `^6.4 | ^7.4`. Code generation additionally needs the `zip` extension.
+with Symfony accept Symfony `^6.4 | ^7.4 | ^8.1`; Symfony 8 itself needs PHP 8.4 or newer, and 8.0 is
+not supported. Code generation additionally needs the `zip` extension.
 {% endhint %}
 
 ## Standalone components
@@ -50,6 +51,27 @@ composer require ardenexal/fhir-code-generation
 
 Generates model classes from FHIR packages. Needs the `zip` extension and pulls in
 `nette/php-generator` for code emission.
+{% endtab %}
+
+{% tab title="SDC" %}
+```bash
+composer require ardenexal/fhir-sdc
+```
+
+Provides SDC `Questionnaire/$populate` and `QuestionnaireResponse/$extract`. It depends on
+`ardenexal/fhir-validation`, `ardenexal/fhir-path` and `ardenexal/fhir-http-client`. See
+[SDC](../sdc/overview.md).
+{% endtab %}
+
+{% tab title="HTTP Client" %}
+```bash
+composer require ardenexal/fhir-http-client
+```
+
+Provides `FHIRHttpClient` for calling a FHIR server, OAuth decorators, the x-fhir-query template
+resolver, and the HTTP terminology clients that validation can use. It depends on
+`ardenexal/fhir-serialization` and `ardenexal/fhir-path`. See
+[FHIR HTTP Client](../http-client/overview.md).
 {% endtab %}
 {% endtabs %}
 

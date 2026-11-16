@@ -27,10 +27,24 @@ resolution to the configured `FHIRReferenceResolverInterface::resolve()`:
 3. If the resolved object has profiles but none match any URL in `targetProfiles`, an ERROR is
    emitted listing expected vs. actual profile URLs.
 
-Canonical-typed values (raw `string` or `\Stringable` objects such as `CanonicalPrimitive`) are
-always skipped — they cannot be resolved to an in-process PHP object. Null values are skipped.
+Canonical-typed values (raw `string` or `\Stringable` objects such as `CanonicalPrimitive`) never
+reach the resolver, because they cannot be resolved to an in-process PHP object. Null values are skipped.
 
-Both messages are overridable via the `FHIRTargetProfile` key in `FHIRValidationMessageRegistry`.
+Both resolver messages are overridable via the `FHIRTargetProfile` key in
+`FHIRValidationMessageRegistry`.
+
+## Checks that need no resolver
+
+Two rules read only the reference or canonical itself, so they run with the default
+`NullFHIRReferenceResolver` too. Both report an ERROR in the HL7 Java reference validator's wording:
+
+| Rule | Example message |
+|---|---|
+| A canonical shaped `[base]/[type]/[id]` must name a type the element allows. This applies only when every target profile is a core resource type; a target such as an IG profile or `Resource` skips the check, and a canonical of another shape (`http://loinc.org/vs/LL123`, `urn:oid:…`) is left alone | `Canonical URL 'http://hl7.org/fhir/ValueSet/example-extensional' refers to a resource that has the wrong type. Found ValueSet expecting one of [Questionnaire]` |
+| The query of a conditional reference must be `name=value` parameters joined by `&` | `The query part of the conditional reference is not a valid query string (Device?identifier=1234&?==)` |
+
+A plain reference such as `Device/foo` is not checked against the element's allowed target types. The two
+messages above are fixed; `FHIRValidationMessageRegistry` does not override them.
 
 ## Resolver examples
 
