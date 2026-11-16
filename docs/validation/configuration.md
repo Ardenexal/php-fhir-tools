@@ -16,6 +16,12 @@ bindings. It defines three methods: `validateCode()`, `validateCoding()`, and
 `validateCodingWithDisplay()` (the last returns a `CodingValidationResult` carrying a validity
 flag plus an optional corrected display string).
 
+`FHIRTerminologyClientInterface` and `CodingValidationResult` live in `fhir-metadata`
+(`Ardenexal\FHIRTools\Component\Metadata\Contract\`). `HttpFHIRTerminologyClient`,
+`CachingFHIRTerminologyClient` and `HttpFHIRTerminologyClientFactory` ship in `fhir-http-client`
+(`composer require ardenexal/fhir-http-client`). The in-memory, null and preferred-server clients ship
+in `fhir-validation`.
+
 | Class | Role |
 |---|---|
 | `HttpFHIRTerminologyClient` | Calls a terminology server's `ValueSet/$validate-code` operation (GET by default, POST optional). The bool methods return `false` / invalid on any HTTP, transport, or parse error; `checkCode()` and `checkCoding()` (from `FHIRTerminologyMembershipClientInterface`) return `null` instead, which the binding validator reports as `fhir:unchecked-binding`. |

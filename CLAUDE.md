@@ -32,7 +32,7 @@ or other projects. `src/Component/Models/src/` is read-only to agents — regene
 PHP 8.3+ monorepo toolkit for FHIR: generates model classes from FHIR Structure Definitions,
 provides JSON/XML serialization, and evaluates FHIRPath expressions. Distributed as per-component
 Composer packages under `ardenexal/*` — `fhir-bundle`, `fhir-code-generation`, `fhir-serialization`,
-`fhir-validation`, `fhir-path`, `fhir-metadata`, `fhir-models`, `cda-sd-models` — split out of this
+`fhir-validation`, `fhir-path`, `fhir-metadata`, `fhir-models`, `cda-sd-models`, `fhir-http-client`, `fhir-sdc` — split out of this
 monorepo by `.github/workflows/split-monorepo.yml` on push to `main` and on tags. The root
 `ardenexal/fhir-tools` names the monorepo itself; it is **not** published to Packagist, so never
 tell a consumer to `composer require` it. **Namespace:** `Ardenexal\FHIRTools\Component\{ComponentName}\`
