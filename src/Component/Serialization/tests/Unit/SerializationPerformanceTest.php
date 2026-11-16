@@ -20,11 +20,34 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * Tests that the Serialization component maintains acceptable performance for large FHIR documents.
  *
+ * Timings run on shared CI runners, so every measurement goes through fastestRunMs() and every
+ * budget through assertWithinBudget(). Together they keep scheduler and garbage-collection noise
+ * from failing the suite while still catching per-operation regressions.
+ *
  * @author Ardenexal
  */
 class SerializationPerformanceTest extends TestCase
 {
     use TestTrait;
+
+    /**
+     * Fixed allowance added to every time budget, in milliseconds.
+     *
+     * A per-iteration budget alone is tiny when Eris picks a small iteration count (4 iterations
+     * at 1ms each is a 4ms budget), so one scheduler pause or garbage-collection cycle on a shared
+     * CI runner would fail the test even though nothing is slow. This allowance absorbs that fixed
+     * noise. The per-iteration budgets still catch the regressions these tests guard against,
+     * such as IO or an O(n) lookup inside a loop.
+     */
+    private const float FIXED_ALLOWANCE_MS = 50.0;
+
+    /**
+     * Timed passes per measurement. The fastest pass is reported.
+     *
+     * Noise only ever adds time, so the fastest of several passes is the closest to the real cost.
+     * A genuine regression slows every pass and still fails.
+     */
+    private const int TIMED_PASSES = 3;
 
     /**
      * Test that context factory performs efficiently with various configurations.
@@ -40,10 +63,8 @@ class SerializationPerformanceTest extends TestCase
         )->then(function(string $format, int $iterations): void {
             $contextFactory = new FHIRSerializationContextFactory();
 
-            $startTime = microtime(true);
-
             // Create contexts multiple times to test performance
-            for ($i = 0; $i < $iterations; ++$i) {
+            $duration = self::fastestRunMs($iterations, static function() use ($contextFactory, $format): void {
                 $context = $format === 'xml'
                     ? $contextFactory->createXmlContext()
                     : $contextFactory->createJsonContext();
@@ -51,19 +72,10 @@ class SerializationPerformanceTest extends TestCase
                 // Verify context is valid
                 self::assertIsArray($context);
                 self::assertArrayHasKey('format', $context);
-            }
+            });
 
-            $endTime  = microtime(true);
-            $duration = ($endTime - $startTime) * 1000; // Convert to milliseconds
-
-            // Performance assertion: should complete within reasonable time
-            // Allow 1ms per iteration as a reasonable performance threshold
-            $maxAllowedTime = $iterations * 1.0; // 1ms per iteration
-            self::assertLessThan(
-                $maxAllowedTime,
-                $duration,
-                "Context creation took {$duration}ms for {$iterations} iterations, expected < {$maxAllowedTime}ms",
-            );
+            // Allow 1ms per iteration on top of the fixed allowance
+            self::assertWithinBudget($duration, $iterations, 1.0, 'Context creation');
         });
     }
 
@@ -80,10 +92,8 @@ class SerializationPerformanceTest extends TestCase
             Generator\elements(['normalize', 'denormalize']),
             Generator\choose(10, 100), // Number of debug info operations
         )->then(function(string $format, string $operation, int $iterations): void {
-            $startTime = microtime(true);
-
             // Create and manipulate debug info multiple times
-            for ($i = 0; $i < $iterations; ++$i) {
+            $duration = self::fastestRunMs($iterations, static function(int $i) use ($format, $operation): void {
                 $debugInfo = $operation === 'normalize'
                     ? FHIRSerializationDebugInfo::forNormalization($format)
                     : FHIRSerializationDebugInfo::forDenormalization($format);
@@ -98,19 +108,10 @@ class SerializationPerformanceTest extends TestCase
                 self::assertSame($format, $debugInfo->format);
                 self::assertTrue($debugInfo->hasWarnings());
                 self::assertNotNull($debugInfo->getDurationMs());
-            }
+            });
 
-            $endTime  = microtime(true);
-            $duration = ($endTime - $startTime) * 1000; // Convert to milliseconds
-
-            // Performance assertion: should complete within reasonable time
-            // Allow 0.5ms per iteration for debug info operations
-            $maxAllowedTime = $iterations * 0.5;
-            self::assertLessThan(
-                $maxAllowedTime,
-                $duration,
-                "Debug info operations took {$duration}ms for {$iterations} iterations, expected < {$maxAllowedTime}ms",
-            );
+            // Allow 0.5ms per iteration on top of the fixed allowance
+            self::assertWithinBudget($duration, $iterations, 0.5, 'Debug info operations');
         });
     }
 
@@ -127,23 +128,21 @@ class SerializationPerformanceTest extends TestCase
         )->then(function(int $iterations): void {
             $cache = new FHIRMetadataCache();
 
-            // Test cache write performance
-            $startTime = microtime(true);
-
-            for ($i = 0; $i < $iterations; ++$i) {
-                $className = "TestClass{$i}";
-                $cache->cacheFHIRTypeMetadata($className, "TestType{$i}");
-                $cache->cacheFHIRVersionMetadata($className, 'R4B');
-                $cache->cacheStructureKindFlag($className, 'resource', true);
-            }
-
-            $writeEndTime  = microtime(true);
-            $writeDuration = ($writeEndTime - $startTime) * 1000;
+            // Test cache write performance. The cache is emptied before each timed pass so every
+            // pass inserts new entries rather than overwriting the previous pass's.
+            $writeDuration = self::fastestRunMs(
+                $iterations,
+                static function(int $i) use ($cache): void {
+                    $className = "TestClass{$i}";
+                    $cache->cacheFHIRTypeMetadata($className, "TestType{$i}");
+                    $cache->cacheFHIRVersionMetadata($className, 'R4B');
+                    $cache->cacheStructureKindFlag($className, 'resource', true);
+                },
+                $cache->invalidateCache(...),
+            );
 
             // Test cache read performance
-            $readStartTime = microtime(true);
-
-            for ($i = 0; $i < $iterations; ++$i) {
+            $readDuration = self::fastestRunMs($iterations, static function(int $i) use ($cache): void {
                 $className     = "TestClass{$i}";
                 $fhirType      = $cache->getFHIRTypeMetadata($className);
                 $fhirVersion   = $cache->getFHIRVersionMetadata($className);
@@ -153,28 +152,11 @@ class SerializationPerformanceTest extends TestCase
                 self::assertSame("TestType{$i}", $fhirType);
                 self::assertSame('R4B', $fhirVersion);
                 self::assertTrue($structureType);
-            }
+            });
 
-            $readEndTime  = microtime(true);
-            $readDuration = ($readEndTime - $readStartTime) * 1000;
-
-            // Performance assertions
-            // Cache writes should be fast (allow 5ms per operation — threshold is generous
-            // to tolerate slow CI runners while still catching accidental IO or O(n) ops)
-            $maxWriteTime = $iterations * 5.0;
-            self::assertLessThan(
-                $maxWriteTime,
-                $writeDuration,
-                "Cache writes took {$writeDuration}ms for {$iterations} operations, expected < {$maxWriteTime}ms",
-            );
-
-            // Cache reads should be fast (allow 2ms per operation)
-            $maxReadTime = $iterations * 2.0;
-            self::assertLessThan(
-                $maxReadTime,
-                $readDuration,
-                "Cache reads took {$readDuration}ms for {$iterations} operations, expected < {$maxReadTime}ms",
-            );
+            // Allow 5ms per write and 2ms per read, enough to catch accidental IO or O(n) lookups
+            self::assertWithinBudget($writeDuration, $iterations, 5.0, 'Cache writes');
+            self::assertWithinBudget($readDuration, $iterations, 2.0, 'Cache reads');
 
             // Verify cache statistics are reasonable
             $stats = $cache->getCacheStats();
@@ -195,11 +177,10 @@ class SerializationPerformanceTest extends TestCase
         $this->forAll(
             Generator\choose(5, 20), // Number of service instantiations
         )->then(function(int $iterations): void {
-            $startTime = microtime(true);
-
-            for ($i = 0; $i < $iterations; ++$i) {
-                // Create mock serializer
-                $mockSerializer = $this->createMock(SerializerInterface::class);
+            // Not static: createStub() needs the test case instance
+            $duration = self::fastestRunMs($iterations, function(): void {
+                // Create stub serializer
+                $serializer = $this->createStub(SerializerInterface::class);
 
                 // Create components
                 $contextFactory = new FHIRSerializationContextFactory();
@@ -207,26 +188,17 @@ class SerializationPerformanceTest extends TestCase
 
                 // Create service
                 $service = new FHIRSerializationService(
-                    $mockSerializer,
+                    $serializer,
                     $contextFactory,
                     $debugInfo,
                 );
 
                 // Verify service was created
                 self::assertInstanceOf(FHIRSerializationService::class, $service);
-            }
+            });
 
-            $endTime  = microtime(true);
-            $duration = ($endTime - $startTime) * 1000; // Convert to milliseconds
-
-            // Performance assertion: service instantiation should be fast
-            // Allow 10ms per instantiation (including mock creation overhead on CI)
-            $maxAllowedTime = $iterations * 10.0;
-            self::assertLessThan(
-                $maxAllowedTime,
-                $duration,
-                "Service instantiation took {$duration}ms for {$iterations} instances, expected < {$maxAllowedTime}ms",
-            );
+            // Allow 10ms per instantiation, including stub creation
+            self::assertWithinBudget($duration, $iterations, 10.0, 'Service instantiation');
         });
     }
 
@@ -275,5 +247,48 @@ class SerializationPerformanceTest extends TestCase
                 'Performance context should have fewer or equal enabled features compared to strict context',
             );
         });
+    }
+
+    /**
+     * Runs $operation $iterations times per pass and returns the fastest pass in milliseconds.
+     *
+     * One untimed call runs first so one-off costs, such as autoloading or PHPUnit generating a
+     * test double class, are not charged to the timed passes.
+     *
+     * @param callable(int): void     $operation      receives the iteration index
+     * @param (callable(): void)|null $beforeEachPass runs untimed before each timed pass, e.g. to reset state
+     */
+    private static function fastestRunMs(int $iterations, callable $operation, ?callable $beforeEachPass = null): float
+    {
+        $operation(0);
+
+        $fastestNs = PHP_INT_MAX;
+        for ($pass = 0; $pass < self::TIMED_PASSES; ++$pass) {
+            if ($beforeEachPass !== null) {
+                $beforeEachPass();
+            }
+
+            $startNs = hrtime(true);
+            for ($i = 0; $i < $iterations; ++$i) {
+                $operation($i);
+            }
+            $fastestNs = min($fastestNs, hrtime(true) - $startNs);
+        }
+
+        return $fastestNs / 1_000_000;
+    }
+
+    /**
+     * Asserts $durationMs is under the fixed allowance plus $perIterationMs for each iteration.
+     */
+    private static function assertWithinBudget(float $durationMs, int $iterations, float $perIterationMs, string $label): void
+    {
+        $budgetMs = self::FIXED_ALLOWANCE_MS + ($iterations * $perIterationMs);
+
+        self::assertLessThan(
+            $budgetMs,
+            $durationMs,
+            sprintf('%s took %.2fms for %d iterations, expected < %.2fms', $label, $durationMs, $iterations, $budgetMs),
+        );
     }
 }
