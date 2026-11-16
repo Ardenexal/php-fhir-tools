@@ -6,21 +6,25 @@ icon: globe
 # Overview
 
 `ardenexal/fhir-http-client` is the toolkit's client for talking to a FHIR server. Other packages
-reach a server only through it:
+make their FHIR server calls through it:
 
 * SDC `$populate` fetches live `application/x-fhir-query` context with it. See
   [SDC](../sdc/overview.md).
-* FHIRPath `resolve()` and `memberOf()` use it for references and value-set checks they cannot answer
-  locally. See [FHIR-Specific functions](../fhirpath/functions/fhir.md).
+* FHIRPath `resolve()` uses it for relative and canonical references, and `memberOf()` for value-set
+  checks. A reference's own absolute URL is fetched with a separate PSR-18 client instead. See
+  [FHIR-Specific functions](../fhirpath/functions/fhir.md).
 * The HTTP terminology clients for binding validation live in this package. See
   [Validation configuration](../validation/configuration.md).
 
 ```bash
-composer require ardenexal/fhir-http-client
+composer require ardenexal/fhir-http-client symfony/http-client
 ```
 
-Nothing in the toolkit makes a network request unless you construct a `FHIRHttpClient` with a real
-HTTP client and pass it in.
+The package depends only on the Symfony HTTP client contracts. The examples on this page use
+`symfony/http-client` as the implementation; any `HttpClientInterface` implementation works.
+
+No FHIR server is called unless you construct a `FHIRHttpClient` with a real HTTP client and pass it
+in.
 
 ## `FHIRHttpClient`
 
@@ -34,7 +38,8 @@ HTTP client and pass it in.
 | `request(string $method, string $path, ?string $body = null, array $headers = [])` | The raw response body, for any other FHIR REST call such as `$validate-code` |
 
 Each method returns `null` when the call fails: a transport error, a timeout, a non-2xx status or a
-body it cannot read. An unknown FHIR version is a programming error and throws a `\ValueError`.
+body it cannot read. `search()` and `followLink()` throw a `\ValueError` for an unknown FHIR version,
+because that is a programming error rather than a server failure.
 
 ```php
 use Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient;
@@ -109,7 +114,8 @@ When a token cannot be fetched, the request fails like any other transport error
 
 `NullFHIRHttpClient` makes no requests and returns `null` from every method. Use it where a client is
 required but no server is configured. The Symfony bundle registers it as the default
-`FHIRHttpClientInterface`. To use a real server, register `FHIRHttpClient` in your application's
+`FHIRHttpClientInterface`. To use a real server, install `symfony/http-client` so the bundle can
+autowire an `HttpClientInterface`, then register `FHIRHttpClient` in your application's
 `services.yaml` and point the alias at it:
 
 ```yaml
@@ -140,7 +146,8 @@ $search  = (new XFhirQueryResolver())->resolve('Observation?subject={{%patient.i
 $bundle = $client->search($search, 'R4');
 ```
 
-Every substituted value is percent-encoded. A search parameter whose hole resolves to nothing is
+Substituted values are percent-encoded, except a token's system URI and the `|` and `,` separators,
+which are emitted as written. A search parameter whose hole resolves to nothing is
 dropped from the query, which widens the search: `Observation?subject={{%patient.id}}` with a
 `%patient` that has no `id` becomes `Observation`, a search for every subject's observations. When
 every parameter is dropped, the `?` is dropped too. An unterminated `{{` throws

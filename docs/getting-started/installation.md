@@ -65,12 +65,14 @@ Provides SDC `Questionnaire/$populate` and `QuestionnaireResponse/$extract`. It 
 
 {% tab title="HTTP Client" %}
 ```bash
-composer require ardenexal/fhir-http-client
+composer require ardenexal/fhir-http-client symfony/http-client
 ```
 
 Provides `FHIRHttpClient` for calling a FHIR server, OAuth decorators, the x-fhir-query template
 resolver, and the HTTP terminology clients that validation can use. It depends on
-`ardenexal/fhir-serialization` and `ardenexal/fhir-path`. See
+`ardenexal/fhir-serialization`, `ardenexal/fhir-models`, `ardenexal/fhir-path` and
+`ardenexal/fhir-metadata`, and only on the Symfony HTTP client contracts, so install an implementation
+such as `symfony/http-client` alongside it. See
 [FHIR HTTP Client](../http-client/overview.md).
 {% endtab %}
 {% endtabs %}

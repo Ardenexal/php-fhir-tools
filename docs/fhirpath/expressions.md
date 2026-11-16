@@ -68,7 +68,7 @@ The parser and evaluator support the core FHIRPath 2.0 syntax:
 
 | Variable | Resolves to |
 |----------|-------------|
-| `%context` | The evaluation focus: the `$resource` argument passed to `evaluate()` |
+| `%context` | The context's root resource. When the context has none, the first `evaluate()` call sets it to that call's focus, and the context keeps it |
 | `%resource` | The resource bound with `EvaluationContext::withResourceNode()`, or the focus when none is bound |
 | `%rootResource` | The containing resource when the context carries one (constructor argument `containerResource`), otherwise the same node as `%resource` |
 | `%ucum`, `%sct`, `%loinc` | `http://unitsofmeasure.org`, `http://snomed.info/sct`, `http://loinc.org` |
@@ -88,7 +88,9 @@ $context = (new EvaluationContext())
     ->withResourceNode($questionnaireResponse)
     ->withExternalConstant('patient', $patient);
 
-// Focus is the item; %resource is the QuestionnaireResponse; %patient is the launch-context Patient
+// Focus is the item; %resource is the QuestionnaireResponse; %patient is the launch-context Patient.
+// The first call fixes the context's root resource (%context) to $item, so reuse a context only for
+// the same focus.
 $result = $service->evaluate('answer.value', $item, $context);
 $status = $service->evaluate('%resource.status', $item, $context);
 ```
