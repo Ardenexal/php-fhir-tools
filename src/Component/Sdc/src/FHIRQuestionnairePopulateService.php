@@ -557,8 +557,10 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
                 $values = [$values[0]];
             }
 
+            $answerOptions = AnswerValueCoercer::answerOptionsFrom($item);
+
             foreach ($values as $value) {
-                $coerced = $this->coercer->coerce($itemType, $value, $linkId, $factory, $issues);
+                $coerced = $this->coercer->coerce($itemType, $value, $linkId, $factory, $issues, $answerOptions);
                 if ($coerced !== null) {
                     $answers[] = $factory->answer($coerced);
                 }

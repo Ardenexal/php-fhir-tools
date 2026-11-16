@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 
@@ -148,6 +149,13 @@ final class HighBoundaryFunction extends AbstractFunction
 
         if (is_int($value)) {
             return [(string) $value, 0];
+        }
+
+        // float — use PHP string representation. A non-finite float has no decimal form bcmath can
+        // take, so it is an evaluation error rather than a boundary. Check before converting: PHP 8.5
+        // warns when NAN is coerced to a string.
+        if (!is_finite($value)) {
+            throw new EvaluationException(sprintf('Cannot compute the boundary of non-finite value %s', is_nan($value) ? 'NAN' : ($value > 0 ? 'INF' : '-INF')));
         }
 
         $str    = (string) $value;

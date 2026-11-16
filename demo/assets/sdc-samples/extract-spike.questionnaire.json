@@ -1,0 +1,41 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "extract-spike",
+  "url": "http://example.org/Questionnaire/extract-spike",
+  "status": "active",
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract",
+          "extension": [
+            { "url": "definition", "valueCanonical": "http://hl7.org/fhir/StructureDefinition/Patient" }
+          ]
+        }
+      ],
+      "linkId": "patient",
+      "text": "Patient",
+      "type": "group",
+      "item": [
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+          "linkId": "given",
+          "text": "Given name",
+          "type": "string"
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.family",
+          "linkId": "family",
+          "text": "Family name",
+          "type": "string"
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+          "linkId": "dob",
+          "text": "Date of birth",
+          "type": "date"
+        }
+      ]
+    }
+  ]
+}

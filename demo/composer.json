@@ -24,6 +24,7 @@
         "symfony/intl": "7.4.*",
         "symfony/mime": "7.4.*",
         "symfony/runtime": "7.4.*",
+        "symfony/security-csrf": "7.4.*",
         "symfony/serializer": "7.4.*",
         "symfony/stimulus-bundle": "^2.36",
         "symfony/translation": "7.4.*",
@@ -56,7 +57,9 @@
             "Ardenexal\\FHIRTools\\Component\\Models\\": "../src/Component/Models/src/",
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "../src/Component/Metadata/src/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "../src/Component/FHIRPath/src/",
-            "Ardenexal\\FHIRTools\\Component\\Validation\\": "../src/Component/Validation/src/"
+            "Ardenexal\\FHIRTools\\Component\\Validation\\": "../src/Component/Validation/src/",
+            "Ardenexal\\FHIRTools\\Component\\HttpClient\\": "../src/Component/HttpClient/src/",
+            "Ardenexal\\FHIRTools\\Component\\Sdc\\": "../src/Component/Sdc/src/"
         }
     },
     "autoload-dev": {

@@ -1,0 +1,116 @@
+{% macro field_input(field, name, value, codeCheckResults, id) %}
+    {% if field.type == 'boolean' %}
+        <select id="{{ id }}" name="{{ name }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="" {% if value == '' %}selected{% endif %}>(unanswered)</option>
+            <option value="true" {% if value == 'true' %}selected{% endif %}>True</option>
+            <option value="false" {% if value == 'false' %}selected{% endif %}>False</option>
+        </select>
+    {% elseif field.type == 'choice' and field.hasAnswerValueSet %}
+        <div class="flex items-center gap-2">
+            <input type="text" id="{{ id }}" name="{{ name }}" value="{{ value }}" placeholder="Enter a code"
+                   class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button type="submit" name="checkCodeLinkId" value="{{ field.linkId }}" formaction="{{ path('app_sdc_validate_code') }}"
+                    class="whitespace-nowrap text-xs text-indigo-600 hover:text-indigo-800 font-medium px-3 py-2 border border-indigo-200 rounded-lg">
+                Check code
+            </button>
+        </div>
+        {% set result = (codeCheckResults ?? {})[field.linkId] ?? null %}
+        {% if result %}
+            {% if not result.configured %}
+                <p class="mt-1 text-xs text-gray-400">No terminology server configured — code cannot be checked.</p>
+            {% elseif not result.checked %}
+                <p class="mt-1 text-xs text-gray-400">Enter a code, then click "Check code".</p>
+            {% elseif result.valid %}
+                <p class="mt-1 text-xs text-green-600">Valid: "{{ result.code }}" is a member of this value set.</p>
+            {% else %}
+                <p class="mt-1 text-xs text-red-600">Invalid: "{{ result.code }}" is not a member of this value set.</p>
+            {% endif %}
+        {% else %}
+            <p class="mt-1 text-xs text-gray-400">No populated dropdown — this value set isn't expanded, only individual codes are checked.</p>
+        {% endif %}
+    {% elseif field.type == 'choice' %}
+        <select id="{{ id }}" name="{{ name }}" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="" {% if value == '' %}selected{% endif %}>(unanswered)</option>
+            {% for option in field.options %}
+                <option value="{{ option.index }}" {% if value == option.index %}selected{% endif %}>{{ option.label }}</option>
+            {% endfor %}
+        </select>
+    {% elseif field.type == 'date' %}
+        <input type="date" id="{{ id }}" name="{{ name }}" value="{{ value }}"
+               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    {% elseif field.type == 'dateTime' %}
+        <input type="datetime-local" id="{{ id }}" name="{{ name }}" value="{{ value }}"
+               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    {% elseif field.type == 'integer' or field.type == 'decimal' %}
+        <input type="number" id="{{ id }}" {% if field.type == 'decimal' %}step="any"{% endif %} name="{{ name }}" value="{{ value }}"
+               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    {% elseif field.type == 'text' %}
+        <textarea id="{{ id }}" name="{{ name }}" rows="3"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ value }}</textarea>
+    {% elseif field.type == 'quantity' %}
+        <input type="text" id="{{ id }}" name="{{ name }}" value="{{ value }}" placeholder="e.g. 70 kg"
+               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <p class="mt-1 text-xs text-gray-400">Numeric value followed by a unit, e.g. "70 kg".</p>
+    {% else %}
+        <input type="text" id="{{ id }}" name="{{ name }}" value="{{ value }}"
+               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    {% endif %}
+{% endmacro %}
+
+{% macro field_inputs(fields, prefix, codeCheckResults) %}
+    {% import _self as self %}
+    {% for field in fields %}
+        {% set base_name = prefix ~ '[' ~ field.linkId ~ ']' %}
+
+        {% if field.kind == 'display' %}
+            <p class="text-sm text-gray-500 italic">{{ field.text }}</p>
+
+        {% elseif field.kind == 'group' %}
+            <div data-repeat-group-linkid="{{ field.linkId }}" class="space-y-3"
+                 {% if field.enableWhen %}data-sdc-enable-when-target="dependent" data-sdc-enable-when-condition-value="{{ field.enableWhen|json_encode }}"{% endif %}>
+                {% for instance in field.instances %}
+                    {% set instance_name = field.repeats ? base_name ~ '[' ~ loop.index0 ~ ']' : base_name %}
+                    <fieldset class="border border-gray-200 rounded-lg p-4 space-y-3" data-repeat-instance>
+                        <div class="flex items-center justify-between">
+                            <legend class="text-sm font-semibold text-gray-700 px-1">{{ field.text }}</legend>
+                            {% if field.repeats %}
+                                <button type="button" data-action="sdc-repeat#remove" class="text-xs text-red-600 hover:text-red-800">Remove</button>
+                            {% endif %}
+                        </div>
+                        {{ self.field_inputs(instance, instance_name, codeCheckResults) }}
+                    </fieldset>
+                {% endfor %}
+                {% if field.repeats %}
+                    <button type="button" data-action="sdc-repeat#add" data-sdc-repeat-linkid-param="{{ field.linkId }}"
+                            class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                        + Add another {{ field.text }}
+                    </button>
+                {% endif %}
+            </div>
+
+        {% else %}
+            <div data-repeat-field-linkid="{{ field.linkId }}" class="space-y-2"
+                 {% if field.enableWhen %}data-sdc-enable-when-target="dependent" data-sdc-enable-when-condition-value="{{ field.enableWhen|json_encode }}"{% endif %}>
+                {% for value in field.values %}
+                    {% set input_name = field.repeats ? base_name ~ '[' ~ loop.index0 ~ ']' : base_name %}
+                    {% set input_id = 'field-' ~ input_name|replace({'[': '-', ']': ''}) %}
+                    <div class="flex items-end gap-2" data-repeat-instance>
+                        <div class="flex-1">
+                            <label for="{{ input_id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ field.text }}</label>
+                            {{ self.field_input(field, input_name, value, codeCheckResults, input_id) }}
+                        </div>
+                        {% if field.repeats %}
+                            <button type="button" data-action="sdc-repeat#remove" class="text-xs text-red-600 hover:text-red-800 mb-2">Remove</button>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% if field.repeats %}
+                    <button type="button" data-action="sdc-repeat#add" data-sdc-repeat-linkid-param="{{ field.linkId }}"
+                            class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                        + Add another {{ field.text }}
+                    </button>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}

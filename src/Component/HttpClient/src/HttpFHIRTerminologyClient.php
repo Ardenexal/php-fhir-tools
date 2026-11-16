@@ -29,8 +29,14 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyMembershipClient
     /**
      * Returns true when $value is a valid member of the named value set.
      *
-     * Returns false on any HTTP error, transport failure, malformed response, or when the value
-     * cannot be converted to a string. {@see checkCode()} keeps those apart from a "not a member" verdict.
+     * Calls GET /ValueSet/$validate-code with url, code, and inferSystem=true parameters. A bare code
+     * with no system is ambiguous per the operation's own definition; `inferSystem` asks the server to
+     * resolve the system itself when the value set's compose makes that unambiguous. Without it, a strict
+     * spec-compliant server (confirmed against tx.fhir.org) replies "unable to find code to validate" for
+     * every code, valid or not — this parameter is what makes the method's "true when valid" contract
+     * actually reachable. Returns false on any HTTP error, transport failure, malformed response, or when
+     * the value cannot be converted to a string (e.g. null or unsupported object type). {@see checkCode()}
+     * keeps those apart from a "not a member" verdict.
      *
      * @param string $valueSetUrl Canonical URL of the value set to check against
      * @param mixed  $value       The code to validate; accepts string, int, or BackedEnum

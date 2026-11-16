@@ -80,3 +80,5 @@ phpstan.neon
 ###< codecov uploader ###
 
 node_modules/
+/.playwright-mcp/
+

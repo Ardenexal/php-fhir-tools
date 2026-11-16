@@ -1,0 +1,162 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "sdc-demo-patient",
+  "url": "http://example.org/Questionnaire/sdc-demo-patient",
+  "name": "SdcDemoPatient",
+  "title": "Patient intake (SDC demo)",
+  "status": "active",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
+      "extension": [
+        { "url": "name", "valueCoding": { "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "code": "patient" } },
+        { "url": "type", "valueCode": "Patient" }
+      ]
+    }
+  ],
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract",
+          "extension": [
+            { "url": "definition", "valueCanonical": "http://hl7.org/fhir/StructureDefinition/Patient" }
+          ]
+        }
+      ],
+      "linkId": "patient",
+      "text": "Patient",
+      "type": "group",
+      "item": [
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
+          "linkId": "active",
+          "text": "Active",
+          "type": "boolean",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "%patient.active" }
+            }
+          ]
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+          "linkId": "given",
+          "text": "Given name",
+          "type": "string",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "iif(%patient.name.where(use='official').exists(), %patient.name.where(use='official').first(), %patient.name.first()).given.first()" }
+            }
+          ]
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.family",
+          "linkId": "family",
+          "text": "Family name",
+          "type": "string",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "iif(%patient.name.where(use='official').exists(), %patient.name.where(use='official').first(), %patient.name.first()).family" }
+            }
+          ]
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+          "linkId": "gender",
+          "text": "Gender",
+          "type": "choice",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "%patient.gender" }
+            }
+          ],
+          "answerOption": [
+            { "valueCoding": { "system": "http://hl7.org/fhir/administrative-gender", "code": "male", "display": "Male" } },
+            { "valueCoding": { "system": "http://hl7.org/fhir/administrative-gender", "code": "female", "display": "Female" } },
+            { "valueCoding": { "system": "http://hl7.org/fhir/administrative-gender", "code": "other", "display": "Other" } },
+            { "valueCoding": { "system": "http://hl7.org/fhir/administrative-gender", "code": "unknown", "display": "Unknown" } }
+          ]
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+          "linkId": "dob",
+          "text": "Date of birth",
+          "type": "date",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "%patient.birthDate" }
+            }
+          ]
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.maritalStatus.coding",
+          "linkId": "maritalStatus",
+          "text": "Marital status (code)",
+          "type": "choice",
+          "answerValueSet": "http://hl7.org/fhir/ValueSet/marital-status"
+        },
+        {
+          "linkId": "hasAllergies",
+          "text": "Any known allergies?",
+          "type": "boolean"
+        },
+        {
+          "linkId": "allergyDetails",
+          "text": "Allergy details",
+          "type": "string",
+          "enableWhen": [
+            { "question": "hasAllergies", "operator": "=", "answerBoolean": true }
+          ]
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact",
+          "linkId": "contact",
+          "text": "Emergency contact",
+          "type": "group",
+          "repeats": true,
+          "item": [
+            {
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact.name.given",
+              "linkId": "contactGiven",
+              "text": "Contact given name",
+              "type": "string"
+            },
+            {
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact.name.family",
+              "linkId": "contactFamily",
+              "text": "Contact family name",
+              "type": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract",
+          "extension": [
+            { "url": "definition", "valueCanonical": "http://hl7.org/fhir/StructureDefinition/Observation" }
+          ]
+        }
+      ],
+      "linkId": "weightObs",
+      "text": "Weight",
+      "type": "group",
+      "item": [
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.value[x]",
+          "linkId": "weight",
+          "text": "Weight (e.g. \"70 kg\")",
+          "type": "quantity"
+        }
+      ]
+    }
+  ]
+}

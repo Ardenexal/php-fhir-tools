@@ -83,6 +83,34 @@ $client = new FHIRHttpClient($authed, 'https://fhir.example.org/r4');
 Every request `FHIRHttpClient` makes goes through this scoped client, so the header is applied
 consistently with no new API surface here.
 
+The `OAuth\` subnamespace builds on this same pattern for two cases `withOptions()` alone doesn't cover —
+a token that needs to be *fetched and refreshed*, and a header whose name isn't `Authorization`:
+
+- **`OAuth\OAuthClientCredentialsTokenProvider`** — fetches an OAuth 2.0 client-credentials-grant access
+  token (RFC 6749 §4.4) from a token endpoint, optionally caching it (PSR-6) with a TTL derived from the
+  server's own `expires_in`. **`OAuth\OAuthHttpClient`** decorates an `HttpClientInterface` with it,
+  attaching a fresh (or cached) bearer token to every request via `auth_bearer` — no changes to
+  `FHIRHttpClient` needed:
+  ```php
+  $tokenProvider = new OAuthClientCredentialsTokenProvider($symfonyHttpClient, $tokenUrl, $clientId, $clientSecret);
+  $authed        = new OAuthHttpClient($symfonyHttpClient, $tokenProvider);
+  $client        = new FHIRHttpClient($authed, 'https://fhir.example.org/r4');
+  ```
+  A token-fetch failure never exposes the client secret: `OAuthTokenException`'s message is always a
+  fixed, generic string, and `OAuthHttpClient` rethrows it as a Symfony `TransportException` so it flows
+  through `FHIRHttpClient`'s existing graceful-null handling like any other transport failure.
+- **`OAuth\StaticHeaderHttpClient`** — attaches one fixed header (name + value) to every request
+  verbatim, no token exchange. Covers a hand-obtained bearer token or an arbitrary header like
+  `X-Api-Key`:
+  ```php
+  $authed = new StaticHeaderHttpClient($symfonyHttpClient, 'X-Api-Key', $apiKey);
+  $client = new FHIRHttpClient($authed, 'https://fhir.example.org/r4');
+  ```
+
+Both decorators are composable (they touch different request options) as long as they don't target the
+same header name — see `demo/src/Sdc/ExternalClientFactory.php` for the demo's wiring, including the
+misconfiguration guards for that case.
+
 ### Null-object default
 
 `NullFHIRHttpClient` performs no I/O and returns `null` for every call. It is the wiring default when no

@@ -815,6 +815,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         message_overrides?: array<string, scalar|Param|null>,
  *         terminology_cache_pool?: scalar|Param|null, // PSR-6 cache pool service ID for terminology validation results. Set to null to disable. // Default: null
  *         terminology_cache_ttl?: int|Param, // TTL in seconds for cached terminology results. 0 = no expiry. // Default: 3600
+ *         runtime_profiles?: array{ // StructureDefinitions to validate against without generating classes for them. Each needs a snapshot, and the core package of the FHIR release must be listed too.
+ *             package_dirs?: list<scalar|Param|null>,
+ *             files?: list<scalar|Param|null>,
+ *         },
  *     },
  *     packages?: array<string, array{ // Default: []
  *         version?: scalar|Param|null, // Package version to use
