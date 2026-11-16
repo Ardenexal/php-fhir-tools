@@ -97,7 +97,9 @@ src/
 │   ├── Validation/src/             # Resource validation against profiles
 │   ├── Models/src/                 # Generated FHIR model classes (R4, R4B, R5)
 │   ├── CdaModels/src/              # Generated CDA R2 and AU CDA logical model classes
-│   └── FHIRPath/src/               # FHIRPath 2.0 expression evaluator
+│   ├── FHIRPath/src/               # FHIRPath 2.0 expression evaluator
+│   ├── HttpClient/src/             # FHIR server client and HTTP terminology clients
+│   └── Sdc/src/                    # SDC Questionnaire $populate and QuestionnaireResponse $extract
 ```
 
 Each component has its own README with detailed documentation:
@@ -110,6 +112,8 @@ Each component has its own README with detailed documentation:
 - [Validation](src/Component/Validation/README.md) — Resource validation against profiles
 - [Models](src/Component/Models/README.md) — Generated FHIR model classes
 - [CdaModels](src/Component/CdaModels/README.md) — Generated CDA R2 and AU CDA logical models
+- [HttpClient](src/Component/HttpClient/README.md) — FHIR server client and HTTP terminology clients
+- [Sdc](src/Component/Sdc/README.md) — Structured Data Capture `$populate` and `$extract`
 
 ## Monorepo Structure
 
@@ -125,6 +129,8 @@ This is a library monorepo. Each component can be installed and used independent
 | `ardenexal/fhir-metadata` | FHIR type and property metadata, attributes, and the IG type registry | `composer require ardenexal/fhir-metadata` |
 | `ardenexal/fhir-models` | Pre-generated FHIR models (R4, R4B, R5) | `composer require ardenexal/fhir-models` |
 | `ardenexal/cda-sd-models` | Pre-generated CDA R2 and AU CDA logical models | `composer require ardenexal/cda-sd-models` |
+| `ardenexal/fhir-http-client` | FHIR server client and HTTP terminology clients | `composer require ardenexal/fhir-http-client` |
+| `ardenexal/fhir-sdc` | SDC Questionnaire `$populate` and QuestionnaireResponse `$extract` | `composer require ardenexal/fhir-sdc` |
 
 ## Development
 

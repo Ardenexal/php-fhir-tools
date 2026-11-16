@@ -6,11 +6,11 @@ goat-flow-ownership: "user-owned"
 
 Use this playbook to cut a release of the `ardenexal/*` packages: choosing the version, bumping
 every version site in lockstep, proving the result resolves, and publishing it through a GitHub
-Release that fans out to eight split repositories and Packagist. Load it whenever a request
+Release that fans out to ten split repositories and Packagist. Load it whenever a request
 mentions a release, a version bump, a tag, or `gh release`.
 
 **Publishing cannot be undone.** A tag on this repo triggers `split-monorepo.yml`, which tags all
-eight split repos within about a minute. Packagist indexes them within minutes more and never
+ten split repos within about a minute. Packagist indexes them within minutes more and never
 forgets a version. Every rule below exists so that the tag is created only on a commit already
 proven correct.
 
@@ -60,8 +60,8 @@ breaks CI or consumers:
 
 | Shape | Where | Minor bump (e.g. 0.6.0) | Patch bump (e.g. 0.6.2) |
 |---|---|---|---|
-| Cross-pins `"ardenexal/<pkg>": "^0.N"` (14 as of 0.6.1) | `src/Component/*/composer.json`, `src/Bundle/FHIRBundle/composer.json` | `^0.6` | Unchanged, unless a sibling fix is required, then floor at `^0.6.2` |
-| Branch aliases `"dev-main": "0.N.x-dev"` (8) | Same manifests | `0.6.x-dev` | Unchanged |
+| Cross-pins `"ardenexal/<pkg>": "^0.N"` (26 as of 0.7.0) | `src/Component/*/composer.json`, `src/Bundle/FHIRBundle/composer.json` | `^0.6` | Unchanged, unless a sibling fix is required, then floor at `^0.6.2` |
+| Branch aliases `"dev-main": "0.N.x-dev"` (10) | Same manifests | `0.6.x-dev` | Unchanged |
 | CI sibling stamp `composer config version 0.N.x-dev` and its comments | `.github/workflows/package-integrity.yml` (search: "composer config version") | `0.6.x-dev` | Unchanged |
 | Compat harness `0.N.999` (3 sites in each of the 2 manifests) and the floor quoted in its README | `tests/Compat/symfony-6.4/composer.json`, `tests/Compat/symfony-8.1/composer.json`, `tests/Compat/symfony-6.4/README.md` | `0.6.999` | Unchanged |
 
@@ -131,7 +131,7 @@ for pkg in "$W"/*; do
 done; exit $fail
 ```
 
-- Run it with `SRC` set to the checkout root and the new alias, e.g. `STAMP=0.6.x-dev`. Expect 7
+- Run it with `SRC` set to the checkout root and the new alias, e.g. `STAMP=0.6.x-dev`. Expect 9
   `OK` lines; `fhir-metadata` has no siblings and is skipped. Filter the output with
   `grep -v 'could not detect the root package'`, because each `composer config` call prints that line.
 - **Negative control:** re-run it with the previous alias, e.g. `STAMP=0.5.x-dev`, and expect
@@ -176,7 +176,7 @@ Then stop and wait for the user.
 
 ## Step 6: PR checks
 
-`gh pr checks <n>`. The bump-sensitive checks are all seven `Undeclared deps (<pkg>)` jobs,
+`gh pr checks <n>`. The bump-sensitive checks are all nine `Undeclared deps (<pkg>)` jobs,
 `package-integrity-passed`, `symfony-lower-bound` and `symfony-upper-bound`. A stale CI stamp fails every
 `Undeclared deps` job except `fhir-metadata`'s, which has no siblings; a single green job among
 red ones is the sign of that. Merging needs an approving review (`REVIEW_REQUIRED`).
