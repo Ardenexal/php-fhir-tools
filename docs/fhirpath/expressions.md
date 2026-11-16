@@ -69,7 +69,7 @@ The parser and evaluator support the core FHIRPath 2.0 syntax:
 | Variable | Resolves to |
 |----------|-------------|
 | `%context` | The context's root resource. When the context has none, the first `evaluate()` call sets it to that call's focus, and the context keeps it |
-| `%resource` | The resource bound with `EvaluationContext::withResourceNode()`, or the focus when none is bound |
+| `%resource` | The resource bound with `EvaluationContext::withResourceNode()`, otherwise the context's root resource (the same node as `%context`), even when the focus is a node inside it |
 | `%rootResource` | The containing resource when the context carries one (constructor argument `containerResource`), otherwise the same node as `%resource` |
 | `%ucum`, `%sct`, `%loinc` | `http://unitsofmeasure.org`, `http://snomed.info/sct`, `http://loinc.org` |
 | ``%`vs-[name]` ``, ``%`ext-[name]` `` | `http://hl7.org/fhir/ValueSet/[name]`, `http://hl7.org/fhir/StructureDefinition/[name]`. Quote the name with backticks, because `-` is otherwise read as subtraction |

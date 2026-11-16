@@ -88,7 +88,7 @@ Two decorators in the `OAuth\` namespace cover the cases `withOptions()` does no
 
 | Class | Use it for |
 |---|---|
-| `OAuth\OAuthHttpClient` with `OAuth\OAuthClientCredentialsTokenProvider` | An OAuth 2.0 client-credentials token that must be fetched and refreshed. Pass a PSR-6 pool to the provider to cache the token for a lifetime derived from the server's `expires_in` |
+| `OAuth\OAuthHttpClient` with `OAuth\OAuthClientCredentialsTokenProvider` | An OAuth 2.0 client-credentials token fetched from a token endpoint. Pass a PSR-6 pool to the provider to share the token across requests, cached until 60 seconds before the server's `expires_in` |
 | `OAuth\StaticHeaderHttpClient` | One fixed header on every request, such as a token you already hold or `X-Api-Key` |
 
 ```php
@@ -106,6 +106,11 @@ $client = new FHIRHttpClient(
     'https://fhir.example.org/r4',
 );
 ```
+
+A provider fetches its token once and then keeps it for its own lifetime. It does not check expiry
+and does not retry on a `401`, so a provider that lives longer than its token keeps sending the
+expired one. Build the provider and its `OAuthHttpClient` per request or job, and pass a PSR-6 pool
+so that each new provider reuses the cached token until it is due to expire.
 
 When a token cannot be fetched, the request fails like any other transport error, so the
 `FHIRHttpClient` method returns `null`. The error message never contains the client secret.
