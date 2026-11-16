@@ -87,10 +87,14 @@ The `OAuth\` subnamespace builds on this same pattern for two cases `withOptions
 a token that needs to be *fetched and refreshed*, and a header whose name isn't `Authorization`:
 
 - **`OAuth\OAuthClientCredentialsTokenProvider`** — fetches an OAuth 2.0 client-credentials-grant access
-  token (RFC 6749 §4.4) from a token endpoint, optionally caching it (PSR-6) with a TTL derived from the
-  server's own `expires_in`. **`OAuth\OAuthHttpClient`** decorates an `HttpClientInterface` with it,
-  attaching a fresh (or cached) bearer token to every request via `auth_bearer` — no changes to
-  `FHIRHttpClient` needed:
+  token (RFC 6749 §4.4) from a token endpoint and reuses it until 60 seconds before the server's own
+  `expires_in`, then fetches a new one, so a long-running worker keeps working. Pass a PSR-6 pool to
+  share the token between provider instances, and a PSR-20 clock to control the time it checks against.
+  **`OAuth\OAuthHttpClient`** decorates an `HttpClientInterface` with it, attaching a fresh (or cached)
+  bearer token to every request via `auth_bearer` — no changes to `FHIRHttpClient` needed. When the
+  server answers `401`, it drops the token and sends the request once more with a new one; a body that
+  is a stream, a generator or a form upload holding a stream is not resent (set body defaults through
+  `OAuthHttpClient::withOptions()`, not on the client it wraps, so it can tell). To read the status, `request()` waits for the response headers:
   ```php
   $tokenProvider = new OAuthClientCredentialsTokenProvider($symfonyHttpClient, $tokenUrl, $clientId, $clientSecret);
   $authed        = new OAuthHttpClient($symfonyHttpClient, $tokenProvider);

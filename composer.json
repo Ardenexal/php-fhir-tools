@@ -31,6 +31,7 @@
         "matesofmate/phpstan-extension": "^0.2.0",
         "nette/php-generator": "^4.2.1",
         "psr/cache": "^3.0",
+        "psr/clock": "^1.0",
         "psr/http-client": "^1.0",
         "seld/jsonlint": "^1.12.1",
         "symfony/config": "^6.4|^7.4|^8.1",

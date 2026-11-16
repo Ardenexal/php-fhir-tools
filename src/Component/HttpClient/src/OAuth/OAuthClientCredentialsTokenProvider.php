@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\HttpClient\OAuth;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Clock\ClockInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
@@ -20,13 +21,20 @@ use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
  * raw response are never included in any exception message, so this can be safely surfaced in a
  * user-facing error (see {@see OAuthTokenException}'s own docblock).
  *
- * When a PSR-6 cache pool is supplied, the token is cached under a key derived from every token-issuance
- * input (see {@see self::cacheKey()}), with a TTL of the server's own `expires_in` minus a 60s safety
- * margin. This mirrors {@see CachingFHIRTerminologyClient}'s in-process-then-PSR-6 layering, simplified
- * to a single cached value per provider instance (no per-call variation exists here the way it does for
- * terminology lookups). A margin-adjusted TTL at or below zero is never persisted to the pool at all (see
- * {@see self::getAccessToken()}); it is only served from the in-process token for the remainder of this
- * instance's lifetime.
+ * A token is reused until its expiry: the server's own `expires_in` minus a 60s safety margin. After
+ * that, the next `getAccessToken()` call fetches a new one, so a long-running worker (a Messenger
+ * consumer, a daemon) keeps working past the first token's lifetime. A freshly fetched token is always
+ * returned for the call that fetched it, even when `expires_in` is inside the margin, but such a token
+ * is never reused.
+ *
+ * When a PSR-6 cache pool is supplied, the token and its expiry are also cached under a key derived from
+ * every token-issuance input (see {@see self::cacheKey()}), with the same margin-adjusted TTL. This
+ * mirrors {@see CachingFHIRTerminologyClient}'s in-process-then-PSR-6 layering, simplified to a single
+ * cached value per provider instance (no per-call variation exists here the way it does for terminology
+ * lookups). A token whose margin-adjusted TTL is at or below zero is never written to the pool.
+ *
+ * Pass a PSR-20 clock to control "now" (tests, or an application-wide clock); without one the system
+ * time is used.
  */
 final class OAuthClientCredentialsTokenProvider
 {
@@ -34,7 +42,13 @@ final class OAuthClientCredentialsTokenProvider
 
     private const DEFAULT_TTL_SECONDS = 3600;
 
+    /** One year: longer than any real access token lives, and small enough to add to a timestamp safely. */
+    private const MAX_TTL_SECONDS = 31_536_000;
+
     private ?string $inProcessToken = null;
+
+    /** Unix timestamp from which {@see self::$inProcessToken} must no longer be used. */
+    private int $inProcessExpiresAt = 0;
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -43,53 +57,91 @@ final class OAuthClientCredentialsTokenProvider
         private readonly string $clientSecret,
         private readonly ?string $scope = null,
         private readonly ?CacheItemPoolInterface $cache = null,
+        private readonly ?ClockInterface $clock = null,
     ) {
     }
 
     /**
-     * Returns a valid access token, from cache when available and unexpired, otherwise freshly fetched.
+     * Returns an unexpired access token from the in-process or PSR-6 cache, otherwise a freshly fetched one.
      *
      * @throws OAuthTokenException on any failure to obtain a token
      */
     public function getAccessToken(): string
     {
-        if ($this->inProcessToken !== null) {
+        $now = $this->now();
+
+        if ($this->inProcessToken !== null && $now < $this->inProcessExpiresAt) {
             return $this->inProcessToken;
         }
 
-        $cacheKey = $this->cacheKey();
+        $this->inProcessToken = null;
+        $cacheKey             = $this->cacheKey();
 
         if ($this->cache !== null) {
             $item = $this->cache->getItem($cacheKey);
             if ($item->isHit()) {
                 $cached = $item->get();
-                if (\is_string($cached) && $cached !== '') {
-                    $this->inProcessToken = $cached;
+                // The pool expires the item itself, but a pool that ignores TTLs, or one whose clock is
+                // ahead of or behind this provider's, can return it late, so the stored expiry is checked too.
+                if (\is_array($cached)
+                    && isset($cached['token'], $cached['expires_at'])
+                    && \is_string($cached['token']) && $cached['token'] !== ''
+                    && \is_int($cached['expires_at']) && $now < $cached['expires_at']
+                ) {
+                    $this->inProcessToken     = $cached['token'];
+                    $this->inProcessExpiresAt = $cached['expires_at'];
 
-                    return $cached;
+                    return $cached['token'];
                 }
             }
         }
 
-        [$token, $expiresIn]  = $this->fetchToken();
-        $this->inProcessToken = $token;
+        [$token, $expiresIn] = $this->fetchToken();
+        $ttl                 = $expiresIn - self::SAFETY_MARGIN_SECONDS;
 
-        $ttl = $expiresIn - self::SAFETY_MARGIN_SECONDS;
+        $this->inProcessToken     = $token;
+        $this->inProcessExpiresAt = $now + $ttl;
 
-        // A non-positive margin-adjusted TTL means the token is already at (or past) the point the
-        // safety margin exists to guard against — it must NOT be persisted to the PSR-6 pool at all.
-        // Passing null to expiresAfter() means "never expires" (persist indefinitely), which would be
-        // the opposite of correct here: a short-lived token would be served long after it actually
-        // expired, causing sustained auth failures until the pool entry is manually evicted. The
-        // in-process token above still serves the remainder of this request/instance's lifetime.
+        // A non-positive TTL means the token is already inside the safety margin, so it is not written
+        // to the pool at all. Never "fix" this by passing null to expiresAfter(): null means "never
+        // expires", which would serve the token long after the server stopped accepting it.
         if ($this->cache !== null && $ttl > 0) {
             $item = $this->cache->getItem($cacheKey);
-            $item->set($token);
+            $item->set(['token' => $token, 'expires_at' => $now + $ttl]);
             $item->expiresAfter($ttl);
             $this->cache->save($item);
         }
 
         return $token;
+    }
+
+    /**
+     * Drops $token from the in-process and PSR-6 caches so the next {@see self::getAccessToken()} call
+     * fetches a new one. Call this when a server rejects the token (HTTP 401) before its expiry, for
+     * example after the authorisation server revoked it. A different token already in the cache, such
+     * as one another worker fetched in the meantime, is left alone.
+     */
+    public function invalidate(string $token): void
+    {
+        if ($this->inProcessToken === $token) {
+            $this->inProcessToken = null;
+        }
+
+        if ($this->cache === null) {
+            return;
+        }
+
+        $cacheKey = $this->cacheKey();
+        $item     = $this->cache->getItem($cacheKey);
+        $cached   = $item->isHit() ? $item->get() : null;
+        if (\is_array($cached) && ($cached['token'] ?? null) === $token) {
+            $this->cache->deleteItem($cacheKey);
+        }
+    }
+
+    private function now(): int
+    {
+        return $this->clock?->now()->getTimestamp() ?? time();
     }
 
     /**
@@ -146,8 +198,24 @@ final class OAuthClientCredentialsTokenProvider
             throw new OAuthTokenException('OAuth token endpoint response did not include an access_token.');
         }
 
-        $expiresIn = isset($data['expires_in']) && \is_int($data['expires_in']) ? $data['expires_in'] : self::DEFAULT_TTL_SECONDS;
+        return [$data['access_token'], self::expiresIn($data['expires_in'] ?? null)];
+    }
 
-        return [$data['access_token'], $expiresIn];
+    /**
+     * Reads `expires_in` as whole seconds. Some token endpoints send it as a numeric string (`"3599"`),
+     * which is accepted too. A missing or unreadable value falls back to one hour, and a value above
+     * {@see self::MAX_TTL_SECONDS} is capped so the expiry timestamp cannot overflow.
+     */
+    private static function expiresIn(mixed $value): int
+    {
+        if (\is_string($value) && preg_match('/^\d{1,10}$/', $value) === 1) {
+            $value = (int) $value;
+        }
+
+        if (!\is_int($value)) {
+            return self::DEFAULT_TTL_SECONDS;
+        }
+
+        return min($value, self::MAX_TTL_SECONDS);
     }
 }
