@@ -1,7 +1,7 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 0,
-    "infoCount": 1,
+    "infoCount": 0,
     "java": {
         "errorCount": 0,
         "warningCount": 0,
@@ -14,6 +14,9 @@
         "errors": {
             "constraint:Regex": [
                 "contained[0].id — Invalid Resource id: \"12345678901234567890123456789012345678901234567890123456789012345\" must be 1-64 characters of A-Z, a-z, 0-9, \"-\" or \".\"."
+            ],
+            "invariant:dom-3": [
+                "contained[0] — The contained resource '12345678901234567890123456789012345678901234567890123456789012345' is not referenced to from elsewhere in the containing resource nor does it refer to the containing resource (dom-3)"
             ]
         },
         "warnings": {}
