@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **[Validation] Resources that validated clean can now fail: more of the core invariants are checked.** Each now reports where the HL7 Java reference validator does (#159):
+  - `ext-1` on every extension, including one on a primitive value, when it has neither a value nor sub-extensions, or has both.
+  - `ele-1` on a primitive that is present but has no value and no extension, such as `<implicitRules id="i1"/>` or `"fullUrl": ""`, beside the existing `value cannot be empty`.
+  - `txt-2` on a narrative with no text other than whitespace and no image, such as `<div><p></p></div>`.
+  - In R4, `que-12` (two `enableWhen` without `enableBehavior`) and `eld-19` (an `ElementDefinition.path` such as `Observation...unit`), which R4 published wrongly, are checked with the expressions R4B corrected them to.
+- [Serialization] Reading XML no longer drops narrative text from a resource inside a Bundle entry, a contained resource or another repeating element when the `div`, or an element in it, has an attribute. `<div lang="en">Text</div>` came out as `<div lang="en"/>`.
+
 ## [0.7.0] - 2026-11-17
 
 ### Added

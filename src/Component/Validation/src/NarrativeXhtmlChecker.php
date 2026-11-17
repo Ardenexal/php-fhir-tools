@@ -205,15 +205,20 @@ final class NarrativeXhtmlChecker
     private function checkXhtml(string $xhtml, string $path, string $fhirVersion): array
     {
         $trimmed = ltrim($xhtml);
+        $suffix  = $fhirVersion === 'R5' ? self::DEFINED_IN : '';
 
-        // Not markup: the XML pipeline strips the <div> wrapper off a text-only narrative, so a
-        // bare string is an artefact of deserialization rather than evidence of a malformed
-        // document. Same "looks like markup" test the XML normalizer uses.
-        if ($trimmed === '' || !str_starts_with($trimmed, '<')) {
-            return [];
+        // Nothing but whitespace. The XML pipeline strips the <div> wrapper off a narrative with no
+        // child elements, so `<div>\n</div>` arrives as the bare newline (`R5.extension-slice`).
+        if ($trimmed === '') {
+            return [$this->violation($path, self::TXT_2 . $suffix, 'txt-2')];
         }
 
-        $suffix = $fhirVersion === 'R5' ? self::DEFINED_IN : '';
+        // Not markup: the same wrapper stripping applies to a text-only narrative, so a bare string
+        // is an artefact of deserialization rather than evidence of a malformed document. Same
+        // "looks like markup" test the XML normalizer uses.
+        if (!str_starts_with($trimmed, '<')) {
+            return [];
+        }
 
         // A DOCTYPE is refused before parsing, so no entity it declares is ever expanded.
         if (preg_match('/<!DOCTYPE/i', $xhtml) === 1) {
@@ -297,11 +302,43 @@ final class NarrativeXhtmlChecker
             $violations[] = $this->violation($path, self::TXT_1 . $suffix, 'txt-1');
         }
 
+        if (!self::hasContent($root)) {
+            $violations[] = $this->violation($path, self::TXT_2 . $suffix, 'txt-2');
+        }
+
         foreach ($diagnostics as $diagnostic) {
             $violations[] = $diagnostic;
         }
 
         return $violations;
+    }
+
+    /**
+     * Does the narrative say anything? txt-2's rule, as the reference validator applies it.
+     *
+     * The published txt-2 expression is `htmlChecks()`, which says nothing about what "content" is.
+     * The reference validator substitutes its own `htmlChecks2()`: some text that is not only
+     * whitespace, or an `img`, anywhere in the tree. So `<div><p/></div>` (`R4.list-xhtml-empty`) and
+     * `<div><p>  </p></div>` (`R5.narrative-empty`) both fail it, and a narrative that is only an
+     * image passes.
+     */
+    private static function hasContent(\DOMNode $node): bool
+    {
+        if ($node instanceof \DOMText && trim($node->data) !== '') {
+            return true;
+        }
+
+        if ($node instanceof \DOMElement && strtolower($node->localName ?? '') === 'img') {
+            return true;
+        }
+
+        foreach ($node->childNodes as $child) {
+            if (self::hasContent($child)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

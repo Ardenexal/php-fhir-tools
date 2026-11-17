@@ -214,7 +214,7 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
 
         try {
             $result = $this->pathService->evaluate(
-                $constraint->expression,
+                FHIRPathInvariantErrata::correct($constraint->expression),
                 $value,
                 FHIRPathResourceContext::at($this->context->getRoot(), (string) $this->context->getPropertyPath(), $this->context),
             );
