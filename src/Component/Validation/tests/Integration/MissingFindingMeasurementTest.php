@@ -160,8 +160,10 @@ final class MissingFindingMeasurementTest extends TestCase
     public function testWarningDivergenceIsPinned(FhirVersion $version): void
     {
         // R4 fell from 97 when meta.profile activation arrived (#170): a profile the reference
-        // validator reports as unknown, we now report unchecked in the same words.
-        $expected = ['R4' => 92, 'R4B' => 1, 'R5' => 45];
+        // validator reports as unknown, we now report unchecked in the same words. It rose to 93 with
+        // Bundle reachability (#155): `bundle-urn` matched Java's one warning by coincidence, with an
+        // unrelated binding warning of ours, and now carries Java's reachability warning as well.
+        $expected = ['R4' => 93, 'R4B' => 1, 'R5' => 45];
 
         self::assertSame(
             $expected[$version->value] ?? null,

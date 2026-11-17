@@ -94,6 +94,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly DuplicateElementIdChecker $duplicateIdChecker = new DuplicateElementIdChecker(),
         private readonly AttachmentIntegrityChecker $attachmentChecker = new AttachmentIntegrityChecker(),
         private readonly QuestionnaireDefinitionChecker $questionnaireDefinitionChecker = new QuestionnaireDefinitionChecker(),
+        private readonly BundleReachabilityChecker $bundleReachabilityChecker = new BundleReachabilityChecker(),
     ) {
         $this->runtimeConstraints          = new \WeakMap();
         $this->runtimeExtensionConstraints = new \WeakMap();
@@ -263,6 +264,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // against the entries already in hand. See BundleReferenceResolutionChecker.
         foreach ($this->bundleReferenceChecker->check($resource) as $bundleReferenceViolation) {
             $violations[] = $bundleReferenceViolation;
+        }
+
+        // Document and message entries the first entry cannot reach by following links. Unconditional
+        // like the two passes above, and it too resolves only against the entries in hand. See
+        // BundleReachabilityChecker.
+        foreach ($this->bundleReachabilityChecker->check($resource) as $reachabilityViolation) {
+            $violations[] = $reachabilityViolation;
         }
 
         // Extension.url is a structural rule, not a resolution one: it needs no registry, so unlike

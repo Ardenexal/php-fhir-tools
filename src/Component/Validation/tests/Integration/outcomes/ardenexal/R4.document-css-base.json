@@ -1,5 +1,5 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 2,
     "infoCount": 1,
     "java": {
@@ -18,6 +18,9 @@
         "errors": {
             "constraint:BundleEntryFullUrlChecker": [
                 "entry[0] — The fullUrl 'http://hl7.org/fhir/test/Composition/test-css-document' looks like a RESTful server URL, so it must end with the correct type and id (/Composition/test-document-good)"
+            ],
+            "constraint:BundleReachabilityChecker": [
+                "entry[2] — Entry 'http://hl7.org/fhir/test/Binary/css1' isn't reachable by traversing links (forward or backward) from the Composition"
             ]
         },
         "warnings": {
