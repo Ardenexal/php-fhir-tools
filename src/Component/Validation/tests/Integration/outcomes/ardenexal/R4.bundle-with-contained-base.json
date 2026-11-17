@@ -1,5 +1,5 @@
 {
-    "errorCount": 2,
+    "errorCount": 3,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -23,6 +23,9 @@
             ],
             "constraint:BundleReferenceResolutionChecker": [
                 "entry[0].resource.focus[0] — Can't find 'Organization/SampleLabelerOrganization' in the bundle. A resource with the same type and id is present at fullUrl 'http://example.org/Organization/SampleLabelerOrganization', but the fullUrl based rules around matching relative references do not match it against the source fullUrl 'http://example.org/MessageHeader/LabelerCodeRequestMessage'"
+            ],
+            "constraint:NarrativeXhtmlChecker": [
+                "entry[0].resource.text.div — Hyperlink '#Organization_SampleLabelerOrganization' at 'div/p/a' for 'See above (Organization/SampleLabelerOrganization)' does not resolve"
             ]
         },
         "warnings": {}

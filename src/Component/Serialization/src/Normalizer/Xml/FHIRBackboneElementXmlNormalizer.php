@@ -24,6 +24,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRStructureKindProviderInterfa
  */
 class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
 {
+    use ThreadsXmlSourceElement;
+
     public function __construct(
         FHIRMetadataExtractorInterface $metadataExtractor,
         private readonly FHIRTypeResolverInterface $typeResolver,
@@ -83,6 +85,8 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
         if (!is_array($data)) {
             throw new NotNormalizableValueException('Expected array, got ' . gettype($data));
         }
+
+        $sourceElement = $this->takeSourceElement($context);
 
         try {
             $object     = $this->instantiateWithConstructorDefaults($type);
@@ -152,7 +156,9 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                     if ($resourceElementName !== null && $this->denormalizer !== null && is_array($value) && isset($value[$resourceElementName])) {
                         $resolvedClass = $this->typeResolver->resolveResourceType(['resourceType' => $resourceElementName]);
                         if ($resolvedClass !== null) {
-                            $denormalizedValue = $this->denormalizer->denormalize($value[$resourceElementName], $resolvedClass, 'xml', $context);
+                            $wrapper           = $this->sourceChildrenNamed($sourceElement, $elementName)[0] ?? null;
+                            $resourceContext   = $this->withSourceElement($context, $this->wrappedResourceElement($wrapper, $resourceElementName));
+                            $denormalizedValue = $this->denormalizer->denormalize($value[$resourceElementName], $resolvedClass, 'xml', $resourceContext);
                             self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                             continue;
                         }
@@ -170,14 +176,16 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                         $items = [''];
                     }
                     $denormalizedValue = [];
-                    foreach ((array) $items as $item) {
+                    $sourceChildren    = $this->sourceChildrenNamed($sourceElement, $elementName);
+                    foreach (array_values((array) $items) as $index => $item) {
                         /** @var class-string $phpItemClass */
-                        $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $context);
+                        $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $this->withSourceElement($context, $sourceChildren[$index] ?? null));
                     }
                 } elseif ($this->denormalizer !== null) {
                     $propertyType = $this->getPropertyType($type, $elementName);
                     if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                        $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
+                        $childContext      = $this->withSourceElement($context, $this->sourceChildrenNamed($sourceElement, $elementName)[0] ?? null);
+                        $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $childContext);
                     } else {
                         $this->recordMalformedScalar($object, $elementName, $propertyType, $value, 'xml');
                         $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
