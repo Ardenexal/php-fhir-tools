@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\XhtmlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\ListResource;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\List\ListEntry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationViolation;
 use Ardenexal\FHIRTools\Component\Validation\NarrativeXhtmlChecker;
 use PHPUnit\Framework\TestCase;
@@ -123,14 +124,112 @@ final class NarrativeXhtmlCheckerTest extends TestCase
     public function testWellFormedHrefsAreAccepted(): void
     {
         self::assertSame([], $this->messagesFor(
-            '<div><a href="http://example.com/a-b/link.html?x=1&amp;y=2#top">a</a><a href="#local">b</a>'
+            '<div id="local"><a href="http://example.com/a-b/link.html?x=1&amp;y=2#top">a</a><a href="#local">b</a>'
             . '<a href="http://example.com/a%20b">c</a><a href="http://例え.jp/パス">d</a></div>',
         ));
     }
 
+    /** Wording from `R4.message`: `urn:uuid:` names a resource, it does not locate a page. */
+    public function testIdentifierSchemeHrefIsReportedWithItsElementPath(): void
+    {
+        self::assertSame(
+            [
+                "Hyperlink scheme 'urn' in 'urn:uuid:e442c924-df77-47fa-838f-24a8253bbdd4' at 'div/p/a' for 'Amy V. Shaw' is not a valid hyperlinkable scheme",
+                "Hyperlink scheme 'urn' in 'urn:uuid:75ea28b5-74b8-4d9c-9eb5-cfdc10b48fa' at 'div/table/tr/td/a' for 'Health Level Seven International - Amherst' is not a valid hyperlinkable scheme",
+            ],
+            $this->messagesFor(
+                '<div><p><a href="urn:uuid:e442c924-df77-47fa-838f-24a8253bbdd4">Amy V. Shaw</a></p>'
+                . '<table><tr><td><a href="urn:uuid:75ea28b5-74b8-4d9c-9eb5-cfdc10b48fa">Health Level Seven International - Amherst</a></td></tr></table></div>',
+            ),
+        );
+    }
+
+    public function testWebAndContactSchemesAreAccepted(): void
+    {
+        self::assertSame([], $this->messagesFor(
+            '<div><a href="https://hl7.org/fhir">a</a><a href="mailto:a@example.org">b</a><a href="tel:+61300000000">c</a></div>',
+        ));
+    }
+
+    /** Wording from `R4.bundle-with-contained`. */
+    public function testFragmentLinkWithNoTargetIsReported(): void
+    {
+        self::assertSame(
+            ["Hyperlink '#Organization_SampleLabelerOrganization' at 'div/p/a' for 'See above (Organization/SampleLabelerOrganization)' does not resolve"],
+            $this->messagesFor('<div><p><a href="#Organization_SampleLabelerOrganization">See above (Organization/SampleLabelerOrganization)</a></p></div>'),
+        );
+    }
+
+    public function testRepeatedUnresolvedFragmentLinkIsReportedOnce(): void
+    {
+        self::assertSame(
+            ["Hyperlink '#nope' at 'div/a' for 'x' does not resolve"],
+            $this->messagesFor('<div><a href="#nope">x</a><a href="#nope">x</a></div>'),
+        );
+    }
+
+    public function testFragmentLinkResolvesToAnElementIdAnAnchorNameOrAContainedResource(): void
+    {
+        $resource            = new ListResource();
+        $resource->text      = new Narrative(status: null, div: new XhtmlPrimitive(
+            value: '<div><a name="top"/><a href="#top">a</a><a href="#entry-1">b</a><a href="#c1">c</a><a href="#">d</a></div>',
+        ));
+        $contained           = new ListResource();
+        $contained->id       = 'c1';
+        $resource->contained = [$contained];
+        $resource->entry     = [new ListEntry(id: 'entry-1')];
+
+        self::assertSame([], (new NarrativeXhtmlChecker())->check($resource));
+    }
+
+    /** `R4.ips-htmlrefs-forwards`: the reference validator does not accept `idref` on any element. */
+    public function testIdrefAttributeIsReportedWithTxt1(): void
+    {
+        self::assertSame(
+            [self::TXT_1, "Invalid attribute name in the XHTML ('idref' on 'tr')"],
+            $this->messagesFor('<div><table><tr idref="ai1"><td>x</td></tr><tr idref="ai2"><td>y</td></tr></table></div>'),
+        );
+    }
+
+    /** Wording from `R5.list-xhtml-wrongns1`, reachable from JSON, where the string keeps its `xmlns`. */
+    public function testWrongDeclaredNamespaceIsReported(): void
+    {
+        self::assertSame(
+            ["Wrong namespace on the XHTML ('http://www.w3.org/1999/xhtmlx', should be 'http://www.w3.org/1999/xhtml')"],
+            $this->messagesFor('<div xmlns="http://www.w3.org/1999/xhtmlx"><p>This is some narrative</p></div>'),
+        );
+    }
+
+    /** `R5.list-xhtml-wrongns2`: the namespace is wrong on a nested element, and is reported once. */
+    public function testWrongNamespaceOnANestedElementIsReportedOnce(): void
+    {
+        self::assertSame(
+            ["Wrong namespace on the XHTML ('http://www.w3.org/1999/xhtmlx', should be 'http://www.w3.org/1999/xhtml')"],
+            $this->messagesFor('<div><p xmlns="http://www.w3.org/1999/xhtmlx">a</p><p xmlns="http://www.w3.org/1999/xhtmlx">b</p></div>'),
+        );
+    }
+
+    /** `R4.message` links the same `urn:` twice in one narrative; the reference validator reports it once. */
+    public function testRepeatedFindingIsReportedOncePerNarrative(): void
+    {
+        self::assertSame(
+            ["Hyperlink scheme 'urn' in 'urn:uuid:1' at 'div/p/a' for 'x' is not a valid hyperlinkable scheme"],
+            $this->messagesFor('<div><p><a href="urn:uuid:1">x</a></p><p><a href="urn:uuid:1">x</a></p></div>'),
+        );
+    }
+
+    /** Wording from `R5.list-xhtml-syntax`: what was found, then what was expected. */
+    public function testTagMismatchIsWordedAsTheReferenceValidatorDoes(): void
+    {
+        self::assertSame(
+            'Error parsing XHTML: Malformed XHTML: Found "</pa>" expecting "</p>" at line 2 column 37',
+            $this->messagesFor("<div xmlns=\"http://www.w3.org/1999/xhtml\">\n      <p>This is some narrative</pa>\n    </div>")[0],
+        );
+    }
+
     public function testTextWithoutMarkupIsNotTreatedAsMalformed(): void
     {
-        // The XML normalizer strips the <div> wrapper off a text-only narrative.
+        // A model built in code can hold a text-only narrative without its <div> wrapper.
         self::assertSame([], $this->messagesFor("\n      some text in no particular language\n    "));
     }
 

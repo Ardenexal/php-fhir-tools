@@ -428,7 +428,7 @@ final class JavaFindingMatcher
     }
 
     /**
-     * Both sides say the same reference fails the Bundle fullUrl matching rules.
+     * Both sides say the same reference fails to resolve in the Bundle, for the same reason.
      *
      * This family needs its own rule because neither general route reaches it.
      *
@@ -451,8 +451,8 @@ final class JavaFindingMatcher
      * So this rule reads the field the reference validator gets **right**, the context label inside the
      * message, and ignores the one it gets wrong. Three agreements where the label is a path:
      *
-     *  1. the rule, via a phrase that commits either validator to fullUrl matching rather than to plain
-     *     absence (`Can't find …` alone) or ambiguity (`Found 2 matches …`);
+     *  1. the rule, via the sentence template: fullUrl matching, plain absence or ambiguity. See
+     *     {@see bundleResolutionRule()};
      *  2. the reference being resolved, quoted identically by both sides;
      *  3. the element, taken as the label's trailing property name. `Bundle.entry[2].resource.subject`
      *     and `Composition.author` both yield the property, which is what separates `bundle-urn`'s four
@@ -467,21 +467,14 @@ final class JavaFindingMatcher
      */
     private function matchesByBundleResolution(string $javaText, FHIRValidationViolation $ours): bool
     {
+        // Agreements 1 and 2: the same sentence template, about the same quoted reference.
+        $javaRule = $this->bundleResolutionRule(strtolower($javaText));
+
+        if ($javaRule === null || $javaRule !== $this->bundleResolutionRule(strtolower($ours->message))) {
+            return false;
+        }
+
         $java = strtolower($javaText);
-        $mine = strtolower($ours->message);
-
-        if (!str_contains($java, self::BUNDLE_RESOLUTION_PHRASE) || !str_contains($mine, self::BUNDLE_RESOLUTION_PHRASE)) {
-            return false;
-        }
-
-        // Agreement 2: the reference itself, which both sides quote first.
-        if (preg_match("/can't find '([^']*)'/", $java, $javaRef) !== 1) {
-            return false;
-        }
-
-        if (preg_match("/can't find '([^']*)'/", $mine, $ourRef) !== 1 || $javaRef[1] !== $ourRef[1]) {
-            return false;
-        }
 
         // Agreement 3: the element, from the context label where that label is a path.
         if (preg_match('/in the bundle \(([^)]*)\)/', $java, $context) !== 1) {
@@ -506,6 +499,32 @@ final class JavaFindingMatcher
         $dot  = strrpos($tail, '.');
 
         return ($dot === false ? $tail : substr($tail, $dot + 1)) === $property;
+    }
+
+    /**
+     * Which of the three Bundle resolution templates a finding uses, and the reference it quotes.
+     *
+     * Each template commits a validator to a different rule, so pairing across them would credit us
+     * with a rule we have not written:
+     *
+     *  - `apparent`: `Can't find 'X' … fullUrl based rules …`, a same-type-and-id entry the matching
+     *    rules refuse;
+     *  - `ambiguous`: `Found 2 matches for 'X' in the bundle`, more than one entry matches;
+     *  - `absent`: `Can't find 'X' in the bundle` without the fullUrl clause, nothing is there at all.
+     *
+     * The template is returned with the reference so a caller compares both in one step.
+     */
+    private function bundleResolutionRule(string $lowerText): ?string
+    {
+        if (preg_match("/\\Afound \\d+ matches for '([^']*)' in the bundle/", $lowerText, $m) === 1) {
+            return 'ambiguous:' . $m[1];
+        }
+
+        if (preg_match("/\\Acan't find '([^']*)' in the bundle/", $lowerText, $m) !== 1) {
+            return null;
+        }
+
+        return (str_contains($lowerText, self::BUNDLE_RESOLUTION_PHRASE) ? 'apparent:' : 'absent:') . $m[1];
     }
 
     /**

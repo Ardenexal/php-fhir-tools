@@ -1446,16 +1446,6 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                 continue;
             }
 
-            // A narrative's XHTML is content, not FHIR structure: its text decodes under '#' as soon as
-            // the element carrying it has an attribute, so `<div lang="en">Text</div>` is
-            // `['@lang' => 'en', '#' => 'Text']`. Stripping inside it erased the narrative text of every
-            // resource reached through an array property, such as a Bundle entry or a contained
-            // resource. `div` is the only element FHIR names that way, and the xhtml denormalizer
-            // re-encodes the subtree whole.
-            if ($key === 'div') {
-                continue;
-            }
-
             if (is_array($value) && $value !== []) {
                 $stripped = $this->stripXmlMetaKeys($value);
 

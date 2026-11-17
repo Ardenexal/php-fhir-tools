@@ -53,6 +53,8 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      */
     protected const XML_DEFAULT_NAMESPACE_CONTEXT_KEY = '__cda_default_ns';
 
+    private const string XHTML_NAMESPACE = 'http://www.w3.org/1999/xhtml';
+
     private readonly XmlEncoder $xmlEncoder;
 
     public function __construct(
@@ -378,8 +380,16 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         if ($resourceElementName !== null) {
                             $resolvedClass = $this->typeResolver->resolveResourceType(['resourceType' => $resourceElementName]);
                             if ($resolvedClass !== null) {
-                                $innerData         = is_array($value[$resourceElementName] ?? null) ? $value[$resourceElementName] : $value;
-                                $denormalizedValue = $this->denormalizer->denormalize($innerData, $resolvedClass, 'xml', $context);
+                                $innerData = is_array($value[$resourceElementName] ?? null) ? $value[$resourceElementName] : $value;
+                                // Thread the wrapped resource's own element down (`<resource><Patient>`),
+                                // so its narrative is read from the source DOM like the root's.
+                                $resourceContext = $context;
+                                $wrapper         = $sourceElement !== null ? ($this->childElementsByLocalName($sourceElement, $elementName)[0] ?? null) : null;
+                                $resourceSource  = $wrapper       !== null ? ($this->childElementsByLocalName($wrapper, $resourceElementName)[0] ?? null) : null;
+                                if ($resourceSource !== null) {
+                                    $resourceContext[self::SOURCE_ELEMENT_CONTEXT_KEY] = $resourceSource;
+                                }
+                                $denormalizedValue = $this->denormalizer->denormalize($innerData, $resolvedClass, 'xml', $resourceContext);
                                 self::modelAccessor()->writeValue($object, $elementName, $denormalizedValue);
                                 continue;
                             }
@@ -639,7 +649,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     } elseif (is_string($rawXhtml)) {
                         $trimmed    = ltrim($rawXhtml);
                         $xhtmlArray = str_starts_with($trimmed, '<')
-                            ? $this->decodeXhtmlToArray($rawXhtml)
+                            ? ($this->buildFhirNarrativeElement($rawXhtml) ?? $this->decodeXhtmlToArray($rawXhtml))
                             : ['#' => $rawXhtml];
                         $xhtmlArray['@xmlns'] = 'http://www.w3.org/1999/xhtml';
                         $data[$xmlKey]        = $xhtmlArray;
@@ -1154,19 +1164,37 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 continue;
             }
 
+            $elementName = $this->cdaLocalElementName($propertyName, $meta);
+
             // declaredTypeOf answers null for an absent property and the bare name for a nullable
             // one, so this single test covers both halves of what the handle checked.
-            if (self::modelAccessor()->declaredTypeOf($object, $propertyName) !== 'string') {
+            if (self::modelAccessor()->declaredTypeOf($object, $propertyName) === 'string') {
+                $children = $this->childElementsByLocalName($sourceElement, $elementName);
+                if ($children === []) {
+                    continue;
+                }
+
+                self::modelAccessor()->writeValue($object, $propertyName, $this->narrativeMarkupFrom($children[0]));
+                $consumed[$elementName] = true;
+
                 continue;
             }
 
-            $elementName = $this->cdaLocalElementName($propertyName, $meta);
-            $children    = $this->childElementsByLocalName($sourceElement, $elementName);
+            // FHIR `Narrative.div`: the generated xhtml primitive holds the whole div as a string.
+            $xhtmlClass = $this->getFirstNonBuiltinTypeFromProperty($object, $propertyName);
+            if ($xhtmlClass === null) {
+                continue;
+            }
+
+            $children = $this->childElementsByLocalName($sourceElement, $elementName);
             if ($children === []) {
                 continue;
             }
 
-            self::modelAccessor()->writeValue($object, $propertyName, $this->narrativeMarkupFrom($children[0]));
+            // Bare, not defaulted: the instance carries only its value, as the decoded-array path does.
+            $xhtml = self::modelAccessor()->instantiateBare($xhtmlClass);
+            self::modelAccessor()->writeValue($xhtml, 'value', $this->fhirNarrativeMarkupFrom($children[0]));
+            self::modelAccessor()->writeValue($object, $propertyName, $xhtml);
             $consumed[$elementName] = true;
         }
 
@@ -1196,6 +1224,76 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         return $markup;
+    }
+
+    /**
+     * Serialize a FHIR `Narrative.div` element, wrapper included, writing a namespace only where an
+     * element's differs from its parent's.
+     *
+     * A narrative wholly in the XHTML namespace is written bare, as the decoded-array path always
+     * wrote it: the namespace is re-declared on emit. An element in any other namespace keeps it,
+     * because that is a validation finding (`Wrong namespace on the XHTML`) and dropping it would turn
+     * a broken narrative into a correct one. The FHIR namespace a div inherits when it declares none is
+     * kept for the same reason.
+     */
+    private function fhirNarrativeMarkupFrom(\DOMElement $div): string
+    {
+        $target = new \DOMDocument();
+        $copy   = $this->copyFhirNarrativeNode($div, $target, true, self::XHTML_NAMESPACE);
+
+        return $copy === null ? '' : (string) $target->saveXML($copy);
+    }
+
+    /**
+     * Recursively copy a FHIR narrative node. Unlike {@see copyWithoutNamespaces()}, namespaced
+     * attributes such as `xml:lang` are kept: they are legitimate in FHIR narrative, and the
+     * decoded-array path kept them too.
+     *
+     * Reading ({@see fhirNarrativeMarkupFrom()}) keeps a namespace wherever it differs from the one
+     * in scope, so an XHTML child of a wrong-namespace div stays XHTML instead of inheriting the
+     * parent's. Writing ({@see buildFhirNarrativeElement()}) drops every namespace: the div is
+     * declared XHTML on emit, so a narrative is always written in the namespace FHIR requires,
+     * as it was before.
+     *
+     * @param bool   $keepNamespaces whether to keep namespaces that differ from the one in scope
+     * @param string $inScope        the default namespace this node's parent establishes
+     */
+    private function copyFhirNarrativeNode(\DOMNode $node, \DOMDocument $target, bool $keepNamespaces, string $inScope): ?\DOMNode
+    {
+        if ($node instanceof \DOMText) {
+            return $target->createTextNode($node->nodeValue ?? '');
+        }
+
+        if (!$node instanceof \DOMElement || $node->localName === null) {
+            return null;
+        }
+
+        // An element in no namespace at all is treated as XHTML: absence is not a wrong namespace.
+        $namespace = $node->namespaceURI ?? self::XHTML_NAMESPACE;
+        $copy      = !$keepNamespaces || $namespace === $inScope
+            ? $target->createElement($node->localName)
+            : $target->createElementNS($namespace, $node->localName);
+
+        foreach ($node->attributes as $attribute) {
+            if ($attribute->localName === null) {
+                continue;
+            }
+
+            if ($attribute->namespaceURI === null) {
+                $copy->setAttribute($attribute->localName, $attribute->value);
+            } else {
+                $copy->setAttributeNS($attribute->namespaceURI, $attribute->nodeName, $attribute->value);
+            }
+        }
+
+        foreach ($node->childNodes as $child) {
+            $childCopy = $this->copyFhirNarrativeNode($child, $target, $keepNamespaces, $namespace);
+            if ($childCopy !== null) {
+                $copy->appendChild($childCopy);
+            }
+        }
+
+        return $copy;
     }
 
     /**
@@ -1288,6 +1386,52 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         return $fragment;
+    }
+
+    /**
+     * Build a FHIR `Narrative.div` for XmlEncoder: the div's own attributes as `@` keys and its
+     * content as a DOMDocumentFragment under `#`, so mixed text and same-named siblings are emitted
+     * in document order. Decoding the markup into an XmlEncoder array instead regrouped `<p>`
+     * siblings and moved an element's text after its child elements.
+     *
+     * Children are copied through {@see copyFhirNarrativeNode()} with every namespace dropped, so
+     * they inherit the XHTML `xmlns` the caller declares on the div.
+     *
+     * @return array<string, mixed>|null null when the markup does not parse as a single element, so
+     *                                   the caller can fall back to the decoded-array path
+     */
+    private function buildFhirNarrativeElement(string $markup): ?array
+    {
+        $source   = new \DOMDocument();
+        $previous = libxml_use_internal_errors(true);
+        $parsed   = $source->loadXML($markup, \LIBXML_NONET);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        $root = $source->documentElement;
+        if (!$parsed || $root === null) {
+            return null;
+        }
+
+        $target   = new \DOMDocument();
+        $fragment = $target->createDocumentFragment();
+        foreach ($root->childNodes as $child) {
+            $copy = $this->copyFhirNarrativeNode($child, $target, false, self::XHTML_NAMESPACE);
+            if ($copy !== null) {
+                $fragment->appendChild($copy);
+            }
+        }
+
+        $element = [];
+        foreach ($root->attributes as $attribute) {
+            $element['@' . $attribute->nodeName] = $attribute->value;
+        }
+        // An empty fragment cannot be appended, so a childless div keeps only its attributes.
+        if ($fragment->hasChildNodes()) {
+            $element['#'] = $fragment;
+        }
+
+        return $element;
     }
 
     /**
