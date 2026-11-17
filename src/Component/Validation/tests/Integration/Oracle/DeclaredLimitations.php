@@ -116,6 +116,9 @@ final class DeclaredLimitations
             'q-bp'                                 => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 17],
             'pat-dob-ext'                          => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
             'nested-questionnaire-nested-valueset' => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
+
+            'parameters-reference-bad'    => ['reason' => self::REASON_NO_RESOURCE_FETCHER, 'ours' => 0, 'java' => 1],
+            'bad-bundle-reference-type-4' => ['reason' => self::REASON_R4_URN_ID_MATCH, 'ours' => 0, 'java' => 1],
         ],
         'R4B' => [],
         'R5'  => [
@@ -124,6 +127,7 @@ final class DeclaredLimitations
             'observation-triglyceride-good2'         => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'demo-example-2'                         => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'contained-canonical'                    => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
+            'reference-bad'                          => ['reason' => self::REASON_NO_RESOURCE_FETCHER, 'ours' => 0, 'java' => 1],
         ],
     ];
 
@@ -237,7 +241,7 @@ final class DeclaredLimitations
      *
      * The rule most of these findings exercise, a modifier extension placed in `extension`, is not
      * cross-version in itself. The generated models do not record which extensions are modifiers yet,
-     * so it is follow-up work for #163 rather than part of this write-off.
+     * so it is tracked in #223 rather than part of this write-off.
      */
     public const REASON_CROSS_VERSION = 'cross-version extensions are synthesised from another FHIR release\'s definitions, which are not vendored';
 
@@ -247,9 +251,43 @@ final class DeclaredLimitations
      * `R5.extension-version-restriction-range-r5` and its `-ctxt` sibling supply the extension's
      * definition beside the instance, differential only. Runtime validation requires a snapshot, and
      * neither the generator nor the runtime compiler reads `version-specific-use` yet, so neither the
-     * whole-extension range nor the per-context range can be checked. Follow-up work for #163.
+     * whole-extension range nor the per-context range can be checked. Tracked in #222.
      */
     public const REASON_VERSION_SPECIFIC_USE = 'the extension is restricted by version-specific-use, which is not implemented, and its definition ships without a snapshot';
+
+    /**
+     * The reference validator fetches a reference's target from outside the instance, and we do not.
+     *
+     * `parameters-reference-bad` (R4) and `reference-bad` (R5) set `validateReference:
+     * CHECK_EXISTS_AND_TYPE` in the manifest, which hands the reference validator a resource fetcher
+     * that answers "does `Patient/2` exist?". Neither reference points into a Bundle or a `contained`
+     * resource, so nothing in the instance can settle it, and the corpus is validated offline.
+     */
+    public const REASON_NO_RESOURCE_FETCHER = 'the reference validator looks the target up through a resource fetcher the manifest configures; the corpus is validated offline with none';
+
+    /**
+     * An R4-only reference validator behaviour that its own R5 run of the same file does not repeat.
+     *
+     * `bad-bundle-reference-type.xml` is a `collection` whose Patient refers to
+     * `Practitioner/5d9588d8-…` and whose only other entry is an Organization at
+     * `urn:uuid:5d9588d8-…`. Under R4 (`bad-bundle-reference-type-4`) the reference validator matches the
+     * id against the `urn:uuid:` and reports the type mismatch; under R5 (`-5`) it reports only that the
+     * URL cannot be resolved without a RESTful base, at information level. A `collection` is an open
+     * envelope this project never resolves (see `BundleReferenceResolutionChecker`), and copying the R4
+     * match would mean resolving a relative reference against a `urn:uuid:` in one version only.
+     */
+    public const REASON_R4_URN_ID_MATCH = 'the R4 reference validator matches a relative id against a urn:uuid fullUrl in a collection, which its R5 run of the same file does not';
+
+    /**
+     * The reference validator reports one ambiguous document section entry twice, and we report it once.
+     *
+     * On `bundle-document-versioned-references-bad` the reference `Observation/ObservationExample`
+     * matches two entries. The reference validator reports it as `Found 2 matches for …` from its
+     * reference resolution and again as `Multiple matches in bundle for reference …` from its document
+     * section check. We report the first, which pairs. The second names the same reference on the same
+     * section entry and is the same defect.
+     */
+    public const REASON_DUPLICATE_REPORT = 'the reference validator reports the same ambiguous section entry a second time from its document section check';
 
     /**
      * Text signature => reason, for limitations that are not about a code system.
@@ -293,6 +331,15 @@ final class DeclaredLimitations
         'http://hl7.org/fhir/5.0/structuredefinition/' => self::REASON_CROSS_VERSION,
         // The corpus's own test extension; nothing else uses this canonical.
         'http://hl7.org/fhir/test/structuredefinition/version-range' => self::REASON_VERSION_SPECIFIC_USE,
+        // The next four are whole findings, quoted in full, so each declares one corpus finding and
+        // never the rule behind it: a wrong-type match, an ambiguous section entry or an unresolvable
+        // reference anywhere else would still count as open work. See REASON_DUPLICATE_REPORT.
+        'multiple matches in bundle for reference observation/observationexample' => self::REASON_DUPLICATE_REPORT,
+        // See REASON_R4_URN_ID_MATCH.
+        'matching reference for reference practitioner/5d9588d8-3cd6-4b32-8fb7-ad13694e069d has resourcetype organization' => self::REASON_R4_URN_ID_MATCH,
+        // See REASON_NO_RESOURCE_FETCHER: `parameters-reference-bad` (R4) and `reference-bad` (R5).
+        "unable to resolve resource with reference 'patient/2'"         => self::REASON_NO_RESOURCE_FETCHER,
+        "unable to resolve resource with reference 'patient/test-fail'" => self::REASON_NO_RESOURCE_FETCHER,
     ];
 
     /**
@@ -326,6 +373,9 @@ final class DeclaredLimitations
             // Tied at one: ordered by reason text, as in R5 below.
             self::REASON_ASSUMED_REST_REFERENCE => 1,
             self::REASON_NCI                    => 1,
+            self::REASON_R4_URN_ID_MATCH        => 1,
+            self::REASON_NO_RESOURCE_FETCHER    => 1,
+            self::REASON_DUPLICATE_REPORT       => 1,
         ],
         'R4B' => [],
         'R5'  => [
@@ -333,8 +383,9 @@ final class DeclaredLimitations
             self::REASON_VERSION_SPECIFIC_USE => 2,
             // These two are tied at one, so their order is decided by reason text rather than by
             // whatever order the corpus produced them in. See ComparisonReport::declaredByReason().
-            self::REASON_UNKNOWN_EXTENSION => 1,
-            self::REASON_XXE_REFUSAL       => 1,
+            self::REASON_UNKNOWN_EXTENSION   => 1,
+            self::REASON_XXE_REFUSAL         => 1,
+            self::REASON_NO_RESOURCE_FETCHER => 1,
         ],
     ];
 
