@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Profile;
 
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Profile\ObservationBpProfile;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationOptions;
@@ -76,6 +81,42 @@ final class VitalSignsProfilesTest extends TestCase
 
         self::assertNotSame([], $fromMetaOnly);
         self::assertEquals($fromMetaOnly, $both);
+    }
+
+    public function testARequestedVersionOfTheProfileIsNotCheckedAgain(): void
+    {
+        $observation = $this->bloodPressureWithoutSystolic();
+        $requested   = $this->profileViolations($observation, new FHIRValidationOptions(profileUrls: [self::BP . '|5.0.0']));
+        $both        = $this->profileViolations($observation, new FHIRValidationOptions(profileUrls: [self::BP . '|5.0.0'], profilesFromVitalSignsCodes: true));
+
+        self::assertNotSame([], $requested);
+        // The implied bp adds only its vitalsigns parent, which the requested URL alone does not bring.
+        self::assertEquals(
+            $requested,
+            array_values(array_filter($both, static fn (FHIRValidationViolation $v): bool => $v->profileGroup === self::BP)),
+        );
+    }
+
+    /**
+     * A typed profile instance is checked from its class, with no resolver at all.
+     *
+     * Without the option only the base rules run on it, because no profile group was asked for.
+     */
+    public function testATypedProfileInstanceRunsItsClassProfiles(): void
+    {
+        $observation = new ObservationBpProfile(code: new CodeableConcept(coding: [
+            new Coding(system: new UriPrimitive(value: VitalSignsProfiles::LOINC), code: new CodePrimitive(value: '85354-9')),
+        ]));
+        $service = FHIRValidationServiceBuilder::create()->build();
+        $groups  = static fn (FHIRValidationOptions $options): array => array_values(array_unique(array_filter(array_map(
+            static fn (FHIRValidationViolation $v): ?string => $v->profileGroup,
+            $service->validateWithOptions($observation, $options)->violations,
+        ))));
+
+        self::assertSame([], $groups(new FHIRValidationOptions()));
+        $implied = $groups(new FHIRValidationOptions(profilesFromVitalSignsCodes: true));
+        sort($implied);
+        self::assertSame([self::BP, self::VITALSIGNS], $implied);
     }
 
     public function testAnObservationInsideABundleIsChecked(): void

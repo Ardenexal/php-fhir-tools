@@ -173,8 +173,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // Profiles the resource's class does not declare, checked against StructureDefinitions
         // resolved at runtime. A separate pass because their rules are not attributes on any class:
         // they are handed to the validator explicitly, under the same group names a generated class uses.
-        // Without a resolver the walk still runs for `meta.profile`, whose profiles a nested resource's
-        // generated class may declare without the pass above having run them
+        // Without a resolver the walk still runs for `meta.profile` and vital-sign codes, whose profiles
+        // a resource's generated class may declare without the pass above having run them
         if (($this->runtimeProfiles !== null && $profileUrls !== []) || $options->profilesFromMeta || $options->profilesFromVitalSignsCodes) {
             $walk = ['visited' => [], 'reached' => [], 'mismatched' => [], 'groups' => $groups];
             $this->collectRuntimeProfileViolations($resource, '', $profileUrls, $options, $violations, $walk);
@@ -511,8 +511,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             }
 
             if ($this->runtimeProfiles === null) {
-                // Without a resolver a requested URL is ignored, as it always was; a meta.profile URL
-                // is reported, because profilesFromMeta asks for every claimed profile to be checked
+                // Without a resolver a requested URL is ignored, as it always was, and so is an implied
+                // one; a meta.profile URL is reported, because profilesFromMeta asks for every claimed
+                // profile to be checked
                 if ($how['fromMeta']) {
                     $violations[] = new FHIRValidationViolation(
                         severity: 'warning',
@@ -553,6 +554,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
             $resolution = $this->runtimeProfiles->resolve($url, $fhirVersion);
 
+            // Nobody named an implied profile, so one that cannot be used here is dropped, not reported.
             if ($how['implied'] && (!$resolution->isResolved() || $resolution->rootType !== $resourceType)) {
                 continue;
             }

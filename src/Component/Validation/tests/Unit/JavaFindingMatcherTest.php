@@ -121,6 +121,14 @@ final class JavaFindingMatcherTest extends TestCase
         self::assertSame([], $this->matcher->unmatched($java, $ours, ['Observation']));
     }
 
+    /** A required primitive the profile wraps in `NotBlank` pairs the same way. */
+    public function testAProfileNotBlankFindingPairsAsCardinality(): void
+    {
+        $java = ['Observation.code: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/bp|4.0.1)'];
+
+        self::assertSame([], $this->matcher->unmatched($java, [$this->profileCount('code', 'This value should not be blank.')], ['Observation']));
+    }
+
     /** The same wrapper also carries fixed values and patterns, which are not cardinality findings. */
     public function testAProfileFindingThatIsNotACountDoesNotPairAsCardinality(): void
     {
