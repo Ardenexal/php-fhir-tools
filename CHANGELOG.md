@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - the `idref` attribute, which is not HTML 4.0, now breaks `txt-1` like any other unknown attribute;
   - a mismatched closing tag reads `Found "</pa>" expecting "</p>"` instead of libxml's wording.
 - [Serialization] Reading XML now keeps a FHIR narrative exactly as written. Text beside a child element moved after it (`<p>a <b>b</b> c</p>` became `<p>a  c<b>b</b></p>`), same-named siblings were regrouped (`<p/><table/><p/>` became `<p/><p/><table/>`), and inside a Bundle entry an anchor's text was lost entirely. The `div` is now read from the parsed document and written back as markup, so a round trip keeps its order. A `div` or element outside the XHTML namespace keeps that namespace in the model, so validation can report it; writing XML still emits the whole narrative in the XHTML namespace. See also #219, which fixes the same text loss for a `div` with attributes.
+- [Validation] An extension whose context names a child of a data type is now reported when it sits on that data type itself. `humanname-mothers-family` (context `HumanName.family`) on `Patient.name` is now an error: `Extension "http://hl7.org/fhir/StructureDefinition/humanname-mothers-family" is not permitted on element "Patient.name".` Before, contexts rooted in a data type were only checked when they matched, so a misplaced extension passed (#163)
 
 ## [0.7.0] - 2026-11-17
 
