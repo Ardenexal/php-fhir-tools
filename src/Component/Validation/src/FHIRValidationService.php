@@ -38,6 +38,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledExtension;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledProfile;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileFailure;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
+use Ardenexal\FHIRTools\Component\Validation\Profile\VitalSignsProfiles;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -174,7 +175,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // they are handed to the validator explicitly, under the same group names a generated class uses.
         // Without a resolver the walk still runs for `meta.profile`, whose profiles a nested resource's
         // generated class may declare without the pass above having run them
-        if (($this->runtimeProfiles !== null && $profileUrls !== []) || $options->profilesFromMeta) {
+        if (($this->runtimeProfiles !== null && $profileUrls !== []) || $options->profilesFromMeta || $options->profilesFromVitalSignsCodes) {
             $walk = ['visited' => [], 'reached' => [], 'mismatched' => [], 'groups' => $groups];
             $this->collectRuntimeProfileViolations($resource, '', $profileUrls, $options, $violations, $walk);
 
@@ -407,14 +408,24 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 }
             }
 
-            /** @var array<string, array{ancestors: bool, fromMeta: bool}> $wanted URL as written => whether its ancestors apply, and whether meta.profile named it */
+            /** @var array<string, array{ancestors: bool, fromMeta: bool, implied: bool}> $wanted URL as written => whether its ancestors apply, whether meta.profile named it, and whether only a vital-sign code implies it */
             $wanted = [];
             foreach ($requested as $url) {
-                $wanted[$url] = ['ancestors' => $topLevel && $options->deriveProfilesFromClass, 'fromMeta' => false];
+                $wanted[$url] = ['ancestors' => $topLevel && $options->deriveProfilesFromClass, 'fromMeta' => false, 'implied' => false];
             }
             if ($options->profilesFromMeta) {
                 foreach ($metaProfiles as $url) {
-                    $wanted[$url] = ['ancestors' => true, 'fromMeta' => true];
+                    $wanted[$url] = ['ancestors' => true, 'fromMeta' => true, 'implied' => false];
+                }
+            }
+            if ($options->profilesFromVitalSignsCodes) {
+                // A vital-sign code implies its profile the way a meta.profile entry claims one. A
+                // profile already wanted under any version is left as it is.
+                $named = array_map(self::canonicalWithoutVersion(...), array_keys($wanted));
+                foreach ($this->impliedVitalSignsProfiles($resource) as $url) {
+                    if (!in_array($url, $named, true)) {
+                        $wanted[$url] = ['ancestors' => true, 'fromMeta' => false, 'implied' => true];
+                    }
                 }
             }
 
@@ -440,11 +451,14 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * @param array<string, array{ancestors: bool, fromMeta: bool}> $wanted     URL as written => whether its constraint ancestors
-     *                                                                          apply, and whether `meta.profile` named it
-     * @param list<string>                                          $mainGroups The groups the pass over the whole resource ran
-     * @param list<FHIRValidationViolation>                         $violations appended to
-     * @param object                                                $root       The object validation started at, which $prefix is relative to
+     * @param array<string, array{ancestors: bool, fromMeta: bool, implied: bool}> $wanted     URL as written => whether its constraint
+     *                                                                                         ancestors apply, whether `meta.profile` named
+     *                                                                                         it, and whether only a vital-sign code implies
+     *                                                                                         it. An implied profile that cannot be checked
+     *                                                                                         is skipped without a warning: nobody asked for it
+     * @param list<string>                                                         $mainGroups The groups the pass over the whole resource ran
+     * @param list<FHIRValidationViolation>                                        $violations appended to
+     * @param object                                                               $root       The object validation started at, which $prefix is relative to
      *
      * @return array<string, FHIRValidationViolation> one error per wanted profile that constrains another type, by canonical
      */
@@ -483,8 +497,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 // The class's attributes check it. A requested URL's group already ran over the whole
                 // resource; a meta.profile URL's group ran only if it was also requested, so a typed
                 // nested instance claiming its profile would otherwise go unchecked. Claiming a
-                // profile claims its ancestors too, so every profile the class declares runs.
-                if ($how['fromMeta'] && !in_array($canonical, $mainGroups, true)) {
+                // profile claims its ancestors too, so every profile the class declares runs. An
+                // implied profile is claimed in the same way.
+                if (($how['fromMeta'] || $how['implied']) && !in_array($canonical, $mainGroups, true)) {
                     foreach ($declared as $group) {
                         if (!in_array($group, $mainGroups, true)) {
                             $classGroups[$group] = true;
@@ -538,6 +553,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
             $resolution = $this->runtimeProfiles->resolve($url, $fhirVersion);
 
+            if ($how['implied'] && (!$resolution->isResolved() || $resolution->rootType !== $resourceType)) {
+                continue;
+            }
+
             if (!$resolution->isResolved()) {
                 $violations[] = new FHIRValidationViolation(
                     severity: 'warning',
@@ -590,6 +609,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 }
             }
             if ($conflict !== null) {
+                if ($how['implied']) {
+                    continue;
+                }
+
                 $violations[] = new FHIRValidationViolation(
                     severity: 'warning',
                     path: rtrim($prefix, '.'),
@@ -725,6 +748,47 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return $this->runtimeExtensionConstraints[$extension] = $constraints;
+    }
+
+    /**
+     * The core vital-signs profiles an Observation's LOINC codes imply; nothing for any other resource.
+     *
+     * @return list<string>
+     */
+    private function impliedVitalSignsProfiles(object $resource): array
+    {
+        if ($this->getResourceFhirType($resource) !== 'Observation') {
+            return [];
+        }
+
+        $code = self::readPublic($resource, 'code');
+        if (!is_object($code)) {
+            return [];
+        }
+
+        $codings = [];
+        foreach ((array) self::readPublic($code, 'coding') as $coding) {
+            if (is_object($coding)) {
+                $codings[] = [
+                    'system' => self::primitiveString(self::readPublic($coding, 'system')),
+                    'code'   => self::primitiveString(self::readPublic($coding, 'code')),
+                ];
+            }
+        }
+
+        return VitalSignsProfiles::forCodings($codings);
+    }
+
+    /**
+     * A primitive's string value, whether the model holds it bare or wrapped in a primitive object.
+     */
+    private static function primitiveString(mixed $value): ?string
+    {
+        if (is_object($value)) {
+            $value = self::readPublic($value, 'value');
+        }
+
+        return is_string($value) ? $value : null;
     }
 
     /**

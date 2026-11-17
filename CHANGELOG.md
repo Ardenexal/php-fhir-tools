@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [Validation] `FHIRValidationOptions` has a new `profilesFromVitalSignsCodes` setting. When it is on, each Observation whose `code.coding` holds a vital-sign LOINC code, such as `85354-9` or `29463-7`, is checked against the matching core vital-signs profile (`bp`, `bodyweight` and so on) and its parents, as the spec requires, even when `meta.profile` does not name it. The codes are the ten in the spec's vital-signs table, which is the same in R4 and R5. Resolving the profiles needs the release's core package. An implied profile that cannot be resolved is skipped without a warning. The setting is off by default, because it can report new errors on data that passed before (#202)
+
 ## [0.7.0] - 2026-11-17
 
 ### Added

@@ -116,6 +116,9 @@ final class JavaFindingMatcher
         'constraint:Length',
     ];
 
+    /** The messages `Count`, `NotBlank` and `NotNull` report, which a profile's cardinality rule reuses. */
+    private const string CARDINALITY_MESSAGE = '/^(This collection should contain |This value should not be (blank|null)\.)/';
+
     /**
      * Phrases both validators open with when they report the same rule in their own words.
      *
@@ -377,7 +380,7 @@ final class JavaFindingMatcher
         }
 
         $family = (new ViolationFamilyClassifier())->classify($ours);
-        if (!in_array($family, self::CARDINALITY_FAMILIES, true)) {
+        if (!in_array($family, self::CARDINALITY_FAMILIES, true) && !$this->isProfileCardinality($family, $ours)) {
             return false;
         }
 
@@ -392,6 +395,19 @@ final class JavaFindingMatcher
         }
 
         return $this->instancePath($javaExpression) === $this->parentPath($ours->path);
+    }
+
+    /**
+     * A profile's cardinality rule, which `FHIRProfileConstraint` carries as an inner `Count`, `NotBlank`
+     * or `NotNull` and reports in that constraint's words.
+     *
+     * The family names only the wrapper, which also carries fixed values, patterns and types, so the
+     * inner constraint's message is what says the rule is a cardinality one.
+     */
+    private function isProfileCardinality(string $family, FHIRValidationViolation $ours): bool
+    {
+        return $family                                               === 'constraint:FHIRProfileConstraint'
+            && preg_match(self::CARDINALITY_MESSAGE, $ours->message) === 1;
     }
 
     /**
