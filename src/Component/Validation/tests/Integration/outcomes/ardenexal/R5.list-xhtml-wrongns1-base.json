@@ -1,19 +1,23 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Wrong namespace on the XHTML ('http://www.w3.org/1999/xhtmlx', should be 'http://www.w3.org/1999/xhtml')"
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:NarrativeXhtmlChecker": [
+                "text.div — Wrong namespace on the XHTML ('http://www.w3.org/1999/xhtmlx', should be 'http://www.w3.org/1999/xhtml')"
+            ]
+        },
         "warnings": {}
     }
 }
