@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **[Validation] Document and message Bundles that validated clean can now fail: entries the first entry cannot reach are reported.** Validation follows every reference and every `uri`, `url` or `canonical` value from the Composition or MessageHeader. An entry that only points back at what was reached is reported too, unless it is a Provenance in a document. Severities and wording follow the HL7 Java reference validator:
+- **[Validation] Document Bundles that validated clean can now fail: entries the Composition cannot reach are errors.** Validation follows every reference and every `uri`, `url` or `canonical` value from the Composition, or from the MessageHeader in a message Bundle, where the findings are warnings and information instead. An entry that only points back at what was reached is reported too, unless it is a Provenance. Severities and wording follow the HL7 Java reference validator:
   - Document, entry not reached: error, `Entry 'urn:uuid:…' isn't reachable by traversing links (forward or backward) from the Composition`.
   - Document, entry reached only by pointing back: warning, `Entry '…' isn't reachable by traversing forwards from the Composition. Only Provenance is approved to be used this way (R4 section 3.3.1)`.
   - Message, entry not reached: warning, `…from the MessageHeader, so its presence should be reviewed (is it needed to process the message?)`.

@@ -12,8 +12,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Each expected message is the HL7 Java reference validator's sentence from the vendored
- * `fhir-test-cases` outcome named in the test, so the two findings pair by text.
+ * Each expected message is the HL7 Java reference validator's sentence, so the two findings pair by
+ * text. A test shaped on a vendored `fhir-test-cases` case names that case.
  */
 final class BundleReachabilityCheckerTest extends TestCase
 {
@@ -80,8 +80,8 @@ final class BundleReachabilityCheckerTest extends TestCase
     }
 
     /**
-     * `bundle-urn` entry[7]: an entry reached only because it points at the document is a warning, and
-     * what it leads to counts as reached.
+     * `bundle-duplicate-ids-not` (`RelatedPerson/1`): an entry reached only because it points at the
+     * document is a warning, and what it leads to counts as reached.
      */
     public function testEntryReachedOnlyBackwardsIsAWarningInADocument(): void
     {
@@ -117,8 +117,8 @@ final class BundleReachabilityCheckerTest extends TestCase
     }
 
     /**
-     * `bundle-urn` entry[7]: an absolute value with a `#fragment` points into the entry before the `#`,
-     * here back at the Composition, so the entry is reached backwards rather than orphaned.
+     * The MedicationStatement in `bundle-urn`: an absolute value with a `#fragment` points into the entry
+     * before the `#`, here back at the Composition, so the entry is reached backwards rather than orphaned.
      */
     public function testAbsoluteValueWithAFragmentLinksToItsEntry(): void
     {
@@ -233,6 +233,56 @@ final class BundleReachabilityCheckerTest extends TestCase
             ['urn:uuid:c', ['resourceType' => 'Composition', 'contained' => [['resourceType' => 'List', 'id' => 'l', 'status' => 'current', 'mode' => 'working', 'entry' => [['item' => ['reference' => 'urn:uuid:p']]]]]]],
             ['urn:uuid:p', ['resourceType' => 'Patient']],
         ])));
+    }
+
+    /** Two entries that link to each other but that nothing reaches are both orphans, and the walk ends. */
+    public function testOrphanedCycleIsReportedAndTerminates(): void
+    {
+        self::assertSame(
+            [
+                ['error', 'entry[1]', sprintf(self::ORPHAN, "'urn:uuid:a'")],
+                ['error', 'entry[2]', sprintf(self::ORPHAN, "'urn:uuid:b'")],
+            ],
+            $this->findings($this->bundle('document', [
+                ['urn:uuid:c', ['resourceType' => 'Composition']],
+                ['urn:uuid:a', ['resourceType' => 'Patient', 'link' => [['type' => 'seealso', 'other' => ['reference' => 'urn:uuid:b']]]]],
+                ['urn:uuid:b', ['resourceType' => 'Patient', 'link' => [['type' => 'seealso', 'other' => ['reference' => 'urn:uuid:a']]]]],
+            ])),
+        );
+    }
+
+    /** A link from an entry to itself reaches nothing new, so it cannot rescue the entry. */
+    public function testSelfLinkDoesNotReachTheEntry(): void
+    {
+        self::assertSame(
+            [['error', 'entry[1]', sprintf(self::ORPHAN, "'urn:uuid:p'")]],
+            $this->findings($this->bundle('document', [
+                ['urn:uuid:c', ['resourceType' => 'Composition']],
+                ['urn:uuid:p', ['resourceType' => 'Patient', 'link' => [['type' => 'seealso', 'other' => ['reference' => 'urn:uuid:p']]]]],
+            ])),
+        );
+    }
+
+    /**
+     * The backwards step runs whole passes until one adds nothing, like the reference validator. Entry 1
+     * points only at entry 2, which itself joins backwards later in the first pass, so entry 1 joins in
+     * the second pass: both are warnings, never an error.
+     */
+    public function testBackwardsStepRepeatsUntilNothingIsAdded(): void
+    {
+        $warning = "Entry '%s' isn't reachable by traversing forwards from the Composition. Only Provenance is approved to be used this way (R4 section 3.3.1)";
+
+        self::assertSame(
+            [
+                ['warning', 'entry[2]', sprintf($warning, 'urn:uuid:b')],
+                ['warning', 'entry[1]', sprintf($warning, 'urn:uuid:a')],
+            ],
+            $this->findings($this->bundle('document', [
+                ['urn:uuid:c', ['resourceType' => 'Composition']],
+                ['urn:uuid:a', ['resourceType' => 'Patient', 'link' => [['type' => 'seealso', 'other' => ['reference' => 'urn:uuid:b']]]]],
+                ['urn:uuid:b', ['resourceType' => 'Patient', 'link' => [['type' => 'seealso', 'other' => ['reference' => 'urn:uuid:c']]]]],
+            ])),
+        );
     }
 
     /** Only documents and messages are walked, and only from the resource each must open with. */
