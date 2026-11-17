@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [Validation] An extension whose context names a child of a data type is now reported when it sits on that data type itself. `humanname-mothers-family` (context `HumanName.family`) on `Patient.name` is now an error: `Extension "http://hl7.org/fhir/StructureDefinition/humanname-mothers-family" is not permitted on element "Patient.name".` Before, contexts rooted in a data type were only checked when they matched, so a misplaced extension passed (#163)
+
 ## [0.7.0] - 2026-11-17
 
 ### Added

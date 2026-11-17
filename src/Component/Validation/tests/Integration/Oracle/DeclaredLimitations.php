@@ -227,6 +227,31 @@ final class DeclaredLimitations
     public const REASON_ASSUMED_REST_REFERENCE = 'a reference URL is taken as proof of its target type only under the reference validator option assumeValidRestReferences, which is off by default';
 
     /**
+     * Cross-version extensions, whose definitions come from another FHIR release.
+     *
+     * A url such as `http://hl7.org/fhir/1.0/StructureDefinition/extension-Patient.animal` names no
+     * StructureDefinition anyone publishes: the reference validator builds it on the fly from the DSTU2
+     * definition of `Patient.animal`, a modifier element there. Every finding about such an extension
+     * (`R4.patient-xver`, `patient-xver-bad`, `pat-xver-extension-expected`) depends on that synthesised
+     * definition, and this project holds no other release's definitions to build it from.
+     *
+     * The rule most of these findings exercise, a modifier extension placed in `extension`, is not
+     * cross-version in itself. The generated models do not record which extensions are modifiers yet,
+     * so it is follow-up work for #163 rather than part of this write-off.
+     */
+    public const REASON_CROSS_VERSION = 'cross-version extensions are synthesised from another FHIR release\'s definitions, which are not vendored';
+
+    /**
+     * An extension restricted to certain FHIR releases by `version-specific-use`.
+     *
+     * `R5.extension-version-restriction-range-r5` and its `-ctxt` sibling supply the extension's
+     * definition beside the instance, differential only. Runtime validation requires a snapshot, and
+     * neither the generator nor the runtime compiler reads `version-specific-use` yet, so neither the
+     * whole-extension range nor the per-context range can be checked. Follow-up work for #163.
+     */
+    public const REASON_VERSION_SPECIFIC_USE = 'the extension is restricted by version-specific-use, which is not implemented, and its definition ships without a snapshot';
+
+    /**
      * Text signature => reason, for limitations that are not about a code system.
      *
      * Kept apart from {@see TERMINOLOGY_SYSTEMS} because the two are different claims. A terminology entry
@@ -262,6 +287,12 @@ final class DeclaredLimitations
         // The host of every KBV canonical. No vendored package defines anything under it, so no
         // finding naming it can be one we could decide.
         'https://fhir.kbv.de/' => self::REASON_UNVENDORED_PACKAGE,
+        // The release segment is what makes a url cross-version; no published canonical has one.
+        'http://hl7.org/fhir/1.0/structuredefinition/' => self::REASON_CROSS_VERSION,
+        'http://hl7.org/fhir/3.0/structuredefinition/' => self::REASON_CROSS_VERSION,
+        'http://hl7.org/fhir/5.0/structuredefinition/' => self::REASON_CROSS_VERSION,
+        // The corpus's own test extension; nothing else uses this canonical.
+        'http://hl7.org/fhir/test/structuredefinition/version-range' => self::REASON_VERSION_SPECIFIC_USE,
     ];
 
     /**
@@ -287,6 +318,7 @@ final class DeclaredLimitations
             self::REASON_LOINC                  => 27,
             self::REASON_SNOMED                 => 19,
             self::REASON_UNVENDORED_PROFILE     => 6,
+            self::REASON_CROSS_VERSION          => 5,
             self::REASON_ICD10                  => 4,
             self::REASON_CVX                    => 3,
             self::REASON_HL7_DISPLAY            => 2,
@@ -297,7 +329,8 @@ final class DeclaredLimitations
         ],
         'R4B' => [],
         'R5'  => [
-            self::REASON_LOINC             => 7,
+            self::REASON_LOINC                => 7,
+            self::REASON_VERSION_SPECIFIC_USE => 2,
             // These two are tied at one, so their order is decided by reason text rather than by
             // whatever order the corpus produced them in. See ComparisonReport::declaredByReason().
             self::REASON_UNKNOWN_EXTENSION => 1,

@@ -77,6 +77,61 @@ final class FHIRValidationServiceIntegrationTest extends TestCase
         self::assertContains(FHIRExtensionContext::class, $classes);
     }
 
+    /**
+     * `humanname-mothers-family` may only sit on `HumanName.family`. On the name itself the context
+     * names a child of the element's own type, which the element cannot be, so it is denied — as the
+     * reference validator denies it in `maiden-name-extension`.
+     */
+    public function testDataTypeRootedContextIsDeniedOnAnElementOfThatType(): void
+    {
+        $json = '{"resourceType":"Patient","name":[{"family":"Family","extension":[{'
+            . '"url":"http://hl7.org/fhir/StructureDefinition/humanname-mothers-family","valueString":"Mothers family"}]}]}';
+
+        $resource = FHIRSerializationService::createDefault(FhirVersion::R4)->deserialize($json);
+        $report   = OracleValidationServiceFactory::create(FhirVersion::R4)->validate($resource);
+
+        $messages = array_map(static fn ($v): string => $v->message, $report->errors());
+
+        self::assertSame(
+            ['Extension "http://hl7.org/fhir/StructureDefinition/humanname-mothers-family" is not permitted on element "Patient.name".'],
+            $messages,
+        );
+    }
+
+    /**
+     * The same extension in the place its context names is permitted.
+     */
+    public function testDataTypeRootedContextIsPermittedOnTheElementItNames(): void
+    {
+        $json = '{"resourceType":"Patient","name":[{"family":"Family","_family":{"extension":[{'
+            . '"url":"http://hl7.org/fhir/StructureDefinition/humanname-mothers-family","valueString":"Mothers family"}]}}]}';
+
+        $resource = FHIRSerializationService::createDefault(FhirVersion::R4)->deserialize($json);
+        $report   = OracleValidationServiceFactory::create(FhirVersion::R4)->validate($resource);
+
+        self::assertSame([], $report->errors());
+    }
+
+    /**
+     * The value-type check `japanese-utf8-ok` expects, on a document we can read. That case's three
+     * findings stay unmatched only because its bytes are not UTF-8 and the reader refuses the file.
+     */
+    public function testExtensionValueOfADisallowedTypeIsReportedOnAHumanName(): void
+    {
+        $json = '{"resourceType":"Patient","name":[{"family":"Family","extension":[{'
+            . '"url":"http://hl7.org/fhir/StructureDefinition/iso21090-EN-representation","valueString":"SYL"}]}]}';
+
+        $resource = FHIRSerializationService::createDefault(FhirVersion::R4)->deserialize($json);
+        $report   = OracleValidationServiceFactory::create(FhirVersion::R4)->validate($resource);
+
+        $messages = array_map(static fn ($v): string => $v->message, $report->errors());
+
+        self::assertContains(
+            "The Extension 'http://hl7.org/fhir/StructureDefinition/iso21090-EN-representation' definition allows for the types [code] but found type string",
+            $messages,
+        );
+    }
+
     public function testBuiltInCountViolationLandsInErrorBucket(): void
     {
         $fixture = new CountConstraintFixture(identifier: []);

@@ -1180,12 +1180,21 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
         // Foreign root (e.g. "ElementDefinition.binding" inside StructureDefinition): permitted
         // when a type-rooted candidate matches (a path ancestor is typed with the context root).
-        // A non-match is deferred, never denied — that would require complete type resolution of
+        // Any other non-match is deferred: denying it would require complete type resolution of
         // every path segment, which we do not guarantee.
         foreach ($typeCandidates as $candidate) {
             if ($candidate === $expr || str_starts_with($candidate, $expr . '.')) {
                 return self::CONTEXT_PERMIT;
             }
+        }
+
+        // The element is itself of the context's root type, so the context names one of this
+        // element's own children (`HumanName.family` on a HumanName). An element is never its own
+        // child, and every ancestor whose type resolved has already been tried above, so this is a
+        // confident denial: the reference validator denies `humanname-mothers-family` on
+        // `Patient.name` the same way.
+        if (in_array($exprRoot, $ownSupertypes, true)) {
+            return self::CONTEXT_DENY;
         }
 
         return self::CONTEXT_DEFER;
