@@ -345,10 +345,29 @@ final class JavaFindingMatcher
         return strcasecmp($m[1], $ours->invariantKey) === 0;
     }
 
-    /** Both sides render the same sentence, give or take punctuation and quoted values. */
+    /**
+     * Both sides render the same sentence, give or take punctuation and quoted values.
+     *
+     * The reference validator appends the package version to a canonical it names
+     * (`patient-animal|5.3.0-ballot`), and the generated models do not carry it. So when our sentence
+     * names no version at all, Java's versions are dropped before comparing. When ours does name one,
+     * the versions must agree, so two findings about different versions never pair.
+     */
     private function matchesByText(string $javaText, FHIRValidationViolation $ours): bool
     {
-        return $this->normalise($javaText) === $this->normalise($ours->message);
+        $mine = $this->normalise($ours->message);
+
+        if ($this->normalise($javaText) === $mine) {
+            return true;
+        }
+
+        if (str_contains($ours->message, '|')) {
+            return false;
+        }
+
+        $unversioned = (string) preg_replace('#(https?://[^\s|]+)\|[0-9][\w.-]*#', '$1', $javaText);
+
+        return $this->normalise($unversioned) === $mine;
     }
 
     /**
@@ -811,9 +830,7 @@ final class JavaFindingMatcher
         $out = (string) preg_replace('/"[^"]*"/', '""', $out);
         $out = (string) preg_replace('/\((?:from|defined in|url:|ids:)[^)]*\)/', '', $out);
         $out = (string) preg_replace('/ in the profile \S+$/', '', $out);
-        // A canonical's `|version` suffix: the reference validator appends the package version
-        // (`patient-animal|5.3.0-ballot`), and the generated models do not carry it.
-        $out = (string) preg_replace('#(https?://[^\s|]+)\|[0-9][\w.-]*#', '$1', $out);
+
         $out = (string) preg_replace('/\s+/', ' ', $out);
 
         return trim($out, " \t\n\r.;:");

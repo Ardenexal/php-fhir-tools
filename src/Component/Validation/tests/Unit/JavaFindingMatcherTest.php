@@ -552,6 +552,17 @@ final class JavaFindingMatcherTest extends TestCase
         self::assertSame($java, $this->matcher->unmatched($java, [$ours]));
     }
 
+    public function testAVersionOfOursMustAgreeWithJavas(): void
+    {
+        $java = ["Sub-extension url 'species-x' is not defined by the Extension http://hl7.org/fhir/StructureDefinition/patient-animal|5.3.0-ballot"];
+        $ours = $this->plain(
+            'extension[0].extension[1]',
+            "Sub-extension url 'species-x' is not defined by the Extension http://hl7.org/fhir/StructureDefinition/patient-animal|4.0.1",
+        );
+
+        self::assertSame($java, $this->matcher->unmatched($java, [$ours]));
+    }
+
     private function notBlank(string $path): FHIRValidationViolation
     {
         return new FHIRValidationViolation(
