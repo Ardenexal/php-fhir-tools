@@ -12,8 +12,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 
 /**
- * Reports a relative `Reference.reference` that names a resource the Bundle holds, but which the
- * fullUrl matching rules refuse to resolve to it.
+ * Reports the relative references inside a Bundle that the Bundle cannot resolve.
+ *
+ * In every Bundle, the root and any nested one, a relative reference must have the shape
+ * `[type]/[id]` and its entry must have a `fullUrl` to resolve against. In a document or a message the
+ * reference must then resolve to exactly one entry: two matches are ambiguous, a near miss is described
+ * by the fullUrl rules below, and no match at all is plain absence.
+ *
+ * The rest of this docblock is about the near miss.
  *
  * A Bundle entry's `fullUrl` is what a reference inside another entry resolves *against*. There is no
  * base URL to resolve against when a document identifies its entries by `urn:uuid:`, by a relative
@@ -57,16 +63,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
  *
  * ## Scoping
  *
- * Only the **absent** direction is reported, and only when a same-type-and-id candidate exists. A
- * reference that resolves is silent, and so is one with no candidate at all. The reference validator
- * reports that second case too, but naming a resource that is genuinely not there is a different rule
- * with a different sentence, and it is recorded in the milestone backlog rather than guessed at here.
+ * A reference with no same-type-and-id candidate is plain absence, `Can't find 'X' in the bundle`
+ * without the fullUrl clause. It is an error only from the Composition, as the reference validator
+ * reports it; from any other entry it is information, because the target may sit on a server.
  *
- * `contained` is not descended into. Contained resources carry their own resolution rules (`ref-1`,
- * `dom-3`, and fragment lookup), none of which is this one, and no finding of this shape in the
- * vendored corpus sits inside a contained resource. Descending would risk resolving a nested bundle's
- * references against the outer bundle's index, which is how this rule would manufacture the `ABOVE`
- * cases it is written to avoid.
+ * A reference's own entry's `contained` is not searched, and `#` fragments are not judged here: they
+ * resolve against `contained`, which {@see ContainedReferenceChecker} owns. A Bundle reached through
+ * `contained` (`bundle-ea-testcase` holds one in a MeasureReport) is checked against its own entries,
+ * never the outer Bundle's, which is how this rule would otherwise manufacture `ABOVE` cases.
  *
  * The bundle is indexed once per validation, not once per reference. Walking every entry for every
  * reference is quadratic in entry count, and `bundle-duplicate-ids-not` is a 39-entry document.
@@ -83,6 +87,9 @@ final class BundleReferenceResolutionChecker
 
     /** Identifies the root resource we apply to, read from the class attribute. */
     private const string BUNDLE = 'Bundle';
+
+    /** The one entry whose missing reference targets are errors rather than information. */
+    private const string COMPOSITION = 'Composition';
 
     /** Identifies a reference node, by FHIR type rather than by the presence of a property name. */
     private const string REFERENCE = 'Reference';
@@ -388,17 +395,25 @@ final class BundleReferenceResolutionChecker
             }
         }
 
+        // Plain absence is an error only from the Composition, whose references are what a document
+        // is made of. From any other entry the reference validator reports it as information: a
+        // message's Observation may point at a Patient held on a server (`R4.message`,
+        // `R3.bundle-ref`), while `R3.bundle.document` reports every Composition reference it misses.
         if ($candidates === []) {
-            return $this->violation($path, sprintf("Can't find '%s' in the bundle", $value));
+            return $this->violation(
+                $path,
+                sprintf("Can't find '%s' in the bundle", $value),
+                $source['type'] === self::COMPOSITION ? 'error' : 'information',
+            );
         }
 
         return $this->violation($path, $this->message($value, $candidates, $source['fullUrl']));
     }
 
-    private function violation(string $path, string $message): FHIRValidationViolation
+    private function violation(string $path, string $message, string $severity = 'error'): FHIRValidationViolation
     {
         return new FHIRValidationViolation(
-            severity: 'error',
+            severity: $severity,
             path: $path,
             message: $message,
             constraintClass: self::class,

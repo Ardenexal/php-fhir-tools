@@ -173,7 +173,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $violation = $this->mapViolation($rawViolation);
 
             // ContainedReferenceChecker reports dom-3 below, once per unreferenced contained resource,
-            // in place of the generated invariant's single finding on the whole resource.
+            // in place of the generated invariant's single finding on the whole resource. Its
+            // "could not be evaluated" notice goes too, since the checker does evaluate the rule.
             if ($violation->invariantKey === self::DOM_3) {
                 continue;
             }

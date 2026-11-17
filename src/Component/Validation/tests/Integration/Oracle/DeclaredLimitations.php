@@ -300,27 +300,15 @@ final class DeclaredLimitations
         // The host of every KBV canonical. No vendored package defines anything under it, so no
         // finding naming it can be one we could decide.
         'https://fhir.kbv.de/' => self::REASON_UNVENDORED_PACKAGE,
-        // The opening of the reference validator's document section check, which repeats a finding its
-        // reference resolution already made. See REASON_DUPLICATE_REPORT.
-        'multiple matches in bundle for reference' => self::REASON_DUPLICATE_REPORT,
-        // The opening of exactly one reference validator rule, and only `bad-bundle-reference-type-4`
-        // carries it. See REASON_R4_URN_ID_MATCH.
-        'matching reference for reference' => self::REASON_R4_URN_ID_MATCH,
-    ];
-
-    /**
-     * Declared findings a plain substring cannot single out, matched as regular expressions on the
-     * lowercased text after {@see DECLARED_SIGNATURES} has been tried.
-     *
-     * `Unable to resolve resource with reference '…'` is two rules in one sentence. A `#` fragment is
-     * resolved against `contained`, which is in the instance and ours to check; anything else needs the
-     * resource fetcher of REASON_NO_RESOURCE_FETCHER. Only the second is declared, so the pattern
-     * refuses a quote followed by `#`.
-     *
-     * @var array<string, string>
-     */
-    public const DECLARED_PATTERNS = [
-        "/\\Aunable to resolve resource with reference '[^#']/" => self::REASON_NO_RESOURCE_FETCHER,
+        // The next four are whole findings, quoted in full, so each declares one corpus finding and
+        // never the rule behind it: a wrong-type match, an ambiguous section entry or an unresolvable
+        // reference anywhere else would still count as open work. See REASON_DUPLICATE_REPORT.
+        'multiple matches in bundle for reference observation/observationexample' => self::REASON_DUPLICATE_REPORT,
+        // See REASON_R4_URN_ID_MATCH.
+        'matching reference for reference practitioner/5d9588d8-3cd6-4b32-8fb7-ad13694e069d has resourcetype organization' => self::REASON_R4_URN_ID_MATCH,
+        // See REASON_NO_RESOURCE_FETCHER: `parameters-reference-bad` (R4) and `reference-bad` (R5).
+        "unable to resolve resource with reference 'patient/2'"         => self::REASON_NO_RESOURCE_FETCHER,
+        "unable to resolve resource with reference 'patient/test-fail'" => self::REASON_NO_RESOURCE_FETCHER,
     ];
 
     /**
@@ -386,12 +374,6 @@ final class DeclaredLimitations
         $haystack = strtolower($javaText);
         foreach (self::DECLARED_SIGNATURES as $signature => $reason) {
             if (str_contains($haystack, $signature)) {
-                return $reason;
-            }
-        }
-
-        foreach (self::DECLARED_PATTERNS as $pattern => $reason) {
-            if (preg_match($pattern, $haystack) === 1) {
                 return $reason;
             }
         }

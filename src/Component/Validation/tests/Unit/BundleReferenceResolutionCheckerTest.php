@@ -90,6 +90,29 @@ final class BundleReferenceResolutionCheckerTest extends TestCase
         );
     }
 
+    /**
+     * `R4.message` and `R3.bundle-ref`: outside the Composition, a reference to something the bundle
+     * does not hold may point at a server, and the reference validator says so only as information.
+     */
+    public function testAbsenceOutsideTheCompositionIsInformation(): void
+    {
+        $bundle = new BundleResource(
+            type: new BundleTypeType(value: 'message'),
+            entry: [
+                new BundleEntry(
+                    fullUrl: new UriPrimitive(value: 'http://example.org/Observation/1'),
+                    resource: new ObservationResource(id: '1', subject: new Reference(reference: 'Patient/123')),
+                ),
+            ],
+        );
+
+        $violations = (new BundleReferenceResolutionChecker())->check($bundle);
+
+        self::assertCount(1, $violations);
+        self::assertSame("Can't find 'Patient/123' in the bundle", $violations[0]->message);
+        self::assertSame('information', $violations[0]->severity);
+    }
+
     /** `relative_reference_to_TYPE_ID.all_fullUrl_UUID`. A `urn:` fullUrl yields no base at all. */
     public function testUrnFullUrlYieldsNoBase(): void
     {

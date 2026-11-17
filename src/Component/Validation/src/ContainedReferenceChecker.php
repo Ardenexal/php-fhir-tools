@@ -146,7 +146,7 @@ final class ContainedReferenceChecker
         // Fragment Reference.reference values by path, and every `#…` value anywhere in the container.
         $references = [];
         $pointers   = [];
-        $visited  = [];
+        $visited    = [];
         $this->collectPointers($container, $prefix, $visited, $references, $pointers);
 
         $ids = [];
