@@ -465,6 +465,49 @@ final class JavaFindingMatcherTest extends TestCase
         self::assertSame($java, $this->matcher->unmatched($java, $ours, ['Observation.value.ofType(Quantity)']));
     }
 
+    /**
+     * `bundle-document-versioned-references-bad`: both sides say one reference matches two entries.
+     * The reference validator adds a context label we do not reproduce.
+     */
+    public function testAmbiguousBundleReferencePairs(): void
+    {
+        $java = ["Found 2 matches for 'Observation/ObservationExample' in the bundle (Section Entry)"];
+        $ours = [$this->plain('entry[0].resource.section[0].entry[1]', "Found 2 matches for 'Observation/ObservationExample' in the bundle")];
+
+        $pairs = $this->matcher->matchedPairs($java, $ours);
+
+        self::assertCount(1, $pairs);
+        self::assertSame('bundle-resolution', $pairs[0]['rule']);
+    }
+
+    /** `relative_reference_to_fullUrl.no_ids.PROBLEM`: plain absence, with the element from the label. */
+    public function testAbsentBundleReferencePairsOnTheLabelledElement(): void
+    {
+        $java = ["Can't find 'Organization/666' in the bundle (Composition.author)"];
+
+        self::assertSame([], $this->matcher->unmatched($java, [$this->plain('entry[0].resource.author[0]', "Can't find 'Organization/666' in the bundle")]));
+        self::assertSame($java, $this->matcher->unmatched($java, [$this->plain('entry[0].resource.subject', "Can't find 'Organization/666' in the bundle")]));
+    }
+
+    /**
+     * Plain absence and a fullUrl-rule near miss are different rules about the same reference, so one
+     * never pairs with the other, in either direction.
+     */
+    public function testBundleResolutionTemplatesDoNotCrossPair(): void
+    {
+        $apparent = "Can't find 'Organization/666' in the bundle (Composition.author). Note that there is a resource in the bundle with the same type and id, but it does not match because of the fullUrl based rules around matching relative references";
+        $absent   = "Can't find 'Organization/666' in the bundle";
+
+        self::assertSame([$apparent], $this->matcher->unmatched([$apparent], [$this->plain('entry[0].resource.author[0]', $absent)]));
+        self::assertSame(
+            ["Can't find 'Organization/666' in the bundle (Composition.author)"],
+            $this->matcher->unmatched(
+                ["Can't find 'Organization/666' in the bundle (Composition.author)"],
+                [$this->plain('entry[0].resource.author[0]', $absent . '. A resource with the same type and id is present, but the fullUrl based rules around matching relative references do not match it')],
+            ),
+        );
+    }
+
     private function notBlank(string $path): FHIRValidationViolation
     {
         return new FHIRValidationViolation(

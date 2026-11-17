@@ -1,5 +1,5 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -15,7 +15,11 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "invariant:dom-3": [
+                "contained[3] — The contained resource '(no id)' is not referenced to from elsewhere in the containing resource nor does it refer to the containing resource (dom-3)"
+            ]
+        },
         "warnings": {}
     }
 }

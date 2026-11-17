@@ -1,5 +1,5 @@
 {
-    "errorCount": 0,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 1,
     "java": {
@@ -15,7 +15,12 @@
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:BundleReferenceResolutionChecker": [
+                "entry[0].resource.section[0].entry[0] — Can't find 'Observation/ObservationExample/_history/3' in the bundle. 2 resources with the same type and id are present at fullUrls 'http://example.org/Observation/ObservationExample,http://example.org/Observation/ObservationExample', but the fullUrl based rules around matching relative references match none of them against the source fullUrl 'http://example.org/Composition/CompositionExample1'",
+                "entry[0].resource.section[0].entry[1] — Found 2 matches for 'Observation/ObservationExample' in the bundle"
+            ]
+        },
         "warnings": {}
     }
 }
