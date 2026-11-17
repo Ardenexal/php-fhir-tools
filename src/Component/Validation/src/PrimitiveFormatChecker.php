@@ -93,15 +93,15 @@ final class PrimitiveFormatChecker
         FHIRTime::class     => "Not a valid time format: '%s'",
     ];
 
+    /** Element.ele-1's published human text, the same in every release. */
+    private const string ELE_1_HUMAN = 'All FHIR elements must have a @value or children';
+
     /**
      * A seconds field of 60 — a leap second, which FHIR permits and brick/date-time cannot parse.
      *
      * Anchored on the seconds position specifically, so `11:60:59` (minute 60, genuinely invalid and
      * reported by the oracle) is not caught by it.
      */
-    /** Element.ele-1's published human text, the same in every release. */
-    private const string ELE_1_HUMAN = 'All FHIR elements must have a @value or children';
-
     private const string LEAP_SECOND = '/(?:^|T)\d{2}:\d{2}:60(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})?$/';
 
     /**

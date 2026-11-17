@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept as R4CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\Extension\ADUseExtension;
+use Ardenexal\FHIRTools\Component\Models\R4\Extension\PronounsExtension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive as R4CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource as R4PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ListModeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ListStatusType;
@@ -63,6 +68,26 @@ final class FHIRExtensionBaseInvariantValidationTest extends TestCase
         $list = $this->list([new Extension(url: 'http://example.org/some-url', value: new CodePrimitive(value: 'a'))]);
 
         self::assertSame([], $this->invariantFailures($list));
+    }
+
+    /**
+     * A typed extension class inherits ext-1 from Extension, so it is held to it too. A complex one
+     * keeps its parts as typed properties, `PronounsExtension::$valueSlice` among them, so ext-1 must
+     * not read that property as the extension's own value.
+     */
+    public function testTypedExtensionsPassTheBaseInvariants(): void
+    {
+        $patient = new R4PatientResource(extension: [
+            new PronounsExtension(valueSlice: new R4CodeableConcept(text: 'she/her')),
+            new ADUseExtension(valueCode: new R4CodePrimitive(value: 'BAD')),
+        ]);
+
+        $baseFailures = array_filter(
+            $this->service->validate($patient)->errors(),
+            static fn (FHIRValidationViolation $v): bool => in_array($v->invariantKey, ['ext-1', 'ele-1'], true),
+        );
+
+        self::assertSame([], array_values($baseFailures));
     }
 
     /** @param list<Extension> $extensions */

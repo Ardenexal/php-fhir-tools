@@ -30,9 +30,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
  *
  * A DOCTYPE short-circuits (txt-1 plus the XXE diagnostic, nothing else). Undefined entities are
  * reported on their own — with no txt-1 and no txt-2 — and substituted out before parsing, so that
- * an entity can never masquerade as malformedness. Only then is the document parsed; a genuine
- * parse failure is the sole trigger for txt-2. txt-1 is emitted at most once per narrative, never
- * once per diagnostic.
+ * an entity can never masquerade as malformedness. Only then is the document parsed. txt-2 follows
+ * a genuine parse failure, or a document that parses but holds no content (see {@see hasContent()}).
+ * txt-1 is emitted at most once per narrative, never once per diagnostic.
  *
  * ## What is deliberately not checked
  *
