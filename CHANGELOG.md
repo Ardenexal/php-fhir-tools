@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [Validation] `FHIRValidationService` now checks more references inside Bundles, so a Bundle that passed before can now fail. In every Bundle type, nested ones included, a reference that is not `[type]/[id]` is an error (`Relative URLs must be of the format [ResourceName]/[id]. Encountered denom-EXM104`), and so is a relative reference in an entry with no `fullUrl`. In a `document` or `message`, a reference that matches two entries is an error (`Found 2 matches for 'Observation/1' in the bundle`). A reference from the Composition that matches nothing is an error too (`Can't find 'Organization/666' in the bundle`); from any other entry it is information, because it may point at a server. A `_history/[version]` reference now resolves against the entry's `meta.versionId` (#154)
+- [Validation] A `#id` reference that names no contained resource is now an error, `Unable to resolve resource with reference '#id'`, beside the existing `ref-1` finding (#154)
+
 ### Changed
 - **[Validation] Document Bundles that validated clean can now fail: entries the Composition cannot reach are errors.** Validation follows every reference and every `uri`, `url` or `canonical` value from the Composition, or from the MessageHeader in a message Bundle, where the findings are warnings and information instead. An entry that only points back at what was reached is reported too, unless it is a Provenance. Severities and wording follow the HL7 Java reference validator:
   - Document, entry not reached: error, `Entry 'urn:uuid:…' isn't reachable by traversing links (forward or backward) from the Composition`.
@@ -15,6 +19,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Message, entry reached only by pointing back: information.
 
   A relative reference such as `Patient/1` reaches an entry only when the referring entry's `fullUrl` is RESTful and ends in that resource's own id, so a document that names its entries by `urn:uuid:` and links them with relative references reports every entry it links that way. A reference whose `fullUrl` two entries share reaches neither, unless a `_history/n` suffix matches one entry's `meta.versionId` (#155)
+- [Validation] `dom-3` is now reported once for each unreferenced contained resource, on `contained[n]`, with the message `The contained resource 'pat1' is not referenced to from elsewhere in the containing resource nor does it refer to the containing resource (dom-3)`. Before, `FHIRValidationService` reported it once on the whole resource, missed a contained resource without an id, and in R4 and R4B could not evaluate it at all, leaving an info-level "could not be evaluated" notice instead. So an R4 or R4B resource with an unreferenced contained resource now fails. A pointer from narrative anywhere in the resource counts as a reference. The generated constraint still runs when you use the Symfony validator directly (#154)
+
+### Fixed
+- **[Validation] Narratives that validated clean can now fail: more of the reference validator's narrative checks are reported** (#158). Each finding is reported once per narrative, in the HL7 Java reference validator's wording:
+  - an `<a href>` with a scheme that names rather than locates, such as `Hyperlink scheme 'urn' in 'urn:uuid:…' at 'div/p/a' for 'Amy V. Shaw' is not a valid hyperlinkable scheme` (`urn`, `oid` and `uuid`);
+  - an `<a href="#…">` that matches no element id, contained resource or anchor `id`/`name` in what was validated: `Hyperlink '#x' at 'div/p/a' for '…' does not resolve`;
+  - an element outside the XHTML namespace: `Wrong namespace on the XHTML ('…', should be 'http://www.w3.org/1999/xhtml')`;
+  - the `idref` attribute, which is not HTML 4.0, now breaks `txt-1` like any other unknown attribute;
+  - a mismatched closing tag reads `Found "</pa>" expecting "</p>"` instead of libxml's wording.
+- [Serialization] Reading XML now keeps a FHIR narrative exactly as written. Text beside a child element moved after it (`<p>a <b>b</b> c</p>` became `<p>a  c<b>b</b></p>`), same-named siblings were regrouped (`<p/><table/><p/>` became `<p/><p/><table/>`), and inside a Bundle entry an anchor's text was lost entirely. The `div` is now read from the parsed document and written back as markup, so a round trip keeps its order. A `div` or element outside the XHTML namespace keeps that namespace in the model, so validation can report it; writing XML still emits the whole narrative in the XHTML namespace. This also covers a `div` with attributes: `<div lang="en">Text</div>` in a Bundle entry came out as `<div lang="en"/>`.
+- **[Validation] Resources that validated clean can now fail: more of the core invariants are checked.** Each now reports where the HL7 Java reference validator does (#159):
+  - `ext-1` on every extension, including one on a primitive value, when it has neither a value nor sub-extensions, or has both.
+  - `ele-1` on a primitive that is present but has no value and no extension, such as `<implicitRules id="i1"/>` or `"fullUrl": ""`, beside the existing `value cannot be empty`.
+  - `txt-2` on a narrative with no text other than whitespace and no image, such as `<div><p></p></div>`.
+  - In R4, `que-12` (two `enableWhen` without `enableBehavior`) and `eld-19` (an `ElementDefinition.path` such as `Observation...unit`), which R4 published wrongly, are checked with the expressions R4B corrected them to.
 
 ## [0.7.0] - 2026-11-17
 

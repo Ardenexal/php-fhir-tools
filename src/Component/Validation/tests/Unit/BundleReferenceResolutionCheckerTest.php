@@ -5,11 +5,18 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BundleTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntry;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Composition\CompositionSection;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\List\ListEntry;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\ListResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\MeasureReportResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\OrganizationResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Validation\BundleReferenceResolutionChecker;
@@ -65,19 +72,45 @@ final class BundleReferenceResolutionCheckerTest extends TestCase
     }
 
     /**
-     * `relative_reference_to_fullUrl.no_ids.PROBLEM`. Neither resource has an id, so there is no
-     * same-type-and-id candidate to name. The reference validator reports plain absence here, which is
-     * a different sentence and a different rule; this class stays silent rather than guessing at it.
+     * `relative_reference_to_fullUrl.no_ids.PROBLEM`. Neither resource has an id, so nothing in the
+     * bundle has the type and id the reference names. The reference validator reports plain absence,
+     * a sentence without the fullUrl clause because there is no near miss to explain.
      */
-    public function testNoCandidateIsNotThisRulesFinding(): void
+    public function testReferenceToNothingInTheBundleIsReportedAsAbsent(): void
     {
-        self::assertSame([], $this->messagesFor($this->document(
-            sourceFullUrl: 'http://zrbj.eu/x/Composition/666',
-            sourceId: null,
-            reference: 'Organization/666',
-            targetFullUrl: 'http://zrbj.eu/x/Organization/666',
-            targetId: null,
-        )));
+        self::assertSame(
+            ["Can't find 'Organization/666' in the bundle"],
+            $this->messagesFor($this->document(
+                sourceFullUrl: 'http://zrbj.eu/x/Composition/666',
+                sourceId: null,
+                reference: 'Organization/666',
+                targetFullUrl: 'http://zrbj.eu/x/Organization/666',
+                targetId: null,
+            )),
+        );
+    }
+
+    /**
+     * `R4.message` and `R3.bundle-ref`: outside the Composition, a reference to something the bundle
+     * does not hold may point at a server, and the reference validator says so only as information.
+     */
+    public function testAbsenceOutsideTheCompositionIsInformation(): void
+    {
+        $bundle = new BundleResource(
+            type: new BundleTypeType(value: 'message'),
+            entry: [
+                new BundleEntry(
+                    fullUrl: new UriPrimitive(value: 'http://example.org/Observation/1'),
+                    resource: new ObservationResource(id: '1', subject: new Reference(reference: 'Patient/123')),
+                ),
+            ],
+        );
+
+        $violations = (new BundleReferenceResolutionChecker())->check($bundle);
+
+        self::assertCount(1, $violations);
+        self::assertSame("Can't find 'Patient/123' in the bundle", $violations[0]->message);
+        self::assertSame('information', $violations[0]->severity);
     }
 
     /** `relative_reference_to_TYPE_ID.all_fullUrl_UUID`. A `urn:` fullUrl yields no base at all. */
@@ -159,20 +192,43 @@ final class BundleReferenceResolutionCheckerTest extends TestCase
     }
 
     /**
-     * `bundle-document-versioned-references-good` holds two references at `_history/1` and `_history/2`
-     * against two entries sharing one fullUrl, and the reference validator accepts both. A versioned
-     * reference resolves against `meta.versionId`, which is a rule this class does not implement, so it
-     * declines to judge one rather than reporting a document the reference validator passes.
+     * `bundle-document-versioned-references-good`: two entries share one fullUrl and differ only in
+     * `meta.versionId`, and each `_history/n` reference picks out exactly one of them. The reference
+     * validator accepts both.
      */
-    public function testVersionedReferencesAreNotJudged(): void
+    public function testVersionedReferencesResolveAgainstTheVersionId(): void
     {
-        self::assertSame([], $this->messagesFor($this->document(
-            sourceFullUrl: 'http://example.org/Composition/CompositionExample1',
-            sourceId: 'CompositionExample1',
-            reference: 'Organization/666/_history/1',
-            targetFullUrl: 'http://example.org/Organization/666',
-            targetId: '666',
-        )));
+        self::assertSame([], $this->messagesFor($this->versionedDocument([
+            'Observation/ObservationExample/_history/1',
+            'Observation/ObservationExample/_history/2',
+        ])));
+    }
+
+    /**
+     * `bundle-document-versioned-references-bad`, first reference. Version 3 is not in the bundle, so
+     * the reference matches nothing, while two entries with the same type and id sit right there.
+     */
+    public function testVersionedReferenceToAMissingVersionIsReported(): void
+    {
+        self::assertSame(
+            ["Can't find 'Observation/ObservationExample/_history/3' in the bundle. 2 resources with the same type and id are present at fullUrls 'http://example.org/Observation/ObservationExample,http://example.org/Observation/ObservationExample', but the fullUrl based rules around matching relative references match none of them against the source fullUrl 'http://example.org/Composition/CompositionExample1'"],
+            $this->messagesFor($this->versionedDocument(['Observation/ObservationExample/_history/3'])),
+        );
+    }
+
+    /**
+     * `bundle-document-versioned-references-bad`, second reference. Without a version the reference
+     * resolves to both entries sharing the fullUrl, which is ambiguity rather than absence.
+     */
+    public function testReferenceMatchingTwoEntriesIsReportedAsAmbiguous(): void
+    {
+        $violations = (new BundleReferenceResolutionChecker())->check(
+            $this->versionedDocument(['Observation/ObservationExample']),
+        );
+
+        self::assertCount(1, $violations);
+        self::assertSame("Found 2 matches for 'Observation/ObservationExample' in the bundle", $violations[0]->message);
+        self::assertSame('entry[0].resource.section[0].entry[0]', $violations[0]->path);
     }
 
     /** A resource is not reachable through this rule when it is not in the bundle at all. */
@@ -242,6 +298,134 @@ final class BundleReferenceResolutionCheckerTest extends TestCase
         self::assertCount(1, $violations);
         self::assertSame('entry[0].resource.author[0]', $violations[0]->path);
         self::assertSame('error', $violations[0]->severity);
+    }
+
+    /**
+     * `bundle-ea-testcase`: a List inside a Bundle that is itself contained in a MeasureReport refers
+     * to `denom-EXM104`, which is not `[type]/[id]`. The reference validator reports the shape whatever
+     * the Bundle type, and it reaches Bundles nested in `contained`.
+     */
+    public function testMalformedRelativeReferenceInANestedBundleIsReported(): void
+    {
+        $inner = new BundleResource(
+            type: new BundleTypeType(value: 'collection'),
+            entry: [
+                new BundleEntry(
+                    fullUrl: new UriPrimitive(value: 'urn:uuid:1a19a371'),
+                    resource: new ListResource(entry: [new ListEntry(item: new Reference(reference: 'denom-EXM104'))]),
+                ),
+            ],
+        );
+
+        $outer = new BundleResource(
+            type: new BundleTypeType(value: 'transaction'),
+            entry: [
+                new BundleEntry(
+                    fullUrl: new UriPrimitive(value: 'urn:uuid:0d5a8a2e'),
+                    resource: new MeasureReportResource(contained: [$inner]),
+                ),
+            ],
+        );
+
+        $violations = (new BundleReferenceResolutionChecker())->check($outer);
+
+        self::assertCount(1, $violations);
+        self::assertSame('Relative URLs must be of the format [ResourceName]/[id]. Encountered denom-EXM104', $violations[0]->message);
+        self::assertSame('entry[0].resource.contained[0].entry[0].resource.entry[0].item', $violations[0]->path);
+    }
+
+    /**
+     * `bundle-ea-testcase`, the MeasureReport entry: it has no fullUrl, so its relative `subject`
+     * has nothing to resolve against. This holds in a transaction too, which is where the corpus has it.
+     */
+    public function testRelativeReferenceInAnEntryWithoutAFullUrlIsReported(): void
+    {
+        $bundle = new BundleResource(
+            type: new BundleTypeType(value: 'transaction'),
+            entry: [
+                new BundleEntry(resource: new MeasureReportResource(subject: new Reference(reference: 'Patient/denom-EXM104'))),
+            ],
+        );
+
+        $violations = (new BundleReferenceResolutionChecker())->check($bundle);
+
+        self::assertCount(1, $violations);
+        self::assertSame('Relative Reference appears inside Bundle whose entry is missing a fullUrl', $violations[0]->message);
+        self::assertSame('entry[0].resource.subject', $violations[0]->path);
+    }
+
+    /**
+     * `bundle-bad-empty` (R5): an empty `"fullUrl": ""` is present, not missing. The reference
+     * validator reports it as an empty value, which other passes cover, and says only for information
+     * that the relative reference beside it cannot be resolved.
+     */
+    public function testAnEmptyFullUrlIsNotAMissingOne(): void
+    {
+        $bundle = new BundleResource(
+            type: new BundleTypeType(value: 'collection'),
+            entry: [
+                new BundleEntry(
+                    fullUrl: new UriPrimitive(value: ''),
+                    resource: new PatientResource(id: 'pat1', generalPractitioner: [new Reference(reference: 'Practitioner/pr1')]),
+                ),
+            ],
+        );
+
+        self::assertSame([], $this->messagesFor($bundle));
+    }
+
+    /**
+     * A conditional reference (`Device?identifier=1234`) is a search, not a `[type]/[id]`, and is
+     * legitimate in a transaction. Its query syntax belongs to the target-profile validator.
+     */
+    public function testConditionalReferenceIsNotJudged(): void
+    {
+        $bundle = new BundleResource(
+            type: new BundleTypeType(value: 'transaction'),
+            entry: [
+                new BundleEntry(
+                    fullUrl: new UriPrimitive(value: 'http://example.org/Observation/observation1'),
+                    resource: new ObservationResource(id: 'observation1', subject: new Reference(reference: 'Patient?identifier=1234')),
+                ),
+            ],
+        );
+
+        self::assertSame([], $this->messagesFor($bundle));
+    }
+
+    /**
+     * The `bundle-document-versioned-references-*` shape: a Composition whose one section lists the
+     * given references, and two versions of one Observation sharing a fullUrl.
+     *
+     * @param list<string> $references
+     */
+    private function versionedDocument(array $references): BundleResource
+    {
+        $observation = static fn (string $version): BundleEntry => new BundleEntry(
+            fullUrl: new UriPrimitive(value: 'http://example.org/Observation/ObservationExample'),
+            resource: new ObservationResource(
+                id: 'ObservationExample',
+                meta: new Meta(versionId: new IdPrimitive(value: $version)),
+            ),
+        );
+
+        return new BundleResource(
+            type: new BundleTypeType(value: 'document'),
+            entry: [
+                new BundleEntry(
+                    fullUrl: new UriPrimitive(value: 'http://example.org/Composition/CompositionExample1'),
+                    resource: new CompositionResource(
+                        id: 'CompositionExample1',
+                        section: [new CompositionSection(entry: array_map(
+                            static fn (string $reference): Reference => new Reference(reference: $reference),
+                            $references,
+                        ))],
+                    ),
+                ),
+                $observation('1'),
+                $observation('2'),
+            ],
+        );
     }
 
     /**

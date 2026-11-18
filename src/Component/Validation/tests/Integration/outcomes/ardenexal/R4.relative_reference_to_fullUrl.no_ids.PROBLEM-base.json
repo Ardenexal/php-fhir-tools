@@ -1,12 +1,12 @@
 {
-    "errorCount": 3,
+    "errorCount": 4,
     "warningCount": 0,
     "infoCount": 1,
     "java": {
         "errorCount": 4,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Can't find 'Organization/666' in the bundle (Composition.author)",
@@ -23,6 +23,9 @@
             ],
             "constraint:BundleReachabilityChecker": [
                 "entry[1] — Entry 'http://zrbj.eu/x/Organization/666' isn't reachable by traversing links (forward or backward) from the Composition"
+            ],
+            "constraint:BundleReferenceResolutionChecker": [
+                "entry[0].resource.author[0] — Can't find 'Organization/666' in the bundle"
             ]
         },
         "warnings": {}

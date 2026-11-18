@@ -59,6 +59,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
     private const CONTEXT_DENY   = -1;
 
+    /** The invariant ContainedReferenceChecker reports in place of the generated constraint. */
+    private const string DOM_3 = 'dom-3';
+
     /** @var \WeakMap<CompiledProfile, list<Constraint>> Runtime constraints per compiled profile */
     private \WeakMap $runtimeConstraints;
 
@@ -94,6 +97,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly DuplicateElementIdChecker $duplicateIdChecker = new DuplicateElementIdChecker(),
         private readonly AttachmentIntegrityChecker $attachmentChecker = new AttachmentIntegrityChecker(),
         private readonly QuestionnaireDefinitionChecker $questionnaireDefinitionChecker = new QuestionnaireDefinitionChecker(),
+        private readonly ContainedReferenceChecker $containedReferenceChecker = new ContainedReferenceChecker(),
         private readonly BundleReachabilityChecker $bundleReachabilityChecker = new BundleReachabilityChecker(),
     ) {
         $this->runtimeConstraints          = new \WeakMap();
@@ -167,7 +171,16 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
         $violations = [];
         foreach ($rawViolations as $rawViolation) {
-            $violations[] = $this->mapViolation($rawViolation);
+            $violation = $this->mapViolation($rawViolation);
+
+            // ContainedReferenceChecker reports dom-3 below, once per unreferenced contained resource,
+            // in place of the generated invariant's single finding on the whole resource. Its
+            // "could not be evaluated" notice goes too, since the checker does evaluate the rule.
+            if ($violation->invariantKey === self::DOM_3) {
+                continue;
+            }
+
+            $violations[] = $violation;
         }
 
         // Profiles the resource's class does not declare, checked against StructureDefinitions
@@ -267,10 +280,16 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         // Document and message entries the first entry cannot reach by following links. Unconditional
-        // like the two passes above, and it too resolves only against the entries in hand. See
+        // like the passes above, and it too resolves only against the entries in hand. See
         // BundleReachabilityChecker.
         foreach ($this->bundleReachabilityChecker->check($resource) as $reachabilityViolation) {
             $violations[] = $reachabilityViolation;
+        }
+
+        // `#id` references and the contained resources they point at, including dom-3. Unconditional
+        // like the passes above and resolves nothing off-box. See ContainedReferenceChecker.
+        foreach ($this->containedReferenceChecker->check($resource) as $containedViolation) {
+            $violations[] = $containedViolation;
         }
 
         // Extension.url is a structural rule, not a resolution one: it needs no registry, so unlike
@@ -698,6 +717,22 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return $this->runtimeConstraints[$profile] = $constraints;
+    }
+
+    /**
+     * The invariants every extension carries as an Extension: ext-1, and ele-1 from Element.
+     *
+     * They are declared on the base model classes, which Symfony would apply to any element it
+     * cascades into. It never cascades into an extension, so without this they were never evaluated
+     * on one, and `R5.list-extension2`'s extension with neither a value nor sub-extensions went
+     * unreported. Read from the class hierarchy, so a typed extension class inherits them as a plain
+     * one does; neither a typed class nor a runtime definition declares them again.
+     *
+     * @return list<FHIRPathInvariant>
+     */
+    private function extensionBaseInvariants(object $extension): array
+    {
+        return $this->attributes->classAttributesInHierarchy($extension, FHIRPathInvariant::class);
     }
 
     /**
@@ -1600,7 +1635,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 // Invariants and bindings from the extension's definition. Symfony does not cascade into
                 // extensions, so a typed class's attributes are run here too, the same way as a plain
                 // extension's runtime definition
-                $rules = $runtime !== null ? $this->runtimeExtensionConstraintsOf($runtime) : $this->extensionRuleAttributes($ext);
+                $rules = [
+                    ...$this->extensionBaseInvariants($ext),
+                    ...($runtime !== null ? $this->runtimeExtensionConstraintsOf($runtime) : $this->extensionRuleAttributes($ext)),
+                ];
                 if ($rules !== []) {
                     $at  = $extPath . '[' . $extIndex . ']';
                     $raw = FHIRPathResourceContext::within(
