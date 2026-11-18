@@ -1,6 +1,6 @@
 {
     "errorCount": 2,
-    "warningCount": 0,
+    "warningCount": 2,
     "infoCount": 1,
     "java": {
         "errorCount": 3,
@@ -21,6 +21,11 @@
                 "entry[0].resource.section[0].entry[1] — Found 2 matches for 'Observation/ObservationExample' in the bundle"
             ]
         },
-        "warnings": {}
+        "warnings": {
+            "constraint:BundleReachabilityChecker": [
+                "entry[1] — Entry 'http://example.org/Observation/ObservationExample' isn't reachable by traversing forwards from the Composition. Only Provenance is approved to be used this way (R4 section 3.3.1)",
+                "entry[2] — Entry 'http://example.org/Observation/ObservationExample' isn't reachable by traversing forwards from the Composition. Only Provenance is approved to be used this way (R4 section 3.3.1)"
+            ]
+        }
     }
 }

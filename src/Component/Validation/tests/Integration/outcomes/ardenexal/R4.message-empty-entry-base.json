@@ -1,7 +1,7 @@
 {
     "errorCount": 9,
-    "warningCount": 1,
-    "infoCount": 5,
+    "warningCount": 2,
+    "infoCount": 6,
     "java": {
         "errorCount": 9,
         "warningCount": 3,
@@ -37,6 +37,9 @@
             ]
         },
         "warnings": {
+            "constraint:BundleReachabilityChecker": [
+                "entry[2] — Entry 'urn:uuid:75ea28b5-74b8-4d9c-9eb5-cfdc10b48fad' isn't reachable by traversing links (forward or backward) from the MessageHeader, so its presence should be reviewed (is it needed to process the message?)"
+            ],
             "constraint:FHIRValueSetBinding": [
                 "entry[7].resource.contained[0].payloadMimeType — Required binding for value set http://hl7.org/fhir/ValueSet/mimetypes|4.0.1 could not be validated: no enum class generated."
             ]

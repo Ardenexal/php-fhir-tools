@@ -98,6 +98,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly AttachmentIntegrityChecker $attachmentChecker = new AttachmentIntegrityChecker(),
         private readonly QuestionnaireDefinitionChecker $questionnaireDefinitionChecker = new QuestionnaireDefinitionChecker(),
         private readonly ContainedReferenceChecker $containedReferenceChecker = new ContainedReferenceChecker(),
+        private readonly BundleReachabilityChecker $bundleReachabilityChecker = new BundleReachabilityChecker(),
     ) {
         $this->runtimeConstraints          = new \WeakMap();
         $this->runtimeExtensionConstraints = new \WeakMap();
@@ -276,6 +277,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // against the entries already in hand. See BundleReferenceResolutionChecker.
         foreach ($this->bundleReferenceChecker->check($resource) as $bundleReferenceViolation) {
             $violations[] = $bundleReferenceViolation;
+        }
+
+        // Document and message entries the first entry cannot reach by following links. Unconditional
+        // like the passes above, and it too resolves only against the entries in hand. See
+        // BundleReachabilityChecker.
+        foreach ($this->bundleReachabilityChecker->check($resource) as $reachabilityViolation) {
+            $violations[] = $reachabilityViolation;
         }
 
         // `#id` references and the contained resources they point at, including dom-3. Unconditional

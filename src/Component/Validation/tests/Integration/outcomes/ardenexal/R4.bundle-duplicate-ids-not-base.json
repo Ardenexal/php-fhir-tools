@@ -1,6 +1,6 @@
 {
     "errorCount": 39,
-    "warningCount": 6,
+    "warningCount": 7,
     "infoCount": 28,
     "java": {
         "errorCount": 49,
@@ -105,6 +105,9 @@
             ]
         },
         "warnings": {
+            "constraint:BundleReachabilityChecker": [
+                "entry[9] — Entry 'RelatedPerson/1' isn't reachable by traversing forwards from the Composition. Only Provenance is approved to be used this way (R4 section 3.3.1)"
+            ],
             "constraint:FHIRValueSetBinding": [
                 "entry[10].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
                 "entry[12].resource.status — Required binding for value set http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1 could not be validated: no enum class generated.",
