@@ -216,6 +216,21 @@ final class BundleReachabilityCheckerTest extends TestCase
         );
     }
 
+    /**
+     * A version that is not a FHIR id, such as `v_1`, does not resolve, so the entry it names is an
+     * orphan. {@see BundleReferenceResolutionChecker} reads relative references with the same rule.
+     */
+    public function testVersionThatIsNotAFhirIdDoesNotLink(): void
+    {
+        self::assertSame(
+            [['error', 'entry[1]', sprintf(self::ORPHAN, "'http://example.org/Patient/p'")]],
+            $this->findings($this->bundle('document', [
+                ['http://example.org/Composition/c', ['resourceType' => 'Composition', 'id' => 'c', 'subject' => ['reference' => 'Patient/p/_history/v_1']]],
+                ['http://example.org/Patient/p', ['resourceType' => 'Patient', 'id' => 'p', 'meta' => ['versionId' => 'v_1']]],
+            ])),
+        );
+    }
+
     /** A `uri` value links like a Reference does, which is how the reference validator reads it too. */
     public function testUriValueIsALink(): void
     {
