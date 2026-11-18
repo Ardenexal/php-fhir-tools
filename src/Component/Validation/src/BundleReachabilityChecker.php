@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
@@ -41,13 +38,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
  *
  * ## Resolving a link
  *
- * Only what the Bundle itself can answer. An absolute value (it has a scheme) matches the entry whose
- * `fullUrl` is that value, once any `#fragment` is dropped. A relative `Type/id` takes its base from the referring entry's `fullUrl`,
- * which must read `[base]/[type]/[id]` with `[id]` equal to that resource's own id; see
- * {@see BundleReferenceResolutionChecker} for the fixtures that pin this rule down. A `_history/n` suffix
- * is matched against the entry's `meta.versionId`. A value matching two entries links to neither: the
- * reference validator reports that ambiguity as a separate finding, and following either entry would
- * be a guess.
+ * {@see BundleEntryIndex} decides which entries a value names, by the same rules
+ * {@see BundleReferenceResolutionChecker} reports against. A value that names two entries holding a
+ * resource links to neither: the reference validator reports that ambiguity as a separate finding, and
+ * following either entry would be a guess.
  *
  * A `#id` fragment, an id without a type, and a reference under a non-RESTful or `urn:` `fullUrl`
  * resolve to nothing. That is why every entry of `japanese-utf8-ok` (bare-uuid references) and of
@@ -64,13 +58,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
  * costs nothing in the R4, R4B and R5 corpus. The first entry must be the Composition (document) or the
  * MessageHeader (message); when it is not, `bdl-11` / `bdl-12` already report the bundle, and walking
  * from the wrong resource would report every other entry on top of that.
+ *
+ * @phpstan-import-type IndexedEntry from BundleEntryIndex
  */
 final class BundleReachabilityChecker
 {
+    private readonly BundleEntryReader $reader;
+
     public function __construct(
-        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
-        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
+        FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
     ) {
+        $this->reader = new BundleEntryReader($models, $attributes);
     }
 
     /** Identifies the root resource we apply to, read from the class attribute. */
@@ -94,24 +93,6 @@ final class BundleReachabilityChecker
     /** The primitive types whose values the reference validator treats as links, like a Reference. */
     private const array LINK_PRIMITIVES = ['uri', 'url', 'canonical'];
 
-    /** A value with a URI scheme, `http:` or `urn:` for example, resolves by `fullUrl` alone. */
-    private const string ABSOLUTE = '~\A[A-Za-z][A-Za-z0-9+.\-]*:~';
-
-    /** A relative reference, `[Type]/[id]`, optionally pinned to a version. */
-    private const string RELATIVE_REFERENCE = '~\A(?<type>[A-Z][A-Za-z]+)/(?<id>[A-Za-z0-9\-\.]{1,64})(?:/_history/(?<version>[^/]+))?\z~';
-
-    /** A version suffix on an absolute reference. */
-    private const string HISTORY_SUFFIX = '~\A(?<url>.+)/_history/(?<version>[^/]+)\z~';
-
-    /** A `fullUrl` that yields a base. The same rule as {@see BundleReferenceResolutionChecker}, empty base included. */
-    private const string RESTFUL_FULL_URL = '~\A(?<base>(?:.*/)?)(?<type>[A-Za-z]+)/(?<id>[A-Za-z0-9\-\.]{1,64})\z~';
-
-    /** @var array<class-string, string|null> FHIR resource type per class; reflection is not free */
-    private array $resourceTypes = [];
-
-    /** @var array<class-string, string|null> FHIR type of a complex type or primitive, per class */
-    private array $typeNames = [];
-
     /**
      * Walk a document or message Bundle and report each entry its first entry cannot reach.
      *
@@ -119,11 +100,11 @@ final class BundleReachabilityChecker
      */
     public function check(object $resource): array
     {
-        if ($this->resourceType($resource) !== self::BUNDLE) {
+        if ($this->reader->resourceType($resource) !== self::BUNDLE) {
             return [];
         }
 
-        $bundleType = $this->readString($resource, 'type');
+        $bundleType = $this->reader->readString($resource, 'type');
 
         if ($bundleType === null || !isset(self::FIRST_RESOURCE[$bundleType])) {
             return [];
@@ -131,32 +112,27 @@ final class BundleReachabilityChecker
 
         $isDocument = $bundleType === 'document';
         $anchor     = self::FIRST_RESOURCE[$bundleType];
-        $entries    = $this->entries($resource);
+        $index      = $this->reader->index($resource);
+
+        // An entry without a resource takes no part in the walk.
+        $entries = array_filter($index->entries, static fn (array $entry): bool => $entry['resource'] !== null);
 
         if ($entries === [] || array_key_first($entries) !== 0 || $entries[0]['type'] !== $anchor) {
             return [];
         }
 
-        $byFullUrl = [];
-
-        foreach ($entries as $index => $entry) {
-            if ($entry['fullUrl'] !== null) {
-                $byFullUrl[$entry['fullUrl']][] = $index;
-            }
-        }
-
         // Resolve every entry's links once, up front: the backwards step reads them repeatedly.
         $targets = [];
 
-        foreach ($entries as $index => $entry) {
-            $targets[$index] = [];
-            $visited         = [];
+        foreach ($entries as $position => $entry) {
+            $targets[$position] = [];
+            $visited            = [];
 
             foreach ($this->linkValues($entry['entry'], $visited) as $value) {
-                $target = $this->resolve($value, $entry, $entries, $byFullUrl);
+                $target = $this->resolve($value, $position, $index);
 
-                if ($target !== null && $target !== $index) {
-                    $targets[$index][$target] = $target;
+                if ($target !== null && $target !== $position) {
+                    $targets[$position][$target] = $target;
                 }
             }
         }
@@ -220,13 +196,13 @@ final class BundleReachabilityChecker
      * disagrees with its own fullUrl, so the base rule for references cannot be what pairs them, and
      * the reference validator does not report that Binary.
      *
-     * @param array<int, array{entry: object, fullUrl: string|null, resource: object, type: string|null}> $entries
+     * @param array<int, IndexedEntry> $entries
      *
      * @return list<int>
      */
     private function stylesheets(object $bundle, array $entries): array
     {
-        $links = $this->readPublic($bundle, 'link');
+        $links = $this->reader->readPublic($bundle, 'link');
 
         if (!is_array($links)) {
             return [];
@@ -235,17 +211,17 @@ final class BundleReachabilityChecker
         $found = [];
 
         foreach ($links as $link) {
-            if (!is_object($link) || $this->readString($link, 'relation') !== self::STYLESHEET) {
+            if (!is_object($link) || $this->reader->readString($link, 'relation') !== self::STYLESHEET) {
                 continue;
             }
 
-            $url = $this->readString($link, 'url');
+            $url = $this->reader->readString($link, 'url');
 
             if ($url === null) {
                 continue;
             }
 
-            $isAbsolute = preg_match(self::ABSOLUTE, $url) === 1;
+            $isAbsolute = BundleEntryIndex::isAbsolute($url);
 
             foreach ($entries as $index => $entry) {
                 $fullUrl = $entry['fullUrl'];
@@ -289,7 +265,7 @@ final class BundleReachabilityChecker
     /**
      * The finding for an entry reached only by pointing back into the document or message.
      *
-     * @param array{entry: object, fullUrl: string|null, resource: object, type: string|null} $entry
+     * @param IndexedEntry $entry
      */
     private function backwardsViolation(int $index, array $entry, bool $isDocument, string $anchor): ?FHIRValidationViolation
     {
@@ -313,48 +289,11 @@ final class BundleReachabilityChecker
      * How the reference validator names an entry: its quoted `fullUrl`, or nothing at all without one,
      * which leaves the double space in `Entry  isn't reachable`. Kept so the two findings pair.
      *
-     * @param array{entry: object, fullUrl: string|null, resource: object, type: string|null} $entry
+     * @param IndexedEntry $entry
      */
     private function entryName(array $entry): string
     {
         return $entry['fullUrl'] === null ? '' : "'" . $entry['fullUrl'] . "'";
-    }
-
-    /**
-     * The entries that hold a resource, by position. An entry without one takes no part in the walk.
-     *
-     * @return array<int, array{entry: object, fullUrl: string|null, resource: object, type: string|null}>
-     */
-    private function entries(object $bundle): array
-    {
-        $value = $this->readPublic($bundle, 'entry');
-
-        if (!is_array($value)) {
-            return [];
-        }
-
-        $entries = [];
-
-        foreach ($value as $index => $entry) {
-            if (!is_int($index) || !is_object($entry)) {
-                continue;
-            }
-
-            $resource = $this->readPublic($entry, 'resource');
-
-            if (!is_object($resource)) {
-                continue;
-            }
-
-            $entries[$index] = [
-                'entry'    => $entry,
-                'fullUrl'  => $this->readString($entry, 'fullUrl'),
-                'resource' => $resource,
-                'type'     => $this->resourceType($resource),
-            ];
-        }
-
-        return $entries;
     }
 
     /**
@@ -375,11 +314,11 @@ final class BundleReachabilityChecker
 
         $visited[$id] = true;
         $found        = [];
-        $type         = $this->typeName($node);
+        $type         = $this->reader->typeName($node);
 
         $value = match (true) {
-            $type === self::REFERENCE                         => $this->readString($node, 'reference'),
-            in_array($type, self::LINK_PRIMITIVES, true)      => $this->readString($node, 'value'),
+            $type === self::REFERENCE                         => $this->reader->readString($node, 'reference'),
+            in_array($type, self::LINK_PRIMITIVES, true)      => $this->reader->readString($node, 'value'),
             default                                           => null,
         };
 
@@ -387,7 +326,7 @@ final class BundleReachabilityChecker
             $found[] = $value;
         }
 
-        foreach ($this->models->initializedPublicValues($node) as $child) {
+        foreach ($this->reader->children($node) as $child) {
             $children = is_array($child) ? $child : [$child];
 
             foreach ($children as $item) {
@@ -401,173 +340,20 @@ final class BundleReachabilityChecker
     }
 
     /**
-     * The position of the one entry a link value resolves to, or null when it resolves to none or to
-     * several.
-     *
-     * @param array{entry: object, fullUrl: string|null, resource: object, type: string|null}             $source
-     * @param array<int, array{entry: object, fullUrl: string|null, resource: object, type: string|null}> $entries
-     * @param array<string, list<int>>                                                                    $byFullUrl
+     * The position of the one entry holding a resource that a link value resolves to, or null when it
+     * resolves to none or to several. Two matches are ambiguous, and following either would be a guess.
      */
-    private function resolve(string $value, array $source, array $entries, array $byFullUrl): ?int
+    private function resolve(string $value, int $source, BundleEntryIndex $index): ?int
     {
-        if (preg_match(self::ABSOLUTE, $value) === 1) {
-            // `urn:uuid:…#section` points into the entry `urn:uuid:…`, which is all the walk needs.
-            $value = explode('#', $value, 2)[0];
-
-            if (isset($byFullUrl[$value])) {
-                return $this->unique($byFullUrl[$value], null, $entries);
-            }
-
-            if (preg_match(self::HISTORY_SUFFIX, $value, $parts) === 1 && isset($byFullUrl[$parts['url']])) {
-                return $this->unique($byFullUrl[$parts['url']], $parts['version'], $entries);
-            }
-
-            return null;
-        }
-
-        if (preg_match(self::RELATIVE_REFERENCE, $value, $parts) !== 1) {
-            return null;
-        }
-
-        $base = $this->base($source);
-
-        if ($base === null) {
-            return null;
-        }
-
-        $target = $base . $parts['type'] . '/' . $parts['id'];
-
-        if (!isset($byFullUrl[$target])) {
-            return null;
-        }
-
-        $version = ($parts['version'] ?? '') === '' ? null : $parts['version'];
-
-        return $this->unique($byFullUrl[$target], $version, $entries);
-    }
-
-    /**
-     * The one candidate left once a version, if any, has narrowed them, or null when that is not one.
-     *
-     * @param list<int>                                                                                   $candidates
-     * @param array<int, array{entry: object, fullUrl: string|null, resource: object, type: string|null}> $entries
-     */
-    private function unique(array $candidates, ?string $version, array $entries): ?int
-    {
-        if ($version !== null) {
-            $candidates = array_values(array_filter(
-                $candidates,
-                fn (int $index): bool => $this->versionId($entries[$index]['resource']) === $version,
-            ));
-        }
-
-        return count($candidates) === 1 ? $candidates[0] : null;
-    }
-
-    /**
-     * The base a relative reference inside this entry resolves against, or null when it yields none.
-     *
-     * @param array{entry: object, fullUrl: string|null, resource: object, type: string|null} $source
-     */
-    private function base(array $source): ?string
-    {
-        $fullUrl = $source['fullUrl'];
-
-        if ($fullUrl === null || preg_match(self::RESTFUL_FULL_URL, $fullUrl, $parts) !== 1) {
-            return null;
-        }
-
-        // Only a tail naming this resource's own id can be stripped to leave a base.
-        if ($parts['id'] !== $this->readString($source['resource'], 'id')) {
-            return null;
-        }
-
-        return $parts['base'];
-    }
-
-    private function versionId(object $resource): ?string
-    {
-        $meta = $this->readPublic($resource, 'meta');
-
-        return is_object($meta) ? $this->readString($meta, 'versionId') : null;
-    }
-
-    /** Read a string-ish property, which may be a primitive wrapper, a bare string, or absent. */
-    private function readString(object $node, string $property): ?string
-    {
-        $value = $this->readPublic($node, $property);
-
-        if ($value instanceof \BackedEnum) {
-            $value = $value->value;
-        }
-
-        if (is_string($value)) {
-            return $value === '' ? null : $value;
-        }
-
-        if ($value instanceof \Stringable) {
-            $string = (string) $value;
-
-            return $string === '' ? null : $string;
-        }
-
-        return null;
-    }
-
-    /**
-     * A public property's value, or null when it is absent, non-public or never written.
-     *
-     * Deserializers bypass the constructor, so an absent field is uninitialized rather than null, and
-     * reading it directly would throw rather than answer.
-     */
-    private function readPublic(object $node, string $property): mixed
-    {
-        if (!in_array($property, $this->models->publicPropertyNames($node), true)) {
-            return null;
-        }
-
-        if (!$this->models->isPropertyInitialized($node, $property)) {
-            return null;
-        }
-
-        return $this->models->readInitializedValue($node, $property);
-    }
-
-    private function resourceType(object $node): ?string
-    {
-        $key = $node::class;
-
-        if (array_key_exists($key, $this->resourceTypes)) {
-            return $this->resourceTypes[$key];
-        }
-
-        $attributes = $this->attributes->classAttributes($node, FhirResource::class);
-
-        return $this->resourceTypes[$key] = $attributes === [] ? null : $attributes[0]->getResourceType();
-    }
-
-    /** The FHIR type a complex-type or primitive class stands for, or null for anything else. */
-    private function typeName(object $node): ?string
-    {
-        $key = $node::class;
-
-        if (array_key_exists($key, $this->typeNames)) {
-            return $this->typeNames[$key];
-        }
-
-        $type    = null;
-        $complex = $this->attributes->classAttributes($node, FHIRComplexType::class);
-
-        if ($complex !== []) {
-            $type = $complex[0]->typeName;
+        if (BundleEntryIndex::isAbsolute($value)) {
+            $matches = $index->resolveAbsolute($value);
         } else {
-            $primitive = $this->attributes->classAttributes($node, FHIRPrimitive::class);
-
-            if ($primitive !== []) {
-                $type = $primitive[0]->primitiveType;
-            }
+            $parts   = BundleEntryIndex::parseRelative($value);
+            $matches = $parts === null ? [] : $index->resolveRelative($parts['type'], $parts['id'], $parts['version'], $source);
         }
 
-        return $this->typeNames[$key] = $type;
+        $matches = array_values(array_filter($matches, static fn (int $match): bool => $index->entries[$match]['resource'] !== null));
+
+        return count($matches) === 1 ? $matches[0] : null;
     }
 }
