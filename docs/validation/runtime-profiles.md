@@ -89,6 +89,40 @@ A profile URL that the resource's class already declares is checked from the cla
 instances included. Any other URL is resolved at runtime; without a resolver, a `meta.profile` URL
 no class declares is reported as not checked, and a URL passed to `validate()` is ignored.
 
+The spec also says an Observation recording a vital sign SHALL conform to the matching core
+vital-signs profile, even when `meta.profile` does not name it. To apply that rule, as the HL7
+reference validator does:
+
+```php
+$report = $service->validateWithOptions($bundle, new FHIRValidationOptions(profilesFromVitalSignsCodes: true));
+```
+
+Each Observation, nested ones included, whose `code.coding` holds one of these codes is then
+checked against the profile, and its parents, as if `meta.profile` named it:
+
+| Code | System | Profile |
+|------|--------|---------|
+| `85353-1` | LOINC | `vitalspanel` |
+| `9279-1` | LOINC | `resprate` |
+| `8867-4` | LOINC | `heartrate` |
+| `2708-6`, `59408-5` | LOINC | `oxygensat` |
+| `8310-5` | LOINC | `bodytemp` |
+| `276885007` | SNOMED CT | `bodytemp` |
+| `8302-2` | LOINC | `bodyheight` |
+| `9843-4` | LOINC | `headcircum` |
+| `29463-7` | LOINC | `bodyweight` |
+| `39156-5` | LOINC | `bmi` |
+| `85354-9`, `76534-7` | LOINC | `bp` |
+
+The spec's vital-signs table lists the first LOINC code for each profile. `59408-5`, `76534-7` and
+SNOMED CT `276885007` are not in it, but the HL7 reference validator maps them too, so they are
+included to match it.
+
+The profiles are the core ones (`http://hl7.org/fhir/StructureDefinition/bp` and so on), so the
+service needs the release's core package to resolve them. An implied profile that cannot be
+resolved is skipped without a warning, because you did not ask for it by name. The option is off
+by default, because turning it on can report new errors on data that passed before.
+
 To check that a profile and its parents resolve before validating anything, for example at
 startup:
 
