@@ -66,7 +66,7 @@ public function validate(
 `validateWithOptions($resource, new FHIRValidationOptions(...))` takes the same settings plus
 `profilesFromMeta`, which checks each resource against the profiles in its own `meta.profile`, and
 `profilesFromVitalSignsCodes`, which checks each Observation against the core vital-signs profile its
-LOINC code implies. See [Runtime Profiles](runtime-profiles.md#validate).
+code implies. See [Runtime Profiles](runtime-profiles.md#validate).
 
 ## Architecture
 

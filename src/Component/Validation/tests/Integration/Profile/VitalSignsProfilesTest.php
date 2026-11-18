@@ -60,6 +60,27 @@ final class VitalSignsProfilesTest extends TestCase
         self::assertContains(self::VITALSIGNS, $groups);
     }
 
+    /**
+     * `obs-temp-bad` in the HL7 test cases: a body temperature coded only in SNOMED CT, with no
+     * category, so the `bodytemp` profile and its `vitalsigns` parent have something to report.
+     */
+    public function testTheSnomedBodyTemperatureCodeChecksTheBodytempProfile(): void
+    {
+        $observation = $this->serializer->deserialize((string) json_encode([
+            'resourceType'      => 'Observation',
+            'status'            => 'final',
+            'code'              => ['coding' => [['system' => VitalSignsProfiles::SNOMED_CT, 'code' => '276885007']]],
+            'subject'           => ['reference' => 'Patient/example'],
+            'effectiveDateTime' => '2026-11-17',
+            'valueQuantity'     => ['value' => 36.0, 'unit' => 'Cel', 'system' => 'http://unitsofmeasure.org', 'code' => 'Cel'],
+        ]));
+
+        self::assertContains(
+            'http://hl7.org/fhir/StructureDefinition/bodytemp',
+            $this->profileGroups($observation, new FHIRValidationOptions(profilesFromVitalSignsCodes: true)),
+        );
+    }
+
     public function testNothingIsImpliedWhenTheOptionIsOff(): void
     {
         self::assertSame([], $this->profileGroups($this->bloodPressureWithoutSystolic(), new FHIRValidationOptions()));

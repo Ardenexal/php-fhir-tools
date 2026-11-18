@@ -97,21 +97,26 @@ reference validator does:
 $report = $service->validateWithOptions($bundle, new FHIRValidationOptions(profilesFromVitalSignsCodes: true));
 ```
 
-Each Observation, nested ones included, whose `code.coding` holds one of these LOINC codes is then
+Each Observation, nested ones included, whose `code.coding` holds one of these codes is then
 checked against the profile, and its parents, as if `meta.profile` named it:
 
-| LOINC code | Profile |
-|------------|---------|
-| `85353-1` | `vitalspanel` |
-| `9279-1` | `resprate` |
-| `8867-4` | `heartrate` |
-| `2708-6` | `oxygensat` |
-| `8310-5` | `bodytemp` |
-| `8302-2` | `bodyheight` |
-| `9843-4` | `headcircum` |
-| `29463-7` | `bodyweight` |
-| `39156-5` | `bmi` |
-| `85354-9` | `bp` |
+| Code | System | Profile |
+|------|--------|---------|
+| `85353-1` | LOINC | `vitalspanel` |
+| `9279-1` | LOINC | `resprate` |
+| `8867-4` | LOINC | `heartrate` |
+| `2708-6`, `59408-5` | LOINC | `oxygensat` |
+| `8310-5` | LOINC | `bodytemp` |
+| `276885007` | SNOMED CT | `bodytemp` |
+| `8302-2` | LOINC | `bodyheight` |
+| `9843-4` | LOINC | `headcircum` |
+| `29463-7` | LOINC | `bodyweight` |
+| `39156-5` | LOINC | `bmi` |
+| `85354-9`, `76534-7` | LOINC | `bp` |
+
+The spec's vital-signs table lists the first LOINC code for each profile. `59408-5`, `76534-7` and
+SNOMED CT `276885007` are not in it, but the HL7 reference validator maps them too, so they are
+included to match it.
 
 The profiles are the core ones (`http://hl7.org/fhir/StructureDefinition/bp` and so on), so the
 service needs the release's core package to resolve them. An implied profile that cannot be

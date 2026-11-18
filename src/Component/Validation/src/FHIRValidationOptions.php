@@ -28,7 +28,7 @@ final readonly class FHIRValidationOptions
      *                                                                runtime profile resolver on the service, and without one is reported as
      *                                                                not checked
      * @param bool                       $profilesFromVitalSignsCodes Also validate each Observation, nested ones included, against the core
-     *                                                                vital-signs profile its LOINC code implies (`85354-9` brings `bp`, for
+     *                                                                vital-signs profile its code implies (LOINC `85354-9` brings `bp`, for
      *                                                                example), as the spec requires and the reference validator does. Such a
      *                                                                profile is checked as if `meta.profile` named it, and skipped without a
      *                                                                warning when it cannot be resolved, because the caller never named it

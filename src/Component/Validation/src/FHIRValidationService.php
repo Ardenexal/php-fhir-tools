@@ -753,7 +753,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * The core vital-signs profiles an Observation's LOINC codes imply; nothing for any other resource.
+     * The core vital-signs profiles an Observation's codes imply; nothing for any other resource.
      *
      * @return list<string>
      */

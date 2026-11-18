@@ -309,8 +309,8 @@ final class ComparisonHarness
             // profilesFromMeta covers the rest of meta.profile: a URL the resource's class does not declare is
             // checked against the StructureDefinition the runtime resolver finds for it, and one it
             // cannot find is reported unchecked, as the reference validator reports it.
-            // profilesFromVitalSignsCodes adds the core vital-signs profile an Observation's LOINC
-            // code implies, which the reference validator applies without being asked.
+            // profilesFromVitalSignsCodes adds the core vital-signs profile an Observation's code
+            // implies, which the reference validator applies without being asked.
             $report = $service->validateWithOptions($resource, new FHIRValidationOptions(
                 deriveProfilesFromClass: true,
                 profilesFromMeta: true,
