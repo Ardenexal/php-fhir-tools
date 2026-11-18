@@ -18,8 +18,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
  * an absent, uninitialized or non-public property instead of throwing.
  *
  * @internal shared by the Bundle checkers of this component, not part of the public API
- *
- * @phpstan-import-type IndexedEntry from BundleEntryIndex
  */
 final class BundleEntryReader
 {
@@ -64,7 +62,11 @@ final class BundleEntryReader
         return new BundleEntryIndex($entries);
     }
 
-    /** Read a string-ish property: a primitive wrapper, a backed enum, a bare string, or absent. */
+    /**
+     * Read a string-ish property: a primitive wrapper, a backed enum, a bare string, or absent.
+     *
+     * An empty string reads as null, so a caller that must tell `""` from absent uses {@see readPublic()}.
+     */
     public function readString(object $node, string $property): ?string
     {
         $value = $this->readPublic($node, $property);

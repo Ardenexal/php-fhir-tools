@@ -42,7 +42,12 @@ final class BundleEntryIndex
     /** A value with a URI scheme resolves by `fullUrl` alone. */
     private const string ABSOLUTE = '~\A[A-Za-z][A-Za-z0-9+.\-]*:~';
 
-    /** A relative reference, `[Type]/[id]`, optionally pinned to a version. */
+    /**
+     * A relative reference, `[Type]/[id]`, optionally pinned to a version.
+     *
+     * Both the id and the version must have the shape of a FHIR id. A reference with any other version,
+     * such as `Patient/1/_history/v_1`, is not one this class resolves.
+     */
     private const string RELATIVE_REFERENCE = '~\A(?<type>[A-Z][A-Za-z]+)/(?<id>[A-Za-z0-9\-\.]{1,64})(?:/_history/(?<version>[A-Za-z0-9\-\.]{1,64}))?\z~';
 
     /** A version suffix on an absolute reference. */
@@ -52,7 +57,8 @@ final class BundleEntryIndex
      * A `fullUrl` that yields a base: `[base]/[type]/[id]`, where `[id]` must be the entry's own.
      *
      * The base is allowed to be **empty**. `mni-patientOverview-bundle-example1` identifies its entries
-     * relatively, as `Composition/1` and `Patient/1`, and against an empty base `Patient/1` resolves to
+     * relatively, as `Composition/1` and `Patient/1` (which {@see BundleEntryFullUrlChecker} reports
+     * separately), and against an empty base `Patient/1` resolves to
      * exactly what that bundle holds; the reference validator reports nothing there. Its twin
      * `…example1b` differs in one character, a Composition whose id is `1a` against a fullUrl saying
      * `1`, and the reference validator reports both of its references. A required trailing slash
