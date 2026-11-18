@@ -1,5 +1,5 @@
 {
-    "errorCount": 2,
+    "errorCount": 3,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -23,6 +23,9 @@
             ],
             "constraint:PrimitiveFormatChecker": [
                 "value — Primitive types must have a value or must have child extensions"
+            ],
+            "invariant:ele-1": [
+                "value — All FHIR elements must have a @value or children"
             ]
         },
         "warnings": {}

@@ -94,6 +94,26 @@ final class DeclaredLimitations
     public const REASON_UNKNOWN_EXTENSION = 'an unresolvable regular extension is not reported, by decision; only modifier extensions are enforced';
 
     /**
+     * An invariant that evaluates to empty is not a failure here, by decision.
+     *
+     * FHIRPath is three-valued, and an empty result means "unknown". The reference validator turns
+     * empty into `false` (`FHIRPathEngine.convertToBoolean`) and reports the invariant as failed. This
+     * project does not, because empty arises constantly from valid data: `FHIRPathInvariantValidator`
+     * (search: `An empty collection is not a failure`) records the case pair that shows collapsing it
+     * would report a Reference the reference validator itself passes.
+     *
+     * Each case below is empty for a reason that is valid FHIRPath, checked 2026-11-17:
+     *
+     * - `encounter-period` (per-1): `start` is the date `2023-06-21` and `end` the dateTime
+     *   `2023-06-21T06:20:00Z`. Values of different precision that agree as far as both go are not
+     *   comparable, so `start <= end` is empty.
+     * - `fhirpath-bad` and `fhirpath-null` (ctm-1): `member.resolve() is Practitioner`, where `member`
+     *   points at a Practitioner that is not in the document. `resolve()` finds nothing, and `is` on
+     *   empty is empty.
+     */
+    public const REASON_EMPTY_INVARIANT = 'an invariant that evaluates to empty is unknown rather than failed, by decision; the reference validator treats empty as false';
+
+    /**
      * case name => [reason, ourErrorCount, javaErrorCount]
      *
      * `ourErrorCount` is what we legitimately report today — 0 for all current entries, but recorded
@@ -116,6 +136,10 @@ final class DeclaredLimitations
             'q-bp'                                 => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 17],
             'pat-dob-ext'                          => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
             'nested-questionnaire-nested-valueset' => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
+
+            'parameters-reference-bad'    => ['reason' => self::REASON_NO_RESOURCE_FETCHER, 'ours' => 0, 'java' => 1],
+            'bad-bundle-reference-type-4' => ['reason' => self::REASON_R4_URN_ID_MATCH, 'ours' => 0, 'java' => 1],
+            'encounter-period'            => ['reason' => self::REASON_EMPTY_INVARIANT, 'ours' => 0, 'java' => 1],
         ],
         'R4B' => [],
         'R5'  => [
@@ -124,6 +148,9 @@ final class DeclaredLimitations
             'observation-triglyceride-good2'         => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'demo-example-2'                         => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'contained-canonical'                    => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
+            'reference-bad'                          => ['reason' => self::REASON_NO_RESOURCE_FETCHER, 'ours' => 0, 'java' => 1],
+            'fhirpath-bad'                           => ['reason' => self::REASON_EMPTY_INVARIANT, 'ours' => 0, 'java' => 1],
+            'fhirpath-null'                          => ['reason' => self::REASON_EMPTY_INVARIANT, 'ours' => 0, 'java' => 1],
         ],
     ];
 
@@ -227,6 +254,40 @@ final class DeclaredLimitations
     public const REASON_ASSUMED_REST_REFERENCE = 'a reference URL is taken as proof of its target type only under the reference validator option assumeValidRestReferences, which is off by default';
 
     /**
+     * The reference validator fetches a reference's target from outside the instance, and we do not.
+     *
+     * `parameters-reference-bad` (R4) and `reference-bad` (R5) set `validateReference:
+     * CHECK_EXISTS_AND_TYPE` in the manifest, which hands the reference validator a resource fetcher
+     * that answers "does `Patient/2` exist?". Neither reference points into a Bundle or a `contained`
+     * resource, so nothing in the instance can settle it, and the corpus is validated offline.
+     */
+    public const REASON_NO_RESOURCE_FETCHER = 'the reference validator looks the target up through a resource fetcher the manifest configures; the corpus is validated offline with none';
+
+    /**
+     * An R4-only reference validator behaviour that its own R5 run of the same file does not repeat.
+     *
+     * `bad-bundle-reference-type.xml` is a `collection` whose Patient refers to
+     * `Practitioner/5d9588d8-…` and whose only other entry is an Organization at
+     * `urn:uuid:5d9588d8-…`. Under R4 (`bad-bundle-reference-type-4`) the reference validator matches the
+     * id against the `urn:uuid:` and reports the type mismatch; under R5 (`-5`) it reports only that the
+     * URL cannot be resolved without a RESTful base, at information level. A `collection` is an open
+     * envelope this project never resolves (see `BundleReferenceResolutionChecker`), and copying the R4
+     * match would mean resolving a relative reference against a `urn:uuid:` in one version only.
+     */
+    public const REASON_R4_URN_ID_MATCH = 'the R4 reference validator matches a relative id against a urn:uuid fullUrl in a collection, which its R5 run of the same file does not';
+
+    /**
+     * The reference validator reports one ambiguous document section entry twice, and we report it once.
+     *
+     * On `bundle-document-versioned-references-bad` the reference `Observation/ObservationExample`
+     * matches two entries. The reference validator reports it as `Found 2 matches for …` from its
+     * reference resolution and again as `Multiple matches in bundle for reference …` from its document
+     * section check. We report the first, which pairs. The second names the same reference on the same
+     * section entry and is the same defect.
+     */
+    public const REASON_DUPLICATE_REPORT = 'the reference validator reports the same ambiguous section entry a second time from its document section check';
+
+    /**
      * Text signature => reason, for limitations that are not about a code system.
      *
      * Kept apart from {@see TERMINOLOGY_SYSTEMS} because the two are different claims. A terminology entry
@@ -262,6 +323,21 @@ final class DeclaredLimitations
         // The host of every KBV canonical. No vendored package defines anything under it, so no
         // finding naming it can be one we could decide.
         'https://fhir.kbv.de/' => self::REASON_UNVENDORED_PACKAGE,
+        // The next four are whole findings, quoted in full, so each declares one corpus finding and
+        // never the rule behind it: a wrong-type match, an ambiguous section entry or an unresolvable
+        // reference anywhere else would still count as open work. See REASON_DUPLICATE_REPORT.
+        'multiple matches in bundle for reference observation/observationexample' => self::REASON_DUPLICATE_REPORT,
+        // See REASON_R4_URN_ID_MATCH.
+        'matching reference for reference practitioner/5d9588d8-3cd6-4b32-8fb7-ad13694e069d has resourcetype organization' => self::REASON_R4_URN_ID_MATCH,
+        // See REASON_NO_RESOURCE_FETCHER: `parameters-reference-bad` (R4) and `reference-bad` (R5).
+        "unable to resolve resource with reference 'patient/2'"         => self::REASON_NO_RESOURCE_FETCHER,
+        "unable to resolve resource with reference 'patient/test-fail'" => self::REASON_NO_RESOURCE_FETCHER,
+        // Keyed by invariant, which is the shape that once swallowed a genuine finding, so it is held to
+        // two invariants and to the pinned counts in EXPECTED_FINDING_COUNTS. Only an invariant we do not
+        // report reaches here, and both evaluate to empty on every corpus case that carries them; a new
+        // one moves the pin and has to be read before it is accepted. See REASON_EMPTY_INVARIANT.
+        'constraint failed: per-1:' => self::REASON_EMPTY_INVARIANT,
+        'constraint failed: ctm-1:' => self::REASON_EMPTY_INVARIANT,
     ];
 
     /**
@@ -293,15 +369,21 @@ final class DeclaredLimitations
             self::REASON_UNVENDORED_PACKAGE     => 2,
             // Tied at one: ordered by reason text, as in R5 below.
             self::REASON_ASSUMED_REST_REFERENCE => 1,
+            self::REASON_EMPTY_INVARIANT        => 1,
             self::REASON_NCI                    => 1,
+            self::REASON_R4_URN_ID_MATCH        => 1,
+            self::REASON_NO_RESOURCE_FETCHER    => 1,
+            self::REASON_DUPLICATE_REPORT       => 1,
         ],
         'R4B' => [],
         'R5'  => [
             self::REASON_LOINC             => 7,
+            self::REASON_EMPTY_INVARIANT   => 2,
             // These two are tied at one, so their order is decided by reason text rather than by
             // whatever order the corpus produced them in. See ComparisonReport::declaredByReason().
-            self::REASON_UNKNOWN_EXTENSION => 1,
-            self::REASON_XXE_REFUSAL       => 1,
+            self::REASON_UNKNOWN_EXTENSION   => 1,
+            self::REASON_XXE_REFUSAL         => 1,
+            self::REASON_NO_RESOURCE_FETCHER => 1,
         ],
     ];
 
