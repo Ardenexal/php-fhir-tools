@@ -21,7 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - an element outside the XHTML namespace: `Wrong namespace on the XHTML ('…', should be 'http://www.w3.org/1999/xhtml')`;
   - the `idref` attribute, which is not HTML 4.0, now breaks `txt-1` like any other unknown attribute;
   - a mismatched closing tag reads `Found "</pa>" expecting "</p>"` instead of libxml's wording.
-- [Serialization] Reading XML now keeps a FHIR narrative exactly as written. Text beside a child element moved after it (`<p>a <b>b</b> c</p>` became `<p>a  c<b>b</b></p>`), same-named siblings were regrouped (`<p/><table/><p/>` became `<p/><p/><table/>`), and inside a Bundle entry an anchor's text was lost entirely. The `div` is now read from the parsed document and written back as markup, so a round trip keeps its order. A `div` or element outside the XHTML namespace keeps that namespace in the model, so validation can report it; writing XML still emits the whole narrative in the XHTML namespace. See also #219, which fixes the same text loss for a `div` with attributes.
+- [Serialization] Reading XML now keeps a FHIR narrative exactly as written. Text beside a child element moved after it (`<p>a <b>b</b> c</p>` became `<p>a  c<b>b</b></p>`), same-named siblings were regrouped (`<p/><table/><p/>` became `<p/><p/><table/>`), and inside a Bundle entry an anchor's text was lost entirely. The `div` is now read from the parsed document and written back as markup, so a round trip keeps its order. A `div` or element outside the XHTML namespace keeps that namespace in the model, so validation can report it; writing XML still emits the whole narrative in the XHTML namespace. This also covers a `div` with attributes: `<div lang="en">Text</div>` in a Bundle entry came out as `<div lang="en"/>`.
+- **[Validation] Resources that validated clean can now fail: more of the core invariants are checked.** Each now reports where the HL7 Java reference validator does (#159):
+  - `ext-1` on every extension, including one on a primitive value, when it has neither a value nor sub-extensions, or has both.
+  - `ele-1` on a primitive that is present but has no value and no extension, such as `<implicitRules id="i1"/>` or `"fullUrl": ""`, beside the existing `value cannot be empty`.
+  - `txt-2` on a narrative with no text other than whitespace and no image, such as `<div><p></p></div>`.
+  - In R4, `que-12` (two `enableWhen` without `enableBehavior`) and `eld-19` (an `ElementDefinition.path` such as `Observation...unit`), which R4 published wrongly, are checked with the expressions R4B corrected them to.
 
 ## [0.7.0] - 2026-11-17
 

@@ -94,6 +94,26 @@ final class DeclaredLimitations
     public const REASON_UNKNOWN_EXTENSION = 'an unresolvable regular extension is not reported, by decision; only modifier extensions are enforced';
 
     /**
+     * An invariant that evaluates to empty is not a failure here, by decision.
+     *
+     * FHIRPath is three-valued, and an empty result means "unknown". The reference validator turns
+     * empty into `false` (`FHIRPathEngine.convertToBoolean`) and reports the invariant as failed. This
+     * project does not, because empty arises constantly from valid data: `FHIRPathInvariantValidator`
+     * (search: `An empty collection is not a failure`) records the case pair that shows collapsing it
+     * would report a Reference the reference validator itself passes.
+     *
+     * Each case below is empty for a reason that is valid FHIRPath, checked 2026-11-17:
+     *
+     * - `encounter-period` (per-1): `start` is the date `2023-06-21` and `end` the dateTime
+     *   `2023-06-21T06:20:00Z`. Values of different precision that agree as far as both go are not
+     *   comparable, so `start <= end` is empty.
+     * - `fhirpath-bad` and `fhirpath-null` (ctm-1): `member.resolve() is Practitioner`, where `member`
+     *   points at a Practitioner that is not in the document. `resolve()` finds nothing, and `is` on
+     *   empty is empty.
+     */
+    public const REASON_EMPTY_INVARIANT = 'an invariant that evaluates to empty is unknown rather than failed, by decision; the reference validator treats empty as false';
+
+    /**
      * case name => [reason, ourErrorCount, javaErrorCount]
      *
      * `ourErrorCount` is what we legitimately report today — 0 for all current entries, but recorded
@@ -119,6 +139,7 @@ final class DeclaredLimitations
 
             'parameters-reference-bad'    => ['reason' => self::REASON_NO_RESOURCE_FETCHER, 'ours' => 0, 'java' => 1],
             'bad-bundle-reference-type-4' => ['reason' => self::REASON_R4_URN_ID_MATCH, 'ours' => 0, 'java' => 1],
+            'encounter-period'            => ['reason' => self::REASON_EMPTY_INVARIANT, 'ours' => 0, 'java' => 1],
         ],
         'R4B' => [],
         'R5'  => [
@@ -128,6 +149,8 @@ final class DeclaredLimitations
             'demo-example-2'                         => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'contained-canonical'                    => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
             'reference-bad'                          => ['reason' => self::REASON_NO_RESOURCE_FETCHER, 'ours' => 0, 'java' => 1],
+            'fhirpath-bad'                           => ['reason' => self::REASON_EMPTY_INVARIANT, 'ours' => 0, 'java' => 1],
+            'fhirpath-null'                          => ['reason' => self::REASON_EMPTY_INVARIANT, 'ours' => 0, 'java' => 1],
         ],
     ];
 
@@ -309,6 +332,12 @@ final class DeclaredLimitations
         // See REASON_NO_RESOURCE_FETCHER: `parameters-reference-bad` (R4) and `reference-bad` (R5).
         "unable to resolve resource with reference 'patient/2'"         => self::REASON_NO_RESOURCE_FETCHER,
         "unable to resolve resource with reference 'patient/test-fail'" => self::REASON_NO_RESOURCE_FETCHER,
+        // Keyed by invariant, which is the shape that once swallowed a genuine finding, so it is held to
+        // two invariants and to the pinned counts in EXPECTED_FINDING_COUNTS. Only an invariant we do not
+        // report reaches here, and both evaluate to empty on every corpus case that carries them; a new
+        // one moves the pin and has to be read before it is accepted. See REASON_EMPTY_INVARIANT.
+        'constraint failed: per-1:' => self::REASON_EMPTY_INVARIANT,
+        'constraint failed: ctm-1:' => self::REASON_EMPTY_INVARIANT,
     ];
 
     /**
@@ -340,6 +369,7 @@ final class DeclaredLimitations
             self::REASON_UNVENDORED_PACKAGE     => 2,
             // Tied at one: ordered by reason text, as in R5 below.
             self::REASON_ASSUMED_REST_REFERENCE => 1,
+            self::REASON_EMPTY_INVARIANT        => 1,
             self::REASON_NCI                    => 1,
             self::REASON_R4_URN_ID_MATCH        => 1,
             self::REASON_NO_RESOURCE_FETCHER    => 1,
@@ -348,6 +378,7 @@ final class DeclaredLimitations
         'R4B' => [],
         'R5'  => [
             self::REASON_LOINC             => 7,
+            self::REASON_EMPTY_INVARIANT   => 2,
             // These two are tied at one, so their order is decided by reason text rather than by
             // whatever order the corpus produced them in. See ComparisonReport::declaredByReason().
             self::REASON_UNKNOWN_EXTENSION   => 1,

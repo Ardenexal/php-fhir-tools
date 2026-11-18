@@ -712,6 +712,22 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
+     * The invariants every extension carries as an Extension: ext-1, and ele-1 from Element.
+     *
+     * They are declared on the base model classes, which Symfony would apply to any element it
+     * cascades into. It never cascades into an extension, so without this they were never evaluated
+     * on one, and `R5.list-extension2`'s extension with neither a value nor sub-extensions went
+     * unreported. Read from the class hierarchy, so a typed extension class inherits them as a plain
+     * one does; neither a typed class nor a runtime definition declares them again.
+     *
+     * @return list<FHIRPathInvariant>
+     */
+    private function extensionBaseInvariants(object $extension): array
+    {
+        return $this->attributes->classAttributesInHierarchy($extension, FHIRPathInvariant::class);
+    }
+
+    /**
      * The invariants and bindings a typed extension class carries, in the order its generator wrote them.
      *
      * @return list<Constraint>
@@ -1611,7 +1627,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 // Invariants and bindings from the extension's definition. Symfony does not cascade into
                 // extensions, so a typed class's attributes are run here too, the same way as a plain
                 // extension's runtime definition
-                $rules = $runtime !== null ? $this->runtimeExtensionConstraintsOf($runtime) : $this->extensionRuleAttributes($ext);
+                $rules = [
+                    ...$this->extensionBaseInvariants($ext),
+                    ...($runtime !== null ? $this->runtimeExtensionConstraintsOf($runtime) : $this->extensionRuleAttributes($ext)),
+                ];
                 if ($rules !== []) {
                     $at  = $extPath . '[' . $extIndex . ']';
                     $raw = FHIRPathResourceContext::within(

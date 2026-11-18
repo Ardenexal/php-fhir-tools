@@ -1,19 +1,23 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 1,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Constraint failed: que-12: 'If there are more than one enableWhen, enableBehavior must be specified'"
         ]
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "invariant:que-12": [
+                "item[3] — If there are more than one enableWhen, enableBehavior must be specified"
+            ]
+        },
         "warnings": {}
     }
 }
