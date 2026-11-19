@@ -14,10 +14,10 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 /**
  * Checks that a primitive value holds no more characters than a profile's maxLength allows.
  *
- * Enforces a #[FHIRMaxLength] constraint. A plain string and a primitive wrapper (which is
- * \Stringable) are measured by their string form, in Unicode characters. Any other value, such as
- * a bare integer or boolean, is left alone. When the property repeats, each item is checked and
- * reported at its index. The message is the HL7 reference validator's.
+ * Enforces a #[FHIRMaxLength] constraint. A plain string, a primitive wrapper (which is
+ * \Stringable), and a bare integer or boolean are measured by their FHIR string form; any other
+ * value is left alone. When the property repeats, each item is checked and reported at its index.
+ * The length and the message follow the HL7 reference validator.
  */
 final class FHIRMaxLengthValidator extends ConstraintValidator
 {
@@ -49,11 +49,13 @@ final class FHIRMaxLengthValidator extends ConstraintValidator
     {
         $string = match (true) {
             is_string($value)             => $value,
+            is_int($value)                => (string) $value,
+            is_bool($value)               => $value ? 'true' : 'false',
             $value instanceof \Stringable => (string) $value,
             default                       => null,
         };
 
-        if ($string === null || mb_strlen($string, 'UTF-8') <= $constraint->max) {
+        if ($string === null || self::length($string) <= $constraint->max) {
             return;
         }
 
@@ -67,5 +69,14 @@ final class FHIRMaxLengthValidator extends ConstraintValidator
         }
 
         $violation->addViolation();
+    }
+
+    /**
+     * The length in UTF-16 code units, as the reference validator (Java's String.length()) counts
+     * it, so a character outside the Basic Multilingual Plane, such as an emoji, counts as two.
+     */
+    private static function length(string $value): int
+    {
+        return intdiv(strlen(mb_convert_encoding($value, 'UTF-16LE', 'UTF-8')), 2);
     }
 }

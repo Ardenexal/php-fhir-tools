@@ -1164,7 +1164,7 @@ final class StructureDefinitionCompiler
             $rules[] = ['constraint' => FHIRPatternValue::class, 'options' => ['pattern' => $patternField['value']]];
         }
 
-        // maxLength is only allowed on primitive elements, so the rule never meets a complex value
+        // FHIR allows maxLength only on primitive elements; the validator skips a value with no string form
         $maxLength = $element['maxLength'] ?? null;
         if (is_int($maxLength) && $maxLength > 0) {
             $rules[] = ['constraint' => FHIRMaxLength::class, 'options' => ['max' => $maxLength]];
