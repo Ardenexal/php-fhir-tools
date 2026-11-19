@@ -21,7 +21,7 @@ final class FHIRViolationCode
 
     /**
      * An extensible/preferred binding check was skipped because no real terminology
-     * client is configured (the client is null or a NullFHIRTerminologyClient).
+     * client is configured (see NullFHIRTerminologyClient::isAbsent()).
      * This denotes a coverage gap, not instance non-conformance, and is surfaced
      * at INFO severity. Message overrides use the registry key
      * 'FHIRValueSetBindingUnchecked' (not a class name, unlike other keys).

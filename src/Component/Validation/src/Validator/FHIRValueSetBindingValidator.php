@@ -46,8 +46,8 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     /**
      * @param string[]                            $enumNamespaceRoots Namespace roots to probe for generated enum classes,
      *                                                                e.g. ['Ardenexal\FHIRTools\Component\Models\R4\Enum']
-     * @param FHIRTerminologyClientInterface|null $terminologyClient  Null or NullFHIRTerminologyClient → extensible/preferred checks
-     *                                                                are skipped and surfaced as fhir:unchecked-binding INFO violations
+     * @param FHIRTerminologyClientInterface|null $terminologyClient  Null or NullFHIRTerminologyClient, decorated or not → extensible/preferred
+     *                                                                checks are skipped and surfaced as fhir:unchecked-binding INFO violations
      */
     public function __construct(
         private readonly FHIRValidationMessageRegistry $messageRegistry,
@@ -117,7 +117,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
      */
     private function validateDisplays(mixed $value, FHIRValueSetBinding $constraint): void
     {
-        if ($this->terminologyClient === null || $this->terminologyClient instanceof NullFHIRTerminologyClient) {
+        if (NullFHIRTerminologyClient::isAbsent($this->terminologyClient)) {
             return;
         }
 
@@ -208,7 +208,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         $enumFqcn = $this->resolveBoundEnum($constraint);
 
         if ($enumFqcn === null) {
-            if ($this->terminologyClient !== null && !($constraint->fromProfile && $this->terminologyClient instanceof NullFHIRTerminologyClient)) {
+            if ($this->terminologyClient !== null && !($constraint->fromProfile && NullFHIRTerminologyClient::isAbsent($this->terminologyClient))) {
                 $this->checkGroupsWithClient($this->terminologyClient, $value, $constraint->valueSetUrl, FHIRViolationCode::ERROR);
 
                 return;
@@ -244,7 +244,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
 
     /**
      * Validates extensible/preferred bindings via the terminology client.
-     * When no real client is configured (null or NullFHIRTerminologyClient), the check is
+     * When no real client is configured (see NullFHIRTerminologyClient::isAbsent()), the check is
      * skipped and a single fhir:unchecked-binding INFO violation surfaces the coverage gap
      * (issue #71); it does not affect FHIRValidationReport::isValid().
      * Violations use WARNING by default; strict=true escalates to ERROR.
@@ -260,7 +260,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
             return;
         }
 
-        if ($this->terminologyClient === null || $this->terminologyClient instanceof NullFHIRTerminologyClient) {
+        if (NullFHIRTerminologyClient::isAbsent($this->terminologyClient)) {
             $this->reportUnchecked($constraint->valueSetUrl);
 
             return;
