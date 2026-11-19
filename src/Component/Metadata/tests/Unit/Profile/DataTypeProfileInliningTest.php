@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Metadata\Tests\Unit\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
@@ -140,7 +141,13 @@ final class DataTypeProfileInliningTest extends TestCase
 
         $diagnostics = self::inliningDiagnostics($compiled);
 
-        self::assertSame([], $compiled->attributes);
+        // Nothing is inlined. A choice element still gets the rule naming the types it may hold.
+        $inlined = array_filter(
+            $compiled->attributes,
+            static fn (CompiledAttribute $attribute): bool => ($attribute->arguments['constraint'] ?? null) !== FHIRAllowedTypes::class,
+        );
+
+        self::assertSame([], $inlined);
         self::assertCount(1, $diagnostics);
         self::assertStringContainsString($reason, $diagnostics[0]);
         self::assertStringContainsString('not enforced', $diagnostics[0]);

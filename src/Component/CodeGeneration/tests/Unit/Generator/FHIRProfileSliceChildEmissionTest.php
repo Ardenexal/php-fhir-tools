@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
@@ -23,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Observation\ObservationComponent;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAllowedTypesValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPatternValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator;
@@ -265,6 +267,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         self::assertSame([
             'SystolicBP' => [
                 'code ' . FHIRPatternValue::class,
+                'value[x] ' . FHIRAllowedTypes::class,
                 'value[x].system ' . Count::class,
                 'value[x].system ' . FHIRFixedValue::class,
                 'value[x].code ' . Count::class,
@@ -685,6 +688,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
                         new SliceDiscriminatorMatcher($this->accessor),
                     ),
                     $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->registry),
+                    $constraint instanceof FHIRAllowedTypes      => new FHIRAllowedTypesValidator($this->registry),
                     $constraint instanceof FHIRFixedValue        => new FHIRFixedValueValidator($this->registry),
                     default                                      => $this->default->getInstance($constraint),
                 };

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Metadata\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
@@ -15,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustS
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Symfony\Component\Validator\Constraints\Count;
 
 /**
@@ -904,12 +906,13 @@ final class StructureDefinitionCompiler
 
     /**
      * The constraints one differential element places on its own path: cardinality (Count) when
-     * min > 0 or max is bounded, a fixed[x], scalar or complex, and an array pattern[x] (scalar
-     * patterns use value matching).
+     * min > 0 or max is bounded, a fixed[x], scalar or complex, an array pattern[x] (scalar
+     * patterns use value matching), the types a choice element may hold, and the target profiles a
+     * Reference or canonical may point at.
      *
      * @param array<string, mixed> $element
      *
-     * @return list<array{constraint: class-string<Count|FHIRFixedValue|FHIRPatternValue>, options: array<string, mixed>}>
+     * @return list<array{constraint: class-string<Count|FHIRFixedValue|FHIRPatternValue|FHIRAllowedTypes|FHIRTargetProfile>, options: array<string, mixed>}>
      */
     private static function elementRules(array $element): array
     {
@@ -939,7 +942,52 @@ final class StructureDefinitionCompiler
             $rules[] = ['constraint' => FHIRPatternValue::class, 'options' => ['pattern' => $patternField['value']]];
         }
 
+        // The model holds every variant of a choice element in one property, so a profile that lists
+        // fewer types than the base needs a rule to say which ones may occur. A choice type slice
+        // ("value[x]:valueQuantity") already names its one type in its path, and so has no '[x]'.
+        $types = self::typeCodes($element);
+        if ($types !== [] && str_ends_with(self::rewriteChoiceTypeSlices((string) ($element['id'] ?? $element['path'] ?? '')), '[x]')) {
+            $rules[] = ['constraint' => FHIRAllowedTypes::class, 'options' => ['types' => $types]];
+        }
+
+        $targetProfiles = self::targetProfiles($element);
+        if ($targetProfiles !== []) {
+            $rules[] = ['constraint' => FHIRTargetProfile::class, 'options' => ['targetProfiles' => $targetProfiles]];
+        }
+
         return $rules;
+    }
+
+    /**
+     * The profiles a Reference or canonical on this element may point at, across all its types, in order.
+     *
+     * One rule holds one list for the whole element. A Reference or canonical type with no
+     * targetProfile allows any target, so when one sits beside a restricted type the merged list
+     * would reject what that type allows; the element then gets no rule at all.
+     *
+     * @param array<string, mixed> $element
+     *
+     * @return list<string>
+     */
+    private static function targetProfiles(array $element): array
+    {
+        $profiles = [];
+        foreach (is_array($element['type'] ?? null) ? $element['type'] : [] as $type) {
+            if (!is_array($type)) {
+                continue;
+            }
+
+            $targets = is_array($type['targetProfile'] ?? null) ? array_filter($type['targetProfile'], static fn (mixed $url): bool => is_string($url) && $url !== '') : [];
+            if ($targets === [] && in_array($type['code'] ?? null, ['Reference', 'canonical', 'CodeableReference'], true)) {
+                return [];
+            }
+
+            foreach ($targets as $url) {
+                $profiles[] = (string) $url;
+            }
+        }
+
+        return array_values(array_unique($profiles));
     }
 
     /**

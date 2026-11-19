@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Metadata\Tests\Unit\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledAttribute;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\StructureDefinitionCompiler;
 use PHPUnit\Framework\TestCase;
@@ -103,6 +105,91 @@ final class StructureDefinitionCompilerTest extends TestCase
             ['path' => 'code', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => $coding], 'groups' => [self::URL]],
             $compiled->attributes[0]->arguments,
         );
+    }
+
+    /**
+     * A choice element's narrowed type list and a Reference's target profiles each compile to a rule,
+     * at the top level and inside a slice (#229). A choice type slice (`value[x]:valueQuantity`)
+     * already names its one type in its path and gets no type rule.
+     */
+    public function testTypeAndTargetProfileRestrictionsCompileToRules(): void
+    {
+        $patient = 'http://hl7.org/fhir/StructureDefinition/Patient';
+        $sd      = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Observation', 'path' => 'Observation'],
+                ['id' => 'Observation.value[x]', 'path' => 'Observation.value[x]', 'type' => [['code' => 'Quantity'], ['code' => 'string']]],
+                ['id' => 'Observation.subject', 'path' => 'Observation.subject', 'type' => [['code' => 'Reference', 'targetProfile' => [$patient]]]],
+                [
+                    'id'      => 'Observation.component',
+                    'path'    => 'Observation.component',
+                    'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'code.text']], 'rules' => 'open'],
+                ],
+                ['id' => 'Observation.component:a', 'path' => 'Observation.component', 'sliceName' => 'a'],
+                ['id' => 'Observation.component:a.code.text', 'path' => 'Observation.component.code.text', 'fixedString' => 'a'],
+                ['id' => 'Observation.component:a.value[x]', 'path' => 'Observation.component.value[x]', 'type' => [['code' => 'integer']]],
+                ['id' => 'Observation.component:b', 'path' => 'Observation.component', 'sliceName' => 'b'],
+                ['id' => 'Observation.component:b.code.text', 'path' => 'Observation.component.code.text', 'fixedString' => 'b'],
+                [
+                    'id'   => 'Observation.component:b.value[x]:valueQuantity',
+                    'path' => 'Observation.component.value[x]',
+                    'type' => [['code' => 'Quantity']],
+                ],
+            ]],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+
+        self::assertSame([], $compiled->diagnostics);
+        self::assertSame(
+            [
+                ['path' => 'value[x]', 'constraint' => FHIRAllowedTypes::class, 'options' => ['types' => ['Quantity', 'string']], 'groups' => [self::URL]],
+                ['path' => 'subject', 'constraint' => FHIRTargetProfile::class, 'options' => ['targetProfiles' => [$patient]], 'groups' => [self::URL]],
+            ],
+            array_values(array_map(
+                static fn (CompiledAttribute $a): array => $a->arguments,
+                array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRProfileConstraint::class),
+            )),
+        );
+
+        $rules = [];
+        foreach ($compiled->attributes as $attribute) {
+            if ($attribute->class === FHIRSliceConstraint::class) {
+                $rules[(string) $attribute->arguments['sliceName']] = array_map(
+                    static fn (array $rule): string => $rule['path'] . ' ' . $rule['constraint'],
+                    (array) ($attribute->arguments['rules'] ?? []),
+                );
+            }
+        }
+
+        self::assertSame(
+            [
+                'a' => ['code.text ' . FHIRFixedValue::class, 'value[x] ' . FHIRAllowedTypes::class],
+                'b' => ['code.text ' . FHIRFixedValue::class],
+            ],
+            $rules,
+        );
+    }
+
+    /**
+     * One target rule covers the whole element. A Reference with no targetProfile allows any target,
+     * so beside a restricted canonical the merged list would reject `Patient/1`; no rule is emitted.
+     */
+    public function testUnrestrictedReferenceBesideARestrictedTypeGetsNoTargetRule(): void
+    {
+        $sd = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Observation', 'path' => 'Observation'],
+                ['id' => 'Observation.focus', 'path' => 'Observation.focus', 'type' => [
+                    ['code' => 'Reference'],
+                    ['code' => 'canonical', 'targetProfile' => ['http://hl7.org/fhir/StructureDefinition/ValueSet']],
+                ]],
+            ]],
+        ];
+
+        self::assertSame([], (new StructureDefinitionCompiler())->compile($sd)->attributes);
     }
 
     public function testSliceOnUndefinedSlicingIsReportedNotDropped(): void

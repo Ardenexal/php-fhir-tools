@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAllowedTypesValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileBindingValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileInvariantValidator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
@@ -109,6 +111,7 @@ final class OracleValidationServiceFactory
                     $constraint instanceof FHIRValueSetBinding   => new FHIRValueSetBindingValidator($this->registry, [$this->enumNamespace], $this->collaborators->terminologyClient),
                     $constraint instanceof FHIRFixedValue        => new FHIRFixedValueValidator($this->registry),
                     $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->registry),
+                    $constraint instanceof FHIRAllowedTypes      => new FHIRAllowedTypesValidator($this->registry),
                     $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, $this->matcher, $this->sliceReader),
                     $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->collaborators->referenceResolver, $this->registry),
                     default                                      => $this->default->getInstance($constraint),
