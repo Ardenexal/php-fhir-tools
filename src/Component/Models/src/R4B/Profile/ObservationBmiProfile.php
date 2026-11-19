@@ -70,9 +70,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'BMICode',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'code',
-    discriminatorValue: '39156-5',
+    discriminators: [
+        ['type' => 'value', 'path' => 'code', 'value' => '39156-5'],
+        ['type' => 'value', 'path' => 'system', 'value' => 'http://loinc.org'],
+    ],
     orderedIndex: 0,
     rules: [
         [

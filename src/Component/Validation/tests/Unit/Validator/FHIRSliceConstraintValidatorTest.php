@@ -24,9 +24,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
     sliceName: 'ihiNumber',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://ihi.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
     groups: [],
 )]
 #[FHIRSliceConstraint(
@@ -34,9 +32,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
     sliceName: 'medicareNumber',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://medicare.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://medicare.example.org']],
     groups: [],
 )]
 #[FHIRSlicingRules(property: 'identifier', rules: 'open')]
@@ -51,9 +47,7 @@ class SliceTestPatientOpen
     sliceName: 'ihiNumber',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://ihi.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
     groups: [],
 )]
 #[FHIRSlicingRules(property: 'identifier', rules: 'closed')]
@@ -68,9 +62,7 @@ class SliceTestPatientClosed
     sliceName: 'ihiNumber',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://ihi.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
     groups: [],
 )]
 #[FHIRSliceConstraint(
@@ -78,9 +70,7 @@ class SliceTestPatientClosed
     sliceName: '@default',
     min: 0,
     max: 2,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: null,
+    discriminators: [['type' => 'value', 'path' => 'system']],
     isDefault: true,
     groups: [],
 )]
@@ -96,9 +86,7 @@ class SliceTestPatientClosedWithDefault
     sliceName: 'ihiNumber',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://ihi.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
     groups: [],
 )]
 #[FHIRSlicingRules(property: 'identifier', rules: 'openAtEnd')]
@@ -117,8 +105,7 @@ class SliceTestPatientOpenAtEnd
     sliceName: 'first',
     min: 1,
     max: 1,
-    discriminatorType: 'exists',
-    discriminatorPath: 'identifier',
+    discriminators: [['type' => 'exists', 'path' => 'identifier']],
     groups: [],
 )]
 #[FHIRSlicingRules(property: 'identifier', rules: 'closed')]

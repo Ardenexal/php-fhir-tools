@@ -526,7 +526,16 @@ final class StructureDefinitionCompiler
             $derived['max'] = min(array_map('intval', $maxes));
         }
 
-        $derived['discriminatorValue'] ??= $ancestor['discriminatorValue'] ?? null;
+        // A discriminator value the ancestor found fills one the derived definition lacks
+        $discriminators = is_array($derived['discriminators'] ?? null) ? $derived['discriminators'] : [];
+        $inherited      = is_array($ancestor['discriminators'] ?? null) ? $ancestor['discriminators'] : [];
+        foreach ($discriminators as $index => $discriminator) {
+            $from = $inherited[$index] ?? [];
+            if (!array_key_exists('value', $discriminator) && !array_key_exists('valueSet', $discriminator) && ($from['path'] ?? null) === ($discriminator['path'] ?? null)) {
+                $discriminators[$index] = $from;
+            }
+        }
+        $derived['discriminators'] = $discriminators;
 
         $rules = is_array($derived['rules'] ?? null) ? $derived['rules'] : [];
         foreach (is_array($ancestor['rules'] ?? null) ? $ancestor['rules'] : [] as $rule) {
@@ -918,9 +927,10 @@ final class StructureDefinitionCompiler
      * `rules` as nested slice definitions, which the validator applies within each matching item.
      *
      * Limitations:
-     *  - Only the first discriminator of a composite discriminator is used.
-     *  - A slice whose discriminator cannot be matched (types 'type' and 'profile', `$this`, or a
-     *    value, pattern or exists discriminator with no value or presence found) gets no minimum,
+     *  - Every discriminator of the slicing is compiled into the slice's `discriminators`; see
+     *    sliceDiscriminator() for where each value comes from.
+     *  - A slice with a discriminator that has nothing to match on (a path through `resolve()`, or a
+     *    value, pattern, presence, type or profile the definitions do not state) gets no minimum,
      *    since it could only fail. Closed or openAtEnd slicing with such a slice is enforced as open,
      *    and its default slice is left out; the relaxed rules are reported as a diagnostic.
      *  - Choice type slices ("value[x]:valueQuantity") are left to the plain constraints, which put
@@ -1170,10 +1180,12 @@ final class StructureDefinitionCompiler
         ?\Closure $lookup = null,
     ): array {
         $definition     = $slicing['definition'];
-        $discriminators = is_array($definition['discriminator'] ?? null) ? array_values($definition['discriminator']) : [];
-        $first          = is_array($discriminators[0] ?? null) ? $discriminators[0] : [];
-        $discType       = (string) ($first['type'] ?? 'value');
-        $discPath       = (string) ($first['path'] ?? '');
+        $discriminators = [];
+        foreach (is_array($definition['discriminator'] ?? null) ? $definition['discriminator'] : [] as $discriminator) {
+            if (is_array($discriminator)) {
+                $discriminators[] = ['type' => (string) ($discriminator['type'] ?? 'value'), 'path' => (string) ($discriminator['path'] ?? '')];
+            }
+        }
 
         $names = self::sliceNames($slicedId, $diff);
         if ($names !== [] && $slicing['declaredHere'] && ($definition['rules'] ?? 'open') !== 'open') {
@@ -1185,25 +1197,25 @@ final class StructureDefinitionCompiler
             $sliceId   = "{$slicedId}:{$sliceName}";
             $header    = $diff[$sliceId] ?? [];
             $isDefault = $sliceName === '@default';
-            $value     = self::discriminatorValue($sliceId, $discType, $discPath, $diff, $snapshot)
-                ?? ($lookup === null ? null : self::typeProfileDiscriminatorValue($snapshot[$sliceId] ?? $header, $discType, $discPath, $lookup));
             $max       = (string) ($header['max'] ?? '*');
+
+            $sliceDiscriminators = [];
+            foreach ($discriminators as $discriminator) {
+                $sliceDiscriminators[] = $isDefault
+                    ? $discriminator
+                    : self::sliceDiscriminator($sliceId, $discriminator['type'], $discriminator['path'], $diff, $snapshot, $lookup);
+            }
 
             // An item can only join a slice its discriminator can match, so a minimum on any other
             // slice could only fail. The default slice takes the items no named slice matched.
-            $matchable = $isDefault || $value !== null;
+            $matchable = $isDefault || self::unmatchableDiscriminators($sliceDiscriminators) === [];
 
             $definition = [
-                'sliceName'         => $sliceName,
-                'min'               => $matchable ? (int) ($header['min'] ?? 0) : 0,
-                'max'               => is_numeric($max) ? (int) $max : $max,
-                'discriminatorType' => $discType,
-                'discriminatorPath' => $discPath,
+                'sliceName'      => $sliceName,
+                'min'            => $matchable ? (int) ($header['min'] ?? 0) : 0,
+                'max'            => is_numeric($max) ? (int) $max : $max,
+                'discriminators' => $sliceDiscriminators,
             ];
-
-            if ($value !== null) {
-                $definition['discriminatorValue'] = $value;
-            }
 
             if ($isDefault) {
                 $definition['isDefault'] = true;
@@ -1218,7 +1230,7 @@ final class StructureDefinitionCompiler
                 // No item ever joins a slice its discriminator cannot match, so its rules never run
                 if (self::isUnmatchable($definition)) {
                     $diagnostics[] = new CompilerDiagnostic(
-                        "Profile {$profileUrl}: {$sliceId} carries rules, but its {$discType} discriminator on '{$discPath}' cannot be evaluated, so no item is matched to it; those rules are not enforced",
+                        "Profile {$profileUrl}: {$sliceId} carries rules, but " . self::describeDiscriminators(self::unmatchableDiscriminators($sliceDiscriminators)) . ' cannot be evaluated, so no item is matched to it; those rules are not enforced',
                         $sliceId,
                         ['profileUrl' => $profileUrl],
                     );
@@ -1238,15 +1250,51 @@ final class StructureDefinitionCompiler
     }
 
     /**
-     * True for a named slice whose discriminator cannot be evaluated against an item, so no item
-     * ever matches it: types 'type' and 'profile', `$this`, a path through `resolve()`, or a value,
-     * pattern or presence the compiler did not find.
+     * True for a named slice with a discriminator that has nothing to match on, so no item ever
+     * matches it: a path through `resolve()`, or a value, pattern, presence, type, profile or
+     * required binding the compiler did not find.
      *
      * @param array<string, mixed> $definition A slice definition from sliceDefinitions()
      */
     private static function isUnmatchable(array $definition): bool
     {
-        return !($definition['isDefault'] ?? false) && !array_key_exists('discriminatorValue', $definition);
+        if ($definition['isDefault'] ?? false) {
+            return false;
+        }
+
+        $discriminators = array_values(array_filter(is_array($definition['discriminators'] ?? null) ? $definition['discriminators'] : [], 'is_array'));
+
+        return $discriminators === [] || self::unmatchableDiscriminators($discriminators) !== [];
+    }
+
+    /**
+     * The discriminators of a slice that carry neither a value nor a value set to match on.
+     *
+     * @param list<array<mixed>> $discriminators
+     *
+     * @return list<array<mixed>>
+     */
+    private static function unmatchableDiscriminators(array $discriminators): array
+    {
+        return array_values(array_filter(
+            $discriminators,
+            static fn (array $d): bool => !array_key_exists('value', $d) && !array_key_exists('valueSet', $d),
+        ));
+    }
+
+    /**
+     * "its pattern discriminator on 'type'", or "its value discriminators on 'system', 'code'".
+     *
+     * @param list<array<mixed>> $discriminators
+     */
+    private static function describeDiscriminators(array $discriminators): string
+    {
+        $types = array_values(array_unique(array_map(static fn (array $d): string => (string) ($d['type'] ?? ''), $discriminators)));
+        $paths = implode(', ', array_map(static fn (array $d): string => "'" . (string) ($d['path'] ?? '') . "'", $discriminators));
+
+        return count($discriminators) === 1
+            ? "its {$types[0]} discriminator on {$paths}"
+            : 'its ' . implode('/', $types) . " discriminators on {$paths}";
     }
 
     /**
@@ -1462,8 +1510,111 @@ final class StructureDefinitionCompiler
     }
 
     /**
-     * The value an item must hold at the discriminator path to belong to a slice, or null when it
-     * cannot be found without full profile resolution.
+     * One discriminator of a slice, with the value an item must hold to belong to it when one is found.
+     *
+     * The value comes from discriminatorValue(), or else from the data-type profile the slice is typed
+     * with. A `value` or `pattern` discriminator that finds neither, where a required binding holds at
+     * its path (see discriminatorValueSet()), carries that value set as `valueSet`: the item belongs to
+     * the slice when its code is in the value set, which only a terminology client can answer.
+     *
+     * @param array<string, array<string, mixed>>                  $diff     Differential elements by id
+     * @param array<string, array<string, mixed>>                  $snapshot Snapshot elements by id
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup   Finds the data-type profile a slice is typed with
+     *
+     * @return array{type: string, path: string, value?: mixed, valueSet?: string}
+     */
+    private static function sliceDiscriminator(string $sliceId, string $discType, string $discPath, array $diff, array $snapshot, ?\Closure $lookup): array
+    {
+        $discriminator = ['type' => $discType, 'path' => $discPath];
+        $header        = $snapshot[$sliceId] ?? $diff[$sliceId] ?? [];
+
+        $value       = self::discriminatorValue($sliceId, $discType, $discPath, $diff, $snapshot);
+        $typeProfile = $value === null && $lookup !== null ? self::typeProfileDiscriminator($header, $discType, $discPath, $lookup) : [];
+        if ($value !== null || array_key_exists('value', $typeProfile)) {
+            $discriminator['value'] = $value ?? $typeProfile['value'];
+
+            return $discriminator;
+        }
+
+        if (!in_array($discType, ['value', 'pattern'], true) || str_contains($discPath, 'resolve()')) {
+            return $discriminator;
+        }
+
+        // A slice that forbids the element at the path takes the items without it, as the slicing
+        // profile's `email` slice in core's slicing example forbids `telecom.use`
+        if ($discPath !== '$this') {
+            $element = $snapshot[$sliceId . '.' . $discPath] ?? $diff[$sliceId . '.' . $discPath] ?? [];
+            if ((string) ($element['max'] ?? '') === '0') {
+                return ['type' => 'exists', 'path' => $discPath, 'value' => false];
+            }
+        }
+
+        $valueSet = self::discriminatorValueSet($sliceId, $discPath, $diff, $snapshot) ?? $typeProfile['valueSet'] ?? null;
+        if ($valueSet !== null) {
+            $discriminator['valueSet'] = $valueSet;
+        }
+
+        return $discriminator;
+    }
+
+    /**
+     * The value set of the required binding nearest the discriminator path, or null.
+     *
+     * The element at the path is read first, then each ancestor up to the slice itself, from the
+     * snapshot first: a binding on a CodeableConcept slice holds for the codings and codes beneath it,
+     * so a slice discriminated on `coding.code` is keyed by a required binding on the slice. A binding
+     * every item carries, slice or not, is skipped.
+     *
+     * @param array<string, array<string, mixed>> $diff     Differential elements by id
+     * @param array<string, array<string, mixed>> $snapshot Snapshot elements by id
+     */
+    private static function discriminatorValueSet(string $sliceId, string $discPath, array $diff, array $snapshot): ?string
+    {
+        $segments = $discPath === '$this' ? [] : explode('.', $discPath);
+        $slicedId = substr($sliceId, 0, (int) strrpos($sliceId, ':'));
+
+        for ($depth = count($segments); $depth >= 0; --$depth) {
+            $relative = array_slice($segments, 0, $depth);
+            $id       = implode('.', [$sliceId, ...$relative]);
+            $valueSet = self::requiredValueSet($id, $diff, $snapshot);
+            if ($valueSet === null) {
+                continue;
+            }
+
+            // A binding this profile states on the slice tells its items apart. One the snapshot only
+            // inherits does so when the unsliced element is bound otherwise; R5 history-bundle's `patch`
+            // slice has only the http-verb binding every `entry.request.method` has
+            $unsliced = implode('.', [$slicedId, ...$relative]);
+            if (self::requiredValueSet($id, $diff, []) === $valueSet
+                || (isset($snapshot[$unsliced]) && self::requiredValueSet($unsliced, [], $snapshot) !== $valueSet)) {
+                return $valueSet;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The value set of an element's required binding, from the snapshot first, or null.
+     *
+     * @param array<string, array<string, mixed>> $diff     Differential elements by id
+     * @param array<string, array<string, mixed>> $snapshot Snapshot elements by id
+     */
+    private static function requiredValueSet(string $id, array $diff, array $snapshot): ?string
+    {
+        foreach ([$snapshot, $diff] as $source) {
+            $binding = is_array($source[$id]['binding'] ?? null) ? $source[$id]['binding'] : [];
+            if (($binding['strength'] ?? null) === 'required' && is_string($binding['valueSet'] ?? null)) {
+                return $binding['valueSet'];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The value an item must hold at the discriminator path to belong to a slice, or null when the
+     * definitions state none.
      *
      * The snapshot is searched first, in its order, so an inherited slice keeps the value its parent
      * declared ahead of one the profile adds beneath it: AU Core's SystolicBP stays discriminated by
@@ -1481,7 +1632,28 @@ final class StructureDefinitionCompiler
         array $diff,
         array $snapshot,
     ): mixed {
-        if ($discPath === '' || $discPath === '$this') {
+        if ($discPath === '' || str_contains($discPath, 'resolve()')) {
+            return null;
+        }
+
+        if ($discType === 'type' || $discType === 'profile') {
+            return self::discriminatorTypes($sliceId, $discType, $discPath, $diff, $snapshot);
+        }
+
+        // The slice's own fixed or pattern value: AU Core's smoking status `category:socialHistory`
+        if ($discPath === '$this') {
+            if (!in_array($discType, ['value', 'pattern'], true)) {
+                return null;
+            }
+
+            foreach ([$snapshot, $diff] as $source) {
+                $field = ElementDefinitionReader::extractPolymorphicField($source[$sliceId] ?? [], 'fixed')
+                    ?? ElementDefinitionReader::extractPolymorphicField($source[$sliceId] ?? [], 'pattern');
+                if ($field !== null) {
+                    return $field['value'];
+                }
+            }
+
             return null;
         }
 
@@ -1536,42 +1708,98 @@ final class StructureDefinitionCompiler
     }
 
     /**
-     * The value or pattern discriminator value a slice gets from the data-type profile it is typed
-     * with, when the slicing profile states none itself, or null.
+     * The type codes (for a `type` discriminator) or profile URLs (for `profile`) the slice allows at
+     * the discriminator path, or null when it names none.
+     *
+     * The element is the slice itself for `$this`, else the one at the path beneath it, read from the
+     * snapshot first. A profile URL keeps any `|version`; the matcher decides how to look it up.
+     *
+     * @param array<string, array<string, mixed>> $diff     Differential elements by id
+     * @param array<string, array<string, mixed>> $snapshot Snapshot elements by id
+     *
+     * @return non-empty-list<string>|null
+     */
+    private static function discriminatorTypes(string $sliceId, string $discType, string $discPath, array $diff, array $snapshot): ?array
+    {
+        $id = $discPath === '$this' ? $sliceId : $sliceId . '.' . $discPath;
+
+        foreach ([$snapshot, $diff] as $source) {
+            $element = $source[$id] ?? $source[$id . '[x]'] ?? null;
+            if ($element === null) {
+                continue;
+            }
+
+            if ($discType === 'type') {
+                $codes = self::typeCodes($element);
+            } else {
+                $codes = [];
+                foreach (is_array($element['type'] ?? null) ? $element['type'] : [] as $type) {
+                    foreach (is_array($type['profile'] ?? null) ? $type['profile'] : [] as $profile) {
+                        if (is_string($profile) && $profile !== '') {
+                            $codes[] = $profile;
+                        }
+                    }
+                }
+            }
+
+            if ($codes !== []) {
+                return array_values(array_unique($codes));
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * What the data-type profile a slice is typed with says about the discriminator path, when the
+     * slicing profile states nothing itself: `['value' => ...]` for a fixed or pattern value,
+     * `['valueSet' => ...]` for a required binding the profile states, or `[]`.
      *
      * AU Core types `Patient.identifier:ihi` with `au-ihi` and discriminates on `type`, but only
-     * `au-ihi` fixes that `type`. The profile's snapshot is read at the discriminator path, outside
-     * any slice. Only a slice allowing one type with one profile is read, as inlining requires.
+     * `au-ihi` fixes that `type`; `au-dvanumber` only binds it. The profile's snapshot is read at the
+     * discriminator path, outside any slice. Only a slice allowing one type with one profile is read,
+     * as inlining requires.
      *
      * @param array<string, mixed>                          $header The slice element
      * @param \Closure(string): (array<string, mixed>|null) $lookup
+     *
+     * @return array{value?: mixed, valueSet?: string}
      */
-    private static function typeProfileDiscriminatorValue(array $header, string $discType, string $discPath, \Closure $lookup): mixed
+    private static function typeProfileDiscriminator(array $header, string $discType, string $discPath, \Closure $lookup): array
     {
         $types = is_array($header['type'] ?? null) ? array_values($header['type']) : [];
-        if (!in_array($discType, ['value', 'pattern'], true) || $discPath === '' || $discPath === '$this' || count($types) !== 1) {
-            return null;
+        if (!in_array($discType, ['value', 'pattern'], true) || $discPath === '' || count($types) !== 1) {
+            return [];
         }
 
         $profiles = is_array($types[0]['profile'] ?? null) ? array_values(array_filter($types[0]['profile'], 'is_string')) : [];
         if (count($profiles) !== 1 || ($types[0]['code'] ?? null) === 'Extension') {
-            return null;
+            return [];
         }
 
         $definition = $lookup(self::canonicalWithoutVersion($profiles[0]));
         if ($definition === null || ($definition['kind'] ?? null) !== 'complex-type') {
-            return null;
+            return [];
         }
 
-        $element = self::snapshotElements($definition)[($definition['type'] ?? '') . '.' . $discPath] ?? null;
+        $root    = (string) ($definition['type'] ?? '');
+        $element = self::snapshotElements($definition)[$discPath === '$this' ? $root : $root . '.' . $discPath] ?? null;
         if ($element === null) {
-            return null;
+            return [];
         }
 
         $field = ElementDefinitionReader::extractPolymorphicField($element, 'fixed')
             ?? ElementDefinitionReader::extractPolymorphicField($element, 'pattern');
+        if ($field !== null) {
+            return ['value' => $field['value']];
+        }
 
-        return $field['value'] ?? null;
+        // Only a binding the data-type profile states itself; one it inherits from the data type
+        // holds for every value of that type, in the slice or not
+        $id       = $discPath === '$this' ? $root : $root . '.' . $discPath;
+        $valueSet = self::requiredValueSet($id, self::differentialElements($definition), []);
+
+        return $valueSet === null ? [] : ['valueSet' => $valueSet];
     }
 
     /**

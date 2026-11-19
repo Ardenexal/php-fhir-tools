@@ -46,9 +46,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'directReferenceCode',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-directReferenceCode',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-directReferenceCode'],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'],
 )]
@@ -58,9 +58,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'dependency',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'type',
-    discriminatorValue: 'depends-on',
+    discriminators: [['type' => 'value', 'path' => 'type', 'value' => 'depends-on']],
     orderedIndex: 0,
     rules: [
         [

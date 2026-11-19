@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Validation\Profile\CompositeStructureDefinitio
 use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator;
 use Symfony\Component\Config\FileLocator;
@@ -47,7 +48,7 @@ class FHIRExtension extends Extension
      *   as a decorator around the terminology client.
      * - When runtime profile package directories or files are configured, gives the validation
      *   service a RuntimeProfileResolver over them, and the slice validator a
-     *   RuntimeProfileAttributeReader.
+     *   RuntimeProfileAttributeReader and a RuntimeProfileConformance for profile discriminators.
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -150,6 +151,11 @@ class FHIRExtension extends Extension
             ->setDecoratedService(FHIRTerminologyClientInterface::class)
             ->setPublic(false);
 
+        // Profile discriminators are matched for generated profile classes even without runtime
+        // profiles; registerRuntimeProfiles() gives the checker a resolver when they are configured
+        $container->getDefinition(FHIRSliceConstraintValidator::class)
+            ->setArgument('$profiles', new Definition(RuntimeProfileConformance::class, [null]));
+
         /** @var array{package_dirs: list<string>, files: list<string>} $runtimeProfileConfig */
         $runtimeProfileConfig = $config['validation']['runtime_profiles'];
         $this->registerRuntimeProfiles($container, $runtimeProfileConfig['package_dirs'], $runtimeProfileConfig['files']);
@@ -196,7 +202,8 @@ class FHIRExtension extends Extension
             ->setArgument('$runtimeProfiles', new Reference(RuntimeProfileResolver::class));
 
         $container->getDefinition(FHIRSliceConstraintValidator::class)
-            ->setArgument('$attributes', new Reference('fhir.runtime_profiles.attribute_reader'));
+            ->setArgument('$attributes', new Reference('fhir.runtime_profiles.attribute_reader'))
+            ->setArgument('$profiles', new Definition(RuntimeProfileConformance::class, [new Reference(RuntimeProfileResolver::class)]));
     }
 
     public function getAlias(): string

@@ -21,9 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     sliceName: 'operationOutcome',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'search.mode',
-    discriminatorValue: 'outcome',
+    discriminators: [['type' => 'value', 'path' => 'search.mode', 'value' => 'outcome']],
     orderedIndex: 0,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
@@ -43,8 +41,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     sliceName: 'other',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'search.mode',
+    discriminators: [['type' => 'value', 'path' => 'search.mode']],
     orderedIndex: 1,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],

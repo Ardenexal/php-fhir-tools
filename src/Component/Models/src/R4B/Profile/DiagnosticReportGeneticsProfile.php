@@ -32,9 +32,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\DiagnosticReportResource;
     sliceName: 'AssessedCondition',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsAssessedCondition',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsAssessedCondition',
+        ],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics'],
 )]
@@ -43,9 +47,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\DiagnosticReportResource;
     sliceName: 'FamilyMemberHistory',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsFamilyMemberHistory',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsFamilyMemberHistory',
+        ],
+    ],
     orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics'],
 )]
@@ -54,9 +62,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\DiagnosticReportResource;
     sliceName: 'Analysis',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsAnalysis',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsAnalysis',
+        ],
+    ],
     orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics'],
 )]
@@ -65,9 +77,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\DiagnosticReportResource;
     sliceName: 'References',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsReferences',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsReferences',
+        ],
+    ],
     orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics'],
 )]

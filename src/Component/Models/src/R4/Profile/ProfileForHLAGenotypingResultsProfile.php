@@ -21,9 +21,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
     sliceName: 'allele-database',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/hla-genotyping-results-allele-database',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/hla-genotyping-results-allele-database',
+        ],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/hlaresult'],
 )]
@@ -32,9 +36,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
     sliceName: 'glstring',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/hla-genotyping-results-glstring',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/hla-genotyping-results-glstring',
+        ],
+    ],
     orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/hlaresult'],
 )]
@@ -43,9 +51,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
     sliceName: 'haploid',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/hla-genotyping-results-haploid',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/hla-genotyping-results-haploid',
+        ],
+    ],
     orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/hlaresult'],
 )]
@@ -54,9 +66,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
     sliceName: 'method',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/hla-genotyping-results-method',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/hla-genotyping-results-method',
+        ],
+    ],
     orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/hlaresult'],
 )]

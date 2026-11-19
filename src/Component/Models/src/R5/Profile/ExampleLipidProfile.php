@@ -66,8 +66,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\DiagnosticReportResource;
     sliceName: 'Cholesterol',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'resolve().code',
+    discriminators: [['type' => 'value', 'path' => 'resolve().code']],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
@@ -76,8 +75,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\DiagnosticReportResource;
     sliceName: 'Triglyceride',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'resolve().code',
+    discriminators: [['type' => 'value', 'path' => 'resolve().code']],
     orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
@@ -86,8 +84,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\DiagnosticReportResource;
     sliceName: 'HDLCholesterol',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'resolve().code',
+    discriminators: [['type' => 'value', 'path' => 'resolve().code']],
     orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
@@ -96,8 +93,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\DiagnosticReportResource;
     sliceName: 'LDLCholesterol',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'resolve().code',
+    discriminators: [['type' => 'value', 'path' => 'resolve().code']],
     orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]

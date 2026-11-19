@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\HttpClient;
 
 use Ardenexal\FHIRTools\Component\Metadata\Contract\CodingValidationResult;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientDecoratorInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyMembershipClientInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -19,7 +20,7 @@ use Psr\Cache\CacheItemPoolInterface;
  * and gives no answer (a refused request, a timeout), nothing is stored, so a passing outage is not
  * remembered as "not a member" for the length of the TTL.
  */
-final class CachingFHIRTerminologyClient implements FHIRTerminologyMembershipClientInterface
+final class CachingFHIRTerminologyClient implements FHIRTerminologyMembershipClientInterface, FHIRTerminologyClientDecoratorInterface
 {
     /**
      * Prefix of the membership cache keys.
@@ -39,6 +40,11 @@ final class CachingFHIRTerminologyClient implements FHIRTerminologyMembershipCli
         private readonly ?CacheItemPoolInterface $cache = null,
         private readonly int $ttl = 3600,
     ) {
+    }
+
+    public function innerClient(): FHIRTerminologyClientInterface
+    {
+        return $this->inner;
     }
 
     /**

@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Validation\Profile\CompositeStructureDefinitio
 use Ardenexal\FHIRTools\Component\Validation\Profile\InMemoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDefinitionRegistry;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 use Ardenexal\FHIRTools\Component\Validation\Profile\StructureDefinitionRegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -182,6 +183,7 @@ final class FHIRValidationServiceBuilder
                 $sliceAttributes,
                 $this->terminologyClient,
                 $this->referenceResolver,
+                new RuntimeProfileConformance($runtimeProfiles),
             ))
             ->getValidator();
 

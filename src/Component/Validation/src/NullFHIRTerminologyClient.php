@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\Metadata\Contract\CodingValidationResult;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientDecoratorInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 
 /**
@@ -17,6 +18,19 @@ use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterfa
  */
 final class NullFHIRTerminologyClient implements FHIRTerminologyClientInterface
 {
+    /**
+     * Whether no real terminology client is configured: none at all, this null client, or decorators
+     * (such as the bundle's cache) wrapped around nothing else.
+     */
+    public static function isAbsent(?FHIRTerminologyClientInterface $client): bool
+    {
+        while ($client instanceof FHIRTerminologyClientDecoratorInterface) {
+            $client = $client->innerClient();
+        }
+
+        return $client === null || $client instanceof self;
+    }
+
     /**
      * Always returns true — the null object treats every code as valid.
      *

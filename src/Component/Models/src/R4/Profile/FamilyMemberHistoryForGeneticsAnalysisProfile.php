@@ -25,9 +25,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\FamilyMemberHistoryResource
     sliceName: 'Parent',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-parent',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-parent',
+        ],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'],
 )]
@@ -36,9 +40,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\FamilyMemberHistoryResource
     sliceName: 'Sibling',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-sibling',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-sibling',
+        ],
+    ],
     orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'],
 )]
@@ -47,9 +55,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\FamilyMemberHistoryResource
     sliceName: 'Observation',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation',
+        ],
+    ],
     orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/familymemberhistory-genetic'],
 )]

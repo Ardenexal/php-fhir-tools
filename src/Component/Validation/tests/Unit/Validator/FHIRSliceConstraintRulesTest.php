@@ -32,9 +32,7 @@ final class SliceRulesIdentifierStub
     sliceName: 'ihiNumber',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://ihi.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
     rules: [['path' => 'value', 'constraint' => Count::class, 'options' => ['min' => 1]]],
 )]
 final class SliceRulesPatientStub
@@ -49,15 +47,12 @@ final class SliceRulesPatientStub
 #[FHIRSliceConstraint(
     property: 'identifier',
     sliceName: 'ihiNumber',
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://ihi.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
 )]
 #[FHIRSliceConstraint(
     property: 'identifier',
     sliceName: '@default',
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
+    discriminators: [['type' => 'value', 'path' => 'system']],
     isDefault: true,
     rules: [['path' => 'value', 'constraint' => Count::class, 'options' => ['min' => 1]]],
 )]
@@ -101,9 +96,7 @@ final class SliceRulesComponentStub
 #[FHIRSliceConstraint(
     property: 'component',
     sliceName: 'SystolicBP',
-    discriminatorType: 'value',
-    discriminatorPath: 'code.coding.code',
-    discriminatorValue: '8480-6',
+    discriminators: [['type' => 'value', 'path' => 'code.coding.code', 'value' => '8480-6']],
     rules: [[
         'path'       => 'code.coding',
         'constraint' => FHIRSliceConstraint::class,
@@ -112,9 +105,7 @@ final class SliceRulesComponentStub
             'sliceName'          => 'snomedSBP',
             'min'                => 1,
             'max'                => 1,
-            'discriminatorType'  => 'value',
-            'discriminatorPath'  => 'code',
-            'discriminatorValue' => '271649006',
+            'discriminators'     => [['type' => 'value', 'path' => 'code', 'value' => '271649006']],
             'rules'              => [['path' => 'system', 'constraint' => Count::class, 'options' => ['min' => 1]]],
         ],
     ]],

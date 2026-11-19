@@ -226,9 +226,9 @@ final class StructureDefinitionCompilerTest extends TestCase
         $compiled = (new StructureDefinitionCompiler())->compile($sd);
         $slices   = self::sliceArguments($compiled->attributes);
 
-        self::assertTrue($slices['withResource']['discriminatorValue']);
+        self::assertTrue($slices['withResource']['discriminators'][0]['value']);
         self::assertSame(1, $slices['withResource']['min']);
-        self::assertFalse($slices['withoutResource']['discriminatorValue']);
+        self::assertFalse($slices['withoutResource']['discriminators'][0]['value']);
         self::assertSame(['openAtEnd'], self::slicingRules($compiled->attributes));
         self::assertSame([], $compiled->diagnostics);
     }
@@ -248,7 +248,7 @@ final class StructureDefinitionCompilerTest extends TestCase
         $compiled = (new StructureDefinitionCompiler())->compile($sd);
         $slices   = self::sliceArguments($compiled->attributes);
 
-        self::assertArrayNotHasKey('discriminatorValue', $slices['first']);
+        self::assertArrayNotHasKey('value', $slices['first']['discriminators'][0]);
         self::assertSame(0, $slices['first']['min']);
         self::assertSame(['open'], self::slicingRules($compiled->attributes));
 

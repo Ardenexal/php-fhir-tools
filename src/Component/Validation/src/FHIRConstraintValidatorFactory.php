@@ -24,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPatternValueValidator
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileBindingValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileInvariantValidator;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRTargetProfileValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRValueSetBindingValidator;
@@ -60,6 +61,7 @@ final class FHIRConstraintValidatorFactory implements ConstraintValidatorFactory
         private readonly FHIRAttributeReaderInterface $sliceAttributes,
         private readonly ?FHIRTerminologyClientInterface $terminologyClient,
         private readonly FHIRReferenceResolverInterface $referenceResolver,
+        private readonly ?RuntimeProfileConformance $profileConformance = null,
     ) {
         $this->fallback = new ConstraintValidatorFactory();
     }
@@ -76,7 +78,7 @@ final class FHIRConstraintValidatorFactory implements ConstraintValidatorFactory
             $constraint instanceof FHIRProfileConstraint => new FHIRProfileConstraintValidator($this->accessor),
             $constraint instanceof FHIRProfileInvariant  => new FHIRProfileInvariantValidator($this->pathService, $this->messages, $this->accessor),
             $constraint instanceof FHIRProfileBinding    => new FHIRProfileBindingValidator($this->accessor),
-            $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, new SliceDiscriminatorMatcher($this->accessor), $this->sliceAttributes),
+            $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, new SliceDiscriminatorMatcher($this->accessor, $this->terminologyClient), $this->sliceAttributes, profiles: $this->profileConformance),
             $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->referenceResolver, $this->messages),
             default                                      => $this->fallback->getInstance($constraint),
         };

@@ -59,9 +59,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'BodyWeightCode',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'code',
-    discriminatorValue: '29463-7',
+    discriminators: [
+        ['type' => 'value', 'path' => 'code', 'value' => '29463-7'],
+        ['type' => 'value', 'path' => 'system', 'value' => 'http://loinc.org'],
+    ],
     orderedIndex: 0,
     rules: [
         [

@@ -49,7 +49,6 @@ final class SuppliedProfileMeasurementTest extends TestCase
             'standards-status-x-r4',
             'type-ref-unchecked [profile]',
             'type-subtype-slicing1 [profile]',
-            'type-subtype-slicing2 [profile]',
         ],
         'R5' => [
             'patient-patternidentifier-good [profile]',

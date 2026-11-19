@@ -181,9 +181,9 @@ final class DeclaredLimitations
      *
      * Loading the packages would not be enough on its own, checked 2026-11-14 against
      * `kbv.mio.diga#1.0.0-festlegung`: its body weight profile ships without a snapshot, which runtime
-     * validation requires, inherits the fixed `version` from `kbv.basis`, and slices `code.coding` by
-     * pattern on `$this`, which the compiler cannot yet turn into a discriminator value. The fixed value
-     * on a slice child itself is enforced: `FixedValueValidationTest::testFixedValueInsideASliceIsChecked`.
+     * validation requires, and inherits the fixed `version` from `kbv.basis`. Its `code.coding` slicing
+     * by pattern on `$this` is matched since the slice's own pattern became its discriminator value. The
+     * fixed value on a slice child itself is enforced: `FixedValueValidationTest::testFixedValueInsideASliceIsChecked`.
      */
     public const REASON_UNVENDORED_PACKAGE = 'the IG packages this case loads by name are not vendored, and their profile ships without a snapshot';
 

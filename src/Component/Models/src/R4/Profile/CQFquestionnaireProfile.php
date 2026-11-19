@@ -21,9 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResource;
     sliceName: 'library',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-library',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-library'],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/cqf-questionnaire'],
 )]
