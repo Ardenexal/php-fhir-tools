@@ -86,7 +86,7 @@ final class FHIRAnyOfProfilesValidator extends ConstraintValidator
             try {
                 $errors = $conformance->errors($validator, $value, $profile);
             } finally {
-                $this->initialize($context);
+                $this->context = $context;
             }
 
             match (true) {
