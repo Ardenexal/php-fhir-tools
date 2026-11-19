@@ -32,6 +32,11 @@ final class SuppliedProfileMeasurementTest extends TestCase
      *
      * Remove a case once it stops being ABOVE; the test fails until you do, so an improvement is
      * recorded rather than silently absorbed.
+     *
+     * `type-ref-unchecked [profile]` is ABOVE by design: this project reads a reference's type from
+     * its `Type/id` URL by default (#229), which the reference validator does only under
+     * `assumeValidRestReferences`. Its twin `type-ref-checked` sets that option and agrees with us.
+     * See DeclaredLimitations::REASON_ASSUMED_REST_REFERENCE.
      */
     private const array KNOWN_ABOVE = [
         'R4' => [
@@ -42,6 +47,7 @@ final class SuppliedProfileMeasurementTest extends TestCase
             'patient-min-pattern [profile]',
             'patient-min-pattern1 [profile]',
             'standards-status-x-r4',
+            'type-ref-unchecked [profile]',
             'type-subtype-slicing1 [profile]',
             'type-subtype-slicing2 [profile]',
         ],
