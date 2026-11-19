@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  *
  * Every example AU Core publishes must validate without errors against the profiles in its
  * meta.profile (all but `Specimen-nasoswab` name one), and a few broken copies of them must report the errors AU Core defines for them:
- * the IHI checks, the Medicare number's fixed system, the smoking status category and the blood
+ * the IHI checks, the Medicare number's fixed system and maximum length, the smoking status category and the blood
  * pressure components. These cover pattern, `$this` and composite slice discriminators, invariants
  * inside a data-type profile on a slice, and slice minimums.
  *
@@ -94,6 +94,21 @@ final class AuCoreProfileTest extends TestCase
 
         self::assertSame(
             ["identifier[1].system | Value is 'http://example.org/medicare' but is fixed to 'http://ns.electronichealth.net.au/id/medicare-number'"],
+            $this->errorLines($this->validate($patient)),
+        );
+    }
+
+    public function testMedicareNumberLongerThanElevenCharactersIsAnError(): void
+    {
+        $patient                 = $this->load('Patient-bennelong-anne.json');
+        $patient['identifier'][] = [
+            'type'   => ['coding' => [['system' => 'http://terminology.hl7.org/CodeSystem/v2-0203', 'code' => 'MC']]],
+            'system' => 'http://ns.electronichealth.net.au/id/medicare-number',
+            'value'  => '295015648112',
+        ];
+
+        self::assertSame(
+            ['identifier[1].value | value is longer than permitted maximum length of 11'],
             $this->errorLines($this->validate($patient)),
         );
     }

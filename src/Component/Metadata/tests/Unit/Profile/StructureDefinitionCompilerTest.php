@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Tests\Unit\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLength;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileObligation;
@@ -169,6 +170,28 @@ final class StructureDefinitionCompilerTest extends TestCase
                 'b' => ['code.text ' . FHIRFixedValue::class],
             ],
             $rules,
+        );
+    }
+
+    /**
+     * A maxLength compiles to a rule on the element's path (#240).
+     */
+    public function testMaxLengthCompilesToARule(): void
+    {
+        $sd = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Identifier', 'path' => 'Identifier'],
+                ['id' => 'Identifier.value', 'path' => 'Identifier.value', 'maxLength' => 11],
+            ]],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+
+        self::assertCount(1, $compiled->attributes);
+        self::assertSame(
+            ['path' => 'value', 'constraint' => FHIRMaxLength::class, 'options' => ['max' => 11], 'groups' => [self::URL]],
+            $compiled->attributes[0]->arguments,
         );
     }
 

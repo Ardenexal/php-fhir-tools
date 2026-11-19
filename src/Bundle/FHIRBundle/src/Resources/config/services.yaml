@@ -177,6 +177,12 @@ services:
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypesValidator' }
 
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRMaxLengthValidator:
+        arguments:
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLengthValidator' }
+
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator:
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraintValidator' }

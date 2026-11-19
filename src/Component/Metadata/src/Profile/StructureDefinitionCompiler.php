@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLength;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
@@ -1128,12 +1129,12 @@ final class StructureDefinitionCompiler
     /**
      * The constraints one differential element places on its own path: cardinality (Count) when
      * min > 0 or max is bounded, a fixed[x], scalar or complex, an array pattern[x] (scalar
-     * patterns use value matching), the types a choice element may hold, and the target profiles a
-     * Reference or canonical may point at.
+     * patterns use value matching), a maxLength, the types a choice element may hold, and the target
+     * profiles a Reference or canonical may point at.
      *
      * @param array<string, mixed> $element
      *
-     * @return list<array{constraint: class-string<Count|FHIRFixedValue|FHIRPatternValue|FHIRAllowedTypes|FHIRTargetProfile>, options: array<string, mixed>}>
+     * @return list<array{constraint: class-string<Count|FHIRFixedValue|FHIRPatternValue|FHIRMaxLength|FHIRAllowedTypes|FHIRTargetProfile>, options: array<string, mixed>}>
      */
     private static function elementRules(array $element): array
     {
@@ -1161,6 +1162,12 @@ final class StructureDefinitionCompiler
         $patternField = ElementDefinitionReader::extractPolymorphicField($element, 'pattern');
         if ($patternField !== null && is_array($patternField['value'])) {
             $rules[] = ['constraint' => FHIRPatternValue::class, 'options' => ['pattern' => $patternField['value']]];
+        }
+
+        // maxLength is only allowed on primitive elements, so the rule never meets a complex value
+        $maxLength = $element['maxLength'] ?? null;
+        if (is_int($maxLength) && $maxLength > 0) {
+            $rules[] = ['constraint' => FHIRMaxLength::class, 'options' => ['max' => $maxLength]];
         }
 
         // The model holds every variant of a choice element in one property, so a profile that lists
