@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description The identifier that is used to identify this version of the artifact when it is referenced in a specification, model, design or instance. This is an arbitrary value managed by the artifact author and is not expected to be globally unique. For example, it might be a timestamp (e.g. yyyymmdd) if a managed version is not available. There is also no expectation that versions can be placed in a lexicographical sequence.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-version', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-version', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]

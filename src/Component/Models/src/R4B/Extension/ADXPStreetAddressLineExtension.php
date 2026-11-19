@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description A street address line is frequently used instead of breaking out building number, street name, street type, etc. An address generally has only a delivery address line or a street address line, but not both.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetAddressLine', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetAddressLine', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Address.line')]
 class ADXPStreetAddressLineExtension extends Extension
 {

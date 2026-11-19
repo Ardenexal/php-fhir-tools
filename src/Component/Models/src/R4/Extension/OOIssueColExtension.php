@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Identifies the source column for the issue.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationOutcome.issue')]
 class OOIssueColExtension extends Extension
 {

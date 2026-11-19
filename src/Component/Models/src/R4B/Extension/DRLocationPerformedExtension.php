@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  *
  * @description This extension is deprecated. The DiagnosticReport Location Performed is same as  Event Location extension. Old description: Facility location where this report was prepared.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/diagnosticReport-locationPerformed', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/diagnosticReport-locationPerformed', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 class DRLocationPerformedExtension extends Extension
 {

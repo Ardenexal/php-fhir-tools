@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description Human-friendly name for the activity.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/careplan-activity-title', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/careplan-activity-title', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity')]
 class CPActivityTitleExtension extends Extension
 {

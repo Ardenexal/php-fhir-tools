@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
  *
  * @description Inherit all the obligations and non-conformance additional bindings from an Obligation Profile. The other profile must be a Obligation Profile (using [[[http://hl7.org/fhir/StructureDefinition/obligation-profile-flag]]])
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/inherit-obligations', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/inherit-obligations', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class InheritObligationsExtension extends Extension
 {

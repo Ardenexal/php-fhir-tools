@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
  *
  * @description The time of the first incision.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-incisionDateTime', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-incisionDateTime', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
 class PRIncisionDateTimeExtension extends Extension
 {

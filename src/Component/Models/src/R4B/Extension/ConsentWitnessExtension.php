@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  *
  * @description Any witness to the consent.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/consent-Witness', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/consent-Witness', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Consent')]
 class ConsentWitnessExtension extends Extension
 {

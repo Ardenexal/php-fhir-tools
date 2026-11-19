@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description The mode of operation of the device (e.g., maintenance, demo, normal).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-operation-mode', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-operation-mode', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Device')]
 class DeviceOperationModeExtension extends Extension
 {

@@ -29,7 +29,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  *   A more complex alternative to this profile is to use the [[[http://hl7.org/fhir/StructureDefinition/obligations-profile]]] extension.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/target-feature-assertion', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/target-feature-assertion', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Provenance')]
 class TargetFeatureAsssertionExtension extends Extension implements FHIRComplexExtensionInterface
 {

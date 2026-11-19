@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Allows disabling certain questionnaire options for the containing item based on evaluating expressions.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-optionRestriction', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-optionRestriction', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 #[FHIRContextInvariant(expression: 'ofType(ElementDefinition).binding.where(strength=\'required\').exists() or where(%resource.is(Questionnaire)).exists(answerValueSet.exists() or answerOption.exists())')]

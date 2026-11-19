@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Indicates alternate codings and/or original text for the concept represented by the code.  Codings or text provided SHALL convey equivalent meaning to the meaning of the code being extended (though with potential differences in level of detail conveyed).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/alternate-codes', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/alternate-codes', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'code')]
 #[FHIRExtensionContext(type: 'element', expression: 'string')]
 #[FHIRExtensionContext(type: 'element', expression: 'Coding')]

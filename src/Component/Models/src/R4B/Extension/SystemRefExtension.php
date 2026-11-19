@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  *
  * @description The formal URI for the code system.  I.e. ValueSet.codeSystem.system (or its equivalent).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-systemRef', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-systemRef', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include')]
 class SystemRefExtension extends Extension
 {

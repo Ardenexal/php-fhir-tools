@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description DEPRECATED: Use artifact-authoritativeSource instead. A reference to the authoritative, human readable, source of truth for the code system information. External code system information can be found in THO or the relevant HTA confluence pages.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-authoritativeSource', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-authoritativeSource', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]
 class CSAuthoritativeSourceExtension extends Extension
 {

@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description References a location within a set of source text from which the discrete information described by this Resource/Element was extracted.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/derivation-reference', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/derivation-reference', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 #[FHIRExtensionContext(type: 'element', expression: 'Element')]
 #[FHIRProfileInvariant(

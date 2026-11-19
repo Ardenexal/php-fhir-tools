@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Carries additional confidentiality codes beyond the base fixed code specified in the CDA document.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/composition-clinicaldocument-otherConfidentiality', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/composition-clinicaldocument-otherConfidentiality',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
 class CompositionOtherConfidentialityExtension extends Extension
 {

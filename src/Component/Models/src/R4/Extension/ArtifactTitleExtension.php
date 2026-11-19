@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description A short, descriptive, user-friendly title for the artifact.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-title', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-title', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CompartmentDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ExampleScenario')]

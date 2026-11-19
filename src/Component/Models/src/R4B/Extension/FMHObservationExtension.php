@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  *
  * @description Allows capturing risk-relevant observations about the relative that aren't themselves a specific health condition; e.g. Certain ethnic ancestries that are disease-relevant, presence of particular genetic markers, etc.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-observation',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'FamilyMemberHistory')]
 class FMHObservationExtension extends Extension
 {

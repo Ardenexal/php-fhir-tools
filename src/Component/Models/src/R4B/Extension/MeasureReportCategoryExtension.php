@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description What category is this measure report.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/measurereport-category', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/measurereport-category', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/measurereport-category', strength: 'extensible')]
 class MeasureReportCategoryExtension extends Extension

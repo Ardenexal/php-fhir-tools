@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description The artifact under test for this test content
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-testArtifact', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-testArtifact', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 #[FHIRExtensionContext(type: 'element', expression: 'Library')]
 class TestArtifactExtension extends Extension

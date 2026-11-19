@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description Indicates that validators should check that elements in the narrative have source attribution in their class attributes (boilerplate, generated, extensions and additional), and level of issue associated with the check
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/narrative-source-control', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/narrative-source-control', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/issue-severity', strength: 'required')]
 class NarrativeSourceControlExtension extends Extension

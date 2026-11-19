@@ -17,20 +17,20 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @description The name of the organization or individual responsible for the release and ongoing maintenance of the artifact.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-publisher', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment')]
-#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-publisher', fhirVersion: 'R5', isModifier: false)]
+#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition', startFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication')]
-#[FHIRExtensionContext(type: 'element', expression: 'MedicationKnowledge')]
-#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationKnowledge', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
-#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Substance')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition', startFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic', startFhirVersion: '4.3')]
 class ArtifactPublisherExtension extends Extension
 {
     /**

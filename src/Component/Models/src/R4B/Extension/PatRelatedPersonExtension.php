@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  *
  * @description In some cases a Patient.contact will also be populated as a RelatedPerson resource. This linkage permits the linkage between the 2 resources to be able to accurately indicate a representation of the same individual, and updating details between could be appropriate.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-relatedPerson', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-relatedPerson', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient.contact')]
 class PatRelatedPersonExtension extends Extension
 {

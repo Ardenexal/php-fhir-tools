@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Specifies whether the related artifact is defining a primary citation for the artifact (i.e. one that should appear in the narrative for the artifact specification.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-isPrimaryCitation', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-isPrimaryCitation', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedArtifact')]
 class IsPrimaryCitationExtension extends Extension
 {

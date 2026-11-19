@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
  *
  * @description DateTime of the last time the device was subject to maintenance.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-lastmaintenancetime', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-lastmaintenancetime', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Device')]
 class DeviceLastMaintenanceTimeExtension extends Extension
 {

@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description The pronouns to use when referring to an individual in verbal or written communication.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/individual-pronouns', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/individual-pronouns', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson')]
 #[FHIRExtensionContext(type: 'element', expression: 'Person')]

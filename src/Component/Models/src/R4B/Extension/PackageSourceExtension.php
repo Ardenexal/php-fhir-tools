@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  *
  * @description Specifies the package (and preferably, package version) in which an artifact (or referenced artifact) is defined.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/package-source', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/package-source', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 #[FHIRExtensionContext(type: 'element', expression: 'Meta')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedArtifact')]

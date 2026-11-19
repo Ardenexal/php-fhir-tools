@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Proficiency level of the communication.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-proficiency', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-proficiency', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient.communication')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson.communication')]
 #[FHIRExtensionContext(type: 'element', expression: 'Practitioner.communication')]

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Descriptive topics related to the content of the artifact. Topics provide a high-level categorization of the artifact that can be useful for filtering and searching.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-topic', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-topic', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]

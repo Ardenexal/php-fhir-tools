@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description The location of the delivery installation, usually a town or city, and is only required if the area is different from the municipality. Area to which mail delivery service is provided from any postal facility or service such as an individual letter carrier, rural route, or postal route.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-deliveryInstallationArea', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-deliveryInstallationArea',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'Address.line')]
 class ADXPDeliveryInstallationAreaExtension extends Extension
 {

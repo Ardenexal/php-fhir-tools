@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  *
  * @description Specifies the expansion parameters that should be used to expand ValueSets referenced from artifacts in the Library or ImplementationGuide.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-expansionParameters', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-expansionParameters', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Library')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide')]
 class ExpansionParametersExtension extends Extension

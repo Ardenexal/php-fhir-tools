@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description If the encountered was cancelled after it was planned, why? Applies only if the status is cancelled.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/encounter-reasonCancelled', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/encounter-reasonCancelled', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 class EncReasonCancelledExtension extends Extension
 {

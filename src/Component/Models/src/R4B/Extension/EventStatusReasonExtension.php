@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Captures the reason for the current state of the resource.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-statusReason', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-statusReason', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 #[FHIRExtensionContext(type: 'element', expression: 'DocumentReference')]

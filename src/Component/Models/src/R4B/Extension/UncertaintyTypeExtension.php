@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  *
  * @description A code specifying the type of probability distribution for the uncertainty.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-uncertaintyType', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-uncertaintyType', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Quantity')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/probability-distribution-type', strength: 'required')]
 class UncertaintyTypeExtension extends Extension

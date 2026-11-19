@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description A plan, proposal or order that is fulfilled in whole or in part by this event.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-basedOn', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-basedOn', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Condition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ChargeItem')]
 #[FHIRExtensionContext(type: 'element', expression: 'ClinicalImpression')]
@@ -27,8 +27,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'EpisodeOfCare')]
 #[FHIRExtensionContext(type: 'element', expression: 'ExplanationOfBenefit')]
 #[FHIRExtensionContext(type: 'element', expression: 'FamilyMemberHistory')]
-#[FHIRExtensionContext(type: 'element', expression: 'ImmunizationEvaluation')]
-#[FHIRExtensionContext(type: 'element', expression: 'InventoryReport')]
+#[FHIRExtensionContext(type: 'element', expression: 'ImmunizationEvaluation', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'InventoryReport', startFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'PaymentNotice')]
 #[FHIRExtensionContext(type: 'element', expression: 'PaymentReconciliation')]

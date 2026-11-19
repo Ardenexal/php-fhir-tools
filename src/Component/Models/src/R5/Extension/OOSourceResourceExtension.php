@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Identifies the source resource related to this outcome or issue.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/operationoutcome-resource', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/operationoutcome-resource', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationOutcome')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationOutcome.issue')]
 class OOSourceResourceExtension extends Extension

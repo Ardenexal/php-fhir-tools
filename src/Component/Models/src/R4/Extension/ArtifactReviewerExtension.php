@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description An individual or organization primarily responsible for review of some aspect of the artifact.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-reviewer', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-reviewer', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]
 #[FHIRExtensionContext(type: 'element', expression: 'CompartmentDefinition')]

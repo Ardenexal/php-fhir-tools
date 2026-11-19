@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\InstantPrimitive;
  *
  * @description The workflow status of the diagnostic report.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/diagnosticReport-workflowStatus', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/diagnosticReport-workflowStatus', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 class DRWorkflowStatusExtension extends Extension implements FHIRComplexExtensionInterface
 {

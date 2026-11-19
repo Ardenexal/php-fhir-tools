@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description A code that replaces this - use this code instead.  This extension is not used in R6 because identification of replacement codes should be captured using the concept properties replacedByCode and replacedByCoding.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-replacedby', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-replacedby', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept')]
 class CSReplacedbyExtension extends Extension
 {

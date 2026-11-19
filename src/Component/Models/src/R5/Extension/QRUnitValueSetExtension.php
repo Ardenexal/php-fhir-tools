@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  *
  * @description A set of units that the user may choose when providing a quantity value.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 #[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'Quantity\') or where(%resource.is(Questionnaire)).exists(type.first()=\'quantity\')')]

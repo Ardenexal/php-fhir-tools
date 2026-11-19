@@ -26,7 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  *
  * The codes 'probable' and 'possible' although similar, indicate the level of confidence the matching engine has that the result is a match. This could be through the number of matching fields, or other similar levels of certainty. Probable indicates that the match is likely, however  possible indicates it had some partial matching data.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/match-grade', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/match-grade', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Bundle.entry.search')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/match-grade', strength: 'required')]
 class BundleMatchGradeExtension extends Extension

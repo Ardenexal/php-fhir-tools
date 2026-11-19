@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\TimePrimitive;
  *
  * @description The inclusive upper bound on the range of allowed values for the data element.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/maxValue', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/maxValue', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 class MaxValueExtension extends Extension
 {

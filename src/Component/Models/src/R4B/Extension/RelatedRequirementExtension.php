@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description Allows relationships to be established between data requirements. For example, a Medication data requirement that depends on a MedicationRequest data requirement.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-relatedRequirement', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-relatedRequirement', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'DataRequirement')]
 class RelatedRequirementExtension extends Extension implements FHIRComplexExtensionInterface
 {

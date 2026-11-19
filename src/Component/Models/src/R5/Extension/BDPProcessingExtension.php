@@ -21,8 +21,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @description Extension for processing of a biologically derived product.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/biologicallyderivedproduct-processing', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'BiologicallyDerivedProduct')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/biologicallyderivedproduct-processing',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
+#[FHIRExtensionContext(type: 'element', expression: 'BiologicallyDerivedProduct', startFhirVersion: '4.0')]
 class BDPProcessingExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

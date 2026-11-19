@@ -19,7 +19,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  *
  * @description Identifies an operation parameter with a type of Resource for which this resource is to be considered an additional permitted allowedType.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/additional-operation-parameter-allowedType', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/additional-operation-parameter-allowedType',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class AdditionalOperationParameterAllowedTypeExtension extends Extension implements FHIRComplexExtensionInterface
 {

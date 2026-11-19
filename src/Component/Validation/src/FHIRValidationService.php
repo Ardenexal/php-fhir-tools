@@ -63,6 +63,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     /** The invariant ContainedReferenceChecker reports in place of the generated constraint. */
     private const string DOM_3 = 'dom-3';
 
+    /** Extension contexts that name a pattern of resources rather than a type each resource derives from */
+    private const array RESOURCE_PATTERNS = ['CanonicalResource', 'MetadataResource'];
+
     /** @var \WeakMap<CompiledProfile, list<Constraint>> Runtime constraints per compiled profile */
     private \WeakMap $runtimeConstraints;
 
@@ -1051,11 +1054,42 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $extensions = $resource->getExtensions();
 
             foreach ($extensions as $extIndex => $extension) {
-                $definition   = $this->extensionDefinitionOf($extension);
-                $contextAttrs = $this->extensionAttributes($extension, $definition, FHIRExtensionContext::class);
+                $definition = $this->extensionDefinitionOf($extension);
+                $usage      = $this->extensionUsage($extension, $definition);
+                $release    = $this->releaseOf($extension);
+
+                // A modifier extension changes the meaning of the element that bears it, so it must sit
+                // where readers look for modifiers
+                if ($usage?->isModifier === true) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'error',
+                        path: $extViolationPath . '[' . $extIndex . ']',
+                        message: sprintf("The Extension '%s' must not be used as an extension (it's a modifierExtension)", $this->readExtensionUrl($extension)),
+                        constraintClass: FHIRExtensionDefinition::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                    );
+                }
+
+                // An extension whose definition excludes this FHIR version is reported once; where it
+                // sits is then beside the point, so its contexts are not checked
+                $outOfRange = $usage !== null && $release !== null ? $this->extensionVersionViolation($extension, $usage, $release, $extViolationPath) : null;
+                if ($outOfRange !== null) {
+                    $violations[] = $outOfRange;
+                }
+
+                $contextAttrs = $outOfRange === null ? $this->extensionAttributes($extension, $definition, FHIRExtensionContext::class) : [];
+
+                // Contexts limited to other FHIR versions do not apply here. When none is left, the
+                // extension is allowed nowhere in this version
+                $versionContexts = $release === null ? $contextAttrs : array_values(array_filter(
+                    $contextAttrs,
+                    static fn (FHIRExtensionContext $context): bool => FHIRVersionRange::includes($release, $context->startFhirVersion, $context->endFhirVersion),
+                ));
 
                 if ($contextAttrs !== []
-                    && $this->classifyExtensionContexts($contextAttrs, $resource, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes, $ancestorExtensionUrls) === self::CONTEXT_DENY
+                    && ($versionContexts                                                                                                                                    === []
+                        || $this->classifyExtensionContexts($versionContexts, $resource, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes, $ancestorExtensionUrls) === self::CONTEXT_DENY)
                 ) {
                     $url          = $this->readExtensionUrl($extension);
                     $violations[] = new FHIRValidationViolation(
@@ -1271,8 +1305,15 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
             // At the resource root the type is definitively known (resolver-independent), so a
             // non-matching bare context is a confident denial. At nested elements the type may be
-            // abstract or unresolvable, so defer rather than risk a false positive.
-            return $isRoot ? self::CONTEXT_DENY : self::CONTEXT_DEFER;
+            // abstract or unresolvable, so defer rather than risk a false positive. CanonicalResource
+            // and MetadataResource name patterns of resources: the reference validator counts
+            // CodeSystem as one, but no generated resource class derives from them in any release,
+            // so they always defer
+            if (!$isRoot || in_array($expr, self::RESOURCE_PATTERNS, true)) {
+                return self::CONTEXT_DEFER;
+            }
+
+            return self::CONTEXT_DENY;
         }
 
         $exprRoot = substr($expr, 0, (int) strpos($expr, '.'));
@@ -1289,15 +1330,17 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
         // Foreign root (e.g. "ElementDefinition.binding" inside StructureDefinition): permitted
         // when a type-rooted candidate matches (a path ancestor is typed with the context root).
-        // A non-match is deferred, never denied — that would require complete type resolution of
-        // every path segment, which we do not guarantee.
+        // A non-match below the root is deferred, never denied — that would require complete type
+        // resolution of every path segment, which we do not guarantee. A resource being validated
+        // sits at no element path at all, so no dotted context can name it there. A data type
+        // validated on its own may still be meant for such a path, so it defers.
         foreach ($typeCandidates as $candidate) {
             if ($candidate === $expr || str_starts_with($candidate, $expr . '.')) {
                 return self::CONTEXT_PERMIT;
             }
         }
 
-        return self::CONTEXT_DEFER;
+        return $isRoot && $this->isResource($bearingElement) ? self::CONTEXT_DENY : self::CONTEXT_DEFER;
     }
 
     /**
@@ -1429,6 +1472,58 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return $matching;
+    }
+
+    /**
+     * Whether an extension is a modifier and the FHIR versions it may be used in, from its class or the
+     * definition its url names at runtime; null when neither is known.
+     *
+     * @param object|class-string $definition where its rules are declared, from {@see extensionDefinitionOf()}
+     */
+    private function extensionUsage(object $extension, object|string $definition): ?ExtensionUsage
+    {
+        $declared = $this->attributes->classAttributes($definition, FHIRExtensionDefinition::class)[0] ?? null;
+        if ($declared !== null) {
+            return new ExtensionUsage($declared->isModifier, $declared->startFhirVersion, $declared->endFhirVersion);
+        }
+
+        $runtime = $definition === $extension ? $this->runtimeExtensionOf($extension) : null;
+
+        return $runtime === null ? null : new ExtensionUsage($runtime->isModifier, $runtime->startFhirVersion, $runtime->endFhirVersion);
+    }
+
+    /**
+     * The finding for an extension used in a FHIR version its definition's `version-specific-use` excludes; null when the version is allowed.
+     *
+     * Worded as the reference validator words it, naming the bound that is broken.
+     */
+    private function extensionVersionViolation(object $extension, ExtensionUsage $usage, string $release, string $path): ?FHIRValidationViolation
+    {
+        [$template, $bound] = match (true) {
+            FHIRVersionRange::isBefore($release, $usage->startFhirVersion) => ['earliest', $usage->startFhirVersion],
+            FHIRVersionRange::isAfter($release, $usage->endFhirVersion)    => ['latest', $usage->endFhirVersion],
+            default                                                        => [null, null],
+        };
+        if ($template === null || $bound === null) {
+            return null;
+        }
+
+        return new FHIRValidationViolation(
+            severity: 'error',
+            path: $path,
+            message: sprintf(
+                "The definition of the extension '%s' specifies that the %s version it can be used with is %s (v%s), but this context of use is version %s (v%s)",
+                $this->readExtensionUrl($extension),
+                $template,
+                FHIRVersionRange::releaseNameOf($bound),
+                $bound,
+                $release,
+                FHIRVersionRange::versionOf($release),
+            ),
+            constraintClass: FHIRExtensionDefinition::class,
+            profileGroup: null,
+            invariantKey: null,
+        );
     }
 
     /**
@@ -1929,7 +2024,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         if (property_exists($resource, 'modifierExtension') && isset($resource->modifierExtension) && is_array($resource->modifierExtension)) {
             $extPath = $path !== '' ? $path . '.modifierExtension' : 'modifierExtension';
 
-            foreach ($resource->modifierExtension as $ext) {
+            foreach ($resource->modifierExtension as $index => $ext) {
                 if (!is_object($ext)) {
                     continue;
                 }
@@ -1953,6 +2048,22 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                         path: $extPath,
                         message: sprintf('Unknown modifier extension: %s — resource cannot be safely processed', $url),
                         constraintClass: FHIRIGTypeRegistry::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                    );
+
+                    continue;
+                }
+
+                // A known extension that is not a modifier does not belong here. A class generated
+                // before 0.8 does not say, so it is not reported
+                $usage = $this->extensionUsage($ext, $this->extensionDefinitionOf($ext));
+                if ($usage?->isModifier === false) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'error',
+                        path: $extPath . '[' . $index . ']',
+                        message: sprintf("The Extension '%s' must not be used as a modifierExtension (it's a regular extension)", $url),
+                        constraintClass: FHIRExtensionDefinition::class,
                         profileGroup: null,
                         invariantKey: null,
                     );

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description The method used to perform this procedure.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-method', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-method', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
 class PRMethodExtension extends Extension
 {

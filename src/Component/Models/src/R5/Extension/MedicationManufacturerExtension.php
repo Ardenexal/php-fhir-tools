@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description This extension indicates The manufacturer of the medication.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medication-manufacturer', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medication-manufacturer', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication')]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication.code.coding')]
 class MedicationManufacturerExtension extends Extension

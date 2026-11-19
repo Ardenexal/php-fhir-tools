@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description The urgency of sample collection, such as STAT, ASAP, ASAP-ED, ROUTINE, ROUTINE-AM, etc….
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-collectionPriority', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-collectionPriority', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen.collection')]
 class SpecCollectionPriorityExtension extends Extension
 {

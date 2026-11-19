@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description In satisfying this request or instantiating this definition, the expectations defined in the Definition resource are expected to be met.  (This allows requirements defined elsewhere to be brought into play by reference rather than providing all of the detail in-line necessary to satisfy the referenced Definition.).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-shallComplyWith', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-shallComplyWith', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Appointment')]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
@@ -31,13 +31,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
-#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup', endFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyRequest')]
-#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]
 #[FHIRExtensionContext(type: 'element', expression: 'VisionPrescription')]
 class ShallComplyWithExtension extends Extension

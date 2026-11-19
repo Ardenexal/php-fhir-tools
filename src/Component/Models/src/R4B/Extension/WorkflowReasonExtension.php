@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description References a resource or provides a code or text that explains why this event occurred or request was created.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-reason', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-reason', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 #[FHIRExtensionContext(type: 'element', expression: 'DocumentReference')]

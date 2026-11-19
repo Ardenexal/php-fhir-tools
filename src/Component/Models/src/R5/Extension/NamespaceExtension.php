@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description Use this extension to indicate tha the element has an XML namespace different to http://hl7.org/fhir.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-namespace', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-namespace', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class NamespaceExtension extends Extension

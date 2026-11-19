@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * Prefixes are particularly relevant if there are textual instructions that accompany the question. E.g. 'Do not select more than one of options a, b, or c' on a multi-select question.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-label', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-label', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.expansion.contains')]
 class VSLabelExtension extends Extension

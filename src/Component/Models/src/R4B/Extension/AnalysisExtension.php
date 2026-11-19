@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Knowledge-based comments on the effect of the sequence on patient's condition/medication reaction.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsAnalysis', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsAnalysis', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 class AnalysisExtension extends Extension implements FHIRComplexExtensionInterface
 {

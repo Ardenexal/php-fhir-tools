@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Further conditions, problems, diagnoses, procedures or events or the substance that preceded this Condition.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/condition-occurredFollowing', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/condition-occurredFollowing', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Condition')]
 class ConditionOccurredFollowingExtension extends Extension
 {

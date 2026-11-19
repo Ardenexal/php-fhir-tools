@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
  *
  * @description Information captured by the author/maintainer of the questionnaire for development purposes, not intended to be seen by users.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/designNote', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/designNote', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]

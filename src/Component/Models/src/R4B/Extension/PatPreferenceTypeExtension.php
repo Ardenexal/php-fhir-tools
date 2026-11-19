@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Indicates what mode of communication the patient prefers to use for the indicated language.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-preferenceType', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-preferenceType', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient.communication.preferred')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson.communication.preferred')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/language-preference-type', strength: 'extensible')]

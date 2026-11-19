@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Allele information.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsAllele', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsAllele', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 class AlleleExtension extends Extension implements FHIRComplexExtensionInterface
 {

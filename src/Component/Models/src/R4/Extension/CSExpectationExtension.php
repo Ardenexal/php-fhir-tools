@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  *
  * @description Defines the level of expectation associated with a given system capability.  See the capabilitystatement-prohibited modifier extension to set expectations to *not* support a feature.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-expectation', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-expectation', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.document')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.format')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.implementationGuide')]

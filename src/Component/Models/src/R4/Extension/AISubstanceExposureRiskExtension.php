@@ -19,7 +19,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description The 'substanceExposureRisk' extension is a structured and more flexible alternative to AllergyIntolerance.code for making positive or negative allergy or intolerance statements. This extension provides the capability to make "no known allergy" (or "no risk of adverse reaction") statements regarding any coded substance/product (including cases when a pre-coordinated "no allergy to x" concept for that substance/product does not exist). If the 'substanceExposureRisk' extension is present, the AllergyIntolerance.code element SHALL be omitted.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/allergyintolerance-substanceExposureRisk', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/allergyintolerance-substanceExposureRisk',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'AllergyIntolerance')]
 #[FHIRContextInvariant(expression: 'AllergyIntolerance.code.empty()')]
 class AISubstanceExposureRiskExtension extends Extension implements FHIRComplexExtensionInterface

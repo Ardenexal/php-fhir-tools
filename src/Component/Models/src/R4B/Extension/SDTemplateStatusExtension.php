@@ -18,7 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  *
  * @description Status code taken from [HL7 template specification](http://www.hl7.org/implement/standards/product_brief.cfm?product_id=377) - allows for alignment with the template DSTU, and has more authoring status codes.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-template-status', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-template-status',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/template-status-code', strength: 'required')]
 class SDTemplateStatusExtension extends Extension

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
  *
  * @description When the artifact was last reviewed by the publisher.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-lastReviewDate', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-lastReviewDate', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]
 #[FHIRExtensionContext(type: 'element', expression: 'CompartmentDefinition')]

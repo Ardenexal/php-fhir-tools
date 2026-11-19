@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @description Link to an actual medication administration record with the full details of the administration, if a link is known.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/openEHR-administration', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/openEHR-administration', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'AllergyIntolerance.reaction')]
 class AIAdministrationExtension extends Extension
 {

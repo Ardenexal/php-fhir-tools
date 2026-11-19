@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  *
  * @description Create a reference, following canonical reference semantics, to an artifact that uses the artifact-url and artifact-version extensions to provide a canonical identifier.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-uriReference', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-uriReference', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Reference')]
 #[FHIRExtensionContext(type: 'element', expression: 'canonical')]
 class ArtifactUriReferenceExtension extends Extension

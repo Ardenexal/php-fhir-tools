@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Materials used or needed to feed the patient.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/nutritionorder-adaptiveFeedingDevice', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/nutritionorder-adaptiveFeedingDevice',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder.oralDiet')]
 class NttAdaptiveFeedingDeviceExtension extends Extension
 {

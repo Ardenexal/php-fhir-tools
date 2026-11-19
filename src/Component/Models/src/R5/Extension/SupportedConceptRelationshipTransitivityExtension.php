@@ -16,7 +16,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description Indicates whether the relationship always (transitive) or never (antitransitive) propagates such that if the association exists from A to B and from B to C that the relationship can be inferred to exist from A to C
  */
-#[FHIRExtensionDefinition(url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-relationship-transitivity', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-relationship-transitivity',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.property')]
 #[FHIRProfileBinding(
     path: 'value[x]',

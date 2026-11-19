@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
  *
  * @description An alternative representation of the same physical quantity expressed in a different unit from a different unit code system and possibly with a different value.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-PQ-translation', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-PQ-translation', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Quantity')]
 class PQTranslationExtension extends Extension
 {

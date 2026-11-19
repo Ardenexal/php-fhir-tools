@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description If true, indicates the channel should be treated as though it is using a non-guaranteed delivery mechanism, effectively labeling the subscription as 'best effort'.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/subscription-best-effort', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/subscription-best-effort', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Subscription')]
 class SubscriptionBestEffortExtension extends Extension
 {

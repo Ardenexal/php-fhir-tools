@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description If true, indicates that the concept is deprecated from the value set - that is, it should not be used, and is planned to be withdrawn.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-deprecated', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-deprecated', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 class DeprecatedExtension extends Extension
 {

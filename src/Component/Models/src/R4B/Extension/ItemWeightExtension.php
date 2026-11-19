@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description A numeric value that allows the comparison (less than, greater than) or other numerical manipulation of a concept (e.g. Adding up components of a score). Scores are usually a whole number, but occasionally decimals are encountered in scores. Note: This extension used to be called http://hl7.org/fhir/StructureDefinition/ordinalValue. In questionnaires, this extension goes on answerOption where possible.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/itemWeight', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/itemWeight', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Coding')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption')]
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse.item.answer.value')]

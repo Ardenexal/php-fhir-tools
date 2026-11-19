@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description If true indicates that the request is asking for the specified action to not occur.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-doNotPerform', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-doNotPerform', fhirVersion: 'R4B', isModifier: true)]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]
 class DoNotPerformExtension extends Extension

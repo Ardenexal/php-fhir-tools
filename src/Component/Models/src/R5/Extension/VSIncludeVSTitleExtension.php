@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @description Human readable name for the included Value Set.  This extension is deprecated. Please use https://hl7.org/fhir/extensions/StructureDefinition-display.html to provide a value set title in a value set definition.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-compose-include-valueSetTitle', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/valueset-compose-include-valueSetTitle',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.valueSet')]
 class VSIncludeVSTitleExtension extends Extension
 {

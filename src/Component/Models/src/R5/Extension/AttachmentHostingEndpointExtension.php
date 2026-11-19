@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description The Endpoint resource which hosts the content referenced by the url of this attachment.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/attachment-hostingEndpoint', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/attachment-hostingEndpoint', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Attachment')]
 class AttachmentHostingEndpointExtension extends Extension
 {

@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description This acts as an overall 'required' binding for an element that already has a less restrictive binding.  It is used when there is a desire to have a 'small' enumerable binding that meets most needs and where the overall value set that the codes must be drawn from is 'infinite'.  The the base less restrictive binding SHALL be a proper subset of the max binding valueset.  In most cases, this extension is used where the base binding is 'extensible'.  DEPRECATED: Use additionalBinding extension or element instead
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-maxValueSet', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-maxValueSet', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.binding')]
 class MaxValueSetExtension extends Extension
 {

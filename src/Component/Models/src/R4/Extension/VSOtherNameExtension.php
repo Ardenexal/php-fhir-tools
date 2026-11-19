@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Natural language names identifying the value set. These names should be usable as an identifier for the module by machine processing applications such as code generation.  This extension is deprecated.  The valueset-otherTitle extension should be used to provide other titles instead of this extension.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-otherName', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-otherName', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class VSOtherNameExtension extends Extension implements FHIRComplexExtensionInterface
 {

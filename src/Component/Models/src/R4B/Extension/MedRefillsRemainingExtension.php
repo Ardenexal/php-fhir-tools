@@ -16,7 +16,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description The number of refills allowed or remaining after a dispensing event.  Does not include the current dispense.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medicationdispense-refillsRemaining', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/medicationdispense-refillsRemaining',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationDispense')]
 class MedRefillsRemainingExtension extends Extension
 {

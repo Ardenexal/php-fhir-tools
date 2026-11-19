@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description A single paragraph plain string short description alternative to CanonicalResource.description for display in lists etc.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/canonicalresource-short-description', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/canonicalresource-short-description',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CanonicalResource')]
 class CRShortDescriptionExtension extends Extension
 {

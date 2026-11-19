@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description DEPRECATED: Use artifact-authoritativeSource instead. A reference to the authoritative accessible, persisted source of truth of the entire Value Set Definition, including textual information and available versions.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-authoritativeSource', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-authoritativeSource', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class VSAuthoritativeSourceExtension extends Extension
 {

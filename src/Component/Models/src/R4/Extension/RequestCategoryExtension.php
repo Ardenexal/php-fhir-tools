@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Partitions the request into one or more categories that can be used to filter searching, to govern access control and/or to guide system behavior.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-category', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-category', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
 class RequestCategoryExtension extends Extension
 {

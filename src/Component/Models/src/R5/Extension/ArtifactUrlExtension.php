@@ -17,22 +17,22 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description An absolute URI that is used to identify this artifact when it is referenced in a specification, model, design or an instance; also called its canonical identifier. This SHOULD be globally unique and SHOULD be a literal address at which an authoritative instance of this artifact is (or will be) published. This URL can be the target of a canonical reference. It SHALL remain the same when the artifact is stored on different servers.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-url', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment')]
-#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'Composition')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-url', fhirVersion: 'R5', isModifier: false)]
+#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition', startFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'Composition', endFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication')]
-#[FHIRExtensionContext(type: 'element', expression: 'MedicationKnowledge')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationKnowledge', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'NamingSystem')]
-#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
-#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy', endFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Substance')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition', startFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic', startFhirVersion: '4.3')]
 class ArtifactUrlExtension extends Extension
 {
     /**

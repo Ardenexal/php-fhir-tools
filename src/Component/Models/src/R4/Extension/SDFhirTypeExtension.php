@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
  *
  * @description The FHIR type of a property - used on the value property of a primitive type (for which there is no type in the FHIR typing system), and Element.id, Resource.id, and Extension.url. All of these have a non-FHIR type in their structure definition, and this specifies the applicable FHIR type.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/data-types', strength: 'required')]
 class SDFhirTypeExtension extends Extension

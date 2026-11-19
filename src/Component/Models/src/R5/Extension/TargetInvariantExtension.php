@@ -21,14 +21,14 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @description DEPRECATED: Use the `targetConstraint` extension instead. Specifies an invariant that is enforced on instantiated resources. This extension can be applied to any element of a definitional resource (such as ActivityDefinition or Measure) and indicates that the invariant should be enforced on resources that are instantiated from the definition. For example, this extension can be used to define a constraint such as `numerator count must be less than or equal to denominator count`.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-targetInvariant', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-targetInvariant', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.code')]
-#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.intent')]
-#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.priority')]
-#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.doNotPerform')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.intent', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.priority', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.doNotPerform', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.timing[x]')]
-#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.asNeeded[x]')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.asNeeded[x]', startFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.location')]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.participant')]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.product[x]')]
@@ -44,7 +44,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal.target')]
-#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.actor')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.actor', startFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]

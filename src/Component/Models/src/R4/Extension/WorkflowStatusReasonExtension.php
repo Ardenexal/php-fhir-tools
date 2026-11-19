@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Captures the reason for the current state of the resource. Note that any change to the state requires the removal of any existing statusReasons, and, if appropriate, populating new statusReasons.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-statusReason', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-statusReason', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'DomainResource')]
 class WorkflowStatusReasonExtension extends Extension
 {

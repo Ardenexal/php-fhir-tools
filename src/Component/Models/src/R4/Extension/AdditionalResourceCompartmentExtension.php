@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Allows the definition of an additional resource to indicate the resource is a candidate for inclusion in a compartment by the implementing server.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/additional-resource-compartment', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/additional-resource-compartment', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class AdditionalResourceCompartmentExtension extends Extension implements FHIRComplexExtensionInterface
 {

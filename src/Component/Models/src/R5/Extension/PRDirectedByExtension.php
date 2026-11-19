@@ -18,9 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description The target of the extension is a distinct actor from the requester and has decision-making authority over the service and takes direct responsibility to manage the service.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-directedBy', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-directedBy', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
-#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0')]
 class PRDirectedByExtension extends Extension
 {
     /**

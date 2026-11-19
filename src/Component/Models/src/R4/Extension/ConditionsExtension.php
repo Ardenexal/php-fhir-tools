@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
  *
  * @description Conditions that apply to this set of dosing instructions.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/dosage-conditions', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/dosage-conditions', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Dosage')]
 class ConditionsExtension extends Extension implements FHIRComplexExtensionInterface
 {

@@ -19,7 +19,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @description Identifies a parent of the relative.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-parent', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-parent',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'FamilyMemberHistory')]
 class FMHParentExtension extends Extension implements FHIRComplexExtensionInterface
 {

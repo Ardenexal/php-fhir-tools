@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description An expression that provides an alternative definition of the content of the value set (compose). There are two different ways to use this expression extension: If both an expression (this extension) and a compose element is present, the compose is understood to make the same statement as the expression. If there is no compose, the expression is the only definition of the value set and the ValueSet definition (compose) can only be evaluated by a system that understands the syntax used in the expression.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-expression', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-expression', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class VSExpressionExtension extends Extension
 {

@@ -19,13 +19,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  *
  * Compliance means that an implementation of a canonical resource (e.g., a search parameter or operation) satisfies all the normative requirements of the referenced canonical resource definition. When an implementation states that it complies with multiple canonical definitions, it means that it simultaneously satisfies all mandatory requirements from each referenced definition. This enables a single implementation to declare conformance to multiple sources without having to duplicate capability statement entries.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/complies-with-canonical', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/complies-with-canonical', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.searchParam')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.searchParam')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.operation')]
-#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.operation')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.operation', startFhirVersion: '4.0')]
 class CompliesWithCanonicalExtension extends Extension
 {
     /**

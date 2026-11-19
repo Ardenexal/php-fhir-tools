@@ -16,7 +16,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  *
  * @description Indicates if the relationship always holds in the reverse direction as well (symetric), never holds in the reverse direction as well (antisymetric)
  */
-#[FHIRExtensionDefinition(url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-relationship-symmetry', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-relationship-symmetry',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.property')]
 #[FHIRProfileBinding(
     path: 'value[x]',

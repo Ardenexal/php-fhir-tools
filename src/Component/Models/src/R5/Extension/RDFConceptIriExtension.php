@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description Concept IRI representing the RDF-equivalent of a Coding, as specified by the IRI stem registered in the NamingSystem that corresponds to the Coding.system.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/rdf-concept-iri', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/rdf-concept-iri', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Coding')]
 class RDFConceptIriExtension extends Extension
 {

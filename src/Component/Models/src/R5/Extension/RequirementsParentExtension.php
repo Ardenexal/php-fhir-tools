@@ -17,8 +17,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  *
  * @description A larger/more generic set of requirements that this set of requirements helps to refine and enable.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/requirements-parent', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Requirements.statement')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/requirements-parent', fhirVersion: 'R5', isModifier: false)]
+#[FHIRExtensionContext(type: 'element', expression: 'Requirements.statement', startFhirVersion: '5.0')]
 class RequirementsParentExtension extends Extension
 {
     /**

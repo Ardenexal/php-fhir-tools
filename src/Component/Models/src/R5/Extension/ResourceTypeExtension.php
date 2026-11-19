@@ -18,8 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description Specifies the type of resource the canonical references.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-resourceType', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'canonical')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-resourceType', fhirVersion: 'R5', isModifier: false)]
+#[FHIRExtensionContext(type: 'element', expression: 'canonical', startFhirVersion: '4.0')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-resource-types', strength: 'required')]
 class ResourceTypeExtension extends Extension
 {

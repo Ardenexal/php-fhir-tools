@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Significant health events and conditions for a person related to the patient relevant in the context of care for the patient.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsFamilyMemberHistory', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsFamilyMemberHistory',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 class FamilyMemberHistoryExtension extends Extension
 {

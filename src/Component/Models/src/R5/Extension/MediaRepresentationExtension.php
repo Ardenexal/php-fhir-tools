@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description A media representation of the target resource of a reference or canonical.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/mediaRepresentation', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/mediaRepresentation', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'canonical')]
 #[FHIRExtensionContext(type: 'element', expression: 'Reference')]
 class MediaRepresentationExtension extends Extension

@@ -22,7 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
  *
  * @description Organization-level portal information.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/organization-portal', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/organization-portal', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Organization')]
 class OrganizationPortalExtension extends Extension implements FHIRComplexExtensionInterface
 {

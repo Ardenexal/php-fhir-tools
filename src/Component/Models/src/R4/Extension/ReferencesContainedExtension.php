@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @description This indicates that the element containing this extension has an expression, xhtml, or some other content that makes reference to the specified contained resource in a way that is not detectable by the dom-3 constraint.  This extension is included to make the reference 'visible' to the dom-3 constraint.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/referencesContained', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/referencesContained', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'markdown')]
 #[FHIRExtensionContext(type: 'element', expression: 'string')]
 #[FHIRExtensionContext(type: 'element', expression: 'Narrative')]

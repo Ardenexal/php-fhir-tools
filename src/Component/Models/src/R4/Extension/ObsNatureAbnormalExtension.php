@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description This field contains the nature of the abnormal test. This is represented in v2 as OBX-10 Nature of abnormal test (ID) 00578.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-nature-of-abnormal-test', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-nature-of-abnormal-test', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 class ObsNatureAbnormalExtension extends Extension
 {

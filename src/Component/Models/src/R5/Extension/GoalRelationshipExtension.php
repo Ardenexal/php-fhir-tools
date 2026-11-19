@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Establishes a relationship between this goal and other goals.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/goal-relationship', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/goal-relationship', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Goal')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal')]
 class GoalRelationshipExtension extends Extension implements FHIRComplexExtensionInterface

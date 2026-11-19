@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description When an AuditEvent is attributed to an agent that is acting on behalf of another agent. Typically needed when multiple agents are acting on behalf of different organizations, and when PractitionerRole is not appropriate.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/auditevent-OnBehalfOf', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/auditevent-OnBehalfOf', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'AuditEvent.agent')]
 class AEOnBehalfOfExtension extends Extension
 {

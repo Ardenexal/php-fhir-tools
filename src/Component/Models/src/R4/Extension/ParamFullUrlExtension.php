@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  *
  * @description This specifies the fullUrl for the resource in parameters.resource, if there is one. When fullUrl is provided, ithe [resource resolution method described for Bundle](bundle.html#references).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/parameters-fullUrl', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/parameters-fullUrl', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Parameters.parameter')]
 class ParamFullUrlExtension extends Extension
 {

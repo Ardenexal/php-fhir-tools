@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  *
  * @description Indicates that this event is relevant to the specified research study(ies).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-researchStudy', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-researchStudy', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Consent')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]

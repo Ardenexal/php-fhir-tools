@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  *
  * @description Possible values for the workflow status of the comment or assessment, typically used to coordinate workflow around the process of accepting and rejecting changes and comments on the artifact.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifactassessment-workflowStatus', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifactassessment-workflowStatus', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/artifactassessment-workflow-status', strength: 'required')]
 class ArtifactAssessmentWorkflowStatusExtension extends Extension

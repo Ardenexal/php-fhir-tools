@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * There can be multiple contacts on an Organizations record with this value set to true, but these should all have different purpose values.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/organization-preferredContact', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/organization-preferredContact', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Organization.contact')]
 class OrgPreferredContactExtension extends Extension
 {

@@ -23,7 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description Specifies that a date is relative to some event. The event happens [Duration] after [Event].
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/relative-date', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/relative-date', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'date')]
 #[FHIRExtensionContext(type: 'element', expression: 'dateTime')]
 #[FHIRProfileInvariant(

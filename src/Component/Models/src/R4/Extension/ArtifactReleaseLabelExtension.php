@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description A human-friendly release label assigned for the version.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-releaseLabel', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-releaseLabel', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]

@@ -17,7 +17,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  *
  * @description When the base type is an abstract type (e.g. Resource or Element) then this extension defines which concrete types are allowed to be used for a parameter. In the absence of this extension, any type is allowed. Replaced by OperationDefinition.parameter.allowedType in R5+
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/operationdefinition-allowed-type', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/operationdefinition-allowed-type',
+    fhirVersion: 'R4',
+    isModifier: false,
+    endFhirVersion: '4.3',
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.resource')]
 class AllowedTypeExtension extends Extension

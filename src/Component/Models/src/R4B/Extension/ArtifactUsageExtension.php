@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
  *
  * @description Describes the clinical usage of the artifact.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-usage', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-usage', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]

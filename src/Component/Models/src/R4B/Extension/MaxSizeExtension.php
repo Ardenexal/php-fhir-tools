@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description For attachment answers, indicates the maximum size in bytes an attachment can be.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/maxSize', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/maxSize', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class MaxSizeExtension extends Extension

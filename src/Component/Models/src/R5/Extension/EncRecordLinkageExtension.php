@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description This extension can be used to link two encounters that are related. This extension may be used when you want to provide a directional relationship between two encounters. If you just want to just list a set of related encounters without directional relationship, use the Linkage resource instead.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/encounter-recordLinkage', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/encounter-recordLinkage', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 class EncRecordLinkageExtension extends Extension implements FHIRComplexExtensionInterface
 {

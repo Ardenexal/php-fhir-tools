@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description The Number of SOP Instances referred to by this entity.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/auditevent-NumberOfInstances', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/auditevent-NumberOfInstances', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'AuditEvent.entity')]
 class AENumberOfInstancesExtension extends Extension
 {

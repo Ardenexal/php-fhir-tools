@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  *
  * @description Indicates the relative preference of an element within a collection of repeating elements.  Lower numbers indicate a stronger degree of preference.  Equal number indicate equal preference.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/rank', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/rank', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Address')]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient.contact')]
 #[FHIRExtensionContext(type: 'element', expression: 'Organization.contact')]

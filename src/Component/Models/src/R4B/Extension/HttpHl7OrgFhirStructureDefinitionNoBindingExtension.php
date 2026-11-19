@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Marks that a particular element definition is one that is not expected/allowed to have a binding, even though it has types that may be bound to value sets.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/no-binding', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/no-binding', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.binding')]
 class HttpHl7OrgFhirStructureDefinitionNoBindingExtension extends Extension
 {

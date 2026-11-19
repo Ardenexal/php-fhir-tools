@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Describes the intended purpose of the rendered text.  For example - instructions, guidance on access control, maintenance information, etc.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-display-category', strength: 'extensible')]

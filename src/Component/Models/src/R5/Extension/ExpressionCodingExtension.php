@@ -17,8 +17,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description A code that defines the meaning of the result of the expression (and that may apply to the specific means of calculating the result)
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/expression-coding', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Expression')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/expression-coding', fhirVersion: 'R5', isModifier: false)]
+#[FHIRExtensionContext(type: 'element', expression: 'Expression', startFhirVersion: '4.0')]
 class ExpressionCodingExtension extends Extension
 {
     /**

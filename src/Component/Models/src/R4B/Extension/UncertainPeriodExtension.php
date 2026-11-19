@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
  *
  * @description Used to express an uncertain date(+time) value by specifying an allowed or observed upper and lower bound.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/uncertainPeriod', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/uncertainPeriod', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'date')]
 #[FHIRExtensionContext(type: 'element', expression: 'dateTime')]
 class UncertainPeriodExtension extends Extension

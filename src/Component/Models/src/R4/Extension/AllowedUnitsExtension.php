@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
  *
  * @description Identifies the units of measure in which the element should be captured or expressed.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-allowedUnits', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-allowedUnits', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units', strength: 'required')]
 class AllowedUnitsExtension extends Extension

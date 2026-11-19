@@ -19,23 +19,23 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description The action requested by this resource is intended to satisfy the expectations established by the referenced Definition resource.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-compliesWith', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-compliesWith', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
-#[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity.plannedActivityReference')]
+#[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity.plannedActivityReference', startFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImmunizationRecommendation')]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup', endFhirVersion: '4.3')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyRequest')]
-#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]
 #[FHIRExtensionContext(type: 'element', expression: 'VisionPrescription')]
-#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition', startFhirVersion: '4.0')]
 class CompliesWithExtension extends Extension
 {
     /**

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description The minimum amount of time that must pass between administering the specified dose amount.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/dosage-minimumGapBetweenDose', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/dosage-minimumGapBetweenDose', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Dosage')]
 class DosageMinimumGapBetweenDoseExtension extends Extension
 {

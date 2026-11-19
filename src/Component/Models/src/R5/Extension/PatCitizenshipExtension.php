@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
  *
  * @description The patient's legal status as citizen of a country.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-citizenship', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-citizenship', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson')]
 #[FHIRExtensionContext(type: 'element', expression: 'Person')]

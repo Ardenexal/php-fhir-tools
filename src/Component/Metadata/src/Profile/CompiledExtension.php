@@ -8,6 +8,8 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Profile;
  * What an extension's StructureDefinition says about where the extension may appear and what it holds.
  *
  * Its `contexts` are the placement rules: the definition's contexts, then its context invariants.
+ * Whether it is a modifier and the FHIR versions it may be used in are kept beside them; a generated
+ * class carries those on its `#[FHIRExtensionDefinition]`.
  * A generated extension class carries the same facts in two forms: its contexts and context
  * invariants as class attributes, and its value type and sub-extensions in its constructor and
  * `fromSubExtensions()`. Its differential invariants and bindings are class attributes too.
@@ -19,14 +21,18 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Profile;
 final readonly class CompiledExtension
 {
     /**
-     * @param string                   $url           Canonical URL of the extension
-     * @param list<CompiledAttribute>  $contexts      FHIRExtensionContext then FHIRContextInvariant attributes, in generator order
-     * @param list<string>             $valueTypes    Type codes `Extension.value[x]` allows; empty when the value is prohibited
-     * @param list<ExtensionSlice>     $subExtensions The `Extension.extension` slices, in snapshot order
-     * @param list<CompiledAttribute>  $constraints   FHIRProfileInvariant then FHIRProfileBinding attributes from the
-     *                                                differential, in the default validation group
-     * @param list<CompilerDiagnostic> $diagnostics   Invariants and bindings that are not enforced, such as those
-     *                                                on a sub-extension
+     * @param string                   $url              Canonical URL of the extension
+     * @param list<CompiledAttribute>  $contexts         FHIRExtensionContext then FHIRContextInvariant attributes, in generator order
+     * @param list<string>             $valueTypes       Type codes `Extension.value[x]` allows; empty when the value is prohibited
+     * @param list<ExtensionSlice>     $subExtensions    The `Extension.extension` slices, in snapshot order
+     * @param list<CompiledAttribute>  $constraints      FHIRProfileInvariant then FHIRProfileBinding attributes from the
+     *                                                   differential, in the default validation group
+     * @param list<CompilerDiagnostic> $diagnostics      Invariants and bindings that are not enforced, such as those
+     *                                                   on a sub-extension
+     * @param bool                     $isModifier       Whether the root `Extension` element is a modifier
+     * @param string|null              $startFhirVersion The earliest FHIR version the whole extension may be used in,
+     *                                                   from `version-specific-use`; null for no limit
+     * @param string|null              $endFhirVersion   The latest FHIR version the whole extension may be used in; null for no limit
      */
     public function __construct(
         public string $url,
@@ -35,6 +41,9 @@ final readonly class CompiledExtension
         public array $subExtensions,
         public array $constraints = [],
         public array $diagnostics = [],
+        public bool $isModifier = false,
+        public ?string $startFhirVersion = null,
+        public ?string $endFhirVersion = null,
     ) {
     }
 

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  *
  * @description The approach body site used for this procedure.  Multiple locations are allowed.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-approachBodyStructure', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-approachBodyStructure', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]

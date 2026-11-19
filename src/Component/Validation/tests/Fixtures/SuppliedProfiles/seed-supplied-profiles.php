@@ -122,7 +122,7 @@ foreach ($manifest['test-cases'] ?? [] as $case) {
         continue;
     }
     $profile = is_array($case['profile'] ?? null) ? $case['profile'] : [];
-    foreach ([...($case['supporting'] ?? []), ...($case['profiles'] ?? []), ...(isset($profile['source']) ? [$profile['source']] : []), ...($profile['supporting'] ?? [])] as $path) {
+    foreach ([...($case['supporting'] ?? []), ...($case['supporting5'] ?? []), ...($case['profiles'] ?? []), ...(isset($profile['source']) ? [$profile['source']] : []), ...($profile['supporting'] ?? [])] as $path) {
         if (!is_string($path) || !is_file($casesDir . '/' . $path)) {
             continue;
         }

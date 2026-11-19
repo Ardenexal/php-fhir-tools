@@ -36,6 +36,8 @@
     "slice-by-polymorphic-type2-profile.xml": "supplied/slice-by-polymorphic-type2-profile.xml.json",
     "slice-profile.json": "supplied/slice-profile.json",
     "string-extensions-and-constraints-profile.xml": "supplied/string-extensions-and-constraints-profile.xml.json",
+    "structuredefinition-version-range-ctxt.xml": "supplied/structuredefinition-version-range-ctxt.xml.json",
+    "structuredefinition-version-range.xml": "supplied/structuredefinition-version-range.xml.json",
     "v2/v2-datatype-profile.json": "supplied/v2-v2-datatype-profile.json",
     "v2/v2-message-profile.json": "supplied/v2-v2-message-profile.json",
     "v2/v2-message.json": "supplied/v2-v2-message.json",

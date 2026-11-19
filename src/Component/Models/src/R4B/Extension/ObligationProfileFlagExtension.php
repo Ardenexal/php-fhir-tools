@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Profiles marked to be 'Obligation Profiles' cannot introduce new structural elements or slicing, but they can add non-conformance strength additional bindings (not required, extensible, current, current-extensible) and additional obligations on the elements that are already defined
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/obligation-profile-flag', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/obligation-profile-flag', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class ObligationProfileFlagExtension extends Extension
 {

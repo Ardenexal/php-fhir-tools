@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  *
  * @description The living/delivery status of the fetus (patient). This extension is deprecated and replaced by patient-fetalStatus extension.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-bornStatus', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-bornStatus', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/patient-bornstatus', strength: 'required')]
 class PatBornStatusExtension extends Extension

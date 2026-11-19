@@ -46,13 +46,11 @@ final class SuppliedProfileMeasurementTest extends TestCase
             'extb-ctxt-good',
             'patient-min-pattern [profile]',
             'patient-min-pattern1 [profile]',
-            'standards-status-x-r4',
             'type-ref-unchecked [profile]',
             'type-subtype-slicing1 [profile]',
         ],
         'R5' => [
             'patient-patternidentifier-good [profile]',
-            'standards-status-x-r5',
         ],
     ];
 

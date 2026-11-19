@@ -16,13 +16,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Indicates whether an interpreter is required to facilitate communication in a healthcare setting. While this extension is named patient-interpreterRequired for backwards compatibility, it may also be used on RelatedPerson, Practitioner, Encounter, Appointment and ServiceRequest.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-interpreterRequired', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-interpreterRequired', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson')]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 #[FHIRExtensionContext(type: 'element', expression: 'Practitioner')]
 #[FHIRExtensionContext(type: 'element', expression: 'Appointment')]
-#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0')]
 class InterpreterRequiredExtension extends Extension
 {
     /**

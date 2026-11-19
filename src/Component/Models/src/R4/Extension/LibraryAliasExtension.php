@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Specifies the alias to be used for the library on which it appears. This is useful when multiple libraries have the same unqualified name, and allows in-line CQL expressions to refer to the libraries via their alias, rather than the default of the unqualified name of the library.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-libraryAlias', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-libraryAlias', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.library')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.library')]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure.library')]

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @description The human-readable name for the code system.  This extension is deprecated. Please use https://hl7.org/fhir/extensions/StructureDefinition-display.html to provide a code system name in a value set definition.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-systemName', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-systemName', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include')]
 class VSSystemNameExtension extends Extension
 {

@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  *
  * @description A code system that is supported by the system that is not defined in a value set resource.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-supported-system', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-supported-system',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]
 class CSSupportedSystemExtension extends Extension
 {

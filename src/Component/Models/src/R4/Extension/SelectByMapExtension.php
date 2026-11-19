@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  *
  * @description This extension indicates that in addition to the concepts directly selected (either included or excluded) in the include/exclude statement, any source codes that are mapped to target codes that are selected by the nominated ConceptMapare also selected. The filter property can be used to restrict which types of relationships are included.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-select-by-map', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-select-by-map', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.exclude')]
 class SelectByMapExtension extends Extension implements FHIRComplexExtensionInterface

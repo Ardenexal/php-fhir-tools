@@ -14,7 +14,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Indicates whether the relationship is intended to be navigated when selecting a code
  */
-#[FHIRExtensionDefinition(url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-relationship-isNavigable', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-relationship-isNavigable',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.property')]
 class SupportedConceptRelationshipIsNavigableExtension extends Extension
 {

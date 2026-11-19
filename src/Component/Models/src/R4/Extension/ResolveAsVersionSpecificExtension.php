@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description If true, indicates that the reference should be resolved to a version-specific reference rather than a version-agnostic reference.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resolve-as-version-specific', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resolve-as-version-specific', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Reference')]
 #[FHIRExtensionContext(type: 'element', expression: 'uri')]
 #[FHIRExtensionContext(type: 'element', expression: 'url')]

@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description A number, letter or name identifying a delivery installation. For example, for Station A, the delivery installation qualifier would be 'A'.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-deliveryInstallationQualifier', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-deliveryInstallationQualifier',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'Address.line')]
 class ADXPDeliveryInstallationQualifierExtension extends Extension
 {

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description The position of the body when the observation was done, e.g. standing, sitting. To be used only when the body position in not precoordinated in the observation code.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-bodyPosition', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-bodyPosition', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen.collection')]
 class ObsBodyPositionExtension extends Extension

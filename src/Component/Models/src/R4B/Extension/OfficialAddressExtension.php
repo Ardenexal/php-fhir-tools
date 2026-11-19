@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Indicate that this address is meant to be the 'official' address for that person. What an 'official' address is depends on the country. This extension allows to specify if this address is or it is not the official address, or to indicate that this is the official address for that country.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/address-official', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/address-official', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Address')]
 class OfficialAddressExtension extends Extension
 {

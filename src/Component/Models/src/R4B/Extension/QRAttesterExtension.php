@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
  *
  * @description Allows capturing the individual(s) who attest to the accuracy of the information within the QuestionnaireResponse.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaireresponse-attester', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaireresponse-attester', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse')]
 class QRAttesterExtension extends Extension implements FHIRComplexExtensionInterface
 {

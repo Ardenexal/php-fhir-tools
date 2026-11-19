@@ -21,7 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description Specifies the result of a supporting evidence expression in the measure population. The result of the expression is represented in an extension, using the same mapping as specified in Using CQL With FHIR, with the exception that tuples and lists are represented in extensions, rather than mapped to the Parameters resource.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-supportingEvidence', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-supportingEvidence', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.group.population')]
 class SupportingEvidenceExtension extends Extension implements FHIRComplexExtensionInterface
 {

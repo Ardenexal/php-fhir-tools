@@ -17,9 +17,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description Indicates that the reference has a particular focus in the target resource, a particular element of interest, identified by its element id. This extension requires that an 'id' property be present on the element to be referenced, but does not require the use of simplified FHIRPath.  If the creator of the reference can't ensure an id will be present, the [[[http://hl7.org/fhir/StructureDefinition/targetPath]]] extension can be used instead.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/targetElement', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/targetElement', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Reference')]
-#[FHIRExtensionContext(type: 'element', expression: 'canonical')]
+#[FHIRExtensionContext(type: 'element', expression: 'canonical', startFhirVersion: '4.0')]
 class TargetElementExtension extends Extension
 {
     /**

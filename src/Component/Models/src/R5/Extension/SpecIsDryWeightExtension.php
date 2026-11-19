@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description If the recorded quantity of the specimen is reported as a weight, if it is a dry weight.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-isDryWeight', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-isDryWeight', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen.collection.quantity')]
 class SpecIsDryWeightExtension extends Extension
 {

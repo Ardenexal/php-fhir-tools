@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @description Specifies the settings to be used for constructing modelinfo from profile definitions. This extension is used on ImplementationGuide or asset-collection Library resources to provide a way for authors to configure additional information about the ModelInfo for profiles defined in the ImplementationGuide or Asset Collection. The extension is used in profiles in the Using CQL With FHIR IG. See the ModelInfo discussion there for additional information on how to use this extension.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-modelInfoSettings', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-modelInfoSettings', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Library')]
 #[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedArtifact')]

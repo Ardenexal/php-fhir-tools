@@ -99,9 +99,11 @@ final class StructureDefinitionCompiler
             if (!is_array($context) || !isset($context['type'], $context['expression'])) {
                 continue;
             }
+            // A context limited to some FHIR versions carries its range; the validator ignores the context in other versions
             $contexts[] = new CompiledAttribute(FHIRExtensionContext::class, [
                 'type'       => (string) $context['type'],
                 'expression' => (string) $context['expression'],
+                ...self::versionSpecificUse($context),
             ]);
         }
 
@@ -157,7 +159,67 @@ final class StructureDefinitionCompiler
             ...self::differentialBindings($structureDefinition, null, null, $diagnostics),
         ];
 
-        return new CompiledExtension((string) ($structureDefinition['url'] ?? ''), $contexts, $valueTypes ?? [], $subExtensions, $constraints, $diagnostics);
+        $range = self::versionSpecificUse($structureDefinition);
+
+        return new CompiledExtension(
+            (string) ($structureDefinition['url'] ?? ''),
+            $contexts,
+            $valueTypes ?? [],
+            $subExtensions,
+            $constraints,
+            $diagnostics,
+            self::isModifierExtension($structureDefinition),
+            $range['startFhirVersion'] ?? null,
+            $range['endFhirVersion']   ?? null,
+        );
+    }
+
+    /**
+     * Whether an extension definition's root `Extension` element is a modifier.
+     *
+     * Read from the snapshot, which states it on every definition, else from the differential.
+     *
+     * @param array<string, mixed> $structureDefinition
+     */
+    private static function isModifierExtension(array $structureDefinition): bool
+    {
+        foreach (['snapshot', 'differential'] as $view) {
+            foreach (is_array($structureDefinition[$view]['element'] ?? null) ? $structureDefinition[$view]['element'] : [] as $element) {
+                if (is_array($element) && ($element['path'] ?? null) === 'Extension') {
+                    return ($element['isModifier'] ?? false) === true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * The FHIR version range a `version-specific-use` extension sets on a definition or one of its contexts.
+     *
+     * Only the bounds that are stated are returned, keyed as the extension names them, so a context
+     * with no range compiles to its type and expression alone.
+     *
+     * @param array<mixed> $owner the StructureDefinition, or one `context` entry
+     *
+     * @return array{startFhirVersion?: string, endFhirVersion?: string}
+     */
+    private static function versionSpecificUse(array $owner): array
+    {
+        $range = [];
+        foreach (is_array($owner['extension'] ?? null) ? $owner['extension'] : [] as $extension) {
+            if (!is_array($extension) || ($extension['url'] ?? null) !== 'http://hl7.org/fhir/StructureDefinition/version-specific-use') {
+                continue;
+            }
+            foreach (is_array($extension['extension'] ?? null) ? $extension['extension'] : [] as $bound) {
+                $name = is_array($bound) ? ($bound['url'] ?? null) : null;
+                if (($name === 'startFhirVersion' || $name === 'endFhirVersion') && is_string($bound['valueCode'] ?? null) && $bound['valueCode'] !== '') {
+                    $range[$name] = $bound['valueCode'];
+                }
+            }
+        }
+
+        return $range;
     }
 
     /**

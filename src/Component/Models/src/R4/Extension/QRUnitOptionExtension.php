@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description A unit that the user may choose when providing a quantity value.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 #[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'Quantity\') or where(%resource.is(Questionnaire)).exists(type.first()=\'quantity\')')]

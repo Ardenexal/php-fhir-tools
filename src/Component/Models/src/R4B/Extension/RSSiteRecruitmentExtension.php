@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
  *
  * @description Target and actual numbers of sites for a study.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/researchStudy-siteRecruitment', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/researchStudy-siteRecruitment', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
 class RSSiteRecruitmentExtension extends Extension implements FHIRComplexExtensionInterface
 {

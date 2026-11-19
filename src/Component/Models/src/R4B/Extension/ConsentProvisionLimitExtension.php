@@ -22,7 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * This extension should be used as a ModifierExtension as it is critical to the proper understanding of the consent. If the provision limit is not observed, then the consent is effectively not valid and should not be applied.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/consent-provision-limit', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/consent-provision-limit', fhirVersion: 'R4B', isModifier: true)]
 #[FHIRExtensionContext(type: 'element', expression: 'Consent.provision')]
 #[FHIRExtensionContext(type: 'element', expression: 'Consent.provision.provision')]
 class ConsentProvisionLimitExtension extends Extension implements FHIRComplexExtensionInterface

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
  *
  * @description Where CodeSystem properties are of type code, Coding or string, this ValueSet defines the permitted set of codes or string values to be used in CodeSystem.concept.property.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-property-valueset', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-property-valueset', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.property')]
 class CSPropertyValueSetExtension extends Extension
 {
