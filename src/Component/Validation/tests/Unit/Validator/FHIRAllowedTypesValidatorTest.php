@@ -91,9 +91,11 @@ final class FHIRAllowedTypesValidatorTest extends ConstraintValidatorTestCase
      * `"valueBoolean": "abc"` is held as a bare string. Its type cannot be told, and the format
      * check already reports the value, so it is not also reported as a disallowed decimal.
      */
-    public function testNonNumericBareStringIsLeftAlone(): void
+    public function testBareStringOfUnknowableTypeIsLeftAlone(): void
     {
         $this->validator->validate('abc', new FHIRAllowedTypes(['boolean']));
+        // A model built in code may hold a plain string for a string-like type
+        $this->validator->validate('42', new FHIRAllowedTypes(['string']));
         $this->validator->validate(new \stdClass(), new FHIRAllowedTypes(['boolean']));
         $this->validator->validate(null, new FHIRAllowedTypes(['boolean']));
 

@@ -172,6 +172,26 @@ final class StructureDefinitionCompilerTest extends TestCase
         );
     }
 
+    /**
+     * One target rule covers the whole element. A Reference with no targetProfile allows any target,
+     * so beside a restricted canonical the merged list would reject `Patient/1`; no rule is emitted.
+     */
+    public function testUnrestrictedReferenceBesideARestrictedTypeGetsNoTargetRule(): void
+    {
+        $sd = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Observation', 'path' => 'Observation'],
+                ['id' => 'Observation.focus', 'path' => 'Observation.focus', 'type' => [
+                    ['code' => 'Reference'],
+                    ['code' => 'canonical', 'targetProfile' => ['http://hl7.org/fhir/StructureDefinition/ValueSet']],
+                ]],
+            ]],
+        ];
+
+        self::assertSame([], (new StructureDefinitionCompiler())->compile($sd)->attributes);
+    }
+
     public function testSliceOnUndefinedSlicingIsReportedNotDropped(): void
     {
         $sd = [

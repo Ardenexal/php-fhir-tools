@@ -961,6 +961,10 @@ final class StructureDefinitionCompiler
     /**
      * The profiles a Reference or canonical on this element may point at, across all its types, in order.
      *
+     * One rule holds one list for the whole element. A Reference or canonical type with no
+     * targetProfile allows any target, so when one sits beside a restricted type the merged list
+     * would reject what that type allows; the element then gets no rule at all.
+     *
      * @param array<string, mixed> $element
      *
      * @return list<string>
@@ -969,10 +973,17 @@ final class StructureDefinitionCompiler
     {
         $profiles = [];
         foreach (is_array($element['type'] ?? null) ? $element['type'] : [] as $type) {
-            foreach (is_array($type) && is_array($type['targetProfile'] ?? null) ? $type['targetProfile'] : [] as $url) {
-                if (is_string($url) && $url !== '') {
-                    $profiles[] = $url;
-                }
+            if (!is_array($type)) {
+                continue;
+            }
+
+            $targets = is_array($type['targetProfile'] ?? null) ? array_filter($type['targetProfile'], static fn (mixed $url): bool => is_string($url) && $url !== '') : [];
+            if ($targets === [] && in_array($type['code'] ?? null, ['Reference', 'canonical', 'CodeableReference'], true)) {
+                return [];
+            }
+
+            foreach ($targets as $url) {
+                $profiles[] = (string) $url;
             }
         }
 

@@ -156,7 +156,11 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
     private function validateItem(object $item, FHIRTargetProfile $constraint): void
     {
         $this->checkConditionalReference($item);
-        $this->checkReferenceType($item, $constraint);
+
+        // A reference already known to name the wrong type gets no second finding from its target
+        if ($this->checkReferenceType($item, $constraint)) {
+            return;
+        }
 
         $resolved = $this->resolver->resolve($item);
 
@@ -228,20 +232,22 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
      *
      * Only a reference of the RESTful shape `Type/id` names a type. A contained (`#p1`), `urn:uuid:`
      * or conditional reference does not, and is left alone.
+     *
+     * @return bool Whether the wrong type was reported
      */
-    private function checkReferenceType(object $item, FHIRTargetProfile $constraint): void
+    private function checkReferenceType(object $item, FHIRTargetProfile $constraint): bool
     {
         $reference = $this->referenceString($item);
 
         if ($reference === null || preg_match(self::TYPED_REFERENCE, $reference, $parts) !== 1) {
-            return;
+            return false;
         }
 
         $allowed = $this->allowedTypes($constraint);
         $type    = $parts['type'];
 
         if ($allowed === null || !$this->isResourceType($type) || in_array($type, $allowed, true)) {
-            return;
+            return false;
         }
 
         $this->context->buildViolation(self::REFERENCE_TYPE_MESSAGE)
@@ -251,6 +257,8 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
             ])
             ->setCode(FHIRViolationCode::ERROR)
             ->addViolation();
+
+        return true;
     }
 
     /**

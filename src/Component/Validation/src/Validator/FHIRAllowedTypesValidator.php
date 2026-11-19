@@ -27,10 +27,18 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * `string` for a decimal, which keeps its lexical form. A string that is not numeric is a malformed
  * value of some other scalar variant (`"valueBoolean": "abc"`); its type cannot be told, and the
  * format check already reports it, so it is left alone. So is any value whose type cannot be read.
+ * A model built in code may also hold a plain string where a string-like type such as `string` or
+ * `code` is allowed, so a bare string is only reported when the profile allows none of those.
  */
 final class FHIRAllowedTypesValidator extends ConstraintValidator
 {
     public const string DEFAULT_MESSAGE = "The type '{{ type }}' is not allowed here; the profile allows {{ allowed }}";
+
+    /** FHIR types a model built in code may hold as a plain PHP string. */
+    private const array STRING_HELD_TYPES = [
+        'base64Binary', 'canonical', 'code', 'date', 'dateTime', 'decimal', 'id', 'instant', 'markdown',
+        'oid', 'string', 'time', 'uri', 'url', 'uuid',
+    ];
 
     /** @var array<class-string, string|null> FHIR type per PHP class, once read */
     private array $typeByClass = [];
@@ -67,6 +75,10 @@ final class FHIRAllowedTypesValidator extends ConstraintValidator
         $type = $this->fhirTypeOf($value);
 
         if ($type === null || in_array($type, $constraint->types, true)) {
+            return;
+        }
+
+        if (is_string($value) && array_intersect($constraint->types, self::STRING_HELD_TYPES) !== []) {
             return;
         }
 
