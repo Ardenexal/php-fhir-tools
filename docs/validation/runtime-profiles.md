@@ -177,7 +177,7 @@ joins a slice only when it matches every discriminator of the slicing.
 | Fixed and pattern values inside a slice | Yes | |
 | Types and Reference targets inside a slice | Yes | As at the top level |
 | A data-type profile named on a slice | Yes | Such as `au-ihi` on `Patient.identifier:ihi` |
-| `ordered` slicing | No | Item order is not checked |
+| `ordered` slicing | Yes | An item matching a slice declared before the slice of an earlier item is an error. Items that match no slice, and items that might belong to a slice that could not be judged, are not part of the order |
 | Reslices (`component:a/b`) | No | Not compiled |
 | Choice type slices (`value[x]:valueQuantity`) | As plain constraints | Checked on the variant, such as `valueQuantity` |
 

@@ -46,7 +46,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
             'value' => 'http://hl7.org/fhir/StructureDefinition/valueset-trusted-expansion',
         ],
     ],
-    orderedIndex: 0,
+    orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/publishablevalueset'],
 )]
 #[FHIRSliceConstraint(
@@ -57,7 +57,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/valueset-otherTitle'],
     ],
-    orderedIndex: 1,
+    orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/publishablevalueset'],
 )]
 #[FHIRSliceConstraint(
@@ -68,7 +68,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/valueset-sourceReference'],
     ],
-    orderedIndex: 2,
+    orderedIndex: 4,
     groups: ['http://hl7.org/fhir/StructureDefinition/publishablevalueset'],
 )]
 #[FHIRSliceConstraint(

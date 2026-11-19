@@ -52,7 +52,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-inputParameters'],
     ],
-    orderedIndex: 0,
+    orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]
 #[FHIRSliceConstraint(
@@ -63,7 +63,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-directReferenceCode'],
     ],
-    orderedIndex: 1,
+    orderedIndex: 4,
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]
 #[FHIRSliceConstraint(
@@ -74,7 +74,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition'],
     ],
-    orderedIndex: 2,
+    orderedIndex: 5,
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]
 #[FHIRSlicingRules(property: 'relatedArtifact', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'])]

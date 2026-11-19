@@ -19,8 +19,8 @@ use Symfony\Component\Validator\Constraint;
  * property in a single pass, checking min/max counts and (for closed slicing) rejecting
  * items that match no defined slice.
  *
- * When slicing.ordered = true exists in the profile, enforcement is intentionally deferred
- * (see backlog). The `orderedIndex` field is stored for future use only.
+ * `orderedIndex` is the slice's position in the slicing's declaration order. When the slicing is
+ * ordered (FHIRSlicingRules `ordered`), items must follow that order.
  *
  * `discriminators` holds every discriminator of the slicing, each with the value this slice
  * expects, and an item belongs to the slice only when it satisfies all of them. A discriminator
@@ -61,7 +61,7 @@ final class FHIRSliceConstraint extends Constraint
      *                                                                                                                                        `valueSet` replaces `value` for a slice keyed only by a required binding
      * @param list<string>                                                                                                    $groups         Profile URL groups under which this slice constraint is active
      * @param bool                                                                                                            $isDefault      True for the special '@default' slice in closed slicing
-     * @param int                                                                                                             $orderedIndex   Slice declaration order (reserved for future ordered-slicing enforcement)
+     * @param int                                                                                                             $orderedIndex   Slice declaration order, enforced when the slicing is ordered
      * @param list<array{path: string, constraint: class-string<Constraint|FHIRSlicingRules>, options: array<string, mixed>}> $rules
      *                                                                                                                                        Rules each item matching this slice must meet; `path` is relative to the item.
      *                                                                                                                                        A FHIRSliceConstraint or FHIRSlicingRules rule describes slicing beneath the slice

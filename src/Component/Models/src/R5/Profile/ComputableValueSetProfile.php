@@ -58,7 +58,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/valueset-rules-text'],
     ],
-    orderedIndex: 0,
+    orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
 )]
 #[FHIRSliceConstraint(
@@ -69,7 +69,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/valueset-expression'],
     ],
-    orderedIndex: 1,
+    orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
 )]
 #[FHIRSliceConstraint(
@@ -80,7 +80,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/valueset-supplement'],
     ],
-    orderedIndex: 2,
+    orderedIndex: 4,
     groups: ['http://hl7.org/fhir/StructureDefinition/computablevalueset'],
 )]
 #[FHIRProfileInvariant(

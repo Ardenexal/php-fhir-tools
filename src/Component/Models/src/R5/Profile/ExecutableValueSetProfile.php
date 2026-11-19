@@ -55,7 +55,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/valueset-warning'],
     ],
-    orderedIndex: 0,
+    orderedIndex: 2,
     rules: [
         [
             'path'       => 'value[x]',

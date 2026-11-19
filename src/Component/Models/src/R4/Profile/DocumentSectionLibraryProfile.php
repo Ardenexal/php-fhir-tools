@@ -17,7 +17,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
     baseType: 'Composition',
     fhirVersion: 'R4',
 )]
-#[FHIRSlicingRules(property: 'section', rules: 'closed', groups: ['http://hl7.org/fhir/StructureDefinition/example-section-library'])]
+#[FHIRSlicingRules(
+    property: 'section',
+    rules: 'closed',
+    groups: ['http://hl7.org/fhir/StructureDefinition/example-section-library'],
+    ordered: true,
+)]
 #[FHIRSliceConstraint(
     property: 'section',
     sliceName: 'procedure',

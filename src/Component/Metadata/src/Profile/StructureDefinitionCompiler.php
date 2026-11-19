@@ -983,7 +983,8 @@ final class StructureDefinitionCompiler
      *
      * FHIRSlicingRules is compiled only for slicing declared here. An inherited closed slicing
      * checked in this profile's group, which holds only this profile's slices, would reject the
-     * items that match the parent's.
+     * items that match the parent's. Inherited ordered slicing is the exception: it gets open rules
+     * with `ordered`, so the slices this profile adds are held to their order among themselves.
      *
      * Slicing beneath a slice ("component:SystolicBP.code.coding:snomedSBP") travels in that slice's
      * `rules` as nested slice definitions, which the validator applies within each matching item.
@@ -1044,6 +1045,16 @@ final class StructureDefinitionCompiler
                     'property' => $propertyPath,
                     'rules'    => self::enforceableRules($slicedId, $slicing, $slices, $profileUrl, $diagnostics),
                     'groups'   => [$profileUrl],
+                    ...self::orderedOption($slicedId, $slicing, $snapshot),
+                ]);
+            } elseif (self::orderedOption($slicedId, $slicing, $snapshot) !== []) {
+                // Inherited ordered slicing: the order still binds the slices this profile adds. Open
+                // rules are what no FHIRSlicingRules means, so only the order is added.
+                $attributes[] = new CompiledAttribute(FHIRSlicingRules::class, [
+                    'property' => $propertyPath,
+                    'rules'    => 'open',
+                    'groups'   => [$profileUrl],
+                    'ordered'  => true,
                 ]);
             }
 
@@ -1212,6 +1223,27 @@ final class StructureDefinitionCompiler
     }
 
     /**
+     * `ordered: true` for a FHIRSlicingRules whose slicing is ordered, else nothing, so unordered
+     * slicing compiles exactly as before.
+     *
+     * A differential that restates the slicing without `ordered` keeps the snapshot's: a derived
+     * profile cannot make ordered slicing unordered.
+     *
+     * @param string                                                      $slicedId Id of the sliced element
+     * @param array{definition: array<string, mixed>, declaredHere: bool} $slicing  From slicingFor()
+     * @param array<string, array<string, mixed>>                         $snapshot Snapshot elements by id
+     *
+     * @return array{ordered?: true}
+     */
+    private static function orderedOption(string $slicedId, array $slicing, array $snapshot): array
+    {
+        $inherited = is_array($snapshot[$slicedId]['slicing'] ?? null) ? $snapshot[$slicedId]['slicing'] : [];
+        $ordered   = $slicing['definition']['ordered'] ?? $inherited['ordered'] ?? false;
+
+        return $ordered === true ? ['ordered' => true] : [];
+    }
+
+    /**
      * Arguments for one #[FHIRSliceConstraint] per slice of a sliced element, without `property`
      * and `groups`.
      *
@@ -1254,12 +1286,18 @@ final class StructureDefinitionCompiler
             $names = array_values(array_unique([...$names, ...self::sliceNames($slicedId, $snapshot)]));
         }
 
+        // Declaration order is the snapshot's, which lists every slice of the slicing; the merged
+        // list above puts the differential's slices first. A slice the snapshot lacks (a
+        // StructureDefinition without one) keeps its differential position, after the snapshot's.
+        $declared = array_flip(self::sliceNames($slicedId, $snapshot));
+
         $definitions = [];
-        foreach ($names as $orderedIndex => $sliceName) {
-            $sliceId   = "{$slicedId}:{$sliceName}";
-            $header    = $diff[$sliceId] ?? [];
-            $isDefault = $sliceName === '@default';
-            $max       = (string) ($header['max'] ?? '*');
+        foreach ($names as $position => $sliceName) {
+            $orderedIndex = $declared[$sliceName] ?? count($declared) + $position;
+            $sliceId      = "{$slicedId}:{$sliceName}";
+            $header       = $diff[$sliceId] ?? [];
+            $isDefault    = $sliceName === '@default';
+            $max          = (string) ($header['max'] ?? '*');
 
             $sliceDiscriminators = [];
             foreach ($discriminators as $discriminator) {
@@ -1478,7 +1516,15 @@ final class StructureDefinitionCompiler
                     'options'    => [
                         'property' => $relative,
                         'rules'    => self::enforceableRules($nestedId, $slicing, $definitions, $profileUrl, $diagnostics),
+                        ...self::orderedOption($nestedId, $slicing, $snapshot),
                     ],
+                ];
+            } elseif (self::orderedOption($nestedId, $slicing, $snapshot) !== []) {
+                // Inherited ordered slicing, as at the top level
+                $rules[] = [
+                    'path'       => $relative,
+                    'constraint' => FHIRSlicingRules::class,
+                    'options'    => ['property' => $relative, 'rules' => 'open', 'ordered' => true],
                 ];
             }
 

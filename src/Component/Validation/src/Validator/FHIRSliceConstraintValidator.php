@@ -29,7 +29,8 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  * Symfony invokes this validator once per #[FHIRSliceConstraint] attribute on the class.
  * When first invoked for a (property, active-group) pair on an object, it performs a
  * complete validation pass: reads all slices for that property, counts item matches,
- * checks min/max cardinality, and (for closed slicing) rejects items matching no slice.
+ * checks min/max cardinality, (for closed slicing) rejects items matching no slice, and
+ * (for ordered slicing) reports items that come before an item of a later-declared slice.
  *
  * Subsequent invocations for the same (property, active-group, object) within a single
  * $validator->validate() call are no-ops; a WeakMap keyed on the ExecutionContext prevents
@@ -149,6 +150,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         string $property,
     ): void {
         $rules         = $slicingRules !== null ? $slicingRules->rules : 'open';
+        $ordered       = $slicingRules !== null && self::isOrdered($slicingRules);
         $defaultSlice  = null;
         $namedSlices   = [];
 
@@ -177,6 +179,10 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         /** @var array<int, true> $undecided sliceConstraints index → some unmatched item may belong to it */
         $undecided          = [];
         $openAtEndViolation = false;
+        /** @var FHIRSliceConstraint|null $latestSlice ordered slicing: the latest-declared slice an earlier item matched */
+        $latestSlice        = null;
+        /** @var array<int|string, array{FHIRSliceConstraint, FHIRSliceConstraint}> $outOfOrder item index → [its slice, the later slice before it] */
+        $outOfOrder         = [];
 
         foreach ($items as $itemIndex => $item) {
             if (!is_object($item) && !is_array($item)) {
@@ -201,6 +207,16 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                     // openAtEnd: a matched item after any unmatched item violates ordering
                     if ($rules === 'openAtEnd' && $unmatchedItems !== []) {
                         $openAtEndViolation = true;
+                    }
+
+                    // Ordered: an item may belong to an earlier slice that could not say, so its
+                    // place in the order is unknown and it neither breaks nor sets the order
+                    if ($ordered && $maybeIn === []) {
+                        if ($latestSlice !== null && $sc->orderedIndex < $latestSlice->orderedIndex) {
+                            $outOfOrder[$itemIndex] = [$sc, $latestSlice];
+                        } else {
+                            $latestSlice = $sc;
+                        }
                     }
                     break;
                 }
@@ -290,6 +306,17 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                     '{{ count }}'    => (string) count($unmatchedItems),
                 ])->atPath($property)->setCode(FHIRViolationCode::ERROR)->addViolation();
             }
+        }
+
+        // Ordered: each item must match a slice declared no earlier than the slices of the items before it
+        foreach ($outOfOrder as $itemIndex => [$slice, $previous]) {
+            $this->context->buildViolation(
+                'Property "{{ property }}" uses ordered slicing: this item matches slice "{{ slice }}", which must come before slice "{{ previous }}" of an earlier item.',
+            )->setParameters([
+                '{{ property }}' => $property,
+                '{{ slice }}'    => $slice->sliceName,
+                '{{ previous }}' => $previous->sliceName,
+            ])->atPath("{$property}[{$itemIndex}]")->setCode(FHIRViolationCode::ERROR)->addViolation();
         }
 
         // openAtEnd: unmatched items must only appear after all matched items
@@ -450,6 +477,17 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                 }
             }
         }
+    }
+
+    /**
+     * Whether the slicing is ordered; false when the installed fhir-metadata predates `ordered`.
+     *
+     * Read from the object's public state for the same reason as rulesOf(): reading a property an
+     * older FHIRSlicingRules does not declare would warn on every sliced profile.
+     */
+    private static function isOrdered(FHIRSlicingRules $slicingRules): bool
+    {
+        return (get_object_vars($slicingRules)['ordered'] ?? false) === true;
     }
 
     /**
