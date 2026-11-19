@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Tests\Unit\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLength;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileObligation;
@@ -170,6 +171,62 @@ final class StructureDefinitionCompilerTest extends TestCase
             ],
             $rules,
         );
+    }
+
+    /**
+     * A maxLength compiles to a rule on the element's path (#240).
+     */
+    public function testMaxLengthCompilesToARule(): void
+    {
+        $sd = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Identifier', 'path' => 'Identifier'],
+                ['id' => 'Identifier.value', 'path' => 'Identifier.value', 'maxLength' => 11],
+            ]],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+
+        self::assertCount(1, $compiled->attributes);
+        self::assertSame(
+            ['path' => 'value', 'constraint' => FHIRMaxLength::class, 'options' => ['max' => 11], 'groups' => [self::URL]],
+            $compiled->attributes[0]->arguments,
+        );
+    }
+
+    /**
+     * Inside a slice, a maxLength joins that slice's rules, so it applies to its items only (#240).
+     */
+    public function testMaxLengthInsideASliceCompilesToASliceRule(): void
+    {
+        $sd = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Patient', 'path' => 'Patient'],
+                [
+                    'id'      => 'Patient.identifier',
+                    'path'    => 'Patient.identifier',
+                    'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'system']], 'rules' => 'open'],
+                ],
+                ['id' => 'Patient.identifier:mc', 'path' => 'Patient.identifier', 'sliceName' => 'mc'],
+                ['id' => 'Patient.identifier:mc.system', 'path' => 'Patient.identifier.system', 'fixedUri' => 'urn:mc'],
+                ['id' => 'Patient.identifier:mc.value', 'path' => 'Patient.identifier.value', 'maxLength' => 11],
+            ]],
+        ];
+
+        $rules = [];
+        foreach ((new StructureDefinitionCompiler())->compile($sd)->attributes as $attribute) {
+            if ($attribute->class === FHIRSliceConstraint::class) {
+                foreach ((array) ($attribute->arguments['rules'] ?? []) as $rule) {
+                    if ($rule['constraint'] === FHIRMaxLength::class) {
+                        $rules[] = [$rule['path'], $rule['options']];
+                    }
+                }
+            }
+        }
+
+        self::assertSame([['value', ['max' => 11]]], $rules);
     }
 
     /**

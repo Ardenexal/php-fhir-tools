@@ -226,5 +226,5 @@ against it instead.
   terminology client; without one it is reported as `fhir:unchecked-binding` INFO.
 * **Sub-extension cardinality, fixed and pattern values are not checked**, because the generated
   extension classes do not check them either.
-* **A profile's `maxLength` on an element is not checked**, in a runtime profile or a generated profile class. AU Base's
-  Medicare card number allows at most 11 characters, so a longer one is not reported.
+* **A `maxLength` is checked only where a profile's other element rules are.** One in an extension's
+  own definition, or on the root element of a profile on a primitive type, is not checked.
