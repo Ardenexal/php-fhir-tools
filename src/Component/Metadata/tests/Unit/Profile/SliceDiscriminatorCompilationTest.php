@@ -187,9 +187,10 @@ final class SliceDiscriminatorCompilationTest extends TestCase
     }
 
     /**
-     * A path through `resolve()` is not followed, so its slice stays unmatchable.
+     * A path through `resolve()` whose reference names no target profile has nothing to match on, so
+     * its slice stays unmatchable and its closed slicing is enforced as open.
      */
-    public function testAPathThroughResolveHasNoValue(): void
+    public function testAPathThroughResolveWithNoTargetProfileHasNoValue(): void
     {
         $compiled = self::compile('Bundle', 'entry', 'closed', [['type' => 'type', 'path' => 'resource.subject.resolve()']], [
             ['id' => 'Bundle.entry:patient', 'path' => 'Bundle.entry', 'sliceName' => 'patient', 'min' => 1],
@@ -197,6 +198,118 @@ final class SliceDiscriminatorCompilationTest extends TestCase
 
         self::assertSame([['type' => 'type', 'path' => 'resource.subject.resolve()']], self::slices($compiled)['patient']['discriminators']);
         self::assertSame(['open'], self::slicingRules($compiled));
+    }
+
+    /**
+     * A `type` discriminator through `resolve()` takes the resource types of the reference's target
+     * profiles, as the supplied profile-slicing-type-resolve does for `List.entry.item`. A core
+     * resource profile names its type; any other is looked up for its `type`.
+     */
+    public function testATypeDiscriminatorThroughResolveTakesTheTargetTypes(): void
+    {
+        $definition = self::definition('List', 'entry', 'closed', [['type' => 'type', 'path' => 'item.resolve()']], [
+            ['id' => 'List.entry:conditions', 'path' => 'List.entry', 'sliceName' => 'conditions', 'min' => 1, 'max' => '1'],
+            ['id' => 'List.entry:conditions.item', 'path' => 'List.entry.item', 'type' => [['code' => 'Reference', 'targetProfile' => ['http://hl7.org/fhir/StructureDefinition/Condition']]]],
+            ['id' => 'List.entry:vitals', 'path' => 'List.entry', 'sliceName' => 'vitals', 'min' => 1],
+            ['id' => 'List.entry:vitals.item', 'path' => 'List.entry.item', 'type' => [['code' => 'Reference', 'targetProfile' => ['http://hl7.org/fhir/StructureDefinition/vitalsigns|4.0.1']]]],
+        ]);
+
+        $lookup   = static fn (string $url): ?array => $url === 'http://hl7.org/fhir/StructureDefinition/vitalsigns' ? ['url' => $url, 'kind' => 'resource', 'type' => 'Observation'] : null;
+        $compiled = (new StructureDefinitionCompiler())->compile($definition, $lookup);
+        $slices   = self::slices($compiled);
+
+        self::assertSame([['type' => 'type', 'path' => 'item.resolve()', 'value' => ['Condition']]], $slices['conditions']['discriminators']);
+        self::assertSame([['type' => 'type', 'path' => 'item.resolve()', 'value' => ['Observation']]], $slices['vitals']['discriminators']);
+        self::assertSame(1, $slices['conditions']['min']);
+        self::assertSame(['closed'], self::slicingRules($compiled));
+
+        // Without a lookup the IG profile's type is unknown, so that slice has nothing to match on
+        $unlooked = self::slices((new StructureDefinitionCompiler())->compile($definition));
+        self::assertSame([['type' => 'type', 'path' => 'item.resolve()']], $unlooked['vitals']['discriminators']);
+    }
+
+    /**
+     * A `profile` discriminator through `resolve()` takes the target profiles themselves, on the slice
+     * (`resolve()`, `$this.resolve()`) or beneath it, and through a choice element narrowed with
+     * `ofType(Reference)`.
+     */
+    public function testAProfileDiscriminatorThroughResolveTakesTheTargetProfiles(): void
+    {
+        $profile  = 'http://example.org/fhir/StructureDefinition/prosthesis';
+        $compiled = self::compile('Appointment', 'supportingInformation', 'closed', [['type' => 'profile', 'path' => '$this.resolve()']], [
+            ['id' => 'Appointment.supportingInformation:prosthesis', 'path' => 'Appointment.supportingInformation', 'sliceName' => 'prosthesis', 'max' => '1', 'type' => [['code' => 'Reference', 'targetProfile' => [$profile]]]],
+        ]);
+
+        self::assertSame([['type' => 'profile', 'path' => '$this.resolve()', 'value' => [$profile]]], self::slices($compiled)['prosthesis']['discriminators']);
+        self::assertSame(['closed'], self::slicingRules($compiled));
+
+        $choice = self::compile('Communication', 'payload', 'open', [['type' => 'type', 'path' => 'content.ofType(Reference).resolve()']], [
+            ['id' => 'Communication.payload:task', 'path' => 'Communication.payload', 'sliceName' => 'task'],
+            ['id' => 'Communication.payload:task.content[x]', 'path' => 'Communication.payload.content[x]', 'type' => [['code' => 'Reference', 'targetProfile' => ['http://hl7.org/fhir/StructureDefinition/Task']]]],
+        ]);
+
+        self::assertSame([['type' => 'type', 'path' => 'content.ofType(Reference).resolve()', 'value' => ['Task']]], self::slices($choice)['task']['discriminators']);
+    }
+
+    /**
+     * A `value` or `pattern` discriminator through `resolve()` takes the fixed or pattern value the
+     * reference's one target profile states at the rest of the path: the core lipid profile's
+     * `resolve().code` slices are told apart by the code each Observation profile fixes.
+     */
+    public function testAValueDiscriminatorThroughResolveReadsTheTargetProfile(): void
+    {
+        $code        = ['coding' => [['system' => 'http://loinc.org', 'code' => '35200-5']]];
+        $cholesterol = 'http://hl7.org/fhir/StructureDefinition/cholesterol';
+        $definition  = self::definition('DiagnosticReport', 'result', 'closed', [['type' => 'value', 'path' => 'resolve().code']], [
+            ['id' => 'DiagnosticReport.result:Cholesterol', 'path' => 'DiagnosticReport.result', 'sliceName' => 'Cholesterol', 'min' => 1, 'max' => '1', 'type' => [['code' => 'Reference', 'targetProfile' => [$cholesterol]]]],
+        ]);
+
+        $lookup = static fn (string $url): ?array => $url === $cholesterol ? [
+            'url'      => $url,
+            'kind'     => 'resource',
+            'type'     => 'Observation',
+            'snapshot' => ['element' => [
+                ['id' => 'Observation', 'path' => 'Observation'],
+                ['id' => 'Observation.code', 'path' => 'Observation.code', 'fixedCodeableConcept' => $code],
+            ]],
+        ] : null;
+
+        $compiled = (new StructureDefinitionCompiler())->compile($definition, $lookup);
+        $slice    = self::slices($compiled)['Cholesterol'];
+
+        self::assertSame([['type' => 'value', 'path' => 'resolve().code', 'value' => $code]], $slice['discriminators']);
+        self::assertSame(1, $slice['min']);
+        self::assertSame(['closed'], self::slicingRules($compiled));
+        self::assertSame([], $compiled->diagnostics);
+
+        // Without the target profile there is nothing to match on, as before
+        self::assertSame(['open'], self::slicingRules((new StructureDefinitionCompiler())->compile($definition)));
+    }
+
+    /**
+     * A target profile that binds the element instead of fixing it gives its value set, as the lipid
+     * profile's `ldlcholesterol` binds `code` to the LDL codes. A binding it only inherits does not.
+     */
+    public function testAValueDiscriminatorThroughResolveTakesTheTargetProfilesBinding(): void
+    {
+        $ldl        = 'http://hl7.org/fhir/StructureDefinition/ldlcholesterol';
+        $valueSet   = 'http://hl7.org/fhir/ValueSet/ldlcholesterol-codes|4.0.1';
+        $code       = ['id' => 'Observation.code', 'path' => 'Observation.code', 'binding' => ['strength' => 'required', 'valueSet' => $valueSet]];
+        $definition = self::definition('DiagnosticReport', 'result', 'closed', [['type' => 'value', 'path' => 'resolve().code']], [
+            ['id' => 'DiagnosticReport.result:LDL', 'path' => 'DiagnosticReport.result', 'sliceName' => 'LDL', 'max' => '1', 'type' => [['code' => 'Reference', 'targetProfile' => [$ldl]]]],
+        ]);
+
+        $stated = static fn (string $url): ?array => ['url' => $url, 'kind' => 'resource', 'type' => 'Observation', 'snapshot' => ['element' => [$code]], 'differential' => ['element' => [$code]]];
+        self::assertSame(
+            [['type' => 'value', 'path' => 'resolve().code', 'valueSet' => $valueSet]],
+            self::slices((new StructureDefinitionCompiler())->compile($definition, $stated))['LDL']['discriminators'],
+        );
+
+        $inherited = static fn (string $url): ?array => ['url' => $url, 'kind' => 'resource', 'type' => 'Observation', 'snapshot' => ['element' => [$code]]];
+        self::assertSame(
+            [['type' => 'value', 'path' => 'resolve().code']],
+            self::slices((new StructureDefinitionCompiler())->compile($definition, $inherited))['LDL']['discriminators'],
+        );
     }
 
     /**
