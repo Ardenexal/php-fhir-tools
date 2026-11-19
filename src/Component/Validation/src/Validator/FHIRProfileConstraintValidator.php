@@ -100,10 +100,15 @@ final class FHIRProfileConstraintValidator extends ConstraintValidator
             // inspects the element itself and gets it exactly as the model holds it.
             $subject = $innerConstraint instanceof Count ? $group['occurrences'] : $group['value'];
 
-            $this->reportViolations(
-                $this->context->getValidator()->validate($subject, $innerConstraint, ['Default']),
-                $constraint,
-            );
+            // The factory hands out one instance of this validator, and a rule that checks the value
+            // against another profile on the side (FHIRAnyOfProfiles) runs that profile's own
+            // FHIRProfileConstraints through this same instance, which points $this->context at the
+            // side run. Restored before reporting, or the findings land in the side run and vanish.
+            $context    = $this->context;
+            $violations = $context->getValidator()->validate($subject, $innerConstraint, ['Default']);
+            $this->initialize($context);
+
+            $this->reportViolations($violations, $constraint);
         }
     }
 

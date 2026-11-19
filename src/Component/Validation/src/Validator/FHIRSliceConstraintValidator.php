@@ -339,11 +339,24 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             return $this->matcher;
         }
 
-        $validator = $this->context->getValidator();
-        $profiles  = $this->profiles;
+        $context  = $this->context;
+        $profiles = $this->profiles;
 
+        // A profile that slices elements of its own runs them through this same instance, which
+        // points $this->context at the side run. Restored after each check, or this slicing's
+        // findings land in the side run and vanish.
         return $this->matcher->withProfileCheck(
-            static fn (object|array $value, string $profileUrl): ?bool => is_object($value) ? $profiles->conforms($validator, $value, $profileUrl) : null,
+            function(object|array $value, string $profileUrl) use ($context, $profiles): ?bool {
+                if (!is_object($value)) {
+                    return null;
+                }
+
+                try {
+                    return $profiles->conforms($context->getValidator(), $value, $profileUrl);
+                } finally {
+                    $this->initialize($context);
+                }
+            },
         );
     }
 

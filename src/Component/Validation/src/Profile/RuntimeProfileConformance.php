@@ -10,11 +10,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValueType;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Answers whether a value conforms to a profile, for slices discriminated by `profile`.
+ * Answers whether a value conforms to a profile, for slices discriminated by `profile` and for
+ * elements that must match one of several profiles.
  *
  * Java's validator matches such a slice by validating the item against the profile on the side and
  * keeping the item when no error comes back. This does the same. The profile's rules are checked
@@ -34,6 +37,8 @@ final class RuntimeProfileConformance
     /** How many profile checks may run inside one another. */
     public const int MAX_DEPTH = 4;
 
+    public const string WRONG_TYPE_MESSAGE = 'The profile constrains {{ profiled }}, not {{ type }}';
+
     private int $depth = 0;
 
     /** @var array<string, list<Constraint>> constraints per compiled profile URL, built once */
@@ -50,6 +55,20 @@ final class RuntimeProfileConformance
      */
     public function conforms(ValidatorInterface $validator, object $value, string $profileUrl): ?bool
     {
+        $errors = $this->errors($validator, $value, $profileUrl);
+
+        return $errors === null ? null : $errors === [];
+    }
+
+    /**
+     * The errors $value has against $profileUrl, with paths inside $value: none when it conforms, one
+     * naming both types when the profile constrains another type, null when the profile cannot be
+     * checked.
+     *
+     * @return list<ConstraintViolationInterface>|null
+     */
+    public function errors(ValidatorInterface $validator, object $value, string $profileUrl): ?array
+    {
         if ($this->depth >= self::MAX_DEPTH) {
             return null;
         }
@@ -62,13 +81,16 @@ final class RuntimeProfileConformance
         }
     }
 
-    private function check(ValidatorInterface $validator, object $value, string $profileUrl): ?bool
+    /**
+     * @return list<ConstraintViolationInterface>|null
+     */
+    private function check(ValidatorInterface $validator, object $value, string $profileUrl): ?array
     {
         $canonical = self::canonicalWithoutVersion($profileUrl);
 
         foreach (self::attributesInHierarchy($value, FHIRProfile::class) as $profile) {
             if ($profile->profileUrl === $canonical) {
-                return !self::hasError($validator->validate($value, null, [$canonical]));
+                return self::errorMessages($validator->validate($value, null, [$canonical]));
             }
         }
 
@@ -82,8 +104,11 @@ final class RuntimeProfileConformance
             return null;
         }
 
-        if ($resolution->rootType !== FHIRValueType::of($value)) {
-            return false;
+        $type = FHIRValueType::of($value);
+        if ($resolution->rootType !== $type) {
+            $parameters = ['{{ profiled }}' => (string) $resolution->rootType, '{{ type }}' => $type ?? 'this type'];
+
+            return [new ConstraintViolation(strtr(self::WRONG_TYPE_MESSAGE, $parameters), self::WRONG_TYPE_MESSAGE, $parameters, $value, '', $value, code: FHIRViolationCode::ERROR)];
         }
 
         $constraints = [];
@@ -105,14 +130,17 @@ final class RuntimeProfileConformance
         // The slice validator reads a runtime profile's slices from the profiles activated for the type
         $this->resolver->activate($fhirVersion, (string) $resolution->rootType, $resolution->chain);
 
-        return !self::hasError($validator->validate($value, $constraints, $groups));
+        return self::errorMessages($validator->validate($value, $constraints, $groups));
     }
 
     /**
-     * Whether any finding is an error, read the way the validation report reads severity.
+     * The findings that are errors, read the way the validation report reads severity.
+     *
+     * @return list<ConstraintViolationInterface>
      */
-    private static function hasError(ConstraintViolationListInterface $violations): bool
+    private static function errorMessages(ConstraintViolationListInterface $violations): array
     {
+        $errors = [];
         foreach ($violations as $violation) {
             if (!in_array($violation->getCode(), [
                 FHIRViolationCode::WARNING,
@@ -121,11 +149,11 @@ final class RuntimeProfileConformance
                 FHIRViolationCode::EVAL_ERROR,
                 FHIRViolationCode::UNCHECKED_BINDING,
             ], true)) {
-                return true;
+                $errors[] = $violation;
             }
         }
 
-        return false;
+        return $errors;
     }
 
     /**
