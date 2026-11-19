@@ -46,7 +46,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 final class FHIRSliceConstraintValidator extends ConstraintValidator
 {
     /**
-     * Tracks already-validated (property, group) pairs per ExecutionContext.
+     * Tracks already-validated (object, property, group) combinations per ExecutionContext.
      * The ExecutionContext is a new object per $validator->validate() call, so dedup
      * naturally resets between separate validation passes on the same object.
      *
@@ -100,9 +100,10 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
 
         $property    = $constraint->property;
         $activeGroup = $this->context->getGroup() ?? 'Default';
-        $dedupKey    = "{$property}|{$activeGroup}";
+        // The object is part of the key: two resources of one profile in a Bundle share the context
+        $dedupKey    = spl_object_id($value) . "|{$property}|{$activeGroup}";
 
-        // Only process each (property, group) combination once per $validator->validate() call.
+        // Only process each (object, property, group) combination once per $validator->validate() call.
         // Keyed on the ExecutionContext so the dedup resets when a new call creates a fresh context.
         $ctx       = $this->context;
         $keys      = self::processedKeys();

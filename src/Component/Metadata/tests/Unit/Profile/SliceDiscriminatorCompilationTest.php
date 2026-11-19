@@ -223,6 +223,14 @@ final class SliceDiscriminatorCompilationTest extends TestCase
         self::assertSame(1, $slices['conditions']['min']);
         self::assertSame(['closed'], self::slicingRules($compiled));
 
+        // `Reference(Any)` targets the abstract Resource, which no resource is, so it gives no value
+        $any = self::compile('List', 'entry', 'closed', [['type' => 'type', 'path' => 'item.resolve()']], [
+            ['id' => 'List.entry:any', 'path' => 'List.entry', 'sliceName' => 'any', 'min' => 1],
+            ['id' => 'List.entry:any.item', 'path' => 'List.entry.item', 'type' => [['code' => 'Reference', 'targetProfile' => ['http://hl7.org/fhir/StructureDefinition/Resource']]]],
+        ]);
+        self::assertSame([['type' => 'type', 'path' => 'item.resolve()']], self::slices($any)['any']['discriminators']);
+        self::assertSame(['open'], self::slicingRules($any));
+
         // Without a lookup the IG profile's type is unknown, so that slice has nothing to match on
         $unlooked = self::slices((new StructureDefinitionCompiler())->compile($definition));
         self::assertSame([['type' => 'type', 'path' => 'item.resolve()']], $unlooked['vitals']['discriminators']);
@@ -299,13 +307,13 @@ final class SliceDiscriminatorCompilationTest extends TestCase
             ['id' => 'DiagnosticReport.result:LDL', 'path' => 'DiagnosticReport.result', 'sliceName' => 'LDL', 'max' => '1', 'type' => [['code' => 'Reference', 'targetProfile' => [$ldl]]]],
         ]);
 
-        $stated = static fn (string $url): ?array => ['url' => $url, 'kind' => 'resource', 'type' => 'Observation', 'snapshot' => ['element' => [$code]], 'differential' => ['element' => [$code]]];
+        $stated = static fn (string $url): ?array => ['url' => $url, 'kind' => 'resource', 'type' => 'Observation', 'derivation' => 'constraint', 'snapshot' => ['element' => [$code]], 'differential' => ['element' => [$code]]];
         self::assertSame(
             [['type' => 'value', 'path' => 'resolve().code', 'valueSet' => $valueSet]],
             self::slices((new StructureDefinitionCompiler())->compile($definition, $stated))['LDL']['discriminators'],
         );
 
-        $inherited = static fn (string $url): ?array => ['url' => $url, 'kind' => 'resource', 'type' => 'Observation', 'snapshot' => ['element' => [$code]]];
+        $inherited = static fn (string $url): ?array => ['url' => $url, 'kind' => 'resource', 'type' => 'Observation', 'derivation' => 'constraint', 'snapshot' => ['element' => [$code]]];
         self::assertSame(
             [['type' => 'value', 'path' => 'resolve().code']],
             self::slices((new StructureDefinitionCompiler())->compile($definition, $inherited))['LDL']['discriminators'],

@@ -25,8 +25,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
  * Null means the reference could not be resolved, which leaves the item unjudged rather than outside
  * the slice.
  *
- * Built for one sliced element in one validation: the resources around it are read once, from the
- * validation root along the element's property path, and model properties are mutable.
+ * Built for one sliced element in one validation, because model properties are mutable: the resources
+ * around the element are read once, from the validation root along the element's property path.
  *
  * @internal used by FHIRSliceConstraintValidator, not part of the public API
  *
@@ -34,8 +34,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
  */
 final class SliceReferenceResolver
 {
-    /** @var list<object> The resources holding the sliced element, nearest first */
-    private readonly array $enclosing;
+    /** The nearest resource holding the sliced element */
+    private readonly ?object $nearest;
 
     /** The container of the nearest enclosing resource, when that resource is contained */
     private readonly ?object $container;
@@ -57,7 +57,7 @@ final class SliceReferenceResolver
         private readonly FHIRReferenceResolverInterface $resolver = new NullFHIRReferenceResolver(),
         private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
     ) {
-        $enclosing  = self::isResource($root) ? [$root] : [];
+        $nearest    = self::isResource($root) ? $root : null;
         $container  = null;
         $bundle     = null;
         $entryIndex = -1;
@@ -81,7 +81,7 @@ final class SliceReferenceResolver
 
             // `contained[2]`: the property is the segment before the index
             $via       = is_numeric($segment) ? ($trail[count($trail) - 2][0] ?? null) : $segment;
-            $container = $via === 'contained' ? ($enclosing[0] ?? null) : null;
+            $container = $via === 'contained' ? $nearest : null;
 
             // `entry[1].resource`: the Bundle is the node `entry` was read from
             $count = count($trail);
@@ -93,10 +93,10 @@ final class SliceReferenceResolver
                 }
             }
 
-            array_unshift($enclosing, $current);
+            $nearest = $current;
         }
 
-        $this->enclosing  = $enclosing;
+        $this->nearest    = $nearest;
         $this->container  = $container;
         $this->bundle     = $bundle;
         $this->entryIndex = $entryIndex;
@@ -128,10 +128,8 @@ final class SliceReferenceResolver
      */
     private function resolveContained(string $id): ?object
     {
-        $nearest = $this->enclosing[0] ?? null;
-
         // Inside a contained resource, `#` is the container and `#x` a sibling
-        $holder = $this->container ?? $nearest;
+        $holder = $this->container ?? $this->nearest;
         if ($id === '') {
             return $this->container;
         }

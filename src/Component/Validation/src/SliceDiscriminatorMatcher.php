@@ -25,16 +25,17 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *
  * The path `$this` is the item itself. A path through `resolve()` (`item.resolve().code`) follows each
  * reference at the part before it to the resource it points at, with the reference resolver handed to
- * the constructor, and checks the part after it (or the resource itself) there. `ofType(T)` keeps only
- * the values of type T, as `content.ofType(Reference)` does for a choice element. A reference that
- * cannot be resolved cannot be judged. A `value` or `pattern` discriminator that carries a
- * `valueSet` instead of a value matches an item whose code is in that value set, as the
- * terminology client answers.
+ * the constructor, and checks the part after it (or the resource itself) there. `ofType(T)` at the end
+ * of the reference's path keeps only the values of type T, as `content.ofType(Reference)` does for a
+ * choice element. A reference that cannot be resolved cannot be judged.
+ *
+ * A `value` or `pattern` discriminator that carries a `valueSet` instead of a value matches an item
+ * whose code is in that value set, as the terminology client answers.
  *
  * An item belongs to a slice when it satisfies every discriminator. Where one of them cannot be
  * answered (no terminology client, a server that gave no answer, no profile check, or a reference
- * that does not resolve), the answer
- * is null: the item neither belongs to the slice nor is known to be outside it.
+ * that does not resolve), the answer is null: the item neither belongs to the slice nor is known to
+ * be outside it.
  *
  * @author Ardenexal
  */

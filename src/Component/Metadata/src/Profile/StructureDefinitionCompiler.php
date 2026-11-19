@@ -46,6 +46,9 @@ final class StructureDefinitionCompiler
     /** Canonical URL prefix of the core definitions, base types included. */
     private const string CORE_BASE = 'http://hl7.org/fhir/StructureDefinition/';
 
+    /** Abstract resource types a Reference may target; no resource is one of them itself. */
+    private const array ABSTRACT_RESOURCE_TYPES = ['Resource', 'DomainResource', 'CanonicalResource', 'MetadataResource'];
+
     /** How deep data-type profiles may nest inside each other before inlining stops. */
     public const int MAX_INLINE_DEPTH = 8;
 
@@ -1780,14 +1783,19 @@ final class StructureDefinitionCompiler
             return ['value' => $field['value']];
         }
 
-        // Only a binding the target profile states itself; one it inherits holds for every resource of its type
+        // Only a binding the target profile states itself; one it inherits holds for every resource of
+        // its type. A core resource definition is not a profile: its differential repeats every element
+        if (($definition['derivation'] ?? null) !== 'constraint') {
+            return [];
+        }
+
         $valueSet = self::requiredValueSet($targetId, self::differentialElements($definition), []);
 
         return $valueSet === null ? [] : ['valueSet' => $valueSet];
     }
 
     /**
-     * The resource type a target profile constrains, or null when it cannot be told.
+     * The resource type a target profile constrains, or null when it cannot be told or is abstract.
      *
      * @param (\Closure(string): (array<string, mixed>|null))|null $lookup
      */
@@ -1795,7 +1803,8 @@ final class StructureDefinitionCompiler
     {
         $url = self::canonicalWithoutVersion($url);
         if (preg_match('~\Ahttp://hl7\.org/fhir/StructureDefinition/(?<type>[A-Z][A-Za-z]+)\z~', $url, $match) === 1) {
-            return $match['type'];
+            // `Reference(Any)` names an abstract type, which no resource has as its own
+            return in_array($match['type'], self::ABSTRACT_RESOURCE_TYPES, true) ? null : $match['type'];
         }
 
         $definition = $lookup === null ? null : $lookup($url);
