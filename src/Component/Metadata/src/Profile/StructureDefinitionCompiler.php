@@ -619,8 +619,9 @@ final class StructureDefinitionCompiler
      */
     private static function parentTypesElementTheSame(array $structureDefinition, string $id, array $profiles, \Closure $lookup): bool
     {
-        // Only a parent that allows exactly this one profiled type inlined it; one that allowed
-        // several types checks them as alternatives, so the narrowed child must enforce it itself
+        // Only a parent that allows exactly this one profiled type inlined it. One that allowed several
+        // checks at most that the value matches one of them, so the narrowed child must inline its
+        // own profile itself
         $element = self::parentSnapshotElement($structureDefinition, $id, $lookup);
         $types   = is_array($element['type'] ?? null) ? array_values($element['type']) : [];
         if (count($types) !== 1 || !is_array($types[0]['profile'] ?? null)) {
@@ -1269,7 +1270,8 @@ final class StructureDefinitionCompiler
      * several profiled types, and the type codes it allows without one; null when there is no such
      * choice.
      *
-     * One type with one profile has that profile's rules inlined instead (inlinedDataTypeProfiles()).
+     * One type with one profile is left to inlinedDataTypeProfiles(), which inlines a data-type
+     * profile's rules and reports any other profile as not enforced.
      * An element that also allows the base type of every profiled type gets no rule, since any value
      * of that type conforms (AU Core's `Identifier` beside `au-ihi`). Extension profiles are left to
      * extension validation, so an Extension type counts as allowed without a profile.

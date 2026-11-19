@@ -154,6 +154,37 @@ final class RuntimeAnyOfProfilesTest extends TestCase
     }
 
     /**
+     * A slice's choice of profiles, where one profile slices an element of its own, still reports:
+     * that profile's slicing runs through the same slice validator as the outer slice's rules.
+     */
+    public function testASliceChoiceWhoseProfileSlicesKeepsItsFindings(): void
+    {
+        $profile      = self::BASE . 'care-team-bundle';
+        $practitioner = self::BASE . 'named-practitioner';
+        $role         = self::BASE . 'active-role';
+        $registry     = self::registry(
+            self::definition($profile, 'resource', 'Bundle', [
+                ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => ['discriminator' => [['type' => 'type', 'path' => 'resource']], 'rules' => 'open']],
+                ['id' => 'Bundle.entry:carer', 'path' => 'Bundle.entry', 'sliceName' => 'carer', 'min' => 0, 'max' => '*'],
+                ['id' => 'Bundle.entry:carer.resource', 'path' => 'Bundle.entry.resource', 'type' => [
+                    ['code' => 'Practitioner', 'profile' => [$practitioner]],
+                    ['code' => 'PractitionerRole', 'profile' => [$role]],
+                ]],
+            ]),
+            self::definition($practitioner, 'resource', 'Practitioner', [
+                ['id' => 'Practitioner.identifier', 'path' => 'Practitioner.identifier', 'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'system']], 'rules' => 'open']],
+                ['id' => 'Practitioner.identifier:local', 'path' => 'Practitioner.identifier', 'sliceName' => 'local', 'min' => 0, 'max' => '1'],
+                ['id' => 'Practitioner.identifier:local.system', 'path' => 'Practitioner.identifier.system', 'fixedUri' => 'urn:local'],
+                ['id' => 'Practitioner.name', 'path' => 'Practitioner.name', 'min' => 1],
+            ]),
+            self::definition($role, 'resource', 'PractitionerRole', [['id' => 'PractitionerRole.active', 'path' => 'PractitionerRole.active', 'min' => 1]]),
+        );
+
+        self::assertSame([], $this->errors($registry, $profile, self::bundle(['resourceType' => 'Practitioner', 'name' => [['family' => 'Nguyen']]])));
+        self::assertSame(['entry[0].resource'], self::noMatchPaths($this->errors($registry, $profile, self::bundle(['resourceType' => 'Practitioner']))));
+    }
+
+    /**
      * A choice whose profiles have a choice of their own still reports the outer finding: the inner
      * check runs through the same validator, and must not swallow the outer one's findings.
      */

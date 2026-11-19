@@ -81,10 +81,13 @@ final class FHIRAnyOfProfilesValidator extends ConstraintValidator
         $unchecked = [];
         $failed    = [];
         foreach ($constraint->profiles as $profile) {
-            $errors = $conformance->errors($validator, $value, $profile);
             // A profile with a choice of profiles of its own runs it through this same instance, which
             // points $this->context at the side run; the findings below belong to this run
-            $this->initialize($context);
+            try {
+                $errors = $conformance->errors($validator, $value, $profile);
+            } finally {
+                $this->initialize($context);
+            }
 
             match (true) {
                 $errors === null => $unchecked[]      = $profile,
@@ -151,8 +154,8 @@ final class FHIRAnyOfProfilesValidator extends ConstraintValidator
         return match (true) {
             $inner    === ''      => $outer,
             $outer    === ''      => $inner,
-            $inner[0] === '['  => $outer . $inner,
-            default            => $outer . '.' . $inner,
+            $inner[0] === '['     => $outer . $inner,
+            default               => $outer . '.' . $inner,
         };
     }
 }

@@ -10,9 +10,9 @@ use Symfony\Component\Validator\Constraint;
  * Declares that an element's value must conform to at least one of several profiles
  * (`Patient.address only (AddressA or AddressB)`).
  *
- * A profile that types an element with one profile has that profile's rules compiled into its own,
- * but an element whose types name several profiles, or several profiled types, can be satisfied by
- * any one of them, which a flat list of rules cannot express. The value is instead checked against
+ * A profile that types an element with one data-type profile has that profile's rules compiled into
+ * its own, but an element whose types name several profiles, or several profiled types, can be
+ * satisfied by any one of them, which a flat list of rules cannot express. The value is instead checked against
  * each profile on the side. A value whose type is one of $openTypes is allowed without a profile.
  * The profile compiler emits this inside a {@see FHIRProfileConstraint} or as a slice rule.
  *

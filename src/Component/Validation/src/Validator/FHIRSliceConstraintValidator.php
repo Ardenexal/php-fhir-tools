@@ -474,7 +474,14 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                     $subject = $innerConstraint instanceof Count ? $group['occurrences'] : $group['value'];
                     $base    = "{$property}[{$itemIndex}].{$rule['path']}";
 
-                    foreach ($this->context->getValidator()->validate($subject, $innerConstraint, ['Default']) as $v) {
+                    // A rule that checks the item against other profiles on the side (FHIRAnyOfProfiles)
+                    // can run a sliced profile through this same instance, which points $this->context
+                    // at the side run; restored before reporting, as in matcher()
+                    $context    = $this->context;
+                    $violations = $context->getValidator()->validate($subject, $innerConstraint, ['Default']);
+                    $this->initialize($context);
+
+                    foreach ($violations as $v) {
                         $innerPath = $v->getPropertyPath();
                         $path      = match (true) {
                             $innerPath    === ''  => $base,
