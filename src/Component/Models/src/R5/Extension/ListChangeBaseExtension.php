@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Reference to the List that a "change" list is asserting changes with respect to.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/list-changeBase', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/list-changeBase', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'List')]
 #[FHIRContextInvariant(expression: 'mode = \'changes\'')]
 class ListChangeBaseExtension extends Extension

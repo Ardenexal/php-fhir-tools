@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
  *
  * @description The period during which the resource content was or is planned to be effective.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-effectivePeriod', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-effectivePeriod', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureMap')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]

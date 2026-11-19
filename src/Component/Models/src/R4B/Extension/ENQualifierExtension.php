@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  *
  * @description A set of codes each of which specifies a certain subcategory of the name part in addition to the main name part type.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-EN-qualifier', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-EN-qualifier', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'HumanName.family')]
 #[FHIRExtensionContext(type: 'element', expression: 'HumanName.given')]
 #[FHIRExtensionContext(type: 'element', expression: 'HumanName.prefix')]

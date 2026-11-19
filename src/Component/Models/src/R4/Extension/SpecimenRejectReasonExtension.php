@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Provides a code or text that specifies the reason a specimen is not usable for testing.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-reject-reason', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-reject-reason', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen')]
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen.container')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/specimen-reject-reason', strength: 'extensible')]

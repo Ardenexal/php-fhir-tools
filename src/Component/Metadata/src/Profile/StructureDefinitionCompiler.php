@@ -99,7 +99,7 @@ final class StructureDefinitionCompiler
             if (!is_array($context) || !isset($context['type'], $context['expression'])) {
                 continue;
             }
-            // A context limited to some FHIR versions carries its range; the validator drops it elsewhere
+            // A context limited to some FHIR versions carries its range; the validator ignores the context in other versions
             $contexts[] = new CompiledAttribute(FHIRExtensionContext::class, [
                 'type'       => (string) $context['type'],
                 'expression' => (string) $context['expression'],
@@ -198,7 +198,7 @@ final class StructureDefinitionCompiler
      * The FHIR version range a `version-specific-use` extension sets on a definition or one of its contexts.
      *
      * Only the bounds that are stated are returned, keyed as the extension names them, so a context
-     * with no range compiles to the same arguments as before.
+     * with no range compiles to its type and expression alone.
      *
      * @param array<mixed> $owner the StructureDefinition, or one `context` entry
      *

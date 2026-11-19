@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
  *
  * @description A free text natural language description of the artifact from a consumer's perspective.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-description', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-description', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ExampleScenario')]

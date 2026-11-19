@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description A reference to additional devices, kits, or reagents (e.g., TestKit, Calibration Kit, QC materials) to support the generation of the measurement.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-supportingDevice', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-supportingDevice', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation', endFhirVersion: '5.0')]
 class ObservationSupportingDeviceExtension extends Extension
 {

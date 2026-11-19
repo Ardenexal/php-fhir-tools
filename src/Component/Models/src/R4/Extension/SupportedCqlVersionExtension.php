@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Indicates that the server supports the given version of Clinical Quality Language (CQL). Valid values are major.minor and optionally the patch version of any published version of the CQL specification.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-supportedCqlVersion', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-supportedCqlVersion', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest')]
 class SupportedCqlVersionExtension extends Extension
 {

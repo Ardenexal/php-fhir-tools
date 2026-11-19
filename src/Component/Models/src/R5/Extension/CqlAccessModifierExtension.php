@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description Indicates the access modifier (i.e. public or private) of a CQL declaration. When CQL library declarations are represented in FHIR structures such as ParameterDefinition, this extension represents the access modifier of the declaration.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-cqlAccessModifier', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-cqlAccessModifier', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ParameterDefinition')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://terminology.hl7.org/ValueSet/cql-access-modifier', strength: 'required')]
 class CqlAccessModifierExtension extends Extension

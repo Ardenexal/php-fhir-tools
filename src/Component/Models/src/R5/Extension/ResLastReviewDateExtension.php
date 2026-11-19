@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
  *
  * @description The date on which the asset content was last reviewed. Review happens periodically after that, but doesn't change the original approval date.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-lastReviewDate', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-lastReviewDate', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureMap')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]

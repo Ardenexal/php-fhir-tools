@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description A default parameter to use when expanding this value set. A client may also pass a parameter with the same parameter name; servers should either overwrite this default parameter, or add to the list of identically named parameters, depending on which parameter is named
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-expansion-parameter', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-expansion-parameter', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose')]
 class ValueSetExpansionParameterExtension extends Extension implements FHIRComplexExtensionInterface
 {

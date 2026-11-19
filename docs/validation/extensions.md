@@ -102,7 +102,8 @@ record, starting `Slice 'Extension.extension:<name>': a matching slice is requir
 
 `validateModifierExtensions()` walks the tree recursively and flags **unknown modifier extension
 URLs** as ERRORs. It also reports a known extension that is not a modifier:
-`The Extension '…' must not be used as a modifierExtension (it's a regular extension)`. This check
+`The Extension '…' must not be used as a modifierExtension (it's a regular extension)`. A class
+generated before 0.8 does not state whether it is a modifier, so it is not reported. This check
 only runs when a `FHIRIGTypeRegistry` is provided to `FHIRValidationService`; without one, the walk
 is skipped.
 

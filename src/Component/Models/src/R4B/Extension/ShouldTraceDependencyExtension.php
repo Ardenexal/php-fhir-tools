@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Indicates whether the extension or profile element on which it appears represents a dependency that should be traced for the purposes of artifact packaging and distribution
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-shouldTraceDependency', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-shouldTraceDependency', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class ShouldTraceDependencyExtension extends Extension

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Captures the reason for the current state of the resource.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-statusReason', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-statusReason', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0', endFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
  *
  * @description When present, this extension indicates that the event actually only occurs on the specified days of the month, on the times as otherwise specified by the timing schedule.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/timing-dayOfMonth', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/timing-dayOfMonth', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Timing.repeat')]
 class TimingDayOfMonthExtension extends Extension
 {

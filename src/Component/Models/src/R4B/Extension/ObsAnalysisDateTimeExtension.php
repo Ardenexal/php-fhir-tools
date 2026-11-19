@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
  *
  * @description The date/time stamp associated with the generation of the analytical result by an instrument. This extension represents when the analysis of the specimen occurred, while the Observation.effective[x] is when the specimen was collected.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-analysis-date-time', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-analysis-date-time', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 class ObsAnalysisDateTimeExtension extends Extension
 {

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
  *
  * @description External Identifiers associated with this element - these are identifiers that are associated with the concept this element represents. DEPRECATED: Use either ElementDefinition.code or ElementDefinition.mapping to provide the mapping instead
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-identifier', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-identifier', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class IdentifierExtension extends Extension
 {

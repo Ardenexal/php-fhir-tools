@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Surfaces the CQL type of the extension, parameter, or parameter definition on which it appears.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-cqlType', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-cqlType', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ParameterDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Parameters.parameter')]
 #[FHIRExtensionContext(type: 'element', expression: 'Parameters.parameter.part')]

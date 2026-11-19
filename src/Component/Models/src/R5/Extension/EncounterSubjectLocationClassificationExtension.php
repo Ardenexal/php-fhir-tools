@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description The classification of the location of the subject in an Encounter.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/subject-locationClassification', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/subject-locationClassification', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter.location')]
 #[FHIRExtensionContext(type: 'element', expression: 'EncounterHistory.location', startFhirVersion: '5.0')]
 class EncounterSubjectLocationClassificationExtension extends Extension

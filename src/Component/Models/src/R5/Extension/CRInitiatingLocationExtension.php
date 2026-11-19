@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Location where the information being requested to be communicated happened.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/communicationrequest-initiatingLocation', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/communicationrequest-initiatingLocation',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
 class CRInitiatingLocationExtension extends Extension
 {

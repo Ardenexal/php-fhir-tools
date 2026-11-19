@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
  *
  * @description Identifies an actor that is 'not relevant' for the purposes of the current publication and that will therefore not be prominently exposed in the profile tables, nor used when determining 'key elements' based on obligations.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/canonicalresource-suppressActor', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/canonicalresource-suppressActor', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class SuppressActorExtension extends Extension

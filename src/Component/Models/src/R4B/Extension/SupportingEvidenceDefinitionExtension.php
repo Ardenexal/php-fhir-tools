@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Specifies an expression that when evaluated, returns supporting evidence. The expression may be the name of an expression defined in a measure library. If qualified it may be the name of an expression defined in any library referenced by a measure library. The expression is allowed to be a definition, or a function that takes a single argument of the same type as the population basis of the population in which it appears, in the same way that continuous variable measure observations function. The expression may return any type. The name element of the expression is required, and is used to provide a link from the MeasureReport back to the supporting evidence definition. The description element of the expression is optional, but if specified, is expected to be populated in the resulting supporting evidence in the measure report. Note also that the expression-coding extension may be used to provide a code on the expression if desired, and if specified is expected to be populated in the resulting supporting evidence.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-supportingEvidenceDefinition', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-supportingEvidenceDefinition', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure.group.population')]
 class SupportingEvidenceDefinitionExtension extends Extension
 {

@@ -14,12 +14,12 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 final readonly class ExtensionUsage
 {
     /**
-     * @param bool        $isModifier       Whether the extension belongs in `modifierExtension`
+     * @param bool|null   $isModifier       Whether the extension belongs in `modifierExtension`; null when its class does not say
      * @param string|null $startFhirVersion The earliest FHIR version it may be used in; null for no limit
      * @param string|null $endFhirVersion   The latest FHIR version it may be used in; null for no limit
      */
     public function __construct(
-        public bool $isModifier,
+        public ?bool $isModifier,
         public ?string $startFhirVersion,
         public ?string $endFhirVersion,
     ) {

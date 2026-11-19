@@ -1060,7 +1060,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
                 // A modifier extension changes the meaning of the element that bears it, so it must sit
                 // where readers look for modifiers
-                if ($usage !== null && $usage->isModifier) {
+                if ($usage?->isModifier === true) {
                     $violations[] = new FHIRValidationViolation(
                         severity: 'error',
                         path: $extViolationPath . '[' . $extIndex . ']',
@@ -1306,9 +1306,14 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             // At the resource root the type is definitively known (resolver-independent), so a
             // non-matching bare context is a confident denial. At nested elements the type may be
             // abstract or unresolvable, so defer rather than risk a false positive. CanonicalResource
-            // and MetadataResource are patterns before R5: the reference validator counts CodeSystem
-            // as one in R4 although no R4 type derives from it, so they defer everywhere
-            return $isRoot && !in_array($expr, self::RESOURCE_PATTERNS, true) ? self::CONTEXT_DENY : self::CONTEXT_DEFER;
+            // and MetadataResource name patterns of resources: the reference validator counts
+            // CodeSystem as one, but no generated resource class derives from them in any release,
+            // so they always defer
+            if (!$isRoot || in_array($expr, self::RESOURCE_PATTERNS, true)) {
+                return self::CONTEXT_DEFER;
+            }
+
+            return self::CONTEXT_DENY;
         }
 
         $exprRoot = substr($expr, 0, (int) strpos($expr, '.'));
@@ -1326,15 +1331,16 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // Foreign root (e.g. "ElementDefinition.binding" inside StructureDefinition): permitted
         // when a type-rooted candidate matches (a path ancestor is typed with the context root).
         // A non-match below the root is deferred, never denied — that would require complete type
-        // resolution of every path segment, which we do not guarantee. The resource being validated
-        // sits at no element path at all, so no dotted context can name it there.
+        // resolution of every path segment, which we do not guarantee. A resource being validated
+        // sits at no element path at all, so no dotted context can name it there. A data type
+        // validated on its own may still be meant for such a path, so it defers.
         foreach ($typeCandidates as $candidate) {
             if ($candidate === $expr || str_starts_with($candidate, $expr . '.')) {
                 return self::CONTEXT_PERMIT;
             }
         }
 
-        return $isRoot ? self::CONTEXT_DENY : self::CONTEXT_DEFER;
+        return $isRoot && $this->isResource($bearingElement) ? self::CONTEXT_DENY : self::CONTEXT_DEFER;
     }
 
     /**
@@ -1487,7 +1493,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * The finding for an extension used in a FHIR version its definition's `version-specific-use` excludes, if it is.
+     * The finding for an extension used in a FHIR version its definition's `version-specific-use` excludes; null when the version is allowed.
      *
      * Worded as the reference validator words it, naming the bound that is broken.
      */
@@ -2049,9 +2055,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     continue;
                 }
 
-                // A known extension that is not a modifier does not belong here
+                // A known extension that is not a modifier does not belong here. A class generated
+                // before 0.8 does not say, so it is not reported
                 $usage = $this->extensionUsage($ext, $this->extensionDefinitionOf($ext));
-                if ($usage !== null && !$usage->isModifier) {
+                if ($usage?->isModifier === false) {
                     $violations[] = new FHIRValidationViolation(
                         severity: 'error',
                         path: $extPath . '[' . $index . ']',

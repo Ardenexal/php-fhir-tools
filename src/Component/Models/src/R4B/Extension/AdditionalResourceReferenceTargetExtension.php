@@ -18,7 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\Base64BinaryPrimitive;
  *
  * @description When defining additional resources, this extension allows the relevant work group to indicate and approve that a core element (or another additional resource) may refer to the resource. This enables normal Reference.reference in deployments where both the core and additional resource definitions are in scope.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/additional-resource-reference-target', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/additional-resource-reference-target',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class AdditionalResourceReferenceTargetExtension extends Extension implements FHIRComplexExtensionInterface
 {

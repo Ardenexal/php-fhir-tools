@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Indicates the entity for whose benefit the List is created and maintained.  This is used when the intended beneficiary of the List is distinct from whoever authored it.  For example, if a capitation List is maintained by a central organization of the patients for a particular provider, the List.source would be the central organization, while the 'List for' extension would point to the provider.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/list-for', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/list-for', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'List')]
 class ListForExtension extends Extension
 {

@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @description The measure criteria that resulted in the resource being included in the result of a measure evaluation. The extension can be used on the resource directly, or it can be used on a Reference element such as MeasureReport.evaluatedResource to identify the measure criteria in the reference (i.e. without requiring the referenced resource to be changed by adding an extension).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-measureInfo', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-measureInfo', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 #[FHIRExtensionContext(type: 'element', expression: 'Reference')]
 class MeasureInfoExtension extends Extension implements FHIRComplexExtensionInterface

@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description This resource came into being as a result of expectations set in the referenced Definition resource.  I.e. This resource represents a 'step' dictated within the protocol/order set/etc.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-triggeredBy', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-triggeredBy', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity.plannedActivityReference', startFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]

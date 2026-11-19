@@ -16,7 +16,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  *
  * @description Indicates if the association always holds for a concept with itself (refexive), never holds for a concept with itself (irreflexive)
  */
-#[FHIRExtensionDefinition(url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-relationship-reflexivity', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-relationship-reflexivity',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.property')]
 #[FHIRProfileBinding(
     path: 'value[x]',

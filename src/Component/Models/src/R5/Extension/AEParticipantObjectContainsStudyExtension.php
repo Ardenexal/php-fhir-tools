@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
  *
  * @description A Study Instance ID, which may be used when the Entity type is not (110180, DCM, "Study Instance UID").
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/auditevent-ParticipantObjectContainsStudy', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/auditevent-ParticipantObjectContainsStudy',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'AuditEvent.entity')]
 class AEParticipantObjectContainsStudyExtension extends Extension
 {

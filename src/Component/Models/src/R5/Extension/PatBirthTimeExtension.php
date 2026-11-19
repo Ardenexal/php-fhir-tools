@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
  *
  * @description The time of day that the Patient/Person/RelatedPerson/Practitioner was born. This includes the date to ensure that the timezone information can be communicated effectively.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-birthTime', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-birthTime', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient.birthDate')]
 #[FHIRExtensionContext(type: 'element', expression: 'Person.birthDate')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson.birthDate')]

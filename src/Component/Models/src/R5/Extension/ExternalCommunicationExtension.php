@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Documentation of out-of-band communication (verbal, etc.)
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/external-communication', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/external-communication', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Appointment')]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]

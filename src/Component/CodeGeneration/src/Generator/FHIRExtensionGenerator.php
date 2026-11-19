@@ -121,16 +121,16 @@ class FHIRExtensionGenerator
         // same rules
         $compiled = $this->compiler->compileExtension($structureDefinition);
 
-        // Arguments left at their defaults are not written, so most classes keep their attribute as it was
+        // isModifier is always written, so a class states it either way; an unstated version bound is left out
         $class = new ClassType($className, $namespace);
         $class->addAttribute(FHIRExtensionDefinition::class, [
             'url'         => $url,
             'fhirVersion' => $version,
+            'isModifier'  => $compiled->isModifier,
             ...array_filter([
-                'isModifier'       => $compiled->isModifier,
                 'startFhirVersion' => $compiled->startFhirVersion,
                 'endFhirVersion'   => $compiled->endFhirVersion,
-            ], static fn (bool|string|null $argument): bool => $argument !== null && $argument !== false),
+            ], static fn (?string $bound): bool => $bound !== null),
         ]);
         foreach ([...$compiled->contexts, ...$compiled->constraints] as $attribute) {
             $class->addAttribute($attribute->class, $attribute->arguments);

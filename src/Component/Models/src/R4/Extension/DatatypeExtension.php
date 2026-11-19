@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Used when the actual type is not allowed by the definition of the element, or not specified in the context (e.g. in a cross-version extension). In general, this should only arise when wrangling between versions using cross-version extensions - see [Cross Version Extensions](versions.html#extensions). For legacy reasons, this extension has a type of `string` but it behaves as a URI with a default namespace (per ElementDefinition.type.code). Also note that the default namespace behavior is version independent
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/_datatype', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/_datatype', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Base')]
 class DatatypeExtension extends Extension
 {

@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Flag denoting whether parent item is preferred - e.g., a preferred address or telephone number.  DEPRECATED: Use rank element or extension instead
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-preferred', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-preferred', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Address')]
 #[FHIRExtensionContext(type: 'element', expression: 'ContactPoint')]
 #[FHIRExtensionContext(type: 'element', expression: 'ExtendedContactDetail', startFhirVersion: '5.0')]

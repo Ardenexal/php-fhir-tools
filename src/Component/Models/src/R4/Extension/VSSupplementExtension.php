@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
  *
  * @description This extension declares that a value set depends on a particular [CodeSystem supplement](codesystem.html#supplements) and should not be used in its absence.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-supplement', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-supplement', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.exclude')]

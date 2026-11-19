@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 #[FHIRExtensionDefinition(
     url: 'http://hl7.org/fhir/StructureDefinition/goal-acceptance',
     fhirVersion: 'R4',
+    isModifier: false,
     startFhirVersion: '1.0',
     endFhirVersion: '5.0',
 )]

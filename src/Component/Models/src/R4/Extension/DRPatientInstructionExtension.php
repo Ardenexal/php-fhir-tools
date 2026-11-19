@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Simple concise instructions to be read by the patient.  For example  "twice a day" rather than "BID.".
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/devicerequest-patientInstruction', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/devicerequest-patientInstruction', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
 class DRPatientInstructionExtension extends Extension implements FHIRComplexExtensionInterface
 {

@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description Supports automated discovery of OAuth2 endpoints.
  */
-#[FHIRExtensionDefinition(url: 'http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.security')]
 class OAuthUrisExtension extends Extension implements FHIRComplexExtensionInterface
 {

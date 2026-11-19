@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description An indicator of what employment conditions/capacity/entitlements the practitioner is working under - e.g. Full-time, part-time, casual. This is typically a HR related attribute.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/practitionerrole-employmentStatus', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/practitionerrole-employmentStatus', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'PractitionerRole')]
 class PREmploymentStatusExtension extends Extension
 {

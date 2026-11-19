@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  *
  * @description Identifies that the element carrying this extension is only a correct value for a particular range of FHIR versions. This extension is found in contexts where a definition is applying to more than one version, usually defining extensions, and should only be used in context that clearly document how a cross-version definition is used. While there are no limitations to where this extension can be used, known uses are: StructureDefinition.context, ElementDefinition.type, ElementDefinition.type.targetProfile, ElementDefinition.additionalBinding and SearchParameter.base.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/version-specific-use', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/version-specific-use', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Element')]
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 class VersionSpecificUseExtension extends Extension implements FHIRComplexExtensionInterface

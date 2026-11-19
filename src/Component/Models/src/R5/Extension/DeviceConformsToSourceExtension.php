@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact;
  *
  * @description Standard, regulation, certification, or guidance website, document, or other publication, or similar, supporting the conformance.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-conformsTo-source', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-conformsTo-source', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Device.conformsTo', startFhirVersion: '5.0')]
 class DeviceConformsToSourceExtension extends Extension
 {

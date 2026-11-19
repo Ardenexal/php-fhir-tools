@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\ParameterDefinition;
  *
  * @description This specifies the definition for a parameter if needed. This is useful for communicating the type of a parameter when the parameter has no value.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/parameters-definition', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/parameters-definition', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Parameters.parameter')]
 class ParametersDefinitionExtension extends Extension
 {

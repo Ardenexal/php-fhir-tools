@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @description The action requested by this resource is intended to satisfy the expectations established by the referenced Definition resource.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-compliesWith', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-compliesWith', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity.plannedActivityReference', startFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description allow for a check digit and a check digit scheme to be conveyed as part of Naming System.    The rules of the ID Type determine if the check digit is part of the ID value or sent    separately.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/namingsystem-checkDigit', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/namingsystem-checkDigit', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'NamingSystem')]
 class NSCheckDigitExtension extends Extension
 {

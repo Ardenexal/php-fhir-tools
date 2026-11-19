@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @description The pharmacies that are preferred for dispensing prescribed medications.  A patient might prefer their local pharmacy.  A provider in a given practice may prefer a pharmacy near their clinic.  Or facilities may have a preference to use an in-house pharmacy.  These preferences may be represented using this extension on several resource types, and are expected to be inputs into a process that determines which pharmacy is ultimately used to dispense a medication.  That process may include considering drug formularies, pharmacy operating hours, pharmacy inventory, practitioner preferences, patient preferences, etc.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-preferredPharmacy', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-preferredPharmacy', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient')]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 #[FHIRExtensionContext(type: 'element', expression: 'PractitionerRole')]

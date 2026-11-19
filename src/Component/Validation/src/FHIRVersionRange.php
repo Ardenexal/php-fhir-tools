@@ -13,6 +13,8 @@ namespace Ardenexal\FHIRTools\Component\Validation;
  * way this library names it ('R4', 'R4B', 'R5'); the reference validator's wording names it the same
  * way and adds its version, which {@see versionOf()} gives.
  *
+ * @internal
+ *
  * @author Ardenexal
  */
 final class FHIRVersionRange
@@ -70,10 +72,10 @@ final class FHIRVersionRange
     }
 
     /**
-     * The first two parts of a version, such as '4.0' for '4.0.1'.
+     * The first two parts of a version, such as '4.0' for '4.0.1' and for a bare '4'.
      */
     private static function majorMinor(string $version): string
     {
-        return implode('.', array_slice(explode('.', $version), 0, 2));
+        return implode('.', array_slice([...explode('.', $version), '0'], 0, 2));
     }
 }

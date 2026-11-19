@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @description A plan, proposal or order that is fulfilled in whole or in part by this event.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-basedOn', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-basedOn', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Condition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ChargeItem')]
 #[FHIRExtensionContext(type: 'element', expression: 'ClinicalImpression')]

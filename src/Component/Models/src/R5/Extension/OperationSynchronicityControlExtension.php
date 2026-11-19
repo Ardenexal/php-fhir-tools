@@ -21,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 #[FHIRExtensionDefinition(
     url: 'http://hl7.org/fhir/StructureDefinition/synchronicity-control',
     fhirVersion: 'R5',
+    isModifier: false,
     startFhirVersion: '4.0',
     endFhirVersion: '5.0',
 )]

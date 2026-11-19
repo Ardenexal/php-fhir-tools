@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Points to the Observation, AllergyIntolerance or other record that provides additional supporting information about this flag. Note that This extension will be replaced by Flag.supportingInfo in the FHIR R6 release.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/flag-detail', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/flag-detail', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Flag')]
 #[FHIRExtensionContext(type: 'element', expression: 'Media', endFhirVersion: '4.3')]
 class FlagDetailExtension extends Extension

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
  *
  * @description Indicates the date on which request or event resource that has a status of 'on-hold' or 'suspended' should be moved back to an active state.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-releaseDate', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-releaseDate', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Account')]
 #[FHIRExtensionContext(type: 'element', expression: 'Appointment')]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]

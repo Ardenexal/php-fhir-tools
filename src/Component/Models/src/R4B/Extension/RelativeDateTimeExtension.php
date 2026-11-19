@@ -21,7 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description A date/time value that is determined based on a duration offset from a target event. DEPRECATED: This extension has been deprecated in favor of the new relative-time extension.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-relativeDateTime', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-relativeDateTime', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class RelativeDateTimeExtension extends Extension implements FHIRComplexExtensionInterface
 {

@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description A reference to additional devices, kits, or reagents (e.g., TestKit, Calibration Kit, QC materials) to support the generation of the measurement.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-supportingDevice', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-supportingDevice', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 class ObservationSupportingDeviceExtension extends Extension implements FHIRComplexExtensionInterface
 {

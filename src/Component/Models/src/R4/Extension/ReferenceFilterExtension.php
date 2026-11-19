@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Identifies a filter to apply when looking up candidate answers for the question.  DEPRECATED: This extension has been replaced by the Structured Data Capture candidateExpression extension.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-referenceFilter', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-referenceFilter', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 #[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'Reference\') or where(%resource.is(Questionnaire)).exists(type.first()=\'reference\')')]

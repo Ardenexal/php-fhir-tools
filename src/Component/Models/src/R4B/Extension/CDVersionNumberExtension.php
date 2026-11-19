@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 #[FHIRExtensionDefinition(
     url: 'http://hl7.org/fhir/StructureDefinition/composition-clinicaldocument-versionNumber',
     fhirVersion: 'R4B',
+    isModifier: false,
     endFhirVersion: '4.3',
 )]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]

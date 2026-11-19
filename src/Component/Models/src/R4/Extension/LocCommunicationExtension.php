@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Language(s) that services are available in at this location/organization.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/location-communication', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/location-communication', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Location')]
 #[FHIRExtensionContext(type: 'element', expression: 'Organization')]
 #[FHIRExtensionContext(type: 'element', expression: 'OrganizationAffiliation')]

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Indicates the geographic/geopolitical region for which the identifier is scoped or intended to be used.  E.g. the region for a drivers license, professional license or passport.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/identifier-jurisdiction', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/identifier-jurisdiction', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Identifier')]
 class IdentifierJurisdictionExtension extends Extension
 {

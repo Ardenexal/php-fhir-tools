@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description The type of actor in the research study that is masked to study group assignment.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/blinded-role', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/blinded-role', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
 #[FHIRExtensionContext(type: 'element', expression: 'Evidence', startFhirVersion: '4.0', endFhirVersion: '4.3')]
 class BlindedRoleExtension extends Extension

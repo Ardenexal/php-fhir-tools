@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Distinguishes the type of involvement of the performer in the event. For example, 'author',  'verifier' or 'responsible party'.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-performerFunction', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-performerFunction', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation.performer')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport.performer')]
 #[FHIRExtensionContext(type: 'element', expression: 'DocumentReference.author')]

@@ -20,7 +20,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
  *
  * @description Target and actual numbers of interventionalists for a study.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/researchStudy-interventionalistRecruitment', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/researchStudy-interventionalistRecruitment',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
 class RSInterventionalistRecruitmentExtension extends Extension implements FHIRComplexExtensionInterface
 {

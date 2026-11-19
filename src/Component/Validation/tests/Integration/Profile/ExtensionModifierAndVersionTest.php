@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
 use Ardenexal\FHIRTools\Component\Models\R4\Extension\DoNotPerformExtension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
@@ -44,6 +46,8 @@ final class ExtensionModifierAndVersionTest extends TestCase
 
     private const string CANONICAL = self::BASE . 'canonical';
 
+    private const string ON_PATIENT_NAME = self::BASE . 'on-patient-name';
+
     private FHIRValidationService $service;
 
     protected function setUp(): void
@@ -61,6 +65,7 @@ final class ExtensionModifierAndVersionTest extends TestCase
             ]),
             self::extension(self::CODE_SYSTEM_PROPERTY, [['type' => 'element', 'expression' => 'CodeSystem.property']]),
             self::extension(self::CANONICAL, [['type' => 'element', 'expression' => 'CanonicalResource']]),
+            self::extension(self::ON_PATIENT_NAME, [['type' => 'element', 'expression' => 'Patient.name']]),
         ])));
     }
 
@@ -105,6 +110,23 @@ final class ExtensionModifierAndVersionTest extends TestCase
 
         $task->extension         = [];
         $task->modifierExtension = [new DoNotPerformExtension(valueBoolean: true)];
+        self::assertSame([], $this->findings($task, 'must not be used'));
+    }
+
+    /**
+     * A class generated before 0.8 does not say whether it is a modifier, so it is not reported in
+     * either place.
+     */
+    public function testAnExtensionClassThatDoesNotSayIsNotReported(): void
+    {
+        $task                    = new TaskResource();
+        $task->modifierExtension = [new #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-doNotPerform', fhirVersion: 'R4')] class extends Extension {
+            public function __construct()
+            {
+                parent::__construct(url: 'http://hl7.org/fhir/StructureDefinition/request-doNotPerform');
+            }
+        }];
+
         self::assertSame([], $this->findings($task, 'must not be used'));
     }
 
@@ -154,6 +176,18 @@ final class ExtensionModifierAndVersionTest extends TestCase
 
         $patient->extension = [self::plain(self::CANONICAL)];
         self::assertSame([], $this->findings($patient, 'not permitted'));
+    }
+
+    /**
+     * A data type validated on its own may be meant for an element path, so a dotted context is
+     * left undecided rather than denied.
+     */
+    public function testADataTypeValidatedOnItsOwnLeavesADottedContextUndecided(): void
+    {
+        $name            = new HumanName(family: new StringPrimitive(value: 'Chalmers'));
+        $name->extension = [self::plain(self::ON_PATIENT_NAME)];
+
+        self::assertSame([], $this->findings($name, 'not permitted'));
     }
 
     private static function plain(string $url): Extension

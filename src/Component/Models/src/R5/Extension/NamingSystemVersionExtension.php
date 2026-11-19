@@ -15,7 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @description The business version associated with the Naming System
  */
-#[FHIRExtensionDefinition(url: 'http://terminology.hl7.org/StructureDefinition/ext-namingsystem-version', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://terminology.hl7.org/StructureDefinition/ext-namingsystem-version', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'NamingSystem')]
 class NamingSystemVersionExtension extends Extension
 {

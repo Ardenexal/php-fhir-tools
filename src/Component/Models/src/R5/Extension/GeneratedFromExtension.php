@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  *
  * @description This artifact was algorithmically produced by applying the referenced artifact to the context relevant for this request.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-generatedFrom', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-generatedFrom', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity.plannedActivityReference', startFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Communication')]

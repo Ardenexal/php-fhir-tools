@@ -27,6 +27,7 @@ final class FHIRVersionRangeTest extends TestCase
         yield 'end bound is inclusive' => ['R4B', null, '4.3', true];
         yield 'after the end' => ['R5', null, '4.3', false];
         yield 'a patch version counts as its minor' => ['R4', '4.0.1', '4.0.1', true];
+        yield 'a bare major counts as its .0 minor' => ['R5', '5', '5', true];
         yield 'an unknown release is never excluded' => ['R6', '4.0', '4.3', true];
     }
 

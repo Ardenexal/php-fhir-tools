@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
  *
  * @description A warning about how to interpret and/or correctly use the value set.  This is intended for anyone engaging with the value set definition or its expansion.  For example, a warning advising of licensing requirements for code systems the value set relies upon.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-warning', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-warning', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class VSWarningExtension extends Extension
 {

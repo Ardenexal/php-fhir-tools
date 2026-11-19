@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Identifies the relative preference of alternative performers when the request lists multiple performers.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-performerOrder', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-performerOrder', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest.performer', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task.requestedPerformer', startFhirVersion: '5.0')]
 class PerformerOrderExtension extends Extension

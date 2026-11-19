@@ -23,7 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
  *
  * Accuracy is usually in the same units as the reported value. Accuracy valueQuantity units SHOULD be provided for clarity; if omitted, they are implied to be the same as the reported value's units (or the DeviceMetric units).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/quantity-accuracy', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/quantity-accuracy', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Quantity')]
 class QuantityAccuracyExtension extends Extension
 {

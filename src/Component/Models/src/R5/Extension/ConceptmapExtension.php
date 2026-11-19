@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  *
  * @description This extension references a ConceptMap that maps to relevant terminologies used in an implementation.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-conceptmap', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-conceptmap', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.snapshot.element.binding.valueSet')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.differential.element.binding.valueSet')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerValueSet', startFhirVersion: '4.0')]

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
  *
  * @description The date the occurrence of the event was first captured in the record - potentially significantly after the occurrence of the event.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-recorded', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-recorded', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Communication')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 class EventRecordedExtension extends Extension

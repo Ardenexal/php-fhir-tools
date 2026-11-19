@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
  *
  * @description The human readable description of population criteria.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/measurereport-populationDescription', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/measurereport-populationDescription', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.group')]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.group.population')]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.group.stratifier')]

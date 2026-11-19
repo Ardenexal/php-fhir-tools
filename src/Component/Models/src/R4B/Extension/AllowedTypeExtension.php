@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 #[FHIRExtensionDefinition(
     url: 'http://hl7.org/fhir/StructureDefinition/operationdefinition-allowed-type',
     fhirVersion: 'R4B',
+    isModifier: false,
     endFhirVersion: '4.3',
 )]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter')]

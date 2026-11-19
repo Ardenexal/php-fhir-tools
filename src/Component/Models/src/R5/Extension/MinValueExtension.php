@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive;
  *
  * @description The inclusive lower bound on the range of allowed values for the data element.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/minValue', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/minValue', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 class MinValueExtension extends Extension
 {

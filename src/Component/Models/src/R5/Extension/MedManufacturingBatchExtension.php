@@ -23,7 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @description The date at which the drug substance or drug product was manufactured.  The specific operation/step in the process used to determine the date is specified by the manufacturingDateClassification element.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medication-manufacturingBatch', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medication-manufacturingBatch', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication.batch', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Substance')]
 class MedManufacturingBatchExtension extends Extension implements FHIRComplexExtensionInterface

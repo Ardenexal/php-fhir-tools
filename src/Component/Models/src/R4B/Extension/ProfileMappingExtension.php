@@ -34,7 +34,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * This extension repeats, and order is important - once a match is found, this profile is the one that applies. Todo: If this extension is useful, it will be moved to the core extensions pack
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/profile-mapping', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/profile-mapping', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource')]
 class ProfileMappingExtension extends Extension implements FHIRComplexExtensionInterface
 {

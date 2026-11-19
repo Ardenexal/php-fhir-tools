@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
  *
  * @description A trusted FHIR terminology server endpoint (the [base] url of the FHIR server) where an expansion of the valueset may be performed.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-trusted-expansion', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-trusted-expansion', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class VSTrustedExpansionExtension extends Extension
 {

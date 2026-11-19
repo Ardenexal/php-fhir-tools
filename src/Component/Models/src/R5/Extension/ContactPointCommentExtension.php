@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @description A comment associated with the ContactPoint such as usage notes or pronunciation.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/contactpoint-comment', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/contactpoint-comment', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ContactPoint')]
 #[FHIRExtensionContext(type: 'element', expression: 'ExtendedContactDetail', startFhirVersion: '5.0')]
 class ContactPointCommentExtension extends Extension

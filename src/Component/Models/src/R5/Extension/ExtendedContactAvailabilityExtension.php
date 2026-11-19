@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description The details provided in this contact may be used according to the attached availability guidelines.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/extended-contact-availability', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/extended-contact-availability', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ExtendedContactDetail', startFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'ContactDetail')]
 #[FHIRExtensionContext(type: 'element', expression: 'Address')]

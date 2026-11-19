@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
  *
  * @description The quanity left to be dispensed after a dispensing event.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medicationdispense-quantityRemaining', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/medicationdispense-quantityRemaining',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationDispense')]
 class MedQuantityRemainingExtension extends Extension
 {

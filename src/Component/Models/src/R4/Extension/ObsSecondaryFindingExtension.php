@@ -21,7 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * For more detail, please see:
  * https://ghr.nlm.nih.gov/primer/testing/secondaryfindings.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-secondaryFinding', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-secondaryFinding', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/secondary-finding', strength: 'extensible')]
 class ObsSecondaryFindingExtension extends Extension

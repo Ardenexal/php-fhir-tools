@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description This extension allows conveying the coded meaning of the extension in instances of the extension.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-extension-meaning', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-extension-meaning',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'Extension')]
 #[FHIRExtensionContext(type: 'element', expression: 'Extension.value')]
 class SDExtensionMeaningExtension extends Extension

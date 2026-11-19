@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Indicates whether the service is directly schedulable or not. For example, a generic "Radiology" service is not schedulable, but a CT Scan is schedulable.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/healthcareservice-schedulable', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/healthcareservice-schedulable', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'HealthcareService')]
 class HealthcareServiceSchedulableExtension extends Extension
 {
