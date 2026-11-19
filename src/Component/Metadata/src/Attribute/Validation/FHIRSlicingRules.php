@@ -10,7 +10,7 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation;
  * This is pure metadata — it does NOT extend Symfony's Constraint and has no validator.
  * The FHIRSliceConstraintValidator reads it via reflection alongside #[FHIRSliceConstraint]
  * attributes to determine whether items that match no defined slice should be rejected
- * (closed) or allowed (open / openAtEnd).
+ * (closed) or allowed (open / openAtEnd), and whether items must follow slice order (ordered).
  *
  * One per sliced property per profile. Multiple properties on the same class each get
  * their own #[FHIRSlicingRules] attribute.

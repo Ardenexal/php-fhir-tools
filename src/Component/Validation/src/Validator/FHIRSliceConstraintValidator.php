@@ -29,7 +29,8 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  * Symfony invokes this validator once per #[FHIRSliceConstraint] attribute on the class.
  * When first invoked for a (property, active-group) pair on an object, it performs a
  * complete validation pass: reads all slices for that property, counts item matches,
- * checks min/max cardinality, and (for closed slicing) rejects items matching no slice.
+ * checks min/max cardinality, (for closed slicing) rejects items matching no slice, and
+ * (for ordered slicing) reports items that come before an item of a later-declared slice.
  *
  * Subsequent invocations for the same (property, active-group, object) within a single
  * $validator->validate() call are no-ops; a WeakMap keyed on the ExecutionContext prevents

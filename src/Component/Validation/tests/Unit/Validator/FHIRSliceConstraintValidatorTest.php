@@ -460,6 +460,25 @@ final class FHIRSliceConstraintValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    /** Every out-of-order item is reported against the latest slice before it, which a violation does not lower. */
+    public function testOrderedSlicingReportsEachOutOfOrderItem(): void
+    {
+        $obj               = new SliceTestPatientOrdered();
+        $obj->identifier[] = $this->makeIdentifier('http://medicare.example.org');
+        $obj->identifier[] = $this->makeIdentifier('http://ihi.example.org');
+        $obj->identifier[] = $this->makeIdentifier('http://medicare.example.org');
+        $obj->identifier[] = $this->makeIdentifier('http://ihi.example.org');
+
+        $this->validator->validate($obj, $this->firstConstraintOf($obj));
+
+        $message    = 'Property "{{ property }}" uses ordered slicing: this item matches slice "{{ slice }}", which must come before slice "{{ previous }}" of an earlier item.';
+        $parameters = ['{{ property }}' => 'identifier', '{{ slice }}' => 'ihiNumber', '{{ previous }}' => 'medicareNumber'];
+
+        $this->buildViolation($message)->setParameters($parameters)->atPath('identifier[1]')->setCode(FHIRViolationCode::ERROR)
+            ->buildNextViolation($message)->setParameters($parameters)->atPath('identifier[3]')->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
     public function testUnorderedSlicingAllowsAnyItemOrder(): void
     {
         $obj               = new SliceTestPatientUnordered();

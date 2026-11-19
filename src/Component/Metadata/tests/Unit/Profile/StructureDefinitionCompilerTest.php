@@ -329,6 +329,34 @@ final class StructureDefinitionCompilerTest extends TestCase
     }
 
     /**
+     * The snapshot's `ordered` holds when the differential restates the slicing without it, and
+     * when the differential only adds slices to inherited slicing, which then gets open rules.
+     */
+    public function testInheritedOrderIsKept(): void
+    {
+        $ordered  = ['discriminator' => [['type' => 'value', 'path' => 'fullUrl']], 'rules' => 'open', 'ordered' => true];
+        $snapshot = [
+            ['id' => 'Bundle', 'path' => 'Bundle'],
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => $ordered],
+            ['id' => 'Bundle.entry:first', 'path' => 'Bundle.entry', 'sliceName' => 'first'],
+            ['id' => 'Bundle.entry:first.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:first'],
+        ];
+        $slice = ['id' => 'Bundle.entry:first', 'path' => 'Bundle.entry', 'sliceName' => 'first', 'min' => 1];
+
+        $restated = [
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => ['discriminator' => $ordered['discriminator'], 'rules' => 'closed']],
+            $slice,
+        ];
+        $compiled = (new StructureDefinitionCompiler())->compile(['url' => self::URL, 'differential' => ['element' => $restated], 'snapshot' => ['element' => $snapshot]]);
+        self::assertSame(['closed'], self::slicingRules($compiled->attributes));
+        self::assertSame([true], self::slicingArgument($compiled->attributes, 'ordered'));
+
+        $added    = (new StructureDefinitionCompiler())->compile(['url' => self::URL, 'differential' => ['element' => [$slice]], 'snapshot' => ['element' => $snapshot]]);
+        self::assertSame(['open'], self::slicingRules($added->attributes));
+        self::assertSame([true], self::slicingArgument($added->attributes, 'ordered'));
+    }
+
+    /**
      * A profile restating closed slicing lists its own slices first and the snapshot's after them,
      * yet each slice's `orderedIndex` is its place in the snapshot, where every slice is declared.
      */
