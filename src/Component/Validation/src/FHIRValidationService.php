@@ -2099,7 +2099,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * Collects violations for unmet obligation requirements (SHALL_POPULATE, SHOULD_POPULATE, etc.).
      *
      * Reflects over the resource's properties, finds those with #[FHIRObligation] attributes matching
-     * the provided context, and generates violations when required fields are empty.
+     * the provided context, and generates violations when required fields are empty. An obligation
+     * with a FHIRPath filter covers only the property's occurrences the filter selects, so it is met
+     * only when at least one occurrence matches; a filter that cannot be evaluated yields an info
+     * eval-error instead of the obligation's violation.
      *
      * @param object                $resource The FHIR resource to inspect
      * @param FHIRObligationContext $context  The obligation context to match against
@@ -2121,25 +2124,14 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
             // Uninitialized (constructor-bypassed deserialization) counts as absent → empty, so the
             // obligation still fires; the guarded read answers null for uninitialized and for null.
-            $value   = $this->models->readInitializedValue($resource, $name);
-            $isEmpty = $value === null || $value === [];
+            $value = $this->models->readInitializedValue($resource, $name);
 
             foreach ($attrs as $obligation) {
                 if (!$context->matchesObligation($obligation)) {
                     continue;
                 }
 
-                if ($obligation->filter !== null) {
-                    continue; // FHIRPath filter evaluation deferred to backlog
-                }
-
-                $code = ObligationCode::tryFrom($obligation->code);
-
-                if ($code === null || !$isEmpty) {
-                    continue;
-                }
-
-                $severity = match ($code) {
+                $severity = match (ObligationCode::tryFrom($obligation->code)) {
                     ObligationCode::SHALL_POPULATE          => 'error',
                     ObligationCode::SHOULD_POPULATE         => 'warning',
                     ObligationCode::SHALL_POPULATE_IF_KNOWN => 'info',
@@ -2150,10 +2142,37 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     continue;
                 }
 
+                $matched = $this->obligationOccurrences($obligation, $name, $value);
+
+                if ($matched === null) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'info',
+                        path: $name,
+                        message: sprintf(
+                            'Obligation %s on property "%s" not checked: its filter could not be evaluated: %s',
+                            $obligation->code,
+                            $name,
+                            (string) $obligation->filter,
+                        ),
+                        constraintClass: FHIRObligation::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                        code: FHIRViolationCode::EVAL_ERROR,
+                    );
+
+                    continue;
+                }
+
+                if ($matched !== []) {
+                    continue;
+                }
+
                 $violations[] = new FHIRValidationViolation(
                     severity: $severity,
                     path: $name,
-                    message: sprintf('Obligation %s: property "%s" must be populated.', $obligation->code, $name),
+                    message: $obligation->filter === null
+                        ? sprintf('Obligation %s: property "%s" must be populated.', $obligation->code, $name)
+                        : sprintf('Obligation %s: property "%s" must be populated with a value matching %s.', $obligation->code, $name, $obligation->filter),
                     constraintClass: FHIRObligation::class,
                     profileGroup: null,
                     invariantKey: null,
@@ -2165,7 +2184,56 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * Removes fhir:error violations for properties where a matching SHALL:no-error obligation applies.
+     * The paths of a property's occurrences that an obligation covers.
+     *
+     * Without a filter that is every occurrence. With one, as the obligation extension defines it,
+     * the filter is evaluated against each occurrence in turn, and the obligation covers those for
+     * which it returns a single boolean true. A list property's occurrences are `name[i]`; a
+     * single-valued property's only occurrence is `name`. An absent or empty property has none.
+     *
+     * @return list<string>|null null when the filter could not be evaluated for some occurrence: a
+     *                           FHIRPath engine exception, such as a syntax error or an unsupported
+     *                           function. Any other throwable is a bug and propagates.
+     */
+    private function obligationOccurrences(FHIRObligation $obligation, string $name, mixed $value): ?array
+    {
+        if ($value === null || $value === []) {
+            return [];
+        }
+
+        $occurrences = [];
+        if (is_array($value)) {
+            foreach (array_values($value) as $index => $item) {
+                $occurrences[sprintf('%s[%d]', $name, $index)] = $item;
+            }
+        } else {
+            $occurrences[$name] = $value;
+        }
+
+        if ($obligation->filter === null) {
+            return array_keys($occurrences);
+        }
+
+        $matched = [];
+        foreach ($occurrences as $path => $item) {
+            try {
+                $result = $this->pathService->evaluate($obligation->filter, $item);
+            } catch (FHIRPathException) {
+                return null;
+            }
+
+            if ($result->count() === 1 && $result->first() === true) {
+                $matched[] = $path;
+            }
+        }
+
+        return $matched;
+    }
+
+    /**
+     * Removes error-severity violations whose path is a property with a matching SHALL:no-error
+     * obligation, or, for a filtered one, an occurrence `name[i]` its filter selects. Only exact path
+     * matches are removed; a filter that cannot be evaluated removes nothing.
      *
      * @param list<FHIRValidationViolation> $violations
      *
@@ -2177,11 +2245,23 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
         foreach ($this->models->publicPropertyNames($resource) as $name) {
             foreach ($this->attributes->propertyAttributes($resource, $name, FHIRObligation::class) as $obligation) {
-                if ($context->matchesObligation($obligation)
-                    && ObligationCode::tryFrom($obligation->code) === ObligationCode::SHALL_NO_ERROR
+                if (!$context->matchesObligation($obligation)
+                    || ObligationCode::tryFrom($obligation->code) !== ObligationCode::SHALL_NO_ERROR
                 ) {
-                    $suppressedPaths[] = $name;
+                    continue;
                 }
+
+                if ($obligation->filter === null) {
+                    $suppressedPaths[] = $name;
+
+                    continue;
+                }
+
+                // A filtered obligation covers only the occurrences it selects, so only their errors
+                // go. A filter that cannot be evaluated (null) suppresses nothing, so errors stay visible.
+                $value   = $this->models->readInitializedValue($resource, $name);
+                $matched = $this->obligationOccurrences($obligation, $name, $value) ?? [];
+                array_push($suppressedPaths, ...$matched);
             }
         }
 
