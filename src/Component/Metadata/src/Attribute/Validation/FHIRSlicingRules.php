@@ -18,6 +18,11 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation;
  * openAtEnd: Extra (unmatched) items are allowed only after all matched-slice items.
  * The validator enforces that no matched-slice item appears after any unmatched item.
  *
+ * ordered: the profile's `slicing.ordered`. Items must then appear in slice declaration order,
+ * which each #[FHIRSliceConstraint] carries as `orderedIndex`: an item matching a slice declared
+ * before the slice of an earlier item is reported. Items that match no slice are not part of
+ * the order.
+ *
  * Example:
  * <pre>
  * #[FHIRSlicingRules(
@@ -37,11 +42,13 @@ final class FHIRSlicingRules
      * @param string       $property Property path on the target class (e.g. 'identifier')
      * @param string       $rules    Slicing rules: 'open', 'openAtEnd', or 'closed'
      * @param list<string> $groups   Profile URL groups under which these rules are active
+     * @param bool         $ordered  True when items must appear in slice declaration order (`slicing.ordered`)
      */
     public function __construct(
         public readonly string $property,
         public readonly string $rules,
         public readonly array $groups = [],
+        public readonly bool $ordered = false,
     ) {
     }
 }

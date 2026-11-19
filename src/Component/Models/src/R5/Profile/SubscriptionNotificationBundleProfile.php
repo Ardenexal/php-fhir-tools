@@ -32,7 +32,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     options: ['min' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'],
 )]
-#[FHIRSlicingRules(property: 'entry', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'])]
+#[FHIRSlicingRules(
+    property: 'entry',
+    rules: 'open',
+    groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'],
+    ordered: true,
+)]
 #[FHIRSliceConstraint(
     property: 'entry',
     sliceName: 'first',

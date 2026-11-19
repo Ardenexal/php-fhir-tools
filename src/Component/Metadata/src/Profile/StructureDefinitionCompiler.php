@@ -1044,6 +1044,7 @@ final class StructureDefinitionCompiler
                     'property' => $propertyPath,
                     'rules'    => self::enforceableRules($slicedId, $slicing, $slices, $profileUrl, $diagnostics),
                     'groups'   => [$profileUrl],
+                    ...self::orderedOption($slicing),
                 ]);
             }
 
@@ -1212,6 +1213,19 @@ final class StructureDefinitionCompiler
     }
 
     /**
+     * `ordered: true` for a FHIRSlicingRules whose slicing is ordered, else nothing, so unordered
+     * slicing compiles exactly as before.
+     *
+     * @param array{definition: array<string, mixed>, declaredHere: bool} $slicing From slicingFor()
+     *
+     * @return array{ordered?: true}
+     */
+    private static function orderedOption(array $slicing): array
+    {
+        return ($slicing['definition']['ordered'] ?? false) === true ? ['ordered' => true] : [];
+    }
+
+    /**
      * Arguments for one #[FHIRSliceConstraint] per slice of a sliced element, without `property`
      * and `groups`.
      *
@@ -1254,12 +1268,17 @@ final class StructureDefinitionCompiler
             $names = array_values(array_unique([...$names, ...self::sliceNames($slicedId, $snapshot)]));
         }
 
+        // Declaration order is the snapshot's, which lists every slice of the slicing; the merged
+        // list above puts the differential's slices first
+        $declared = array_flip(self::sliceNames($slicedId, $snapshot));
+
         $definitions = [];
-        foreach ($names as $orderedIndex => $sliceName) {
-            $sliceId   = "{$slicedId}:{$sliceName}";
-            $header    = $diff[$sliceId] ?? [];
-            $isDefault = $sliceName === '@default';
-            $max       = (string) ($header['max'] ?? '*');
+        foreach ($names as $position => $sliceName) {
+            $orderedIndex = $declared[$sliceName] ?? count($declared) + $position;
+            $sliceId      = "{$slicedId}:{$sliceName}";
+            $header       = $diff[$sliceId] ?? [];
+            $isDefault    = $sliceName === '@default';
+            $max          = (string) ($header['max'] ?? '*');
 
             $sliceDiscriminators = [];
             foreach ($discriminators as $discriminator) {
@@ -1478,6 +1497,7 @@ final class StructureDefinitionCompiler
                     'options'    => [
                         'property' => $relative,
                         'rules'    => self::enforceableRules($nestedId, $slicing, $definitions, $profileUrl, $diagnostics),
+                        ...self::orderedOption($slicing),
                     ],
                 ];
             }

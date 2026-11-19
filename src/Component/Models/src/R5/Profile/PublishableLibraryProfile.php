@@ -60,7 +60,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition'],
     ],
-    orderedIndex: 0,
+    orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'],
 )]
 class PublishableLibraryProfile extends ShareableLibraryProfile

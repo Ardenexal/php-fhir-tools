@@ -49,7 +49,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-directReferenceCode'],
     ],
-    orderedIndex: 0,
+    orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'],
 )]
 #[FHIRSlicingRules(property: 'relatedArtifact', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/logiclibrary'])]

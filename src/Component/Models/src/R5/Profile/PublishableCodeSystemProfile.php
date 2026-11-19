@@ -45,7 +45,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
             'value' => 'http://hl7.org/fhir/StructureDefinition/codesystem-sourceReference',
         ],
     ],
-    orderedIndex: 0,
+    orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/publishablecodesystem'],
 )]
 #[FHIRSliceConstraint(
@@ -56,7 +56,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
     discriminators: [
         ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/codesystem-otherName'],
     ],
-    orderedIndex: 1,
+    orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/publishablecodesystem'],
 )]
 class PublishableCodeSystemProfile extends ShareableCodeSystemProfile

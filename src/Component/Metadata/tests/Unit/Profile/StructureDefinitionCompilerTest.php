@@ -311,18 +311,70 @@ final class StructureDefinitionCompilerTest extends TestCase
     }
 
     /**
+     * `slicing.ordered` reaches FHIRSlicingRules as `ordered: true`; unordered slicing compiles
+     * without the argument.
+     */
+    public function testOrderedSlicingCompilesItsOrder(): void
+    {
+        $slices = [
+            ['id' => 'Bundle.entry:first', 'path' => 'Bundle.entry', 'sliceName' => 'first'],
+            ['id' => 'Bundle.entry:first.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:first'],
+        ];
+
+        $ordered = self::entrySlicing('open', ['type' => 'value', 'path' => 'fullUrl'], $slices, ordered: true);
+        self::assertSame([true], self::slicingArgument((new StructureDefinitionCompiler())->compile($ordered)->attributes, 'ordered'));
+
+        $unordered = self::entrySlicing('open', ['type' => 'value', 'path' => 'fullUrl'], $slices);
+        self::assertSame([null], self::slicingArgument((new StructureDefinitionCompiler())->compile($unordered)->attributes, 'ordered'));
+    }
+
+    /**
+     * A profile restating closed slicing lists its own slices first and the snapshot's after them,
+     * yet each slice's `orderedIndex` is its place in the snapshot, where every slice is declared.
+     */
+    public function testOrderedIndexFollowsTheSnapshotsSliceOrder(): void
+    {
+        $slicing  = ['discriminator' => [['type' => 'value', 'path' => 'fullUrl']], 'rules' => 'closed', 'ordered' => true];
+        $snapshot = [
+            ['id' => 'Bundle', 'path' => 'Bundle'],
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => $slicing],
+            ['id' => 'Bundle.entry:first', 'path' => 'Bundle.entry', 'sliceName' => 'first'],
+            ['id' => 'Bundle.entry:first.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:first'],
+            ['id' => 'Bundle.entry:second', 'path' => 'Bundle.entry', 'sliceName' => 'second'],
+            ['id' => 'Bundle.entry:second.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:second'],
+        ];
+        $differential = [
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => $slicing],
+            ['id' => 'Bundle.entry:second', 'path' => 'Bundle.entry', 'sliceName' => 'second', 'min' => 1],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile(['url' => self::URL, 'differential' => ['element' => $differential], 'snapshot' => ['element' => $snapshot]]);
+        $slices   = self::sliceArguments($compiled->attributes);
+
+        self::assertSame(['second', 'first'], array_keys($slices));
+        self::assertSame(0, $slices['first']['orderedIndex']);
+        self::assertSame(1, $slices['second']['orderedIndex']);
+    }
+
+    /**
      * A Bundle profile slicing `entry` with the given rules and discriminator, plus $slices.
      *
      * @param array{type: string, path: string} $discriminator
      * @param list<array<string, mixed>>        $slices
+     * @param bool                              $ordered       Whether the slicing is ordered
      *
      * @return array<string, mixed>
      */
-    private static function entrySlicing(string $rules, array $discriminator, array $slices): array
+    private static function entrySlicing(string $rules, array $discriminator, array $slices, bool $ordered = false): array
     {
+        $slicing = ['discriminator' => [$discriminator], 'rules' => $rules];
+        if ($ordered) {
+            $slicing['ordered'] = true;
+        }
+
         $elements = [
             ['id' => 'Bundle', 'path' => 'Bundle'],
-            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => ['discriminator' => [$discriminator], 'rules' => $rules]],
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => $slicing],
             ...$slices,
         ];
 
@@ -365,6 +417,25 @@ final class StructureDefinitionCompilerTest extends TestCase
         }
 
         return $rules;
+    }
+
+    /**
+     * One argument of each compiled FHIRSlicingRules, in order; null where it is not given.
+     *
+     * @param list<CompiledAttribute> $attributes
+     *
+     * @return list<mixed>
+     */
+    private static function slicingArgument(array $attributes, string $name): array
+    {
+        $values = [];
+        foreach ($attributes as $attribute) {
+            if ($attribute->class === FHIRSlicingRules::class) {
+                $values[] = $attribute->arguments[$name] ?? null;
+            }
+        }
+
+        return $values;
     }
 
     /**

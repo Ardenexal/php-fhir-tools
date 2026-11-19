@@ -118,6 +118,47 @@ final class SliceRulesObservationStub
     }
 }
 
+/** Ordered slicing beneath the systolic slice: the LOINC coding must come before the SNOMED one. */
+#[FHIRSliceConstraint(
+    property: 'component',
+    sliceName: 'SystolicBP',
+    discriminators: [['type' => 'value', 'path' => 'code.coding.code', 'value' => '8480-6']],
+    rules: [
+        [
+            'path'       => 'code.coding',
+            'constraint' => FHIRSlicingRules::class,
+            'options'    => ['property' => 'code.coding', 'rules' => 'open', 'ordered' => true],
+        ],
+        [
+            'path'       => 'code.coding',
+            'constraint' => FHIRSliceConstraint::class,
+            'options'    => [
+                'property'       => 'code.coding',
+                'sliceName'      => 'loincSBP',
+                'discriminators' => [['type' => 'value', 'path' => 'code', 'value' => '8480-6']],
+                'orderedIndex'   => 0,
+            ],
+        ],
+        [
+            'path'       => 'code.coding',
+            'constraint' => FHIRSliceConstraint::class,
+            'options'    => [
+                'property'       => 'code.coding',
+                'sliceName'      => 'snomedSBP',
+                'discriminators' => [['type' => 'value', 'path' => 'code', 'value' => '271649006']],
+                'orderedIndex'   => 1,
+            ],
+        ],
+    ],
+)]
+final class SliceRulesOrderedObservationStub
+{
+    /** @param list<SliceRulesComponentStub> $component */
+    public function __construct(public array $component = [])
+    {
+    }
+}
+
 /**
  * Rules carried on a FHIRSliceConstraint bind only the items that match that slice, and are
  * reported at the item's index.
@@ -175,6 +216,22 @@ final class FHIRSliceConstraintRulesTest extends TestCase
             'component[0].code.coding: Slice "snomedSBP" on "component[0].code.coding" requires at least 1 item(s), but 0 matched.',
             'component[1].code.coding[1].system: This collection should contain 1 element or more.|This collection should contain 1 elements or more.',
         ], $this->validate($invalid));
+    }
+
+    /** Ordered slicing beneath a slice is checked within each item matching the outer slice. */
+    public function testNestedOrderedSlicingAppliesWithinEachMatchingItem(): void
+    {
+        $component = static fn (SliceRulesCodingStub ...$coding): SliceRulesComponentStub => new SliceRulesComponentStub(new SliceRulesConceptStub(array_values($coding)));
+
+        $observation = new SliceRulesOrderedObservationStub([
+            $component(new SliceRulesCodingStub('http://loinc.org', '8480-6'), new SliceRulesCodingStub('http://snomed.info/sct', '271649006')),
+            $component(new SliceRulesCodingStub('http://snomed.info/sct', '271649006'), new SliceRulesCodingStub('http://loinc.org', '8480-6')),
+        ]);
+
+        self::assertSame(
+            ['component[1].code.coding[1]: Property "component[1].code.coding" uses ordered slicing: this item matches slice "loincSBP", which must come before slice "snomedSBP" of an earlier item.'],
+            $this->validate($observation),
+        );
     }
 
     /**
