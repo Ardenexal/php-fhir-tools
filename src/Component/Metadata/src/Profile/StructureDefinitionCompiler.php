@@ -989,6 +989,8 @@ final class StructureDefinitionCompiler
      *
      * Slicing beneath a slice ("component:SystolicBP.code.coding:snomedSBP") travels in that slice's
      * `rules` as nested slice definitions, which the validator applies within each matching item.
+     * Reslices ("extension:altid/npi") travel there too, at the path '', and the validator matches
+     * the slice's items among them; see sliceRules().
      *
      * Limitations:
      *  - Every discriminator of the slicing is compiled into the slice's `discriminators`; see
@@ -998,7 +1000,7 @@ final class StructureDefinitionCompiler
      *    since it could only fail. Closed or openAtEnd slicing with such a slice is enforced as open,
      *    and its default slice is left out; the relaxed rules are reported as a diagnostic.
      *  - Choice type slices ("value[x]:valueQuantity") are left to the plain constraints, which put
-     *    them on the variant path. Reslices ("component:a/b") are not compiled.
+     *    them on the variant path.
      *  - A slice on slicing found in neither the differential nor the snapshot (a StructureDefinition
      *    built without a snapshot that slices inherited slicing) cannot be compiled; it is reported as
      *    a diagnostic rather than dropped silently.
@@ -1014,6 +1016,7 @@ final class StructureDefinitionCompiler
     {
         $diff       = self::differentialElements($structureDefinition);
         $snapshot   = self::snapshotElements($structureDefinition);
+        $parent     = self::parentSnapshotElements($structureDefinition, $lookup);
         $attributes = [];
 
         foreach (self::allSlicedElementIds($diff) as $slicedId) {
@@ -1033,7 +1036,7 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
-            $slices = self::sliceDefinitions($slicedId, $slicing, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup);
+            $slices = self::sliceDefinitions($slicedId, $slicing, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup, parentSnapshot: $parent);
             if ($slices === []) {
                 continue;
             }
@@ -1259,14 +1262,16 @@ final class StructureDefinitionCompiler
      * FHIRSlicingRules compiled in this profile's group judges every item against the slices in that
      * group, so an item matching only a parent's slice would otherwise be rejected.
      *
-     * @param string                                                                                                                                    $slicedId    Id of the sliced element, e.g. 'Observation.component'
-     * @param array{definition: array<string, mixed>, declaredHere: bool}                                                                               $slicing     Its slicing, from slicingFor()
-     * @param array<string, array<string, mixed>>                                                                                                       $diff        Differential elements by id
-     * @param array<string, array<string, mixed>>                                                                                                       $snapshot    Snapshot elements by id
-     * @param string                                                                                                                                    $profileUrl  URL of the profile being compiled
-     * @param list<CompilerDiagnostic>                                                                                                                  $diagnostics Receives slicing beneath a slice that is enforced as open
-     * @param (\Closure(string, array<string, mixed>, string): list<array{path: string, constraint: class-string, options: array<string, mixed>}>)|null $inline      Inlines a data-type profile named inside a slice; see sliceInliner()
-     * @param (\Closure(string): (array<string, mixed>|null))|null                                                                                      $lookup      Finds the data-type profile a slice is typed with, for its discriminator value
+     * @param string                                                                                                                                    $slicedId       Id of the sliced element, e.g. 'Observation.component'
+     * @param array{definition: array<string, mixed>, declaredHere: bool}                                                                               $slicing        Its slicing, from slicingFor()
+     * @param array<string, array<string, mixed>>                                                                                                       $diff           Differential elements by id
+     * @param array<string, array<string, mixed>>                                                                                                       $snapshot       Snapshot elements by id
+     * @param string                                                                                                                                    $profileUrl     URL of the profile being compiled
+     * @param list<CompilerDiagnostic>                                                                                                                  $diagnostics    Receives slicing beneath a slice that is enforced as open
+     * @param (\Closure(string, array<string, mixed>, string): list<array{path: string, constraint: class-string, options: array<string, mixed>}>)|null $inline         Inlines a data-type profile named inside a slice; see sliceInliner()
+     * @param (\Closure(string): (array<string, mixed>|null))|null                                                                                      $lookup         Finds the data-type profile a slice is typed with, for its discriminator value
+     * @param string                                                                                                                                    $resliceOf      Name of the slice whose reslices to define, or '' for the element's own slices
+     * @param array<string, array<string, mixed>>|null                                                                                                  $parentSnapshot The parent profile's snapshot elements by id, when found; marks the parent's slices `inherited`
      *
      * @return list<array<string, mixed>>
      */
@@ -1280,6 +1285,7 @@ final class StructureDefinitionCompiler
         ?\Closure $inline = null,
         ?\Closure $lookup = null,
         string $resliceOf = '',
+        ?array $parentSnapshot = null,
     ): array {
         $definition     = $slicing['definition'];
         $discriminators = [];
@@ -1290,14 +1296,19 @@ final class StructureDefinitionCompiler
         }
 
         // Closed or openAtEnd rules declared here, and ordered slicing, judge every item by the slice
-        // it matches, so the snapshot's slices (the parent's) join this profile's as bare members.
-        // They are marked inherited: the parent's group already reports the order among them.
+        // it matches, so the snapshot's slices join this profile's as bare members
         $slicingId = $resliceOf === '' ? $slicedId : "{$slicedId}:{$resliceOf}";
         $names     = self::sliceNames($slicedId, $diff, $resliceOf);
         $inherited = [];
         if ($names !== [] && (($slicing['declaredHere'] && ($definition['rules'] ?? 'open') !== 'open') || self::orderedOption($slicingId, $slicing, $snapshot) !== [])) {
-            $inherited = array_flip(array_values(array_diff(self::sliceNames($slicedId, $snapshot, $resliceOf), $names)));
-            $names     = [...$names, ...array_keys($inherited)];
+            $names = array_values(array_unique([...$names, ...self::sliceNames($slicedId, $snapshot, $resliceOf)]));
+
+            // The parent's slices, restated here or not, are marked inherited: the parent's group
+            // already reports the order among them. Without the parent, those this differential
+            // leaves alone are taken to be the parent's.
+            $inherited = array_flip($parentSnapshot !== null
+                ? array_values(array_intersect($names, self::sliceNames($slicedId, $parentSnapshot, $resliceOf)))
+                : array_values(array_diff($names, self::sliceNames($slicedId, $diff, $resliceOf))));
         }
 
         // Declaration order is the snapshot's, which lists every slice of the slicing; the merged
@@ -1341,7 +1352,7 @@ final class StructureDefinitionCompiler
                 $definition['inherited'] = true;
             }
 
-            $rules = self::sliceRules($sliceId, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup);
+            $rules = self::sliceRules($sliceId, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup, $parentSnapshot);
             if ($rules !== []) {
                 $definition['rules'] = $rules;
 
@@ -1467,17 +1478,18 @@ final class StructureDefinitionCompiler
      * slice, plus its FHIRSlicingRules when the slicing is declared here; the validator applies them
      * to that element's items within each item matching this slice.
      *
-     * @param string                                                                                                                                    $sliceId     Id of the slice, e.g. 'Observation.component:SystolicBP'
-     * @param array<string, array<string, mixed>>                                                                                                       $diff        Differential elements by id
-     * @param array<string, array<string, mixed>>                                                                                                       $snapshot    Snapshot elements by id
-     * @param string                                                                                                                                    $profileUrl  URL of the profile being compiled
-     * @param list<CompilerDiagnostic>                                                                                                                  $diagnostics Receives slicing beneath the slice that is enforced as open
-     * @param (\Closure(string, array<string, mixed>, string): list<array{path: string, constraint: class-string, options: array<string, mixed>}>)|null $inline      Inlines a data-type profile named on the slice or beneath it; see sliceInliner()
-     * @param (\Closure(string): (array<string, mixed>|null))|null                                                                                      $lookup      Finds the data-type profile a nested slice is typed with, for its discriminator value
+     * @param string                                                                                                                                    $sliceId        Id of the slice, e.g. 'Observation.component:SystolicBP'
+     * @param array<string, array<string, mixed>>                                                                                                       $diff           Differential elements by id
+     * @param array<string, array<string, mixed>>                                                                                                       $snapshot       Snapshot elements by id
+     * @param string                                                                                                                                    $profileUrl     URL of the profile being compiled
+     * @param list<CompilerDiagnostic>                                                                                                                  $diagnostics    Receives slicing beneath the slice that is enforced as open
+     * @param (\Closure(string, array<string, mixed>, string): list<array{path: string, constraint: class-string, options: array<string, mixed>}>)|null $inline         Inlines a data-type profile named on the slice or beneath it; see sliceInliner()
+     * @param (\Closure(string): (array<string, mixed>|null))|null                                                                                      $lookup         Finds the data-type profile a nested slice is typed with, for its discriminator value
+     * @param array<string, array<string, mixed>>|null                                                                                                  $parentSnapshot The parent profile's snapshot elements by id, when found; see sliceDefinitions()
      *
      * @return list<array{path: string, constraint: class-string, options: array<string, mixed>}>
      */
-    private static function sliceRules(string $sliceId, array $diff, array $snapshot, string $profileUrl, array &$diagnostics, ?\Closure $inline = null, ?\Closure $lookup = null): array
+    private static function sliceRules(string $sliceId, array $diff, array $snapshot, string $profileUrl, array &$diagnostics, ?\Closure $inline = null, ?\Closure $lookup = null, ?array $parentSnapshot = null): array
     {
         $prefix = $sliceId . '.';
         $rules  = [];
@@ -1521,7 +1533,7 @@ final class StructureDefinitionCompiler
 
             // As at the top level, a slicing with no slices to check compiles to nothing: closed rules
             // with no slice beside them would reject every item
-            $definitions = self::sliceDefinitions($nestedId, $slicing, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup);
+            $definitions = self::sliceDefinitions($nestedId, $slicing, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup, parentSnapshot: $parentSnapshot);
             if ($definitions === []) {
                 continue;
             }
@@ -1540,7 +1552,7 @@ final class StructureDefinitionCompiler
         $sliceName = substr($sliceId, $colon + 1);
         if (self::sliceNames($slicedId, $diff, $sliceName) !== []) {
             $reslicing   = self::reslicingFor($sliceId, $slicedId, $diff, $snapshot);
-            $definitions = $reslicing === null ? [] : self::sliceDefinitions($slicedId, $reslicing, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup, $sliceName);
+            $definitions = $reslicing === null ? [] : self::sliceDefinitions($slicedId, $reslicing, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup, $sliceName, $parentSnapshot);
 
             foreach ($reslicing === null || $definitions === [] ? [] : self::nestedSlicingRules('', $sliceId, $reslicing, $definitions, $snapshot, $profileUrl, $diagnostics) as $rule) {
                 $rules[] = $rule;
@@ -2218,7 +2230,8 @@ final class StructureDefinitionCompiler
      * Profiles often reslice without restating slicing on the slice: the sliced element's
      * discriminators already name the paths, and each reslice fixes the values there. The HL7
      * validator matches such reslices that way too. The rules are open, since no closed or ordered
-     * reslicing was declared, and the result counts as declared here only when the slice declares it.
+     * reslicing was declared, and the result counts as declared here only when this differential
+     * declares slicing on the slice.
      *
      * @param string                              $sliceId  Id of the resliced slice, e.g. 'AuditEvent.agent.extension:altid'
      * @param string                              $slicedId Id of the element it slices, e.g. 'AuditEvent.agent.extension'
@@ -2351,6 +2364,23 @@ final class StructureDefinitionCompiler
         }
 
         return $id;
+    }
+
+    /**
+     * The snapshot elements of the profile this one constrains, keyed by id, or null when there is
+     * no lookup or it does not find the parent.
+     *
+     * @param array<string, mixed>                                 $structureDefinition
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup
+     *
+     * @return array<string, array<string, mixed>>|null
+     */
+    private static function parentSnapshotElements(array $structureDefinition, ?\Closure $lookup): ?array
+    {
+        $base   = is_string($structureDefinition['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($structureDefinition['baseDefinition']) : '';
+        $parent = $base === '' || $lookup === null ? null : $lookup($base);
+
+        return $parent === null ? null : self::snapshotElements($parent);
     }
 
     /**

@@ -89,7 +89,7 @@ final class RuntimeInheritedOrderedSlicingTest extends TestCase
 
     /**
      * The parent slices `entry` by full URL with ordered slicing into "first" and "second"; the child
-     * adds "third" after them.
+     * restates "second" with a maximum, which keeps it the parent's slice, and adds "third" after them.
      */
     private static function registry(): InMemoryStructureDefinitionRegistry
     {
@@ -100,7 +100,7 @@ final class RuntimeInheritedOrderedSlicingTest extends TestCase
             ...self::slice('first'),
             ...self::slice('second'),
         ];
-        $added = self::slice('third');
+        $added = [['id' => 'Bundle.entry:second', 'path' => 'Bundle.entry', 'sliceName' => 'second', 'max' => '1'], ...self::slice('third')];
 
         return new InMemoryStructureDefinitionRegistry([
             [
@@ -113,7 +113,7 @@ final class RuntimeInheritedOrderedSlicingTest extends TestCase
                 'snapshot'     => ['element' => [['id' => 'Bundle', 'path' => 'Bundle']]],
             ],
             self::profile(self::PARENT, self::CORE . 'Bundle', $parent, $parent),
-            self::profile(self::CHILD, self::PARENT, [['id' => 'Bundle', 'path' => 'Bundle'], ...$added], [...$parent, ...$added]),
+            self::profile(self::CHILD, self::PARENT, [['id' => 'Bundle', 'path' => 'Bundle'], ...$added], [...$parent, ...self::slice('third')]),
         ]);
     }
 

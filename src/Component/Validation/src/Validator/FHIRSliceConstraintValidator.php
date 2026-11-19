@@ -369,7 +369,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                 return true;
             }
 
-            if ($discriminator['type'] === 'exists' && !is_bool($discriminator['value'] ?? null)) {
+            if ($discriminator['type'] === 'exists' && !is_bool($discriminator['value'] ?? null) && !isset($discriminator['anyOf'])) {
                 return true;
             }
         }
