@@ -1,0 +1,558 @@
+{
+    "index-version": 1,
+    "files": [
+        {
+            "filename": "StructureDefinition-au-allergyintolerance.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-allergyintolerance",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-allergyintolerance",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-australianbusinessnumber.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-australianbusinessnumber",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-australianbusinessnumber",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-condition.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-condition",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-condition",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-diagnosticresult.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-diagnosticresult",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-diagnosticresult",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-dosage.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-dosage",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-dosage",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-dvanumber.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-dvanumber",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-dvanumber",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-encounter.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-encounter",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-encounter",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-healthcareservice.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-healthcareservice",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-healthcareservice",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-hpii.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-hpii",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-hpii",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-hpio.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-hpio",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-hpio",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-ihi.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-ihi",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-ihi",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-immunization.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-immunization",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-immunization",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-location.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-location",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-location",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-medicarecardnumber.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-medicarecardnumber",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-medicarecardnumber",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-medicareprovidernumber.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-medicareprovidernumber",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-medicareprovidernumber",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-medication.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-medication",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-medication",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-medicationrequest.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-medicationrequest",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-medicationrequest",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-medicationstatement.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-medicationstatement",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-medicationstatement",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-organization.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-organization",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-organization",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-pathologyresult.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-pathologyresult",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-pathologyresult",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-patient.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-patient",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-patient",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-practitioner.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-practitioner",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-practitioner",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-practitionerrole.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-practitionerrole",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-practitionerrole",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-procedure.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-procedure",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-procedure",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-relatedperson.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-relatedperson",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/au-relatedperson",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-ihi-record-status.json",
+            "resourceType": "StructureDefinition",
+            "id": "ihi-record-status",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/ihi-record-status",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-ihi-status.json",
+            "resourceType": "StructureDefinition",
+            "id": "ihi-status",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/ihi-status",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-indigenous-status.json",
+            "resourceType": "StructureDefinition",
+            "id": "indigenous-status",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/indigenous-status",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-medication-type.json",
+            "resourceType": "StructureDefinition",
+            "id": "medication-type",
+            "url": "http://hl7.org.au/fhir/StructureDefinition/medication-type",
+            "version": "6.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-allergyintolerance.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-allergyintolerance",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-allergyintolerance",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-bloodpressure.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-bloodpressure",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-bloodpressure",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-bodyheight.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-bodyheight",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-bodyheight",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-bodytemp.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-bodytemp",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-bodytemp",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-bodyweight.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-bodyweight",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-bodyweight",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-condition.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-condition",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-condition",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-diagnosticresult.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-diagnosticresult",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-diagnosticresult",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-diagnosticresult-path.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-diagnosticresult-path",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-diagnosticresult-path",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-encounter.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-encounter",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-encounter",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-healthcareservice.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-healthcareservice",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-healthcareservice",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-heartrate.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-heartrate",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-heartrate",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-immunization.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-immunization",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-immunization",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-location.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-location",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-location",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-medication.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-medication",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-medication",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-medicationrequest.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-medicationrequest",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-medicationrequest",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-medicationstatement.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-medicationstatement",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-medicationstatement",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-organization.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-organization",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-organization",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-patient.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-patient",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-patient",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-practitioner.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-practitioner",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-practitioner",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-practitionerrole.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-practitionerrole",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-practitionerrole",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-procedure.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-procedure",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-procedure",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-relatedperson.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-relatedperson",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-relatedperson",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-resprate.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-resprate",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-resprate",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-smokingstatus.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-smokingstatus",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-smokingstatus",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-au-core-waistcircum.json",
+            "resourceType": "StructureDefinition",
+            "id": "au-core-waistcircum",
+            "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-waistcircum",
+            "version": "2.0.0"
+        },
+        {
+            "filename": "StructureDefinition-AllergyIntolerance.json",
+            "resourceType": "StructureDefinition",
+            "id": "AllergyIntolerance",
+            "url": "http://hl7.org/fhir/StructureDefinition/AllergyIntolerance",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Condition.json",
+            "resourceType": "StructureDefinition",
+            "id": "Condition",
+            "url": "http://hl7.org/fhir/StructureDefinition/Condition",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Dosage.json",
+            "resourceType": "StructureDefinition",
+            "id": "Dosage",
+            "url": "http://hl7.org/fhir/StructureDefinition/Dosage",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Encounter.json",
+            "resourceType": "StructureDefinition",
+            "id": "Encounter",
+            "url": "http://hl7.org/fhir/StructureDefinition/Encounter",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-HealthcareService.json",
+            "resourceType": "StructureDefinition",
+            "id": "HealthcareService",
+            "url": "http://hl7.org/fhir/StructureDefinition/HealthcareService",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Identifier.json",
+            "resourceType": "StructureDefinition",
+            "id": "Identifier",
+            "url": "http://hl7.org/fhir/StructureDefinition/Identifier",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Immunization.json",
+            "resourceType": "StructureDefinition",
+            "id": "Immunization",
+            "url": "http://hl7.org/fhir/StructureDefinition/Immunization",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Location.json",
+            "resourceType": "StructureDefinition",
+            "id": "Location",
+            "url": "http://hl7.org/fhir/StructureDefinition/Location",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Medication.json",
+            "resourceType": "StructureDefinition",
+            "id": "Medication",
+            "url": "http://hl7.org/fhir/StructureDefinition/Medication",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-MedicationRequest.json",
+            "resourceType": "StructureDefinition",
+            "id": "MedicationRequest",
+            "url": "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-MedicationStatement.json",
+            "resourceType": "StructureDefinition",
+            "id": "MedicationStatement",
+            "url": "http://hl7.org/fhir/StructureDefinition/MedicationStatement",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Observation.json",
+            "resourceType": "StructureDefinition",
+            "id": "Observation",
+            "url": "http://hl7.org/fhir/StructureDefinition/Observation",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Organization.json",
+            "resourceType": "StructureDefinition",
+            "id": "Organization",
+            "url": "http://hl7.org/fhir/StructureDefinition/Organization",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Patient.json",
+            "resourceType": "StructureDefinition",
+            "id": "Patient",
+            "url": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Practitioner.json",
+            "resourceType": "StructureDefinition",
+            "id": "Practitioner",
+            "url": "http://hl7.org/fhir/StructureDefinition/Practitioner",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-PractitionerRole.json",
+            "resourceType": "StructureDefinition",
+            "id": "PractitionerRole",
+            "url": "http://hl7.org/fhir/StructureDefinition/PractitionerRole",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Procedure.json",
+            "resourceType": "StructureDefinition",
+            "id": "Procedure",
+            "url": "http://hl7.org/fhir/StructureDefinition/Procedure",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-RelatedPerson.json",
+            "resourceType": "StructureDefinition",
+            "id": "RelatedPerson",
+            "url": "http://hl7.org/fhir/StructureDefinition/RelatedPerson",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-bodyheight.json",
+            "resourceType": "StructureDefinition",
+            "id": "bodyheight",
+            "url": "http://hl7.org/fhir/StructureDefinition/bodyheight",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-bodytemp.json",
+            "resourceType": "StructureDefinition",
+            "id": "bodytemp",
+            "url": "http://hl7.org/fhir/StructureDefinition/bodytemp",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-bodyweight.json",
+            "resourceType": "StructureDefinition",
+            "id": "bodyweight",
+            "url": "http://hl7.org/fhir/StructureDefinition/bodyweight",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-bp.json",
+            "resourceType": "StructureDefinition",
+            "id": "bp",
+            "url": "http://hl7.org/fhir/StructureDefinition/bp",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-heartrate.json",
+            "resourceType": "StructureDefinition",
+            "id": "heartrate",
+            "url": "http://hl7.org/fhir/StructureDefinition/heartrate",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-resprate.json",
+            "resourceType": "StructureDefinition",
+            "id": "resprate",
+            "url": "http://hl7.org/fhir/StructureDefinition/resprate",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-vitalsigns.json",
+            "resourceType": "StructureDefinition",
+            "id": "vitalsigns",
+            "url": "http://hl7.org/fhir/StructureDefinition/vitalsigns",
+            "version": "4.0.1"
+        }
+    ]
+}

@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"PractitionerRole","url":"http://hl7.org/fhir/StructureDefinition/PractitionerRole","version":"4.0.1","name":"PractitionerRole","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"PractitionerRole","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

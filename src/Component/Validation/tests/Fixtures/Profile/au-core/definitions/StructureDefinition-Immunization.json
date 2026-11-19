@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Immunization","url":"http://hl7.org/fhir/StructureDefinition/Immunization","version":"4.0.1","name":"Immunization","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Immunization","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}
