@@ -1,0 +1,229 @@
+{
+    "index-version": 1,
+    "files": [
+        {
+            "filename": "StructureDefinition-Address.json",
+            "resourceType": "StructureDefinition",
+            "id": "Address",
+            "url": "http://hl7.org/fhir/StructureDefinition/Address",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Appointment.json",
+            "resourceType": "StructureDefinition",
+            "id": "Appointment",
+            "url": "http://hl7.org/fhir/StructureDefinition/Appointment",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Basic.json",
+            "resourceType": "StructureDefinition",
+            "id": "Basic",
+            "url": "http://hl7.org/fhir/StructureDefinition/Basic",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Bundle.json",
+            "resourceType": "StructureDefinition",
+            "id": "Bundle",
+            "url": "http://hl7.org/fhir/StructureDefinition/Bundle",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Coding.json",
+            "resourceType": "StructureDefinition",
+            "id": "Coding",
+            "url": "http://hl7.org/fhir/StructureDefinition/Coding",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Communication.json",
+            "resourceType": "StructureDefinition",
+            "id": "Communication",
+            "url": "http://hl7.org/fhir/StructureDefinition/Communication",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Composition.json",
+            "resourceType": "StructureDefinition",
+            "id": "Composition",
+            "url": "http://hl7.org/fhir/StructureDefinition/Composition",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-DocumentManifest.json",
+            "resourceType": "StructureDefinition",
+            "id": "DocumentManifest",
+            "url": "http://hl7.org/fhir/StructureDefinition/DocumentManifest",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-DocumentReference.json",
+            "resourceType": "StructureDefinition",
+            "id": "DocumentReference",
+            "url": "http://hl7.org/fhir/StructureDefinition/DocumentReference",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Endpoint.json",
+            "resourceType": "StructureDefinition",
+            "id": "Endpoint",
+            "url": "http://hl7.org/fhir/StructureDefinition/Endpoint",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Extension.json",
+            "resourceType": "StructureDefinition",
+            "id": "Extension",
+            "url": "http://hl7.org/fhir/StructureDefinition/Extension",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-HealthcareService.json",
+            "resourceType": "StructureDefinition",
+            "id": "HealthcareService",
+            "url": "http://hl7.org/fhir/StructureDefinition/HealthcareService",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-HumanName.json",
+            "resourceType": "StructureDefinition",
+            "id": "HumanName",
+            "url": "http://hl7.org/fhir/StructureDefinition/HumanName",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-List.json",
+            "resourceType": "StructureDefinition",
+            "id": "List",
+            "url": "http://hl7.org/fhir/StructureDefinition/List",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-MedicationRequest.json",
+            "resourceType": "StructureDefinition",
+            "id": "MedicationRequest",
+            "url": "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-MedicationStatement.json",
+            "resourceType": "StructureDefinition",
+            "id": "MedicationStatement",
+            "url": "http://hl7.org/fhir/StructureDefinition/MedicationStatement",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Observation.json",
+            "resourceType": "StructureDefinition",
+            "id": "Observation",
+            "url": "http://hl7.org/fhir/StructureDefinition/Observation",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Organization.json",
+            "resourceType": "StructureDefinition",
+            "id": "Organization",
+            "url": "http://hl7.org/fhir/StructureDefinition/Organization",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Parameters.json",
+            "resourceType": "StructureDefinition",
+            "id": "Parameters",
+            "url": "http://hl7.org/fhir/StructureDefinition/Parameters",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Patient.json",
+            "resourceType": "StructureDefinition",
+            "id": "Patient",
+            "url": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Person.json",
+            "resourceType": "StructureDefinition",
+            "id": "Person",
+            "url": "http://hl7.org/fhir/StructureDefinition/Person",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Practitioner.json",
+            "resourceType": "StructureDefinition",
+            "id": "Practitioner",
+            "url": "http://hl7.org/fhir/StructureDefinition/Practitioner",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-PractitionerRole.json",
+            "resourceType": "StructureDefinition",
+            "id": "PractitionerRole",
+            "url": "http://hl7.org/fhir/StructureDefinition/PractitionerRole",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-Procedure.json",
+            "resourceType": "StructureDefinition",
+            "id": "Procedure",
+            "url": "http://hl7.org/fhir/StructureDefinition/Procedure",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-ValueSet.json",
+            "resourceType": "StructureDefinition",
+            "id": "ValueSet",
+            "url": "http://hl7.org/fhir/StructureDefinition/ValueSet",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-data-absent-reason.json",
+            "resourceType": "StructureDefinition",
+            "id": "data-absent-reason",
+            "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-iso21090-ADXP-additionalLocator.json",
+            "resourceType": "StructureDefinition",
+            "id": "iso21090-ADXP-additionalLocator",
+            "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-additionalLocator",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-iso21090-ADXP-houseNumber.json",
+            "resourceType": "StructureDefinition",
+            "id": "iso21090-ADXP-houseNumber",
+            "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-houseNumber",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-iso21090-ADXP-postBox.json",
+            "resourceType": "StructureDefinition",
+            "id": "iso21090-ADXP-postBox",
+            "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-postBox",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-iso21090-ADXP-precinct.json",
+            "resourceType": "StructureDefinition",
+            "id": "iso21090-ADXP-precinct",
+            "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-precinct",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-iso21090-ADXP-streetName.json",
+            "resourceType": "StructureDefinition",
+            "id": "iso21090-ADXP-streetName",
+            "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName",
+            "version": "4.0.1"
+        },
+        {
+            "filename": "StructureDefinition-string.json",
+            "resourceType": "StructureDefinition",
+            "id": "string",
+            "url": "http://hl7.org/fhir/StructureDefinition/string",
+            "version": "4.0.1"
+        }
+    ]
+}

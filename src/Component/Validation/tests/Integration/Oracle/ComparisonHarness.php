@@ -61,6 +61,12 @@ final class ComparisonHarness
         ?ViolationFamilyClassifier $familyClassifier = null,
         ?JavaFindingMatcher $matcher = null,
         ?MissingFindingClassifier $missingClassifier = null,
+        /**
+         * Switches the harness to the cases that supply their own StructureDefinitions: the base
+         * run of each case with `supporting` or `profiles`, which the default run skips, and the
+         * `profile` phase of every case. Null runs the default set.
+         */
+        private readonly ?SuppliedProfiles $suppliedProfiles = null,
     ) {
         $this->familyClassifier  = $familyClassifier  ?? new ViolationFamilyClassifier();
         $this->matcher           = $matcher           ?? new JavaFindingMatcher();
@@ -141,7 +147,12 @@ final class ComparisonHarness
 
         $start = microtime(true);
 
-        foreach ($this->selectCases($manifest['test-cases']) as $name => $case) {
+        foreach ($this->runsOf($this->selectCases($manifest['test-cases'])) as $name => [$case, $profileUrls, $service, $skip]) {
+            if ($skip !== null) {
+                $skips[$name] = $skip;
+                continue;
+            }
+
             $javaOutcome = $reader->read($case);
             if ($javaOutcome === null) {
                 $skips[$name] = SkipReason::NoOracle;
@@ -183,6 +194,8 @@ final class ComparisonHarness
                 $skips,
                 $unread,
                 self::referenceHadExtensionSourcesWeLack($case),
+                $service,
+                $profileUrls,
             );
             if ($comparison === null) {
                 continue;
@@ -206,9 +219,11 @@ final class ComparisonHarness
      * cannot run is not a case we agree on — and because dropping one silently *lowers* the ABOVE
      * count, every drop has to be attributable.
      *
-     * @param array<string, SkipReason> $skips  written by reference so the caller can account for drops
-     * @param list<UnreadCase>          $unread written by reference; deserialization failures paired
-     *                                          with the Java outcome they were never compared against
+     * @param array<string, SkipReason>  $skips           written by reference so the caller can account for drops
+     * @param list<UnreadCase>           $unread          written by reference; deserialization failures paired
+     *                                                    with the Java outcome they were never compared against
+     * @param FHIRValidationService|null $suppliedService the service holding the case's own definitions, in supplied-profile runs
+     * @param list<string>               $profileUrls     profiles to validate against besides meta.profile: a `profile` phase's source
      */
     private function compareCase(
         string $name,
@@ -217,6 +232,8 @@ final class ComparisonHarness
         array &$skips,
         array &$unread,
         bool $referenceHadExtraExtensionSources = false,
+        ?FHIRValidationService $suppliedService = null,
+        array $profileUrls = [],
     ): ?CaseComparison {
         try {
             $resource = $this->serialization->deserialize($data);
@@ -302,9 +319,9 @@ final class ComparisonHarness
             // allowed-extension-domain https://fhir.nhs.uk/StructureDefinition, so the reference
             // validator is told those extensions are legitimate without a definition, and every one
             // we flagged was a false positive of our own making.
-            $service = $referenceHadExtraExtensionSources
+            $service = $suppliedService ?? ($referenceHadExtraExtensionSources
                 ? ($this->validationWithoutExtensionResolution ?? $this->validation)
-                : $this->validation;
+                : $this->validation);
 
             // profilesFromMeta covers the rest of meta.profile: a URL the resource's class does not declare is
             // checked against the StructureDefinition the runtime resolver finds for it, and one it
@@ -312,6 +329,7 @@ final class ComparisonHarness
             // profilesFromVitalSignsCodes adds the core vital-signs profile an Observation's code
             // implies, which the reference validator applies without being asked.
             $report = $service->validateWithOptions($resource, new FHIRValidationOptions(
+                profileUrls: $profileUrls,
                 deriveProfilesFromClass: true,
                 profilesFromMeta: true,
                 profilesFromVitalSignsCodes: true,
@@ -381,6 +399,81 @@ final class ComparisonHarness
     }
 
     /**
+     * Did the reference validator hold extension sources that even a supplied-profile run lacks?
+     *
+     * {@see referenceHadExtensionSourcesWeLack()} without the supplied definitions themselves, which
+     * that run loads: IG packages, an allowed extension domain, `supporting5` definitions from another
+     * release, and cross-version extensions.
+     *
+     * @param array<string, mixed> $case         one manifest `test-cases` entry
+     * @param bool                 $profilePhase whether the run is the case's `profile` phase, whose own
+     *                                           `packages` the base run did not have
+     */
+    private static function referenceHadExtensionSourcesBeyondSuppliedOnes(array $case, bool $profilePhase): bool
+    {
+        $profile = is_array($case['profile'] ?? null) ? $case['profile'] : [];
+
+        return isset($case['packages']) || ($profilePhase && isset($profile['packages'])) || isset($case['allowed-extension-domain'])
+                                        || isset($case['supporting5']) || ($case['module'] ?? '') === 'xver';
+    }
+
+    /**
+     * The validation runs to compare, keyed by the name each is reported under.
+     *
+     * The default run validates each selected case once with the shared service. A supplied-profile
+     * run instead validates, with a service holding the case's own definitions:
+     * - each case with `supporting` or `profiles` once, as the default run would if it could load them;
+     * - each case's `profile` phase, reported as `<name> [profile]`, against the phase's source
+     *   profile and the phase's own reference outcome.
+     *
+     * Each run loads the definitions the reference validator held for it: the base run the case's
+     * `supporting` and `profiles`, the phase those plus its own `source` and `supporting`. A phase whose
+     * source has no fixture is yielded with a skip reason, so it stays visible in the skip arithmetic.
+     *
+     * @param array<string, array<string, mixed>> $cases
+     *
+     * @return iterable<string, array{0: array<string, mixed>, 1: list<string>, 2: FHIRValidationService|null, 3: SkipReason|null}>
+     */
+    private function runsOf(array $cases): iterable
+    {
+        foreach ($cases as $name => $case) {
+            if ($this->suppliedProfiles === null) {
+                yield $name => [$case, [], null, null];
+
+                continue;
+            }
+
+            // The supplied definitions are loaded now, so only the other extension sources still
+            // justify switching extension resolution off
+            if (isset($case['supporting']) || isset($case['profiles'])) {
+                yield $name => [$case, [], $this->suppliedProfiles->serviceFor(
+                    SuppliedProfiles::sourcesOf($case, profilePhase: false),
+                    !self::referenceHadExtensionSourcesBeyondSuppliedOnes($case, profilePhase: false),
+                ), null];
+            }
+
+            $profile = is_array($case['profile'] ?? null) ? $case['profile'] : null;
+            $source  = is_string($profile['source'] ?? null) ? $profile['source'] : null;
+            if ($profile === null || $source === null || !isset($profile['java'])) {
+                continue;
+            }
+
+            $url = $this->suppliedProfiles->urlOf($source);
+            if ($url === null) {
+                yield "{$name} [profile]" => [$case, [], null, SkipReason::NoSuppliedDefinition];
+
+                continue;
+            }
+
+            // The phase's own outcome replaces the base run's; everything else about the case holds
+            yield "{$name} [profile]" => [[...$case, 'java' => $profile['java']], [$url], $this->suppliedProfiles->serviceFor(
+                SuppliedProfiles::sourcesOf($case, profilePhase: true),
+                !self::referenceHadExtensionSourcesBeyondSuppliedOnes($case, profilePhase: true),
+            ), null];
+        }
+    }
+
+    /**
      * @param array<int, mixed> $testCases
      *
      * @return array<string, array<string, mixed>> deduplicated by name; the last entry wins, matching
@@ -407,8 +500,9 @@ final class ComparisonHarness
                 continue;
             }
 
-            // Dynamic StructureDefinition loading is not supported by the validator yet.
-            if (isset($case['supporting']) || isset($case['profiles'])) {
+            // Cases that supply their own StructureDefinitions need them loaded as runtime profiles,
+            // which only the supplied-profile run does; see runsOf().
+            if ($this->suppliedProfiles === null && (isset($case['supporting']) || isset($case['profiles']))) {
                 continue;
             }
 

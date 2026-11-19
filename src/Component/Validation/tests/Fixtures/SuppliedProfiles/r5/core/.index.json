@@ -1,0 +1,103 @@
+{
+    "index-version": 1,
+    "files": [
+        {
+            "filename": "StructureDefinition-AuditEvent.json",
+            "resourceType": "StructureDefinition",
+            "id": "AuditEvent",
+            "url": "http://hl7.org/fhir/StructureDefinition/AuditEvent",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-Base.json",
+            "resourceType": "StructureDefinition",
+            "id": "Base",
+            "url": "http://hl7.org/fhir/StructureDefinition/Base",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-Basic.json",
+            "resourceType": "StructureDefinition",
+            "id": "Basic",
+            "url": "http://hl7.org/fhir/StructureDefinition/Basic",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-Bundle.json",
+            "resourceType": "StructureDefinition",
+            "id": "Bundle",
+            "url": "http://hl7.org/fhir/StructureDefinition/Bundle",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-Composition.json",
+            "resourceType": "StructureDefinition",
+            "id": "Composition",
+            "url": "http://hl7.org/fhir/StructureDefinition/Composition",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-DomainResource.json",
+            "resourceType": "StructureDefinition",
+            "id": "DomainResource",
+            "url": "http://hl7.org/fhir/StructureDefinition/DomainResource",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-Extension.json",
+            "resourceType": "StructureDefinition",
+            "id": "Extension",
+            "url": "http://hl7.org/fhir/StructureDefinition/Extension",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-List.json",
+            "resourceType": "StructureDefinition",
+            "id": "List",
+            "url": "http://hl7.org/fhir/StructureDefinition/List",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-Observation.json",
+            "resourceType": "StructureDefinition",
+            "id": "Observation",
+            "url": "http://hl7.org/fhir/StructureDefinition/Observation",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-Parameters.json",
+            "resourceType": "StructureDefinition",
+            "id": "Parameters",
+            "url": "http://hl7.org/fhir/StructureDefinition/Parameters",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-Patient.json",
+            "resourceType": "StructureDefinition",
+            "id": "Patient",
+            "url": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-PlanDefinition.json",
+            "resourceType": "StructureDefinition",
+            "id": "PlanDefinition",
+            "url": "http://hl7.org/fhir/StructureDefinition/PlanDefinition",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-StructureDefinition.json",
+            "resourceType": "StructureDefinition",
+            "id": "StructureDefinition",
+            "url": "http://hl7.org/fhir/StructureDefinition/StructureDefinition",
+            "version": "5.0.0"
+        },
+        {
+            "filename": "StructureDefinition-vitalsigns.json",
+            "resourceType": "StructureDefinition",
+            "id": "vitalsigns",
+            "url": "http://hl7.org/fhir/StructureDefinition/vitalsigns",
+            "version": "5.0.0"
+        }
+    ]
+}

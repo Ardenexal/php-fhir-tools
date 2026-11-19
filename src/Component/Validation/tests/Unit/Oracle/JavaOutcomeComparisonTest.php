@@ -220,11 +220,12 @@ final class JavaOutcomeComparisonTest extends TestCase
         self::assertSame(4, $report->skippedCount());
         self::assertSame(
             [
-                'no-oracle'         => 1,
-                'unreadable'        => 1,
-                'deserialize-threw' => 0,
-                'validate-crashed'  => 2,
-                'unmodelled-option' => 0,
+                'no-oracle'              => 1,
+                'unreadable'             => 1,
+                'deserialize-threw'      => 0,
+                'validate-crashed'       => 2,
+                'unmodelled-option'      => 0,
+                'no-supplied-definition' => 0,
             ],
             $report->skipHistogram(),
         );

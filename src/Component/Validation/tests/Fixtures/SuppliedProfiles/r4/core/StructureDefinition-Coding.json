@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Coding","url":"http://hl7.org/fhir/StructureDefinition/Coding","version":"4.0.1","name":"Coding","status":"active","fhirVersion":"4.0.1","kind":"complex-type","abstract":false,"type":"Coding","baseDefinition":"http://hl7.org/fhir/StructureDefinition/Element","derivation":"specialization"}

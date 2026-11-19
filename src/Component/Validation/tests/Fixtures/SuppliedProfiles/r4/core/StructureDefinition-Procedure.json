@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Procedure","url":"http://hl7.org/fhir/StructureDefinition/Procedure","version":"4.0.1","name":"Procedure","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Procedure","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}
