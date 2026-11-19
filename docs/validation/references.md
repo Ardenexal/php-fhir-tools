@@ -35,16 +35,18 @@ Both resolver messages are overridable via the `FHIRTargetProfile` key in
 
 ## Checks that need no resolver
 
-Two rules read only the reference or canonical itself, so they run with the default
-`NullFHIRReferenceResolver` too. Both report an ERROR in the HL7 Java reference validator's wording:
+Three rules read only the reference or canonical itself, so they run with the default
+`NullFHIRReferenceResolver` too. Each reports an ERROR in the HL7 Java reference validator's wording:
 
 | Rule | Example message |
 |---|---|
+| A literal reference shaped `[type]/[id]` or `[base]/[type]/[id]`, with or without `/_history/[version]`, must name a type the element allows. As for canonicals, this applies only when every target profile is a core resource type. A contained (`#p1`), `urn:uuid:` or conditional reference names no type and is left alone | `Invalid Resource target type. Found Patient, but expected one of (PractitionerRole)` |
 | A canonical shaped `[base]/[type]/[id]` must name a type the element allows. This applies only when every target profile is a core resource type; a target such as an IG profile or `Resource` skips the check, and a canonical of another shape (`http://loinc.org/vs/LL123`, `urn:oid:…`) is left alone | `Canonical URL 'http://hl7.org/fhir/ValueSet/example-extensional' refers to a resource that has the wrong type. Found ValueSet expecting one of [Questionnaire]` |
 | The query of a conditional reference must be `name=value` parameters joined by `&` | `The query part of the conditional reference is not a valid query string (Device?identifier=1234&?==)` |
 
-A plain reference such as `Device/foo` is not checked against the element's allowed target types. The two
-messages above are fixed; `FHIRValidationMessageRegistry` does not override them.
+The HL7 Java reference validator checks a literal reference's type only with its
+`assumeValidRestReferences` option; this validator always does. The three messages above are fixed;
+`FHIRValidationMessageRegistry` does not override them.
 
 ## Resolver examples
 

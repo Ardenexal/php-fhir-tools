@@ -25,7 +25,14 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * Validates that a Reference- or canonical-typed property points to a resource
  * conforming to at least one of the declared target profile URLs.
  *
- * Two checks need nothing resolved and always run:
+ * Three checks need nothing resolved and always run:
+ *
+ * - **Reference type.** A literal reference of the RESTful shape `Patient/1` or `[base]/Patient/1`
+ *   names the type of the resource it points at. When every target profile is a core resource type
+ *   and the named type is not one of them, the reference points at the wrong kind of resource. The
+ *   HL7 reference validator only does this when told to trust reference URLs (its
+ *   `assumeValidRestReferences` option); this validator always does, so an API contract that allows
+ *   `Reference(PractitionerRole)` rejects `Patient/1` without resolving it.
  *
  * - **Canonical type.** A canonical of the RESTful shape `[base]/ValueSet/foo` names the type of the
  *   resource it identifies. When every target profile is a core resource type
@@ -53,6 +60,8 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
 
     public const string CONDITIONAL_QUERY_MESSAGE = 'The query part of the conditional reference is not a valid query string ({{ reference }})';
 
+    public const string REFERENCE_TYPE_MESSAGE = 'Invalid Resource target type. Found {{ type }}, but expected one of ({{ allowed }})';
+
     /** Where every core resource type's StructureDefinition lives; a target profile under it names a type. */
     private const string CORE_PROFILE_BASE = 'http://hl7.org/fhir/StructureDefinition/';
 
@@ -64,6 +73,12 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
 
     /** A canonical whose path ends `[base]/Type/id`, after any `|version` and `#fragment` are removed. */
     private const string TYPED_CANONICAL = '~\Ahttps?://(?:[^/?#]*/)+(?<type>[A-Z][A-Za-z]+)/[A-Za-z0-9\-.]{1,64}\z~';
+
+    /**
+     * A literal reference whose path ends `Type/id`, optionally with `/_history/version`: relative
+     * (`Patient/1`) or absolute (`https://example.org/fhir/Patient/1`).
+     */
+    private const string TYPED_REFERENCE = '~\A(?:https?://(?:[^/?#]*/)+)?(?<type>[A-Z][A-Za-z]+)/[A-Za-z0-9\-.]{1,64}(?:/_history/[A-Za-z0-9\-.]{1,64})?\z~';
 
     /** One search parameter name, modifiers and chains included (`subject:Patient.name`, `_has:Observation:patient:code`). */
     private const string QUERY_PARAMETER_NAME = '~\A[A-Za-z_][A-Za-z0-9_\-.:|]*\z~';
@@ -141,6 +156,7 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
     private function validateItem(object $item, FHIRTargetProfile $constraint): void
     {
         $this->checkConditionalReference($item);
+        $this->checkReferenceType($item, $constraint);
 
         $resolved = $this->resolver->resolve($item);
 
@@ -185,10 +201,9 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
     /**
      * Check the query of a conditional reference (`Device?identifier=1234`).
      *
-     * Only the query's shape is checked. The type it names is not compared to the allowed targets:
-     * the reference validator does that only when told to treat a reference URL as proof of its
-     * target's type (its `assumeValidRestReferences` option), which is off by default, and on its
-     * default settings it accepts `Practitioner/2` on an element that allows only `Organization`.
+     * Only the query's shape is checked. The type a conditional reference names is a search over
+     * that type, not a resource, so it is not compared to the allowed targets; a literal `Type/id`
+     * reference is, by checkReferenceType().
      */
     private function checkConditionalReference(object $item): void
     {
@@ -204,6 +219,36 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
 
         $this->context->buildViolation(self::CONDITIONAL_QUERY_MESSAGE)
             ->setParameter('{{ reference }}', $reference)
+            ->setCode(FHIRViolationCode::ERROR)
+            ->addViolation();
+    }
+
+    /**
+     * Check the resource type a literal reference names in its path against the allowed targets.
+     *
+     * Only a reference of the RESTful shape `Type/id` names a type. A contained (`#p1`), `urn:uuid:`
+     * or conditional reference does not, and is left alone.
+     */
+    private function checkReferenceType(object $item, FHIRTargetProfile $constraint): void
+    {
+        $reference = $this->referenceString($item);
+
+        if ($reference === null || preg_match(self::TYPED_REFERENCE, $reference, $parts) !== 1) {
+            return;
+        }
+
+        $allowed = $this->allowedTypes($constraint);
+        $type    = $parts['type'];
+
+        if ($allowed === null || !$this->isResourceType($type) || in_array($type, $allowed, true)) {
+            return;
+        }
+
+        $this->context->buildViolation(self::REFERENCE_TYPE_MESSAGE)
+            ->setParameters([
+                '{{ type }}'    => $type,
+                '{{ allowed }}' => implode(', ', $allowed),
+            ])
             ->setCode(FHIRViolationCode::ERROR)
             ->addViolation();
     }

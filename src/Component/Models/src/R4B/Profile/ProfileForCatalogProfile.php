@@ -42,9 +42,21 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\CompositionResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]
 #[FHIRProfileConstraint(
+    path: 'subject',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/Resource']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
+)]
+#[FHIRProfileConstraint(
     path: 'section.entry',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
+)]
+#[FHIRProfileConstraint(
+    path: 'section.entry',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/CatalogEntry']],
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]
 #[FHIRSliceConstraint(

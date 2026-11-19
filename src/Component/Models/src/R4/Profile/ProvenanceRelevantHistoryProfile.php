@@ -31,6 +31,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ProvenanceResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/provenance-relevant-history'],
 )]
 #[FHIRProfileConstraint(
+    path: 'occurred[x]',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes',
+    options: ['types' => ['dateTime']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/provenance-relevant-history'],
+)]
+#[FHIRProfileConstraint(
     path: 'activity',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],

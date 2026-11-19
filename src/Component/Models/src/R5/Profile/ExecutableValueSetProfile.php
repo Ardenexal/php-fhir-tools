@@ -69,6 +69,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
                 'value' => 'This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated.',
             ],
         ],
+        [
+            'path'       => 'value[x]',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes',
+            'options'    => ['types' => ['markdown']],
+        ],
     ],
     groups: ['http://hl7.org/fhir/StructureDefinition/executablevalueset'],
 )]

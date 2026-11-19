@@ -324,14 +324,50 @@ final class FHIRTargetProfileValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    // -------------------------------------------------------------------------
+    // Reference type read from a literal reference (#229)
+    // -------------------------------------------------------------------------
+
     /**
-     * The reference validator reads a type from a reference URL only under its opt-in
-     * `assumeValidRestReferences`, and accepts `Practitioner/2` on an Organization-only element
-     * by default (`R5.fhirpath-good`). So a plain `Type/id` of another type passes here too.
+     * The HL7 reference validator reads a type from a reference URL only under its opt-in
+     * `assumeValidRestReferences`; this validator always does, so `Practitioner/2` fails an
+     * Organization-only element without being resolved.
      */
-    public function testReferenceTypeIsNotInferredFromAPlainUrl(): void
+    public function testReferenceNamingAnotherResourceTypeEmitsErrorViolation(): void
     {
         $this->validator->validate(new Reference(reference: 'Practitioner/2'), new FHIRTargetProfile(['http://hl7.org/fhir/StructureDefinition/Organization']));
+
+        $this->buildViolation(FHIRTargetProfileValidator::REFERENCE_TYPE_MESSAGE)
+            ->setParameters(['{{ type }}' => 'Practitioner', '{{ allowed }}' => 'Organization'])
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testAbsoluteAndVersionedReferencesAreReadForTheirType(): void
+    {
+        $constraint = new FHIRTargetProfile(['http://hl7.org/fhir/StructureDefinition/PractitionerRole']);
+
+        $this->validator->validate(new Reference(reference: 'https://example.org/fhir/Patient/1/_history/2'), $constraint);
+
+        $this->buildViolation(FHIRTargetProfileValidator::REFERENCE_TYPE_MESSAGE)
+            ->setParameters(['{{ type }}' => 'Patient', '{{ allowed }}' => 'PractitionerRole'])
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * An allowed type, a reference that names no type (contained, `urn:uuid:`), a target that is not
+     * a core resource type, and an abstract target all pass: none of them says the type is wrong.
+     */
+    public function testReferenceTypeIsOnlyComparedWhenBothSidesNameAType(): void
+    {
+        $core = new FHIRTargetProfile(['http://hl7.org/fhir/StructureDefinition/Patient', 'http://hl7.org/fhir/StructureDefinition/Group']);
+
+        $this->validator->validate(new Reference(reference: 'Group/1'), $core);
+        $this->validator->validate(new Reference(reference: '#p1'), $core);
+        $this->validator->validate(new Reference(reference: 'urn:uuid:9d7c2a3e-8a4f-4f43-9e3b-6b1c2d3e4f50'), $core);
+        $this->validator->validate(new Reference(reference: 'Practitioner/2'), new FHIRTargetProfile([self::PROFILE_A]));
+        $this->validator->validate(new Reference(reference: 'Practitioner/2'), new FHIRTargetProfile(['http://hl7.org/fhir/StructureDefinition/Resource']));
 
         $this->assertNoViolation();
     }

@@ -98,6 +98,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'constraint' => 'Symfony\Component\Validator\Constraints\Count',
             'options'    => ['min' => 1, 'max' => 1],
         ],
+        [
+            'path'       => 'resource',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+            'options'    => [
+                'targetProfiles' => [
+                    'http://hl7.org/fhir/StructureDefinition/CodeSystem',
+                    'http://hl7.org/fhir/StructureDefinition/ValueSet',
+                    'http://hl7.org/fhir/StructureDefinition/Library',
+                ],
+            ],
+        ],
     ],
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]

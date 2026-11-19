@@ -238,16 +238,16 @@ final class DeclaredLimitations
     public const REASON_XXE_REFUSAL = 'refusing an XML DOCTYPE is deliberate: it blocks external-entity attacks, so this finding is unreachable by design';
 
     /**
-     * A reference's type is not read from its URL, because the reference validator's default does not.
+     * A finding the reference validator raises only when told to read a reference's type from its URL.
      *
      * `R4.dr-eh` reports `The type 'Device' implied by the reference URL Device/foo is not a valid Target`.
      * The reference validator raises that only when its manifest sets `assumeValidRestReferences`, which
-     * tells it to treat `Type/id` as proof of the target's type without resolving it. On its default
-     * settings it accepts `Practitioner/2` on an element that allows only `Organization`
-     * (`R5.fhirpath-good`), which inferring the type here would report as an error. Matching the
-     * default is the comparison's baseline, so the opt-in finding is declared rather than chased.
+     * tells it to treat `Type/id` as proof of the target's type without resolving it. This project reads
+     * the type from the URL by default (#229), so it reports `Practitioner/2` on an element that allows
+     * only `Organization` where the reference validator's default does not (`R5.fhirpath-good`, seeded
+     * as ABOVE).
      *
-     * `dr-eh` is unreachable for a second reason too: the `[Patient]` restriction comes from US Core
+     * `dr-eh` stays unreachable for another reason: the `[Patient]` restriction comes from US Core
      * 3.1.0, which the manifest loads for that case and this harness does not. Against the base
      * `DocumentReference.subject` targets, `Device` is allowed.
      */

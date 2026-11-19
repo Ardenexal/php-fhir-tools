@@ -65,6 +65,25 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\EvidenceVariableResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/picoelement'],
 )]
 #[FHIRProfileConstraint(
+    path: 'characteristic.definition[x]',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes',
+    options: [
+        'types' => ['Reference', 'canonical', 'CodeableConcept', 'Expression', 'DataRequirement', 'TriggerDefinition'],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/picoelement'],
+)]
+#[FHIRProfileConstraint(
+    path: 'characteristic.definition[x]',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: [
+        'targetProfiles' => [
+            'http://hl7.org/fhir/StructureDefinition/Group',
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/picoelement'],
+)]
+#[FHIRProfileConstraint(
     path: 'characteristic.exclude',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 1],
@@ -74,6 +93,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\EvidenceVariableResource;
     path: 'characteristic.participantEffective[x]',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/picoelement'],
+)]
+#[FHIRProfileConstraint(
+    path: 'characteristic.participantEffective[x]',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes',
+    options: ['types' => ['dateTime', 'Period', 'Duration', 'Timing']],
     groups: ['http://hl7.org/fhir/StructureDefinition/picoelement'],
 )]
 #[FHIRProfileConstraint(

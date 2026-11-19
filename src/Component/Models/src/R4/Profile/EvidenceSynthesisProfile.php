@@ -95,15 +95,33 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\EvidenceResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/synthesis'],
 )]
 #[FHIRProfileConstraint(
+    path: 'exposureBackground',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/EvidenceVariable']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/synthesis'],
+)]
+#[FHIRProfileConstraint(
     path: 'exposureVariant',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 2],
     groups: ['http://hl7.org/fhir/StructureDefinition/synthesis'],
 )]
 #[FHIRProfileConstraint(
+    path: 'exposureVariant',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/EvidenceVariable']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/synthesis'],
+)]
+#[FHIRProfileConstraint(
     path: 'outcome',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/synthesis'],
+)]
+#[FHIRProfileConstraint(
+    path: 'outcome',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/EvidenceVariable']],
     groups: ['http://hl7.org/fhir/StructureDefinition/synthesis'],
 )]
 class EvidenceSynthesisProfile extends EvidenceResource
