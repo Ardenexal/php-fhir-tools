@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Validator;
 
+use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
@@ -129,6 +130,24 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'extensible'));
 
         $this->buildViolation('Custom skip notice for {{ url }}')
+            ->setParameters(['{{ url }}' => self::VS_URL])
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+            ->assertRaised();
+    }
+
+    /**
+     * The bundle always wraps the configured client in its cache, so with no server configured the
+     * validator receives a cache around the null client. That is still no client (issue #245).
+     */
+    public function testExtensibleBindingWithCachedNullClientProducesUncheckedBindingInfoViolation(): void
+    {
+        $client    = new CachingFHIRTerminologyClient(new NullFHIRTerminologyClient());
+        $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $client);
+        $this->bindContext($validator);
+
+        $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'extensible'));
+
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_UNCHECKED_BINDING_MESSAGE)
             ->setParameters(['{{ url }}' => self::VS_URL])
             ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
             ->assertRaised();

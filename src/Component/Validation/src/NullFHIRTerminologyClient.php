@@ -11,7 +11,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterfa
 /**
  * Null-object implementation used when no real terminology server is configured.
  *
- * FHIRValueSetBindingValidator treats this client the same as having no client at all:
+ * FHIRValueSetBindingValidator treats this client, alone or wrapped in decorators such as the
+ * bundle's cache, the same as having no client at all:
  * extensible/preferred binding checks are skipped and each skip is surfaced as a
  * fhir:unchecked-binding INFO violation (issue #71). To suppress those, wire a real
  * client (e.g. HttpFHIRTerminologyClient) or filter the code at the application layer.
@@ -21,6 +22,8 @@ final class NullFHIRTerminologyClient implements FHIRTerminologyClientInterface
     /**
      * Whether no real terminology client is configured: none at all, this null client, or decorators
      * (such as the bundle's cache) wrapped around nothing else.
+     *
+     * @phpstan-assert-if-false FHIRTerminologyClientInterface $client
      */
     public static function isAbsent(?FHIRTerminologyClientInterface $client): bool
     {
