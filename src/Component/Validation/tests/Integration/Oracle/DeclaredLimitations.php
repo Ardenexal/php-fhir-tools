@@ -288,6 +288,18 @@ final class DeclaredLimitations
     public const REASON_DUPLICATE_REPORT = 'the reference validator reports the same ambiguous section entry a second time from its document section check';
 
     /**
+     * The reference validator's snapshot drops slicing a profile's differential declares on a slice.
+     *
+     * `R5.reslicing-extensions` slices `AuditEvent.agent.extension` by `url` and declares slicing on
+     * its `altid` slice by `url` and `value.system`, which tells `altid/npi` from `altid/ssn`. The
+     * snapshot shipped with the case has no slicing on `altid`, so the reference validator tells the
+     * two reslices apart by `url` alone, finds both items in both, and reports them. This project
+     * follows the differential, as it does for every slicing (#242), so the instance conforms. The
+     * case's `reslicing-good-extensions` twin moves the discriminator to the element and passes in both.
+     */
+    public const REASON_DROPPED_RESLICING = 'the reference validator snapshot drops the slicing the profile declares on a resliced slice; this project follows the differential';
+
+    /**
      * Text signature => reason, for limitations that are not about a code system.
      *
      * Kept apart from {@see TERMINOLOGY_SYSTEMS} because the two are different claims. A terminology entry
@@ -338,6 +350,8 @@ final class DeclaredLimitations
         // one moves the pin and has to be read before it is accepted. See REASON_EMPTY_INVARIANT.
         'constraint failed: per-1:' => self::REASON_EMPTY_INVARIANT,
         'constraint failed: ctm-1:' => self::REASON_EMPTY_INVARIANT,
+        // The canonical of the one profile concerned, so no other reslicing finding can match it.
+        'http://example.org/reslicedextension/structuredefinition/myauditeventprofile' => self::REASON_DROPPED_RESLICING,
     ];
 
     /**

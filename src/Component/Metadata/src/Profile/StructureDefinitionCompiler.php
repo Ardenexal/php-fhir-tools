@@ -594,7 +594,7 @@ final class StructureDefinitionCompiler
         $inherited      = is_array($ancestor['discriminators'] ?? null) ? $ancestor['discriminators'] : [];
         foreach ($discriminators as $index => $discriminator) {
             $from = $inherited[$index] ?? [];
-            if (!array_key_exists('value', $discriminator) && !array_key_exists('valueSet', $discriminator) && ($from['path'] ?? null) === ($discriminator['path'] ?? null)) {
+            if (self::unmatchableDiscriminators([$discriminator]) !== [] && ($from['path'] ?? null) === ($discriminator['path'] ?? null)) {
                 $discriminators[$index] = $from;
             }
         }
@@ -1279,6 +1279,7 @@ final class StructureDefinitionCompiler
         array &$diagnostics,
         ?\Closure $inline = null,
         ?\Closure $lookup = null,
+        string $resliceOf = '',
     ): array {
         $definition     = $slicing['definition'];
         $discriminators = [];
@@ -1288,15 +1289,21 @@ final class StructureDefinitionCompiler
             }
         }
 
-        $names = self::sliceNames($slicedId, $diff);
-        if ($names !== [] && $slicing['declaredHere'] && ($definition['rules'] ?? 'open') !== 'open') {
-            $names = array_values(array_unique([...$names, ...self::sliceNames($slicedId, $snapshot)]));
+        // Closed or openAtEnd rules declared here, and ordered slicing, judge every item by the slice
+        // it matches, so the snapshot's slices (the parent's) join this profile's as bare members.
+        // They are marked inherited: the parent's group already reports the order among them.
+        $slicingId = $resliceOf === '' ? $slicedId : "{$slicedId}:{$resliceOf}";
+        $names     = self::sliceNames($slicedId, $diff, $resliceOf);
+        $inherited = [];
+        if ($names !== [] && (($slicing['declaredHere'] && ($definition['rules'] ?? 'open') !== 'open') || self::orderedOption($slicingId, $slicing, $snapshot) !== [])) {
+            $inherited = array_flip(array_values(array_diff(self::sliceNames($slicedId, $snapshot, $resliceOf), $names)));
+            $names     = [...$names, ...array_keys($inherited)];
         }
 
         // Declaration order is the snapshot's, which lists every slice of the slicing; the merged
         // list above puts the differential's slices first. A slice the snapshot lacks (a
         // StructureDefinition without one) keeps its differential position, after the snapshot's.
-        $declared = array_flip(self::sliceNames($slicedId, $snapshot));
+        $declared = array_flip(self::sliceNames($slicedId, $snapshot, $resliceOf));
 
         $definitions = [];
         foreach ($names as $position => $sliceName) {
@@ -1310,7 +1317,7 @@ final class StructureDefinitionCompiler
             foreach ($discriminators as $discriminator) {
                 $sliceDiscriminators[] = $isDefault
                     ? $discriminator
-                    : self::sliceDiscriminator($sliceId, $discriminator['type'], $discriminator['path'], $diff, $snapshot, $lookup);
+                    : self::resolvedDiscriminator($slicedId, $sliceName, $discriminator, $diff, $snapshot, $lookup);
             }
 
             // An item can only join a slice its discriminator can match, so a minimum on any other
@@ -1329,6 +1336,10 @@ final class StructureDefinitionCompiler
             }
 
             $definition['orderedIndex'] = $orderedIndex;
+
+            if (isset($inherited[$sliceName])) {
+                $definition['inherited'] = true;
+            }
 
             $rules = self::sliceRules($sliceId, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup);
             if ($rules !== []) {
@@ -1375,7 +1386,8 @@ final class StructureDefinitionCompiler
     }
 
     /**
-     * The discriminators of a slice that carry neither a value nor a value set to match on.
+     * The discriminators of a slice that carry neither a value nor a value set to match on, nor
+     * their reslices' alternatives (`anyOf`).
      *
      * @param list<array<mixed>> $discriminators
      *
@@ -1385,7 +1397,7 @@ final class StructureDefinitionCompiler
     {
         return array_values(array_filter(
             $discriminators,
-            static fn (array $d): bool => !array_key_exists('value', $d) && !array_key_exists('valueSet', $d),
+            static fn (array $d): bool => !array_key_exists('value', $d) && !array_key_exists('valueSet', $d) && !array_key_exists('anyOf', $d),
         ));
     }
 
@@ -1516,32 +1528,71 @@ final class StructureDefinitionCompiler
 
             $relative = self::rewriteChoiceTypeSlices(substr($nestedId, strlen($prefix)));
 
-            if ($slicing['declaredHere']) {
-                $rules[] = [
-                    'path'       => $relative,
-                    'constraint' => FHIRSlicingRules::class,
-                    'options'    => [
-                        'property' => $relative,
-                        'rules'    => self::enforceableRules($nestedId, $slicing, $definitions, $profileUrl, $diagnostics),
-                        ...self::orderedOption($nestedId, $slicing, $snapshot),
-                    ],
-                ];
-            } elseif (self::orderedOption($nestedId, $slicing, $snapshot) !== []) {
-                // Inherited ordered slicing, as at the top level
-                $rules[] = [
-                    'path'       => $relative,
-                    'constraint' => FHIRSlicingRules::class,
-                    'options'    => ['property' => $relative, 'rules' => 'open', 'ordered' => true],
-                ];
+            foreach (self::nestedSlicingRules($relative, $nestedId, $slicing, $definitions, $snapshot, $profileUrl, $diagnostics) as $rule) {
+                $rules[] = $rule;
             }
+        }
 
-            foreach ($definitions as $nested) {
-                $rules[] = [
-                    'path'       => $relative,
-                    'constraint' => FHIRSliceConstraint::class,
-                    'options'    => ['property' => $relative, ...$nested],
-                ];
+        // Reslices ("altid/npi") split the items matching this slice, so their slicing sits at the
+        // path '', which the validator reads as those items rather than an element beneath each one
+        $colon     = (int) strrpos($sliceId, ':');
+        $slicedId  = substr($sliceId, 0, $colon);
+        $sliceName = substr($sliceId, $colon + 1);
+        if (self::sliceNames($slicedId, $diff, $sliceName) !== []) {
+            $reslicing   = self::reslicingFor($sliceId, $slicedId, $diff, $snapshot);
+            $definitions = $reslicing === null ? [] : self::sliceDefinitions($slicedId, $reslicing, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup, $sliceName);
+
+            foreach ($reslicing === null || $definitions === [] ? [] : self::nestedSlicingRules('', $sliceId, $reslicing, $definitions, $snapshot, $profileUrl, $diagnostics) as $rule) {
+                $rules[] = $rule;
             }
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Slicing beneath a slice as slice rules at $relative: its FHIRSlicingRules when the slicing is
+     * declared here or is inherited ordered slicing, as at the top level, then one FHIRSliceConstraint
+     * per slice.
+     *
+     * @param string                                                      $relative    Item-relative path of the sliced element; '' for a slice's reslices
+     * @param string                                                      $slicingId   Id of the element carrying the slicing
+     * @param array{definition: array<string, mixed>, declaredHere: bool} $slicing     From slicingFor() or reslicingFor()
+     * @param list<array<string, mixed>>                                  $definitions From sliceDefinitions()
+     * @param array<string, array<string, mixed>>                         $snapshot    Snapshot elements by id
+     * @param list<CompilerDiagnostic>                                    $diagnostics Receives slicing enforced as open
+     *
+     * @return list<array{path: string, constraint: class-string, options: array<string, mixed>}>
+     */
+    private static function nestedSlicingRules(string $relative, string $slicingId, array $slicing, array $definitions, array $snapshot, string $profileUrl, array &$diagnostics): array
+    {
+        $rules = [];
+
+        if ($slicing['declaredHere']) {
+            $rules[] = [
+                'path'       => $relative,
+                'constraint' => FHIRSlicingRules::class,
+                'options'    => [
+                    'property' => $relative,
+                    'rules'    => self::enforceableRules($slicingId, $slicing, $definitions, $profileUrl, $diagnostics),
+                    ...self::orderedOption($slicingId, $slicing, $snapshot),
+                ],
+            ];
+        } elseif (self::orderedOption($slicingId, $slicing, $snapshot) !== []) {
+            // Inherited ordered slicing, as at the top level
+            $rules[] = [
+                'path'       => $relative,
+                'constraint' => FHIRSlicingRules::class,
+                'options'    => ['property' => $relative, 'rules' => 'open', 'ordered' => true],
+            ];
+        }
+
+        foreach ($definitions as $nested) {
+            $rules[] = [
+                'path'       => $relative,
+                'constraint' => FHIRSliceConstraint::class,
+                'options'    => ['property' => $relative, ...$nested],
+            ];
         }
 
         return $rules;
@@ -1622,6 +1673,83 @@ final class StructureDefinitionCompiler
         }
 
         return $rules;
+    }
+
+    /**
+     * One discriminator of a slice, as sliceDiscriminator() finds it, or else as the slice's reslices
+     * find it.
+     *
+     * A resliced slice often states no value of its own at a discriminator path, and leaves each of
+     * its reslices to fix one ("altid" slices extensions by `value.system`, and "altid/npi" and
+     * "altid/ssn" each fix a system). Its items are then those of its reslices, so the discriminator
+     * carries each reslice's own discriminator under `anyOf`, and an item matching any one of them
+     * passes. A reslice with nothing of its own takes the value of the slice it belongs to (see
+     * ancestorSliceDiscriminator()); when there is none, the discriminator is left as found.
+     *
+     * @param string                                               $slicedId      Id of the sliced element
+     * @param string                                               $sliceName     Name of the slice, "a" or a reslice "a/b"
+     * @param array{type: string, path: string}                    $discriminator The slicing's discriminator
+     * @param array<string, array<string, mixed>>                  $diff          Differential elements by id
+     * @param array<string, array<string, mixed>>                  $snapshot      Snapshot elements by id
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup        Finds the data-type profile a slice is typed with
+     *
+     * @return array{type: string, path: string, value?: mixed, valueSet?: string, anyOf?: list<array{type: string, path: string, value?: mixed, valueSet?: string}>}
+     */
+    private static function resolvedDiscriminator(string $slicedId, string $sliceName, array $discriminator, array $diff, array $snapshot, ?\Closure $lookup): array
+    {
+        $found = self::sliceDiscriminator("{$slicedId}:{$sliceName}", $discriminator['type'], $discriminator['path'], $diff, $snapshot, $lookup);
+        if (self::unmatchableDiscriminators([$found]) === []) {
+            return $found;
+        }
+
+        $reslices = array_values(array_unique([...self::sliceNames($slicedId, $snapshot, $sliceName), ...self::sliceNames($slicedId, $diff, $sliceName)]));
+        if ($reslices === []) {
+            return self::ancestorSliceDiscriminator($slicedId, $sliceName, $discriminator, $diff, $snapshot, $lookup) ?? $found;
+        }
+
+        $alternatives = [];
+        foreach ($reslices as $reslice) {
+            $resolved = self::resolvedDiscriminator($slicedId, $reslice, $discriminator, $diff, $snapshot, $lookup);
+            if (self::unmatchableDiscriminators([$resolved]) !== []) {
+                return self::ancestorSliceDiscriminator($slicedId, $sliceName, $discriminator, $diff, $snapshot, $lookup) ?? $found;
+            }
+
+            foreach ($resolved['anyOf'] ?? [$resolved] as $alternative) {
+                if (!in_array($alternative, $alternatives, true)) {
+                    $alternatives[] = $alternative;
+                }
+            }
+        }
+
+        return [...$found, 'anyOf' => $alternatives];
+    }
+
+    /**
+     * The discriminator as the nearest slice a reslice belongs to states it ("a" for "a/b"), or null.
+     *
+     * A reslice holds only items of its slice, so a value the slice fixes holds for it too. A
+     * snapshot repeats that value on the reslice; a differential, or a StructureDefinition without a
+     * snapshot, states it only on the slice.
+     *
+     * @param array{type: string, path: string}                    $discriminator
+     * @param array<string, array<string, mixed>>                  $diff
+     * @param array<string, array<string, mixed>>                  $snapshot
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup
+     *
+     * @return array{type: string, path: string, value?: mixed, valueSet?: string}|null
+     */
+    private static function ancestorSliceDiscriminator(string $slicedId, string $sliceName, array $discriminator, array $diff, array $snapshot, ?\Closure $lookup): ?array
+    {
+        while (($slash = strrpos($sliceName, '/')) !== false) {
+            $sliceName = substr($sliceName, 0, $slash);
+            $found     = self::sliceDiscriminator("{$slicedId}:{$sliceName}", $discriminator['type'], $discriminator['path'], $diff, $snapshot, $lookup);
+
+            if (self::unmatchableDiscriminators([$found]) === []) {
+                return $found;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -2045,15 +2173,20 @@ final class StructureDefinitionCompiler
 
     /**
      * Names of the slices on a sliced element that a set of elements declares or reaches into, in
-     * their order. Reslices ("a/b") and choice type slices are left out.
+     * their order. Choice type slices are left out.
      *
-     * @param array<string, array<string, mixed>> $diff Differential (or snapshot) elements by id
+     * With $resliceOf '' these are the slices of the element itself, and an element of a reslice
+     * ("a/b") counts as reaching into its slice ("a"). With a slice name, they are that slice's
+     * reslices one level down: "a/b" for "a", with "a/b/c" counting as reaching into "a/b".
+     *
+     * @param array<string, array<string, mixed>> $diff      Differential (or snapshot) elements by id
+     * @param string                              $resliceOf Name of the slice whose reslices to list, or '' for the element's own slices
      *
      * @return list<string>
      */
-    private static function sliceNames(string $slicedId, array $diff): array
+    private static function sliceNames(string $slicedId, array $diff, string $resliceOf = ''): array
     {
-        $prefix  = $slicedId . ':';
+        $prefix  = $slicedId . ':' . ($resliceOf === '' ? '' : $resliceOf . '/');
         $segment = substr($slicedId, (int) strrpos($slicedId, '.') + 1);
         $names   = [];
 
@@ -2062,16 +2195,51 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
-            $rest = substr($id, strlen($prefix));
-            $dot  = strpos($rest, '.');
-            $name = $dot === false ? $rest : substr($rest, 0, $dot);
+            $rest  = substr($id, strlen($prefix));
+            $dot   = strpos($rest, '.');
+            $name  = $dot === false ? $rest : substr($rest, 0, $dot);
+            $slash = strpos($name, '/');
+            $name  = $slash === false ? $name : substr($name, 0, $slash);
 
-            if ($name !== '' && !str_contains($name, '/') && !self::isChoiceTypeSlice($segment, $name)) {
-                $names[$name] = true;
+            if ($name === '' || ($resliceOf === '' && self::isChoiceTypeSlice($segment, $name))) {
+                continue;
             }
+
+            $names[$resliceOf === '' ? $name : "{$resliceOf}/{$name}"] = true;
         }
 
         return array_keys($names);
+    }
+
+    /**
+     * The slicing that tells a slice's reslices apart: the one declared on the slice itself (in this
+     * differential, else in the snapshot), else the sliced element's discriminators with open rules.
+     *
+     * Profiles often reslice without restating slicing on the slice: the sliced element's
+     * discriminators already name the paths, and each reslice fixes the values there. The HL7
+     * validator matches such reslices that way too. The rules are open, since no closed or ordered
+     * reslicing was declared, and the result counts as declared here only when the slice declares it.
+     *
+     * @param string                              $sliceId  Id of the resliced slice, e.g. 'AuditEvent.agent.extension:altid'
+     * @param string                              $slicedId Id of the element it slices, e.g. 'AuditEvent.agent.extension'
+     * @param array<string, array<string, mixed>> $diff     Differential elements by id
+     * @param array<string, array<string, mixed>> $snapshot Snapshot elements by id
+     *
+     * @return array{definition: array<string, mixed>, declaredHere: bool}|null
+     */
+    private static function reslicingFor(string $sliceId, string $slicedId, array $diff, array $snapshot): ?array
+    {
+        $own = self::slicingFor($sliceId, $diff, $snapshot);
+        if ($own !== null) {
+            return $own;
+        }
+
+        $outer = self::slicingFor($slicedId, $diff, $snapshot);
+        if ($outer === null) {
+            return null;
+        }
+
+        return ['definition' => ['discriminator' => $outer['definition']['discriminator'] ?? [], 'rules' => 'open'], 'declaredHere' => false];
     }
 
     /**
