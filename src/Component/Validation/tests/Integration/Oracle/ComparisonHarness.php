@@ -402,8 +402,8 @@ final class ComparisonHarness
      * Did the reference validator hold extension sources that even a supplied-profile run lacks?
      *
      * {@see referenceHadExtensionSourcesWeLack()} without the supplied definitions themselves, which
-     * that run loads: IG packages, an allowed extension domain, `supporting5` definitions from another
-     * release, and cross-version extensions.
+     * that run loads (including `supporting5`): IG packages, an allowed extension domain, and
+     * cross-version extensions.
      *
      * @param array<string, mixed> $case         one manifest `test-cases` entry
      * @param bool                 $profilePhase whether the run is the case's `profile` phase, whose own
@@ -414,7 +414,7 @@ final class ComparisonHarness
         $profile = is_array($case['profile'] ?? null) ? $case['profile'] : [];
 
         return isset($case['packages']) || ($profilePhase && isset($profile['packages'])) || isset($case['allowed-extension-domain'])
-                                        || isset($case['supporting5']) || ($case['module'] ?? '') === 'xver';
+                                        || ($case['module'] ?? '') === 'xver';
     }
 
     /**
@@ -422,12 +422,13 @@ final class ComparisonHarness
      *
      * The default run validates each selected case once with the shared service. A supplied-profile
      * run instead validates, with a service holding the case's own definitions:
-     * - each case with `supporting` or `profiles` once, as the default run would if it could load them;
+     * - each case with `supporting`, `supporting5` or `profiles` once, as the default run would if it
+     *   could load them;
      * - each case's `profile` phase, reported as `<name> [profile]`, against the phase's source
      *   profile and the phase's own reference outcome.
      *
      * Each run loads the definitions the reference validator held for it: the base run the case's
-     * `supporting` and `profiles`, the phase those plus its own `source` and `supporting`. A phase whose
+     * `supporting`, `supporting5` and `profiles`, the phase those plus its own `source` and `supporting`. A phase whose
      * source has no fixture is yielded with a skip reason, so it stays visible in the skip arithmetic.
      *
      * @param array<string, array<string, mixed>> $cases
@@ -445,7 +446,7 @@ final class ComparisonHarness
 
             // The supplied definitions are loaded now, so only the other extension sources still
             // justify switching extension resolution off
-            if (isset($case['supporting']) || isset($case['profiles'])) {
+            if (isset($case['supporting']) || isset($case['supporting5']) || isset($case['profiles'])) {
                 yield $name => [$case, [], $this->suppliedProfiles->serviceFor(
                     SuppliedProfiles::sourcesOf($case, profilePhase: false),
                     !self::referenceHadExtensionSourcesBeyondSuppliedOnes($case, profilePhase: false),

@@ -18,8 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description This extension is used when EvidenceVariable.handling has a value of ‘extension’ because the handling element has a required binding and an extension is needed when the handling cannot be described with any of the other values in the limited value set.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/evidence-variable-handling-detail', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'EvidenceVariable')]
-#[FHIRExtensionContext(type: 'element', expression: 'Evidence.statistic.modelCharacteristic.variable')]
+#[FHIRExtensionContext(type: 'element', expression: 'EvidenceVariable', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'Evidence.statistic.modelCharacteristic.variable', startFhirVersion: '4.3')]
 class EvidenceVariableHandlingDetailExtension extends Extension
 {
     /**

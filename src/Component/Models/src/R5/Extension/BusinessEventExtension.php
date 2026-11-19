@@ -21,7 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/businessEvent', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
-#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0')]
 class BusinessEventExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

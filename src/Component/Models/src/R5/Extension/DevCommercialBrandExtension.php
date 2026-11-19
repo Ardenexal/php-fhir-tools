@@ -18,8 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description The overall name of a collection of branded devices that an organization brings to market.  It is typically not the same as, although can be derived from, the organization name that owns the name. Use Commercial Brand Family value for Device.name.type or DeviceDefinition.deviceName.type in R6.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-commercialBrand', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Device')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Device', endFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition', startFhirVersion: '4.0', endFhirVersion: '5.0')]
 class DevCommercialBrandExtension extends Extension
 {
     /**

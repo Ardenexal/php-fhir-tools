@@ -28,9 +28,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type.targetProfile')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.type')]
-#[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.allowedType')]
-#[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.targetProfile')]
-#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide.definition.page')]
+#[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.allowedType', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.targetProfile', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide.definition.page', startFhirVersion: '4.0')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/standards-status', strength: 'required')]
 class SDStandardsStatusExtension extends Extension
 {

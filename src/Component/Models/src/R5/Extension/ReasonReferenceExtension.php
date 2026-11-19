@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-reasonReference', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
-#[FHIRExtensionContext(type: 'element', expression: 'Media')]
+#[FHIRExtensionContext(type: 'element', expression: 'Media', endFhirVersion: '4.3')]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
 class ReasonReferenceExtension extends Extension
 {

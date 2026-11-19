@@ -23,7 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive;
  * For example, a device may have connectors for up to three sensors of different types. Each sensor type definition would be referenced in `hasPart.reference`; it would have no `hasPart.count` value, but instead use this extension on `hasPart.count` and setting a minimum count of zero, and maximum of one.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/DeviceDefinition-partVariableCount', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition.hasPart.count')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition.hasPart.count', startFhirVersion: '5.0')]
 #[FHIRContextInvariant(expression: '$this.hasValue().not()')]
 #[FHIRProfileInvariant(
     path: '',

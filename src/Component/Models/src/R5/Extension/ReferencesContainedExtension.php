@@ -21,7 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'markdown')]
 #[FHIRExtensionContext(type: 'element', expression: 'string')]
 #[FHIRExtensionContext(type: 'element', expression: 'Narrative')]
-#[FHIRExtensionContext(type: 'element', expression: 'Expression')]
+#[FHIRExtensionContext(type: 'element', expression: 'Expression', startFhirVersion: '4.0')]
 class ReferencesContainedExtension extends Extension
 {
     /**

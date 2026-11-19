@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Identifies files used as part of the the publication process other than resources referenced in definition.resource.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/implementationguide-sourceFile', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide.definition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide.definition', startFhirVersion: '4.0')]
 class IGSourceFileExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

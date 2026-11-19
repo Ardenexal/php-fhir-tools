@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Version specific identifier for the composition, assigned when each version is created/updated. Note: this extension is only used before R5 because Composition has a version element which should be used instead.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/composition-clinicaldocument-versionNumber', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/composition-clinicaldocument-versionNumber',
+    fhirVersion: 'R4',
+    endFhirVersion: '4.3',
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
 class CDVersionNumberExtension extends Extension
 {

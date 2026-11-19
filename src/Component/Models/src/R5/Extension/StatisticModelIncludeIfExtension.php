@@ -23,8 +23,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * This extension requires two elements, an attribute and a value[x]. The interpretation of the extension instance is that when the attribute VALUE matches the value[x] VALUE, then the corresponding model characteristic (or variable) element shall be included in the model.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/statistic-model-include-if', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Evidence.statistic.modelCharacteristic')]
-#[FHIRExtensionContext(type: 'element', expression: 'Evidence.statistic.modelCharacteristic.variable')]
+#[FHIRExtensionContext(type: 'element', expression: 'Evidence.statistic.modelCharacteristic', startFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'Evidence.statistic.modelCharacteristic.variable', startFhirVersion: '4.3')]
 class StatisticModelIncludeIfExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description Other resources *from the patient record* that may be relevant to the event.  The information from these resources was either used to create the instance or is provided to help with its interpretation.  This extension **should not** be used if more specific  inline elements  or extensions are available.  For example, use `Observation.hasMember`  instead of supportingInformation for  representing the members of an Observation panel.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-supportingInfo', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
+#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport', endFhirVersion: '4.3')]
 #[FHIRExtensionContext(type: 'element', expression: 'DocumentReference')]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]

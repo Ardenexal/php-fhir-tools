@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/ordinalValue', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Coding')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 class OrdinalValueExtension extends Extension

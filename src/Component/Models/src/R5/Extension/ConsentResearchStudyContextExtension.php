@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description When a Research scope Consent, this is the specific research study that is allowed to use the information (or not).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/consent-ResearchStudyContext', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Consent.provision')]
+#[FHIRExtensionContext(type: 'element', expression: 'Consent.provision', startFhirVersion: '4.0')]
 class ConsentResearchStudyContextExtension extends Extension
 {
     /**

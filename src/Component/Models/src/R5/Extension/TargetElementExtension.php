@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/targetElement', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Reference')]
-#[FHIRExtensionContext(type: 'element', expression: 'canonical')]
+#[FHIRExtensionContext(type: 'element', expression: 'canonical', startFhirVersion: '4.0')]
 class TargetElementExtension extends Extension
 {
     /**

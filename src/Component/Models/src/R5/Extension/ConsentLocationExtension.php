@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description Restricts this exception to only apply a specific location as defined.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/consent-location', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Consent.provision')]
+#[FHIRExtensionContext(type: 'element', expression: 'Consent.provision', startFhirVersion: '4.0')]
 class ConsentLocationExtension extends Extension
 {
     /**

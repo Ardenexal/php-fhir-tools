@@ -21,7 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.group')]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.group.population')]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.group.stratifier')]
-#[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.supplementalData')]
+#[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.supplementalData', startFhirVersion: '5.0')]
 class MeasureReportPopulationDescriptionExtension extends Extension
 {
     /**

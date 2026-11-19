@@ -22,8 +22,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement', endFhirVersion: '4.3')]
 class EventHistoryExtension extends Extension
 {
     /**

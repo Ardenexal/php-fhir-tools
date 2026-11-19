@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description Other preceding or concurrent observations that must be known to understand the context and significance of the observation.  For example, an fiO2 measure taken alongside of a SpO2 measurement.  See the FHIR specification [Observation notes](http://hl7.org/fhir/observation.html#notes) section for additional guidance. Use Observation.intpretationContext after R5.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-precondition', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Observation')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation', endFhirVersion: '5.0')]
 class ObsPreconditionExtension extends Extension
 {
     /**

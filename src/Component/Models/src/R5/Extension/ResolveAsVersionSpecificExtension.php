@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resolve-as-version-specific', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Reference')]
 #[FHIRExtensionContext(type: 'element', expression: 'uri')]
-#[FHIRExtensionContext(type: 'element', expression: 'url')]
+#[FHIRExtensionContext(type: 'element', expression: 'url', startFhirVersion: '4.0')]
 class ResolveAsVersionSpecificExtension extends Extension
 {
     /**

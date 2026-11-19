@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/narrative-language-control', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Reference')]
-#[FHIRExtensionContext(type: 'element', expression: 'canonical')]
+#[FHIRExtensionContext(type: 'element', expression: 'canonical', startFhirVersion: '4.0')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/narrative-language-control', strength: 'required')]
 class NarrativeLanguageControlExtension extends Extension
 {

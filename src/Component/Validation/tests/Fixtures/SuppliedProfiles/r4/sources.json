@@ -100,6 +100,8 @@
     "slice23/StructureDefinition-OtherId.json": "supplied/slice23-StructureDefinition-OtherId.json",
     "slicing-kn-profile.json": "supplied/slicing-kn-profile.json",
     "slicing-types-by-string-profile.xml": "supplied/slicing-types-by-string-profile.xml.json",
+    "structuredefinition-version-range-ctxt.xml": "supplied/structuredefinition-version-range-ctxt.xml.json",
+    "structuredefinition-version-range.xml": "supplied/structuredefinition-version-range.xml.json",
     "test-input-params.xml": "supplied/test-input-params.xml.json",
     "tx-extensible-suppression-profile.xml": "supplied/tx-extensible-suppression-profile.xml.json",
     "type-ref-profile.xml": "supplied/type-ref-profile.xml.json",

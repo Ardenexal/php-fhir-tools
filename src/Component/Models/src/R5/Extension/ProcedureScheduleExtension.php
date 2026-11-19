@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
  *
  * @description The schedule that was followed. Use Procedure.occurrenceTiming in R5+
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-schedule', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-schedule', fhirVersion: 'R5', endFhirVersion: '4.3')]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
 class ProcedureScheduleExtension extends Extension
 {

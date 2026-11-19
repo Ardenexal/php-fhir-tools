@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description If set to true, indicates that support for the specified behavior would make a system non-conformant with the specification.  See the capabilitystatement-expectation extension to set non-prohibited expectations.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-prohibited', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-prohibited', fhirVersion: 'R5', isModifier: true)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.interaction')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.searchParam')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.searchParam')]

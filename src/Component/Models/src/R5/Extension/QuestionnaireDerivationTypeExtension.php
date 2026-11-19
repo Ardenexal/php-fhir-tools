@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Provides more precision about the type of derivation relationship that exists.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-derivationType', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.derivedFrom')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.derivedFrom', startFhirVersion: '4.0')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-derivationType', strength: 'extensible')]
 class QuestionnaireDerivationTypeExtension extends Extension
 {

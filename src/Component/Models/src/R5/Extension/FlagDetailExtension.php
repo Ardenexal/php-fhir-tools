@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/flag-detail', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Flag')]
-#[FHIRExtensionContext(type: 'element', expression: 'Media')]
+#[FHIRExtensionContext(type: 'element', expression: 'Media', endFhirVersion: '4.3')]
 class FlagDetailExtension extends Extension
 {
     /**

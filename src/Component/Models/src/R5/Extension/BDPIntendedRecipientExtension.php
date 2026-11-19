@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description The biologicallyderivedproduct-intendedRecipient extension can be used to record the intended recipient of the BiologicallyDerivedProduct to satisfy product traceability requirements, and does not represent administration, nor does it prevent administration to a different recipient at a future date. Further detail on the traceability requirements can be found in the BiologicallyDerivedProduct resource [Intended Recipients](http://hl7.org/fhir/biologicallyderivedproduct.html#intendedrecipient).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/biologicallyderivedproduct-intendedRecipient', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'BiologicallyDerivedProduct')]
+#[FHIRExtensionContext(type: 'element', expression: 'BiologicallyDerivedProduct', startFhirVersion: '4.0')]
 class BDPIntendedRecipientExtension extends Extension
 {
     /**

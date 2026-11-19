@@ -14,8 +14,8 @@ use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 /**
  * The StructureDefinitions fhir-test-cases supply beside their instances, as validation services.
  *
- * A manifest entry can hand the reference validator its own definitions: `supporting` and
- * `profiles` files, and the `source` of a `profile` phase. Most ship a differential only, and runtime
+ * A manifest entry can hand the reference validator its own definitions: `supporting`,
+ * `supporting5` and `profiles` files, and the `source` of a `profile` phase. Most ship a differential only, and runtime
  * validation needs a snapshot, so `Fixtures/SuppliedProfiles/seed-supplied-profiles.php` wrote them
  * once with snapshots from the reference validator. This class reads that output.
  *
@@ -65,7 +65,7 @@ final class SuppliedProfiles
     /**
      * The StructureDefinitions a manifest entry supplies, as source paths in the order it lists them.
      *
-     * The base run gets the case's `supporting` and `profiles`; its `profile` phase also gets the
+     * The base run gets the case's `supporting`, `supporting5` and `profiles`; its `profile` phase also gets the
      * phase's `source` and `supporting`, as the reference validator did.
      *
      * @param array<string, mixed> $case one manifest `test-cases` entry
@@ -77,6 +77,7 @@ final class SuppliedProfiles
         $profile = $profilePhase && is_array($case['profile'] ?? null) ? $case['profile'] : [];
         $paths   = [
             ...(is_array($case['supporting'] ?? null) ? $case['supporting'] : []),
+            ...(is_array($case['supporting5'] ?? null) ? $case['supporting5'] : []),
             ...(is_array($case['profiles'] ?? null) ? $case['profiles'] : []),
             ...(is_string($profile['source'] ?? null) ? [$profile['source']] : []),
             ...(is_array($profile['supporting'] ?? null) ? $profile['supporting'] : []),

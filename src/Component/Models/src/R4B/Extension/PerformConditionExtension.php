@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description A condition on whether to perform the ServiceRequest, which applies when .doNotPerform is false or absent.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/perform-condition', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/perform-condition', fhirVersion: 'R4B', isModifier: true)]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
 #[FHIRContextInvariant(expression: '(%resource is ServiceRequest) implies (%resource.doNotPerform.empty() or %resource.doNotPerform = false)')]
 class PerformConditionExtension extends Extension

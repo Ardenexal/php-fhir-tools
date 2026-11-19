@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-followOnOf', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
-#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 class FollowOnOfExtension extends Extension

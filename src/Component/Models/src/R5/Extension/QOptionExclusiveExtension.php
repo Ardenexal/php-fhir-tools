@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description If true, indicates that if this answerOption is selected, no other possible answers may be selected, even if the item is a repeating question.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption', startFhirVersion: '4.0')]
 class QOptionExclusiveExtension extends Extension
 {
     /**

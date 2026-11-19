@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/blinded-role', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
-#[FHIRExtensionContext(type: 'element', expression: 'Evidence')]
+#[FHIRExtensionContext(type: 'element', expression: 'Evidence', startFhirVersion: '4.0', endFhirVersion: '4.3')]
 class BlindedRoleExtension extends Extension
 {
     /**

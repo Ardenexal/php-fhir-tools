@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description A society affiliation for the venue (publication form) that the cited artifact is cited in.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/citation-societyAffiliation', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Citation.citedArtifact.publicationForm.publishedIn')]
+#[FHIRExtensionContext(type: 'element', expression: 'Citation.citedArtifact.publicationForm.publishedIn', startFhirVersion: '5.0')]
 class CitationSocietyAffiliationExtension extends Extension
 {
     /**

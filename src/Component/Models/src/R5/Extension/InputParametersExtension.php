@@ -21,8 +21,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'Library')]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup', endFhirVersion: '4.3')]
 #[FHIRExtensionContext(type: 'element', expression: 'GuidanceResponse')]
 class InputParametersExtension extends Extension
 {

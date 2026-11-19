@@ -24,11 +24,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter')]
 #[FHIRExtensionContext(type: 'element', expression: 'CompartmentDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide')]
-#[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]
-#[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConceptMap')]
-#[FHIRExtensionContext(type: 'element', expression: 'NamingSystem')]
+#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'CodeSystem', endFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet', endFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'ConceptMap', endFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'NamingSystem', endFhirVersion: '4.3')]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 class ResLastReviewDateExtension extends Extension
 {

@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description The label to list in front of a code when presenting a list of possible values in a questionnaire-like fashion.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption', startFhirVersion: '4.0')]
 class QOptionPrefixExtension extends Extension
 {
     /**

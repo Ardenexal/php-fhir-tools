@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @description The report references related ("sibling") reports. This extension has been replaced by DiagnosticReport.relatesTo element in R6.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/diagnosticReport-extends', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/diagnosticReport-extends', fhirVersion: 'R4', endFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 class DRExtendsExtension extends Extension
 {

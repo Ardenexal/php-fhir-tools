@@ -18,24 +18,24 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
  * @description A copyright statement relating to the artifact and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the artifact.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-copyright', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition', startFhirVersion: '4.3')]
 #[FHIRExtensionContext(type: 'element', expression: 'CompartmentDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
-#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'GraphDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication')]
-#[FHIRExtensionContext(type: 'element', expression: 'MedicationKnowledge')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationKnowledge', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'NamingSystem')]
-#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
 #[FHIRExtensionContext(type: 'element', expression: 'SearchParameter')]
-#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Substance')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition')]
-#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition', startFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic', startFhirVersion: '4.3')]
 class ArtifactCopyrightExtension extends Extension
 {
     /**

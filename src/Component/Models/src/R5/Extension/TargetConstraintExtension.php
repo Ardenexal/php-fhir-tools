@@ -35,7 +35,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal.target')]
-#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.actor')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.actor', startFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]

@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/itemWeight', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Coding')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse.item.answer.value')]
 class ItemWeightExtension extends Extension
 {

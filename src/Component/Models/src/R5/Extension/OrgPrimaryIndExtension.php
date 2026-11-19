@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Flag indicating if the specialty is the primary specialty of the provider. Normally, a practitioner will have one primary specialty, but in some cases more than one can be primary.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/organizationaffiliation-primaryInd', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'OrganizationAffiliation.specialty')]
+#[FHIRExtensionContext(type: 'element', expression: 'OrganizationAffiliation.specialty', startFhirVersion: '4.0')]
 class OrgPrimaryIndExtension extends Extension
 {
     /**

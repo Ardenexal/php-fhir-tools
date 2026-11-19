@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-directedBy', fhirVersion: 'R5')]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
-#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0')]
 class PRDirectedByExtension extends Extension
 {
     /**

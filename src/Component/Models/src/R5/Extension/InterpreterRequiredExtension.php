@@ -22,7 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 #[FHIRExtensionContext(type: 'element', expression: 'Practitioner')]
 #[FHIRExtensionContext(type: 'element', expression: 'Appointment')]
-#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0')]
 class InterpreterRequiredExtension extends Extension
 {
     /**

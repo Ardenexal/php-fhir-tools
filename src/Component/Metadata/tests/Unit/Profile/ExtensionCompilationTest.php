@@ -72,6 +72,61 @@ final class ExtensionCompilationTest extends TestCase
         self::assertSame([true, false, false], array_map(static fn (ExtensionSlice $s): bool => $s->isRequired(), $compiled->subExtensions));
     }
 
+    public function testAModifierExtensionIsMarkedFromItsRootElement(): void
+    {
+        $compiler = new StructureDefinitionCompiler();
+        $modifier = self::definition([], []);
+
+        $modifier['snapshot']['element'][0]['isModifier'] = true;
+
+        self::assertTrue($compiler->compileExtension($modifier)->isModifier);
+        self::assertFalse($compiler->compileExtension(self::definition([], []))->isModifier);
+    }
+
+    /**
+     * `version-specific-use` on the definition limits the whole extension; on a context, only that
+     * context. A context with no range compiles to the arguments it always had.
+     */
+    public function testVersionSpecificUseIsReadFromTheDefinitionAndEachContext(): void
+    {
+        $compiled = (new StructureDefinitionCompiler())->compileExtension(self::definition([
+            'extension' => [self::versionSpecificUse(['startFhirVersion' => '4.0', 'endFhirVersion' => '4.3'])],
+            'context'   => [
+                ['type' => 'element', 'expression' => 'Patient', 'extension' => [self::versionSpecificUse(['endFhirVersion' => '4.3'])]],
+                ['type' => 'element', 'expression' => 'CodeSystem.property'],
+            ],
+        ], []));
+
+        self::assertSame('4.0', $compiled->startFhirVersion);
+        self::assertSame('4.3', $compiled->endFhirVersion);
+        self::assertSame(
+            [
+                ['type' => 'element', 'expression' => 'Patient', 'endFhirVersion' => '4.3'],
+                ['type' => 'element', 'expression' => 'CodeSystem.property'],
+            ],
+            array_map(static fn ($a): array => $a->arguments, $compiled->contexts),
+        );
+
+        $unlimited = (new StructureDefinitionCompiler())->compileExtension(self::definition([], []));
+        self::assertNull($unlimited->startFhirVersion);
+        self::assertNull($unlimited->endFhirVersion);
+    }
+
+    /**
+     * @param array<string, string> $bounds
+     *
+     * @return array<string, mixed>
+     */
+    private static function versionSpecificUse(array $bounds): array
+    {
+        $extension = [];
+        foreach ($bounds as $name => $version) {
+            $extension[] = ['url' => $name, 'valueCode' => $version];
+        }
+
+        return ['url' => 'http://hl7.org/fhir/StructureDefinition/version-specific-use', 'extension' => $extension];
+    }
+
     /**
      * @param array<string, mixed>       $extra
      * @param list<array<string, mixed>> $elements

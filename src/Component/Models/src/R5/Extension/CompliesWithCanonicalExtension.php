@@ -25,7 +25,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.searchParam')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.operation')]
-#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.operation')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.operation', startFhirVersion: '4.0')]
 class CompliesWithCanonicalExtension extends Extension
 {
     /**

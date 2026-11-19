@@ -100,7 +100,7 @@ rules, modifier extensions, must-support, and obligations.
 | Check | Method | What it enforces |
 |---|---|---|
 | Must-support collection | `collectMustSupportInfo()` | Null/empty must-support properties → INFO (opt-in) |
-| Extension context | `validateExtensionContexts()` | Extension applied outside its declared context → ERROR |
+| Extension context | `validateExtensionContexts()` | Extension applied outside its declared context or FHIR versions, or a modifier extension in `extension` → ERROR |
 | Extension `contextInvariant` | `validateExtensionContexts()` | FHIRPath invariant on the extension's use context |
 | Extension structure | `validateExtensionStructure()` | Missing `url`, non-absolute top-level `url`, or a value type the definition does not allow → ERROR; the extension's own invariants and bindings at their usual severity |
 | Complex extension sub-extensions | `ComplexExtensionChecker` | Missing required or undeclared sub-extension → ERROR |
@@ -113,7 +113,7 @@ rules, modifier extensions, must-support, and obligations.
 | Unknown input | `UnknownInputChecker` | Elements the deserializer read but could not place on the model → ERROR |
 | Bundle `fullUrl` | `BundleEntryFullUrlChecker` | `Bundle.entry.fullUrl` that is not an absolute URL; an `http(s)` `fullUrl` of the form `[base]/[type]/[id]` that does not end with the entry resource's type and id; a missing `fullUrl` outside `transaction`/`batch` bundles and their responses, or on any entry whose resource holds a relative reference → ERROR |
 | Bundle reference resolution | `BundleReferenceResolutionChecker` | Relative reference to an entry the bundle holds that the `fullUrl` rules cannot resolve → ERROR |
-| Modifier extension walk | `validateModifierExtensions()` | Unknown modifier extension URLs → ERROR (needs registry) |
+| Modifier extension walk | `validateModifierExtensions()` | Unknown modifier extension URLs, or a regular extension in `modifierExtension` → ERROR (needs registry) |
 | Obligation enforcement | `collectObligationViolations()` | Actor-scoped populate obligations → ERROR/WARNING/INFO |
 
 The extension, modifier, must-support and obligation checks are documented under

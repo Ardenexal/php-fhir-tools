@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Specifies an alternative, equivalent expression in another formal language. For example, given a condition expression in CQL, an alternative formulation in SQL could be provided.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-alternativeExpression', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Expression')]
+#[FHIRExtensionContext(type: 'element', expression: 'Expression', startFhirVersion: '4.0')]
 class AlternativeExpressionExtension extends Extension
 {
     /**
