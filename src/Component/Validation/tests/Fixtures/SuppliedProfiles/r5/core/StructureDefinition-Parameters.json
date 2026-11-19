@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Parameters","url":"http://hl7.org/fhir/StructureDefinition/Parameters","version":"5.0.0","name":"Parameters","status":"active","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"Parameters","baseDefinition":"http://hl7.org/fhir/StructureDefinition/Resource","derivation":"specialization"}

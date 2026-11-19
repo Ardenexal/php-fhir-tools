@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"DomainResource","url":"http://hl7.org/fhir/StructureDefinition/DomainResource","version":"5.0.0","name":"DomainResource","status":"active","fhirVersion":"5.0.0","kind":"resource","abstract":true,"type":"DomainResource","baseDefinition":"http://hl7.org/fhir/StructureDefinition/Resource","derivation":"specialization"}

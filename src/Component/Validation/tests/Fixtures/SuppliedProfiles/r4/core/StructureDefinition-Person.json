@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Person","url":"http://hl7.org/fhir/StructureDefinition/Person","version":"4.0.1","name":"Person","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Person","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

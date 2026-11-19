@@ -1,0 +1,8 @@
+{
+    "name": "php-fhir-tools.supplied-core.r4",
+    "version": "0.0.0",
+    "description": "Core StructureDefinitions the supplied test profiles derive from. Written by seed-supplied-profiles.php; do not edit.",
+    "fhirVersions": [
+        "4.0.1"
+    ]
+}

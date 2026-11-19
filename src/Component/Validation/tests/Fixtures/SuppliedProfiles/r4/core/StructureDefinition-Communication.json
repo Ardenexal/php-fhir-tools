@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Communication","url":"http://hl7.org/fhir/StructureDefinition/Communication","version":"4.0.1","name":"Communication","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Communication","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

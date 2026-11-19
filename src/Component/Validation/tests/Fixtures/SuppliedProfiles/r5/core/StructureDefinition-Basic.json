@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Basic","url":"http://hl7.org/fhir/StructureDefinition/Basic","version":"5.0.0","name":"Basic","status":"draft","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"Basic","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"DocumentManifest","url":"http://hl7.org/fhir/StructureDefinition/DocumentManifest","version":"4.0.1","name":"DocumentManifest","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"DocumentManifest","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

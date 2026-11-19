@@ -16,6 +16,9 @@ declare(strict_types=1);
  *   --below   List only cases where we report FEWER errors than Java (pre-existing gaps).
  *   --all     List every compared case.
  *   --json    Emit machine-readable JSON instead of a table, for before/after diffing.
+ *   --supplied-profiles
+ *             Measure the cases that supply their own StructureDefinitions, and every `profile`
+ *             phase, instead of the default set. Needs the fixtures seed-supplied-profiles.php writes.
  *   --family=<label>
  *             Deep-dive one family across every ABOVE case, printing our error messages beside
  *             Java's. Counts alone cannot tell "we report something Java does not" from "we report
@@ -50,6 +53,7 @@ use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\CaseCompar
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\Classification;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\ComparisonHarness;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\OracleValidationServiceFactory;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\SuppliedProfiles;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle\UnreadCase;
 
 $args    = array_slice($argv, 1);
@@ -70,12 +74,24 @@ $only    = match (true) {
     default                           => null,
 };
 
+// --supplied-profiles: measure the cases that supply their own StructureDefinitions instead of the
+// default set; see ComparisonHarness::runsOf(). Their fixtures come from seed-supplied-profiles.php.
+$suppliedProfiles = null;
+if (in_array('--supplied-profiles', $flags, true)) {
+    $suppliedProfiles = SuppliedProfiles::forVersion($version);
+    if ($suppliedProfiles === null) {
+        fwrite(STDERR, "No supplied-profile fixtures for {$version->value}; run Fixtures/SuppliedProfiles/seed-supplied-profiles.php first.\n");
+        exit(2);
+    }
+}
+
 $harness = new ComparisonHarness(
     vendorDir: __DIR__ . '/../../../../../vendor',
     validation: OracleValidationServiceFactory::create($version),
     serialization: FHIRSerializationService::createWithIG(version: $version, includeBaseProfiles: true),
     version: $version,
     validationWithoutExtensionResolution: OracleValidationServiceFactory::create($version, resolveExtensions: false),
+    suppliedProfiles: $suppliedProfiles,
 );
 
 if (!$asJson) {

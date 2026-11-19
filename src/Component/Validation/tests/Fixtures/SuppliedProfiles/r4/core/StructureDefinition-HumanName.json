@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"HumanName","url":"http://hl7.org/fhir/StructureDefinition/HumanName","version":"4.0.1","name":"HumanName","status":"active","fhirVersion":"4.0.1","kind":"complex-type","abstract":false,"type":"HumanName","baseDefinition":"http://hl7.org/fhir/StructureDefinition/Element","derivation":"specialization"}

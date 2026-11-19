@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"DocumentReference","url":"http://hl7.org/fhir/StructureDefinition/DocumentReference","version":"4.0.1","name":"DocumentReference","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"DocumentReference","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}
