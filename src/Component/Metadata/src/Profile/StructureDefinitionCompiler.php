@@ -62,18 +62,19 @@ final class StructureDefinitionCompiler
     {
         $profileUrl  = (string) ($structureDefinition['url'] ?? '');
         $diagnostics = [];
+        $visited     = [self::canonicalWithoutVersion($profileUrl) => true];
+        $inline      = $lookup === null ? null : self::sliceInliner($structureDefinition, $profileUrl, $lookup, $visited, 1, '', $diagnostics);
 
         $attributes = [
             ...self::differentialConstraints($structureDefinition, $profileUrl),
             ...self::differentialMustSupport($structureDefinition, $profileUrl),
-            ...self::differentialSliceConstraints($structureDefinition, $profileUrl, $diagnostics),
+            ...self::differentialSliceConstraints($structureDefinition, $profileUrl, $diagnostics, $inline, $lookup),
             ...self::snapshotObligations($structureDefinition, $profileUrl),
-            ...self::differentialInvariants($structureDefinition, [$profileUrl], $lookup, $diagnostics),
-            ...self::differentialBindings($structureDefinition, [$profileUrl], $lookup, $diagnostics),
+            ...self::differentialInvariants($structureDefinition, [$profileUrl], $lookup, $diagnostics, slicesCarryRules: true),
+            ...self::differentialBindings($structureDefinition, [$profileUrl], $lookup, $diagnostics, slicesCarryRules: true),
         ];
 
         if ($lookup !== null) {
-            $visited = [self::canonicalWithoutVersion($profileUrl) => true];
             foreach (self::inlinedDataTypeProfiles($structureDefinition, $profileUrl, $lookup, $visited, 1, $diagnostics) as $attribute) {
                 $attributes[] = $attribute;
             }
@@ -190,11 +191,15 @@ final class StructureDefinitionCompiler
      * must-support and obligations are not, since they describe the data type, not the referencing
      * profile, and no validator reads them.
      *
+     * An element on or beneath a slice is left to sliceRules(), which inlines its profile into that
+     * slice's rules through sliceInliner(), so it holds for the slice's items only.
+     *
      * Only an element that allows one type with one profile is inlined. Several types or several
      * profiles mean the value must match any one of them, which these rules cannot express, so such an
      * element, a profile no lookup finds, one that is not a constraint on a data type, a cycle, nesting
-     * past the limit, an element inside a slice and a data-type profile ancestor no lookup finds are
-     * reported as diagnostics and not enforced. Extension profiles are left to extension validation.
+     * past the limit and a data-type profile ancestor no lookup finds are reported as diagnostics and
+     * not enforced. An element that also allows its base data type is skipped without one: any value
+     * of that type conforms. Extension profiles are left to extension validation.
      *
      * A `|version` on the referenced URL is dropped: the lookup decides which version it returns.
      *
@@ -216,116 +221,247 @@ final class StructureDefinitionCompiler
         string $trail = '',
     ): array {
         $attributes = [];
-        $sourceUrl  = (string) ($structureDefinition['url'] ?? '');
 
         foreach (self::differentialElements($structureDefinition) as $id => $element) {
-            $path = (string) ($element['path'] ?? '');
-            if (!str_contains($path, '.') || ElementDefinitionReader::hasContentReference($element)) {
-                continue;
-            }
-
-            $types    = is_array($element['type'] ?? null) ? array_values($element['type']) : [];
-            $profiled = [];
-            foreach ($types as $type) {
-                $profiles = is_array($type['profile'] ?? null) ? array_values(array_filter($type['profile'], 'is_string')) : [];
-                if ($profiles !== [] && ($type['code'] ?? null) !== 'Extension') {
-                    $profiled[] = $profiles;
-                }
-            }
-            if ($profiled === []) {
-                continue;
-            }
-
-            // Where the element sits: its own id, and inside a data-type profile also where that
-            // profile is inlined, so a nested diagnostic can be traced back
-            $where       = $trail === '' ? $id : "{$id} in {$sourceUrl}, inlined at {$trail}";
-            $named       = implode(', ', array_merge(...$profiled));
-            $notEnforced = static function(string $reason) use (&$diagnostics, $groupUrl, $id, $where, $named): void {
-                $diagnostics[] = new CompilerDiagnostic(
-                    "Profile {$groupUrl}: {$where} must conform to {$named}, but {$reason}; those rules are not enforced",
-                    $id,
-                    ['profileUrl' => $groupUrl, 'typeProfile' => $named],
-                );
-            };
-
             $propertyPath = self::differentialPropertyPath($element);
+
+            // An element inside a slice holds for that slice's items only: sliceRules() inlines it
+            // into the slice's rules through sliceInliner()
             if ($propertyPath === null) {
-                $notEnforced('the element is inside a slice');
-                continue;
-            }
-            if (count($types) > 1 || count($profiled[0]) > 1) {
-                $notEnforced('the element allows several types or profiles, so a value may match any one of them');
-                continue;
-            }
-
-            $url = self::canonicalWithoutVersion($profiled[0][0]);
-            if (isset($visited[$url])) {
-                $notEnforced("{$url} is already being inlined on this path, so the profiles refer to each other");
-                continue;
-            }
-            if ($depth > self::MAX_INLINE_DEPTH) {
-                $notEnforced('data-type profiles nest more than ' . self::MAX_INLINE_DEPTH . ' deep');
-                continue;
-            }
-
-            // A profile that restates the type its parent already gave the element would report each
-            // violation twice, once in each group; the parent's group already enforces it
-            if ($depth === 1 && self::parentTypesElementTheSame($structureDefinition, $id, $profiled[0], $lookup)) {
-                continue;
-            }
-
-            $definition = $lookup($url);
-            if ($definition === null) {
-                $notEnforced('no StructureDefinition with that URL is available');
-                continue;
-            }
-            if (($definition['kind'] ?? null) !== 'complex-type' || ($definition['derivation'] ?? null) !== 'constraint') {
-                $notEnforced('it is not a constraint on a data type');
                 continue;
             }
 
             $at = $trail === '' ? $propertyPath : "{$trail}.{$propertyPath}";
-
-            // The data-type profile and each constraint ancestor, up to the base data type. Like a
-            // profile requested directly, each one must carry a snapshot: slicing a differential
-            // inherits is only found there.
-            $current = $definition;
-            $seen    = $visited;
-            $chain   = [];
-            while (is_array($current) && ($current['derivation'] ?? null) === 'constraint') {
-                $currentUrl        = self::canonicalWithoutVersion((string) ($current['url'] ?? ''));
-                $seen[$currentUrl] = true;
-
-                if (self::snapshotElements($current) === []) {
-                    $notEnforced("{$currentUrl} has no snapshot, which runtime validation requires");
-                    $chain = [];
-                    break;
-                }
-
-                $chain[] = [
-                    ...self::differentialConstraints($current, $groupUrl),
-                    ...self::differentialSliceConstraints($current, $groupUrl, $diagnostics),
-                    ...self::differentialInvariants($current, [$groupUrl], $lookup, $diagnostics),
-                    ...self::differentialBindings($current, [$groupUrl], $lookup, $diagnostics),
-                    ...self::inlinedDataTypeProfiles($current, $groupUrl, $lookup, $seen, $depth + 1, $diagnostics, $at),
-                ];
-
-                $parent = is_string($current['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($current['baseDefinition']) : '';
-                if ($parent === '' || isset($seen[$parent])) {
-                    break;
-                }
-                $current = $lookup($parent);
-                if ($current === null && $parent !== self::CORE_BASE . ($definition['type'] ?? '')) {
-                    $notEnforced("{$currentUrl} derives from {$parent}, which is not available, so its rules are missing");
-                }
-            }
-
-            foreach (self::mergeInheritedSlices(array_merge(...($chain === [] ? [[]] : $chain))) as $rule) {
-                $attributes[] = self::underPath($rule, $propertyPath);
+            foreach (self::inlinedProfileAt($structureDefinition, $id, $element, $propertyPath, $at, $trail, $groupUrl, $lookup, $visited, $depth, $diagnostics) as $attribute) {
+                $attributes[] = $attribute;
             }
         }
 
         return $attributes;
+    }
+
+    /**
+     * The rules of the data-type profile one differential element names, moved under $path; see
+     * inlinedDataTypeProfiles() for what is inlined and what is reported instead.
+     *
+     * @param array<string, mixed>                          $structureDefinition Definition the element belongs to
+     * @param array<string, mixed>                          $element             The differential element
+     * @param string                                        $path                Where the rules go: a property path, or an item-relative one inside a slice ('' for the slice's items)
+     * @param string                                        $at                  Where the profile is inlined, as later diagnostics name it
+     * @param string                                        $trail               Where $structureDefinition itself is inlined; '' for the profile being compiled
+     * @param \Closure(string): (array<string, mixed>|null) $lookup
+     * @param array<string, true>                           $visited             Canonical URLs on the current inlining path
+     * @param list<CompilerDiagnostic>                      $diagnostics
+     *
+     * @return list<CompiledAttribute>
+     */
+    private static function inlinedProfileAt(
+        array $structureDefinition,
+        string $id,
+        array $element,
+        string $path,
+        string $at,
+        string $trail,
+        string $groupUrl,
+        \Closure $lookup,
+        array $visited,
+        int $depth,
+        array &$diagnostics,
+    ): array {
+        if (!str_contains((string) ($element['path'] ?? ''), '.') || ElementDefinitionReader::hasContentReference($element)) {
+            return [];
+        }
+
+
+        $types    = is_array($element['type'] ?? null) ? array_values($element['type']) : [];
+        $profiled = [];
+        foreach ($types as $type) {
+            $profiles = is_array($type['profile'] ?? null) ? array_values(array_filter($type['profile'], 'is_string')) : [];
+            if ($profiles !== [] && ($type['code'] ?? null) !== 'Extension') {
+                $profiled[] = $profiles;
+            }
+        }
+        if ($profiled === []) {
+            return [];
+        }
+
+        // Where the element sits: its own id, and inside a data-type profile also where that
+        // profile is inlined, so a nested diagnostic can be traced back
+        $sourceUrl   = (string) ($structureDefinition['url'] ?? '');
+        $where       = $trail === '' ? $id : "{$id} in {$sourceUrl}, inlined at {$trail}";
+        $named       = implode(', ', array_merge(...$profiled));
+        $notEnforced = static function(string $reason) use (&$diagnostics, $groupUrl, $id, $where, $named): void {
+            $diagnostics[] = new CompilerDiagnostic(
+                "Profile {$groupUrl}: {$where} must conform to {$named}, but {$reason}; those rules are not enforced",
+                $id,
+                ['profileUrl' => $groupUrl, 'typeProfile' => $named],
+            );
+        };
+
+        if (count($types) > 1 || count($profiled[0]) > 1) {
+            // When the base data type is itself one of the choices, any value of that type
+            // conforms, so there is no rule to lose
+            if (!self::allowsBaseType($types)) {
+                $notEnforced('the element allows several types or profiles, so a value may match any one of them');
+            }
+
+            return [];
+        }
+
+        $url = self::canonicalWithoutVersion($profiled[0][0]);
+        if (isset($visited[$url])) {
+            $notEnforced("{$url} is already being inlined on this path, so the profiles refer to each other");
+
+            return [];
+        }
+        if ($depth > self::MAX_INLINE_DEPTH) {
+            $notEnforced('data-type profiles nest more than ' . self::MAX_INLINE_DEPTH . ' deep');
+
+            return [];
+        }
+
+        // A profile that restates the type its parent already gave the element would report each
+        // violation twice, once in each group; the parent's group already enforces it
+        if ($depth === 1 && self::parentTypesElementTheSame($structureDefinition, $id, $profiled[0], $lookup)) {
+            return [];
+        }
+
+        $definition = $lookup($url);
+        if ($definition === null) {
+            $notEnforced('no StructureDefinition with that URL is available');
+
+            return [];
+        }
+        if (($definition['kind'] ?? null) !== 'complex-type' || ($definition['derivation'] ?? null) !== 'constraint') {
+            $notEnforced('it is not a constraint on a data type');
+
+            return [];
+        }
+
+        // The data-type profile and each constraint ancestor, up to the base data type. Like a
+        // profile requested directly, each one must carry a snapshot: slicing a differential
+        // inherits is only found there.
+        $current = $definition;
+        $seen    = $visited;
+        $chain   = [];
+        while (is_array($current) && ($current['derivation'] ?? null) === 'constraint') {
+            $currentUrl        = self::canonicalWithoutVersion((string) ($current['url'] ?? ''));
+            $seen[$currentUrl] = true;
+
+            if (self::snapshotElements($current) === []) {
+                $notEnforced("{$currentUrl} has no snapshot, which runtime validation requires");
+                $chain = [];
+                break;
+            }
+
+            $chain[] = [
+                ...self::differentialConstraints($current, $groupUrl),
+                ...self::differentialSliceConstraints($current, $groupUrl, $diagnostics, self::sliceInliner($current, $groupUrl, $lookup, $seen, $depth + 1, $at, $diagnostics), $lookup),
+                ...self::differentialInvariants($current, [$groupUrl], $lookup, $diagnostics, slicesCarryRules: true),
+                ...self::differentialBindings($current, [$groupUrl], $lookup, $diagnostics, slicesCarryRules: true),
+                ...self::inlinedDataTypeProfiles($current, $groupUrl, $lookup, $seen, $depth + 1, $diagnostics, $at),
+            ];
+
+            $parent = is_string($current['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($current['baseDefinition']) : '';
+            if ($parent === '' || isset($seen[$parent])) {
+                break;
+            }
+            $current = $lookup($parent);
+            if ($current === null && $parent !== self::CORE_BASE . ($definition['type'] ?? '')) {
+                $notEnforced("{$currentUrl} derives from {$parent}, which is not available, so its rules are missing");
+            }
+        }
+
+        $attributes = [];
+        foreach (self::mergeInheritedSlices(array_merge(...($chain === [] ? [[]] : $chain))) as $rule) {
+            $attributes[] = self::underPath($rule, $path);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Whether every type an element restricts by profile also allows its base data type, as
+     * `Identifier` named beside `au-ihi`, or an unprofiled `Identifier` entry beside it: any value of
+     * that type then conforms, so the profiles add no rule.
+     *
+     * @param list<mixed> $types The element's `type` entries
+     */
+    private static function allowsBaseType(array $types): bool
+    {
+        $restricted = [];
+        $open       = [];
+        foreach ($types as $type) {
+            if (!is_array($type) || !is_string($type['code'] ?? null)) {
+                continue;
+            }
+
+            $profiles = array_map(self::canonicalWithoutVersion(...), is_array($type['profile'] ?? null) ? array_filter($type['profile'], 'is_string') : []);
+            if ($profiles === [] || in_array(self::CORE_BASE . $type['code'], $profiles, true)) {
+                $open[$type['code']] = true;
+            } else {
+                $restricted[$type['code']] = true;
+            }
+        }
+
+        return array_diff_key($restricted, $open) === [];
+    }
+
+    /**
+     * A closure that inlines the data-type profile an element on or beneath a slice names, as that
+     * slice's rules at the element's item-relative path. sliceRules() calls it for each such element.
+     *
+     * @param array<string, mixed>                          $structureDefinition Definition whose slices are compiled
+     * @param \Closure(string): (array<string, mixed>|null) $lookup
+     * @param array<string, true>                           $visited             Canonical URLs on the current inlining path
+     * @param list<CompilerDiagnostic>                      $diagnostics         Receives what cannot be inlined
+     *
+     * @return \Closure(string, array<string, mixed>, string): list<array{path: string, constraint: class-string, options: array<string, mixed>}>
+     */
+    private static function sliceInliner(
+        array $structureDefinition,
+        string $groupUrl,
+        \Closure $lookup,
+        array $visited,
+        int $depth,
+        string $trail,
+        array &$diagnostics,
+    ): \Closure {
+        return static function(string $id, array $element, string $relative) use ($structureDefinition, $groupUrl, $lookup, $visited, $depth, $trail, &$diagnostics): array {
+            $at = $trail === '' ? $id : "{$trail}.{$id}";
+
+            return self::asSliceRules(self::inlinedProfileAt($structureDefinition, $id, $element, $relative, $at, $trail, $groupUrl, $lookup, $visited, $depth, $diagnostics));
+        };
+    }
+
+    /**
+     * Compiled attributes as slice rules: the same constraints, without their groups, since a slice
+     * rule runs in the group of the slice that carries it.
+     *
+     * @param list<CompiledAttribute> $attributes
+     *
+     * @return list<array{path: string, constraint: class-string, options: array<string, mixed>}>
+     */
+    private static function asSliceRules(array $attributes): array
+    {
+        $rules = [];
+        foreach ($attributes as $attribute) {
+            $arguments = $attribute->arguments;
+            unset($arguments['groups']);
+
+            if ($attribute->class === FHIRProfileConstraint::class) {
+                /** @var class-string $constraint */
+                $constraint = $arguments['constraint'];
+                $rules[]    = ['path' => (string) $arguments['path'], 'constraint' => $constraint, 'options' => is_array($arguments['options'] ?? null) ? $arguments['options'] : []];
+
+                continue;
+            }
+
+            $path    = (string) ($arguments['path'] ?? $arguments['property'] ?? '');
+            $rules[] = ['path' => $path, 'constraint' => $attribute->class, 'options' => $arguments];
+        }
+
+        return $rules;
     }
 
     /**
@@ -444,7 +580,7 @@ final class StructureDefinitionCompiler
     {
         $arguments = $attribute->arguments;
         $key       = array_key_exists('path', $arguments) ? 'path' : 'property';
-        if (is_string($arguments[$key] ?? null)) {
+        if ($prefix !== '' && is_string($arguments[$key] ?? null)) {
             // An invariant on the data type itself has no path of its own
             $arguments[$key] = $arguments[$key] === '' ? $prefix : $prefix . '.' . $arguments[$key];
         }
@@ -521,16 +657,18 @@ final class StructureDefinitionCompiler
      *    them: that definition's own class or group enforces them
      *  - Those the base type already declares on the same element, found through $lookup, which
      *    a differential may restate
-     *  - Those on an element inside a slice, which are reported as diagnostics
+     *  - Those on an element inside a slice: with $slicesCarryRules they are compiled into that
+     *    slice's `rules` instead (see sliceRules()), otherwise they are reported as diagnostics
      *
      * @param array<string, mixed>                                 $structureDefinition
      * @param list<string>|null                                    $groups              Validation groups; null for the default group
      * @param (\Closure(string): (array<string, mixed>|null))|null $lookup              Finds the base type's definition
      * @param list<CompilerDiagnostic>                             $diagnostics
+     * @param bool                                                 $slicesCarryRules    Whether this definition's slices compile to FHIRSliceConstraint rules
      *
      * @return list<CompiledAttribute>
      */
-    private static function differentialInvariants(array $structureDefinition, ?array $groups, ?\Closure $lookup, array &$diagnostics): array
+    private static function differentialInvariants(array $structureDefinition, ?array $groups, ?\Closure $lookup, array &$diagnostics, bool $slicesCarryRules = false): array
     {
         $url        = self::canonicalWithoutVersion((string) ($structureDefinition['url'] ?? ''));
         $attributes = [];
@@ -543,7 +681,10 @@ final class StructureDefinitionCompiler
 
             $path         = (string) ($element['path'] ?? '');
             $propertyPath = str_contains($path, '.') ? self::differentialPropertyPath($element) : '';
-            $inherited    = null;
+            if ($propertyPath === null && $slicesCarryRules) {
+                continue;
+            }
+            $inherited = null;
 
             foreach ($constraints as $constraint) {
                 if (!is_array($constraint) || !is_string($constraint['expression'] ?? null) || $constraint['expression'] === '') {
@@ -598,16 +739,18 @@ final class StructureDefinitionCompiler
      *  - `preferred` and `example` ones, which are guidance
      *  - One the base type already declares on the same element with the same strength and value
      *    set, found through $lookup: the base model's own binding checks it
-     *  - Those on an element inside a slice, which are reported as diagnostics
+     *  - Those on an element inside a slice: with $slicesCarryRules they are compiled into that
+     *    slice's `rules` instead (see sliceRules()), otherwise they are reported as diagnostics
      *
      * @param array<string, mixed>                                 $structureDefinition
      * @param list<string>|null                                    $groups              Validation groups; null for the default group
      * @param (\Closure(string): (array<string, mixed>|null))|null $lookup              Finds the base type's definition
      * @param list<CompilerDiagnostic>                             $diagnostics
+     * @param bool                                                 $slicesCarryRules    Whether this definition's slices compile to FHIRSliceConstraint rules
      *
      * @return list<CompiledAttribute>
      */
-    private static function differentialBindings(array $structureDefinition, ?array $groups, ?\Closure $lookup, array &$diagnostics): array
+    private static function differentialBindings(array $structureDefinition, ?array $groups, ?\Closure $lookup, array &$diagnostics, bool $slicesCarryRules = false): array
     {
         $url        = self::canonicalWithoutVersion((string) ($structureDefinition['url'] ?? ''));
         $attributes = [];
@@ -622,6 +765,10 @@ final class StructureDefinitionCompiler
 
             $path = (string) ($element['path'] ?? '');
             if (!str_contains($path, '.') || ElementDefinitionReader::hasContentReference($element)) {
+                continue;
+            }
+
+            if ($slicesCarryRules && self::differentialPropertyPath($element) === null) {
                 continue;
             }
 
@@ -782,12 +929,14 @@ final class StructureDefinitionCompiler
      *    built without a snapshot that slices inherited slicing) cannot be compiled; it is reported as
      *    a diagnostic rather than dropped silently.
      *
-     * @param array<string, mixed>     $structureDefinition
-     * @param list<CompilerDiagnostic> $diagnostics         Receives one entry per slicing that cannot be found
+     * @param array<string, mixed>                                                                                                                      $structureDefinition
+     * @param list<CompilerDiagnostic>                                                                                                                  $diagnostics         Receives one entry per slicing that cannot be found
+     * @param (\Closure(string, array<string, mixed>, string): list<array{path: string, constraint: class-string, options: array<string, mixed>}>)|null $inline              Inlines a data-type profile named inside a slice; see sliceInliner()
+     * @param (\Closure(string): (array<string, mixed>|null))|null                                                                                      $lookup              Finds the data-type profile a slice is typed with, for its discriminator value
      *
      * @return list<CompiledAttribute>
      */
-    private static function differentialSliceConstraints(array $structureDefinition, string $profileUrl, array &$diagnostics): array
+    private static function differentialSliceConstraints(array $structureDefinition, string $profileUrl, array &$diagnostics, ?\Closure $inline = null, ?\Closure $lookup = null): array
     {
         $diff       = self::differentialElements($structureDefinition);
         $snapshot   = self::snapshotElements($structureDefinition);
@@ -810,7 +959,7 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
-            $slices = self::sliceDefinitions($slicedId, $slicing, $diff, $snapshot, $profileUrl, $diagnostics);
+            $slices = self::sliceDefinitions($slicedId, $slicing, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup);
             if ($slices === []) {
                 continue;
             }
@@ -999,12 +1148,14 @@ final class StructureDefinitionCompiler
      * FHIRSlicingRules compiled in this profile's group judges every item against the slices in that
      * group, so an item matching only a parent's slice would otherwise be rejected.
      *
-     * @param string                                                      $slicedId    Id of the sliced element, e.g. 'Observation.component'
-     * @param array{definition: array<string, mixed>, declaredHere: bool} $slicing     Its slicing, from slicingFor()
-     * @param array<string, array<string, mixed>>                         $diff        Differential elements by id
-     * @param array<string, array<string, mixed>>                         $snapshot    Snapshot elements by id
-     * @param string                                                      $profileUrl  URL of the profile being compiled
-     * @param list<CompilerDiagnostic>                                    $diagnostics Receives slicing beneath a slice that is enforced as open
+     * @param string                                                                                                                                    $slicedId    Id of the sliced element, e.g. 'Observation.component'
+     * @param array{definition: array<string, mixed>, declaredHere: bool}                                                                               $slicing     Its slicing, from slicingFor()
+     * @param array<string, array<string, mixed>>                                                                                                       $diff        Differential elements by id
+     * @param array<string, array<string, mixed>>                                                                                                       $snapshot    Snapshot elements by id
+     * @param string                                                                                                                                    $profileUrl  URL of the profile being compiled
+     * @param list<CompilerDiagnostic>                                                                                                                  $diagnostics Receives slicing beneath a slice that is enforced as open
+     * @param (\Closure(string, array<string, mixed>, string): list<array{path: string, constraint: class-string, options: array<string, mixed>}>)|null $inline      Inlines a data-type profile named inside a slice; see sliceInliner()
+     * @param (\Closure(string): (array<string, mixed>|null))|null                                                                                      $lookup      Finds the data-type profile a slice is typed with, for its discriminator value
      *
      * @return list<array<string, mixed>>
      */
@@ -1015,6 +1166,8 @@ final class StructureDefinitionCompiler
         array $snapshot,
         string $profileUrl,
         array &$diagnostics,
+        ?\Closure $inline = null,
+        ?\Closure $lookup = null,
     ): array {
         $definition     = $slicing['definition'];
         $discriminators = is_array($definition['discriminator'] ?? null) ? array_values($definition['discriminator']) : [];
@@ -1032,7 +1185,8 @@ final class StructureDefinitionCompiler
             $sliceId   = "{$slicedId}:{$sliceName}";
             $header    = $diff[$sliceId] ?? [];
             $isDefault = $sliceName === '@default';
-            $value     = self::discriminatorValue($sliceId, $discType, $discPath, $diff, $snapshot);
+            $value     = self::discriminatorValue($sliceId, $discType, $discPath, $diff, $snapshot)
+                ?? ($lookup === null ? null : self::typeProfileDiscriminatorValue($snapshot[$sliceId] ?? $header, $discType, $discPath, $lookup));
             $max       = (string) ($header['max'] ?? '*');
 
             // An item can only join a slice its discriminator can match, so a minimum on any other
@@ -1057,9 +1211,18 @@ final class StructureDefinitionCompiler
 
             $definition['orderedIndex'] = $orderedIndex;
 
-            $rules = self::sliceRules($sliceId, $diff, $snapshot, $profileUrl, $diagnostics);
+            $rules = self::sliceRules($sliceId, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup);
             if ($rules !== []) {
                 $definition['rules'] = $rules;
+
+                // No item ever joins a slice its discriminator cannot match, so its rules never run
+                if (self::isUnmatchable($definition)) {
+                    $diagnostics[] = new CompilerDiagnostic(
+                        "Profile {$profileUrl}: {$sliceId} carries rules, but its {$discType} discriminator on '{$discPath}' cannot be evaluated, so no item is matched to it; those rules are not enforced",
+                        $sliceId,
+                        ['profileUrl' => $profileUrl],
+                    );
+                }
             }
 
             $definitions[] = $definition;
@@ -1129,22 +1292,35 @@ final class StructureDefinitionCompiler
     /**
      * The rules this differential places beneath one slice, with paths relative to a slice item.
      *
+     * Invariants and required or extensible bindings on the slice itself or beneath it become
+     * FHIRProfileInvariant and FHIRProfileBinding rules, whose own `path` is item-relative ('' for
+     * the item); see sliceInvariantsAndBindings() for the ones left out.
+     *
      * A sliced element beneath the slice contributes one nested FHIRSliceConstraint definition per
      * slice, plus its FHIRSlicingRules when the slicing is declared here; the validator applies them
      * to that element's items within each item matching this slice.
      *
-     * @param string                              $sliceId     Id of the slice, e.g. 'Observation.component:SystolicBP'
-     * @param array<string, array<string, mixed>> $diff        Differential elements by id
-     * @param array<string, array<string, mixed>> $snapshot    Snapshot elements by id
-     * @param string                              $profileUrl  URL of the profile being compiled
-     * @param list<CompilerDiagnostic>            $diagnostics Receives slicing beneath the slice that is enforced as open
+     * @param string                                                                                                                                    $sliceId     Id of the slice, e.g. 'Observation.component:SystolicBP'
+     * @param array<string, array<string, mixed>>                                                                                                       $diff        Differential elements by id
+     * @param array<string, array<string, mixed>>                                                                                                       $snapshot    Snapshot elements by id
+     * @param string                                                                                                                                    $profileUrl  URL of the profile being compiled
+     * @param list<CompilerDiagnostic>                                                                                                                  $diagnostics Receives slicing beneath the slice that is enforced as open
+     * @param (\Closure(string, array<string, mixed>, string): list<array{path: string, constraint: class-string, options: array<string, mixed>}>)|null $inline      Inlines a data-type profile named on the slice or beneath it; see sliceInliner()
+     * @param (\Closure(string): (array<string, mixed>|null))|null                                                                                      $lookup      Finds the data-type profile a nested slice is typed with, for its discriminator value
      *
      * @return list<array{path: string, constraint: class-string, options: array<string, mixed>}>
      */
-    private static function sliceRules(string $sliceId, array $diff, array $snapshot, string $profileUrl, array &$diagnostics): array
+    private static function sliceRules(string $sliceId, array $diff, array $snapshot, string $profileUrl, array &$diagnostics, ?\Closure $inline = null, ?\Closure $lookup = null): array
     {
         $prefix = $sliceId . '.';
         $rules  = [];
+
+        if (isset($diff[$sliceId])) {
+            $rules = self::sliceInvariantsAndBindings($sliceId, '', $diff[$sliceId], $snapshot, $profileUrl);
+            foreach ($inline === null ? [] : $inline($sliceId, $diff[$sliceId], '') as $rule) {
+                $rules[] = $rule;
+            }
+        }
 
         foreach ($diff as $id => $element) {
             if (!str_starts_with($id, $prefix) || ElementDefinitionReader::hasContentReference($element)) {
@@ -1160,6 +1336,14 @@ final class StructureDefinitionCompiler
             foreach (self::elementRules($element) as $rule) {
                 $rules[] = ['path' => $relative, ...$rule];
             }
+
+            foreach (self::sliceInvariantsAndBindings($id, $relative, $element, $snapshot, $profileUrl) as $rule) {
+                $rules[] = $rule;
+            }
+
+            foreach ($inline === null ? [] : $inline($id, $element, $relative) as $rule) {
+                $rules[] = $rule;
+            }
         }
 
         foreach (self::slicedElementIds($diff, $sliceId) as $nestedId) {
@@ -1170,7 +1354,7 @@ final class StructureDefinitionCompiler
 
             // As at the top level, a slicing with no slices to check compiles to nothing: closed rules
             // with no slice beside them would reject every item
-            $definitions = self::sliceDefinitions($nestedId, $slicing, $diff, $snapshot, $profileUrl, $diagnostics);
+            $definitions = self::sliceDefinitions($nestedId, $slicing, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup);
             if ($definitions === []) {
                 continue;
             }
@@ -1193,6 +1377,83 @@ final class StructureDefinitionCompiler
                     'path'       => $relative,
                     'constraint' => FHIRSliceConstraint::class,
                     'options'    => ['property' => $relative, ...$nested],
+                ];
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
+     * The invariants and required or extensible bindings one differential element on or beneath a
+     * slice adds, as slice rules at $relative, an item-relative path ('' for the slice itself).
+     *
+     * Left out, as differentialInvariants() and differentialBindings() leave them out at the top
+     * level:
+     *  - Invariants another definition declares (`source` names it): that definition enforces them
+     *  - Invariants and bindings the same element outside any slice already carries in the snapshot,
+     *    which every item is held to anyway: the base type's, or one the profile places on all items
+     *  - `preferred` and `example` bindings, which are guidance
+     *
+     * @param string                              $id         The element's id, e.g. 'Patient.identifier:ihi.value'
+     * @param string                              $relative   Its path within a slice item, e.g. 'value'
+     * @param array<string, mixed>                $element    The differential element
+     * @param array<string, array<string, mixed>> $snapshot   Snapshot elements by id
+     * @param string                              $profileUrl URL of the profile being compiled
+     *
+     * @return list<array{path: string, constraint: class-string, options: array<string, mixed>}>
+     */
+    private static function sliceInvariantsAndBindings(string $id, string $relative, array $element, array $snapshot, string $profileUrl): array
+    {
+        $url       = self::canonicalWithoutVersion($profileUrl);
+        $unsliced  = $snapshot[(string) preg_replace('/:[^.]+/', '', self::rewriteChoiceTypeSlices($id))] ?? [];
+        $inherited = [];
+        foreach (is_array($unsliced['constraint'] ?? null) ? $unsliced['constraint'] : [] as $constraint) {
+            if (is_array($constraint) && is_string($constraint['key'] ?? null)) {
+                $inherited[] = $constraint['key'];
+            }
+        }
+
+        $rules = [];
+        foreach (is_array($element['constraint'] ?? null) ? $element['constraint'] : [] as $constraint) {
+            if (!is_array($constraint) || !is_string($constraint['expression'] ?? null) || $constraint['expression'] === '') {
+                continue;
+            }
+
+            $key    = (string) ($constraint['key'] ?? '');
+            $source = is_string($constraint['source'] ?? null) ? self::canonicalWithoutVersion($constraint['source']) : null;
+            if (($source !== null && $source !== $url) || in_array($key, $inherited, true)) {
+                continue;
+            }
+
+            $options = [
+                'path'       => $relative,
+                'key'        => $key,
+                'severity'   => (string) ($constraint['severity'] ?? 'error'),
+                'expression' => $constraint['expression'],
+                'human'      => (string) ($constraint['human'] ?? ''),
+            ];
+            if (self::isBestPractice($constraint)) {
+                $options['bestPractice'] = true;
+            }
+
+            $rules[] = ['path' => $relative, 'constraint' => FHIRProfileInvariant::class, 'options' => $options];
+        }
+
+        $binding  = is_array($element['binding'] ?? null) ? $element['binding'] : [];
+        $strength = $binding['strength'] ?? null;
+        $valueSet = $binding['valueSet'] ?? null;
+        if (in_array($strength, ['required', 'extensible'], true) && is_string($valueSet) && $valueSet !== '') {
+            $unslicedBinding = is_array($unsliced['binding'] ?? null) ? $unsliced['binding'] : [];
+            $sameAsUnsliced  = ($unslicedBinding['strength'] ?? null) === $strength
+                && is_string($unslicedBinding['valueSet'] ?? null)
+                && self::canonicalWithoutVersion($unslicedBinding['valueSet']) === self::canonicalWithoutVersion($valueSet);
+
+            if (!$sameAsUnsliced) {
+                $rules[] = [
+                    'path'       => $relative,
+                    'constraint' => FHIRProfileBinding::class,
+                    'options'    => ['path' => $relative, 'valueSetUrl' => $valueSet, 'strength' => $strength],
                 ];
             }
         }
@@ -1272,6 +1533,45 @@ final class StructureDefinitionCompiler
         }
 
         return null;
+    }
+
+    /**
+     * The value or pattern discriminator value a slice gets from the data-type profile it is typed
+     * with, when the slicing profile states none itself, or null.
+     *
+     * AU Core types `Patient.identifier:ihi` with `au-ihi` and discriminates on `type`, but only
+     * `au-ihi` fixes that `type`. The profile's snapshot is read at the discriminator path, outside
+     * any slice. Only a slice allowing one type with one profile is read, as inlining requires.
+     *
+     * @param array<string, mixed>                          $header The slice element
+     * @param \Closure(string): (array<string, mixed>|null) $lookup
+     */
+    private static function typeProfileDiscriminatorValue(array $header, string $discType, string $discPath, \Closure $lookup): mixed
+    {
+        $types = is_array($header['type'] ?? null) ? array_values($header['type']) : [];
+        if (!in_array($discType, ['value', 'pattern'], true) || $discPath === '' || $discPath === '$this' || count($types) !== 1) {
+            return null;
+        }
+
+        $profiles = is_array($types[0]['profile'] ?? null) ? array_values(array_filter($types[0]['profile'], 'is_string')) : [];
+        if (count($profiles) !== 1 || ($types[0]['code'] ?? null) === 'Extension') {
+            return null;
+        }
+
+        $definition = $lookup(self::canonicalWithoutVersion($profiles[0]));
+        if ($definition === null || ($definition['kind'] ?? null) !== 'complex-type') {
+            return null;
+        }
+
+        $element = self::snapshotElements($definition)[($definition['type'] ?? '') . '.' . $discPath] ?? null;
+        if ($element === null) {
+            return null;
+        }
+
+        $field = ElementDefinitionReader::extractPolymorphicField($element, 'fixed')
+            ?? ElementDefinitionReader::extractPolymorphicField($element, 'pattern');
+
+        return $field['value'] ?? null;
     }
 
     /**

@@ -186,12 +186,13 @@ against it instead.
 * **A snapshot is required.** Definitions without a snapshot are reported, not expanded. Published
   packages carry snapshots; a profile you write yourself needs one generated, for example by the
   IG Publisher or SUSHI.
-* **Rules inside a slice are not enforced.** An invariant or binding on an element inside a slice,
-  including an extension's sub-extensions, is skipped without a finding. Each skipped rule is kept
-  as a `CompilerDiagnostic`: in `diagnostics` on each entry of
-  `RuntimeProfileResolver::resolve($url, 'R4')->chain` for a profile, and in
-  `resolveExtension($url, 'R4')->diagnostics` for an extension. `fhir:generate-ig` reports the same
-  rules as warnings.
+* **Rules on an extension definition's sub-extensions are not enforced.** An invariant or binding
+  on a sub-extension is skipped without a finding and kept as a `CompilerDiagnostic` in
+  `resolveExtension($url, 'R4')->diagnostics`; `fhir:generate-ig` reports it as a warning. Rules
+  inside a profile's slices, including a data-type profile such as `au-ihi` named on a slice, are
+  enforced for the items in that slice, unless no item can be matched to the slice because its
+  discriminator cannot be evaluated (`$this`, `type`, `profile`, or a value the profile does not
+  state); that is reported as a `CompilerDiagnostic`.
 * **No terminology server, no binding check.** A binding no generated enum covers needs a
   terminology client; without one it is reported as `fhir:unchecked-binding` INFO.
 * **Sub-extension cardinality, fixed and pattern values are not checked**, because the generated

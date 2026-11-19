@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Validation\FHIRChoiceVariantReader;
 use Ardenexal\FHIRTools\Component\Validation\FHIRElementPath;
@@ -300,6 +302,10 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
      * this rule's violation, a Count sizes the occurrence list, and every other rule inspects the
      * element itself. Violations are reported at the item, e.g. `component[1].valueQuantity.system`.
      *
+     * FHIRProfileInvariant and FHIRProfileBinding rules carry their own item-relative `path` and are
+     * validated on the item in this context, so `%resource` stays the resource around the item and
+     * each finding keeps its invariant key.
+     *
      * Rules carrying a FHIRSliceConstraint or FHIRSlicingRules describe slicing beneath the slice
      * (AU Core's `component:SystolicBP.code.coding:snomedSBP`). They are grouped by path, and each
      * item's elements at that path are matched against them as a slicing of their own, recursively.
@@ -310,8 +316,10 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     private function validateSliceRules(FHIRSliceConstraint $slice, array $items, string $property): void
     {
         /** @var array<string, array{slices: list<FHIRSliceConstraint>, rules: FHIRSlicingRules|null}> $nested */
-        $nested = [];
-        $plain  = [];
+        $nested      = [];
+        $plain       = [];
+        $onItem      = [];
+        $activeGroup = $this->context->getGroup() ?? Constraint::DEFAULT_GROUP;
 
         foreach (self::rulesOf($slice) as $rule) {
             if ($rule['constraint'] === FHIRSliceConstraint::class) {
@@ -320,6 +328,9 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             } elseif ($rule['constraint'] === FHIRSlicingRules::class) {
                 $nested[$rule['path']]['slices'] ??= [];
                 $nested[$rule['path']]['rules'] = new FHIRSlicingRules(...$rule['options']);
+            } elseif ($rule['constraint'] === FHIRProfileInvariant::class || $rule['constraint'] === FHIRProfileBinding::class) {
+                // In the group being validated, so a finding is attributed to the slice's profile
+                $onItem[] = new ($rule['constraint'])(...[...$rule['options'], 'groups' => [$activeGroup]]);
             } elseif (is_a($rule['constraint'], Constraint::class, true)) {
                 $plain[] = ['path' => $rule['path'], 'constraint' => $rule['constraint'], 'options' => $rule['options']];
             }
@@ -336,6 +347,15 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                         "{$property}[{$itemIndex}].{$path}",
                     );
                 }
+            }
+        }
+
+        if ($onItem !== []) {
+            foreach ($items as $itemIndex => $item) {
+                $this->context->getValidator()
+                    ->inContext($this->context)
+                    ->atPath("{$property}[{$itemIndex}]")
+                    ->validate($item, $onItem, [$activeGroup]);
             }
         }
 

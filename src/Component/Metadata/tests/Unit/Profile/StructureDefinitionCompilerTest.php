@@ -251,9 +251,10 @@ final class StructureDefinitionCompilerTest extends TestCase
         self::assertArrayNotHasKey('discriminatorValue', $slices['first']);
         self::assertSame(0, $slices['first']['min']);
         self::assertSame(['open'], self::slicingRules($compiled->attributes));
-        self::assertCount(1, $compiled->diagnostics);
-        self::assertSame('Bundle.entry', $compiled->diagnostics[0]->elementId);
-        self::assertStringContainsString('first', $compiled->diagnostics[0]->message);
+
+        // One for the relaxed slicing, one for the slice's own rules, which no item reaches
+        self::assertSame(['Bundle.entry:first', 'Bundle.entry'], array_map(static fn ($d): string => $d->elementId, $compiled->diagnostics));
+        self::assertStringContainsString('first', $compiled->diagnostics[1]->message);
     }
 
     /**

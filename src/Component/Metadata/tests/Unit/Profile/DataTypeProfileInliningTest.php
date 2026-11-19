@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Metadata\Tests\Unit\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
@@ -177,12 +178,59 @@ final class DataTypeProfileInliningTest extends TestCase
             self::element('Observation.section', ['code' => 'BackboneElement', 'profile' => [self::BASE . 'resource']]),
             'not a constraint on a data type',
         ];
-        yield 'inside a slice' => [
-            ['id' => 'Observation.component:a.valueQuantity', 'path' => 'Observation.component.valueQuantity', 'type' => [
-                ['code' => 'Quantity', 'profile' => [self::BASE . 'qty']],
-            ]],
-            'inside a slice',
-        ];
+    }
+
+    /**
+     * A slice typed with a data-type profile holds its items to that profile: the rules become the
+     * slice's own, at item-relative paths, so items in other slices are left alone.
+     */
+    public function testAProfileOnASliceBecomesThatSlicesRules(): void
+    {
+        $compiled = self::compile(
+            [
+                ['id' => 'Observation.identifier', 'path' => 'Observation.identifier', 'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'system']], 'rules' => 'open']],
+                ['id' => 'Observation.identifier:local', 'path' => 'Observation.identifier', 'sliceName' => 'local', 'type' => [['code' => 'Identifier', 'profile' => [self::BASE . 'ident']]]],
+                ['id' => 'Observation.identifier:local.system', 'path' => 'Observation.identifier.system', 'fixedUri' => 'http://example.org/ids'],
+            ],
+            [self::BASE . 'ident' => self::identifierProfile()],
+        );
+
+        self::assertSame([], self::inliningDiagnostics($compiled));
+
+        $slices = array_values(array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRSliceConstraint::class));
+        self::assertCount(1, $slices);
+
+        /** @var list<array{path: string, constraint: string}> $rules */
+        $rules = $slices[0]->arguments['rules'];
+        self::assertSame(
+            [
+                // The profile's rules, inlined on the slice header
+                ['system', FHIRFixedValue::class],
+                ['type.coding', FHIRSlicingRules::class],
+                ['type.coding', FHIRSliceConstraint::class],
+                // The slice's own fixed system
+                ['system', FHIRFixedValue::class],
+            ],
+            array_map(static fn (array $rule): array => [$rule['path'], $rule['constraint']], $rules),
+        );
+
+        // Nothing from the data-type profile reaches the identifier element as a whole
+        self::assertSame([], array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRProfileConstraint::class));
+    }
+
+    /**
+     * Naming the base data type beside a profile lets any value of that type through, so the
+     * profile adds no rule and nothing is reported as lost.
+     */
+    public function testAnElementThatAlsoAllowsItsBaseTypeIsSkippedQuietly(): void
+    {
+        $compiled = self::compile(
+            [self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty', 'http://hl7.org/fhir/StructureDefinition/Quantity']])],
+            [self::BASE . 'qty' => self::quantityProfile(self::BASE . 'qty', [])],
+        );
+
+        self::assertSame([], $compiled->attributes);
+        self::assertSame([], self::inliningDiagnostics($compiled));
     }
 
     public function testAMissingAncestorOfADataTypeProfileIsReported(): void
