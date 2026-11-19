@@ -49,9 +49,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\GuidanceResponseResource;
     sliceName: 'cdsHooksEndpoint',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-cdsHooksEndpoint',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-cdsHooksEndpoint'],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/cdshooksguidanceresponse'],
 )]

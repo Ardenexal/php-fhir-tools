@@ -49,9 +49,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'inputParameters',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-inputParameters',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-inputParameters'],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]
@@ -60,9 +60,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'directReferenceCode',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-directReferenceCode',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-directReferenceCode'],
+    ],
     orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]
@@ -71,9 +71,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'logicDefinition',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition'],
+    ],
     orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]
@@ -83,9 +83,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'dependency',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'type',
-    discriminatorValue: 'depends-on',
+    discriminators: [['type' => 'value', 'path' => 'type', 'value' => 'depends-on']],
     orderedIndex: 0,
     rules: [
         [

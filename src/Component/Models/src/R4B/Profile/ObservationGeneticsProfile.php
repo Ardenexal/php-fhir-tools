@@ -21,9 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'Gene',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsGene',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/observation-geneticsGene'],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
 )]
@@ -32,9 +32,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'DNARegionName',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsDNARegionName',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/observation-geneticsDNARegionName',
+        ],
+    ],
     orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
 )]
@@ -43,9 +47,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'CopyNumberEvent',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsCopyNumberEvent',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/observation-geneticsCopyNumberEvent',
+        ],
+    ],
     orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
 )]
@@ -54,9 +62,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'GenomicSourceClass',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsGenomicSourceClass',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/observation-geneticsGenomicSourceClass',
+        ],
+    ],
     orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
 )]
@@ -65,9 +77,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'Interpretation',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsInterpretation',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/observation-geneticsInterpretation',
+        ],
+    ],
     orderedIndex: 4,
     groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
 )]
@@ -76,9 +92,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'Variant',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsVariant',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/observation-geneticsVariant',
+        ],
+    ],
     orderedIndex: 5,
     groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
 )]
@@ -87,9 +107,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'AminoAcidChange',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsAminoAcidChange',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/observation-geneticsAminoAcidChange',
+        ],
+    ],
     orderedIndex: 6,
     groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
 )]
@@ -98,9 +122,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'Allele',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsAllele',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/observation-geneticsAllele',
+        ],
+    ],
     orderedIndex: 7,
     groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
 )]
@@ -109,9 +137,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'Ancestry',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsAncestry',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/observation-geneticsAncestry',
+        ],
+    ],
     orderedIndex: 8,
     groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
 )]
@@ -120,9 +152,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'PhaseSet',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsPhaseSet',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/observation-geneticsPhaseSet',
+        ],
+    ],
     orderedIndex: 9,
     groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
 )]

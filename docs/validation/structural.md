@@ -58,10 +58,26 @@ slicing is supported. Subsequent invocations for the same `(property, group, obj
 multiple slice attributes on one property never produce duplicate violations. Out-of-cardinality
 or unmatched-closed items raise ERROR violations.
 
-`SliceDiscriminatorMatcher` evaluates `value`, `pattern` and `exists` discriminators. A slice that
-needs a `type` or `profile` discriminator, `$this`, or a path through `resolve()` matches no item.
-The generator and the runtime compiler enforce closed or openAtEnd slicing that depends on such a
-slice as open, and report a warning, so a conforming resource is not rejected.
+`SliceDiscriminatorMatcher` evaluates every discriminator type, and an item joins a slice only when
+it matches all of the slicing's discriminators:
+
+* `value` and `pattern` compare the element at the path with the slice's fixed or pattern value.
+  On `$this` that is the slice's own value, so AU Core smoking status's `category:socialHistory`
+  takes the `social-history` category.
+* `exists` checks that the element at the path is present or absent.
+* `type` compares the FHIR type at the path, such as a Bundle entry's resource, with the slice's.
+* `profile` checks the element at the path against the slice's profile in a validation run of its
+  own, and the item joins the slice when that run reports no error. Its findings are not reported.
+  The profile must be declared by the element's generated class or resolvable at runtime.
+* A slice with no fixed or pattern value but a `required` binding at the path, such as AU Core's
+  `coding:pbs`, is matched by asking the terminology client whether the code is in the value set.
+
+A `profile` or binding discriminator can go unanswered: no terminology client is configured, the
+server gives no answer, or the profile cannot be found. An item that might belong to such a slice is
+neither counted against closed or openAtEnd rules nor given to the default slice, and that slice's
+minimum is not checked. A slice with nothing to match on, such as a path through `resolve()`,
+matches no item, and the generator and the runtime compiler enforce closed or openAtEnd slicing
+that depends on it as open, with a warning, so a conforming resource is not rejected.
 
 ## Fixed and pattern values
 

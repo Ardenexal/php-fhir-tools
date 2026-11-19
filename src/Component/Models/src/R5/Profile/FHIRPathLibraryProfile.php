@@ -24,9 +24,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'fhirPathContent',
     min: 1,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'contentType',
-    discriminatorValue: 'text/fhirpath',
+    discriminators: [['type' => 'value', 'path' => 'contentType', 'value' => 'text/fhirpath']],
     orderedIndex: 0,
     rules: [
         [

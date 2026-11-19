@@ -24,9 +24,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'elmXmlContent',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'contentType',
-    discriminatorValue: 'application/elm+xml',
+    discriminators: [['type' => 'value', 'path' => 'contentType', 'value' => 'application/elm+xml']],
     orderedIndex: 0,
     rules: [
         [
@@ -52,9 +50,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'elmJsonContent',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'contentType',
-    discriminatorValue: 'application/elm+json',
+    discriminators: [['type' => 'value', 'path' => 'contentType', 'value' => 'application/elm+json']],
     orderedIndex: 1,
     rules: [
         [

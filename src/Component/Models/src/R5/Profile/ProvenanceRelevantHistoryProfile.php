@@ -60,10 +60,14 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ProvenanceResource;
     sliceName: 'Author',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'type',
-    discriminatorValue: [
-        'coding' => [['system' => 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType', 'code' => 'AUT']],
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'type',
+            'value' => [
+                'coding' => [['system' => 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType', 'code' => 'AUT']],
+            ],
+        ],
     ],
     orderedIndex: 0,
     rules: [

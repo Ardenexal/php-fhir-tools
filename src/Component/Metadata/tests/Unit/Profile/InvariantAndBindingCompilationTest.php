@@ -115,13 +115,14 @@ final class InvariantAndBindingCompilationTest extends TestCase
 
     /**
      * A slice its discriminator cannot match never receives an item, so its rules are reported as
-     * not enforced: AU Core's PBS coding slice is discriminated by `$this` and carries only a binding.
+     * not enforced: this coding slice is discriminated by `$this` and carries only an extensible binding.
      */
     public function testRulesOnASliceNoItemCanMatchAreReported(): void
     {
         $compiled = (new StructureDefinitionCompiler())->compile(self::profile([
             ['id' => 'Observation.code.coding', 'path' => 'Observation.code.coding', 'slicing' => ['discriminator' => [['type' => 'pattern', 'path' => '$this']], 'rules' => 'open']],
-            ['id' => 'Observation.code.coding:pbs', 'path' => 'Observation.code.coding', 'sliceName' => 'pbs', 'binding' => ['strength' => 'required', 'valueSet' => 'http://example.org/ValueSet/pbs']],
+            // An extensible binding allows other codes, so it cannot say which codings are the slice's
+            ['id' => 'Observation.code.coding:pbs', 'path' => 'Observation.code.coding', 'sliceName' => 'pbs', 'binding' => ['strength' => 'extensible', 'valueSet' => 'http://example.org/ValueSet/pbs']],
         ]));
 
         self::assertSame(

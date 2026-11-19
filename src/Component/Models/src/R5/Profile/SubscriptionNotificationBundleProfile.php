@@ -38,8 +38,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     sliceName: 'first',
     min: 0,
     max: 1,
-    discriminatorType: 'exists',
-    discriminatorPath: 'entry',
+    discriminators: [['type' => 'exists', 'path' => 'entry']],
     orderedIndex: 0,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
@@ -54,8 +53,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     sliceName: 'other',
     min: 0,
     max: '*',
-    discriminatorType: 'exists',
-    discriminatorPath: 'entry',
+    discriminators: [['type' => 'exists', 'path' => 'entry']],
     orderedIndex: 1,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],

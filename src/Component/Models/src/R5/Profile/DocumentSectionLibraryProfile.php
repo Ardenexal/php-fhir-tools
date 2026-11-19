@@ -25,10 +25,14 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
     sliceName: 'procedure',
     min: 0,
     max: '*',
-    discriminatorType: 'pattern',
-    discriminatorPath: 'code',
-    discriminatorValue: [
-        'coding' => [['code' => '29554-3', 'display' => 'Procedure Narrative', 'system' => 'http://loinc.org']],
+    discriminators: [
+        [
+            'type'  => 'pattern',
+            'path'  => 'code',
+            'value' => [
+                'coding' => [['code' => '29554-3', 'display' => 'Procedure Narrative', 'system' => 'http://loinc.org']],
+            ],
+        ],
     ],
     orderedIndex: 0,
     rules: [
@@ -56,11 +60,15 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
     sliceName: 'medications',
     min: 0,
     max: '*',
-    discriminatorType: 'pattern',
-    discriminatorPath: 'code',
-    discriminatorValue: [
-        'coding' => [
-            ['code' => '29549-3', 'display' => 'Medication administered Narrative', 'system' => 'http://loinc.org'],
+    discriminators: [
+        [
+            'type'  => 'pattern',
+            'path'  => 'code',
+            'value' => [
+                'coding' => [
+                    ['code' => '29549-3', 'display' => 'Medication administered Narrative', 'system' => 'http://loinc.org'],
+                ],
+            ],
         ],
     ],
     orderedIndex: 1,
@@ -95,10 +103,16 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
     sliceName: 'plan',
     min: 0,
     max: '*',
-    discriminatorType: 'pattern',
-    discriminatorPath: 'code',
-    discriminatorValue: [
-        'coding' => [['code' => '18776-5', 'display' => 'Plan of treatment (narrative)', 'system' => 'http://loinc.org']],
+    discriminators: [
+        [
+            'type'  => 'pattern',
+            'path'  => 'code',
+            'value' => [
+                'coding' => [
+                    ['code' => '18776-5', 'display' => 'Plan of treatment (narrative)', 'system' => 'http://loinc.org'],
+                ],
+            ],
+        ],
     ],
     orderedIndex: 2,
     rules: [

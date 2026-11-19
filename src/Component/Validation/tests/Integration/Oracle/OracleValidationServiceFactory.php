@@ -25,6 +25,7 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FhirPropertyTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
@@ -67,7 +68,7 @@ final class OracleValidationServiceFactory
         $accessor       = PropertyAccess::createPropertyAccessor();
         $registry       = new FHIRValidationMessageRegistry();
         $pathService    = new FHIRPathService();
-        $matcher        = new SliceDiscriminatorMatcher($accessor);
+        $matcher        = new SliceDiscriminatorMatcher($accessor, $collaborators->terminologyClient);
         $defaultFactory = new ConstraintValidatorFactory();
         // The slice validator finds sibling slices by reading attributes off the validated class. A
         // base resource checked against a runtime profile has none, so this reader adds them.
@@ -83,6 +84,7 @@ final class OracleValidationServiceFactory
             $defaultFactory,
             $enumNamespace,
             $sliceReader,
+            new RuntimeProfileConformance($runtimeProfiles),
         ) implements ConstraintValidatorFactoryInterface {
             public function __construct(
                 private readonly PropertyAccessorInterface $accessor,
@@ -93,6 +95,7 @@ final class OracleValidationServiceFactory
                 private readonly ConstraintValidatorFactory $default,
                 private readonly string $enumNamespace,
                 private readonly FHIRAttributeReaderInterface $sliceReader,
+                private readonly RuntimeProfileConformance $profiles,
             ) {
             }
 
@@ -112,7 +115,7 @@ final class OracleValidationServiceFactory
                     $constraint instanceof FHIRFixedValue        => new FHIRFixedValueValidator($this->registry),
                     $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->registry),
                     $constraint instanceof FHIRAllowedTypes      => new FHIRAllowedTypesValidator($this->registry),
-                    $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, $this->matcher, $this->sliceReader),
+                    $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, $this->matcher, $this->sliceReader, profiles: $this->profiles),
                     $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->collaborators->referenceResolver, $this->registry),
                     default                                      => $this->default->getInstance($constraint),
                 };

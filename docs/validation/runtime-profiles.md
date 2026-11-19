@@ -191,8 +191,8 @@ against it instead.
   `resolveExtension($url, 'R4')->diagnostics`; `fhir:generate-ig` reports it as a warning. Rules
   inside a profile's slices, including a data-type profile such as `au-ihi` named on a slice, are
   enforced for the items in that slice, unless no item can be matched to the slice because its
-  discriminator cannot be evaluated (`$this`, `type`, `profile`, or a value the profile does not
-  state); that is reported as a `CompilerDiagnostic`.
+  discriminator has nothing to match on (a path through `resolve()`, or a value the profile does
+  not state); that is reported as a `CompilerDiagnostic`.
 * **No terminology server, no binding check.** A binding no generated enum covers needs a
   terminology client; without one it is reported as `fhir:unchecked-binding` INFO.
 * **Sub-extension cardinality, fixed and pattern values are not checked**, because the generated

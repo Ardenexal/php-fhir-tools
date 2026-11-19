@@ -136,9 +136,14 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     sliceName: 'VSCat',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'coding.code',
-    discriminatorValue: 'vital-signs',
+    discriminators: [
+        ['type' => 'value', 'path' => 'coding.code', 'value' => 'vital-signs'],
+        [
+            'type'  => 'value',
+            'path'  => 'coding.system',
+            'value' => 'http://terminology.hl7.org/CodeSystem/observation-category',
+        ],
+    ],
     orderedIndex: 0,
     rules: [
         ['path' => 'coding', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],

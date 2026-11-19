@@ -65,9 +65,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ActivityDefinitionResource;
     sliceName: 'knowledgeCapability',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeCapability',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeCapability'],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
 )]
@@ -76,9 +76,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ActivityDefinitionResource;
     sliceName: 'knowledgeRepresentationLevel',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeRepresentationLevel',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeRepresentationLevel',
+        ],
+    ],
     orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
 )]
@@ -87,9 +91,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ActivityDefinitionResource;
     sliceName: 'artifactComment',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-artifactComment',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-artifactComment'],
+    ],
     orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
 )]

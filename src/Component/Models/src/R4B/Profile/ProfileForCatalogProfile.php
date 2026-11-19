@@ -64,9 +64,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\CompositionResource;
     sliceName: 'ValidityPeriod',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqm-ValidityPeriod',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqm-ValidityPeriod'],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]

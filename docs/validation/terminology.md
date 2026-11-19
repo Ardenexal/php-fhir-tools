@@ -101,8 +101,9 @@ element's path. Two things differ:
   `fhir:unchecked-binding` INFO, not as a missing enum.
 
 A binding on a slice, or on an element beneath one, holds for the items in that slice only, and is
-reported at the item, such as `component[1].value`. A slice whose discriminator cannot be evaluated,
-such as a `$this` pattern, matches no item, so its bindings are reported as not enforced. Bindings on an extension definition's
+reported at the item, such as `component[1].value`. A slice keyed only by a `required` binding, such
+as AU Core's `coding:pbs`, is matched through the terminology client, so without a client its items
+are not known and its bindings and minimum are not checked. Bindings on an extension definition's
 sub-extensions are not enforced yet. Generation reports each one as a warning, and runtime
 compilation as a `CompilerDiagnostic`.
 

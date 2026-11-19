@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
@@ -56,6 +57,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         private readonly SliceDiscriminatorMatcher $matcher,
         private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
         ?FHIRChoiceVariantReader $reader = null,
+        private readonly ?RuntimeProfileConformance $profiles = null,
     ) {
         $this->reader = $reader ?? new FHIRChoiceVariantReader($propertyAccessor);
     }
@@ -160,9 +162,11 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
 
         // Items of a slice no item can match would be judged unmatched, which closed and openAtEnd
         // rules reject; current classes are generated with open rules for such slicing
-        if (array_filter($namedSlices, self::isUndecidedExistsSlice(...)) !== []) {
+        if (array_filter($namedSlices, self::isUnmatchableSlice(...)) !== []) {
             $rules = 'open';
         }
+
+        $matcher = $this->matcher();
 
         // Track match counts per slice and which items matched any slice
         /** @var array<int, int> $matchCounts  sliceConstraints index → count */
@@ -170,6 +174,8 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         /** @var array<int, array<int|string, object|array<mixed>>> $matchedItems sliceConstraints index → item index → item */
         $matchedItems       = [];
         $unmatchedItems     = [];
+        /** @var array<int, true> $undecided sliceConstraints index → some unmatched item may belong to it */
+        $undecided          = [];
         $openAtEndViolation = false;
 
         foreach ($items as $itemIndex => $item) {
@@ -177,14 +183,17 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                 continue;
             }
 
-            $matched = false;
+            $matched  = false;
+            $maybeIn  = [];
             foreach ($namedSlices as $sliceIdx => $sc) {
-                if ($this->matcher->matches(
-                    $item,
-                    $sc->discriminatorType,
-                    $sc->discriminatorPath,
-                    $sc->discriminatorValue,
-                )) {
+                $match = $matcher->matchesAll($item, $sc->discriminators);
+
+                if ($match === null) {
+                    $maybeIn[] = $sliceIdx;
+                    continue;
+                }
+
+                if ($match) {
                     ++$matchCounts[$sliceIdx];
                     $matchedItems[$sliceIdx][$itemIndex] = $item;
                     $matched                             = true;
@@ -197,16 +206,27 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                 }
             }
 
-            if (!$matched) {
-                $unmatchedItems[] = $itemIndex;
+            if ($matched) {
+                continue;
             }
+
+            // An item no slice took, but one or more could not say: it may be theirs, so it is neither
+            // rejected as unmatched nor given to the default slice, and those slices' minimums are not checked
+            if ($maybeIn !== []) {
+                foreach ($maybeIn as $sliceIdx) {
+                    $undecided[$sliceIdx] = true;
+                }
+                continue;
+            }
+
+            $unmatchedItems[] = $itemIndex;
         }
 
         // Check min/max per named slice
         foreach ($namedSlices as $sliceIdx => $sc) {
             $count = $matchCounts[$sliceIdx];
 
-            if ($count < $sc->min && !self::isUndecidedExistsSlice($sc)) {
+            if ($count < $sc->min && !isset($undecided[$sliceIdx]) && self::canCount($sc, $matcher)) {
                 $this->context->buildViolation(
                     'Slice "{{ slice }}" on "{{ property }}" requires at least {{ min }} item(s), but {{ count }} matched.',
                 )->setParameters([
@@ -283,16 +303,63 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     }
 
     /**
-     * True for an `exists` slice with no presence to test, which no item can match.
+     * The matcher, answering `profile` discriminators by checking the item against the profile in a
+     * validation run of its own when a profile checker is configured.
+     */
+    private function matcher(): SliceDiscriminatorMatcher
+    {
+        if ($this->profiles === null) {
+            return $this->matcher;
+        }
+
+        $validator = $this->context->getValidator();
+        $profiles  = $this->profiles;
+
+        return $this->matcher->withProfileCheck(
+            static fn (object|array $value, string $profileUrl): ?bool => is_object($value) ? $profiles->conforms($validator, $value, $profileUrl) : null,
+        );
+    }
+
+    /**
+     * True for a slice with a discriminator that has nothing to match on, which no item can match.
      *
      * Classes generated before the generator read an `exists` slice's presence from its definition
      * carry none, yet keep the slice's minimum and the slicing's closed or openAtEnd rules. Both
      * would fail resources that conform, so neither is checked; current classes give such a slice
      * no minimum and its slicing open rules in the first place.
      */
-    private static function isUndecidedExistsSlice(FHIRSliceConstraint $slice): bool
+    private static function isUnmatchableSlice(FHIRSliceConstraint $slice): bool
     {
-        return $slice->discriminatorType === 'exists' && !is_bool($slice->discriminatorValue);
+        if ($slice->discriminators === []) {
+            return true;
+        }
+
+        foreach ($slice->discriminators as $discriminator) {
+            if (!array_key_exists('value', $discriminator) && !isset($discriminator['valueSet'])) {
+                return true;
+            }
+
+            if ($discriminator['type'] === 'exists' && !is_bool($discriminator['value'] ?? null)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether the items counted for a slice are all of its items: false when one of its
+     * discriminators needs a terminology client or profile check this validator does not have.
+     */
+    private static function canCount(FHIRSliceConstraint $slice, SliceDiscriminatorMatcher $matcher): bool
+    {
+        foreach ($slice->discriminators as $discriminator) {
+            if (!$matcher->canAnswer($discriminator)) {
+                return false;
+            }
+        }
+
+        return !self::isUnmatchableSlice($slice);
     }
 
     /**

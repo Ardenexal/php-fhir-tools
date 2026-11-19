@@ -22,8 +22,12 @@ use Symfony\Component\Validator\Constraint;
  * When slicing.ordered = true exists in the profile, enforcement is intentionally deferred
  * (see backlog). The `orderedIndex` field is stored for future use only.
  *
- * Composite discriminators (two discriminators per slicing entry) are not yet supported;
- * the generator emits only the first discriminator and logs a warning.
+ * `discriminators` holds every discriminator of the slicing, each with the value this slice
+ * expects, and an item belongs to the slice only when it satisfies all of them. A discriminator
+ * the generator could find no value for has no `value` key, and no item matches that slice. A
+ * slice keyed only by a required binding carries the value set as `valueSet` instead; it matches
+ * through a configured terminology client, and without one it matches nothing and its minimum is
+ * not checked.
  *
  * Rules the profile places beneath the slice (e.g. a fixed `valueQuantity.system` on one
  * component slice) travel in `rules`, with paths relative to a slice item. They bind only the
@@ -36,9 +40,7 @@ use Symfony\Component\Validator\Constraint;
  *     sliceName: 'ihiNumber',
  *     min: 1,
  *     max: 1,
- *     discriminatorType: 'value',
- *     discriminatorPath: 'system',
- *     discriminatorValue: 'http://ns.electronichealth.net.au/id/hi/ihi/1.0',
+ *     discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ns.electronichealth.net.au/id/hi/ihi/1.0']],
  *     groups: ['http://hl7.org.au/fhir/core/StructureDefinition/au-core-patient'],
  * )]
  * class AUCorePatientProfile extends AUBasePatientProfile { ... }
@@ -50,28 +52,26 @@ use Symfony\Component\Validator\Constraint;
 final class FHIRSliceConstraint extends Constraint
 {
     /**
-     * @param string                                                                                                          $property           Property path on the target class (e.g. 'identifier')
-     * @param string                                                                                                          $sliceName          FHIR slice name (e.g. 'ihiNumber'); '@default' for the default slice
-     * @param int                                                                                                             $min                Minimum number of items matching this slice (0 = optional)
-     * @param int|string                                                                                                      $max                Maximum items ('*' = unbounded, or a positive integer)
-     * @param string                                                                                                          $discriminatorType  'value', 'pattern', or 'exists'
-     * @param string                                                                                                          $discriminatorPath  Element path within a slice item (e.g. 'system', 'type.coding')
-     * @param mixed                                                                                                           $discriminatorValue Value to match at the discriminator path
-     * @param list<string>                                                                                                    $groups             Profile URL groups under which this slice constraint is active
-     * @param bool                                                                                                            $isDefault          True for the special '@default' slice in closed slicing
-     * @param int                                                                                                             $orderedIndex       Slice declaration order (reserved for future ordered-slicing enforcement)
+     * @param string                                                                                                          $property       Property path on the target class (e.g. 'identifier')
+     * @param string                                                                                                          $sliceName      FHIR slice name (e.g. 'ihiNumber'); '@default' for the default slice
+     * @param int                                                                                                             $min            Minimum number of items matching this slice (0 = optional)
+     * @param int|string                                                                                                      $max            Maximum items ('*' = unbounded, or a positive integer)
+     * @param list<array{type: string, path: string, value?: mixed, valueSet?: string}>                                       $discriminators Every discriminator of the slicing: its type ('value', 'pattern', 'exists', 'type' or 'profile'),
+     *                                                                                                                                        its path within a slice item ('$this' for the item itself), and the value this slice expects there.
+     *                                                                                                                                        `valueSet` replaces `value` for a slice keyed only by a required binding
+     * @param list<string>                                                                                                    $groups         Profile URL groups under which this slice constraint is active
+     * @param bool                                                                                                            $isDefault      True for the special '@default' slice in closed slicing
+     * @param int                                                                                                             $orderedIndex   Slice declaration order (reserved for future ordered-slicing enforcement)
      * @param list<array{path: string, constraint: class-string<Constraint|FHIRSlicingRules>, options: array<string, mixed>}> $rules
-     *                                                                                                                                            Rules each item matching this slice must meet; `path` is relative to the item.
-     *                                                                                                                                            A FHIRSliceConstraint or FHIRSlicingRules rule describes slicing beneath the slice
+     *                                                                                                                                        Rules each item matching this slice must meet; `path` is relative to the item.
+     *                                                                                                                                        A FHIRSliceConstraint or FHIRSlicingRules rule describes slicing beneath the slice
      */
     public function __construct(
         public readonly string $property,
         public readonly string $sliceName,
         public readonly int $min = 0,
         public readonly int|string $max = '*',
-        public readonly string $discriminatorType = 'value',
-        public readonly string $discriminatorPath = '',
-        public readonly mixed $discriminatorValue = null,
+        public readonly array $discriminators = [],
         ?array $groups = null,
         mixed $payload = null,
         public readonly bool $isDefault = false,

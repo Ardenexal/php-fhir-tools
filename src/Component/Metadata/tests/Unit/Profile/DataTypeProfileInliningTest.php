@@ -341,7 +341,7 @@ final class DataTypeProfileInliningTest extends TestCase
         self::assertCount(1, $slices);
         self::assertSame(1, $slices[0]->arguments['min']);
         self::assertSame(2, $slices[0]->arguments['max']);
-        self::assertSame('http://example.org/kinds', $slices[0]->arguments['discriminatorValue'] ?? null);
+        self::assertSame('http://example.org/kinds', $slices[0]->arguments['discriminators'][0]['value'] ?? null);
         self::assertCount(1, array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRSlicingRules::class));
     }
 

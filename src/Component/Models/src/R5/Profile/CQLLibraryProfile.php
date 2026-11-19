@@ -24,9 +24,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'cqlContent',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'contentType',
-    discriminatorValue: 'text/cql',
+    discriminators: [['type' => 'value', 'path' => 'contentType', 'value' => 'text/cql']],
     orderedIndex: 0,
     rules: [
         [

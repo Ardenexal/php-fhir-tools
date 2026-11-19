@@ -163,7 +163,7 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Required bindings | Supported | `FHIRValueSetBindingValidator`; enum-backed |
 | FHIRPath invariants | Supported | Engine eval errors emit `fhir:eval-error` INFO (not ERROR) |
 | Fixed / pattern values | Supported | `FHIRFixedValueValidator` / `FHIRPatternValueValidator` |
-| Slicing (closed/open/openAtEnd) | Supported | `FHIRSliceConstraintValidator`; `value`, `pattern` and `exists` discriminators. Closed slicing the validator cannot match is enforced as open |
+| Slicing (closed/open/openAtEnd) | Supported | `FHIRSliceConstraintValidator`; every discriminator type, `$this`, and composite discriminators. Binding slices need a terminology client; paths through `resolve()` are not followed |
 | Profile constraints (generated) | Supported | `FHIRProfileConstraintValidator`; requires pre-generated models |
 | Profile constraints (dynamic/runtime) | Supported | `RuntimeProfileResolver`; StructureDefinitions must carry a snapshot; see [Runtime Profiles](runtime-profiles.md) |
 | Extension contexts (element/fhirpath/extension) | Supported | Recursive walk; defer-not-deny safety; see [Extensions](extensions.md) |
@@ -191,11 +191,13 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
   `fhir:unchecked-binding` INFO violation (queryable via
   `FHIRValidationReport::hasUncheckedBindings()`). See [Terminology](terminology.md).
 * **Runtime profiles need snapshots.** A profile you have not generated can be validated from its
-  StructureDefinition, but only when it carries a snapshot, and rules inside slices are skipped. All
+  StructureDefinition, but only when it carries a snapshot. All
   HL7 core profiles for R4/R4B/R5 are pre-generated. See [Runtime Profiles](runtime-profiles.md#limits).
-* **Slice discriminators** of type `type` or `profile`, `$this`, and paths through `resolve()` are
-  not evaluated. Closed or openAtEnd slicing that depends on one is enforced as open, and the
-  generator (or the runtime compiler) reports a warning. See [Structural](structural.md#slicing).
+* **Slice discriminators** through `resolve()` are not followed. Closed or openAtEnd slicing that
+  depends on one is enforced as open, and the generator (or the runtime compiler) reports a
+  warning. A slice keyed by a `required` binding needs a terminology client, and one keyed by a
+  profile needs that profile generated or resolvable at runtime; until then its items are not
+  judged. See [Structural](structural.md#slicing).
 * **Narrative XHTML** is checked for disallowed content (`txt-1`) and unparsable markup (`txt-2`).
   A well-formed narrative with no non-whitespace content is not reported, and neither is the XHTML
   namespace: the XML reader drops namespace bindings on `div`, so a correct narrative and a wrong
