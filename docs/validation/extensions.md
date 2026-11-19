@@ -162,10 +162,17 @@ Matching rules (`FHIRObligationContext::matchesObligation()`):
 * An obligation with a **specific actor** only fires when `$context->actorUrl` matches.
 * `new FHIRObligationContext(null)` matches only actor-less obligations.
 
+An obligation with a FHIRPath `filter` covers only the occurrences of its element that the filter
+selects. The filter is evaluated against each occurrence, and selects it when it returns a single
+`true`. So a `SHALL:populate` on `telecom` filtered by `use = 'home'` is met when at least one
+contact point is a home one, and fails when there are none, whatever other contact points exist.
+A populate obligation whose filter cannot be evaluated gives an info `fhir:eval-error` finding
+instead of its own. A filtered `SHALL:no-error` suppresses errors only on the occurrences it
+selects, and suppresses nothing when its filter cannot be evaluated.
+
 {% hint style="info" %}
-**Obligation filter evaluation is deferred.** `#[FHIRObligation]` entries with a non-null FHIRPath
-`filter` are skipped; only unconditional obligations are enforced. Behaviour-only obligations
-(display / persist / handle) cannot be checked from a resource instance and are not evaluated.
+Behaviour-only obligations (display / persist / handle) cannot be checked from a resource instance
+and are not evaluated.
 {% endhint %}
 
 See [Configuration](configuration.md) for actor and type-hierarchy resolver setup.

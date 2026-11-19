@@ -19,8 +19,6 @@ final class ObligationFixture
         public readonly ?string $shallPopulateAllActors = null,
         #[FHIRObligation(code: 'SHALL:no-error', actor: 'http://example.org/actor/placer')]
         public readonly ?string $noErrorProperty = null,
-        #[FHIRObligation(code: 'SHALL:populate', actor: 'http://example.org/actor/placer', filter: 'name.exists()')]
-        public readonly ?string $filteredObligation = null,
     ) {
     }
 }

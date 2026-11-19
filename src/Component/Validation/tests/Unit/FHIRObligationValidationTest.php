@@ -165,17 +165,4 @@ final class FHIRObligationValidationTest extends TestCase
         $errorPaths = array_map(static fn ($v) => $v->path, $report->errors());
         self::assertContains('noErrorProperty', $errorPaths);
     }
-
-    // --- filter sub-extension ---
-
-    public function testFilteredObligationIsSkippedWithoutError(): void
-    {
-        $resource = new ObligationFixture();
-
-        // Must not throw; filtered obligation is silently skipped
-        $report = $this->service->validate($resource, obligationContext: new FHIRObligationContext(self::PLACER));
-
-        $errorPaths = array_map(static fn ($v) => $v->path, $report->errors());
-        self::assertNotContains('filteredObligation', $errorPaths);
-    }
 }

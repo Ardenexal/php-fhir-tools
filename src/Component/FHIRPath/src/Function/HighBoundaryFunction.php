@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\DecimalNotation;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 
@@ -140,11 +141,14 @@ final class HighBoundaryFunction extends AbstractFunction
      */
     private function extractDecimalParts(FHIRPathDecimal|float|int $value): array
     {
+        // A decimal written with an exponent, such as `1e25`, is rewritten in plain notation for bcmath,
+        // and its precision is recounted from the plain digits, since FHIRPathDecimal counts `e2` as
+        // fraction digits
         if ($value instanceof FHIRPathDecimal) {
-            $str = $value->value;
+            $str = DecimalNotation::plain($value->value);
             assert(is_numeric($str));
 
-            return [$str, $value->precision];
+            return $str === $value->value ? [$str, $value->precision] : [$str, (new FHIRPathDecimal($str))->precision];
         }
 
         if (is_int($value)) {
@@ -158,7 +162,9 @@ final class HighBoundaryFunction extends AbstractFunction
             throw new EvaluationException(sprintf('Cannot compute the boundary of non-finite value %s', is_nan($value) ? 'NAN' : ($value > 0 ? 'INF' : '-INF')));
         }
 
-        $str    = (string) $value;
+        // PHP prints a large or small float with an exponent (1.0E+25), which bcmath rejects
+        $str = DecimalNotation::plain((string) $value);
+        assert(is_numeric($str));
         $dotPos = strpos($str, '.');
         $prec   = $dotPos !== false ? strlen($str) - $dotPos - 1 : 0;
 

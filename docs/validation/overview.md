@@ -174,7 +174,7 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Quantity range | Supported | `FHIRQuantityRangeValidator` |
 | Temporal range | Supported | `FHIRTemporalRangeValidator`; handles partial dates (YYYY, YYYY-MM) |
 | MustSupport | Supported | Opt-in via `$includeMustSupportInfo = true`; INFO violations |
-| Obligations (populate) | Conditional | `SHALL`/`SHOULD:populate` enforced; filter evaluation deferred |
+| Obligations (populate) | Conditional | `SHALL`/`SHOULD:populate` enforced, including filtered ones, which need an occurrence the FHIRPath `filter` selects |
 | `$validate` operation output | Supported | `validateForOperation()` → `OperationOutcomeResource` |
 | Questionnaire validation | Separate service | `FHIRQuestionnaireValidator`; see [Questionnaire](questionnaire.md) |
 | Narrative / XHTML | Partial | `NarrativeXhtmlChecker`: disallowed elements and attributes, DOCTYPE, undefined entities and unparsable markup. Empty or whitespace-only narratives, the XHTML namespace, link schemes and stray text are not checked |
@@ -205,8 +205,6 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 * **Target profile reference validation** requires a `FHIRReferenceResolverInterface`. The
   default `NullFHIRReferenceResolver` returns `null`, silently skipping the check. See
   [References](references.md).
-* **Obligation filter evaluation** is deferred: obligations with a non-null FHIRPath `filter`
-  are skipped; only unconditional obligations fire.
 * **`#[FHIRIsModifier]`** marks modifier properties for introspection only — no active
   enforcement; consumers must check modifier element values themselves.
 * **Questionnaire validation** is a separate `FHIRQuestionnaireValidator` service, not part of
