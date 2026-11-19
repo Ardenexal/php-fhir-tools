@@ -58,8 +58,10 @@ final class FHIRProfileBindingValidator extends ConstraintValidator
 
         $binding = new FHIRValueSetBinding($constraint->valueSetUrl, $constraint->strength, fromProfile: true, release: $this->releaseOf($value));
 
-        // One group per parent the element hangs off; an absent ancestor yields none
-        foreach ($this->reader->readGroups($value, $constraint->path) as $group) {
+        // One group per parent the element hangs off; an absent ancestor yields none. An empty path
+        // binds the value itself, as a slice rule on the slice's own items does
+        $groups = $constraint->path === '' ? [['path' => '', 'value' => $value]] : $this->reader->readGroups($value, $constraint->path);
+        foreach ($groups as $group) {
             if ($group['value'] === null || $group['value'] === []) {
                 continue;
             }

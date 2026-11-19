@@ -100,8 +100,11 @@ element's path. Two things differ:
 * A required binding that neither an enum nor a terminology client can check is reported as
   `fhir:unchecked-binding` INFO, not as a missing enum.
 
-Bindings on an element inside a slice are not enforced yet. Generation reports each one as a
-warning, and runtime compilation as a `CompilerDiagnostic`.
+A binding on a slice, or on an element beneath one, holds for the items in that slice only, and is
+reported at the item, such as `component[1].value`. A slice whose discriminator cannot be evaluated,
+such as a `$this` pattern, matches no item, so its bindings are reported as not enforced. Bindings on an extension definition's
+sub-extensions are not enforced yet. Generation reports each one as a warning, and runtime
+compilation as a `CompilerDiagnostic`.
 
 ## Message overrides
 
