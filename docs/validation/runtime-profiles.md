@@ -156,6 +156,35 @@ longer reported as unknown.
 
 Findings carry the profile URL in `profileGroup`, as findings from a generated profile class do.
 
+## Slicing support
+
+Generated profile classes and profiles resolved at runtime enforce slicing the same way. An item
+joins a slice only when it matches every discriminator of the slicing.
+
+| Discriminator or rule | Enforced | Notes |
+|---|---|---|
+| `value` and `pattern` | Yes | Compared with the slice's fixed or pattern value at the path |
+| `exists` | Yes | |
+| `type` | Yes | Compares the FHIR type at the path, such as a Bundle entry's resource |
+| `profile` | Yes | Needs the profile generated or resolvable at runtime; otherwise the slice is not judged |
+| `$this` with a fixed or pattern value | Yes | Uses the slice's own value, such as AU Core smoking status's `social-history` category |
+| `$this` with only a `required` binding | With a terminology client | Such as AU Core's `coding:pbs` and `coding:amt`; without a client the slice is not judged |
+| Several discriminators on one slicing | Yes | All must match |
+| A path through `resolve()` | No | Closed or openAtEnd slicing that depends on it is enforced as open. The compiler reports a `CompilerDiagnostic`, and `fhir:generate` reports it as a warning |
+| Slice minimum and maximum | Yes | Not checked for a slice that could not be judged |
+| `closed` and `openAtEnd` | Yes | Items that might belong to a slice that could not be judged are not rejected |
+| Invariants and bindings inside a slice | Yes | Checked on the items in that slice |
+| Fixed and pattern values inside a slice | Yes | |
+| Types and Reference targets inside a slice | Yes | As at the top level |
+| A data-type profile named on a slice | Yes | Such as `au-ihi` on `Patient.identifier:ihi` |
+| `ordered` slicing | No | Item order is not checked |
+| Reslices (`component:a/b`) | No | Not compiled |
+| Choice type slices (`value[x]:valueQuantity`) | As plain constraints | Checked on the variant, such as `valueQuantity` |
+
+"Not judged" means that items that might belong to the slice are not counted against closed or
+openAtEnd rules and the slice's minimum is not checked, so a conforming resource is not rejected.
+[Structural validation](structural.md#slicing) describes the matching in more detail.
+
 ## When a profile cannot be checked
 
 A profile that cannot be used is reported as a warning with the code `fhir:profile-not-checked`, and
@@ -197,3 +226,5 @@ against it instead.
   terminology client; without one it is reported as `fhir:unchecked-binding` INFO.
 * **Sub-extension cardinality, fixed and pattern values are not checked**, because the generated
   extension classes do not check them either.
+* **A profile's `maxLength` on an element is not checked**, in a runtime profile or a generated profile class. AU Base's
+  Medicare card number allows at most 11 characters, so a longer one is not reported.

@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Location","url":"http://hl7.org/fhir/StructureDefinition/Location","version":"4.0.1","name":"Location","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Location","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Identifier","url":"http://hl7.org/fhir/StructureDefinition/Identifier","version":"4.0.1","name":"Identifier","status":"active","fhirVersion":"4.0.1","kind":"complex-type","abstract":false,"type":"Identifier","baseDefinition":"http://hl7.org/fhir/StructureDefinition/Element","derivation":"specialization"}

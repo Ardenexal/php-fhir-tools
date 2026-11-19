@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Medication","url":"http://hl7.org/fhir/StructureDefinition/Medication","version":"4.0.1","name":"Medication","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Medication","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}
