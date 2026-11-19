@@ -49,6 +49,17 @@ final class StructureDefinitionCompiler
     /** How deep data-type profiles may nest inside each other before inlining stops. */
     public const int MAX_INLINE_DEPTH = 8;
 
+    /** Elements typed `Resource` in R4, R4B or R5, other than `<Type>.contained`: slots a profile can narrow to concrete resource types. */
+    private const array RESOURCE_SLOTS = [
+        'Bundle.entry.resource',
+        'Bundle.entry.response.outcome',
+        'Bundle.issues',
+        'Parameters.parameter.resource',
+    ];
+
+    /** Type codes that allow any resource. */
+    private const array ABSTRACT_RESOURCE_TYPES = ['Resource', 'DomainResource', 'CanonicalResource', 'MetadataResource'];
+
     /**
      * Compile one StructureDefinition into its attributes and any diagnostics.
      *
@@ -1140,8 +1151,8 @@ final class StructureDefinitionCompiler
     /**
      * The constraints one differential element places on its own path: cardinality (Count) when
      * min > 0 or max is bounded, a fixed[x], scalar or complex, an array pattern[x] (scalar
-     * patterns use value matching), a maxLength, the types a choice element may hold, and the target
-     * profiles a Reference or canonical may point at.
+     * patterns use value matching), a maxLength, the types a choice element or a resource slot may
+     * hold, and the target profiles a Reference or canonical may point at.
      *
      * @param array<string, mixed> $element
      *
@@ -1184,49 +1195,37 @@ final class StructureDefinitionCompiler
         // The model holds every variant of a choice element in one property, so a profile that lists
         // fewer types than the base needs a rule to say which ones may occur. A choice type slice
         // ("value[x]:valueQuantity") already names its one type in its path, and so has no '[x]'.
+        // A resource slot such as Bundle.entry.resource is typed `Resource` in the base, so a profile
+        // naming concrete types there (`only Patient`) narrows it the same way
         $types = self::typeCodes($element);
-        if ($types !== [] && str_ends_with(self::rewriteChoiceTypeSlices((string) ($element['id'] ?? $element['path'] ?? '')), '[x]')) {
+        if ($types !== [] && (str_ends_with(self::rewriteChoiceTypeSlices((string) ($element['id'] ?? $element['path'] ?? '')), '[x]') || self::narrowsResourceSlot($element, $types))) {
             $rules[] = ['constraint' => FHIRAllowedTypes::class, 'options' => ['types' => $types]];
         }
 
-        $targetProfiles = self::targetProfiles($element);
-        if ($targetProfiles !== []) {
-            $rules[] = ['constraint' => FHIRTargetProfile::class, 'options' => ['targetProfiles' => $targetProfiles]];
+        foreach (ElementDefinitionReader::targetProfileRules($element) as $options) {
+            $rules[] = ['constraint' => FHIRTargetProfile::class, 'options' => $options];
         }
 
         return $rules;
     }
 
     /**
-     * The profiles a Reference or canonical on this element may point at, across all its types, in order.
+     * Whether an element narrows a base element typed `Resource` to concrete resource types.
      *
-     * One rule holds one list for the whole element. A Reference or canonical type with no
-     * targetProfile allows any target, so when one sits beside a restricted type the merged list
-     * would reject what that type allows; the element then gets no rule at all.
+     * The slot is read from the element's `path`, which names it whatever slice the element sits on.
+     * A published differential carries no `base`, so `path` is what identifies the slot; `contained`
+     * is inherited from DomainResource and so appears under every resource type. A type list that
+     * still names an abstract type allows any resource, so it narrows nothing.
      *
      * @param array<string, mixed> $element
-     *
-     * @return list<string>
+     * @param list<string>         $types   The element's type codes
      */
-    private static function targetProfiles(array $element): array
+    private static function narrowsResourceSlot(array $element, array $types): bool
     {
-        $profiles = [];
-        foreach (is_array($element['type'] ?? null) ? $element['type'] : [] as $type) {
-            if (!is_array($type)) {
-                continue;
-            }
+        $path = is_string($element['path'] ?? null) ? $element['path'] : '';
+        $slot = in_array($path, self::RESOURCE_SLOTS, true) || preg_match('~\A[A-Z][A-Za-z]+\.contained\z~', $path) === 1;
 
-            $targets = is_array($type['targetProfile'] ?? null) ? array_filter($type['targetProfile'], static fn (mixed $url): bool => is_string($url) && $url !== '') : [];
-            if ($targets === [] && in_array($type['code'] ?? null, ['Reference', 'canonical', 'CodeableReference'], true)) {
-                return [];
-            }
-
-            foreach ($targets as $url) {
-                $profiles[] = (string) $url;
-            }
-        }
-
-        return array_values(array_unique($profiles));
+        return $slot && array_intersect($types, self::ABSTRACT_RESOURCE_TYPES) === [];
     }
 
     /**

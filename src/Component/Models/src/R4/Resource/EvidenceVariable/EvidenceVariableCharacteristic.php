@@ -93,10 +93,8 @@ class EvidenceVariableCharacteristic extends BackboneElement
             ],
         )]
         #[NotBlank]
-        #[FHIRTargetProfile(targetProfiles: [
-            'http://hl7.org/fhir/StructureDefinition/Group',
-            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
-        ])]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'], kind: 'Reference')]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ActivityDefinition'], kind: 'canonical')]
         public Reference|CanonicalPrimitive|CodeableConcept|Expression|DataRequirement|TriggerDefinition|null $definition = null,
         /** @var array<UsageContext> usageContext What code/value pairs define members? */
         #[FhirProperty(
