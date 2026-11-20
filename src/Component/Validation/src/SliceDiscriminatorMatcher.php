@@ -25,7 +25,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *
  * The path `$this` is the item itself. A `value` or `pattern` discriminator that carries a
  * `valueSet` instead of a value matches an item whose code is in that value set, as the
- * terminology client answers.
+ * terminology client answers. One that carries `anyOf` instead, the discriminators of a slice's
+ * reslices, matches an item that matches any one of them.
  *
  * An item belongs to a slice when it satisfies every discriminator. Where one of them cannot be
  * answered (no terminology client, a server that gave no answer, or no profile check), the answer
@@ -81,8 +82,8 @@ final class SliceDiscriminatorMatcher
      * A discriminator with neither `value` nor `valueSet` is one the generator found nothing to
      * match on, so no item satisfies it; nor does any item satisfy an empty list.
      *
-     * @param object|array<string, mixed>                                               $item
-     * @param list<array{type: string, path: string, value?: mixed, valueSet?: string}> $discriminators
+     * @param object|array<string, mixed>                                                                                                                                  $item
+     * @param list<array{type: string, path: string, value?: mixed, valueSet?: string, anyOf?: list<array{type: string, path: string, value?: mixed, valueSet?: string}>}> $discriminators
      */
     public function matchesAll(object|array $item, array $discriminators): ?bool
     {
@@ -111,10 +112,20 @@ final class SliceDiscriminatorMatcher
      * terminology client, or a profile with no profile check. A slice keyed by one never learns
      * which items are its own, so its minimum cannot be checked.
      *
-     * @param array{type: string, path: string, value?: mixed, valueSet?: string} $discriminator
+     * @param array{type: string, path: string, value?: mixed, valueSet?: string, anyOf?: list<array{type: string, path: string, value?: mixed, valueSet?: string}>} $discriminator
      */
     public function canAnswer(array $discriminator): bool
     {
+        if (!array_key_exists('value', $discriminator) && isset($discriminator['anyOf'])) {
+            foreach ($discriminator['anyOf'] as $alternative) {
+                if (!$this->canAnswer($alternative)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         if (!array_key_exists('value', $discriminator)) {
             return !isset($discriminator['valueSet']) || $this->hasTerminologyClient();
         }
@@ -123,12 +134,16 @@ final class SliceDiscriminatorMatcher
     }
 
     /**
-     * @param object|array<string, mixed>                                         $item
-     * @param array{type: string, path: string, value?: mixed, valueSet?: string} $discriminator
+     * @param object|array<string, mixed>                                                                                                                            $item
+     * @param array{type: string, path: string, value?: mixed, valueSet?: string, anyOf?: list<array{type: string, path: string, value?: mixed, valueSet?: string}>} $discriminator
      */
     private function matchesDiscriminator(object|array $item, array $discriminator): ?bool
     {
         $path = $discriminator['path'];
+
+        if (!array_key_exists('value', $discriminator) && isset($discriminator['anyOf'])) {
+            return $this->matchesAny($item, $discriminator['anyOf']);
+        }
 
         if (!array_key_exists('value', $discriminator)) {
             return isset($discriminator['valueSet']) && in_array($discriminator['type'], ['value', 'pattern'], true)
@@ -146,6 +161,31 @@ final class SliceDiscriminatorMatcher
             'profile' => $this->matchesProfile($item, $path, $value),
             default   => $this->unsupportedType($discriminator['type']),
         };
+    }
+
+    /**
+     * Whether $item matches any one of the alternatives: true when one matches, null when none does
+     * but one could not be answered, and false when every one fails.
+     *
+     * @param object|array<string, mixed>                                               $item
+     * @param list<array{type: string, path: string, value?: mixed, valueSet?: string}> $alternatives
+     */
+    private function matchesAny(object|array $item, array $alternatives): ?bool
+    {
+        $verdict = false;
+        foreach ($alternatives as $alternative) {
+            $match = $this->matchesDiscriminator($item, $alternative);
+
+            if ($match === true) {
+                return true;
+            }
+
+            if ($match === null) {
+                $verdict = null;
+            }
+        }
+
+        return $verdict;
     }
 
     /**

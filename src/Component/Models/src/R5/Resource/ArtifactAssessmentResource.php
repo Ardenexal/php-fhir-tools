@@ -146,7 +146,7 @@ class ArtifactAssessmentResource extends AbstractDomainResource
             ],
         )]
         #[NotBlank]
-        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'], kind: 'Reference')]
         public Reference|CanonicalPrimitive|UriPrimitive|null $artifact = null,
         /** @var array<ArtifactAssessmentContent> content Comment, classifier, or rating content */
         #[FhirProperty(

@@ -136,7 +136,7 @@ class PlanDefinitionAction extends BackboneElement
             strength: 'extensible',
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SubjectType',
         )]
-        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'], kind: 'Reference')]
         public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var array<TriggerDefinition> trigger When the action should be triggered */
         #[FhirProperty(

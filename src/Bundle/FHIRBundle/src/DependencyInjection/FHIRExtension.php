@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Validation\Profile\PackageDirectoryStructureDe
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
+use Ardenexal\FHIRTools\Component\Validation\Profile\TargetProfileBaseTypes;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -199,6 +200,9 @@ class FHIRExtension extends Extension
             ->setArguments([new Reference(RuntimeProfileResolver::class)]);
 
         $container->getDefinition(FHIRValidationService::class)
+            ->setArgument('$runtimeProfiles', new Reference(RuntimeProfileResolver::class));
+
+        $container->getDefinition(TargetProfileBaseTypes::class)
             ->setArgument('$runtimeProfiles', new Reference(RuntimeProfileResolver::class));
 
         $container->getDefinition(FHIRSliceConstraintValidator::class)

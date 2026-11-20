@@ -152,6 +152,59 @@ final class FHIRTargetProfileEmissionTest extends TestCase
         self::assertEmpty($attrs, '#[FHIRTargetProfile] must NOT be emitted when targetProfile array is empty');
     }
 
+    /**
+     * Reference and canonical types listing different targets get one attribute each, naming its
+     * kind; an unrestricted kind gets none (#246).
+     */
+    public function testMixedReferenceAndCanonicalTargetsEmitOneAttributePerKind(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('RefType6', 'complex-type', [
+                [
+                    'path' => 'RefType6.subject[x]',
+                    'min'  => 0,
+                    'max'  => '1',
+                    'type' => [
+                        ['code' => 'CodeableConcept'],
+                        ['code' => 'Reference', 'targetProfile' => [self::PROFILE_A]],
+                        ['code' => 'canonical', 'targetProfile' => [self::PROFILE_B]],
+                    ],
+                    'base' => ['path' => 'RefType6.subject[x]'],
+                ],
+                [
+                    'path' => 'RefType6.focus',
+                    'min'  => 0,
+                    'max'  => '1',
+                    'type' => [
+                        ['code' => 'Reference'],
+                        ['code' => 'canonical', 'targetProfile' => [self::PROFILE_B]],
+                    ],
+                    'base' => ['path' => 'RefType6.focus'],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn       = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $reflection = new \ReflectionClass($fqcn);
+        $read       = static fn (string $property): array => array_map(
+            static function(\ReflectionAttribute $attribute): array {
+                $instance = $attribute->newInstance();
+                \assert($instance instanceof FHIRTargetProfile);
+
+                return [$instance->kind, $instance->targetProfiles];
+            },
+            $reflection->getProperty($property)->getAttributes(FHIRTargetProfile::class),
+        );
+
+        self::assertSame(
+            [[FHIRTargetProfile::KIND_REFERENCE, [self::PROFILE_A]], [FHIRTargetProfile::KIND_CANONICAL, [self::PROFILE_B]]],
+            $read('subject'),
+        );
+        self::assertSame([[FHIRTargetProfile::KIND_CANONICAL, [self::PROFILE_B]]], $read('focus'));
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------

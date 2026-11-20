@@ -34,6 +34,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligationCo
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Profile\ElementDefinitionReader;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRQuantityRange;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTemporalRange;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
@@ -1070,17 +1071,10 @@ class FHIRModelGenerator implements GeneratorInterface
                 $param->addAttribute(FHIRObligationConstraint::class);
             }
 
-            // FHIRTargetProfile from type[].targetProfile arrays (Reference and canonical properties).
-            $targetProfiles = [];
-            foreach ($element['type'] ?? [] as $type) {
-                foreach ($type['targetProfile'] ?? [] as $profileUrl) {
-                    if (is_string($profileUrl) && $profileUrl !== '') {
-                        $targetProfiles[] = $profileUrl;
-                    }
-                }
-            }
-            if ($targetProfiles !== []) {
-                $param->addAttribute(FHIRTargetProfile::class, ['targetProfiles' => array_values(array_unique($targetProfiles))]);
+            // FHIRTargetProfile from type[].targetProfile arrays (Reference and canonical properties),
+            // one per kind when the element's Reference and canonical types list different targets
+            foreach (ElementDefinitionReader::targetProfileRules($element) as $options) {
+                $param->addAttribute(FHIRTargetProfile::class, $options);
             }
         }
     }

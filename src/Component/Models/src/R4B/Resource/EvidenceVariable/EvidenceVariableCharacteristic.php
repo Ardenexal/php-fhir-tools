@@ -74,11 +74,14 @@ class EvidenceVariableCharacteristic extends BackboneElement
             ],
         )]
         #[NotBlank]
-        #[FHIRTargetProfile(targetProfiles: [
-            'http://hl7.org/fhir/StructureDefinition/Group',
-            'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
-            'http://hl7.org/fhir/StructureDefinition/Resource',
-        ])]
+        #[FHIRTargetProfile(
+            targetProfiles: [
+                'http://hl7.org/fhir/StructureDefinition/Group',
+                'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
+            ],
+            kind: 'Reference',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'], kind: 'canonical')]
         public Reference|CanonicalPrimitive|CodeableConcept|Expression|null $definition = null,
         /** @var CodeableConcept|null method Method used for describing characteristic */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), Valid]
