@@ -75,12 +75,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\EvidenceVariableResource;
 #[FHIRProfileConstraint(
     path: 'characteristic.definition[x]',
     constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
-    options: [
-        'targetProfiles' => [
-            'http://hl7.org/fhir/StructureDefinition/Group',
-            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
-        ],
-    ],
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/Group'], 'kind' => 'Reference'],
+    groups: ['http://hl7.org/fhir/StructureDefinition/picoelement'],
+)]
+#[FHIRProfileConstraint(
+    path: 'characteristic.definition[x]',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/ActivityDefinition'], 'kind' => 'canonical'],
     groups: ['http://hl7.org/fhir/StructureDefinition/picoelement'],
 )]
 #[FHIRProfileConstraint(

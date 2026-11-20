@@ -27,6 +27,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         [
+            'path'       => 'resource',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes',
+            'options'    => ['types' => ['OperationOutcome']],
+        ],
+        [
             'path'       => 'search.mode',
             'constraint' => 'Symfony\Component\Validator\Constraints\Count',
             'options'    => ['min' => 1],

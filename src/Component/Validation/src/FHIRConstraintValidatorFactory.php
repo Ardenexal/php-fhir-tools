@@ -27,6 +27,7 @@ use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileBindingValidat
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileInvariantValidator;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
+use Ardenexal\FHIRTools\Component\Validation\Profile\TargetProfileBaseTypes;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRTargetProfileValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRValueSetBindingValidator;
@@ -64,6 +65,7 @@ final class FHIRConstraintValidatorFactory implements ConstraintValidatorFactory
         private readonly ?FHIRTerminologyClientInterface $terminologyClient,
         private readonly FHIRReferenceResolverInterface $referenceResolver,
         private readonly ?RuntimeProfileConformance $profileConformance = null,
+        private readonly TargetProfileBaseTypes $targetProfileTypes = new TargetProfileBaseTypes(),
     ) {
         $this->fallback = new ConstraintValidatorFactory();
     }
@@ -82,7 +84,7 @@ final class FHIRConstraintValidatorFactory implements ConstraintValidatorFactory
             $constraint instanceof FHIRProfileInvariant  => new FHIRProfileInvariantValidator($this->pathService, $this->messages, $this->accessor),
             $constraint instanceof FHIRProfileBinding    => new FHIRProfileBindingValidator($this->accessor),
             $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, new SliceDiscriminatorMatcher($this->accessor, $this->terminologyClient), $this->sliceAttributes, profiles: $this->profileConformance),
-            $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->referenceResolver, $this->messages),
+            $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->referenceResolver, $this->messages, profileTypes: $this->targetProfileTypes),
             default                                      => $this->fallback->getInstance($constraint),
         };
     }

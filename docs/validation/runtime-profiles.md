@@ -138,10 +138,12 @@ if (!$resolution->isResolved()) {
 The same rules a generated profile class enforces:
 
 * Cardinality, fixed and pattern values, must-support, obligations, slicing and slices.
-* The types a choice element may hold (`value[x] only Quantity`) and the targets a Reference may
-  point at (`Reference(PractitionerRole)`), at the top level and inside a slice. A literal
-  `Patient/1` is checked against targets that are core resource types without being resolved; a
-  target that is an IG profile is checked only through a configured reference resolver.
+* The types a choice element may hold (`value[x] only Quantity`), the resource types a resource
+  slot may hold (`Bundle.entry.resource only Patient`, also `contained` and
+  `Parameters.parameter.resource`) and the targets a Reference may point at
+  (`Reference(PractitionerRole)`), at the top level and inside a slice. A literal `Patient/1` is
+  checked against the targets' types without being resolved, IG profile targets included when the
+  profile is generated or loaded; see [Target types](references.md#target-types).
 * The profile's own invariants and its `required` and `extensible` bindings, reported at the
   element they are about. See [Profile invariants](invariants.md#profile-invariants) and
   [Profile bindings](terminology.md#profile-bindings).

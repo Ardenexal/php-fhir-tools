@@ -88,21 +88,24 @@ class RequestOrchestrationActionParticipant extends BackboneElement
                 ],
             ],
         )]
-        #[FHIRTargetProfile(targetProfiles: [
-            'http://hl7.org/fhir/StructureDefinition/CapabilityStatement',
-            'http://hl7.org/fhir/StructureDefinition/CareTeam',
-            'http://hl7.org/fhir/StructureDefinition/Device',
-            'http://hl7.org/fhir/StructureDefinition/DeviceDefinition',
-            'http://hl7.org/fhir/StructureDefinition/Endpoint',
-            'http://hl7.org/fhir/StructureDefinition/Group',
-            'http://hl7.org/fhir/StructureDefinition/HealthcareService',
-            'http://hl7.org/fhir/StructureDefinition/Location',
-            'http://hl7.org/fhir/StructureDefinition/Organization',
-            'http://hl7.org/fhir/StructureDefinition/Patient',
-            'http://hl7.org/fhir/StructureDefinition/Practitioner',
-            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
-            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
-        ])]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CapabilityStatement'], kind: 'canonical')]
+        #[FHIRTargetProfile(
+            targetProfiles: [
+                'http://hl7.org/fhir/StructureDefinition/CareTeam',
+                'http://hl7.org/fhir/StructureDefinition/Device',
+                'http://hl7.org/fhir/StructureDefinition/DeviceDefinition',
+                'http://hl7.org/fhir/StructureDefinition/Endpoint',
+                'http://hl7.org/fhir/StructureDefinition/Group',
+                'http://hl7.org/fhir/StructureDefinition/HealthcareService',
+                'http://hl7.org/fhir/StructureDefinition/Location',
+                'http://hl7.org/fhir/StructureDefinition/Organization',
+                'http://hl7.org/fhir/StructureDefinition/Patient',
+                'http://hl7.org/fhir/StructureDefinition/Practitioner',
+                'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+                'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+            ],
+            kind: 'Reference',
+        )]
         public CanonicalPrimitive|Reference|null $actor = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

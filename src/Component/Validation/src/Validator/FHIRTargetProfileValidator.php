@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Enum\ResourceType as R5ResourceType;
 use Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
+use Ardenexal\FHIRTools\Component\Validation\Profile\TargetProfileBaseTypes;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -28,20 +30,24 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * Three checks need nothing resolved and always run:
  *
  * - **Reference type.** A literal reference of the RESTful shape `Patient/1` or `[base]/Patient/1`
- *   names the type of the resource it points at. When every target profile is a core resource type
- *   and the named type is not one of them, the reference points at the wrong kind of resource. The
- *   HL7 reference validator only does this when told to trust reference URLs (its
- *   `assumeValidRestReferences` option); this validator always does, so an API contract that allows
- *   `Reference(PractitionerRole)` rejects `Patient/1` without resolving it.
+ *   names the type of the resource it points at. When that type is not one the target profiles allow,
+ *   the reference points at the wrong kind of resource. The HL7 reference validator only does this
+ *   when told to trust reference URLs (its `assumeValidRestReferences` option); this validator always
+ *   does, so an API contract that allows `Reference(PractitionerRole)` rejects `Patient/1` without
+ *   resolving it.
  *
  * - **Canonical type.** A canonical of the RESTful shape `[base]/ValueSet/foo` names the type of the
- *   resource it identifies. When every target profile is a core resource type
- *   (`http://hl7.org/fhir/StructureDefinition/Questionnaire`) and the named type is not one of them,
- *   the canonical identifies the wrong kind of resource. A target profile that is not a core resource
- *   type, such as an IG profile or `Resource`, says nothing this validator can compare a type name to
- *   without resolving the profile, so the check is skipped.
+ *   resource it identifies, and is compared with the allowed types the same way.
+ *
+ *   A core resource type's target profile (`http://hl7.org/fhir/StructureDefinition/Questionnaire`)
+ *   allows that type. Any other target profile allows the type it constrains, looked up through
+ *   {@see TargetProfileBaseTypes}. When any target is abstract (`Resource`) or a profile no source
+ *   knows, either check is skipped, because that target could allow any type.
  * - **Conditional reference query.** The query of a conditional reference must be a list of
  *   `name=value` parameters joined by `&`.
+ *
+ * A constraint naming a `kind` applies to that kind of value only, so an element allowing
+ * `Reference(Group) | canonical(EvidenceVariable)` checks each value against its own kind's targets.
  *
  * Profile conformance of the target is delegated to {@see FHIRReferenceResolverInterface}. When the
  * resolver returns null (including the NullFHIRReferenceResolver default), that check is skipped
@@ -88,6 +94,7 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
         private readonly FHIRValidationMessageRegistry $messageRegistry,
         private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
         private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        private readonly TargetProfileBaseTypes $profileTypes = new TargetProfileBaseTypes(),
     ) {
     }
 
@@ -97,7 +104,8 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
      * Skips null values. Strings and Stringable objects (canonicals) get the canonical type
      * check only. For Reference objects and arrays of them, checks a conditional reference's
      * query, then delegates resolution to the configured resolver and checks the resolved
-     * object's #[FHIRProfile] attribute against the target profiles.
+     * object's #[FHIRProfile] attribute against the target profiles. A constraint naming a kind
+     * skips values of the other kind: a canonical under KIND_REFERENCE, an object under KIND_CANONICAL.
      *
      * @param mixed      $value      The property value to validate (null, string, object, array, or Stringable)
      * @param Constraint $constraint The #[FHIRTargetProfile] constraint with targetProfiles list
@@ -114,31 +122,15 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
             return;
         }
 
-        // canonical-typed values (CanonicalPrimitive implements \Stringable, or raw string)
-        if (is_string($value) || $value instanceof \Stringable) {
-            if ($this->isCanonical($value)) {
-                $this->checkCanonicalType((string) $value, $constraint);
-            }
-
-            return;
-        }
-
-        if (is_array($value)) {
-            foreach ($value as $item) {
-                if (is_string($item) || $item instanceof \Stringable) {
-                    if ($this->isCanonical($item)) {
-                        $this->checkCanonicalType((string) $item, $constraint);
-                    }
-                } elseif (is_object($item)) {
-                    $this->validateItem($item, $constraint);
+        foreach (is_array($value) ? $value : [$value] as $item) {
+            // canonical-typed values (CanonicalPrimitive implements \Stringable, or raw string)
+            if (is_string($item) || $item instanceof \Stringable) {
+                if ($constraint->kind !== FHIRTargetProfile::KIND_REFERENCE && $this->isCanonical($item)) {
+                    $this->checkCanonicalType($item, $constraint);
                 }
+            } elseif (is_object($item) && $constraint->kind !== FHIRTargetProfile::KIND_CANONICAL) {
+                $this->validateItem($item, $constraint);
             }
-
-            return;
-        }
-
-        if (is_object($value)) {
-            $this->validateItem($value, $constraint);
         }
     }
 
@@ -243,7 +235,7 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
             return false;
         }
 
-        $allowed = $this->allowedTypes($constraint);
+        $allowed = $this->allowedTypes($constraint, $this->fhirVersionOf($item, FHIRComplexType::class));
         $type    = $parts['type'];
 
         if ($allowed === null || !$this->isResourceType($type) || in_array($type, $allowed, true)) {
@@ -267,23 +259,19 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
      * Only a canonical of the RESTful shape `[base]/Type/id` names a type. Many canonicals do not
      * (`http://loinc.org/vs/LL123`, `urn:oid:...`); those are left alone.
      */
-    private function checkCanonicalType(string $canonical, FHIRTargetProfile $constraint): void
+    private function checkCanonicalType(string|\Stringable $value, FHIRTargetProfile $constraint): void
     {
-        $allowed = $this->allowedTypes($constraint);
-
-        if ($allowed === null) {
-            return;
-        }
-
-        $url = explode('#', explode('|', $canonical, 2)[0], 2)[0];
+        $canonical = (string) $value;
+        $url       = explode('#', explode('|', $canonical, 2)[0], 2)[0];
 
         if (preg_match(self::TYPED_CANONICAL, $url, $parts) !== 1) {
             return;
         }
 
-        $type = $parts['type'];
+        $allowed = $this->allowedTypes($constraint, is_string($value) ? null : $this->fhirVersionOf($value, FHIRPrimitive::class));
+        $type    = $parts['type'];
 
-        if (!$this->isResourceType($type) || in_array($type, $allowed, true)) {
+        if ($allowed === null || !$this->isResourceType($type) || in_array($type, $allowed, true)) {
             return;
         }
 
@@ -322,15 +310,19 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
     }
 
     /**
-     * The resource types the target profiles allow, or null when they cannot be read as types.
+     * The resource types the target profiles allow, or null when they cannot all be read as types.
      *
-     * Null when any target is not a core resource type's StructureDefinition (an IG profile, a core
-     * profile such as `vitalsigns`) or is an abstract type such as `Resource`: either way some type the
-     * URL names could still be a valid target, and only resolving the profile would say which.
+     * A core resource type's StructureDefinition names its type in its URL. Any other target, such as
+     * an IG profile (`au-core-patient`) or a core profile (`vitalsigns`), is looked up for the type it
+     * constrains. Null when any target is an abstract type such as `Resource`, or a profile whose type
+     * no source knows: either way some type the URL names could still be a valid target, and only
+     * resolving the reference would say which.
+     *
+     * @param string|null $fhirVersion Release of the value being checked, when its class says
      *
      * @return list<string>|null
      */
-    private function allowedTypes(FHIRTargetProfile $constraint): ?array
+    private function allowedTypes(FHIRTargetProfile $constraint, ?string $fhirVersion): ?array
     {
         if ($constraint->targetProfiles === []) {
             return null;
@@ -339,20 +331,34 @@ final class FHIRTargetProfileValidator extends ConstraintValidator
         $types = [];
 
         foreach ($constraint->targetProfiles as $profile) {
-            if (!str_starts_with($profile, self::CORE_PROFILE_BASE)) {
-                return null;
+            $type = str_starts_with($profile, self::CORE_PROFILE_BASE) ? substr($profile, strlen(self::CORE_PROFILE_BASE)) : null;
+
+            if ($type === null || (!in_array($type, self::ABSTRACT_TARGETS, true) && !$this->isResourceType($type))) {
+                $type = $this->profileTypes->baseTypeOf($profile, $fhirVersion);
             }
 
-            $type = substr($profile, strlen(self::CORE_PROFILE_BASE));
-
-            if (in_array($type, self::ABSTRACT_TARGETS, true) || !$this->isResourceType($type)) {
+            if ($type === null || in_array($type, self::ABSTRACT_TARGETS, true) || !$this->isResourceType($type)) {
                 return null;
             }
 
             $types[] = $type;
         }
 
-        return $types;
+        return array_values(array_unique($types));
+    }
+
+    /**
+     * The release a generated Reference or canonical class belongs to, from its own type attribute.
+     *
+     * @param class-string<FHIRComplexType|FHIRPrimitive> $attributeClass
+     */
+    private function fhirVersionOf(object $value, string $attributeClass): ?string
+    {
+        foreach ($this->attributes->classAttributes($value, $attributeClass) as $attribute) {
+            return $attribute->fhirVersion;
+        }
+
+        return null;
     }
 
     /**

@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeRead
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
 use Ardenexal\FHIRTools\Component\Validation\Profile\StructureDefinitionRegistryInterface;
+use Ardenexal\FHIRTools\Component\Validation\Profile\TargetProfileBaseTypes;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Validation;
 
@@ -184,6 +185,7 @@ final class FHIRValidationServiceBuilder
                 $this->terminologyClient,
                 $this->referenceResolver,
                 new RuntimeProfileConformance($runtimeProfiles),
+                new TargetProfileBaseTypes($this->igTypeRegistry, $runtimeProfiles),
             ))
             ->getValidator();
 

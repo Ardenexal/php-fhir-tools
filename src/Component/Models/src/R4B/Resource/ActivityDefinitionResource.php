@@ -162,7 +162,7 @@ class ActivityDefinitionResource extends AbstractDomainResource
             strength: 'extensible',
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SubjectType',
         )]
-        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'], kind: 'Reference')]
         public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]

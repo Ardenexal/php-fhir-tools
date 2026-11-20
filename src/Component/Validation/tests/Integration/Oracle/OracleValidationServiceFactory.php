@@ -29,6 +29,7 @@ use Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileAttributeReader;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
+use Ardenexal\FHIRTools\Component\Validation\Profile\TargetProfileBaseTypes;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
@@ -87,6 +88,7 @@ final class OracleValidationServiceFactory
             $enumNamespace,
             $sliceReader,
             new RuntimeProfileConformance($runtimeProfiles),
+            new TargetProfileBaseTypes($collaborators->igTypeRegistry, $runtimeProfiles),
         ) implements ConstraintValidatorFactoryInterface {
             public function __construct(
                 private readonly PropertyAccessorInterface $accessor,
@@ -98,6 +100,7 @@ final class OracleValidationServiceFactory
                 private readonly string $enumNamespace,
                 private readonly FHIRAttributeReaderInterface $sliceReader,
                 private readonly RuntimeProfileConformance $profiles,
+                private readonly TargetProfileBaseTypes $targetProfileTypes,
             ) {
             }
 
@@ -119,7 +122,7 @@ final class OracleValidationServiceFactory
                     $constraint instanceof FHIRAllowedTypes      => new FHIRAllowedTypesValidator($this->registry),
                     $constraint instanceof FHIRMaxLength         => new FHIRMaxLengthValidator($this->registry),
                     $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, $this->matcher, $this->sliceReader, profiles: $this->profiles),
-                    $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->collaborators->referenceResolver, $this->registry),
+                    $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->collaborators->referenceResolver, $this->registry, profileTypes: $this->targetProfileTypes),
                     default                                      => $this->default->getInstance($constraint),
                 };
             }
