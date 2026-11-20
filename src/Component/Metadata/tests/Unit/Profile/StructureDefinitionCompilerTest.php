@@ -531,6 +531,70 @@ final class StructureDefinitionCompilerTest extends TestCase
     }
 
     /**
+     * Reslices travel in their slice's rules at path '', with the slice's own slicing, and the
+     * reslice's own rules nested in its definition.
+     */
+    public function testReslicesCompileIntoTheirSlicesRules(): void
+    {
+        $slices = [
+            ['id' => 'Bundle.entry:doc', 'path' => 'Bundle.entry', 'sliceName' => 'doc', 'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'request.method']], 'rules' => 'closed']],
+            ['id' => 'Bundle.entry:doc.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:doc'],
+            ['id' => 'Bundle.entry:doc/post', 'path' => 'Bundle.entry', 'sliceName' => 'doc/post', 'min' => 1, 'max' => '1'],
+            ['id' => 'Bundle.entry:doc/post.request.method', 'path' => 'Bundle.entry.request.method', 'fixedCode' => 'POST'],
+            ['id' => 'Bundle.entry:doc/post.resource', 'path' => 'Bundle.entry.resource', 'min' => 1],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile(self::entrySlicing('open', ['type' => 'value', 'path' => 'fullUrl'], $slices));
+        $doc      = self::sliceArguments($compiled->attributes)['doc'];
+
+        self::assertSame(['doc'], array_keys(self::sliceArguments($compiled->attributes)));
+        self::assertSame([], $compiled->diagnostics);
+
+        $reslicing = array_values(array_filter($doc['rules'], static fn (array $rule): bool => $rule['path'] === ''));
+        self::assertSame([FHIRSlicingRules::class, FHIRSliceConstraint::class], array_column($reslicing, 'constraint'));
+        self::assertSame('closed', $reslicing[0]['options']['rules']);
+
+        $post = $reslicing[1]['options'];
+        self::assertSame('doc/post', $post['sliceName']);
+        self::assertSame(1, $post['min']);
+        self::assertSame([['type' => 'value', 'path' => 'request.method', 'value' => 'POST']], $post['discriminators']);
+        self::assertSame(
+            [
+                ['path' => 'request.method', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => 'POST']],
+                ['path' => 'resource', 'constraint' => Count::class, 'options' => ['min' => 1]],
+            ],
+            $post['rules'],
+        );
+    }
+
+    /**
+     * A resliced slice that fixes no value at a discriminator path its reslices fix matches any of
+     * theirs, and a slice reached only through a reslice is still compiled, as a bare 0..* member.
+     */
+    public function testAResliceOnlySliceMatchesAnyOfItsReslicesValues(): void
+    {
+        $slices = [
+            ['id' => 'Bundle.entry:doc/post', 'path' => 'Bundle.entry', 'sliceName' => 'doc/post', 'max' => '1'],
+            ['id' => 'Bundle.entry:doc/post.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:post'],
+            ['id' => 'Bundle.entry:doc/put', 'path' => 'Bundle.entry', 'sliceName' => 'doc/put', 'max' => '1'],
+            ['id' => 'Bundle.entry:doc/put.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:put'],
+        ];
+
+        $doc = self::sliceArguments((new StructureDefinitionCompiler())->compile(self::entrySlicing('open', ['type' => 'value', 'path' => 'fullUrl'], $slices))->attributes)['doc'];
+
+        self::assertSame(0, $doc['min']);
+        self::assertSame('*', $doc['max']);
+        self::assertSame(
+            [['type' => 'value', 'path' => 'fullUrl', 'anyOf' => [
+                ['type' => 'value', 'path' => 'fullUrl', 'value' => 'urn:post'],
+                ['type' => 'value', 'path' => 'fullUrl', 'value' => 'urn:put'],
+            ]]],
+            $doc['discriminators'],
+        );
+        self::assertSame(['doc/post', 'doc/put'], array_column(array_column($doc['rules'], 'options'), 'sliceName'));
+    }
+
+    /**
      * A Bundle profile slicing `entry` with the given rules and discriminator, plus $slices.
      *
      * @param array{type: string, path: string} $discriminator

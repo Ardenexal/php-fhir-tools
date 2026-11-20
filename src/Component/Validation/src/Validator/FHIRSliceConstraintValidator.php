@@ -213,7 +213,10 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                     // place in the order is unknown and it neither breaks nor sets the order
                     if ($ordered && $maybeIn === []) {
                         if ($latestSlice !== null && $sc->orderedIndex < $latestSlice->orderedIndex) {
-                            $outOfOrder[$itemIndex] = [$sc, $latestSlice];
+                            // Two of the parent's slices are out of order: the parent's group says so
+                            if (!self::isInherited($sc) || !self::isInherited($latestSlice)) {
+                                $outOfOrder[$itemIndex] = [$sc, $latestSlice];
+                            }
                         } else {
                             $latestSlice = $sc;
                         }
@@ -362,11 +365,11 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         }
 
         foreach ($slice->discriminators as $discriminator) {
-            if (!array_key_exists('value', $discriminator) && !isset($discriminator['valueSet'])) {
+            if (!array_key_exists('value', $discriminator) && !isset($discriminator['valueSet']) && !isset($discriminator['anyOf'])) {
                 return true;
             }
 
-            if ($discriminator['type'] === 'exists' && !is_bool($discriminator['value'] ?? null)) {
+            if ($discriminator['type'] === 'exists' && !is_bool($discriminator['value'] ?? null) && !isset($discriminator['anyOf'])) {
                 return true;
             }
         }
@@ -430,8 +433,16 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             }
         }
 
-        // Slicing beneath the slice: match each item's own elements against the nested slices
+        // Slicing beneath the slice: match each item's own elements against the nested slices. Path ''
+        // holds the slice's reslices ("altid/npi"), which split the items matching the slice
+        // themselves, so they are matched as one list and counted across all of them.
         foreach ($nested as $path => $definition) {
+            if ($path === '') {
+                $this->validateSlices($items, $definition['slices'], $definition['rules'], $property);
+
+                continue;
+            }
+
             foreach ($items as $itemIndex => $item) {
                 foreach ($this->reader->readGroups($item, $path) as $group) {
                     $this->validateSlices(
@@ -488,6 +499,15 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     private static function isOrdered(FHIRSlicingRules $slicingRules): bool
     {
         return (get_object_vars($slicingRules)['ordered'] ?? false) === true;
+    }
+
+    /**
+     * Whether the slice is a parent profile's, repeated in this group; false when the installed
+     * fhir-metadata predates `inherited`, read the way isOrdered() reads `ordered`.
+     */
+    private static function isInherited(FHIRSliceConstraint $slice): bool
+    {
+        return (get_object_vars($slice)['inherited'] ?? false) === true;
     }
 
     /**
