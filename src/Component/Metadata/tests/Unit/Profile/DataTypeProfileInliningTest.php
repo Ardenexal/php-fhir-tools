@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Metadata\Tests\Unit\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfiles;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
@@ -159,17 +160,6 @@ final class DataTypeProfileInliningTest extends TestCase
      */
     public static function notEnforced(): iterable
     {
-        yield 'several types' => [
-            ['id' => 'Observation.value[x]', 'path' => 'Observation.value[x]', 'type' => [
-                ['code' => 'Quantity', 'profile' => [self::BASE . 'qty']],
-                ['code' => 'string'],
-            ]],
-            'several types or profiles',
-        ];
-        yield 'several profiles' => [
-            self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty', self::BASE . 'other']]),
-            'several types or profiles',
-        ];
         yield 'unknown profile' => [
             self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'missing']]),
             'no StructureDefinition with that URL',
@@ -231,6 +221,78 @@ final class DataTypeProfileInliningTest extends TestCase
 
         self::assertSame([], $compiled->attributes);
         self::assertSame([], self::inliningDiagnostics($compiled));
+    }
+
+    /**
+     * Several types or several profiles mean a value may match any one of them: nothing is inlined,
+     * and one FHIRAnyOfProfiles names the alternatives instead, with nothing reported as lost.
+     *
+     * @param array<string, mixed>                                   $element
+     * @param array{profiles: list<string>, openTypes: list<string>} $options
+     */
+    #[DataProvider('alternatives')]
+    public function testSeveralTypesOrProfilesAreCheckedAsAlternatives(array $element, string $path, array $options): void
+    {
+        $compiled = self::compile([$element], [
+            self::BASE . 'qty'   => self::quantityProfile(self::BASE . 'qty', []),
+            self::BASE . 'other' => self::quantityProfile(self::BASE . 'other', []),
+        ]);
+
+        $anyOf = array_values(array_filter(
+            $compiled->attributes,
+            static fn (CompiledAttribute $attribute): bool => ($attribute->arguments['constraint'] ?? null) === FHIRAnyOfProfiles::class,
+        ));
+
+        self::assertCount(1, $anyOf);
+        self::assertSame($path, $anyOf[0]->arguments['path']);
+        self::assertSame($options, $anyOf[0]->arguments['options']);
+        self::assertSame([self::OBSERVATION], $anyOf[0]->arguments['groups']);
+        self::assertSame([], self::inliningDiagnostics($compiled));
+        self::assertSame([], array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => str_contains((string) ($a->arguments['path'] ?? ''), '.comparator')));
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, array{profiles: list<string>, openTypes: list<string>}}>
+     */
+    public static function alternatives(): iterable
+    {
+        yield 'several types' => [
+            ['id' => 'Observation.value[x]', 'path' => 'Observation.value[x]', 'type' => [
+                ['code' => 'Quantity', 'profile' => [self::BASE . 'qty']],
+                ['code' => 'string'],
+            ]],
+            'value[x]',
+            ['profiles' => [self::BASE . 'qty'], 'openTypes' => ['string']],
+        ];
+        yield 'several profiles' => [
+            self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty', self::BASE . 'other']]),
+            'valueQuantity',
+            ['profiles' => [self::BASE . 'qty', self::BASE . 'other'], 'openTypes' => []],
+        ];
+    }
+
+    /**
+     * A child profile that restates its parent's alternatives, in any order, leaves them to the
+     * parent's group, so a failing value is reported once. Narrowing them is the child's own rule.
+     */
+    public function testAChildRestatingItsParentsAlternativesLeavesThemToTheParent(): void
+    {
+        $parent      = self::BASE . 'parent-observation';
+        $both        = [self::BASE . 'qty', self::BASE . 'other'];
+        $definitions = [
+            $parent => self::profile($parent, 'resource', 'Observation', [self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => $both])]),
+        ];
+        $child = static fn (array $profiles): CompiledProfile => (new StructureDefinitionCompiler())->compile(
+            self::profile(self::OBSERVATION, 'resource', 'Observation', [self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => $profiles])], $parent),
+            static fn (string $url): ?array => $definitions[$url] ?? null,
+        );
+        $anyOf = static fn (CompiledProfile $compiled): array => array_values(array_filter(
+            $compiled->attributes,
+            static fn (CompiledAttribute $attribute): bool => ($attribute->arguments['constraint'] ?? null) === FHIRAnyOfProfiles::class,
+        ));
+
+        self::assertSame([], $anyOf($child(array_reverse($both))));
+        self::assertCount(1, $anyOf($child([self::BASE . 'qty', self::BASE . 'third'])));
     }
 
     public function testAMissingAncestorOfADataTypeProfileIsReported(): void

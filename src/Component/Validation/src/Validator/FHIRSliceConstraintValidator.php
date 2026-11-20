@@ -342,11 +342,24 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             return $this->matcher;
         }
 
-        $validator = $this->context->getValidator();
-        $profiles  = $this->profiles;
+        $context  = $this->context;
+        $profiles = $this->profiles;
 
+        // A profile that slices elements of its own runs them through this same instance, which
+        // points $this->context at the side run. Restored after each check, or this slicing's
+        // findings land in the side run and vanish.
         return $this->matcher->withProfileCheck(
-            static fn (object|array $value, string $profileUrl): ?bool => is_object($value) ? $profiles->conforms($validator, $value, $profileUrl) : null,
+            function(object|array $value, string $profileUrl) use ($context, $profiles): ?bool {
+                if (!is_object($value)) {
+                    return null;
+                }
+
+                try {
+                    return $profiles->conforms($context->getValidator(), $value, $profileUrl);
+                } finally {
+                    $this->context = $context;
+                }
+            },
         );
     }
 
@@ -472,7 +485,14 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                     $subject = $innerConstraint instanceof Count ? $group['occurrences'] : $group['value'];
                     $base    = "{$property}[{$itemIndex}].{$rule['path']}";
 
-                    foreach ($this->context->getValidator()->validate($subject, $innerConstraint, ['Default']) as $v) {
+                    // A rule that checks the item against other profiles on the side (FHIRAnyOfProfiles)
+                    // can run a sliced profile through this same instance, which points $this->context
+                    // at the side run; restored before reporting, as in matcher()
+                    $context       = $this->context;
+                    $violations    = $context->getValidator()->validate($subject, $innerConstraint, ['Default']);
+                    $this->context = $context;
+
+                    foreach ($violations as $v) {
                         $innerPath = $v->getPropertyPath();
                         $path      = match (true) {
                             $innerPath    === ''  => $base,

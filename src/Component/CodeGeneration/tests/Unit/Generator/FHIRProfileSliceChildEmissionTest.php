@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfiles;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLength;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
@@ -26,6 +27,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\Observation\ObservationComp
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAllowedTypesValidator;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAnyOfProfilesValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRMaxLengthValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPatternValueValidator;
@@ -690,6 +692,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
                     $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->registry),
                     $constraint instanceof FHIRAllowedTypes      => new FHIRAllowedTypesValidator($this->registry),
                     $constraint instanceof FHIRMaxLength         => new FHIRMaxLengthValidator($this->registry),
+                    $constraint instanceof FHIRAnyOfProfiles     => new FHIRAnyOfProfilesValidator(messageRegistry: $this->registry),
                     $constraint instanceof FHIRFixedValue        => new FHIRFixedValueValidator($this->registry),
                     default                                      => $this->default->getInstance($constraint),
                 };
