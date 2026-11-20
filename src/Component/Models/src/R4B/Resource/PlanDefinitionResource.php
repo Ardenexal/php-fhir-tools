@@ -162,14 +162,17 @@ class PlanDefinitionResource extends AbstractDomainResource
             strength: 'extensible',
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R4B\Enum\SubjectType',
         )]
-        #[FHIRTargetProfile(targetProfiles: [
-            'http://hl7.org/fhir/StructureDefinition/Group',
-            'http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition',
-            'http://hl7.org/fhir/StructureDefinition/SubstanceDefinition',
-            'http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition',
-            'http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition',
-            'http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition',
-        ])]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'], kind: 'Reference')]
+        #[FHIRTargetProfile(
+            targetProfiles: [
+                'http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition',
+                'http://hl7.org/fhir/StructureDefinition/SubstanceDefinition',
+                'http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition',
+                'http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition',
+                'http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition',
+            ],
+            kind: 'canonical',
+        )]
         public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]

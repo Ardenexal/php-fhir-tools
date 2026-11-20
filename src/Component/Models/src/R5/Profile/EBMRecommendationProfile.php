@@ -34,6 +34,18 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\ArtifactAssessmentResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/ebmrecommendation'],
 )]
 #[FHIRProfileConstraint(
+    path: 'artifact',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: [
+        'targetProfiles' => [
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+        ],
+        'kind' => 'Reference',
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/ebmrecommendation'],
+)]
+#[FHIRProfileConstraint(
     path: 'workflowStatus',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],

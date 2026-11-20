@@ -202,15 +202,18 @@ class PlanDefinitionResource extends AbstractDomainResource
             strength: 'extensible',
             enumClass: 'Ardenexal\FHIRTools\Component\Models\R5\Enum\ParticipantResourceTypes',
         )]
-        #[FHIRTargetProfile(targetProfiles: [
-            'http://hl7.org/fhir/StructureDefinition/Group',
-            'http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition',
-            'http://hl7.org/fhir/StructureDefinition/SubstanceDefinition',
-            'http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition',
-            'http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition',
-            'http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition',
-            'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
-        ])]
+        #[FHIRTargetProfile(
+            targetProfiles: [
+                'http://hl7.org/fhir/StructureDefinition/Group',
+                'http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition',
+                'http://hl7.org/fhir/StructureDefinition/SubstanceDefinition',
+                'http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition',
+                'http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition',
+                'http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition',
+            ],
+            kind: 'Reference',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/EvidenceVariable'], kind: 'canonical')]
         public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]

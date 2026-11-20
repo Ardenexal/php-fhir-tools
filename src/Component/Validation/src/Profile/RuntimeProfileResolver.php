@@ -89,6 +89,35 @@ final class RuntimeProfileResolver
     }
 
     /**
+     * The resource type a profile constrains (`StructureDefinition.type`), read without compiling it.
+     *
+     * Null when the release is not R4, R4B or R5, when no definition with this URL is registered for
+     * the release, when the definition's kind is not `resource`, or when it cannot be read: a
+     * broken file makes this one lookup fail, never the validation around it.
+     *
+     * @param string $url         Canonical URL, optionally with a `|version` suffix
+     * @param string $fhirVersion 'R4', 'R4B' or 'R5'
+     */
+    public function baseTypeOf(string $url, string $fhirVersion): ?string
+    {
+        $release = FhirReleaseLabel::normalize($fhirVersion);
+        if ($release === null) {
+            return null;
+        }
+
+        [$canonical, $version] = self::splitCanonical($url);
+        try {
+            $definition = $this->registry->find($canonical, $release, $version);
+        } catch (UnreadableStructureDefinitionException) {
+            return null;
+        }
+
+        $type = $definition['type'] ?? null;
+
+        return ($definition['kind'] ?? null) === 'resource' && is_string($type) && $type !== '' ? $type : null;
+    }
+
+    /**
      * Walk and compile a profile's constraint chain for one normalised release.
      *
      * @throws UnreadableStructureDefinitionException When a registry cannot read a definition the chain needs

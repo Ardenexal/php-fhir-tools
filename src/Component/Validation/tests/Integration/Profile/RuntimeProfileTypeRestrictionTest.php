@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Profile\StructureDefinitionCompiler;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationOptions;
@@ -34,6 +37,12 @@ final class RuntimeProfileTypeRestrictionTest extends TestCase
 
     private const string QUANTITY_OBSERVATION = 'http://example.org/fhir/StructureDefinition/quantity-observation';
 
+    private const string IG_PATIENT = 'http://example.org/fhir/StructureDefinition/ig-patient';
+
+    private const string IG_SUBJECT_OBSERVATION = 'http://example.org/fhir/StructureDefinition/ig-subject-observation';
+
+    private const string PATIENT_BUNDLE = 'http://example.org/fhir/StructureDefinition/patient-bundle';
+
     private FHIRValidationService $service;
 
     private FHIRSerializationService $serializer;
@@ -45,7 +54,18 @@ final class RuntimeProfileTypeRestrictionTest extends TestCase
         $this->resolver = new RuntimeProfileResolver(new InMemoryStructureDefinitionRegistry([
             self::specialization('Parameters'),
             self::specialization('Observation'),
+            self::specialization('Patient'),
+            self::specialization('Bundle'),
             self::submitParameters(),
+            self::profile(self::IG_PATIENT, 'Patient', []),
+            self::profile(self::IG_SUBJECT_OBSERVATION, 'Observation', [
+                ['id' => 'Observation.subject', 'path' => 'Observation.subject', 'min' => 0, 'max' => '1', 'type' => [
+                    ['code' => 'Reference', 'targetProfile' => [self::IG_PATIENT]],
+                ]],
+            ]),
+            self::profile(self::PATIENT_BUNDLE, 'Bundle', [
+                ['id' => 'Bundle.entry.resource', 'path' => 'Bundle.entry.resource', 'min' => 0, 'max' => '1', 'type' => [['code' => 'Patient']]],
+            ]),
             self::profile(self::QUANTITY_OBSERVATION, 'Observation', [
                 ['id' => 'Observation.value[x]', 'path' => 'Observation.value[x]', 'min' => 0, 'max' => '1', 'type' => [['code' => 'Quantity']]],
                 ['id' => 'Observation.subject', 'path' => 'Observation.subject', 'min' => 0, 'max' => '1', 'type' => [
@@ -104,12 +124,69 @@ final class RuntimeProfileTypeRestrictionTest extends TestCase
     }
 
     /**
+     * A target that is an IG profile allows the type the profile constrains, read from its loaded
+     * StructureDefinition, so the reference is checked without being resolved (#246).
+     */
+    public function testReferenceIsCheckedAgainstTheTypeAnIgProfileTargetConstrains(): void
+    {
+        $observation = ['resourceType' => 'Observation', 'status' => 'final', 'code' => ['text' => 'x']];
+
+        self::assertSame(
+            [['subject', 'Invalid Resource target type. Found Group, but expected one of (Patient)']],
+            $this->findings(self::IG_SUBJECT_OBSERVATION, [...$observation, 'subject' => ['reference' => 'Group/1']]),
+        );
+        self::assertSame([], $this->findings(self::IG_SUBJECT_OBSERVATION, [...$observation, 'subject' => ['reference' => 'Patient/1']]));
+    }
+
+    /**
+     * `Bundle.entry.resource only Patient` rejects an entry holding another resource type (#246).
+     * A profile rule under a repeating parent reports the path without the item index, as every
+     * FHIRProfileConstraint finding does today.
+     */
+    public function testNarrowedResourceSlotRejectsAnotherResourceType(): void
+    {
+        $bundle = ['resourceType' => 'Bundle', 'type' => 'collection', 'entry' => [
+            ['fullUrl' => 'urn:uuid:9d7c2a3e-8a4f-4f43-9e3b-6b1c2d3e4f50', 'resource' => ['resourceType' => 'Patient']],
+            ['fullUrl' => 'urn:uuid:9d7c2a3e-8a4f-4f43-9e3b-6b1c2d3e4f51', 'resource' => ['resourceType' => 'Observation', 'status' => 'final', 'code' => ['text' => 'x']]],
+        ]];
+
+        self::assertSame(
+            [['entry.resource', "The type 'Observation' is not allowed here; the profile allows Patient"]],
+            $this->findings(self::PATIENT_BUNDLE, $bundle),
+        );
+    }
+
+    /**
+     * A published differential carries no `base`, so the slot is told by the element's path: the R5
+     * core `subscription-notification-bundle` narrows `entry:first.resource` to SubscriptionStatus.
+     */
+    public function testPublishedProfileNarrowingAResourceSlotCompilesToATypeRule(): void
+    {
+        $json = file_get_contents(__DIR__ . '/../../Fixtures/Profile/core-r5/StructureDefinition-subscription-notification-bundle.json');
+        self::assertIsString($json);
+        $definition = json_decode($json, true);
+        self::assertIsArray($definition);
+
+        /** @var array<string, mixed> $definition */
+        $types = [];
+        foreach ((new StructureDefinitionCompiler())->compile($definition)->attributes as $attribute) {
+            foreach ($attribute->class === FHIRSliceConstraint::class ? (array) ($attribute->arguments['rules'] ?? []) : [] as $rule) {
+                if ($rule['constraint'] === FHIRAllowedTypes::class) {
+                    $types[] = [$attribute->arguments['sliceName'], $rule['path'], $rule['options']['types']];
+                }
+            }
+        }
+
+        self::assertSame([['first', 'resource', ['SubscriptionStatus']]], $types);
+    }
+
+    /**
      * The restrictions are compiled into rules, not skipped, so the compiled chain carries no
      * diagnostic for them.
      */
     public function testRestrictionsCompileWithoutDiagnostics(): void
     {
-        foreach ([self::SUBMIT, self::QUANTITY_OBSERVATION] as $url) {
+        foreach ([self::SUBMIT, self::QUANTITY_OBSERVATION, self::IG_SUBJECT_OBSERVATION, self::PATIENT_BUNDLE] as $url) {
             foreach ($this->resolver->resolve($url, 'R4')->chain as $entry) {
                 self::assertSame([], $entry->diagnostics, $url);
             }

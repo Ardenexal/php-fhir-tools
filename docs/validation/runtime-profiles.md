@@ -138,10 +138,12 @@ if (!$resolution->isResolved()) {
 The same rules a generated profile class enforces:
 
 * Cardinality, fixed and pattern values, must-support, obligations, slicing and slices.
-* The types a choice element may hold (`value[x] only Quantity`) and the targets a Reference may
-  point at (`Reference(PractitionerRole)`), at the top level and inside a slice. A literal
-  `Patient/1` is checked against targets that are core resource types without being resolved; a
-  target that is an IG profile is checked only through a configured reference resolver.
+* The types a choice element may hold (`value[x] only Quantity`), the resource types a resource
+  slot may hold (`Bundle.entry.resource only Patient`, also `contained` and
+  `Parameters.parameter.resource`) and the targets a Reference may point at
+  (`Reference(PractitionerRole)`), at the top level and inside a slice. A literal `Patient/1` is
+  checked against the targets' types without being resolved, IG profile targets included when the
+  profile is generated or loaded; see [Target types](references.md#target-types).
 * The profile's own invariants and its `required` and `extensible` bindings, reported at the
   element they are about. See [Profile invariants](invariants.md#profile-invariants) and
   [Profile bindings](terminology.md#profile-bindings).
@@ -177,8 +179,8 @@ joins a slice only when it matches every discriminator of the slicing.
 | Fixed and pattern values inside a slice | Yes | |
 | Types and Reference targets inside a slice | Yes | As at the top level |
 | A data-type profile named on a slice | Yes | Such as `au-ihi` on `Patient.identifier:ihi` |
-| `ordered` slicing | Yes | An item matching a slice declared before the slice of an earlier item is an error. Items that match no slice, and items that might belong to a slice that could not be judged, are not part of the order |
-| Reslices (`component:a/b`) | No | Not compiled |
+| `ordered` slicing | Yes | An item matching a slice declared before the slice of an earlier item is an error. Items that match no slice, and items that might belong to a slice that could not be judged, are not part of the order. A derived profile's slices are ordered among its parent's |
+| Reslices (`extension:altid/npi`) | Yes | Checked among the items of their slice. Without slicing on the slice itself, the element's discriminators tell reslices apart |
 | Choice type slices (`value[x]:valueQuantity`) | As plain constraints | Checked on the variant, such as `valueQuantity` |
 
 "Not judged" means that items that might belong to the slice are not counted against closed or
