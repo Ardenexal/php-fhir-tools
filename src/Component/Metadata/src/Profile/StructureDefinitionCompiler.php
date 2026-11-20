@@ -1069,8 +1069,8 @@ final class StructureDefinitionCompiler
      * Limitations:
      *  - Every discriminator of the slicing is compiled into the slice's `discriminators`; see
      *    sliceDiscriminator() for where each value comes from.
-     *  - A slice with a discriminator that has nothing to match on (a path through `resolve()`, or a
-     *    value, pattern, presence, type or profile the definitions do not state) gets no minimum,
+     *  - A slice with a discriminator that has nothing to match on (a value, pattern, presence, type or
+     *    profile the definitions do not state, including through `resolve()`) gets no minimum,
      *    since it could only fail. Closed or openAtEnd slicing with such a slice is enforced as open,
      *    and its default slice is left out; the relaxed rules are reported as a diagnostic.
      *  - Choice type slices ("value[x]:valueQuantity") are left to the plain constraints, which put
@@ -1495,8 +1495,8 @@ final class StructureDefinitionCompiler
 
     /**
      * True for a named slice with a discriminator that has nothing to match on, so no item ever
-     * matches it: a path through `resolve()`, or a value, pattern, presence, type, profile or
-     * required binding the compiler did not find.
+     * matches it: a value, pattern, presence, type, profile or required binding the compiler did
+     * not find, including one through `resolve()`.
      *
      * @param array<string, mixed> $definition A slice definition from sliceDefinitions()
      */
@@ -1887,9 +1887,12 @@ final class StructureDefinitionCompiler
      * its path (see discriminatorValueSet()), carries that value set as `valueSet`: the item belongs to
      * the slice when its code is in the value set, which only a terminology client can answer.
      *
+     * A path through `resolve()` takes its value from the target profiles of the slice's reference
+     * instead; see resolvedTargetValue().
+     *
      * @param array<string, array<string, mixed>>                  $diff     Differential elements by id
      * @param array<string, array<string, mixed>>                  $snapshot Snapshot elements by id
-     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup   Finds the data-type profile a slice is typed with
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup   Finds the data-type profile a slice is typed with, or the target profile of a reference
      *
      * @return array{type: string, path: string, value?: mixed, valueSet?: string}
      */
@@ -1897,6 +1900,11 @@ final class StructureDefinitionCompiler
     {
         $discriminator = ['type' => $discType, 'path' => $discPath];
         $header        = $snapshot[$sliceId] ?? $diff[$sliceId] ?? [];
+
+        $resolved = self::splitAtResolve($discPath);
+        if ($resolved !== null) {
+            return $discriminator + self::resolvedTargetValue($sliceId, $discType, $resolved[0], $resolved[1], $diff, $snapshot, $lookup);
+        }
 
         $value       = self::discriminatorValue($sliceId, $discType, $discPath, $diff, $snapshot);
         $typeProfile = $value === null && $lookup !== null ? self::typeProfileDiscriminator($header, $discType, $discPath, $lookup) : [];
@@ -1925,6 +1933,161 @@ final class StructureDefinitionCompiler
         }
 
         return $discriminator;
+    }
+
+    /**
+     * The profiles a Reference on this element may point at, or none when a Reference type on it
+     * allows any target. Canonical targets are left out: `resolve()` follows References.
+     *
+     * @param array<string, mixed> $element
+     *
+     * @return list<string>
+     */
+    private static function referenceTargets(array $element): array
+    {
+        $codes = array_column(is_array($element['type'] ?? null) ? array_filter($element['type'], is_array(...)) : [], 'code');
+        if (array_intersect($codes, ['Reference', 'CodeableReference']) === []) {
+            return [];
+        }
+
+        // An entry naming no kind covers every Reference on the element
+        foreach (ElementDefinitionReader::targetProfileRules($element) as $rule) {
+            if (($rule['kind'] ?? FHIRTargetProfile::KIND_REFERENCE) === FHIRTargetProfile::KIND_REFERENCE) {
+                return $rule['targetProfiles'];
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * A discriminator path through `resolve()`, split into the path of the reference and the path
+     * within the resource it resolves to, or null when the path does not go through `resolve()`.
+     *
+     * `item.resolve().code` gives `['item', 'code']`; `resolve()` and `$this.resolve()` give
+     * `['$this', '']`. A path that resolves more than once is not split, so it keeps no value.
+     *
+     * @return array{string, string}|null
+     */
+    private static function splitAtResolve(string $discPath): ?array
+    {
+        if (preg_match('/\A(?:(?<reference>.+)\.)?resolve\(\)(?:\.(?<rest>.+))?\z/', $discPath, $match) !== 1
+            || str_contains($match['rest'] ?? '', 'resolve()')
+            || str_contains($match['reference'] ?? '', 'resolve()')) {
+            return null;
+        }
+
+        return [($match['reference'] ?? '') === '' ? '$this' : $match['reference'], $match['rest'] ?? ''];
+    }
+
+    /**
+     * What a slice's items must have on the resource their reference resolves to, read from the
+     * target profiles of the slice's reference: `['value' => ...]`, `['valueSet' => ...]`, or `[]`
+     * when they do not tell.
+     *
+     * The reference is the slice itself for `$this`, else the element at $referencePath beneath it; a
+     * choice element narrowed with `ofType(Reference)` is read at its `[x]` element.
+     *  - `profile`: the target profiles, when nothing follows `resolve()`.
+     *  - `type`: the resource type of each target profile, when nothing follows `resolve()`. A core
+     *    resource profile (`.../StructureDefinition/Condition`) names its type; any other is looked
+     *    up for its `type`. One target whose type cannot be told leaves the slice with no value, since
+     *    a partial list would put that target's resources outside the slice.
+     *  - `value` and `pattern`: the fixed or pattern value the one target profile states at the path
+     *    after `resolve()`, from its snapshot, as the lipid profile's `resolve().code` slices take the
+     *    code each Observation profile fixes. With none, a required binding that profile states there
+     *    itself is the value set, as `ldlcholesterol` binds its code. Several target profiles could
+     *    each state another value, so only one is read.
+     *
+     * @param array<string, array<string, mixed>>                  $diff     Differential elements by id
+     * @param array<string, array<string, mixed>>                  $snapshot Snapshot elements by id
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup   Finds a target profile by canonical URL
+     *
+     * @return array{value?: mixed, valueSet?: string}
+     */
+    private static function resolvedTargetValue(
+        string $sliceId,
+        string $discType,
+        string $referencePath,
+        string $rest,
+        array $diff,
+        array $snapshot,
+        ?\Closure $lookup,
+    ): array {
+        $id      = $referencePath === '$this' ? $sliceId : $sliceId . '.' . (string) preg_replace('/\.ofType\([^)]*\)/', '', $referencePath);
+        $element = $snapshot[$id] ?? $snapshot[$id . '[x]'] ?? $diff[$id] ?? $diff[$id . '[x]'] ?? null;
+        $targets = $element === null ? [] : self::referenceTargets($element);
+        if ($targets === []) {
+            return [];
+        }
+
+        if ($discType === 'profile') {
+            return $rest === '' ? ['value' => $targets] : [];
+        }
+
+        if ($discType === 'type') {
+            if ($rest !== '') {
+                return [];
+            }
+
+            $types = [];
+            foreach ($targets as $url) {
+                $type = self::targetResourceType($url, $lookup);
+                if ($type === null) {
+                    return [];
+                }
+
+                $types[] = $type;
+            }
+
+            return ['value' => array_values(array_unique($types))];
+        }
+
+        if (!in_array($discType, ['value', 'pattern'], true) || count($targets) !== 1 || $lookup === null) {
+            return [];
+        }
+
+        $definition = $lookup(self::canonicalWithoutVersion($targets[0]));
+        $root       = (string) ($definition['type'] ?? '');
+        if ($definition === null || $root === '') {
+            return [];
+        }
+
+        $targetId = $rest === '' ? $root : $root . '.' . $rest;
+        $target   = self::snapshotElements($definition)[$targetId] ?? null;
+        $field    = $target === null ? null
+            : (ElementDefinitionReader::extractPolymorphicField($target, 'fixed') ?? ElementDefinitionReader::extractPolymorphicField($target, 'pattern'));
+        if ($field !== null) {
+            return ['value' => $field['value']];
+        }
+
+        // Only a binding the target profile states itself; one it inherits holds for every resource of
+        // its type. A core resource definition is not a profile: its differential repeats every element
+        if (($definition['derivation'] ?? null) !== 'constraint') {
+            return [];
+        }
+
+        $valueSet = self::requiredValueSet($targetId, self::differentialElements($definition), []);
+
+        return $valueSet === null ? [] : ['valueSet' => $valueSet];
+    }
+
+    /**
+     * The resource type a target profile constrains, or null when it cannot be told or is abstract.
+     *
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup
+     */
+    private static function targetResourceType(string $url, ?\Closure $lookup): ?string
+    {
+        $url = self::canonicalWithoutVersion($url);
+        if (preg_match('~\Ahttp://hl7\.org/fhir/StructureDefinition/(?<type>[A-Z][A-Za-z]+)\z~', $url, $match) === 1) {
+            // `Reference(Any)` names an abstract type, which no resource has as its own
+            return in_array($match['type'], self::ABSTRACT_RESOURCE_TYPES, true) ? null : $match['type'];
+        }
+
+        $definition = $lookup === null ? null : $lookup($url);
+        $type       = is_array($definition) ? ($definition['type'] ?? null) : null;
+
+        return is_string($type) && $type !== '' ? $type : null;
     }
 
     /**

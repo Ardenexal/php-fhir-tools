@@ -24,9 +24,9 @@ use PHPUnit\Framework\TestCase;
  * Core profiles whose slices the validator cannot match must not reject resources that conform.
  *
  * Subscription notification bundles slice `entry` on an `exists` discriminator whose path no slice
- * constrains, and the lipid profile slices `result` on `resolve().code`. Neither can be evaluated
- * against an item, so neither may cap a slice's count or reject items under closed or openAtEnd
- * rules. Each instance is checked through its generated class and at runtime from the
+ * constrains, and the lipid profile slices `result` on `resolve().code`, which cannot be evaluated for
+ * a reference that does not resolve. Neither may cap a slice's count or reject items under closed or
+ * openAtEnd rules. A lipid result that does resolve is matched, so the slicing is still enforced. Each instance is checked through its generated class and at runtime from the
  * StructureDefinition, which must agree.
  */
 #[CoversNothing]
@@ -72,7 +72,8 @@ final class UnmatchableSliceDiscriminatorTest extends TestCase
     }
 
     /**
-     * A lipid report with one result reference: no item may be rejected for matching no slice.
+     * A lipid report with one result reference that does not resolve: no item may be rejected for
+     * matching no slice, and no slice's minimum is checked.
      */
     #[DataProvider('sides')]
     public function testLipidReportResultIsNotRejectedByClosedSlicing(bool $runtime): void
@@ -87,6 +88,47 @@ final class UnmatchableSliceDiscriminatorTest extends TestCase
         $instance = self::instance(FhirVersion::R4, $json, $runtime ? DiagnosticReportResource::class : ExampleLipidProfile::class);
 
         self::assertSame([], self::sliceFindings(self::service(FhirVersion::R4, $runtime), $instance, self::LIPID_PROFILE, 'result'));
+    }
+
+    /**
+     * Lipid results in `contained` resolve, so each is matched to the slice its code names: a report
+     * with cholesterol and triglyceride results but no HDL cholesterol is missing a required slice.
+     */
+    #[DataProvider('sides')]
+    public function testLipidReportResultsAreMatchedThroughResolve(bool $runtime): void
+    {
+        $observation = static fn (string $id, string $code, string $display): array => [
+            'resourceType' => 'Observation',
+            'id'           => $id,
+            'status'       => 'final',
+            'code'         => ['coding' => [['system' => 'http://loinc.org', 'code' => $code, 'display' => $display]]],
+        ];
+        $report = static fn (array $contained): string => json_encode([
+            'resourceType' => 'DiagnosticReport',
+            'contained'    => $contained,
+            'status'       => 'final',
+            'code'         => ['coding' => [['system' => 'http://loinc.org', 'code' => '57698-3']]],
+            'result'       => array_map(static fn (array $o): array => ['reference' => '#' . $o['id']], $contained),
+        ], JSON_THROW_ON_ERROR);
+
+        // The profiles fix these displays, zero-width space included
+        $cholesterol  = $observation('chol', '35200-5', "Cholesterol [Moles/\u{200B}volume] in Serum or Plasma");
+        $triglyceride = $observation('trig', '35217-9', "Triglyceride [Moles/\u{200B}volume] in Serum or Plasma");
+        $hdl          = $observation('hdl', '2085-9', 'HDL Cholesterol');
+        $glucose      = $observation('glu', '2345-7', 'Glucose');
+        $service      = self::service(FhirVersion::R4, $runtime);
+        $class        = $runtime ? DiagnosticReportResource::class : ExampleLipidProfile::class;
+
+        self::assertSame([], self::sliceFindings($service, self::instance(FhirVersion::R4, $report([$cholesterol, $triglyceride, $hdl]), $class), self::LIPID_PROFILE, 'result'));
+
+        self::assertSame(
+            ['Slice "HDLCholesterol" on "result" requires at least 1 item(s), but 0 matched.'],
+            self::sliceFindings($service, self::instance(FhirVersion::R4, $report([$cholesterol, $triglyceride]), $class), self::LIPID_PROFILE, 'result'),
+        );
+
+        // The LDL slice is keyed by a required binding, which only a terminology client answers, so
+        // without one a glucose result might be LDL cholesterol and closed slicing cannot reject it
+        self::assertSame([], self::sliceFindings($service, self::instance(FhirVersion::R4, $report([$cholesterol, $triglyceride, $hdl, $glucose]), $class), self::LIPID_PROFILE, 'result'));
     }
 
     /**
