@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Oracle;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfiles;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLength;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
@@ -14,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConst
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAllowedTypesValidator;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAnyOfProfilesValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRMaxLengthValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileBindingValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileInvariantValidator;
@@ -121,6 +123,7 @@ final class OracleValidationServiceFactory
                     $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->registry),
                     $constraint instanceof FHIRAllowedTypes      => new FHIRAllowedTypesValidator($this->registry),
                     $constraint instanceof FHIRMaxLength         => new FHIRMaxLengthValidator($this->registry),
+                    $constraint instanceof FHIRAnyOfProfiles     => new FHIRAnyOfProfilesValidator($this->profiles, $this->registry),
                     $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, $this->matcher, $this->sliceReader, profiles: $this->profiles),
                     $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->collaborators->referenceResolver, $this->registry, profileTypes: $this->targetProfileTypes),
                     default                                      => $this->default->getInstance($constraint),

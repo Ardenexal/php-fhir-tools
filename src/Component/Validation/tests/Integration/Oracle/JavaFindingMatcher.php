@@ -139,6 +139,9 @@ final class JavaFindingMatcher
         // element: the reference validator loses the lexeme and prints `null`, we name it.
         // `R5.primitive-bad` parameter[21] and [22].
         'not a valid time',
+        // Java's `...among choices: ; [A, B]` against our `...among choices: A, B` on the element that
+        // matched none of its profiles. `profile-choice-1`.
+        'unable to find a match for the specified profile among choices',
     ];
 
     /**

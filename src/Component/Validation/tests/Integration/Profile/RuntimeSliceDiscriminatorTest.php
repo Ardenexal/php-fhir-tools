@@ -164,6 +164,36 @@ final class RuntimeSliceDiscriminatorTest extends TestCase
     }
 
     /**
+     * A slice profile that slices an element of its own is checked through the same slice
+     * validator; the outer slicing's findings must still be reported afterwards.
+     */
+    public function testAProfileSliceWhoseProfileSlicesKeepsItsFindings(): void
+    {
+        $profile  = self::BASE . 'one-mrn-patient-bundle';
+        $mrn      = self::BASE . 'mrn-patient';
+        $patient  = ['resourceType' => 'Patient', 'identifier' => [['system' => 'urn:mrn', 'value' => '1']]];
+        $registry = self::registry(
+            self::profile($profile, 'Bundle', [
+                ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => ['discriminator' => [['type' => 'profile', 'path' => 'resource']], 'rules' => 'open']],
+                ['id' => 'Bundle.entry:patient', 'path' => 'Bundle.entry', 'sliceName' => 'patient', 'min' => 0, 'max' => '1'],
+                ['id' => 'Bundle.entry:patient.resource', 'path' => 'Bundle.entry.resource', 'type' => [['code' => 'Patient', 'profile' => [$mrn]]]],
+            ]),
+            self::profile($mrn, 'Patient', [
+                ['id' => 'Patient.identifier', 'path' => 'Patient.identifier', 'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'system']], 'rules' => 'open']],
+                ['id' => 'Patient.identifier:mrn', 'path' => 'Patient.identifier', 'sliceName' => 'mrn', 'min' => 0, 'max' => '1'],
+                ['id' => 'Patient.identifier:mrn.system', 'path' => 'Patient.identifier.system', 'fixedUri' => 'urn:mrn'],
+            ]),
+        );
+        $bundle            = self::bundle($patient);
+        $bundle['entry'][] = ['fullUrl' => 'urn:uuid:0d6c5b4a-3f21-4a3b-9e8f-7c3b2a4e1f0d', 'resource' => $patient];
+
+        self::assertSame(
+            [['entry', 'Slice "patient" on "entry" allows at most 1 item(s), but 2 matched.']],
+            $this->findings($registry, $profile, $bundle),
+        );
+    }
+
+    /**
      * A profile no registry holds cannot be checked, so its slice is undecided: no minimum, and its
      * items are not rejected by closed slicing.
      */

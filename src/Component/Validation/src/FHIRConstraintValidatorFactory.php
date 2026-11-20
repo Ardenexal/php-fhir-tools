@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfiles;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLength;
@@ -19,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAllowedTypesValidator;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAnyOfProfilesValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPathInvariantValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRMaxLengthValidator;
@@ -80,6 +82,7 @@ final class FHIRConstraintValidatorFactory implements ConstraintValidatorFactory
             $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->messages),
             $constraint instanceof FHIRAllowedTypes      => new FHIRAllowedTypesValidator($this->messages),
             $constraint instanceof FHIRMaxLength         => new FHIRMaxLengthValidator($this->messages),
+            $constraint instanceof FHIRAnyOfProfiles     => new FHIRAnyOfProfilesValidator($this->profileConformance, $this->messages),
             $constraint instanceof FHIRProfileConstraint => new FHIRProfileConstraintValidator($this->accessor),
             $constraint instanceof FHIRProfileInvariant  => new FHIRProfileInvariantValidator($this->pathService, $this->messages, $this->accessor),
             $constraint instanceof FHIRProfileBinding    => new FHIRProfileBindingValidator($this->accessor),

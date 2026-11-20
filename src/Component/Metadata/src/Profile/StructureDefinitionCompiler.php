@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Metadata\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfiles;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
@@ -78,7 +79,7 @@ final class StructureDefinitionCompiler
         $inline      = $lookup === null ? null : self::sliceInliner($structureDefinition, $profileUrl, $lookup, $visited, 1, '', $diagnostics);
 
         $attributes = [
-            ...self::differentialConstraints($structureDefinition, $profileUrl),
+            ...self::differentialConstraints($structureDefinition, $profileUrl, $lookup),
             ...self::differentialMustSupport($structureDefinition, $profileUrl),
             ...self::differentialSliceConstraints($structureDefinition, $profileUrl, $diagnostics, $inline, $lookup),
             ...self::snapshotObligations($structureDefinition, $profileUrl),
@@ -372,13 +373,9 @@ final class StructureDefinitionCompiler
             );
         };
 
+        // A value may match any one of several types or profiles: elementRules() checks it against
+        // each on the side (FHIRAnyOfProfiles), since their rules cannot be merged into one list
         if (count($types) > 1 || count($profiled[0]) > 1) {
-            // When the base data type is itself one of the choices, any value of that type
-            // conforms, so there is no rule to lose
-            if (!self::allowsBaseType($types)) {
-                $notEnforced('the element allows several types or profiles, so a value may match any one of them');
-            }
-
             return [];
         }
 
@@ -633,20 +630,10 @@ final class StructureDefinitionCompiler
      */
     private static function parentTypesElementTheSame(array $structureDefinition, string $id, array $profiles, \Closure $lookup): bool
     {
-        $base = is_string($structureDefinition['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($structureDefinition['baseDefinition']) : '';
-        if ($base === '') {
-            return false;
-        }
-
-        $parent = $lookup($base);
-        // A base resource or data type types no element with a profile
-        if ($parent === null || ($parent['derivation'] ?? null) !== 'constraint') {
-            return false;
-        }
-
-        // Only a parent that allows exactly this one profiled type enforced it; one that allowed
-        // several types left the element unenforced, so the narrowed child must enforce it itself
-        $element = self::snapshotElements($parent)[$id] ?? null;
+        // Only a parent that allows exactly this one profiled type inlined it. One that allowed several
+        // checks at most that the value matches one of them, so the narrowed child must inline its
+        // own profile itself
+        $element = self::parentSnapshotElement($structureDefinition, $id, $lookup);
         $types   = is_array($element['type'] ?? null) ? array_values($element['type']) : [];
         if (count($types) !== 1 || !is_array($types[0]['profile'] ?? null)) {
             return false;
@@ -654,6 +641,74 @@ final class StructureDefinitionCompiler
         $inherited = array_values(array_map(self::canonicalWithoutVersion(...), array_filter($types[0]['profile'], 'is_string')));
 
         return $inherited === array_map(self::canonicalWithoutVersion(...), $profiles);
+    }
+
+    /**
+     * Whether the parent profile's snapshot types this element with the same types and profiles, in
+     * any order, so the parent's group already checks the same alternatives.
+     *
+     * @param array<string, mixed>                          $structureDefinition
+     * @param array<string, mixed>                          $element             The differential element
+     * @param \Closure(string): (array<string, mixed>|null) $lookup
+     */
+    private static function parentTypesElementAlike(array $structureDefinition, string $id, array $element, \Closure $lookup): bool
+    {
+        $inherited = self::parentSnapshotElement($structureDefinition, $id, $lookup);
+
+        return $inherited !== null && self::typeSignature($inherited) === self::typeSignature($element);
+    }
+
+    /**
+     * The element with this id in the parent profile's snapshot, or null when the parent is a base
+     * resource or data type (which types no element with a profile) or cannot be found.
+     *
+     * @param array<string, mixed>                          $structureDefinition
+     * @param \Closure(string): (array<string, mixed>|null) $lookup
+     *
+     * @return array<string, mixed>|null
+     */
+    private static function parentSnapshotElement(array $structureDefinition, string $id, \Closure $lookup): ?array
+    {
+        $base = is_string($structureDefinition['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($structureDefinition['baseDefinition']) : '';
+        if ($base === '') {
+            return null;
+        }
+
+        $parent = $lookup($base);
+        if ($parent === null || ($parent['derivation'] ?? null) !== 'constraint') {
+            return null;
+        }
+
+        return self::snapshotElements($parent)[$id] ?? null;
+    }
+
+    /**
+     * An element's types as sorted `code|profile` strings, profiles without their version, so two
+     * elements typed alike compare equal whatever order they list them in.
+     *
+     * @param array<string, mixed> $element
+     *
+     * @return list<string>
+     */
+    private static function typeSignature(array $element): array
+    {
+        $signature = [];
+        foreach (is_array($element['type'] ?? null) ? $element['type'] : [] as $type) {
+            if (!is_array($type) || !is_string($type['code'] ?? null)) {
+                continue;
+            }
+
+            $profiles = is_array($type['profile'] ?? null) ? array_filter($type['profile'], 'is_string') : [];
+            if ($profiles === []) {
+                $signature[] = $type['code'];
+            }
+            foreach ($profiles as $profile) {
+                $signature[] = $type['code'] . '|' . self::canonicalWithoutVersion($profile);
+            }
+        }
+        sort($signature);
+
+        return $signature;
     }
 
     /**
@@ -693,15 +748,19 @@ final class StructureDefinitionCompiler
      *    rules come from differentialSliceConstraints() instead. Choice type slices
      *    ("value[x]:valueQuantity") are kept, on the variant's path ("valueQuantity").
      *
-     * @param array<string, mixed> $structureDefinition
+     * A FHIRAnyOfProfiles the parent profile already places on the same element, with the same types
+     * and profiles, is left to the parent's group, so a failing value is reported once.
+     *
+     * @param array<string, mixed>                                 $structureDefinition
+     * @param (\Closure(string): (array<string, mixed>|null))|null $lookup              Finds the parent profile
      *
      * @return list<CompiledAttribute>
      */
-    private static function differentialConstraints(array $structureDefinition, string $profileUrl): array
+    private static function differentialConstraints(array $structureDefinition, string $profileUrl, ?\Closure $lookup = null): array
     {
         $attributes = [];
 
-        foreach (self::differentialElements($structureDefinition) as $element) {
+        foreach (self::differentialElements($structureDefinition) as $id => $element) {
             $path = (string) ($element['path'] ?? '');
 
             if (!str_contains($path, '.')) {
@@ -718,6 +777,10 @@ final class StructureDefinitionCompiler
             }
 
             foreach (self::elementRules($element) as $rule) {
+                if ($rule['constraint'] === FHIRAnyOfProfiles::class && $lookup !== null && self::parentTypesElementAlike($structureDefinition, (string) $id, $element, $lookup)) {
+                    continue;
+                }
+
                 $attributes[] = new CompiledAttribute(FHIRProfileConstraint::class, [
                     'path'       => $propertyPath,
                     'constraint' => $rule['constraint'],
@@ -1155,11 +1218,12 @@ final class StructureDefinitionCompiler
      * The constraints one differential element places on its own path: cardinality (Count) when
      * min > 0 or max is bounded, a fixed[x], scalar or complex, an array pattern[x] (scalar
      * patterns use value matching), a maxLength, the types a choice element or a resource slot may
-     * hold, and the target profiles a Reference or canonical may point at.
+     * hold, the target profiles a Reference or canonical may point at, and the profiles a value must
+     * match one of.
      *
      * @param array<string, mixed> $element
      *
-     * @return list<array{constraint: class-string<Count|FHIRFixedValue|FHIRPatternValue|FHIRMaxLength|FHIRAllowedTypes|FHIRTargetProfile>, options: array<string, mixed>}>
+     * @return list<array{constraint: class-string<Count|FHIRFixedValue|FHIRPatternValue|FHIRMaxLength|FHIRAllowedTypes|FHIRTargetProfile|FHIRAnyOfProfiles>, options: array<string, mixed>}>
      */
     private static function elementRules(array $element): array
     {
@@ -1209,7 +1273,59 @@ final class StructureDefinitionCompiler
             $rules[] = ['constraint' => FHIRTargetProfile::class, 'options' => $options];
         }
 
+        $anyOf = self::anyOfProfiles($element);
+        if ($anyOf !== null) {
+            $rules[] = ['constraint' => FHIRAnyOfProfiles::class, 'options' => $anyOf];
+        }
+
         return $rules;
+    }
+
+    /**
+     * The profiles a value must match one of, when the element's types name several profiles or
+     * several profiled types, and the type codes it allows without one; null when there is no such
+     * choice.
+     *
+     * One type with one profile is left to inlinedDataTypeProfiles(), which inlines a data-type
+     * profile's rules and reports any other profile as not enforced.
+     * An element that also allows the base type of every profiled type gets no rule, since any value
+     * of that type conforms (AU Core's `Identifier` beside `au-ihi`). Extension profiles are left to
+     * extension validation, so an Extension type counts as allowed without a profile.
+     *
+     * @param array<string, mixed> $element
+     *
+     * @return array{profiles: list<string>, openTypes: list<string>}|null
+     */
+    private static function anyOfProfiles(array $element): ?array
+    {
+        $types = is_array($element['type'] ?? null) ? array_values($element['type']) : [];
+        if (count($types) < 2 && count(is_array($types[0]['profile'] ?? null) ? $types[0]['profile'] : []) < 2) {
+            return null;
+        }
+        if (self::allowsBaseType($types)) {
+            return null;
+        }
+
+        $profiles  = [];
+        $openTypes = [];
+        foreach ($types as $type) {
+            if (!is_array($type) || !is_string($type['code'] ?? null)) {
+                continue;
+            }
+
+            $named = is_array($type['profile'] ?? null) ? array_values(array_filter($type['profile'], 'is_string')) : [];
+            if ($named === [] || $type['code'] === 'Extension') {
+                $openTypes[] = $type['code'];
+
+                continue;
+            }
+
+            foreach ($named as $profile) {
+                $profiles[] = $profile;
+            }
+        }
+
+        return $profiles === [] ? null : ['profiles' => array_values(array_unique($profiles)), 'openTypes' => array_values(array_unique($openTypes))];
     }
 
     /**

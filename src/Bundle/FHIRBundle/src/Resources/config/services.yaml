@@ -183,6 +183,15 @@ services:
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLengthValidator' }
 
+    # No profile conformance checker here, as for FHIRSliceConstraintValidator: elements that allow
+    # several profiles are not checked through the bundle's validator
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAnyOfProfilesValidator:
+        arguments:
+            $conformance: null
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfilesValidator' }
+
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator:
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraintValidator' }

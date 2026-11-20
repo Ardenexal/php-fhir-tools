@@ -100,10 +100,17 @@ final class FHIRProfileConstraintValidator extends ConstraintValidator
             // inspects the element itself and gets it exactly as the model holds it.
             $subject = $innerConstraint instanceof Count ? $group['occurrences'] : $group['value'];
 
-            $this->reportViolations(
-                $this->context->getValidator()->validate($subject, $innerConstraint, ['Default']),
-                $constraint,
-            );
+            // The factory hands out one instance of this validator, and a rule that checks the value
+            // against another profile on the side (FHIRAnyOfProfiles) runs that profile's own
+            // FHIRProfileConstraints through this same instance, which points $this->context at the
+            // side run. Restored before reporting, or the findings land in the side run and vanish.
+            // Assigned directly: Symfony 8.1 deprecates initialize(), and only its validateInContext()
+            // restores the context itself; Symfony 7.4 does not.
+            $context       = $this->context;
+            $violations    = $context->getValidator()->validate($subject, $innerConstraint, ['Default']);
+            $this->context = $context;
+
+            $this->reportViolations($violations, $constraint);
         }
     }
 
