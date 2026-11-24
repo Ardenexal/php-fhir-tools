@@ -13,12 +13,12 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-http-client": "^0.7",
-        "ardenexal/fhir-metadata": "^0.7",
-        "ardenexal/fhir-models": "^0.7",
-        "ardenexal/fhir-path": "^0.7",
-        "ardenexal/fhir-serialization": "^0.7",
-        "ardenexal/fhir-validation": "^0.7",
+        "ardenexal/fhir-http-client": "^0.8",
+        "ardenexal/fhir-metadata": "^0.8",
+        "ardenexal/fhir-models": "^0.8",
+        "ardenexal/fhir-path": "^0.8",
+        "ardenexal/fhir-serialization": "^0.8",
+        "ardenexal/fhir-validation": "^0.8",
         "symfony/property-access": "^6.4|^7.4|^8.1"
     },
     "autoload": {
@@ -47,7 +47,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.7.x-dev"
+            "dev-main": "0.8.x-dev"
         }
     }
 }

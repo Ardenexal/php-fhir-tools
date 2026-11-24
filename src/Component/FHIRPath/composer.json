@@ -19,7 +19,7 @@
         "psr/log": "^1|^2|^3",
         "symfony/string": "^6.4|^7.4|^8.1",
         "symfony/property-access": "^6.4|^7.4|^8.1",
-        "ardenexal/fhir-metadata": "^0.7"
+        "ardenexal/fhir-metadata": "^0.8"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5",
@@ -41,7 +41,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.7.x-dev"
+            "dev-main": "0.8.x-dev"
         }
     }
 }

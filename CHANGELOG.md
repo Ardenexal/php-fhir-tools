@@ -7,12 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-25
+
 ### Added
 - [Validation] `FHIRValidationOptions` has a new `profilesFromVitalSignsCodes` setting. When it is on, each Observation whose `code.coding` holds a vital-sign code, such as LOINC `85354-9` or `29463-7`, is checked against the matching core vital-signs profile (`bp`, `bodyweight` and so on) and its parents, as the spec requires, even when `meta.profile` does not name it. The codes are the ten LOINC codes in the spec's vital-signs table, which is the same in R4 and R5, plus three the HL7 reference validator also maps: SNOMED CT `276885007` (`bodytemp`), LOINC `59408-5` (`oxygensat`) and LOINC `76534-7` (`bp`). Resolving the profiles needs the release's core package. An implied profile that cannot be resolved is skipped without a warning. The setting is off by default, because it can report new errors on data that passed before (#202)
 - [Validation] `FHIRValidationService` now checks more references inside Bundles, so a Bundle that passed before can now fail. In every Bundle type, nested ones included, a reference that is not `[type]/[id]` is an error (`Relative URLs must be of the format [ResourceName]/[id]. Encountered denom-EXM104`), and so is a relative reference in an entry with no `fullUrl`. In a `document` or `message`, a reference that matches two entries is an error (`Found 2 matches for 'Observation/1' in the bundle`). A reference from the Composition that matches nothing is an error too (`Can't find 'Organization/666' in the bundle`); from any other entry it is information, because it may point at a server. A `_history/[version]` reference now resolves against the entry's `meta.versionId` (#154)
 - [Validation] A `#id` reference that names no contained resource is now an error, `Unable to resolve resource with reference '#id'`, beside the existing `ref-1` finding (#154)
 
 ### Changed
+- [Core] `ardenexal/*` cross-package constraints move from `^0.7` to `^0.8`, and every package's `dev-main` branch-alias moves to `0.8.x-dev`. A 0.8 package installs only alongside 0.8 siblings, so update every `ardenexal/*` package together. Regenerated 0.8 models use attribute arguments a 0.7 validator does not understand, such as `#[FHIRSliceConstraint]`'s `discriminators`
 - **[Validation] More references and resources are checked for their type, so resources that passed can now fail** (#246):
   - A literal `Observation/1` reference is checked against targets that are profiles, not only core resource types. Each profile allows the type it constrains, found in the IG type registry, in the core profiles generated with the models (such as `vitalsigns`) or in the StructureDefinitions loaded for runtime profiles. So `Reference(au-core-patient)` rejects `Observation/1` without a reference resolver. Canonicals are checked the same way. If any target is `Resource` or a profile none of these sources knows, the check is still skipped.
   - When an element's Reference and canonical types list different targets, as in `Reference(Group) | canonical(EvidenceVariable)`, each kind of value is checked only against its own targets. `#[FHIRTargetProfile]` is now repeatable and takes an optional `kind`. The generator and the runtime compiler emit one attribute per kind for such elements. They no longer merge the lists, or drop the rule when one kind is unrestricted. Regenerated R4, R4B and R5 models pick this up.
@@ -87,6 +90,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ele-1` on a primitive that is present but has no value and no extension, such as `<implicitRules id="i1"/>` or `"fullUrl": ""`, beside the existing `value cannot be empty`.
   - `txt-2` on a narrative with no text other than whitespace and no image, such as `<div><p></p></div>`.
   - In R4, `que-12` (two `enableWhen` without `enableBehavior`) and `eld-19` (an `ElementDefinition.path` such as `Observation...unit`), which R4 published wrongly, are checked with the expressions R4B corrected them to.
+
+### Infrastructure
+- [CI] `package-integrity` stamps sibling path repositories with `0.8.x-dev` to match the new branch aliases, and the Symfony 6.4 and 8.1 compat harnesses pin their path repositories at `0.8.999`
+- [CI] A new `demo-tests` job in `pr.yml` runs the demo app's test suite on pull requests that change code. It is not a required check
 
 ## [0.7.0] - 2026-11-17
 
@@ -429,7 +436,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Infrastructure] Demo `composer.lock` constrained to PHP 8.3 compatible packages
 - [FHIRPath] PHPDoc type hints improved in `FHIRPathEvaluator`
 
-[Unreleased]: https://github.com/Ardenexal/php-fhir-tools/compare/0.7.0...HEAD
+[Unreleased]: https://github.com/Ardenexal/php-fhir-tools/compare/0.8.0...HEAD
+[0.8.0]: https://github.com/Ardenexal/php-fhir-tools/compare/0.7.0...0.8.0
 [0.7.0]: https://github.com/Ardenexal/php-fhir-tools/compare/0.6.3...0.7.0
 [0.6.3]: https://github.com/Ardenexal/php-fhir-tools/compare/0.6.2...0.6.3
 [0.6.2]: https://github.com/Ardenexal/php-fhir-tools/compare/0.6.1...0.6.2
