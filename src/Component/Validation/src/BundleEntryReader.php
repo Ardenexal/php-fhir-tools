@@ -11,13 +11,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
 
 /**
- * Reads the values the Bundle checkers need from a model, and indexes a Bundle's entries.
+ * Reads the values the Bundle and contained-reference checkers need from a model, and indexes a
+ * Bundle's entries.
  *
  * Generated models are read through their public properties, and a deserialized model bypasses the
  * constructor, so an absent field is uninitialized rather than null. Every read here answers null for
  * an absent, uninitialized or non-public property instead of throwing.
  *
- * @internal shared by the Bundle checkers of this component, not part of the public API
+ * @internal shared by the Bundle checkers and {@see ContainedReferenceChecker}, not part of the public API
  */
 final class BundleEntryReader
 {

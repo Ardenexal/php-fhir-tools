@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Validation\Profile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValueType;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Symfony\Component\Validator\Constraint;
@@ -86,7 +87,7 @@ final class RuntimeProfileConformance
      */
     private function check(ValidatorInterface $validator, object $value, string $profileUrl): ?array
     {
-        $canonical = self::canonicalWithoutVersion($profileUrl);
+        $canonical = CanonicalUrl::stripVersion($profileUrl);
 
         foreach (self::attributesInHierarchy($value, FHIRProfile::class) as $profile) {
             if ($profile->profileUrl === $canonical) {
@@ -188,12 +189,5 @@ final class RuntimeProfileConformance
         }
 
         return $found;
-    }
-
-    private static function canonicalWithoutVersion(string $url): string
-    {
-        $bar = strpos($url, '|');
-
-        return $bar === false ? $url : substr($url, 0, $bar);
     }
 }

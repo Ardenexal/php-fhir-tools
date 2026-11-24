@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContextInterface;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
+use Ardenexal\FHIRTools\Component\Metadata\CanonicalUrl;
 use Nette\PhpGenerator\ClassLike;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumType;
@@ -41,7 +42,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Support\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Support\StringCase;
 
 use function Symfony\Component\String\u;

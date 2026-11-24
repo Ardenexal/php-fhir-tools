@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
  * Checks that a value conforms to at least one of the profiles an element names.
@@ -124,7 +125,7 @@ final class FHIRAnyOfProfilesValidator extends ConstraintValidator
             foreach ($errors as $error) {
                 $builder = $this->context->buildViolation($error->getMessageTemplate() . self::PROFILE_ERROR_SUFFIX)
                     ->setParameters([...$error->getParameters(), '{{ anyOfProfile }}' => $profile])
-                    ->atPath(self::join($path, $error->getPropertyPath()))
+                    ->atPath(PropertyPath::append($path, $error->getPropertyPath()))
                     ->setCode(FHIRViolationCode::ERROR);
                 if ($error->getPlural() !== null) {
                     $builder->setPlural($error->getPlural());
@@ -144,18 +145,5 @@ final class FHIRAnyOfProfilesValidator extends ConstraintValidator
             ->atPath($path)
             ->setCode($code)
             ->addViolation();
-    }
-
-    /**
-     * $inner beneath $outer, both relative property paths that may be empty or start with an index.
-     */
-    private static function join(string $outer, string $inner): string
-    {
-        return match (true) {
-            $inner    === ''      => $outer,
-            $outer    === ''      => $inner,
-            $inner[0] === '['     => $outer . $inner,
-            default               => $outer . '.' . $inner,
-        };
     }
 }

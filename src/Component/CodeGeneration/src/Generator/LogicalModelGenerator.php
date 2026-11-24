@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Support\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;

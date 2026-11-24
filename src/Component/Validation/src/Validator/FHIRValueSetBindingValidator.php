@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyMembershipCli
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\Validation\TerminologyMembership;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -354,13 +355,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
      */
     private function codingMembership(FHIRTerminologyClientInterface $client, string $valueSetUrl, ?string $system, mixed $code): ?bool
     {
-        $code = $code instanceof \BackedEnum ? (string) $code->value : (string) $code;
-
-        if ($client instanceof FHIRTerminologyMembershipClientInterface) {
-            return $system === null ? $client->checkCode($valueSetUrl, $code) : $client->checkCoding($valueSetUrl, $system, $code);
-        }
-
-        return $system === null ? $client->validateCode($valueSetUrl, $code) : $client->validateCoding($valueSetUrl, $system, $code);
+        return TerminologyMembership::check($client, $valueSetUrl, $system, $code instanceof \BackedEnum ? (string) $code->value : (string) $code);
     }
 
     /**

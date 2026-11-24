@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
+use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
  * Validates FHIR slice membership on sliced array properties.
@@ -518,15 +519,8 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                     $this->context = $context;
 
                     foreach ($violations as $v) {
-                        $innerPath = $v->getPropertyPath();
-                        $path      = match (true) {
-                            $innerPath    === ''  => $base,
-                            $innerPath[0] === '[' => $base . $innerPath,
-                            default               => $base . '.' . $innerPath,
-                        };
-
                         $this->context->buildViolation($v->getMessageTemplate(), $v->getParameters())
-                            ->atPath($path)
+                            ->atPath(PropertyPath::append($base, $v->getPropertyPath()))
                             ->setCode($v->getCode() ?? FHIRViolationCode::ERROR)
                             ->addViolation();
                     }

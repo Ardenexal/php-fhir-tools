@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyMembershipClientInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -494,16 +493,7 @@ final class SliceDiscriminatorMatcher
      */
     private function membership(string $valueSetUrl, ?string $system, string $code): ?bool
     {
-        $client = $this->terminologyClient;
-        if ($client === null) {
-            return null;
-        }
-
-        if ($client instanceof FHIRTerminologyMembershipClientInterface) {
-            return $system === null ? $client->checkCode($valueSetUrl, $code) : $client->checkCoding($valueSetUrl, $system, $code);
-        }
-
-        return $system === null ? $client->validateCode($valueSetUrl, $code) : $client->validateCoding($valueSetUrl, $system, $code);
+        return $this->terminologyClient === null ? null : TerminologyMembership::check($this->terminologyClient, $valueSetUrl, $system, $code);
     }
 
     /**
