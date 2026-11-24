@@ -60,31 +60,65 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
 #[FHIRProfileMustSupport(path: 'conclusion', groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'])]
-#[FHIRSlicingRules(property: 'result', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'], ordered: true)]
+#[FHIRSlicingRules(property: 'result', rules: 'closed', groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'], ordered: true)]
 #[FHIRSliceConstraint(
     property: 'result',
     sliceName: 'Cholesterol',
-    min: 0,
+    min: 1,
     max: 1,
-    discriminators: [['type' => 'value', 'path' => 'resolve().code']],
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'resolve().code',
+            'value' => [
+                'coding' => [
+                    [
+                        'system'  => 'http://loinc.org',
+                        'code'    => '35200-5',
+                        'display' => "Cholesterol [Moles/\u{200B}volume] in Serum or Plasma",
+                    ],
+                ],
+            ],
+        ],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
 #[FHIRSliceConstraint(
     property: 'result',
     sliceName: 'Triglyceride',
-    min: 0,
+    min: 1,
     max: 1,
-    discriminators: [['type' => 'value', 'path' => 'resolve().code']],
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'resolve().code',
+            'value' => [
+                'coding' => [
+                    [
+                        'system'  => 'http://loinc.org',
+                        'code'    => '35217-9',
+                        'display' => "Triglyceride [Moles/\u{200B}volume] in Serum or Plasma",
+                    ],
+                ],
+            ],
+        ],
+    ],
     orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
 #[FHIRSliceConstraint(
     property: 'result',
     sliceName: 'HDLCholesterol',
-    min: 0,
+    min: 1,
     max: 1,
-    discriminators: [['type' => 'value', 'path' => 'resolve().code']],
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'resolve().code',
+            'value' => ['coding' => [['system' => 'http://loinc.org', 'code' => '2085-9', 'display' => 'HDL Cholesterol']]],
+        ],
+    ],
     orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
@@ -93,7 +127,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
     sliceName: 'LDLCholesterol',
     min: 0,
     max: 1,
-    discriminators: [['type' => 'value', 'path' => 'resolve().code']],
+    discriminators: [
+        [
+            'type'     => 'value',
+            'path'     => 'resolve().code',
+            'valueSet' => 'http://hl7.org/fhir/ValueSet/ldlcholesterol-codes|4.0.1',
+        ],
+    ],
     orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
