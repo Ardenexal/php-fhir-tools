@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
@@ -30,6 +31,9 @@ final class QuestionnaireDefinitionChecker
 
     /** @var array<class-string, bool> keyed by class name */
     private array $isQuestionnaire = [];
+
+    /** @var array<class-string, bool> whether a class models a FHIR primitive, keyed by class name */
+    private array $isPrimitive = [];
 
     public function __construct(
         private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
@@ -68,6 +72,13 @@ final class QuestionnaireDefinitionChecker
         if ($this->isQuestionnaire($node)) {
             $itemVisited = [];
             $this->checkItems($this->itemsOf($node), $path === '' ? 'item' : $path . '.item', $itemVisited, $violations);
+        }
+
+        // A primitive holds only its value, id and extensions, and no extension value is a resource.
+        if ($this->isPrimitive[$node::class] ??= $this->attributes->classAttributes($node, FHIRPrimitive::class) !== []) {
+            unset($visited[$objectId]);
+
+            return;
         }
 
         foreach ($this->models->initializedPublicValues($node) as $name => $value) {
