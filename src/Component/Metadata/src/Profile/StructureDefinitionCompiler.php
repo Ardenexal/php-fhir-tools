@@ -2072,7 +2072,7 @@ final class StructureDefinitionCompiler
             return [];
         }
 
-        $definition = $lookup(self::canonicalWithoutVersion($targets[0]));
+        $definition = $lookup(CanonicalUrl::stripVersion($targets[0]));
         $root       = (string) ($definition['type'] ?? '');
         if ($definition === null || $root === '') {
             return [];
@@ -2104,7 +2104,7 @@ final class StructureDefinitionCompiler
      */
     private static function targetResourceType(string $url, ?\Closure $lookup): ?string
     {
-        $url = self::canonicalWithoutVersion($url);
+        $url = CanonicalUrl::stripVersion($url);
         if (preg_match('~\Ahttp://hl7\.org/fhir/StructureDefinition/(?<type>[A-Z][A-Za-z]+)\z~', $url, $match) === 1) {
             // `Reference(Any)` names an abstract type, which no resource has as its own
             return in_array($match['type'], self::ABSTRACT_RESOURCE_TYPES, true) ? null : $match['type'];
