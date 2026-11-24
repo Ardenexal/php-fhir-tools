@@ -12,9 +12,12 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRElementPath;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
+use Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
+use Ardenexal\FHIRTools\Component\Validation\SliceReferenceResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -43,7 +46,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 final class FHIRSliceConstraintValidator extends ConstraintValidator
 {
     /**
-     * Tracks already-validated (property, group) pairs per ExecutionContext.
+     * Tracks already-validated (object, property, group) combinations per ExecutionContext.
      * The ExecutionContext is a new object per $validator->validate() call, so dedup
      * naturally resets between separate validation passes on the same object.
      *
@@ -59,6 +62,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
         ?FHIRChoiceVariantReader $reader = null,
         private readonly ?RuntimeProfileConformance $profiles = null,
+        private readonly FHIRReferenceResolverInterface $references = new NullFHIRReferenceResolver(),
     ) {
         $this->reader = $reader ?? new FHIRChoiceVariantReader($propertyAccessor);
     }
@@ -96,9 +100,10 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
 
         $property    = $constraint->property;
         $activeGroup = $this->context->getGroup() ?? 'Default';
-        $dedupKey    = "{$property}|{$activeGroup}";
+        // The object is part of the key: two resources of one profile in a Bundle share the context
+        $dedupKey    = spl_object_id($value) . "|{$property}|{$activeGroup}";
 
-        // Only process each (property, group) combination once per $validator->validate() call.
+        // Only process each (object, property, group) combination once per $validator->validate() call.
         // Keyed on the ExecutionContext so the dedup resets when a new call creates a fresh context.
         $ctx       = $this->context;
         $keys      = self::processedKeys();
@@ -333,13 +338,33 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     }
 
     /**
-     * The matcher, answering `profile` discriminators by checking the item against the profile in a
-     * validation run of its own when a profile checker is configured.
+     * The matcher, following `resolve()` in a discriminator path to the resources around the sliced
+     * element (see SliceReferenceResolver), and answering `profile` discriminators by checking the
+     * item against the profile in a validation run of its own when a profile checker is configured.
+     *
+     * The references are resolved lazily: a slicing with no `resolve()` path never walks the model.
      */
     private function matcher(): SliceDiscriminatorMatcher
     {
+        $root       = $this->context->getRoot();
+        $value      = $this->context->getObject();
+        $path       = $this->context->getPropertyPath();
+        $references = $this->references;
+        $resolver   = null;
+
+        $matcher = $this->matcher->withReferenceResolver(
+            static function(object $reference) use ($root, $value, $path, $references, &$resolver): ?object {
+                if ($resolver === null) {
+                    $from     = is_object($root) ? $root : $value;
+                    $resolver = is_object($from) ? new SliceReferenceResolver($from, $from === $root ? $path : '', $references) : false;
+                }
+
+                return $resolver === false ? $references->resolve($reference) : $resolver->resolve($reference);
+            },
+        );
+
         if ($this->profiles === null) {
-            return $this->matcher;
+            return $matcher;
         }
 
         $context  = $this->context;
@@ -348,7 +373,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         // A profile that slices elements of its own runs them through this same instance, which
         // points $this->context at the side run. Restored after each check, or this slicing's
         // findings land in the side run and vanish.
-        return $this->matcher->withProfileCheck(
+        return $matcher->withProfileCheck(
             function(object|array $value, string $profileUrl) use ($context, $profiles): ?bool {
                 if (!is_object($value)) {
                     return null;

@@ -23,14 +23,20 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *   - 'profile' — The value at the path conforms to one of the listed profiles, as the profile
  *                 check handed to the constructor answers
  *
- * The path `$this` is the item itself. A `value` or `pattern` discriminator that carries a
- * `valueSet` instead of a value matches an item whose code is in that value set, as the
- * terminology client answers. One that carries `anyOf` instead, the discriminators of a slice's
- * reslices, matches an item that matches any one of them.
+ * The path `$this` is the item itself. A path through `resolve()` (`item.resolve().code`) follows each
+ * reference at the part before it to the resource it points at, with the reference resolver handed to
+ * the constructor, and checks the part after it (or the resource itself) there. `ofType(T)` at the end
+ * of the reference's path keeps only the values of type T, as `content.ofType(Reference)` does for a
+ * choice element. A reference that cannot be resolved cannot be judged.
+ *
+ * A `value` or `pattern` discriminator that carries a `valueSet` instead of a value matches an item
+ * whose code is in that value set, as the terminology client answers. One that carries `anyOf`
+ * instead, the discriminators of a slice's reslices, matches an item that matches any one of them.
  *
  * An item belongs to a slice when it satisfies every discriminator. Where one of them cannot be
- * answered (no terminology client, a server that gave no answer, or no profile check), the answer
- * is null: the item neither belongs to the slice nor is known to be outside it.
+ * answered (no terminology client, a server that gave no answer, no profile check, or a reference
+ * that does not resolve), the answer is null: the item neither belongs to the slice nor is known to
+ * be outside it.
  *
  * @author Ardenexal
  */
@@ -39,11 +45,13 @@ final class SliceDiscriminatorMatcher
     /**
      * @param FHIRTerminologyClientInterface|null                       $terminologyClient Answers value set membership for binding discriminators; null or the null client answers nothing
      * @param (\Closure(object|array<mixed>, string): (bool|null))|null $conformsTo        Whether a value conforms to a profile URL, or null when that cannot be told
+     * @param (\Closure(object): (object|null))|null                    $resolveReference  The resource a Reference points at, or null when it cannot be resolved
      */
     public function __construct(
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly ?FHIRTerminologyClientInterface $terminologyClient = null,
         private readonly ?\Closure $conformsTo = null,
+        private readonly ?\Closure $resolveReference = null,
     ) {
     }
 
@@ -54,7 +62,17 @@ final class SliceDiscriminatorMatcher
      */
     public function withProfileCheck(\Closure $conformsTo): self
     {
-        return new self($this->propertyAccessor, $this->terminologyClient, $conformsTo);
+        return new self($this->propertyAccessor, $this->terminologyClient, $conformsTo, $this->resolveReference);
+    }
+
+    /**
+     * This matcher, following `resolve()` in a discriminator path with $resolveReference.
+     *
+     * @param \Closure(object): (object|null) $resolveReference The resource a Reference points at, or null when it cannot be resolved
+     */
+    public function withReferenceResolver(\Closure $resolveReference): self
+    {
+        return new self($this->propertyAccessor, $this->terminologyClient, $this->conformsTo, $resolveReference);
     }
 
     /**
@@ -145,6 +163,11 @@ final class SliceDiscriminatorMatcher
             return $this->matchesAny($item, $discriminator['anyOf']);
         }
 
+        $resolve = self::splitAtResolve($path);
+        if ($resolve !== null) {
+            return $this->matchesResolved($item, $discriminator, ...$resolve);
+        }
+
         if (!array_key_exists('value', $discriminator)) {
             return isset($discriminator['valueSet']) && in_array($discriminator['type'], ['value', 'pattern'], true)
                 ? $this->matchesValueSet($item, $path, $discriminator['valueSet'])
@@ -186,6 +209,54 @@ final class SliceDiscriminatorMatcher
         }
 
         return $verdict;
+    }
+
+    /**
+     * A discriminator through `resolve()`: true when a resource one of the item's references resolves
+     * to satisfies it at the rest of the path, false when every reference resolves and none does,
+     * and null when none does but one or more could not be resolved.
+     *
+     * @param object|array<string, mixed>                                         $item
+     * @param array{type: string, path: string, value?: mixed, valueSet?: string} $discriminator
+     */
+    private function matchesResolved(object|array $item, array $discriminator, string $referencePath, string $rest): ?bool
+    {
+        $verdict = false;
+
+        foreach ($this->readPathValues($item, $referencePath) as $reference) {
+            if (!is_object($reference)) {
+                continue;
+            }
+
+            $resource = $this->resolveReference === null ? null : ($this->resolveReference)($reference);
+            $match    = $resource               === null ? null : $this->matchesDiscriminator($resource, ['path' => $rest === '' ? '$this' : $rest] + $discriminator);
+
+            if ($match === true) {
+                return true;
+            }
+
+            if ($match === null) {
+                $verdict = null;
+            }
+        }
+
+        return $verdict;
+    }
+
+    /**
+     * A discriminator path through `resolve()`, split into the path of the reference and the path
+     * within the resource it resolves to; null when the path does not go through `resolve()` once.
+     *
+     * @return array{string, string}|null
+     */
+    private static function splitAtResolve(string $path): ?array
+    {
+        if (preg_match('/\A(?:(?<reference>.+)\.)?resolve\(\)(?:\.(?<rest>.+))?\z/', $path, $match) !== 1
+            || substr_count($path, 'resolve()')                                                     !== 1) {
+            return null;
+        }
+
+        return [($match['reference'] ?? '') === '' ? '$this' : $match['reference'], $match['rest'] ?? ''];
     }
 
     /**
@@ -483,6 +554,12 @@ final class SliceDiscriminatorMatcher
             return [$item];
         }
 
+        // `content.ofType(Reference)`: the values at `content` that are References
+        $ofType = null;
+        if (preg_match('/\A(?<path>.+)\.ofType\((?<type>[A-Za-z]+)\)\z/', $path, $match) === 1) {
+            [$path, $ofType] = [$match['path'], $match['type']];
+        }
+
         $current = [$item];
 
         foreach (explode('.', FHIRElementPath::toPropertyPath($path)) as $segment) {
@@ -509,7 +586,7 @@ final class SliceDiscriminatorMatcher
             $current = $next;
         }
 
-        return $current;
+        return $ofType === null ? $current : array_values(array_filter($current, static fn (mixed $value): bool => FHIRValueType::of($value) === $ofType));
     }
 
     /**

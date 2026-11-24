@@ -163,7 +163,7 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Required bindings | Supported | `FHIRValueSetBindingValidator`; enum-backed |
 | FHIRPath invariants | Supported | Engine eval errors emit `fhir:eval-error` INFO (not ERROR) |
 | Fixed / pattern values | Supported | `FHIRFixedValueValidator` / `FHIRPatternValueValidator` |
-| Slicing (closed/open/openAtEnd) | Supported | `FHIRSliceConstraintValidator`; every discriminator type, `$this`, and composite discriminators. Binding slices need a terminology client; paths through `resolve()` are not followed |
+| Slicing (closed/open/openAtEnd) | Supported | `FHIRSliceConstraintValidator`; every discriminator type, `$this`, and composite discriminators. Binding slices need a terminology client; paths through `resolve()` follow the reference to a contained resource, a Bundle entry, or the configured reference resolver |
 | Profile constraints (generated) | Supported | `FHIRProfileConstraintValidator`; requires pre-generated models |
 | Profile constraints (dynamic/runtime) | Supported | `RuntimeProfileResolver`; StructureDefinitions must carry a snapshot; see [Runtime Profiles](runtime-profiles.md) |
 | Extension contexts (element/fhirpath/extension) | Supported | Recursive walk; defer-not-deny safety; see [Extensions](extensions.md) |
@@ -193,11 +193,13 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 * **Runtime profiles need snapshots.** A profile you have not generated can be validated from its
   StructureDefinition, but only when it carries a snapshot. All
   HL7 core profiles for R4/R4B/R5 are pre-generated. See [Runtime Profiles](runtime-profiles.md#limits).
-* **Slice discriminators** through `resolve()` are not followed. Closed or openAtEnd slicing that
-  depends on one is enforced as open, and the generator (or the runtime compiler) reports a
-  warning. A slice keyed by a `required` binding needs a terminology client, and one keyed by a
-  profile needs that profile generated or resolvable at runtime; until then its items are not
-  judged. See [Structural](structural.md#slicing).
+* **Some slice discriminators can go unanswered.** A slice keyed by a `required` binding needs a
+  terminology client, one keyed by a profile needs that profile generated or resolvable at runtime,
+  and one through `resolve()` needs the reference to resolve: to a contained resource, a Bundle
+  entry, or through the configured `FHIRReferenceResolverInterface`. Until then the items are not
+  judged. A `resolve()` slice whose reference names no target profile has nothing to match on, so
+  closed or openAtEnd slicing that depends on it is enforced as open, with a warning. See
+  [Structural](structural.md#slicing).
 * **Narrative XHTML** is checked for disallowed content (`txt-1`) and unparsable markup (`txt-2`).
   A well-formed narrative with no non-whitespace content is not reported, and neither is the XHTML
   namespace: the XML reader drops namespace bindings on `div`, so a correct narrative and a wrong

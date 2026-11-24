@@ -8,6 +8,13 @@ use Ardenexal\FHIRTools\Component\Metadata\Contract\CodingValidationResult;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientDecoratorInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyMembershipClientInterface;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\ConditionResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\List\ListEntry;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Validation\InMemoryFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
@@ -430,6 +437,57 @@ final class SliceDiscriminatorMatcherTest extends TestCase
 
         // Nothing at the path conforms to anything
         self::assertFalse($checked->matchesAll(new \stdClass(), [$discriminator]));
+    }
+
+    /**
+     * A path through `resolve()` follows each reference to the resource it points at and checks the
+     * rest of the path there; a reference that does not resolve leaves the item undecided.
+     */
+    public function testAPathThroughResolveChecksTheResolvedResource(): void
+    {
+        $condition   = new ConditionResource();
+        $observation = new ObservationResource(code: new CodeableConcept(coding: [new Coding(code: new CodePrimitive(value: 'vital-signs'))]));
+        $targets     = ['#c1' => $condition, '#o1' => $observation];
+
+        $resolving = $this->matcher->withReferenceResolver(
+            static fn (object $reference): ?object => $targets[(string) $reference->reference] ?? null,
+        );
+
+        $toCondition   = new ListEntry(item: new Reference(reference: '#c1'));
+        $toObservation = new ListEntry(item: new Reference(reference: '#o1'));
+        $unresolved    = new ListEntry(item: new Reference(reference: 'Patient/elsewhere'));
+
+        self::assertTrue($resolving->matchesAll($toCondition, [['type' => 'type', 'path' => 'item.resolve()', 'value' => ['Condition']]]));
+        self::assertFalse($resolving->matchesAll($toObservation, [['type' => 'type', 'path' => 'item.resolve()', 'value' => ['Condition']]]));
+        self::assertNull($resolving->matchesAll($unresolved, [['type' => 'type', 'path' => 'item.resolve()', 'value' => ['Condition']]]));
+
+        $code = ['type' => 'pattern', 'path' => 'item.resolve().code', 'value' => ['coding' => [['code' => 'vital-signs']]]];
+        self::assertTrue($resolving->matchesAll($toObservation, [$code]));
+        self::assertFalse($resolving->matchesAll($toCondition, [$code]));
+
+        // On the item itself, and with no resolver nothing can be told
+        self::assertTrue($resolving->matchesAll(new Reference(reference: '#c1'), [['type' => 'type', 'path' => 'resolve()', 'value' => 'Condition']]));
+        self::assertNull($this->matcher->matchesAll($toCondition, [['type' => 'type', 'path' => 'item.resolve()', 'value' => ['Condition']]]));
+
+        // No reference at the path: not in the slice
+        self::assertFalse($resolving->matchesAll(new ListEntry(), [['type' => 'type', 'path' => 'item.resolve()', 'value' => ['Condition']]]));
+    }
+
+    /**
+     * `ofType(Reference)` keeps the References of a choice element, so a string payload is not
+     * followed and is outside a slice of resolved resources.
+     */
+    public function testOfTypeKeepsOnlyValuesOfThatType(): void
+    {
+        $resolving     = $this->matcher->withReferenceResolver(static fn (object $reference): ?object => new ConditionResource());
+        $discriminator = ['type' => 'type', 'path' => 'content.ofType(Reference).resolve()', 'value' => ['Condition']];
+
+        $payload          = new \stdClass();
+        $payload->content = new Reference(reference: 'Condition/1');
+        self::assertTrue($resolving->matchesAll($payload, [$discriminator]));
+
+        $payload->content = 'just text';
+        self::assertFalse($resolving->matchesAll($payload, [$discriminator]));
     }
 
     /** Shaped like a CodeableConcept: a repeating `coding`, each with a `code`. */
