@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
+use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
  * Checks each occurrence of a profile-bound element against its value set.
@@ -67,12 +68,7 @@ final class FHIRProfileBindingValidator extends ConstraintValidator
             }
 
             foreach ($this->context->getValidator()->validate($group['value'], $binding, ['Default']) as $violation) {
-                $inner = $violation->getPropertyPath();
-                $path  = match (true) {
-                    $inner    === ''  => $group['path'],
-                    $inner[0] === '[' => $group['path'] . $inner,
-                    default           => $group['path'] . '.' . $inner,
-                };
+                $path = PropertyPath::append($group['path'], $violation->getPropertyPath());
 
                 $this->context->buildViolation($violation->getMessageTemplate(), $violation->getParameters())
                     ->atPath($path)

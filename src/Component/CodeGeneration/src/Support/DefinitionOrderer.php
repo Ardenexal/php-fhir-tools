@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Support;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ClassNameResolver;
+use Ardenexal\FHIRTools\Component\Metadata\CanonicalUrl;
 
 /**
  * Orders StructureDefinitions so a definition is always generated after the definition it derives

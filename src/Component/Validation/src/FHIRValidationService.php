@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use Ardenexal\FHIRTools\Component\Metadata\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\PropertyMetadataProvider;
@@ -428,12 +429,12 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             // A nested resource takes up a requested URL when it claims that profile, through its
             // meta.profile or its class, ignoring any |version on either side.
             if (!$topLevel) {
-                $claimed   = [...$this->declaredProfileUrls($resource), ...array_map(self::canonicalWithoutVersion(...), $metaProfiles)];
+                $claimed   = [...$this->declaredProfileUrls($resource), ...array_map(CanonicalUrl::stripVersion(...), $metaProfiles)];
                 $requested = [];
                 foreach ($options->profileUrls as $url) {
-                    if (in_array(self::canonicalWithoutVersion($url), $claimed, true)) {
+                    if (in_array(CanonicalUrl::stripVersion($url), $claimed, true)) {
                         $requested[]                                          = $url;
-                        $walk['reached'][self::canonicalWithoutVersion($url)] = true;
+                        $walk['reached'][CanonicalUrl::stripVersion($url)]    = true;
                     }
                 }
             }
@@ -451,7 +452,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             if ($options->profilesFromVitalSignsCodes) {
                 // A vital-sign code implies its profile the way a meta.profile entry claims one. A
                 // profile already wanted under any version is left as it is.
-                $named = array_map(self::canonicalWithoutVersion(...), array_keys($wanted));
+                $named = array_map(CanonicalUrl::stripVersion(...), array_keys($wanted));
                 foreach ($this->impliedVitalSignsProfiles($resource) as $url) {
                     if (!in_array($url, $named, true)) {
                         $wanted[$url] = ['ancestors' => true, 'fromMeta' => false, 'implied' => true];
@@ -522,7 +523,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         $classGroups = [];
 
         foreach ($wanted as $url => $how) {
-            $canonical = self::canonicalWithoutVersion($url);
+            $canonical = CanonicalUrl::stripVersion($url);
             if (in_array($canonical, $declared, true)) {
                 // The class's attributes check it. A requested URL's group already ran over the whole
                 // resource; a meta.profile URL's group ran only if it was also requested, so a typed
@@ -909,13 +910,6 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     private static function readPublic(object $subject, string $property): mixed
     {
         return property_exists($subject, $property) ? ($subject->{$property} ?? null) : null;
-    }
-
-    private static function canonicalWithoutVersion(string $url): string
-    {
-        $pipe = strpos($url, '|');
-
-        return $pipe === false ? $url : substr($url, 0, $pipe);
     }
 
     private function mapViolation(ConstraintViolationInterface $violation): FHIRValidationViolation

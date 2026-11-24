@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileOblig
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\CanonicalUrl;
 use Symfony\Component\Validator\Constraints\Count;
 
 /**
@@ -75,7 +76,7 @@ final class StructureDefinitionCompiler
     {
         $profileUrl  = (string) ($structureDefinition['url'] ?? '');
         $diagnostics = [];
-        $visited     = [self::canonicalWithoutVersion($profileUrl) => true];
+        $visited     = [CanonicalUrl::stripVersion($profileUrl) => true];
         $inline      = $lookup === null ? null : self::sliceInliner($structureDefinition, $profileUrl, $lookup, $visited, 1, '', $diagnostics);
 
         $attributes = [
@@ -255,6 +256,16 @@ final class StructureDefinitionCompiler
     }
 
     /**
+     * The profile URLs one `type` entry names, as written (a `|version` included).
+     *
+     * @return list<string>
+     */
+    private static function typeProfiles(mixed $type): array
+    {
+        return is_array($type) && is_array($type['profile'] ?? null) ? array_values(array_filter($type['profile'], 'is_string')) : [];
+    }
+
+    /**
      * The rules of each data-type profile this differential names in an element's `type.profile`,
      * moved under that element's path and into the group of the profile being compiled.
      *
@@ -351,7 +362,7 @@ final class StructureDefinitionCompiler
         $types    = is_array($element['type'] ?? null) ? array_values($element['type']) : [];
         $profiled = [];
         foreach ($types as $type) {
-            $profiles = is_array($type['profile'] ?? null) ? array_values(array_filter($type['profile'], 'is_string')) : [];
+            $profiles = self::typeProfiles($type);
             if ($profiles !== [] && ($type['code'] ?? null) !== 'Extension') {
                 $profiled[] = $profiles;
             }
@@ -379,7 +390,7 @@ final class StructureDefinitionCompiler
             return [];
         }
 
-        $url = self::canonicalWithoutVersion($profiled[0][0]);
+        $url = CanonicalUrl::stripVersion($profiled[0][0]);
         if (isset($visited[$url])) {
             $notEnforced("{$url} is already being inlined on this path, so the profiles refer to each other");
 
@@ -416,7 +427,7 @@ final class StructureDefinitionCompiler
         $seen    = $visited;
         $chain   = [];
         while (is_array($current) && ($current['derivation'] ?? null) === 'constraint') {
-            $currentUrl        = self::canonicalWithoutVersion((string) ($current['url'] ?? ''));
+            $currentUrl        = CanonicalUrl::stripVersion((string) ($current['url'] ?? ''));
             $seen[$currentUrl] = true;
 
             if (self::snapshotElements($current) === []) {
@@ -433,7 +444,7 @@ final class StructureDefinitionCompiler
                 ...self::inlinedDataTypeProfiles($current, $groupUrl, $lookup, $seen, $depth + 1, $diagnostics, $at),
             ];
 
-            $parent = is_string($current['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($current['baseDefinition']) : '';
+            $parent = is_string($current['baseDefinition'] ?? null) ? CanonicalUrl::stripVersion($current['baseDefinition']) : '';
             if ($parent === '' || isset($seen[$parent])) {
                 break;
             }
@@ -467,7 +478,7 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
-            $profiles = array_map(self::canonicalWithoutVersion(...), is_array($type['profile'] ?? null) ? array_filter($type['profile'], 'is_string') : []);
+            $profiles = array_map(CanonicalUrl::stripVersion(...), self::typeProfiles($type));
             if ($profiles === [] || in_array(self::CORE_BASE . $type['code'], $profiles, true)) {
                 $open[$type['code']] = true;
             } else {
@@ -638,9 +649,9 @@ final class StructureDefinitionCompiler
         if (count($types) !== 1 || !is_array($types[0]['profile'] ?? null)) {
             return false;
         }
-        $inherited = array_values(array_map(self::canonicalWithoutVersion(...), array_filter($types[0]['profile'], 'is_string')));
+        $inherited = array_map(CanonicalUrl::stripVersion(...), self::typeProfiles($types[0]));
 
-        return $inherited === array_map(self::canonicalWithoutVersion(...), $profiles);
+        return $inherited === array_map(CanonicalUrl::stripVersion(...), $profiles);
     }
 
     /**
@@ -669,7 +680,7 @@ final class StructureDefinitionCompiler
      */
     private static function parentSnapshotElement(array $structureDefinition, string $id, \Closure $lookup): ?array
     {
-        $base = is_string($structureDefinition['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($structureDefinition['baseDefinition']) : '';
+        $base = is_string($structureDefinition['baseDefinition'] ?? null) ? CanonicalUrl::stripVersion($structureDefinition['baseDefinition']) : '';
         if ($base === '') {
             return null;
         }
@@ -698,12 +709,12 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
-            $profiles = is_array($type['profile'] ?? null) ? array_filter($type['profile'], 'is_string') : [];
+            $profiles = self::typeProfiles($type);
             if ($profiles === []) {
                 $signature[] = $type['code'];
             }
             foreach ($profiles as $profile) {
-                $signature[] = $type['code'] . '|' . self::canonicalWithoutVersion($profile);
+                $signature[] = $type['code'] . '|' . CanonicalUrl::stripVersion($profile);
             }
         }
         sort($signature);
@@ -724,16 +735,6 @@ final class StructureDefinitionCompiler
         }
 
         return new CompiledAttribute($attribute->class, $arguments);
-    }
-
-    /**
-     * "http://x/StructureDefinition/a|1.0" → "http://x/StructureDefinition/a".
-     */
-    private static function canonicalWithoutVersion(string $url): string
-    {
-        $pipe = strpos($url, '|');
-
-        return $pipe === false ? $url : substr($url, 0, $pipe);
     }
 
     /**
@@ -816,7 +817,7 @@ final class StructureDefinitionCompiler
      */
     private static function differentialInvariants(array $structureDefinition, ?array $groups, ?\Closure $lookup, array &$diagnostics, bool $slicesCarryRules = false): array
     {
-        $url        = self::canonicalWithoutVersion((string) ($structureDefinition['url'] ?? ''));
+        $url        = CanonicalUrl::stripVersion((string) ($structureDefinition['url'] ?? ''));
         $attributes = [];
 
         foreach (self::differentialElements($structureDefinition) as $id => $element) {
@@ -837,9 +838,8 @@ final class StructureDefinitionCompiler
                     continue;
                 }
 
-                $key    = (string) ($constraint['key'] ?? '');
-                $source = is_string($constraint['source'] ?? null) ? self::canonicalWithoutVersion($constraint['source']) : null;
-                if ($source !== null && $source !== $url) {
+                $key = (string) ($constraint['key'] ?? '');
+                if (self::declaredElsewhere($constraint, $url)) {
                     continue;
                 }
 
@@ -857,16 +857,7 @@ final class StructureDefinitionCompiler
                     continue;
                 }
 
-                $arguments = [
-                    'path'       => $propertyPath,
-                    'key'        => $key,
-                    'severity'   => (string) ($constraint['severity'] ?? 'error'),
-                    'expression' => $constraint['expression'],
-                    'human'      => (string) ($constraint['human'] ?? ''),
-                ];
-                if (self::isBestPractice($constraint)) {
-                    $arguments['bestPractice'] = true;
-                }
+                $arguments = self::invariantArguments($constraint, $propertyPath);
                 if ($groups !== null) {
                     $arguments['groups'] = $groups;
                 }
@@ -898,16 +889,15 @@ final class StructureDefinitionCompiler
      */
     private static function differentialBindings(array $structureDefinition, ?array $groups, ?\Closure $lookup, array &$diagnostics, bool $slicesCarryRules = false): array
     {
-        $url        = self::canonicalWithoutVersion((string) ($structureDefinition['url'] ?? ''));
+        $url        = CanonicalUrl::stripVersion((string) ($structureDefinition['url'] ?? ''));
         $attributes = [];
 
         foreach (self::differentialElements($structureDefinition) as $id => $element) {
-            $binding  = is_array($element['binding'] ?? null) ? $element['binding'] : [];
-            $strength = $binding['strength'] ?? null;
-            $valueSet = $binding['valueSet'] ?? null;
-            if (!in_array($strength, ['required', 'extensible'], true) || !is_string($valueSet) || $valueSet === '') {
+            $binding = self::enforceableBinding($element);
+            if ($binding === null) {
                 continue;
             }
+            [$strength, $valueSet] = $binding;
 
             $path = (string) ($element['path'] ?? '');
             if (!str_contains($path, '.') || ElementDefinitionReader::hasContentReference($element)) {
@@ -918,8 +908,7 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
-            $base = self::baseElementRules($structureDefinition, $path, $lookup)['binding'];
-            if ($base === [$strength, self::canonicalWithoutVersion($valueSet)]) {
+            if (self::baseElementRules($structureDefinition, $path, $lookup)['binding'] === [$strength, CanonicalUrl::stripVersion($valueSet)]) {
                 continue;
             }
 
@@ -964,17 +953,7 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
-            $keys = [];
-            foreach (is_array($element['constraint'] ?? null) ? $element['constraint'] : [] as $constraint) {
-                if (is_array($constraint) && is_string($constraint['key'] ?? null)) {
-                    $keys[] = $constraint['key'];
-                }
-            }
-
-            $binding = is_array($element['binding'] ?? null) ? $element['binding'] : [];
-            $bound   = is_string($binding['valueSet'] ?? null) ? [$binding['strength'] ?? null, self::canonicalWithoutVersion($binding['valueSet'])] : null;
-
-            return ['keys' => $keys, 'binding' => $bound];
+            return ['keys' => self::constraintKeys($element), 'binding' => self::bindingSignature($element)];
         }
 
         return ['keys' => [], 'binding' => null];
@@ -997,6 +976,93 @@ final class StructureDefinitionCompiler
         }
 
         return false;
+    }
+
+    /**
+     * Whether another definition declares this invariant (its `source` names one): that definition's
+     * own class or group enforces it, so the definition at $url skips it.
+     *
+     * @param array<mixed> $constraint
+     * @param string       $url        The compiled definition's canonical URL, without a version
+     */
+    private static function declaredElsewhere(array $constraint, string $url): bool
+    {
+        return is_string($constraint['source'] ?? null) && CanonicalUrl::stripVersion($constraint['source']) !== $url;
+    }
+
+    /**
+     * The FHIRProfileInvariant arguments for one invariant at $path. A top-level attribute and a
+     * slice rule take the same arguments.
+     *
+     * @param array<mixed> $constraint An invariant with a FHIRPath expression
+     *
+     * @return array<string, mixed>
+     */
+    private static function invariantArguments(array $constraint, string $path): array
+    {
+        $arguments = [
+            'path'       => $path,
+            'key'        => (string) ($constraint['key'] ?? ''),
+            'severity'   => (string) ($constraint['severity'] ?? 'error'),
+            'expression' => $constraint['expression'] ?? '',
+            'human'      => (string) ($constraint['human'] ?? ''),
+        ];
+        if (self::isBestPractice($constraint)) {
+            $arguments['bestPractice'] = true;
+        }
+
+        return $arguments;
+    }
+
+    /**
+     * The keys of every invariant an element declares.
+     *
+     * @param array<mixed> $element
+     *
+     * @return list<string>
+     */
+    private static function constraintKeys(array $element): array
+    {
+        $keys = [];
+        foreach (is_array($element['constraint'] ?? null) ? $element['constraint'] : [] as $constraint) {
+            if (is_array($constraint) && is_string($constraint['key'] ?? null)) {
+                $keys[] = $constraint['key'];
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
+     * An element's required or extensible binding as [strength, value set]; null for a `preferred`
+     * or `example` binding, which is guidance, or no binding.
+     *
+     * @param array<mixed> $element
+     *
+     * @return array{0: 'required'|'extensible', 1: non-empty-string}|null
+     */
+    private static function enforceableBinding(array $element): ?array
+    {
+        $binding  = is_array($element['binding'] ?? null) ? $element['binding'] : [];
+        $strength = $binding['strength'] ?? null;
+        $valueSet = $binding['valueSet'] ?? null;
+
+        return in_array($strength, ['required', 'extensible'], true) && is_string($valueSet) && $valueSet !== '' ? [$strength, $valueSet] : null;
+    }
+
+    /**
+     * An element's binding of any strength as [strength, value set without version], for telling
+     * whether two elements bind alike; null when it names no value set.
+     *
+     * @param array<mixed> $element
+     *
+     * @return array{0: mixed, 1: string}|null
+     */
+    private static function bindingSignature(array $element): ?array
+    {
+        $binding = is_array($element['binding'] ?? null) ? $element['binding'] : [];
+
+        return is_string($binding['valueSet'] ?? null) ? [$binding['strength'] ?? null, CanonicalUrl::stripVersion($binding['valueSet'])] : null;
     }
 
     /**
@@ -1118,30 +1184,8 @@ final class StructureDefinitionCompiler
             // "Observation.code.coding" → "code.coding"
             $propertyPath = self::rewriteChoiceTypeSlices(substr($slicedId, $dotPos + 1));
 
-            if ($slicing['declaredHere']) {
-                $attributes[] = new CompiledAttribute(FHIRSlicingRules::class, [
-                    'property' => $propertyPath,
-                    'rules'    => self::enforceableRules($slicedId, $slicing, $slices, $profileUrl, $diagnostics),
-                    'groups'   => [$profileUrl],
-                    ...self::orderedOption($slicedId, $slicing, $snapshot),
-                ]);
-            } elseif (self::orderedOption($slicedId, $slicing, $snapshot) !== []) {
-                // Inherited ordered slicing: the order still binds the slices this profile adds. Open
-                // rules are what no FHIRSlicingRules means, so only the order is added.
-                $attributes[] = new CompiledAttribute(FHIRSlicingRules::class, [
-                    'property' => $propertyPath,
-                    'rules'    => 'open',
-                    'groups'   => [$profileUrl],
-                    'ordered'  => true,
-                ]);
-            }
-
-            foreach ($slices as $slice) {
-                $attributes[] = new CompiledAttribute(FHIRSliceConstraint::class, [
-                    'property' => $propertyPath,
-                    ...$slice,
-                    'groups'   => [$profileUrl],
-                ]);
+            foreach (self::slicingRules($propertyPath, $slicedId, $slicing, $slices, $snapshot, $profileUrl, $diagnostics, $profileUrl) as $rule) {
+                $attributes[] = new CompiledAttribute($rule['constraint'], $rule['options']);
             }
         }
 
@@ -1313,7 +1357,7 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
-            $named = is_array($type['profile'] ?? null) ? array_values(array_filter($type['profile'], 'is_string')) : [];
+            $named = self::typeProfiles($type);
             if ($named === [] || $type['code'] === 'Extension') {
                 $openTypes[] = $type['code'];
 
@@ -1655,7 +1699,7 @@ final class StructureDefinitionCompiler
 
             $relative = self::rewriteChoiceTypeSlices(substr($nestedId, strlen($prefix)));
 
-            foreach (self::nestedSlicingRules($relative, $nestedId, $slicing, $definitions, $snapshot, $profileUrl, $diagnostics) as $rule) {
+            foreach (self::slicingRules($relative, $nestedId, $slicing, $definitions, $snapshot, $profileUrl, $diagnostics) as $rule) {
                 $rules[] = $rule;
             }
         }
@@ -1669,7 +1713,7 @@ final class StructureDefinitionCompiler
             $reslicing   = self::reslicingFor($sliceId, $slicedId, $diff, $snapshot);
             $definitions = $reslicing === null ? [] : self::sliceDefinitions($slicedId, $reslicing, $diff, $snapshot, $profileUrl, $diagnostics, $inline, $lookup, $sliceName, $parentSnapshot);
 
-            foreach ($reslicing === null || $definitions === [] ? [] : self::nestedSlicingRules('', $sliceId, $reslicing, $definitions, $snapshot, $profileUrl, $diagnostics) as $rule) {
+            foreach ($reslicing === null || $definitions === [] ? [] : self::slicingRules('', $sliceId, $reslicing, $definitions, $snapshot, $profileUrl, $diagnostics) as $rule) {
                 $rules[] = $rule;
             }
         }
@@ -1678,22 +1722,26 @@ final class StructureDefinitionCompiler
     }
 
     /**
-     * Slicing beneath a slice as slice rules at $relative: its FHIRSlicingRules when the slicing is
-     * declared here or is inherited ordered slicing, as at the top level, then one FHIRSliceConstraint
-     * per slice.
+     * A slicing's rules at $relative: its FHIRSlicingRules when the slicing is declared here or is
+     * inherited ordered slicing, then one FHIRSliceConstraint per slice.
      *
-     * @param string                                                      $relative    Item-relative path of the sliced element; '' for a slice's reslices
+     * Top-level slicing passes $group and turns each rule into a class attribute in that group.
+     * Slicing beneath a slice passes none: its rules run in the group of the slice that carries them.
+     *
+     * @param string                                                      $relative    Path of the sliced element: a property path at the top level, else item-relative ('' for a slice's reslices)
      * @param string                                                      $slicingId   Id of the element carrying the slicing
      * @param array{definition: array<string, mixed>, declaredHere: bool} $slicing     From slicingFor() or reslicingFor()
      * @param list<array<string, mixed>>                                  $definitions From sliceDefinitions()
      * @param array<string, array<string, mixed>>                         $snapshot    Snapshot elements by id
      * @param list<CompilerDiagnostic>                                    $diagnostics Receives slicing enforced as open
+     * @param string|null                                                 $group       Validation group of a top-level slicing's attributes
      *
      * @return list<array{path: string, constraint: class-string, options: array<string, mixed>}>
      */
-    private static function nestedSlicingRules(string $relative, string $slicingId, array $slicing, array $definitions, array $snapshot, string $profileUrl, array &$diagnostics): array
+    private static function slicingRules(string $relative, string $slicingId, array $slicing, array $definitions, array $snapshot, string $profileUrl, array &$diagnostics, ?string $group = null): array
     {
-        $rules = [];
+        $rules  = [];
+        $groups = $group === null ? [] : ['groups' => [$group]];
 
         if ($slicing['declaredHere']) {
             $rules[] = [
@@ -1702,23 +1750,25 @@ final class StructureDefinitionCompiler
                 'options'    => [
                     'property' => $relative,
                     'rules'    => self::enforceableRules($slicingId, $slicing, $definitions, $profileUrl, $diagnostics),
+                    ...$groups,
                     ...self::orderedOption($slicingId, $slicing, $snapshot),
                 ],
             ];
         } elseif (self::orderedOption($slicingId, $slicing, $snapshot) !== []) {
-            // Inherited ordered slicing, as at the top level
+            // Inherited ordered slicing: the order still binds the slices this profile adds. Open
+            // rules are what no FHIRSlicingRules means, so only the order is added.
             $rules[] = [
                 'path'       => $relative,
                 'constraint' => FHIRSlicingRules::class,
-                'options'    => ['property' => $relative, 'rules' => 'open', 'ordered' => true],
+                'options'    => ['property' => $relative, 'rules' => 'open', ...$groups, 'ordered' => true],
             ];
         }
 
-        foreach ($definitions as $nested) {
+        foreach ($definitions as $definition) {
             $rules[] = [
                 'path'       => $relative,
                 'constraint' => FHIRSliceConstraint::class,
-                'options'    => ['property' => $relative, ...$nested],
+                'options'    => ['property' => $relative, ...$definition, ...$groups],
             ];
         }
 
@@ -1746,14 +1796,9 @@ final class StructureDefinitionCompiler
      */
     private static function sliceInvariantsAndBindings(string $id, string $relative, array $element, array $snapshot, string $profileUrl): array
     {
-        $url       = self::canonicalWithoutVersion($profileUrl);
+        $url       = CanonicalUrl::stripVersion($profileUrl);
         $unsliced  = $snapshot[(string) preg_replace('/:[^.]+/', '', self::rewriteChoiceTypeSlices($id))] ?? [];
-        $inherited = [];
-        foreach (is_array($unsliced['constraint'] ?? null) ? $unsliced['constraint'] : [] as $constraint) {
-            if (is_array($constraint) && is_string($constraint['key'] ?? null)) {
-                $inherited[] = $constraint['key'];
-            }
-        }
+        $inherited = self::constraintKeys($unsliced);
 
         $rules = [];
         foreach (is_array($element['constraint'] ?? null) ? $element['constraint'] : [] as $constraint) {
@@ -1761,36 +1806,17 @@ final class StructureDefinitionCompiler
                 continue;
             }
 
-            $key    = (string) ($constraint['key'] ?? '');
-            $source = is_string($constraint['source'] ?? null) ? self::canonicalWithoutVersion($constraint['source']) : null;
-            if (($source !== null && $source !== $url) || in_array($key, $inherited, true)) {
+            if (self::declaredElsewhere($constraint, $url) || in_array((string) ($constraint['key'] ?? ''), $inherited, true)) {
                 continue;
             }
 
-            $options = [
-                'path'       => $relative,
-                'key'        => $key,
-                'severity'   => (string) ($constraint['severity'] ?? 'error'),
-                'expression' => $constraint['expression'],
-                'human'      => (string) ($constraint['human'] ?? ''),
-            ];
-            if (self::isBestPractice($constraint)) {
-                $options['bestPractice'] = true;
-            }
-
-            $rules[] = ['path' => $relative, 'constraint' => FHIRProfileInvariant::class, 'options' => $options];
+            $rules[] = ['path' => $relative, 'constraint' => FHIRProfileInvariant::class, 'options' => self::invariantArguments($constraint, $relative)];
         }
 
-        $binding  = is_array($element['binding'] ?? null) ? $element['binding'] : [];
-        $strength = $binding['strength'] ?? null;
-        $valueSet = $binding['valueSet'] ?? null;
-        if (in_array($strength, ['required', 'extensible'], true) && is_string($valueSet) && $valueSet !== '') {
-            $unslicedBinding = is_array($unsliced['binding'] ?? null) ? $unsliced['binding'] : [];
-            $sameAsUnsliced  = ($unslicedBinding['strength'] ?? null) === $strength
-                && is_string($unslicedBinding['valueSet'] ?? null)
-                && self::canonicalWithoutVersion($unslicedBinding['valueSet']) === self::canonicalWithoutVersion($valueSet);
-
-            if (!$sameAsUnsliced) {
+        $binding = self::enforceableBinding($element);
+        if ($binding !== null) {
+            [$strength, $valueSet] = $binding;
+            if (self::bindingSignature($unsliced) !== [$strength, CanonicalUrl::stripVersion($valueSet)]) {
                 $rules[] = [
                     'path'       => $relative,
                     'constraint' => FHIRProfileBinding::class,
@@ -2142,12 +2168,12 @@ final class StructureDefinitionCompiler
             return [];
         }
 
-        $profiles = is_array($types[0]['profile'] ?? null) ? array_values(array_filter($types[0]['profile'], 'is_string')) : [];
+        $profiles = self::typeProfiles($types[0]);
         if (count($profiles) !== 1 || ($types[0]['code'] ?? null) === 'Extension') {
             return [];
         }
 
-        $definition = $lookup(self::canonicalWithoutVersion($profiles[0]));
+        $definition = $lookup(CanonicalUrl::stripVersion($profiles[0]));
         if ($definition === null || ($definition['kind'] ?? null) !== 'complex-type') {
             return [];
         }
@@ -2492,7 +2518,7 @@ final class StructureDefinitionCompiler
      */
     private static function parentSnapshotElements(array $structureDefinition, ?\Closure $lookup): ?array
     {
-        $base   = is_string($structureDefinition['baseDefinition'] ?? null) ? self::canonicalWithoutVersion($structureDefinition['baseDefinition']) : '';
+        $base   = is_string($structureDefinition['baseDefinition'] ?? null) ? CanonicalUrl::stripVersion($structureDefinition['baseDefinition']) : '';
         $parent = $base === '' || $lookup === null ? null : $lookup($base);
 
         return $parent === null ? null : self::snapshotElements($parent);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\CanonicalUrl;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistryInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\ResourceType as R4ResourceType;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRTargetProfileValidator;
@@ -61,7 +62,7 @@ final class TargetProfileBaseTypes
             return $this->cache[$key];
         }
 
-        $canonical = explode('|', $profileUrl, 2)[0];
+        $canonical = CanonicalUrl::stripVersion($profileUrl);
 
         return $this->cache[$key] = $this->fromIgTypes($canonical)
             ?? $this->fromCoreProfiles($canonical, $fhirVersion)
