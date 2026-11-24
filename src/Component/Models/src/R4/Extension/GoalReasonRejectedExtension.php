@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description The reason the goal was not accepted. Applies only if the status of the goal is rejected. This extension is deprecated and replaced by Goal.statusReason.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/goal-reasonRejected', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/goal-reasonRejected', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Goal')]
 class GoalReasonRejectedExtension extends Extension
 {

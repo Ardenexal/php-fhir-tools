@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\ParameterDefinition;
  *
  * @description The definition of a parameter that is expected to be provided as part of the invocation of the trigger.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-parameterDefinition', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-parameterDefinition', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'TriggerDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ParameterDefinition')]
 #[FHIRContextInvariant(expression: '($this is ParameterDefinition).not() or ($this.ofType(ParameterDefinition).type in (\'BackboneElement\' | \'Extension\'))')]

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
  *
  * @description Size of the population as a quantity.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/measurereport-countQuantity', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/measurereport-countQuantity', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.group.population')]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.group.population.count')]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport.group.stratifier.stratum.population')]

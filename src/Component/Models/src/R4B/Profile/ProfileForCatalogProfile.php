@@ -42,9 +42,21 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\CompositionResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]
 #[FHIRProfileConstraint(
+    path: 'subject',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/Resource']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
+)]
+#[FHIRProfileConstraint(
     path: 'section.entry',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
+)]
+#[FHIRProfileConstraint(
+    path: 'section.entry',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/CatalogEntry']],
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]
 #[FHIRSliceConstraint(
@@ -52,9 +64,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\CompositionResource;
     sliceName: 'ValidityPeriod',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqm-ValidityPeriod',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqm-ValidityPeriod'],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]

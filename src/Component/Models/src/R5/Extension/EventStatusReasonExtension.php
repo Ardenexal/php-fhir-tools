@@ -17,13 +17,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Captures the reason for the current state of the resource.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-statusReason', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Observation')]
-#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-statusReason', fhirVersion: 'R5', isModifier: false)]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation', endFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport', endFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'DocumentReference')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement', endFhirVersion: '4.3')]
 class EventStatusReasonExtension extends Extension
 {
     /**

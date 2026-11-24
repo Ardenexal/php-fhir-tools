@@ -13,14 +13,18 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
  * @see http://hl7.org/fhir/StructureDefinition/example-composition
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/example-composition', baseType: 'Composition', fhirVersion: 'R4')]
-#[FHIRSlicingRules(property: 'section', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'])]
+#[FHIRSlicingRules(
+    property: 'section',
+    rules: 'open',
+    groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'],
+    ordered: true,
+)]
 #[FHIRSliceConstraint(
     property: 'section',
     sliceName: 'procedure',
     min: 0,
     max: '*',
-    discriminatorType: 'pattern',
-    discriminatorPath: 'code',
+    discriminators: [['type' => 'pattern', 'path' => 'code']],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'],
 )]
@@ -29,8 +33,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
     sliceName: 'medications',
     min: 0,
     max: '*',
-    discriminatorType: 'pattern',
-    discriminatorPath: 'code',
+    discriminators: [['type' => 'pattern', 'path' => 'code']],
     orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'],
 )]
@@ -39,8 +42,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
     sliceName: 'plan',
     min: 0,
     max: '*',
-    discriminatorType: 'pattern',
-    discriminatorPath: 'code',
+    discriminators: [['type' => 'pattern', 'path' => 'code']],
     orderedIndex: 2,
     groups: ['http://hl7.org/fhir/StructureDefinition/example-composition'],
 )]

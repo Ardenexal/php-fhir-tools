@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
  *
  * @description A natural language description for non-conformance and non-terminology resource instances that is represented in the resource for publication use. Note that this extension only used as part of the IG publication tooling process. Use the [Artifact Title extension](StructureDefinition-artifact-description.html) extension for use outside the IG publishing framework.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-instance-description', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-instance-description', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 #[FHIRProfileInvariant(
     path: '',

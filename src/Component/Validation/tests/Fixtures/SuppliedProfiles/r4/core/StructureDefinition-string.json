@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"string","url":"http://hl7.org/fhir/StructureDefinition/string","version":"4.0.1","name":"string","status":"active","fhirVersion":"4.0.1","kind":"primitive-type","abstract":false,"type":"string","baseDefinition":"http://hl7.org/fhir/StructureDefinition/Element","derivation":"specialization"}

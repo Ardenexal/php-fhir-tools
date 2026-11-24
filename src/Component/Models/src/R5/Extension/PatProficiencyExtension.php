@@ -18,11 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Proficiency level of the communication.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-proficiency', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-proficiency', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient.communication')]
-#[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson.communication')]
+#[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson.communication', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'Practitioner.communication')]
-#[FHIRExtensionContext(type: 'element', expression: 'Person.communication')]
+#[FHIRExtensionContext(type: 'element', expression: 'Person.communication', startFhirVersion: '5.0')]
 class PatProficiencyExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

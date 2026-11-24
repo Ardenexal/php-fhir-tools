@@ -20,7 +20,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Extension for manipulation of a biologically derived product.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/biologicallyderivedproduct-manipulation', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/biologicallyderivedproduct-manipulation',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'BiologicallyDerivedProduct')]
 class BDPManipulationExtension extends Extension implements FHIRComplexExtensionInterface
 {

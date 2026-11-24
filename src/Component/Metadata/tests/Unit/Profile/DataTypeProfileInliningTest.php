@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Metadata\Tests\Unit\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfiles;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
@@ -140,7 +143,13 @@ final class DataTypeProfileInliningTest extends TestCase
 
         $diagnostics = self::inliningDiagnostics($compiled);
 
-        self::assertSame([], $compiled->attributes);
+        // Nothing is inlined. A choice element still gets the rule naming the types it may hold.
+        $inlined = array_filter(
+            $compiled->attributes,
+            static fn (CompiledAttribute $attribute): bool => ($attribute->arguments['constraint'] ?? null) !== FHIRAllowedTypes::class,
+        );
+
+        self::assertSame([], $inlined);
         self::assertCount(1, $diagnostics);
         self::assertStringContainsString($reason, $diagnostics[0]);
         self::assertStringContainsString('not enforced', $diagnostics[0]);
@@ -151,17 +160,6 @@ final class DataTypeProfileInliningTest extends TestCase
      */
     public static function notEnforced(): iterable
     {
-        yield 'several types' => [
-            ['id' => 'Observation.value[x]', 'path' => 'Observation.value[x]', 'type' => [
-                ['code' => 'Quantity', 'profile' => [self::BASE . 'qty']],
-                ['code' => 'string'],
-            ]],
-            'several types or profiles',
-        ];
-        yield 'several profiles' => [
-            self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty', self::BASE . 'other']]),
-            'several types or profiles',
-        ];
         yield 'unknown profile' => [
             self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'missing']]),
             'no StructureDefinition with that URL',
@@ -170,12 +168,131 @@ final class DataTypeProfileInliningTest extends TestCase
             self::element('Observation.section', ['code' => 'BackboneElement', 'profile' => [self::BASE . 'resource']]),
             'not a constraint on a data type',
         ];
-        yield 'inside a slice' => [
-            ['id' => 'Observation.component:a.valueQuantity', 'path' => 'Observation.component.valueQuantity', 'type' => [
+    }
+
+    /**
+     * A slice typed with a data-type profile holds its items to that profile: the rules become the
+     * slice's own, at item-relative paths, so items in other slices are left alone.
+     */
+    public function testAProfileOnASliceBecomesThatSlicesRules(): void
+    {
+        $compiled = self::compile(
+            [
+                ['id' => 'Observation.identifier', 'path' => 'Observation.identifier', 'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'system']], 'rules' => 'open']],
+                ['id' => 'Observation.identifier:local', 'path' => 'Observation.identifier', 'sliceName' => 'local', 'type' => [['code' => 'Identifier', 'profile' => [self::BASE . 'ident']]]],
+                ['id' => 'Observation.identifier:local.system', 'path' => 'Observation.identifier.system', 'fixedUri' => 'http://example.org/ids'],
+            ],
+            [self::BASE . 'ident' => self::identifierProfile()],
+        );
+
+        self::assertSame([], self::inliningDiagnostics($compiled));
+
+        $slices = array_values(array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRSliceConstraint::class));
+        self::assertCount(1, $slices);
+
+        /** @var list<array{path: string, constraint: string}> $rules */
+        $rules = $slices[0]->arguments['rules'];
+        self::assertSame(
+            [
+                // The profile's rules, inlined on the slice header
+                ['system', FHIRFixedValue::class],
+                ['type.coding', FHIRSlicingRules::class],
+                ['type.coding', FHIRSliceConstraint::class],
+                // The slice's own fixed system
+                ['system', FHIRFixedValue::class],
+            ],
+            array_map(static fn (array $rule): array => [$rule['path'], $rule['constraint']], $rules),
+        );
+
+        // Nothing from the data-type profile reaches the identifier element as a whole
+        self::assertSame([], array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRProfileConstraint::class));
+    }
+
+    /**
+     * Naming the base data type beside a profile lets any value of that type through, so the
+     * profile adds no rule and nothing is reported as lost.
+     */
+    public function testAnElementThatAlsoAllowsItsBaseTypeIsSkippedQuietly(): void
+    {
+        $compiled = self::compile(
+            [self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty', 'http://hl7.org/fhir/StructureDefinition/Quantity']])],
+            [self::BASE . 'qty' => self::quantityProfile(self::BASE . 'qty', [])],
+        );
+
+        self::assertSame([], $compiled->attributes);
+        self::assertSame([], self::inliningDiagnostics($compiled));
+    }
+
+    /**
+     * Several types or several profiles mean a value may match any one of them: nothing is inlined,
+     * and one FHIRAnyOfProfiles names the alternatives instead, with nothing reported as lost.
+     *
+     * @param array<string, mixed>                                   $element
+     * @param array{profiles: list<string>, openTypes: list<string>} $options
+     */
+    #[DataProvider('alternatives')]
+    public function testSeveralTypesOrProfilesAreCheckedAsAlternatives(array $element, string $path, array $options): void
+    {
+        $compiled = self::compile([$element], [
+            self::BASE . 'qty'   => self::quantityProfile(self::BASE . 'qty', []),
+            self::BASE . 'other' => self::quantityProfile(self::BASE . 'other', []),
+        ]);
+
+        $anyOf = array_values(array_filter(
+            $compiled->attributes,
+            static fn (CompiledAttribute $attribute): bool => ($attribute->arguments['constraint'] ?? null) === FHIRAnyOfProfiles::class,
+        ));
+
+        self::assertCount(1, $anyOf);
+        self::assertSame($path, $anyOf[0]->arguments['path']);
+        self::assertSame($options, $anyOf[0]->arguments['options']);
+        self::assertSame([self::OBSERVATION], $anyOf[0]->arguments['groups']);
+        self::assertSame([], self::inliningDiagnostics($compiled));
+        self::assertSame([], array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => str_contains((string) ($a->arguments['path'] ?? ''), '.comparator')));
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, array{profiles: list<string>, openTypes: list<string>}}>
+     */
+    public static function alternatives(): iterable
+    {
+        yield 'several types' => [
+            ['id' => 'Observation.value[x]', 'path' => 'Observation.value[x]', 'type' => [
                 ['code' => 'Quantity', 'profile' => [self::BASE . 'qty']],
+                ['code' => 'string'],
             ]],
-            'inside a slice',
+            'value[x]',
+            ['profiles' => [self::BASE . 'qty'], 'openTypes' => ['string']],
         ];
+        yield 'several profiles' => [
+            self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => [self::BASE . 'qty', self::BASE . 'other']]),
+            'valueQuantity',
+            ['profiles' => [self::BASE . 'qty', self::BASE . 'other'], 'openTypes' => []],
+        ];
+    }
+
+    /**
+     * A child profile that restates its parent's alternatives, in any order, leaves them to the
+     * parent's group, so a failing value is reported once. Narrowing them is the child's own rule.
+     */
+    public function testAChildRestatingItsParentsAlternativesLeavesThemToTheParent(): void
+    {
+        $parent      = self::BASE . 'parent-observation';
+        $both        = [self::BASE . 'qty', self::BASE . 'other'];
+        $definitions = [
+            $parent => self::profile($parent, 'resource', 'Observation', [self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => $both])]),
+        ];
+        $child = static fn (array $profiles): CompiledProfile => (new StructureDefinitionCompiler())->compile(
+            self::profile(self::OBSERVATION, 'resource', 'Observation', [self::element('Observation.valueQuantity', ['code' => 'Quantity', 'profile' => $profiles])], $parent),
+            static fn (string $url): ?array => $definitions[$url] ?? null,
+        );
+        $anyOf = static fn (CompiledProfile $compiled): array => array_values(array_filter(
+            $compiled->attributes,
+            static fn (CompiledAttribute $attribute): bool => ($attribute->arguments['constraint'] ?? null) === FHIRAnyOfProfiles::class,
+        ));
+
+        self::assertSame([], $anyOf($child(array_reverse($both))));
+        self::assertCount(1, $anyOf($child([self::BASE . 'qty', self::BASE . 'third'])));
     }
 
     public function testAMissingAncestorOfADataTypeProfileIsReported(): void
@@ -286,7 +403,7 @@ final class DataTypeProfileInliningTest extends TestCase
         self::assertCount(1, $slices);
         self::assertSame(1, $slices[0]->arguments['min']);
         self::assertSame(2, $slices[0]->arguments['max']);
-        self::assertSame('http://example.org/kinds', $slices[0]->arguments['discriminatorValue'] ?? null);
+        self::assertSame('http://example.org/kinds', $slices[0]->arguments['discriminators'][0]['value'] ?? null);
         self::assertCount(1, array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRSlicingRules::class));
     }
 

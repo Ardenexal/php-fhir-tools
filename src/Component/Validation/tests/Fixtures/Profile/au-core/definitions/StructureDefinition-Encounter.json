@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Encounter","url":"http://hl7.org/fhir/StructureDefinition/Encounter","version":"4.0.1","name":"Encounter","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Encounter","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

@@ -21,9 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     sliceName: 'put',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'request.method',
-    discriminatorValue: 'PUT',
+    discriminators: [['type' => 'value', 'path' => 'request.method', 'value' => 'PUT']],
     orderedIndex: 0,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
@@ -39,9 +37,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     sliceName: 'post',
     min: 0,
     max: 0,
-    discriminatorType: 'value',
-    discriminatorPath: 'request.method',
-    discriminatorValue: 'POST',
+    discriminators: [['type' => 'value', 'path' => 'request.method', 'value' => 'POST']],
     orderedIndex: 1,
     rules: [
         ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
@@ -56,9 +52,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     sliceName: 'get',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'request.method',
-    discriminatorValue: 'GET',
+    discriminators: [['type' => 'value', 'path' => 'request.method', 'value' => 'GET']],
     orderedIndex: 2,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
@@ -74,9 +68,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     sliceName: 'delete',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'request.method',
-    discriminatorValue: 'DELETE',
+    discriminators: [['type' => 'value', 'path' => 'request.method', 'value' => 'DELETE']],
     orderedIndex: 3,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
@@ -92,8 +84,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     sliceName: 'patch',
     min: 0,
     max: 0,
-    discriminatorType: 'value',
-    discriminatorPath: 'request.method',
+    discriminators: [['type' => 'value', 'path' => 'request.method']],
     orderedIndex: 4,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],

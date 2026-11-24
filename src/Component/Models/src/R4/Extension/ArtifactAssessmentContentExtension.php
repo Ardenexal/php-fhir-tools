@@ -25,7 +25,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  *
  * @description A Content containing additional documentation, a review Content, usage guidance, or other relevant information from a particular user.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifactassessment-content', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifactassessment-content', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Basic')]
 class ArtifactAssessmentContentExtension extends Extension implements FHIRComplexExtensionInterface
 {

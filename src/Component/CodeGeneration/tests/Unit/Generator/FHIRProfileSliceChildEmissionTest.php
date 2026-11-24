@@ -7,6 +7,9 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfiles;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLength;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
@@ -23,6 +26,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Observation\ObservationComponent;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAllowedTypesValidator;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAnyOfProfilesValidator;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRMaxLengthValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPatternValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator;
@@ -86,8 +92,8 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         $codesBySlice = [];
         foreach ($slices as $slice) {
             self::assertIsString($slice['sliceName']);
-            self::assertIsArray($slice['discriminatorValue'] ?? null);
-            $codesBySlice[$slice['sliceName']] = $slice['discriminatorValue']['coding'][0]['code'] ?? null;
+            self::assertIsArray($slice['discriminators'][0]['value'] ?? null);
+            $codesBySlice[$slice['sliceName']] = $slice['discriminators'][0]['value']['coding'][0]['code'] ?? null;
         }
 
         self::assertSame(
@@ -113,8 +119,8 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         $codesBySlice = [];
         foreach ($this->attributeArguments($this->generateFrom($sd), FHIRSliceConstraint::class) as $slice) {
             self::assertIsString($slice['sliceName']);
-            self::assertIsArray($slice['discriminatorValue'] ?? null);
-            $codesBySlice[$slice['sliceName']] = $slice['discriminatorValue']['coding'][0]['code'] ?? null;
+            self::assertIsArray($slice['discriminators'][0]['value'] ?? null);
+            $codesBySlice[$slice['sliceName']] = $slice['discriminators'][0]['value']['coding'][0]['code'] ?? null;
         }
 
         self::assertSame(
@@ -265,6 +271,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         self::assertSame([
             'SystolicBP' => [
                 'code ' . FHIRPatternValue::class,
+                'value[x] ' . FHIRAllowedTypes::class,
                 'value[x].system ' . Count::class,
                 'value[x].system ' . FHIRFixedValue::class,
                 'value[x].code ' . Count::class,
@@ -320,7 +327,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         ));
 
         self::assertCount(1, $slices);
-        self::assertSame('8480-6', $slices[0]['discriminatorValue'] ?? null);
+        self::assertSame('8480-6', $slices[0]['discriminators'][0]['value'] ?? null);
         self::assertSame([
             ['path' => 'valueQuantity.code', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => 'mm[Hg]']],
             ['path' => 'code.coding', 'constraint' => FHIRSlicingRules::class, 'options' => ['property' => 'code.coding', 'rules' => 'open']],
@@ -332,9 +339,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
                     'sliceName'          => 'SBPCode',
                     'min'                => 1,
                     'max'                => 1,
-                    'discriminatorType'  => 'value',
-                    'discriminatorPath'  => 'code',
-                    'discriminatorValue' => '8480-6',
+                    'discriminators'     => [['type' => 'value', 'path' => 'code', 'value' => '8480-6']],
                     'orderedIndex'       => 0,
                     'rules'              => [
                         ['path' => 'code', 'constraint' => Count::class, 'options' => ['min' => 1]],
@@ -364,12 +369,12 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         }
 
         self::assertSame(['code.coding:snomedBPCode', 'component:SystolicBP'], array_keys($slices));
-        self::assertSame([1, 1, '75367002'], [$slices['code.coding:snomedBPCode']['min'], $slices['code.coding:snomedBPCode']['max'], $slices['code.coding:snomedBPCode']['discriminatorValue'] ?? null]);
+        self::assertSame([1, 1, '75367002'], [$slices['code.coding:snomedBPCode']['min'], $slices['code.coding:snomedBPCode']['max'], $slices['code.coding:snomedBPCode']['discriminators'][0]['value'] ?? null]);
 
         // Touched only through its children: no cardinality restated, and the parent's LOINC code,
         // not the SNOMED code added beneath it, still decides which component is systolic
         $systolic = $slices['component:SystolicBP'];
-        self::assertSame([0, '*', '8480-6'], [$systolic['min'], $systolic['max'], $systolic['discriminatorValue'] ?? null]);
+        self::assertSame([0, '*', '8480-6'], [$systolic['min'], $systolic['max'], $systolic['discriminators'][0]['value'] ?? null]);
         self::assertIsArray($systolic['rules'] ?? null);
         self::assertCount(1, $systolic['rules']);
         self::assertSame(FHIRSliceConstraint::class, $systolic['rules'][0]['constraint']);
@@ -377,7 +382,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         self::assertSame(['snomedSBP', 1, '271649006'], [
             $systolic['rules'][0]['options']['sliceName'],
             $systolic['rules'][0]['options']['min'],
-            $systolic['rules'][0]['options']['discriminatorValue'] ?? null,
+            $systolic['rules'][0]['options']['discriminators'][0]['value'] ?? null,
         ]);
     }
 
@@ -424,7 +429,7 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
         }
 
         self::assertSame(['code.coding:snomed', 'code.coding:loinc', 'component:SystolicBP'], array_keys($slices));
-        self::assertSame([0, '*', '85354-9'], [$slices['code.coding:loinc']['min'], $slices['code.coding:loinc']['max'], $slices['code.coding:loinc']['discriminatorValue'] ?? null]);
+        self::assertSame([0, '*', '85354-9'], [$slices['code.coding:loinc']['min'], $slices['code.coding:loinc']['max'], $slices['code.coding:loinc']['discriminators'][0]['value'] ?? null]);
         self::assertSame(
             [['path' => 'valueQuantity.code', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => 'mm[Hg]']]],
             $slices['component:SystolicBP']['rules'] ?? null,
@@ -685,6 +690,9 @@ final class FHIRProfileSliceChildEmissionTest extends TestCase
                         new SliceDiscriminatorMatcher($this->accessor),
                     ),
                     $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->registry),
+                    $constraint instanceof FHIRAllowedTypes      => new FHIRAllowedTypesValidator($this->registry),
+                    $constraint instanceof FHIRMaxLength         => new FHIRMaxLengthValidator($this->registry),
+                    $constraint instanceof FHIRAnyOfProfiles     => new FHIRAnyOfProfilesValidator(messageRegistry: $this->registry),
                     $constraint instanceof FHIRFixedValue        => new FHIRFixedValueValidator($this->registry),
                     default                                      => $this->default->getInstance($constraint),
                 };

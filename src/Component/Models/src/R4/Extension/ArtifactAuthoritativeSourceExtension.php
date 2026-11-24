@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  *
  * @description A reference to the offical/source of truth definition of the content, typically outside the FHIR ecosystem. For example, the authoritativeSource for a ValueSet might be a spreadsheet published on an agency website.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-authoritativeSource', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-authoritativeSource', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'DomainResource')]
 class ArtifactAuthoritativeSourceExtension extends Extension
 {

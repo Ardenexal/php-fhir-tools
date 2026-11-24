@@ -19,7 +19,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description Identifies an operation parameter with a type of Resource for which this resource is to be considered an additional permitted targetProfile.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/additional-operation-parameter-targetProfile', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/additional-operation-parameter-targetProfile',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class AdditionalOperationParameterTargetProfileExtension extends Extension implements FHIRComplexExtensionInterface
 {

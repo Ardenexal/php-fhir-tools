@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Concept Properties that are associated with this Code System or Value Set Version
  */
-#[FHIRExtensionDefinition(url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-assocConceptProp', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-assocConceptProp', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.property')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class AssociatedConceptPropertyExtension extends Extension implements FHIRComplexExtensionInterface

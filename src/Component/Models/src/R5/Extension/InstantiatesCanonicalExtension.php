@@ -17,10 +17,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  *
  * @description The URL pointing to a FHIR-defined protocol, guideline, orderset or other definition that is adhered to in whole or in part by the event or request resource.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-instantiatesCanonical', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-instantiatesCanonical', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
-#[FHIRExtensionContext(type: 'element', expression: 'Media')]
+#[FHIRExtensionContext(type: 'element', expression: 'Media', endFhirVersion: '4.3')]
 #[FHIRExtensionContext(type: 'element', expression: 'Condition')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]

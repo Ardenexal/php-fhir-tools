@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description Defines a knowledge capability afforded by this knowledge artifact: Shareable, Publishable, Computable, and Executable, a scheme for organizing categories of functionality based on the content management lifecycle. See the Canonical Resource Management Infrastructure implementation guide for more information on these capability categories.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeCapability', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeCapability', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'DomainResource')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/knowledge-capability', strength: 'required')]
 class CQFKnowledgeCapabilityExtension extends Extension

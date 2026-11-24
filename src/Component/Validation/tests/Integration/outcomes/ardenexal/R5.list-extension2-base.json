@@ -1,5 +1,5 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -19,6 +19,9 @@
         "errors": {
             "constraint:UnknownInputChecker": [
                 "(root) — Unrecognized property 'fhir_comments'"
+            ],
+            "invariant:ext-1": [
+                "status.extension[0] — Must have either extensions or value[x], not both"
             ]
         },
         "warnings": {}

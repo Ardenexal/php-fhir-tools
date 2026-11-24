@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
  *
  * @description The Current HL7 ballot/Standards status of this artifact.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status-reason', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status-reason',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'extension', expression: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status')]
 class SDStandardsStatusReasonExtension extends Extension
 {

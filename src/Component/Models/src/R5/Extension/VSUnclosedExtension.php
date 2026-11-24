@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Marks that the expansion is incomplete, and values other than those listed may be valid. This may be used when technical limitations prevent a full expansion, or when post-coordinated codes are allowed, and no complete expansion can be produced.  This extension SHALL only be used when the client specifies that it will recognize and process an incomplete expansion. If the client has not specified it will recognize and process an incomplete expansion, the server SHALL return an error.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-unclosed', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-unclosed', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.expansion')]
 class VSUnclosedExtension extends Extension
 {

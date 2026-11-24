@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Whether or not the referenced artifact is owned by the referencing artifact.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-isOwned', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-isOwned', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedArtifact')]
 #[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.library')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.library')]

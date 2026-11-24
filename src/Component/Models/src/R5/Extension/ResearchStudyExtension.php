@@ -17,11 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Indicates that this event is relevant to the specified research study(ies).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-researchStudy', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-researchStudy', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Consent')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement', endFhirVersion: '4.3')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 #[FHIRExtensionContext(type: 'element', expression: 'FamilyMemberHistory')]
@@ -34,10 +34,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse')]
 #[FHIRExtensionContext(type: 'element', expression: 'RiskAssessment')]
-#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]
-#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition', startFhirVersion: '4.0')]
 class ResearchStudyExtension extends Extension
 {
     /**

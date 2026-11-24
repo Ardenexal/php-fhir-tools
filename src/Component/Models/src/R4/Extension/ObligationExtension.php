@@ -23,7 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description When appearing on an element, documents obligations that apply to applications implementing that element.  When appearing at the root of a StructureDefinition, indicates obligations that apply to all listed elements within the extension.  When appearing on a type, indicates obligations that apply to the use of that specific type.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/obligation', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/obligation', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type')]

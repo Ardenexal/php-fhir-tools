@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
  *
  * @description Narrative text to explain the improvement notation and how to interpret it.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-improvementNotationGuidance', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-improvementNotationGuidance', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure')]
 #[FHIRExtensionContext(type: 'element', expression: 'Measure.group')]
 #[FHIRExtensionContext(type: 'element', expression: 'MeasureReport')]

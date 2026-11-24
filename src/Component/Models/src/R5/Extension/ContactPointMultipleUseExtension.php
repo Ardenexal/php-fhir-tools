@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description Indicates that a ContactPoint has the intended use of the combination of the use and multiple use e.g. Mobile Business, or Temporary Home. Systems SHOULD populate a primary use in ContactPoint.use and then populate all applicable uses in this extension.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/contactpoint-multiple-use', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/contactpoint-multiple-use', fhirVersion: 'R5', isModifier: true)]
 #[FHIRExtensionContext(type: 'element', expression: 'ContactPoint')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/contact-point-use', strength: 'required')]
 class ContactPointMultipleUseExtension extends Extension

@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description If the extension is present on one of the named properties in a differential, the element property should be removed from the the corresponding snapshot.element during snapshot generation.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-suppress', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-suppress', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.comment')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.requirements')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.alias')]

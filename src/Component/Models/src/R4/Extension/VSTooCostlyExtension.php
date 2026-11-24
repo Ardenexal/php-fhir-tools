@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Marks that the expansion is  incomplete, because the full value set is too large to represent, and the client asked for an incomplete fragment.  Used in STU3 and earlier terminology services. The information it provides should be communicated with operation outcome code = too-costly by a terminology server based on a more recent FHIR version.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-toocostly', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-toocostly', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.expansion')]
 class VSTooCostlyExtension extends Extension
 {

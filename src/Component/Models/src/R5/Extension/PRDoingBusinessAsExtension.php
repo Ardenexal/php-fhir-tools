@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\HumanName;
  *
  * For example, if a clinician starts their career providing care at Clinic A, and is well known using their maiden name, but then is married, and starts working at Clinic B, but wants to use their married name at Clinic B.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/practitionerrole-doingBusinessAs', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/practitionerrole-doingBusinessAs', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'PractitionerRole')]
 class PRDoingBusinessAsExtension extends Extension
 {

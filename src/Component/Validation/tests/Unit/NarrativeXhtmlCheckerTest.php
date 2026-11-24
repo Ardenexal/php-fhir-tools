@@ -267,6 +267,29 @@ final class NarrativeXhtmlCheckerTest extends TestCase
         self::assertSame([], (new NarrativeXhtmlChecker())->check($document));
     }
 
+    public function testNarrativeWithOnlyEmptyElementsReportsTxt2(): void
+    {
+        // R4.list-xhtml-empty: `<div><p></p></div>`, which the XML reader hands over as `<p/>`
+        self::assertSame([self::TXT_2], $this->messagesFor('<div><p/></div>'));
+    }
+
+    public function testNarrativeWithOnlyWhitespaceTextReportsTxt2(): void
+    {
+        // R5.narrative-empty
+        self::assertSame([self::TXT_2], $this->messagesFor('<div><p>  </p></div>'));
+    }
+
+    public function testWhitespaceLeftAfterTheXmlReaderStripsTheWrapperReportsTxt2(): void
+    {
+        // R5.extension-slice: `<div>` holding only a newline arrives as the bare whitespace
+        self::assertSame([self::TXT_2], $this->messagesFor("\n    "));
+    }
+
+    public function testImageAloneCountsAsContent(): void
+    {
+        self::assertSame([], $this->messagesFor('<div><img src="x.png"/></div>'));
+    }
+
     /** @return list<string> */
     private function messagesFor(string $div): array
     {

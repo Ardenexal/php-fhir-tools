@@ -310,6 +310,38 @@ jobs:
                       exit 1
                     fi
 
+    # The demo app's own PHPUnit suite (demo/tests): controller tests through Symfony's in-process
+    # KernelBrowser, with outbound FHIR clients stubbed, plus unit tests of the demo's Sdc classes.
+    # The demo autoloads the components from ../src, so a component change can fail it. Not part
+    # of the required checks; it has no matrix, so a skip reports as success.
+    demo-tests:
+        runs-on: ubuntu-latest
+        needs: [ changes ]
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip, curl
+
+            -   name: Cache demo Composer packages
+                uses: actions/cache@v4
+                with:
+                    path: demo/vendor
+                    key: ${{ runner.os }}-demo-php-8.3-${{ hashFiles('demo/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-demo-php-8.3-
+
+            -   name: Install demo dependencies
+                run: composer install --working-dir=demo --prefer-dist --no-progress
+
+            -   name: Run demo tests
+                working-directory: demo
+                run: php vendor/bin/phpunit
+
     # Exercises the LOWEST version of every symfony/* package ardenexal/fhir-code-generation
     # constrains to ^6.4. Nothing did before, which is how the generator commands came to be written in
     # Symfony's 7.3-only invokable style: Composer was satisfied, autoloading was satisfied, and

@@ -36,4 +36,12 @@ enum SkipReason: string
      * departures reading as improvements.
      */
     case UnmodelledOption = 'unmodelled-option';
+
+    /**
+     * A supplied-profile run could not compare a `profile` phase: its source has no seeded fixture,
+     * either because it is not a StructureDefinition file (a package URL, say) or because the
+     * reference validator could not snapshot it. Counted so a re-seed that loses a snapshot shows
+     * up here instead of as a phase quietly leaving ABOVE.
+     */
+    case NoSuppliedDefinition = 'no-supplied-definition';
 }

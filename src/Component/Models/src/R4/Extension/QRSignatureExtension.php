@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Signature;
  *
  * @description Represents a wet or electronic signature for either the form overall or for the question or item it's associated with.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaireresponse-signature', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaireresponse-signature', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse')]
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse.item.item')]

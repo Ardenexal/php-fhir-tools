@@ -15,7 +15,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description Identifies the name of the relationship that references the inverse of the current relationship.  Allows linking a relationship and its derived inverse.
  */
-#[FHIRExtensionDefinition(url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-relationship-inverseName', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://terminology.hl7.org/StructureDefinition/ext-mif-relationship-inverseName',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.property')]
 class SupportedConceptRelationshipInverseNameExtension extends Extension
 {

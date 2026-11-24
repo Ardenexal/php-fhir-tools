@@ -22,7 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  *
  * @description A comment containing additional documentation, a review comment, usage guidance, or other relevant information from a particular user.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-artifactComment', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-artifactComment', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 class ArtifactCommentExtension extends Extension implements FHIRComplexExtensionInterface
 {

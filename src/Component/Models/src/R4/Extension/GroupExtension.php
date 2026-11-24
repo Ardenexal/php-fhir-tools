@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Defines the group in which this usage context is a member. Multiple groups are "OR'ed", contexts within a group are "AND'ed".
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/usagecontext-group', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/usagecontext-group', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'UsageContext')]
 class GroupExtension extends Extension
 {

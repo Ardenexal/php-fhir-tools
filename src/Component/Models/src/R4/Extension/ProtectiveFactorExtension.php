@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Characteristics or strengths of individuals, families, community situations or societies that mitigate risks and promote positive well-being and healthy development; attributes that help to successfully navigate difficult situations; factors that may contribute to or explain positive outcomes.  A trait or habit that "protects" people and makes them less likely to get a chronic disease that include, but are not limited to exercise, healthy eating, managing weight, managing blood pressure and cholesterol, managing mental health,  feeling happy, strong emotional support and social connections.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-protectiveFactor', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-protectiveFactor', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Goal')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity')]

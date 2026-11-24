@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
  *
  * @description The date on which the asset content was approved by the publisher. Approval happens once when the content is officially approved for usage.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-approvalDate', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-approvalDate', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureMap')]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]

@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description This extension defines if a search parameter is only allowed in certain contexts
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-search-parameter-use', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-search-parameter-use',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource')]
 class CSSearchParameterUseExtension extends Extension implements FHIRComplexExtensionInterface
 {

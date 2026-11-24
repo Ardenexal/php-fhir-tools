@@ -17,12 +17,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description The approach body site used for this procedure.  Multiple locations are allowed.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-approachBodyStructure', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-approachBodyStructure', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
-#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement', endFhirVersion: '4.3')]
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen.collection')]
 class PRApproachBodyStructureExtension extends Extension
 {

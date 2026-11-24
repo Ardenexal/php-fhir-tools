@@ -18,7 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description This extension contains the phone number for reporting a status or a result. This is represented in v2 as OBR-17 Order Callback Phone Number ID 00250.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/servicerequest-order-callback-phone-number', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/servicerequest-order-callback-phone-number',
+    fhirVersion: 'R4B',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
 #[FHIRProfileInvariant(
     path: 'value[x]',

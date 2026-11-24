@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description Restricts this provision to only apply when the expression evaluates to true. This enables narrowing down the scope of the provision based on nuanced and fine-grained criteria expressed through a FHIRPath or CQL expression.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/consent-provision-expression', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/consent-provision-expression', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Consent.provision')]
 class ConsentProvisionExpressionExtension extends Extension
 {

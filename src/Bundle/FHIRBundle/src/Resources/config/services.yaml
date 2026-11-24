@@ -171,6 +171,27 @@ services:
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValueValidator' }
 
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAllowedTypesValidator:
+        arguments:
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypesValidator' }
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRMaxLengthValidator:
+        arguments:
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLengthValidator' }
+
+    # No profile conformance checker here, as for FHIRSliceConstraintValidator: elements that allow
+    # several profiles are not checked through the bundle's validator
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAnyOfProfilesValidator:
+        arguments:
+            $conformance: null
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfilesValidator' }
+
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator:
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraintValidator' }
@@ -197,10 +218,18 @@ services:
     Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface:
         alias: 'Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver'
 
+    # Finds the type an IG or core profile target constrains, so a literal `Patient/1` reference is
+    # compared with it; FHIRExtension adds the runtime profile resolver when runtime profiles are configured
+    Ardenexal\FHIRTools\Component\Validation\Profile\TargetProfileBaseTypes:
+        arguments:
+            $igTypes: '@Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry'
+            $runtimeProfiles: null
+
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRTargetProfileValidator:
         arguments:
             $resolver: '@Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface'
             $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+            $profileTypes: '@Ardenexal\FHIRTools\Component\Validation\Profile\TargetProfileBaseTypes'
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfileValidator' }
 

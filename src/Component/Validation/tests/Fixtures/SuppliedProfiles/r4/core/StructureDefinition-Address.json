@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Address","url":"http://hl7.org/fhir/StructureDefinition/Address","version":"4.0.1","name":"Address","status":"active","fhirVersion":"4.0.1","kind":"complex-type","abstract":false,"type":"Address","baseDefinition":"http://hl7.org/fhir/StructureDefinition/Element","derivation":"specialization"}

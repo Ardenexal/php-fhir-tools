@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
  *
  * @description Dates for study registration activities.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/researchStudy-studyRegistration', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/researchStudy-studyRegistration', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
 class RSStudyRegistrationExtension extends Extension implements FHIRComplexExtensionInterface
 {

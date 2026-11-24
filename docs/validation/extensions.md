@@ -38,7 +38,10 @@ an already-valid resource. The three context types:
   resolved supertype set, so a supertype such as `"DomainResource"` or `"Element"` permits its
   subtypes; foreign-root type-paths such as `"ElementDefinition.binding"` match when a path segment
   is typed with the context root. Resolution is monotonic — it only ever permits more. Without a
-  resolver, bare-type and foreign-root contexts are deferred.
+  resolver, bare-type and foreign-root contexts are deferred below the resource. On the resource
+  being validated, a context naming another type, or an element inside another resource such as
+  `CodeSystem.property`, is a confident mismatch. `CanonicalResource` and `MetadataResource` are the
+  exception: R4 has no type that derives from them, so they defer.
 * **`type=fhirpath`** — the expression is evaluated against the element bearing the extension.
   Denial requires a confident result: only a single boolean `false` denies. An empty result or a
   FHIRPath evaluation error defers.
@@ -49,6 +52,24 @@ an already-valid resource. The three context types:
   a sibling context that defers can mask a confident `type=extension` denial.
 
 When OK, no violation. A confident mismatch raises an ERROR.
+
+### FHIR version limits
+
+The `version-specific-use` extension limits an extension to a range of FHIR versions, from
+`startFhirVersion` to `endFhirVersion`. Generated classes carry the range on
+`#[FHIRExtensionDefinition]` and `#[FHIRExtensionContext]`, and runtime definitions are read the same
+way.
+
+* On the definition, it limits the whole extension. Using it outside the range is an ERROR worded as
+  the reference validator words it: `The definition of the extension '…' specifies that the latest
+  version it can be used with is R4B (v4.3), but this context of use is version R5 (v5.0.0)`. Its
+  contexts are then not checked.
+* On a context, it limits that context only. A context whose range excludes the version being
+  validated does not apply, and an extension left with no context for that version is not
+  permitted anywhere.
+
+Some extensions in the published R5 extensions package end at R4B, such as `task-candidateList` and
+`procedure-schedule`, so using their generated R5 classes is reported.
 
 ### Extension contextInvariant
 
@@ -80,8 +101,17 @@ record, starting `Slice 'Extension.extension:<name>': a matching slice is requir
 ## Modifier extensions
 
 `validateModifierExtensions()` walks the tree recursively and flags **unknown modifier extension
-URLs** as ERRORs. This check only runs when a `FHIRIGTypeRegistry` is provided to
-`FHIRValidationService`; without one, the walk is skipped.
+URLs** as ERRORs. It also reports a known extension that is not a modifier:
+`The Extension '…' must not be used as a modifierExtension (it's a regular extension)`. A class
+generated before 0.8 does not state whether it is a modifier, so it is not reported. This check
+only runs when a `FHIRIGTypeRegistry` is provided to `FHIRValidationService`; without one, the walk
+is skipped.
+
+An extension whose definition marks its root `Extension` element `isModifier` belongs in
+`modifierExtension`. Found in `extension`, it is an ERROR:
+`The Extension '…' must not be used as an extension (it's a modifierExtension)`. Generated classes
+carry the flag as `#[FHIRExtensionDefinition(isModifier: true)]`; this check runs with the extension
+context walk, so it needs no registry.
 
 {% hint style="warning" %}
 `#[FHIRIsModifier]` marks properties as modifier elements for introspection only — there is **no
@@ -132,10 +162,17 @@ Matching rules (`FHIRObligationContext::matchesObligation()`):
 * An obligation with a **specific actor** only fires when `$context->actorUrl` matches.
 * `new FHIRObligationContext(null)` matches only actor-less obligations.
 
+An obligation with a FHIRPath `filter` covers only the occurrences of its element that the filter
+selects. The filter is evaluated against each occurrence, and selects it when it returns a single
+`true`. So a `SHALL:populate` on `telecom` filtered by `use = 'home'` is met when at least one
+contact point is a home one, and fails when there are none, whatever other contact points exist.
+A populate obligation whose filter cannot be evaluated gives an info `fhir:eval-error` finding
+instead of its own. A filtered `SHALL:no-error` suppresses errors only on the occurrences it
+selects, and suppresses nothing when its filter cannot be evaluated.
+
 {% hint style="info" %}
-**Obligation filter evaluation is deferred.** `#[FHIRObligation]` entries with a non-null FHIRPath
-`filter` are skipped; only unconditional obligations are enforced. Behaviour-only obligations
-(display / persist / handle) cannot be checked from a resource instance and are not evaluated.
+Behaviour-only obligations (display / persist / handle) cannot be checked from a resource instance
+and are not evaluated.
 {% endhint %}
 
 See [Configuration](configuration.md) for actor and type-hierarchy resolver setup.

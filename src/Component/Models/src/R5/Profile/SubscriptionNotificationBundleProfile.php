@@ -32,18 +32,27 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     options: ['min' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'],
 )]
-#[FHIRSlicingRules(property: 'entry', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'])]
+#[FHIRSlicingRules(
+    property: 'entry',
+    rules: 'open',
+    groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'],
+    ordered: true,
+)]
 #[FHIRSliceConstraint(
     property: 'entry',
     sliceName: 'first',
     min: 0,
     max: 1,
-    discriminatorType: 'exists',
-    discriminatorPath: 'entry',
+    discriminators: [['type' => 'exists', 'path' => 'entry']],
     orderedIndex: 0,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
         ['path' => 'resource', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],
+        [
+            'path'       => 'resource',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes',
+            'options'    => ['types' => ['SubscriptionStatus']],
+        ],
         ['path' => 'search', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
         ['path' => 'response', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['max' => 0]],
     ],
@@ -54,8 +63,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     sliceName: 'other',
     min: 0,
     max: '*',
-    discriminatorType: 'exists',
-    discriminatorPath: 'entry',
+    discriminators: [['type' => 'exists', 'path' => 'entry']],
     orderedIndex: 1,
     rules: [
         ['path' => 'fullUrl', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],

@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description References a previous SupplyDelivery that contains the items in the current SupplyDelivery.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-previousDelivery', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-previousDelivery', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
 class PreviousDeliveryExtension extends Extension
 {

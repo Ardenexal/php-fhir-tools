@@ -21,7 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * `Encounter.specialCourtesy` which provides a simple flag indicating additional `benefits` that the patient might be entitled to during a visit *(e.g. special room types)*.
  * `Resource.meta.security` with codes such as `VIP`. These might be used by actual data level security controls within the system, potentially requiring specific user permissions to access the data.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-importance', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-importance', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient')]
 class PatImportanceExtension extends Extension
 {

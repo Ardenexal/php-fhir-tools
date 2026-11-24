@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  *
  * @description Will cause a GraphDefinition to be executed and the referred-to instance be considered "valid" for that GraphDefinition if the instance is the start of a result of executing that GraphDefinition.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-graphConstraint', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-graphConstraint', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type.targetProfile')]
 class GraphConstraintExtension extends Extension
 {

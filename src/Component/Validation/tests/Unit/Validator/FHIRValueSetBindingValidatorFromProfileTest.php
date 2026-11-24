@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Validator;
 
+use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
@@ -32,14 +34,14 @@ final class FHIRValueSetBindingValidatorFromProfileTest extends ConstraintValida
 
     private const string URL = 'http://hl7.org/fhir/ValueSet/medication-statement-status';
 
-    private bool $nullClient = false;
+    private ?FHIRTerminologyClientInterface $client = null;
 
     protected function createValidator(): FHIRValueSetBindingValidator
     {
         return new FHIRValueSetBindingValidator(
             new FHIRValidationMessageRegistry(),
             [__NAMESPACE__],
-            $this->nullClient ? new NullFHIRTerminologyClient() : null,
+            $this->client,
         );
     }
 
@@ -70,8 +72,37 @@ final class FHIRValueSetBindingValidatorFromProfileTest extends ConstraintValida
      */
     public function testARequiredBindingWithANullTerminologyClientIsUnchecked(): void
     {
-        $this->nullClient = true;
-        $this->validator  = $this->createValidator();
+        $this->assertRequiredBindingUncheckedWith(new NullFHIRTerminologyClient());
+    }
+
+    /**
+     * The bundle always wraps the configured client in its cache, so with no server configured the
+     * validator receives a cache around the null client. That is still no client (issue #245).
+     */
+    public function testARequiredBindingWithACachedNullTerminologyClientIsUnchecked(): void
+    {
+        $this->assertRequiredBindingUncheckedWith(new CachingFHIRTerminologyClient(new NullFHIRTerminologyClient()));
+    }
+
+    /**
+     * Outside a profile, a required binding with no enum still asks whatever client is configured, even a
+     * cached null one. The null client answers yes to every code, so nothing is reported.
+     */
+    public function testARequiredBindingOutsideAProfileWithACachedNullClientReportsNothing(): void
+    {
+        $this->client    = new CachingFHIRTerminologyClient(new NullFHIRTerminologyClient());
+        $this->validator = $this->createValidator();
+        $this->bindContext($this->validator);
+
+        $this->validator->validate('unknown', new FHIRValueSetBinding('http://example.org/ValueSet/no-enum', 'required'));
+
+        $this->assertNoViolation();
+    }
+
+    private function assertRequiredBindingUncheckedWith(FHIRTerminologyClientInterface $client): void
+    {
+        $this->client    = $client;
+        $this->validator = $this->createValidator();
         $this->bindContext($this->validator);
 
         $this->validator->validate('unknown', new FHIRValueSetBinding('http://example.org/ValueSet/no-enum', 'required', fromProfile: true));

@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description Specifies that the precision of the datetime, time, or instant value is less than what appears and indicates the actual level of precision. This extension is used when the precision of a datetime, time, or instant value is not conveyed by the value itself (e.g. the datetime value 2014-02-01T10:00:00Z has a precision of 'min' and actually represents "10:00" and unknown seconds on Feb 1, 2014.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/time-precision', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/time-precision', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'instant')]
 #[FHIRExtensionContext(type: 'element', expression: 'dateTime')]
 #[FHIRExtensionContext(type: 'element', expression: 'time')]

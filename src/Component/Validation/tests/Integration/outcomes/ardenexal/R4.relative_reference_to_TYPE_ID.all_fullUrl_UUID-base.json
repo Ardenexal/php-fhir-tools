@@ -1,12 +1,12 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 1,
     "java": {
         "errorCount": 2,
         "warningCount": 1,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "BELOW",
         "errors": [
             "Can't find 'Organization/666' in the bundle (Composition.author). Note that there is a resource in the bundle with the same type and id, but it does not match because of the fullUrl based rules around matching relative references. Found 'urn:uuid:2aaf815f-3ebe-4a03-9b87-05d0700313b2', but it doesn't match because of the source fullUrl 'urn:uuid:10a67a86-a9ec-427e-ba3f-f042cef21733'",
@@ -15,6 +15,9 @@
     },
     "outcome": {
         "errors": {
+            "constraint:BundleReachabilityChecker": [
+                "entry[1] — Entry 'urn:uuid:2aaf815f-3ebe-4a03-9b87-05d0700313b2' isn't reachable by traversing links (forward or backward) from the Composition"
+            ],
             "constraint:BundleReferenceResolutionChecker": [
                 "entry[0].resource.author[0] — Can't find 'Organization/666' in the bundle. A resource with the same type and id is present at fullUrl 'urn:uuid:2aaf815f-3ebe-4a03-9b87-05d0700313b2', but the fullUrl based rules around matching relative references do not match it against the source fullUrl 'urn:uuid:10a67a86-a9ec-427e-ba3f-f042cef21733'"
             ]

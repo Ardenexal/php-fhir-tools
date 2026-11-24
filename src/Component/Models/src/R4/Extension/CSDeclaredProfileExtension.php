@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
  *
  * @description This extension identifies a profile the system will recognize. If the system supports the _profile search parameter, it will be capable of searching on the profile. The system may support validation against the profile. Deprecated - use CapabilityStatement.rest.resource.supportedProfile
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-declared-profile', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-declared-profile',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource')]
 class CSDeclaredProfileExtension extends Extension
 {

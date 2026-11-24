@@ -35,16 +35,37 @@ Both resolver messages are overridable via the `FHIRTargetProfile` key in
 
 ## Checks that need no resolver
 
-Two rules read only the reference or canonical itself, so they run with the default
-`NullFHIRReferenceResolver` too. Both report an ERROR in the HL7 Java reference validator's wording:
+Three rules read only the reference or canonical itself, so they run with the default
+`NullFHIRReferenceResolver` too. Each reports an ERROR in the HL7 Java reference validator's wording:
 
 | Rule | Example message |
 |---|---|
-| A canonical shaped `[base]/[type]/[id]` must name a type the element allows. This applies only when every target profile is a core resource type; a target such as an IG profile or `Resource` skips the check, and a canonical of another shape (`http://loinc.org/vs/LL123`, `urn:oid:…`) is left alone | `Canonical URL 'http://hl7.org/fhir/ValueSet/example-extensional' refers to a resource that has the wrong type. Found ValueSet expecting one of [Questionnaire]` |
+| A literal reference shaped `[type]/[id]` or `[base]/[type]/[id]`, with or without `/_history/[version]`, must name a type the element allows (see [Target types](#target-types)). A contained (`#p1`), `urn:uuid:` or conditional reference names no type and is left alone | `Invalid Resource target type. Found Patient, but expected one of (PractitionerRole)` |
+| A canonical shaped `[base]/[type]/[id]` must name a type the element allows (see [Target types](#target-types)). A canonical of another shape (`http://loinc.org/vs/LL123`, `urn:oid:…`) is left alone | `Canonical URL 'http://hl7.org/fhir/ValueSet/example-extensional' refers to a resource that has the wrong type. Found ValueSet expecting one of [Questionnaire]` |
 | The query of a conditional reference must be `name=value` parameters joined by `&` | `The query part of the conditional reference is not a valid query string (Device?identifier=1234&?==)` |
 
-A plain reference such as `Device/foo` is not checked against the element's allowed target types. The two
-messages above are fixed; `FHIRValidationMessageRegistry` does not override them.
+The HL7 Java reference validator checks a literal reference's type only with its
+`assumeValidRestReferences` option; this validator always does. The three messages above are fixed;
+`FHIRValidationMessageRegistry` does not override them.
+
+### Target types
+
+The type check needs to know which resource type each target profile allows:
+
+* A core resource type's URL (`http://hl7.org/fhir/StructureDefinition/Patient`) names it.
+* Any other profile allows the type it constrains. That type is looked up in the generated class
+  registered for the URL in the IG type registry, then in the core profiles generated with the models
+  (`vitalsigns`, `cqf-questionnaire` ...), then in the StructureDefinitions loaded for runtime profiles
+  (`StructureDefinition.type`, in the reference's own FHIR release). So `Observation/1` fails
+  `Reference(au-core-patient)` without being resolved, once AU Core is generated or loaded.
+
+If any target is `Resource` (or another abstract type), or is a profile none of these sources knows,
+the type is not checked: that target could allow any type, and only resolving the reference would say.
+
+An element whose Reference and canonical types list different targets, such as
+`Reference(Group) | canonical(EvidenceVariable)`, has one `#[FHIRTargetProfile]` per kind. Each
+names its `kind`, and a reference is checked only against the Reference targets, a canonical only
+against the canonical ones. A kind with no target restriction gets no attribute.
 
 ## Resolver examples
 

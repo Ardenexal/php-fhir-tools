@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Endpoint","url":"http://hl7.org/fhir/StructureDefinition/Endpoint","version":"4.0.1","name":"Endpoint","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"Endpoint","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

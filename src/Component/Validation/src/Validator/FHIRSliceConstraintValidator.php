@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Validation\FHIRChoiceVariantReader;
 use Ardenexal\FHIRTools\Component\Validation\FHIRElementPath;
@@ -11,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
@@ -26,7 +29,8 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  * Symfony invokes this validator once per #[FHIRSliceConstraint] attribute on the class.
  * When first invoked for a (property, active-group) pair on an object, it performs a
  * complete validation pass: reads all slices for that property, counts item matches,
- * checks min/max cardinality, and (for closed slicing) rejects items matching no slice.
+ * checks min/max cardinality, (for closed slicing) rejects items matching no slice, and
+ * (for ordered slicing) reports items that come before an item of a later-declared slice.
  *
  * Subsequent invocations for the same (property, active-group, object) within a single
  * $validator->validate() call are no-ops; a WeakMap keyed on the ExecutionContext prevents
@@ -54,6 +58,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         private readonly SliceDiscriminatorMatcher $matcher,
         private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
         ?FHIRChoiceVariantReader $reader = null,
+        private readonly ?RuntimeProfileConformance $profiles = null,
     ) {
         $this->reader = $reader ?? new FHIRChoiceVariantReader($propertyAccessor);
     }
@@ -145,6 +150,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         string $property,
     ): void {
         $rules         = $slicingRules !== null ? $slicingRules->rules : 'open';
+        $ordered       = $slicingRules !== null && self::isOrdered($slicingRules);
         $defaultSlice  = null;
         $namedSlices   = [];
 
@@ -158,9 +164,11 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
 
         // Items of a slice no item can match would be judged unmatched, which closed and openAtEnd
         // rules reject; current classes are generated with open rules for such slicing
-        if (array_filter($namedSlices, self::isUndecidedExistsSlice(...)) !== []) {
+        if (array_filter($namedSlices, self::isUnmatchableSlice(...)) !== []) {
             $rules = 'open';
         }
+
+        $matcher = $this->matcher();
 
         // Track match counts per slice and which items matched any slice
         /** @var array<int, int> $matchCounts  sliceConstraints index → count */
@@ -168,21 +176,30 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         /** @var array<int, array<int|string, object|array<mixed>>> $matchedItems sliceConstraints index → item index → item */
         $matchedItems       = [];
         $unmatchedItems     = [];
+        /** @var array<int, true> $undecided sliceConstraints index → some unmatched item may belong to it */
+        $undecided          = [];
         $openAtEndViolation = false;
+        /** @var FHIRSliceConstraint|null $latestSlice ordered slicing: the latest-declared slice an earlier item matched */
+        $latestSlice        = null;
+        /** @var array<int|string, array{FHIRSliceConstraint, FHIRSliceConstraint}> $outOfOrder item index → [its slice, the later slice before it] */
+        $outOfOrder         = [];
 
         foreach ($items as $itemIndex => $item) {
             if (!is_object($item) && !is_array($item)) {
                 continue;
             }
 
-            $matched = false;
+            $matched  = false;
+            $maybeIn  = [];
             foreach ($namedSlices as $sliceIdx => $sc) {
-                if ($this->matcher->matches(
-                    $item,
-                    $sc->discriminatorType,
-                    $sc->discriminatorPath,
-                    $sc->discriminatorValue,
-                )) {
+                $match = $matcher->matchesAll($item, $sc->discriminators);
+
+                if ($match === null) {
+                    $maybeIn[] = $sliceIdx;
+                    continue;
+                }
+
+                if ($match) {
                     ++$matchCounts[$sliceIdx];
                     $matchedItems[$sliceIdx][$itemIndex] = $item;
                     $matched                             = true;
@@ -191,20 +208,44 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                     if ($rules === 'openAtEnd' && $unmatchedItems !== []) {
                         $openAtEndViolation = true;
                     }
+
+                    // Ordered: an item may belong to an earlier slice that could not say, so its
+                    // place in the order is unknown and it neither breaks nor sets the order
+                    if ($ordered && $maybeIn === []) {
+                        if ($latestSlice !== null && $sc->orderedIndex < $latestSlice->orderedIndex) {
+                            // Two of the parent's slices are out of order: the parent's group says so
+                            if (!self::isInherited($sc) || !self::isInherited($latestSlice)) {
+                                $outOfOrder[$itemIndex] = [$sc, $latestSlice];
+                            }
+                        } else {
+                            $latestSlice = $sc;
+                        }
+                    }
                     break;
                 }
             }
 
-            if (!$matched) {
-                $unmatchedItems[] = $itemIndex;
+            if ($matched) {
+                continue;
             }
+
+            // An item no slice took, but one or more could not say: it may be theirs, so it is neither
+            // rejected as unmatched nor given to the default slice, and those slices' minimums are not checked
+            if ($maybeIn !== []) {
+                foreach ($maybeIn as $sliceIdx) {
+                    $undecided[$sliceIdx] = true;
+                }
+                continue;
+            }
+
+            $unmatchedItems[] = $itemIndex;
         }
 
         // Check min/max per named slice
         foreach ($namedSlices as $sliceIdx => $sc) {
             $count = $matchCounts[$sliceIdx];
 
-            if ($count < $sc->min && !self::isUndecidedExistsSlice($sc)) {
+            if ($count < $sc->min && !isset($undecided[$sliceIdx]) && self::canCount($sc, $matcher)) {
                 $this->context->buildViolation(
                     'Slice "{{ slice }}" on "{{ property }}" requires at least {{ min }} item(s), but {{ count }} matched.',
                 )->setParameters([
@@ -270,6 +311,17 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             }
         }
 
+        // Ordered: each item must match a slice declared no earlier than the slices of the items before it
+        foreach ($outOfOrder as $itemIndex => [$slice, $previous]) {
+            $this->context->buildViolation(
+                'Property "{{ property }}" uses ordered slicing: this item matches slice "{{ slice }}", which must come before slice "{{ previous }}" of an earlier item.',
+            )->setParameters([
+                '{{ property }}' => $property,
+                '{{ slice }}'    => $slice->sliceName,
+                '{{ previous }}' => $previous->sliceName,
+            ])->atPath("{$property}[{$itemIndex}]")->setCode(FHIRViolationCode::ERROR)->addViolation();
+        }
+
         // openAtEnd: unmatched items must only appear after all matched items
         if ($openAtEndViolation) {
             $this->context->buildViolation(
@@ -281,16 +333,76 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     }
 
     /**
-     * True for an `exists` slice with no presence to test, which no item can match.
+     * The matcher, answering `profile` discriminators by checking the item against the profile in a
+     * validation run of its own when a profile checker is configured.
+     */
+    private function matcher(): SliceDiscriminatorMatcher
+    {
+        if ($this->profiles === null) {
+            return $this->matcher;
+        }
+
+        $context  = $this->context;
+        $profiles = $this->profiles;
+
+        // A profile that slices elements of its own runs them through this same instance, which
+        // points $this->context at the side run. Restored after each check, or this slicing's
+        // findings land in the side run and vanish.
+        return $this->matcher->withProfileCheck(
+            function(object|array $value, string $profileUrl) use ($context, $profiles): ?bool {
+                if (!is_object($value)) {
+                    return null;
+                }
+
+                try {
+                    return $profiles->conforms($context->getValidator(), $value, $profileUrl);
+                } finally {
+                    $this->context = $context;
+                }
+            },
+        );
+    }
+
+    /**
+     * True for a slice with a discriminator that has nothing to match on, which no item can match.
      *
      * Classes generated before the generator read an `exists` slice's presence from its definition
      * carry none, yet keep the slice's minimum and the slicing's closed or openAtEnd rules. Both
      * would fail resources that conform, so neither is checked; current classes give such a slice
      * no minimum and its slicing open rules in the first place.
      */
-    private static function isUndecidedExistsSlice(FHIRSliceConstraint $slice): bool
+    private static function isUnmatchableSlice(FHIRSliceConstraint $slice): bool
     {
-        return $slice->discriminatorType === 'exists' && !is_bool($slice->discriminatorValue);
+        if ($slice->discriminators === []) {
+            return true;
+        }
+
+        foreach ($slice->discriminators as $discriminator) {
+            if (!array_key_exists('value', $discriminator) && !isset($discriminator['valueSet']) && !isset($discriminator['anyOf'])) {
+                return true;
+            }
+
+            if ($discriminator['type'] === 'exists' && !is_bool($discriminator['value'] ?? null) && !isset($discriminator['anyOf'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether the items counted for a slice are all of its items: false when one of its
+     * discriminators needs a terminology client or profile check this validator does not have.
+     */
+    private static function canCount(FHIRSliceConstraint $slice, SliceDiscriminatorMatcher $matcher): bool
+    {
+        foreach ($slice->discriminators as $discriminator) {
+            if (!$matcher->canAnswer($discriminator)) {
+                return false;
+            }
+        }
+
+        return !self::isUnmatchableSlice($slice);
     }
 
     /**
@@ -299,6 +411,10 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
      * Paths are read the way FHIRProfileConstraintValidator reads them: an absent ancestor is not
      * this rule's violation, a Count sizes the occurrence list, and every other rule inspects the
      * element itself. Violations are reported at the item, e.g. `component[1].valueQuantity.system`.
+     *
+     * FHIRProfileInvariant and FHIRProfileBinding rules carry their own item-relative `path` and are
+     * validated on the item in this context, so `%resource` stays the resource around the item and
+     * each finding keeps its invariant key.
      *
      * Rules carrying a FHIRSliceConstraint or FHIRSlicingRules describe slicing beneath the slice
      * (AU Core's `component:SystolicBP.code.coding:snomedSBP`). They are grouped by path, and each
@@ -310,8 +426,10 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
     private function validateSliceRules(FHIRSliceConstraint $slice, array $items, string $property): void
     {
         /** @var array<string, array{slices: list<FHIRSliceConstraint>, rules: FHIRSlicingRules|null}> $nested */
-        $nested = [];
-        $plain  = [];
+        $nested      = [];
+        $plain       = [];
+        $onItem      = [];
+        $activeGroup = $this->context->getGroup() ?? Constraint::DEFAULT_GROUP;
 
         foreach (self::rulesOf($slice) as $rule) {
             if ($rule['constraint'] === FHIRSliceConstraint::class) {
@@ -320,13 +438,24 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             } elseif ($rule['constraint'] === FHIRSlicingRules::class) {
                 $nested[$rule['path']]['slices'] ??= [];
                 $nested[$rule['path']]['rules'] = new FHIRSlicingRules(...$rule['options']);
+            } elseif ($rule['constraint'] === FHIRProfileInvariant::class || $rule['constraint'] === FHIRProfileBinding::class) {
+                // In the group being validated, so a finding is attributed to the slice's profile
+                $onItem[] = new ($rule['constraint'])(...[...$rule['options'], 'groups' => [$activeGroup]]);
             } elseif (is_a($rule['constraint'], Constraint::class, true)) {
                 $plain[] = ['path' => $rule['path'], 'constraint' => $rule['constraint'], 'options' => $rule['options']];
             }
         }
 
-        // Slicing beneath the slice: match each item's own elements against the nested slices
+        // Slicing beneath the slice: match each item's own elements against the nested slices. Path ''
+        // holds the slice's reslices ("altid/npi"), which split the items matching the slice
+        // themselves, so they are matched as one list and counted across all of them.
         foreach ($nested as $path => $definition) {
+            if ($path === '') {
+                $this->validateSlices($items, $definition['slices'], $definition['rules'], $property);
+
+                continue;
+            }
+
             foreach ($items as $itemIndex => $item) {
                 foreach ($this->reader->readGroups($item, $path) as $group) {
                     $this->validateSlices(
@@ -339,6 +468,15 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
             }
         }
 
+        if ($onItem !== []) {
+            foreach ($items as $itemIndex => $item) {
+                $this->context->getValidator()
+                    ->inContext($this->context)
+                    ->atPath("{$property}[{$itemIndex}]")
+                    ->validate($item, $onItem, [$activeGroup]);
+            }
+        }
+
         foreach ($plain as $rule) {
             $innerConstraint = new ($rule['constraint'])(...$rule['options']);
 
@@ -347,7 +485,14 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                     $subject = $innerConstraint instanceof Count ? $group['occurrences'] : $group['value'];
                     $base    = "{$property}[{$itemIndex}].{$rule['path']}";
 
-                    foreach ($this->context->getValidator()->validate($subject, $innerConstraint, ['Default']) as $v) {
+                    // A rule that checks the item against other profiles on the side (FHIRAnyOfProfiles)
+                    // can run a sliced profile through this same instance, which points $this->context
+                    // at the side run; restored before reporting, as in matcher()
+                    $context       = $this->context;
+                    $violations    = $context->getValidator()->validate($subject, $innerConstraint, ['Default']);
+                    $this->context = $context;
+
+                    foreach ($violations as $v) {
                         $innerPath = $v->getPropertyPath();
                         $path      = match (true) {
                             $innerPath    === ''  => $base,
@@ -363,6 +508,26 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
                 }
             }
         }
+    }
+
+    /**
+     * Whether the slicing is ordered; false when the installed fhir-metadata predates `ordered`.
+     *
+     * Read from the object's public state for the same reason as rulesOf(): reading a property an
+     * older FHIRSlicingRules does not declare would warn on every sliced profile.
+     */
+    private static function isOrdered(FHIRSlicingRules $slicingRules): bool
+    {
+        return (get_object_vars($slicingRules)['ordered'] ?? false) === true;
+    }
+
+    /**
+     * Whether the slice is a parent profile's, repeated in this group; false when the installed
+     * fhir-metadata predates `inherited`, read the way isOrdered() reads `ordered`.
+     */
+    private static function isInherited(FHIRSliceConstraint $slice): bool
+    {
+        return (get_object_vars($slice)['inherited'] ?? false) === true;
     }
 
     /**

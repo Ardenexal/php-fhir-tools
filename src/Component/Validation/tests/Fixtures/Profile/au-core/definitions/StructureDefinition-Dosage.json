@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Dosage","url":"http://hl7.org/fhir/StructureDefinition/Dosage","version":"4.0.1","name":"Dosage","status":"draft","fhirVersion":"4.0.1","kind":"complex-type","abstract":false,"type":"Dosage","baseDefinition":"http://hl7.org/fhir/StructureDefinition/BackboneElement","derivation":"specialization"}

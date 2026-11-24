@@ -17,9 +17,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description A numeric value that allows the comparison (less than, greater than) or other numerical
  * manipulation of a concept (e.g. Adding up components of a score). Scores are usually a whole number, but occasionally decimals are encountered in scores.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/ordinalValue', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/ordinalValue', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Coding')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption', startFhirVersion: '4.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 class OrdinalValueExtension extends Extension

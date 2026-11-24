@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
  *
  * @description The SNOMED CT Description ID for the display.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/coding-sctdescid', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/coding-sctdescid', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Coding')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept.display')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept.designation')]

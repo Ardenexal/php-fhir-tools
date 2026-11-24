@@ -1,17 +1,21 @@
 {
-    "errorCount": 0,
+    "errorCount": 1,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 0,
         "warningCount": 0,
         "infoCount": 0,
-        "classification": "EQUAL",
+        "classification": "ABOVE",
         "warningClassification": "EQUAL",
         "errors": []
     },
     "outcome": {
-        "errors": {},
+        "errors": {
+            "constraint:FHIRTargetProfile": [
+                "participant[0].onBehalfOf — Invalid Resource target type. Found Practitioner, but expected one of (Organization)"
+            ]
+        },
         "warnings": {}
     }
 }

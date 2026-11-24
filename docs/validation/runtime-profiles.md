@@ -89,6 +89,40 @@ A profile URL that the resource's class already declares is checked from the cla
 instances included. Any other URL is resolved at runtime; without a resolver, a `meta.profile` URL
 no class declares is reported as not checked, and a URL passed to `validate()` is ignored.
 
+The spec also says an Observation recording a vital sign SHALL conform to the matching core
+vital-signs profile, even when `meta.profile` does not name it. To apply that rule, as the HL7
+reference validator does:
+
+```php
+$report = $service->validateWithOptions($bundle, new FHIRValidationOptions(profilesFromVitalSignsCodes: true));
+```
+
+Each Observation, nested ones included, whose `code.coding` holds one of these codes is then
+checked against the profile, and its parents, as if `meta.profile` named it:
+
+| Code | System | Profile |
+|------|--------|---------|
+| `85353-1` | LOINC | `vitalspanel` |
+| `9279-1` | LOINC | `resprate` |
+| `8867-4` | LOINC | `heartrate` |
+| `2708-6`, `59408-5` | LOINC | `oxygensat` |
+| `8310-5` | LOINC | `bodytemp` |
+| `276885007` | SNOMED CT | `bodytemp` |
+| `8302-2` | LOINC | `bodyheight` |
+| `9843-4` | LOINC | `headcircum` |
+| `29463-7` | LOINC | `bodyweight` |
+| `39156-5` | LOINC | `bmi` |
+| `85354-9`, `76534-7` | LOINC | `bp` |
+
+The spec's vital-signs table lists the first LOINC code for each profile. `59408-5`, `76534-7` and
+SNOMED CT `276885007` are not in it, but the HL7 reference validator maps them too, so they are
+included to match it.
+
+The profiles are the core ones (`http://hl7.org/fhir/StructureDefinition/bp` and so on), so the
+service needs the release's core package to resolve them. An implied profile that cannot be
+resolved is skipped without a warning, because you did not ask for it by name. The option is off
+by default, because turning it on can report new errors on data that passed before.
+
 To check that a profile and its parents resolve before validating anything, for example at
 startup:
 
@@ -104,6 +138,12 @@ if (!$resolution->isResolved()) {
 The same rules a generated profile class enforces:
 
 * Cardinality, fixed and pattern values, must-support, obligations, slicing and slices.
+* The types a choice element may hold (`value[x] only Quantity`), the resource types a resource
+  slot may hold (`Bundle.entry.resource only Patient`, also `contained` and
+  `Parameters.parameter.resource`) and the targets a Reference may point at
+  (`Reference(PractitionerRole)`), at the top level and inside a slice. A literal `Patient/1` is
+  checked against the targets' types without being resolved, IG profile targets included when the
+  profile is generated or loaded; see [Target types](references.md#target-types).
 * The profile's own invariants and its `required` and `extensible` bindings, reported at the
   element they are about. See [Profile invariants](invariants.md#profile-invariants) and
   [Profile bindings](terminology.md#profile-bindings).
@@ -117,6 +157,35 @@ sub-extensions, and its own invariants and bindings. A modifier extension with s
 longer reported as unknown.
 
 Findings carry the profile URL in `profileGroup`, as findings from a generated profile class do.
+
+## Slicing support
+
+Generated profile classes and profiles resolved at runtime enforce slicing the same way. An item
+joins a slice only when it matches every discriminator of the slicing.
+
+| Discriminator or rule | Enforced | Notes |
+|---|---|---|
+| `value` and `pattern` | Yes | Compared with the slice's fixed or pattern value at the path |
+| `exists` | Yes | |
+| `type` | Yes | Compares the FHIR type at the path, such as a Bundle entry's resource |
+| `profile` | Yes | Needs the profile generated or resolvable at runtime; otherwise the slice is not judged |
+| `$this` with a fixed or pattern value | Yes | Uses the slice's own value, such as AU Core smoking status's `social-history` category |
+| `$this` with only a `required` binding | With a terminology client | Such as AU Core's `coding:pbs` and `coding:amt`; without a client the slice is not judged |
+| Several discriminators on one slicing | Yes | All must match |
+| A path through `resolve()` | No | Closed or openAtEnd slicing that depends on it is enforced as open. The compiler reports a `CompilerDiagnostic`, and `fhir:generate` reports it as a warning |
+| Slice minimum and maximum | Yes | Not checked for a slice that could not be judged |
+| `closed` and `openAtEnd` | Yes | Items that might belong to a slice that could not be judged are not rejected |
+| Invariants and bindings inside a slice | Yes | Checked on the items in that slice |
+| Fixed and pattern values inside a slice | Yes | |
+| Types and Reference targets inside a slice | Yes | As at the top level |
+| A data-type profile named on a slice | Yes | Such as `au-ihi` on `Patient.identifier:ihi` |
+| `ordered` slicing | Yes | An item matching a slice declared before the slice of an earlier item is an error. Items that match no slice, and items that might belong to a slice that could not be judged, are not part of the order. A derived profile's slices are ordered among its parent's |
+| Reslices (`extension:altid/npi`) | Yes | Checked among the items of their slice. Without slicing on the slice itself, the element's discriminators tell reslices apart |
+| Choice type slices (`value[x]:valueQuantity`) | As plain constraints | Checked on the variant, such as `valueQuantity` |
+
+"Not judged" means that items that might belong to the slice are not counted against closed or
+openAtEnd rules and the slice's minimum is not checked, so a conforming resource is not rejected.
+[Structural validation](structural.md#slicing) describes the matching in more detail.
 
 ## When a profile cannot be checked
 
@@ -148,13 +217,16 @@ against it instead.
 * **A snapshot is required.** Definitions without a snapshot are reported, not expanded. Published
   packages carry snapshots; a profile you write yourself needs one generated, for example by the
   IG Publisher or SUSHI.
-* **Rules inside a slice are not enforced.** An invariant or binding on an element inside a slice,
-  including an extension's sub-extensions, is skipped without a finding. Each skipped rule is kept
-  as a `CompilerDiagnostic`: in `diagnostics` on each entry of
-  `RuntimeProfileResolver::resolve($url, 'R4')->chain` for a profile, and in
-  `resolveExtension($url, 'R4')->diagnostics` for an extension. `fhir:generate-ig` reports the same
-  rules as warnings.
+* **Rules on an extension definition's sub-extensions are not enforced.** An invariant or binding
+  on a sub-extension is skipped without a finding and kept as a `CompilerDiagnostic` in
+  `resolveExtension($url, 'R4')->diagnostics`; `fhir:generate-ig` reports it as a warning. Rules
+  inside a profile's slices, including a data-type profile such as `au-ihi` named on a slice, are
+  enforced for the items in that slice, unless no item can be matched to the slice because its
+  discriminator has nothing to match on (a path through `resolve()`, or a value the profile does
+  not state); that is reported as a `CompilerDiagnostic`.
 * **No terminology server, no binding check.** A binding no generated enum covers needs a
   terminology client; without one it is reported as `fhir:unchecked-binding` INFO.
 * **Sub-extension cardinality, fixed and pattern values are not checked**, because the generated
   extension classes do not check them either.
+* **A `maxLength` is checked only where a profile's other element rules are.** One in an extension's
+  own definition, or on the root element of a profile on a primitive type, is not checked.

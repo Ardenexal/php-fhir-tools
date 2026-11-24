@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Metadata\Tests\Unit\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLength;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledAttribute;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\StructureDefinitionCompiler;
 use PHPUnit\Framework\TestCase;
@@ -105,6 +108,236 @@ final class StructureDefinitionCompilerTest extends TestCase
         );
     }
 
+    /**
+     * A choice element's narrowed type list and a Reference's target profiles each compile to a rule,
+     * at the top level and inside a slice (#229). A choice type slice (`value[x]:valueQuantity`)
+     * already names its one type in its path and gets no type rule.
+     */
+    public function testTypeAndTargetProfileRestrictionsCompileToRules(): void
+    {
+        $patient = 'http://hl7.org/fhir/StructureDefinition/Patient';
+        $sd      = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Observation', 'path' => 'Observation'],
+                ['id' => 'Observation.value[x]', 'path' => 'Observation.value[x]', 'type' => [['code' => 'Quantity'], ['code' => 'string']]],
+                ['id' => 'Observation.subject', 'path' => 'Observation.subject', 'type' => [['code' => 'Reference', 'targetProfile' => [$patient]]]],
+                [
+                    'id'      => 'Observation.component',
+                    'path'    => 'Observation.component',
+                    'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'code.text']], 'rules' => 'open'],
+                ],
+                ['id' => 'Observation.component:a', 'path' => 'Observation.component', 'sliceName' => 'a'],
+                ['id' => 'Observation.component:a.code.text', 'path' => 'Observation.component.code.text', 'fixedString' => 'a'],
+                ['id' => 'Observation.component:a.value[x]', 'path' => 'Observation.component.value[x]', 'type' => [['code' => 'integer']]],
+                ['id' => 'Observation.component:b', 'path' => 'Observation.component', 'sliceName' => 'b'],
+                ['id' => 'Observation.component:b.code.text', 'path' => 'Observation.component.code.text', 'fixedString' => 'b'],
+                [
+                    'id'   => 'Observation.component:b.value[x]:valueQuantity',
+                    'path' => 'Observation.component.value[x]',
+                    'type' => [['code' => 'Quantity']],
+                ],
+            ]],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+
+        self::assertSame([], $compiled->diagnostics);
+        self::assertSame(
+            [
+                ['path' => 'value[x]', 'constraint' => FHIRAllowedTypes::class, 'options' => ['types' => ['Quantity', 'string']], 'groups' => [self::URL]],
+                ['path' => 'subject', 'constraint' => FHIRTargetProfile::class, 'options' => ['targetProfiles' => [$patient]], 'groups' => [self::URL]],
+            ],
+            array_values(array_map(
+                static fn (CompiledAttribute $a): array => $a->arguments,
+                array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRProfileConstraint::class),
+            )),
+        );
+
+        $rules = [];
+        foreach ($compiled->attributes as $attribute) {
+            if ($attribute->class === FHIRSliceConstraint::class) {
+                $rules[(string) $attribute->arguments['sliceName']] = array_map(
+                    static fn (array $rule): string => $rule['path'] . ' ' . $rule['constraint'],
+                    (array) ($attribute->arguments['rules'] ?? []),
+                );
+            }
+        }
+
+        self::assertSame(
+            [
+                'a' => ['code.text ' . FHIRFixedValue::class, 'value[x] ' . FHIRAllowedTypes::class],
+                'b' => ['code.text ' . FHIRFixedValue::class],
+            ],
+            $rules,
+        );
+    }
+
+    /**
+     * A maxLength compiles to a rule on the element's path (#240).
+     */
+    public function testMaxLengthCompilesToARule(): void
+    {
+        $sd = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Identifier', 'path' => 'Identifier'],
+                ['id' => 'Identifier.value', 'path' => 'Identifier.value', 'maxLength' => 11],
+            ]],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+
+        self::assertCount(1, $compiled->attributes);
+        self::assertSame(
+            ['path' => 'value', 'constraint' => FHIRMaxLength::class, 'options' => ['max' => 11], 'groups' => [self::URL]],
+            $compiled->attributes[0]->arguments,
+        );
+    }
+
+    /**
+     * Inside a slice, a maxLength joins that slice's rules, so it applies to its items only (#240).
+     */
+    public function testMaxLengthInsideASliceCompilesToASliceRule(): void
+    {
+        $sd = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Patient', 'path' => 'Patient'],
+                [
+                    'id'      => 'Patient.identifier',
+                    'path'    => 'Patient.identifier',
+                    'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'system']], 'rules' => 'open'],
+                ],
+                ['id' => 'Patient.identifier:mc', 'path' => 'Patient.identifier', 'sliceName' => 'mc'],
+                ['id' => 'Patient.identifier:mc.system', 'path' => 'Patient.identifier.system', 'fixedUri' => 'urn:mc'],
+                ['id' => 'Patient.identifier:mc.value', 'path' => 'Patient.identifier.value', 'maxLength' => 11],
+            ]],
+        ];
+
+        $rules = [];
+        foreach ((new StructureDefinitionCompiler())->compile($sd)->attributes as $attribute) {
+            if ($attribute->class === FHIRSliceConstraint::class) {
+                foreach ((array) ($attribute->arguments['rules'] ?? []) as $rule) {
+                    if ($rule['constraint'] === FHIRMaxLength::class) {
+                        $rules[] = [$rule['path'], $rule['options']];
+                    }
+                }
+            }
+        }
+
+        self::assertSame([['value', ['max' => 11]]], $rules);
+    }
+
+    /**
+     * A Reference with no targetProfile allows any target, so beside a restricted canonical only the
+     * canonical gets a rule, naming its kind; a merged list would reject `Patient/1` (#246).
+     */
+    public function testUnrestrictedReferenceBesideARestrictedCanonicalGetsNoReferenceRule(): void
+    {
+        $valueSet = 'http://hl7.org/fhir/StructureDefinition/ValueSet';
+        $sd       = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Observation', 'path' => 'Observation'],
+                ['id' => 'Observation.focus', 'path' => 'Observation.focus', 'type' => [
+                    ['code' => 'Reference'],
+                    ['code' => 'canonical', 'targetProfile' => [$valueSet]],
+                ]],
+            ]],
+        ];
+
+        self::assertSame(
+            [['path' => 'focus', 'constraint' => FHIRTargetProfile::class, 'options' => ['targetProfiles' => [$valueSet], 'kind' => 'canonical'], 'groups' => [self::URL]]],
+            array_map(static fn (CompiledAttribute $a): array => $a->arguments, (new StructureDefinitionCompiler())->compile($sd)->attributes),
+        );
+    }
+
+    /**
+     * Reference and canonical types with different targets get one rule per kind; the same targets on
+     * both kinds still compile to one rule that names no kind (#246).
+     */
+    public function testMixedReferenceAndCanonicalTargetsCompileToOneRulePerKind(): void
+    {
+        $group    = 'http://hl7.org/fhir/StructureDefinition/Group';
+        $variable = 'http://hl7.org/fhir/StructureDefinition/EvidenceVariable';
+        $sd       = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'ActivityDefinition', 'path' => 'ActivityDefinition'],
+                ['id' => 'ActivityDefinition.subject[x]', 'path' => 'ActivityDefinition.subject[x]', 'type' => [
+                    ['code' => 'Reference', 'targetProfile' => [$group]],
+                    ['code' => 'canonical', 'targetProfile' => [$variable]],
+                ]],
+                ['id' => 'ActivityDefinition.library', 'path' => 'ActivityDefinition.library', 'type' => [
+                    ['code' => 'Reference', 'targetProfile' => [$group]],
+                    ['code' => 'canonical', 'targetProfile' => [$group]],
+                ]],
+            ]],
+        ];
+
+        $targetRules = array_values(array_filter(
+            array_map(static fn (CompiledAttribute $a): array => $a->arguments, (new StructureDefinitionCompiler())->compile($sd)->attributes),
+            static fn (array $arguments): bool => $arguments['constraint'] === FHIRTargetProfile::class,
+        ));
+
+        self::assertSame(
+            [
+                ['path' => 'subject[x]', 'constraint' => FHIRTargetProfile::class, 'options' => ['targetProfiles' => [$group], 'kind' => 'Reference'], 'groups' => [self::URL]],
+                ['path' => 'subject[x]', 'constraint' => FHIRTargetProfile::class, 'options' => ['targetProfiles' => [$variable], 'kind' => 'canonical'], 'groups' => [self::URL]],
+                ['path' => 'library', 'constraint' => FHIRTargetProfile::class, 'options' => ['targetProfiles' => [$group]], 'groups' => [self::URL]],
+            ],
+            $targetRules,
+        );
+    }
+
+    /**
+     * A resource slot typed `Resource` in the base, narrowed to concrete types, gets a type rule at
+     * the top level and inside a slice; one still naming `Resource` does not (#246).
+     */
+    public function testNarrowedResourceSlotCompilesToATypeRule(): void
+    {
+        $sd = [
+            'url'          => self::URL,
+            'differential' => ['element' => [
+                ['id' => 'Bundle', 'path' => 'Bundle'],
+                [
+                    'id'      => 'Bundle.entry',
+                    'path'    => 'Bundle.entry',
+                    'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'fullUrl']], 'rules' => 'open'],
+                ],
+                ['id' => 'Bundle.entry.resource', 'path' => 'Bundle.entry.resource', 'type' => [['code' => 'Patient'], ['code' => 'Observation']]],
+                ['id' => 'Bundle.entry:p', 'path' => 'Bundle.entry', 'sliceName' => 'p'],
+                ['id' => 'Bundle.entry:p.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:p'],
+                ['id' => 'Bundle.entry:p.resource', 'path' => 'Bundle.entry.resource', 'type' => [['code' => 'Patient']]],
+                ['id' => 'Bundle.entry:p.response.outcome', 'path' => 'Bundle.entry.response.outcome', 'type' => [['code' => 'Resource']]],
+            ]],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile($sd);
+        $rules    = [];
+        foreach ($compiled->attributes as $attribute) {
+            if ($attribute->class === FHIRProfileConstraint::class) {
+                $rules[] = $attribute->arguments['path'] . ' ' . $attribute->arguments['constraint'] . ' ' . implode('|', (array) ($attribute->arguments['options']['types'] ?? []));
+            }
+
+            if ($attribute->class === FHIRSliceConstraint::class) {
+                foreach ((array) ($attribute->arguments['rules'] ?? []) as $rule) {
+                    $rules[] = $attribute->arguments['sliceName'] . ':' . $rule['path'] . ' ' . $rule['constraint'] . ' ' . implode('|', (array) ($rule['options']['types'] ?? []));
+                }
+            }
+        }
+
+        self::assertSame(
+            [
+                'entry.resource ' . FHIRAllowedTypes::class . ' Patient|Observation',
+                'p:fullUrl ' . FHIRFixedValue::class . ' ',
+                'p:resource ' . FHIRAllowedTypes::class . ' Patient',
+            ],
+            $rules,
+        );
+    }
+
     public function testSliceOnUndefinedSlicingIsReportedNotDropped(): void
     {
         $sd = [
@@ -139,9 +372,9 @@ final class StructureDefinitionCompilerTest extends TestCase
         $compiled = (new StructureDefinitionCompiler())->compile($sd);
         $slices   = self::sliceArguments($compiled->attributes);
 
-        self::assertTrue($slices['withResource']['discriminatorValue']);
+        self::assertTrue($slices['withResource']['discriminators'][0]['value']);
         self::assertSame(1, $slices['withResource']['min']);
-        self::assertFalse($slices['withoutResource']['discriminatorValue']);
+        self::assertFalse($slices['withoutResource']['discriminators'][0]['value']);
         self::assertSame(['openAtEnd'], self::slicingRules($compiled->attributes));
         self::assertSame([], $compiled->diagnostics);
     }
@@ -161,12 +394,13 @@ final class StructureDefinitionCompilerTest extends TestCase
         $compiled = (new StructureDefinitionCompiler())->compile($sd);
         $slices   = self::sliceArguments($compiled->attributes);
 
-        self::assertArrayNotHasKey('discriminatorValue', $slices['first']);
+        self::assertArrayNotHasKey('value', $slices['first']['discriminators'][0]);
         self::assertSame(0, $slices['first']['min']);
         self::assertSame(['open'], self::slicingRules($compiled->attributes));
-        self::assertCount(1, $compiled->diagnostics);
-        self::assertSame('Bundle.entry', $compiled->diagnostics[0]->elementId);
-        self::assertStringContainsString('first', $compiled->diagnostics[0]->message);
+
+        // One for the relaxed slicing, one for the slice's own rules, which no item reaches
+        self::assertSame(['Bundle.entry:first', 'Bundle.entry'], array_map(static fn ($d): string => $d->elementId, $compiled->diagnostics));
+        self::assertStringContainsString('first', $compiled->diagnostics[1]->message);
     }
 
     /**
@@ -223,18 +457,162 @@ final class StructureDefinitionCompilerTest extends TestCase
     }
 
     /**
+     * `slicing.ordered` reaches FHIRSlicingRules as `ordered: true`; unordered slicing compiles
+     * without the argument.
+     */
+    public function testOrderedSlicingCompilesItsOrder(): void
+    {
+        $slices = [
+            ['id' => 'Bundle.entry:first', 'path' => 'Bundle.entry', 'sliceName' => 'first'],
+            ['id' => 'Bundle.entry:first.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:first'],
+        ];
+
+        $ordered = self::entrySlicing('open', ['type' => 'value', 'path' => 'fullUrl'], $slices, ordered: true);
+        self::assertSame([true], self::slicingArgument((new StructureDefinitionCompiler())->compile($ordered)->attributes, 'ordered'));
+
+        $unordered = self::entrySlicing('open', ['type' => 'value', 'path' => 'fullUrl'], $slices);
+        self::assertSame([null], self::slicingArgument((new StructureDefinitionCompiler())->compile($unordered)->attributes, 'ordered'));
+    }
+
+    /**
+     * The snapshot's `ordered` holds when the differential restates the slicing without it, and
+     * when the differential only adds slices to inherited slicing, which then gets open rules.
+     */
+    public function testInheritedOrderIsKept(): void
+    {
+        $ordered  = ['discriminator' => [['type' => 'value', 'path' => 'fullUrl']], 'rules' => 'open', 'ordered' => true];
+        $snapshot = [
+            ['id' => 'Bundle', 'path' => 'Bundle'],
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => $ordered],
+            ['id' => 'Bundle.entry:first', 'path' => 'Bundle.entry', 'sliceName' => 'first'],
+            ['id' => 'Bundle.entry:first.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:first'],
+        ];
+        $slice = ['id' => 'Bundle.entry:first', 'path' => 'Bundle.entry', 'sliceName' => 'first', 'min' => 1];
+
+        $restated = [
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => ['discriminator' => $ordered['discriminator'], 'rules' => 'closed']],
+            $slice,
+        ];
+        $compiled = (new StructureDefinitionCompiler())->compile(['url' => self::URL, 'differential' => ['element' => $restated], 'snapshot' => ['element' => $snapshot]]);
+        self::assertSame(['closed'], self::slicingRules($compiled->attributes));
+        self::assertSame([true], self::slicingArgument($compiled->attributes, 'ordered'));
+
+        $added    = (new StructureDefinitionCompiler())->compile(['url' => self::URL, 'differential' => ['element' => [$slice]], 'snapshot' => ['element' => $snapshot]]);
+        self::assertSame(['open'], self::slicingRules($added->attributes));
+        self::assertSame([true], self::slicingArgument($added->attributes, 'ordered'));
+    }
+
+    /**
+     * A profile restating closed slicing lists its own slices first and the snapshot's after them,
+     * yet each slice's `orderedIndex` is its place in the snapshot, where every slice is declared.
+     */
+    public function testOrderedIndexFollowsTheSnapshotsSliceOrder(): void
+    {
+        $slicing  = ['discriminator' => [['type' => 'value', 'path' => 'fullUrl']], 'rules' => 'closed', 'ordered' => true];
+        $snapshot = [
+            ['id' => 'Bundle', 'path' => 'Bundle'],
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => $slicing],
+            ['id' => 'Bundle.entry:first', 'path' => 'Bundle.entry', 'sliceName' => 'first'],
+            ['id' => 'Bundle.entry:first.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:first'],
+            ['id' => 'Bundle.entry:second', 'path' => 'Bundle.entry', 'sliceName' => 'second'],
+            ['id' => 'Bundle.entry:second.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:second'],
+        ];
+        $differential = [
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => $slicing],
+            ['id' => 'Bundle.entry:second', 'path' => 'Bundle.entry', 'sliceName' => 'second', 'min' => 1],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile(['url' => self::URL, 'differential' => ['element' => $differential], 'snapshot' => ['element' => $snapshot]]);
+        $slices   = self::sliceArguments($compiled->attributes);
+
+        self::assertSame(['second', 'first'], array_keys($slices));
+        self::assertSame(0, $slices['first']['orderedIndex']);
+        self::assertSame(1, $slices['second']['orderedIndex']);
+    }
+
+    /**
+     * Reslices travel in their slice's rules at path '', with the slice's own slicing, and the
+     * reslice's own rules nested in its definition.
+     */
+    public function testReslicesCompileIntoTheirSlicesRules(): void
+    {
+        $slices = [
+            ['id' => 'Bundle.entry:doc', 'path' => 'Bundle.entry', 'sliceName' => 'doc', 'slicing' => ['discriminator' => [['type' => 'value', 'path' => 'request.method']], 'rules' => 'closed']],
+            ['id' => 'Bundle.entry:doc.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:doc'],
+            ['id' => 'Bundle.entry:doc/post', 'path' => 'Bundle.entry', 'sliceName' => 'doc/post', 'min' => 1, 'max' => '1'],
+            ['id' => 'Bundle.entry:doc/post.request.method', 'path' => 'Bundle.entry.request.method', 'fixedCode' => 'POST'],
+            ['id' => 'Bundle.entry:doc/post.resource', 'path' => 'Bundle.entry.resource', 'min' => 1],
+        ];
+
+        $compiled = (new StructureDefinitionCompiler())->compile(self::entrySlicing('open', ['type' => 'value', 'path' => 'fullUrl'], $slices));
+        $doc      = self::sliceArguments($compiled->attributes)['doc'];
+
+        self::assertSame(['doc'], array_keys(self::sliceArguments($compiled->attributes)));
+        self::assertSame([], $compiled->diagnostics);
+
+        $reslicing = array_values(array_filter($doc['rules'], static fn (array $rule): bool => $rule['path'] === ''));
+        self::assertSame([FHIRSlicingRules::class, FHIRSliceConstraint::class], array_column($reslicing, 'constraint'));
+        self::assertSame('closed', $reslicing[0]['options']['rules']);
+
+        $post = $reslicing[1]['options'];
+        self::assertSame('doc/post', $post['sliceName']);
+        self::assertSame(1, $post['min']);
+        self::assertSame([['type' => 'value', 'path' => 'request.method', 'value' => 'POST']], $post['discriminators']);
+        self::assertSame(
+            [
+                ['path' => 'request.method', 'constraint' => FHIRFixedValue::class, 'options' => ['value' => 'POST']],
+                ['path' => 'resource', 'constraint' => Count::class, 'options' => ['min' => 1]],
+            ],
+            $post['rules'],
+        );
+    }
+
+    /**
+     * A resliced slice that fixes no value at a discriminator path its reslices fix matches any of
+     * theirs, and a slice reached only through a reslice is still compiled, as a bare 0..* member.
+     */
+    public function testAResliceOnlySliceMatchesAnyOfItsReslicesValues(): void
+    {
+        $slices = [
+            ['id' => 'Bundle.entry:doc/post', 'path' => 'Bundle.entry', 'sliceName' => 'doc/post', 'max' => '1'],
+            ['id' => 'Bundle.entry:doc/post.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:post'],
+            ['id' => 'Bundle.entry:doc/put', 'path' => 'Bundle.entry', 'sliceName' => 'doc/put', 'max' => '1'],
+            ['id' => 'Bundle.entry:doc/put.fullUrl', 'path' => 'Bundle.entry.fullUrl', 'fixedUri' => 'urn:put'],
+        ];
+
+        $doc = self::sliceArguments((new StructureDefinitionCompiler())->compile(self::entrySlicing('open', ['type' => 'value', 'path' => 'fullUrl'], $slices))->attributes)['doc'];
+
+        self::assertSame(0, $doc['min']);
+        self::assertSame('*', $doc['max']);
+        self::assertSame(
+            [['type' => 'value', 'path' => 'fullUrl', 'anyOf' => [
+                ['type' => 'value', 'path' => 'fullUrl', 'value' => 'urn:post'],
+                ['type' => 'value', 'path' => 'fullUrl', 'value' => 'urn:put'],
+            ]]],
+            $doc['discriminators'],
+        );
+        self::assertSame(['doc/post', 'doc/put'], array_column(array_column($doc['rules'], 'options'), 'sliceName'));
+    }
+
+    /**
      * A Bundle profile slicing `entry` with the given rules and discriminator, plus $slices.
      *
      * @param array{type: string, path: string} $discriminator
      * @param list<array<string, mixed>>        $slices
+     * @param bool                              $ordered       Whether the slicing is ordered
      *
      * @return array<string, mixed>
      */
-    private static function entrySlicing(string $rules, array $discriminator, array $slices): array
+    private static function entrySlicing(string $rules, array $discriminator, array $slices, bool $ordered = false): array
     {
+        $slicing = ['discriminator' => [$discriminator], 'rules' => $rules];
+        if ($ordered) {
+            $slicing['ordered'] = true;
+        }
+
         $elements = [
             ['id' => 'Bundle', 'path' => 'Bundle'],
-            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => ['discriminator' => [$discriminator], 'rules' => $rules]],
+            ['id' => 'Bundle.entry', 'path' => 'Bundle.entry', 'slicing' => $slicing],
             ...$slices,
         ];
 
@@ -277,6 +655,25 @@ final class StructureDefinitionCompilerTest extends TestCase
         }
 
         return $rules;
+    }
+
+    /**
+     * One argument of each compiled FHIRSlicingRules, in order; null where it is not given.
+     *
+     * @param list<CompiledAttribute> $attributes
+     *
+     * @return list<mixed>
+     */
+    private static function slicingArgument(array $attributes, string $name): array
+    {
+        $values = [];
+        foreach ($attributes as $attribute) {
+            if ($attribute->class === FHIRSlicingRules::class) {
+                $values[] = $attribute->arguments[$name] ?? null;
+            }
+        }
+
+        return $values;
     }
 
     /**

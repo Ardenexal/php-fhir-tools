@@ -46,9 +46,21 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
 )]
 #[FHIRProfileConstraint(
+    path: 'subject',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/Patient']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
+)]
+#[FHIRProfileConstraint(
     path: 'effective[x]',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
+)]
+#[FHIRProfileConstraint(
+    path: 'effective[x]',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes',
+    options: ['types' => ['dateTime', 'Period']],
     groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
 )]
 #[FHIRProfileConstraint(
@@ -61,6 +73,33 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
     path: 'dataAbsentReason',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
+)]
+#[FHIRProfileConstraint(
+    path: 'hasMember',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: [
+        'targetProfiles' => [
+            'http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse',
+            'http://hl7.org/fhir/StructureDefinition/MolecularSequence',
+            'http://hl7.org/fhir/StructureDefinition/vitalsigns',
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
+)]
+#[FHIRProfileConstraint(
+    path: 'derivedFrom',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: [
+        'targetProfiles' => [
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+            'http://hl7.org/fhir/StructureDefinition/ImagingStudy',
+            'http://hl7.org/fhir/StructureDefinition/Media',
+            'http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse',
+            'http://hl7.org/fhir/StructureDefinition/MolecularSequence',
+            'http://hl7.org/fhir/StructureDefinition/vitalsigns',
+        ],
+    ],
     groups: ['http://hl7.org/fhir/StructureDefinition/vitalsigns'],
 )]
 #[FHIRProfileConstraint(
@@ -98,9 +137,14 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
     sliceName: 'VSCat',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'coding.code',
-    discriminatorValue: 'vital-signs',
+    discriminators: [
+        ['type' => 'value', 'path' => 'coding.code', 'value' => 'vital-signs'],
+        [
+            'type'  => 'value',
+            'path'  => 'coding.system',
+            'value' => 'http://terminology.hl7.org/CodeSystem/observation-category',
+        ],
+    ],
     orderedIndex: 0,
     rules: [
         ['path' => 'coding', 'constraint' => 'Symfony\Component\Validator\Constraints\Count', 'options' => ['min' => 1]],

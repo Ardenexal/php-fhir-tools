@@ -31,6 +31,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ProvenanceResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/provenance-relevant-history'],
 )]
 #[FHIRProfileConstraint(
+    path: 'occurred[x]',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes',
+    options: ['types' => ['dateTime']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/provenance-relevant-history'],
+)]
+#[FHIRProfileConstraint(
     path: 'activity',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
@@ -54,10 +60,14 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ProvenanceResource;
     sliceName: 'Author',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'type',
-    discriminatorValue: [
-        'coding' => [['system' => 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType', 'code' => 'AUT']],
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'type',
+            'value' => [
+                'coding' => [['system' => 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType', 'code' => 'AUT']],
+            ],
+        ],
     ],
     orderedIndex: 0,
     rules: [

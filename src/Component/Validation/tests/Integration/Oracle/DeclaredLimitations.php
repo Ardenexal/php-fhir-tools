@@ -94,6 +94,26 @@ final class DeclaredLimitations
     public const REASON_UNKNOWN_EXTENSION = 'an unresolvable regular extension is not reported, by decision; only modifier extensions are enforced';
 
     /**
+     * An invariant that evaluates to empty is not a failure here, by decision.
+     *
+     * FHIRPath is three-valued, and an empty result means "unknown". The reference validator turns
+     * empty into `false` (`FHIRPathEngine.convertToBoolean`) and reports the invariant as failed. This
+     * project does not, because empty arises constantly from valid data: `FHIRPathInvariantValidator`
+     * (search: `An empty collection is not a failure`) records the case pair that shows collapsing it
+     * would report a Reference the reference validator itself passes.
+     *
+     * Each case below is empty for a reason that is valid FHIRPath, checked 2026-11-17:
+     *
+     * - `encounter-period` (per-1): `start` is the date `2023-06-21` and `end` the dateTime
+     *   `2023-06-21T06:20:00Z`. Values of different precision that agree as far as both go are not
+     *   comparable, so `start <= end` is empty.
+     * - `fhirpath-bad` and `fhirpath-null` (ctm-1): `member.resolve() is Practitioner`, where `member`
+     *   points at a Practitioner that is not in the document. `resolve()` finds nothing, and `is` on
+     *   empty is empty.
+     */
+    public const REASON_EMPTY_INVARIANT = 'an invariant that evaluates to empty is unknown rather than failed, by decision; the reference validator treats empty as false';
+
+    /**
      * case name => [reason, ourErrorCount, javaErrorCount]
      *
      * `ourErrorCount` is what we legitimately report today — 0 for all current entries, but recorded
@@ -119,6 +139,7 @@ final class DeclaredLimitations
 
             'parameters-reference-bad'    => ['reason' => self::REASON_NO_RESOURCE_FETCHER, 'ours' => 0, 'java' => 1],
             'bad-bundle-reference-type-4' => ['reason' => self::REASON_R4_URN_ID_MATCH, 'ours' => 0, 'java' => 1],
+            'encounter-period'            => ['reason' => self::REASON_EMPTY_INVARIANT, 'ours' => 0, 'java' => 1],
         ],
         'R4B' => [],
         'R5'  => [
@@ -128,6 +149,8 @@ final class DeclaredLimitations
             'demo-example-2'                         => ['reason' => self::REASON_LOINC, 'ours' => 0, 'java' => 1],
             'contained-canonical'                    => ['reason' => self::REASON_UNKNOWN_EXTENSION, 'ours' => 0, 'java' => 1],
             'reference-bad'                          => ['reason' => self::REASON_NO_RESOURCE_FETCHER, 'ours' => 0, 'java' => 1],
+            'fhirpath-bad'                           => ['reason' => self::REASON_EMPTY_INVARIANT, 'ours' => 0, 'java' => 1],
+            'fhirpath-null'                          => ['reason' => self::REASON_EMPTY_INVARIANT, 'ours' => 0, 'java' => 1],
         ],
     ];
 
@@ -158,9 +181,9 @@ final class DeclaredLimitations
      *
      * Loading the packages would not be enough on its own, checked 2026-11-14 against
      * `kbv.mio.diga#1.0.0-festlegung`: its body weight profile ships without a snapshot, which runtime
-     * validation requires, inherits the fixed `version` from `kbv.basis`, and slices `code.coding` by
-     * pattern on `$this`, which the compiler cannot yet turn into a discriminator value. The fixed value
-     * on a slice child itself is enforced: `FixedValueValidationTest::testFixedValueInsideASliceIsChecked`.
+     * validation requires, and inherits the fixed `version` from `kbv.basis`. Its `code.coding` slicing
+     * by pattern on `$this` is matched since the slice's own pattern became its discriminator value. The
+     * fixed value on a slice child itself is enforced: `FixedValueValidationTest::testFixedValueInsideASliceIsChecked`.
      */
     public const REASON_UNVENDORED_PACKAGE = 'the IG packages this case loads by name are not vendored, and their profile ships without a snapshot';
 
@@ -215,16 +238,16 @@ final class DeclaredLimitations
     public const REASON_XXE_REFUSAL = 'refusing an XML DOCTYPE is deliberate: it blocks external-entity attacks, so this finding is unreachable by design';
 
     /**
-     * A reference's type is not read from its URL, because the reference validator's default does not.
+     * A finding the reference validator raises only when told to read a reference's type from its URL.
      *
      * `R4.dr-eh` reports `The type 'Device' implied by the reference URL Device/foo is not a valid Target`.
      * The reference validator raises that only when its manifest sets `assumeValidRestReferences`, which
-     * tells it to treat `Type/id` as proof of the target's type without resolving it. On its default
-     * settings it accepts `Practitioner/2` on an element that allows only `Organization`
-     * (`R5.fhirpath-good`), which inferring the type here would report as an error. Matching the
-     * default is the comparison's baseline, so the opt-in finding is declared rather than chased.
+     * tells it to treat `Type/id` as proof of the target's type without resolving it. This project reads
+     * the type from the URL by default (#229), so it reports `Practitioner/2` on an element that allows
+     * only `Organization` where the reference validator's default does not (`R5.fhirpath-good`, seeded
+     * as ABOVE).
      *
-     * `dr-eh` is unreachable for a second reason too: the `[Patient]` restriction comes from US Core
+     * `dr-eh` stays unreachable for another reason: the `[Patient]` restriction comes from US Core
      * 3.1.0, which the manifest loads for that case and this harness does not. Against the base
      * `DocumentReference.subject` targets, `Device` is allowed.
      */
@@ -240,20 +263,21 @@ final class DeclaredLimitations
      * definition, and this project holds no other release's definitions to build it from.
      *
      * The rule most of these findings exercise, a modifier extension placed in `extension`, is not
-     * cross-version in itself. The generated models do not record which extensions are modifiers yet,
-     * so it is tracked in #223 rather than part of this write-off.
+     * cross-version in itself and is enforced for every extension whose definition we hold. Only its
+     * cross-version instances are written off here, because their definitions cannot be found.
      */
     public const REASON_CROSS_VERSION = 'cross-version extensions are synthesised from another FHIR release\'s definitions, which are not vendored';
 
     /**
-     * An extension restricted to certain FHIR releases by `version-specific-use`.
+     * An extension whose definition the case supplies beside the instance.
      *
-     * `R5.extension-version-restriction-range-r5` and its `-ctxt` sibling supply the extension's
-     * definition beside the instance, differential only. Runtime validation requires a snapshot, and
-     * neither the generator nor the runtime compiler reads `version-specific-use` yet, so neither the
-     * whole-extension range nor the per-context range can be checked. Tracked in #222.
+     * `R5.extension-version-restriction-range-r5` and its `-ctxt` sibling hand the reference validator
+     * the definition of `version-range` (`supporting5`). The default run loads only the core packages,
+     * so the extension is unknown there and neither finding can be reported. The `--supplied-profiles`
+     * run loads the definition, and both findings pair: the whole-extension `version-specific-use`
+     * range and the per-context one.
      */
-    public const REASON_VERSION_SPECIFIC_USE = 'the extension is restricted by version-specific-use, which is not implemented, and its definition ships without a snapshot';
+    public const REASON_SUPPLIED_DEFINITION = 'the case supplies the extension\'s definition beside the instance, which only the --supplied-profiles run loads; both findings pair there';
 
     /**
      * The reference validator fetches a reference's target from outside the instance, and we do not.
@@ -288,6 +312,18 @@ final class DeclaredLimitations
      * section entry and is the same defect.
      */
     public const REASON_DUPLICATE_REPORT = 'the reference validator reports the same ambiguous section entry a second time from its document section check';
+
+    /**
+     * The reference validator's snapshot drops slicing a profile's differential declares on a slice.
+     *
+     * `R5.reslicing-extensions` slices `AuditEvent.agent.extension` by `url` and declares slicing on
+     * its `altid` slice by `url` and `value.system`, which tells `altid/npi` from `altid/ssn`. The
+     * snapshot shipped with the case has no slicing on `altid`, so the reference validator tells the
+     * two reslices apart by `url` alone, finds both items in both, and reports them. This project
+     * follows the differential, as it does for every slicing (#242), so the instance conforms. The
+     * case's `reslicing-good-extensions` twin moves the discriminator to the element and passes in both.
+     */
+    public const REASON_DROPPED_RESLICING = 'the reference validator snapshot drops the slicing the profile declares on a resliced slice; this project follows the differential';
 
     /**
      * Text signature => reason, for limitations that are not about a code system.
@@ -329,8 +365,8 @@ final class DeclaredLimitations
         'http://hl7.org/fhir/1.0/structuredefinition/' => self::REASON_CROSS_VERSION,
         'http://hl7.org/fhir/3.0/structuredefinition/' => self::REASON_CROSS_VERSION,
         'http://hl7.org/fhir/5.0/structuredefinition/' => self::REASON_CROSS_VERSION,
-        // The corpus's own test extension; nothing else uses this canonical.
-        'http://hl7.org/fhir/test/structuredefinition/version-range' => self::REASON_VERSION_SPECIFIC_USE,
+        // The corpus's own test extension; nothing else uses this canonical. See REASON_SUPPLIED_DEFINITION.
+        'http://hl7.org/fhir/test/structuredefinition/version-range' => self::REASON_SUPPLIED_DEFINITION,
         // The next four are whole findings, quoted in full, so each declares one corpus finding and
         // never the rule behind it: a wrong-type match, an ambiguous section entry or an unresolvable
         // reference anywhere else would still count as open work. See REASON_DUPLICATE_REPORT.
@@ -340,6 +376,14 @@ final class DeclaredLimitations
         // See REASON_NO_RESOURCE_FETCHER: `parameters-reference-bad` (R4) and `reference-bad` (R5).
         "unable to resolve resource with reference 'patient/2'"         => self::REASON_NO_RESOURCE_FETCHER,
         "unable to resolve resource with reference 'patient/test-fail'" => self::REASON_NO_RESOURCE_FETCHER,
+        // Keyed by invariant, which is the shape that once swallowed a genuine finding, so it is held to
+        // two invariants and to the pinned counts in EXPECTED_FINDING_COUNTS. Only an invariant we do not
+        // report reaches here, and both evaluate to empty on every corpus case that carries them; a new
+        // one moves the pin and has to be read before it is accepted. See REASON_EMPTY_INVARIANT.
+        'constraint failed: per-1:' => self::REASON_EMPTY_INVARIANT,
+        'constraint failed: ctm-1:' => self::REASON_EMPTY_INVARIANT,
+        // The canonical of the one profile concerned, so no other reslicing finding can match it.
+        'http://example.org/reslicedextension/structuredefinition/myauditeventprofile' => self::REASON_DROPPED_RESLICING,
     ];
 
     /**
@@ -372,6 +416,7 @@ final class DeclaredLimitations
             self::REASON_UNVENDORED_PACKAGE     => 2,
             // Tied at one: ordered by reason text, as in R5 below.
             self::REASON_ASSUMED_REST_REFERENCE => 1,
+            self::REASON_EMPTY_INVARIANT        => 1,
             self::REASON_NCI                    => 1,
             self::REASON_R4_URN_ID_MATCH        => 1,
             self::REASON_NO_RESOURCE_FETCHER    => 1,
@@ -380,7 +425,8 @@ final class DeclaredLimitations
         'R4B' => [],
         'R5'  => [
             self::REASON_LOINC                => 7,
-            self::REASON_VERSION_SPECIFIC_USE => 2,
+            self::REASON_EMPTY_INVARIANT      => 2,
+            self::REASON_SUPPLIED_DEFINITION  => 2,
             // These two are tied at one, so their order is decided by reason text rather than by
             // whatever order the corpus produced them in. See ComparisonReport::declaredByReason().
             self::REASON_UNKNOWN_EXTENSION   => 1,

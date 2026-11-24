@@ -17,13 +17,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Links to *Provenance* records for past versions of this resource that document  key state transitions or updates that are deemed "relevant" or important to a user looking at the current version of the resource. E.g, when an observation was verified or corrected.  This extension does not point to the Provenance associated with the current version of the resource - as it would be created after this version existed. The *Provenance* for the current version can be retrieved with a [` _revinclude`](search.html#revinclude).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-eventHistory', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-eventHistory', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
-#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement', endFhirVersion: '4.3')]
 class EventHistoryExtension extends Extension
 {
     /**

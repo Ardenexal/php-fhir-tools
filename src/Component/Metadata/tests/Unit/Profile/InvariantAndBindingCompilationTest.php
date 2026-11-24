@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Metadata\Tests\Unit\Profile;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledAttribute;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\StructureDefinitionCompiler;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -77,20 +79,56 @@ final class InvariantAndBindingCompilationTest extends TestCase
         ], self::argumentsOf($compiled->attributes, FHIRProfileBinding::class));
     }
 
-    public function testRulesInsideASliceAreReportedNotEnforced(): void
+    /**
+     * Rules on a slice, or beneath one, hold for that slice's items only, so they become the slice's
+     * rules rather than attributes on the whole element. One the unsliced element already carries in
+     * the snapshot, and one another definition declares, are left out as they are at the top level.
+     */
+    public function testRulesInsideASliceBecomeThatSlicesRules(): void
     {
-        $compiled = (new StructureDefinitionCompiler())->compile(self::profile([
+        $profile                         = self::profile([
             ['id' => 'Observation.component', 'path' => 'Observation.component', 'slicing' => ['discriminator' => [['type' => 'pattern', 'path' => 'code']], 'rules' => 'open']],
-            ['id' => 'Observation.component:systolic', 'path' => 'Observation.component', 'sliceName' => 'systolic', 'constraint' => [self::invariant('sys-1', 'value.exists()')]],
-            ['id' => 'Observation.component:systolic.code', 'path' => 'Observation.component.code', 'binding' => ['strength' => 'required', 'valueSet' => 'http://example.org/ValueSet/systolic']],
-        ]));
+            ['id' => 'Observation.component:systolic', 'path' => 'Observation.component', 'sliceName' => 'systolic', 'constraint' => [
+                self::invariant('sys-1', 'value.exists()'),
+                self::invariant('ele-1', 'hasValue() or (children().count() > id.count())'),
+                ['source' => 'http://example.org/other', ...self::invariant('oth-1', 'true')],
+            ]],
+            ['id' => 'Observation.component:systolic.code', 'path' => 'Observation.component.code', 'patternCodeableConcept' => ['text' => 'systolic'], 'binding' => ['strength' => 'required', 'valueSet' => 'http://example.org/ValueSet/systolic']],
+            ['id' => 'Observation.component:systolic.value[x]', 'path' => 'Observation.component.value[x]', 'binding' => ['strength' => 'preferred', 'valueSet' => 'http://example.org/ValueSet/units']],
+        ]);
+        $profile['snapshot']['element'][] = ['id' => 'Observation.component', 'path' => 'Observation.component', 'constraint' => [self::invariant('ele-1', 'hasValue() or (children().count() > id.count())')]];
+
+        $compiled = (new StructureDefinitionCompiler())->compile($profile);
 
         self::assertSame([], self::argumentsOf($compiled->attributes, FHIRProfileInvariant::class));
         self::assertSame([], self::argumentsOf($compiled->attributes, FHIRProfileBinding::class));
+        self::assertSame([], $compiled->diagnostics);
 
-        $messages = array_map(static fn ($d): string => $d->message, $compiled->diagnostics);
-        self::assertContains('Profile ' . self::URL . ': invariant sys-1 on Observation.component:systolic is inside a slice; it is not enforced', $messages);
-        self::assertContains('Profile ' . self::URL . ': the required binding to http://example.org/ValueSet/systolic on Observation.component:systolic.code is inside a slice; it is not enforced', $messages);
+        $slices = array_values(array_filter($compiled->attributes, static fn (CompiledAttribute $a): bool => $a->class === FHIRSliceConstraint::class));
+        self::assertCount(1, $slices);
+        self::assertSame([
+            ['path' => '', 'constraint' => FHIRProfileInvariant::class, 'options' => ['path' => '', 'key' => 'sys-1', 'severity' => 'error', 'expression' => 'value.exists()', 'human' => 'sys-1 holds']],
+            ['path' => 'code', 'constraint' => FHIRPatternValue::class, 'options' => ['pattern' => ['text' => 'systolic']]],
+            ['path' => 'code', 'constraint' => FHIRProfileBinding::class, 'options' => ['path' => 'code', 'valueSetUrl' => 'http://example.org/ValueSet/systolic', 'strength' => 'required']],
+        ], $slices[0]->arguments['rules']);
+    }
+
+    /**
+     * A slice its discriminator cannot match never receives an item, so its rules are reported as
+     * not enforced: this coding slice is discriminated by `$this` and carries only an extensible binding.
+     */
+    public function testRulesOnASliceNoItemCanMatchAreReported(): void
+    {
+        $compiled = (new StructureDefinitionCompiler())->compile(self::profile([
+            ['id' => 'Observation.code.coding', 'path' => 'Observation.code.coding', 'slicing' => ['discriminator' => [['type' => 'pattern', 'path' => '$this']], 'rules' => 'open']],
+            // An extensible binding allows other codes, so it cannot say which codings are the slice's
+            ['id' => 'Observation.code.coding:pbs', 'path' => 'Observation.code.coding', 'sliceName' => 'pbs', 'binding' => ['strength' => 'extensible', 'valueSet' => 'http://example.org/ValueSet/pbs']],
+        ]));
+
+        self::assertSame(
+            ['Profile ' . self::URL . ": Observation.code.coding:pbs carries rules, but its pattern discriminator on '\$this' cannot be evaluated, so no item is matched to it; those rules are not enforced"],
+            array_map(static fn ($d): string => $d->message, $compiled->diagnostics),
+        );
     }
 
     public function testAnInlinedDataTypeProfileBringsItsInvariantUnderTheElement(): void

@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"HealthcareService","url":"http://hl7.org/fhir/StructureDefinition/HealthcareService","version":"4.0.1","name":"HealthcareService","status":"draft","fhirVersion":"4.0.1","kind":"resource","abstract":false,"type":"HealthcareService","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

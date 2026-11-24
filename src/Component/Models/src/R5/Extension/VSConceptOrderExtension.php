@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Identifies the relative order in which concepts within the value set should be presented to a user.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-conceptOrder', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-conceptOrder', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.expansion.contains')]
 class VSConceptOrderExtension extends Extension

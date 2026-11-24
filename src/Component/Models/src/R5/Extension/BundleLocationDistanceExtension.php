@@ -21,7 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * If multiple near positions are included in the search query, the distance to the closest point provided may be included.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/location-distance', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/location-distance', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Bundle.entry.search')]
 class BundleLocationDistanceExtension extends Extension
 {

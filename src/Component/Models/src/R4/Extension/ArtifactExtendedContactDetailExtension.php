@@ -24,7 +24,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Contact details (including purpose and address) to assist a user in finding and communicating with the publisher.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-extended-contact-detail', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-extended-contact-detail', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 class ArtifactExtendedContactDetailExtension extends Extension implements FHIRComplexExtensionInterface
 {

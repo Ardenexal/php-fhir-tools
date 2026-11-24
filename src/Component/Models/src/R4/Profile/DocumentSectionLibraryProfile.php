@@ -17,16 +17,25 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
     baseType: 'Composition',
     fhirVersion: 'R4',
 )]
-#[FHIRSlicingRules(property: 'section', rules: 'closed', groups: ['http://hl7.org/fhir/StructureDefinition/example-section-library'])]
+#[FHIRSlicingRules(
+    property: 'section',
+    rules: 'closed',
+    groups: ['http://hl7.org/fhir/StructureDefinition/example-section-library'],
+    ordered: true,
+)]
 #[FHIRSliceConstraint(
     property: 'section',
     sliceName: 'procedure',
     min: 0,
     max: '*',
-    discriminatorType: 'pattern',
-    discriminatorPath: 'code',
-    discriminatorValue: [
-        'coding' => [['system' => 'http://loinc.org', 'code' => '29554-3', 'display' => 'Procedure Narrative']],
+    discriminators: [
+        [
+            'type'  => 'pattern',
+            'path'  => 'code',
+            'value' => [
+                'coding' => [['system' => 'http://loinc.org', 'code' => '29554-3', 'display' => 'Procedure Narrative']],
+            ],
+        ],
     ],
     orderedIndex: 0,
     rules: [
@@ -54,11 +63,15 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
     sliceName: 'medications',
     min: 0,
     max: '*',
-    discriminatorType: 'pattern',
-    discriminatorPath: 'code',
-    discriminatorValue: [
-        'coding' => [
-            ['system' => 'http://loinc.org', 'code' => '29549-3', 'display' => 'Medication administered Narrative'],
+    discriminators: [
+        [
+            'type'  => 'pattern',
+            'path'  => 'code',
+            'value' => [
+                'coding' => [
+                    ['system' => 'http://loinc.org', 'code' => '29549-3', 'display' => 'Medication administered Narrative'],
+                ],
+            ],
         ],
     ],
     orderedIndex: 1,
@@ -93,10 +106,16 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CompositionResource;
     sliceName: 'plan',
     min: 0,
     max: '*',
-    discriminatorType: 'pattern',
-    discriminatorPath: 'code',
-    discriminatorValue: [
-        'coding' => [['system' => 'http://loinc.org', 'code' => '18776-5', 'display' => 'Plan of treatment (narrative)']],
+    discriminators: [
+        [
+            'type'  => 'pattern',
+            'path'  => 'code',
+            'value' => [
+                'coding' => [
+                    ['system' => 'http://loinc.org', 'code' => '18776-5', 'display' => 'Plan of treatment (narrative)'],
+                ],
+            ],
+        ],
     ],
     orderedIndex: 2,
     rules: [

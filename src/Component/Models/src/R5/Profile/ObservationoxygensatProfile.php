@@ -64,9 +64,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'OxygenSatCode',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'code',
-    discriminatorValue: '2708-6',
+    discriminators: [
+        ['type' => 'value', 'path' => 'code', 'value' => '2708-6'],
+        ['type' => 'value', 'path' => 'system', 'value' => 'http://loinc.org'],
+    ],
     orderedIndex: 0,
     rules: [
         [

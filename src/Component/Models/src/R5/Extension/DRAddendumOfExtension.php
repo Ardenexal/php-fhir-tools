@@ -17,7 +17,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description The supplements or provides additional information for the target report. From R6, this extension has been replaced by DiagnosticReport.relatesTo
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/diagnosticReport-addendumOf', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/diagnosticReport-addendumOf',
+    fhirVersion: 'R5',
+    isModifier: false,
+    endFhirVersion: '5.0',
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 class DRAddendumOfExtension extends Extension
 {

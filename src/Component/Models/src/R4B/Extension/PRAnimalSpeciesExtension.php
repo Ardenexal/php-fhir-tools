@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description This extension should be used to specifiy that a practitioner or RelatedPerson resource is a service animal.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/practitioner-animalSpecies', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/practitioner-animalSpecies', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Practitioner')]
 #[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson')]
 class PRAnimalSpeciesExtension extends Extension

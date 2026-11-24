@@ -18,13 +18,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description Determines whether child actions are evaluated independently (all) or evaluated in order with the first action that is applicable being performed (any).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-applicabilityBehavior', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
-#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action.action')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action.action')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration.action')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration.action.action')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-applicabilityBehavior', fhirVersion: 'R5', isModifier: false)]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action', startFhirVersion: '4.0', endFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action.action', startFhirVersion: '4.0', endFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action', startFhirVersion: '4.0', endFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action.action', startFhirVersion: '4.0', endFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration.action', startFhirVersion: '5.0', endFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration.action.action', startFhirVersion: '5.0', endFhirVersion: '5.0')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-applicability-behavior', strength: 'required')]
 class ApplicabilityBehaviorExtension extends Extension
 {

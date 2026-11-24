@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Indicates that the value of the parameter or extension is an empty tuple. Because the parameter element of a Parameters resource must have a value, the value element must be present with either an actual value, or an extension, this extension supports the case when the actual parameter value being represented is an empty tuple. The type of the value element used should be boolean.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-isEmptyTuple', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-isEmptyTuple', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Parameters.parameter.value')]
 #[FHIRExtensionContext(type: 'element', expression: 'Parameters.parameter.part.value')]
 #[FHIRExtensionContext(type: 'element', expression: 'Extension')]

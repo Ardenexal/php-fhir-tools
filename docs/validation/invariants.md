@@ -66,6 +66,7 @@ Extension definitions work the same way: their invariants and bindings are attri
 generated extension class, with no group, and they apply wherever the extension is used. A plain
 `Extension` whose definition was loaded at runtime is held to the same rules.
 
-Invariants on an element inside a slice are not enforced yet, and neither are those on an extension
-definition's sub-extensions. Generation reports each one as a warning, and runtime compilation as a
-`CompilerDiagnostic`.
+An invariant on a slice, or on an element beneath one, holds for the items in that slice only and is
+reported at the item, such as `identifier[1]`; `%resource` in it is the resource around the item.
+Invariants on an extension definition's sub-extensions are not enforced yet. Generation reports each
+one as a warning, and runtime compilation as a `CompilerDiagnostic`.

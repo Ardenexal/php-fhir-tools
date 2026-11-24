@@ -19,9 +19,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
  *
  * @description When the requested service should occur.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-occurrence', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
-#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-occurrence', fhirVersion: 'R5', isModifier: false)]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration', startFhirVersion: '5.0', endFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup', startFhirVersion: '4.0', endFhirVersion: '4.0')]
 class RequestOccurrenceExtension extends Extension
 {
     /**

@@ -41,14 +41,20 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
     options: ['max' => 0],
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]
+#[FHIRProfileConstraint(
+    path: 'subject',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/Resource']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
+)]
 #[FHIRSliceConstraint(
     property: 'extension',
     sliceName: 'ValidityPeriod',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqm-ValidityPeriod',
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqm-ValidityPeriod'],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]

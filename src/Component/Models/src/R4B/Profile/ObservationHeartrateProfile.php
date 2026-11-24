@@ -64,9 +64,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'HeartRateCode',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'code',
-    discriminatorValue: '8867-4',
+    discriminators: [
+        ['type' => 'value', 'path' => 'code', 'value' => '8867-4'],
+        ['type' => 'value', 'path' => 'system', 'value' => 'http://loinc.org'],
+    ],
     orderedIndex: 0,
     rules: [
         [

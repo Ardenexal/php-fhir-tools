@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description If true indicates that the specified type, profile or targetProfile must be supported by implementations.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-type-must-support', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-type-must-support', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type.profile')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type.targetProfile')]

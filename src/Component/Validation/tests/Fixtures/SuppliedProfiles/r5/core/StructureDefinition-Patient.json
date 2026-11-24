@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Patient","url":"http://hl7.org/fhir/StructureDefinition/Patient","version":"5.0.0","name":"Patient","status":"active","fhirVersion":"5.0.0","kind":"resource","abstract":false,"type":"Patient","baseDefinition":"http://hl7.org/fhir/StructureDefinition/DomainResource","derivation":"specialization"}

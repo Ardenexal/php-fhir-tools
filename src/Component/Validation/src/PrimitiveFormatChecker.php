@@ -93,6 +93,9 @@ final class PrimitiveFormatChecker
         FHIRTime::class     => "Not a valid time format: '%s'",
     ];
 
+    /** Element.ele-1's published human text, the same in every release. */
+    private const string ELE_1_HUMAN = 'All FHIR elements must have a @value or children';
+
     /**
      * A seconds field of 60 — a leap second, which FHIR permits and brick/date-time cannot parse.
      *
@@ -259,6 +262,7 @@ final class PrimitiveFormatChecker
             }
 
             if ($value === '' && $this->isEmptyReportableScalar($node, $name)) {
+                $violations[] = $this->ele1Violation($subPath);
                 $violations[] = $this->violation($subPath, 'value cannot be empty');
 
                 continue;
@@ -342,6 +346,10 @@ final class PrimitiveFormatChecker
         $meta = $attributes[0];
         /** @var mixed $value */
         $value = $node->value ?? null;
+
+        if ($value === null) {
+            return $this->checkAbsent($node, $path);
+        }
 
         if (!is_string($value)) {
             return [];
@@ -539,6 +547,12 @@ final class PrimitiveFormatChecker
         foreach (MalformedPrimitiveRecorder::forObject($node) as $malformed) {
             $propertyPath = $path === '' ? $malformed->propertyName : $path . '.' . $malformed->propertyName;
 
+            // An element written with no value at all breaks ele-1 as well, and the reference
+            // validator reports both (`R4.Observation-ex-pain.xml`)
+            if ($malformed->kind === MalformedPrimitive::KIND_NO_VALUE) {
+                $violations[] = $this->ele1Violation($propertyPath);
+            }
+
             $violations[] = $this->violation($propertyPath, match ($malformed->kind) {
                 MalformedPrimitive::KIND_BOOLEAN => "Boolean values must be 'true' or 'false'",
                 MalformedPrimitive::KIND_INTEGER => sprintf("The value '%s' is not a valid integer", $malformed->lexeme),
@@ -597,7 +611,56 @@ final class PrimitiveFormatChecker
             return [];
         }
 
-        return [$this->violation($path, 'value cannot be empty')];
+        return [$this->ele1Violation($path), $this->violation($path, 'value cannot be empty')];
+    }
+
+    /**
+     * A wrapper with no value and no extension: present, and carrying nothing.
+     *
+     * This breaks ele-1 (`hasValue() or (children().count() > id.count())`) and nothing else, since
+     * there is no value for a format rule to judge. An `id` does not count as content, so
+     * `<implicitRules id="i1"/>` on `R4.patient-id-only` fails it, and that is all the reference
+     * validator reports there.
+     *
+     * Reported here rather than by the generated `ele-1` attribute because primitive properties carry
+     * no `Valid` constraint: Symfony never steps into a primitive wrapper, so no invariant declared on
+     * Element is ever evaluated on one.
+     *
+     * The repeating-position guard is {@see checkEmpty()}'s, for the same phantom-entry reason.
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    private function checkAbsent(object $node, string $path): array
+    {
+        if (str_ends_with($path, ']')) {
+            return [];
+        }
+
+        /** @var mixed $extensions */
+        $extensions = $node->extension ?? [];
+
+        if (is_array($extensions) && $extensions !== []) {
+            return [];
+        }
+
+        return [$this->ele1Violation($path)];
+    }
+
+    /**
+     * Element's ele-1, for a primitive the generated attribute never reaches (see {@see checkAbsent()}).
+     *
+     * Carries the invariant key and the published human text, as a failure of the attribute would.
+     */
+    private function ele1Violation(string $path): FHIRValidationViolation
+    {
+        return new FHIRValidationViolation(
+            severity: 'error',
+            path: $path,
+            message: self::ELE_1_HUMAN,
+            constraintClass: self::class,
+            profileGroup: null,
+            invariantKey: 'ele-1',
+        );
     }
 
     /**

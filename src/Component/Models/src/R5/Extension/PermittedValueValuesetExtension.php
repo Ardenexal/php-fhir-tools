@@ -17,10 +17,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  *
  * @description Allows expressing the value set that must be stored internally by the system (as distinct from the base value set which defines values for exchange).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/11179-permitted-value-valueset', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/11179-permitted-value-valueset', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.snapshot.element.binding.valueSet')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.differential.element.binding.valueSet')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerValueSet')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerValueSet', startFhirVersion: '4.0')]
 class PermittedValueValuesetExtension extends Extension
 {
     /**

@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  *
  * @description Indicates one of the resources that was used to infer the specified maturity or standards status.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-conformance-derivedFrom', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-conformance-derivedFrom',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'fhirpath', expression: 'extension(\'http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm\').value')]
 #[FHIRExtensionContext(
     type: 'fhirpath',

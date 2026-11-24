@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Linked device acting as a communication/data collector, translator or controller.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-gateway', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-gateway', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Device')]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 class DeviceGatewayExtension extends Extension implements FHIRComplexExtensionInterface

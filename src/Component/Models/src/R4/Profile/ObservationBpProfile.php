@@ -35,9 +35,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'BPCode',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'code',
-    discriminatorValue: '85354-9',
+    discriminators: [
+        ['type' => 'value', 'path' => 'code', 'value' => '85354-9'],
+        ['type' => 'value', 'path' => 'system', 'value' => 'http://loinc.org'],
+    ],
     orderedIndex: 0,
     rules: [
         [
@@ -69,9 +70,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'SystolicBP',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'code.coding.code',
-    discriminatorValue: '8480-6',
+    discriminators: [
+        ['type' => 'value', 'path' => 'code.coding.code', 'value' => '8480-6'],
+        ['type' => 'value', 'path' => 'code.coding.system', 'value' => 'http://loinc.org'],
+    ],
     orderedIndex: 0,
     rules: [
         [
@@ -113,15 +115,16 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'path'       => 'code.coding',
             'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint',
             'options'    => [
-                'property'           => 'code.coding',
-                'sliceName'          => 'SBPCode',
-                'min'                => 1,
-                'max'                => 1,
-                'discriminatorType'  => 'value',
-                'discriminatorPath'  => 'code',
-                'discriminatorValue' => '8480-6',
-                'orderedIndex'       => 0,
-                'rules'              => [
+                'property'       => 'code.coding',
+                'sliceName'      => 'SBPCode',
+                'min'            => 1,
+                'max'            => 1,
+                'discriminators' => [
+                    ['type' => 'value', 'path' => 'code', 'value' => '8480-6'],
+                    ['type' => 'value', 'path' => 'system', 'value' => 'http://loinc.org'],
+                ],
+                'orderedIndex' => 0,
+                'rules'        => [
                     [
                         'path'       => 'system',
                         'constraint' => 'Symfony\Component\Validator\Constraints\Count',
@@ -153,9 +156,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'DiastolicBP',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'code.coding.code',
-    discriminatorValue: '8462-4',
+    discriminators: [
+        ['type' => 'value', 'path' => 'code.coding.code', 'value' => '8462-4'],
+        ['type' => 'value', 'path' => 'code.coding.system', 'value' => 'http://loinc.org'],
+    ],
     orderedIndex: 1,
     rules: [
         [
@@ -197,15 +201,16 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'path'       => 'code.coding',
             'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint',
             'options'    => [
-                'property'           => 'code.coding',
-                'sliceName'          => 'DBPCode',
-                'min'                => 1,
-                'max'                => 1,
-                'discriminatorType'  => 'value',
-                'discriminatorPath'  => 'code',
-                'discriminatorValue' => '8462-4',
-                'orderedIndex'       => 0,
-                'rules'              => [
+                'property'       => 'code.coding',
+                'sliceName'      => 'DBPCode',
+                'min'            => 1,
+                'max'            => 1,
+                'discriminators' => [
+                    ['type' => 'value', 'path' => 'code', 'value' => '8462-4'],
+                    ['type' => 'value', 'path' => 'system', 'value' => 'http://loinc.org'],
+                ],
+                'orderedIndex' => 0,
+                'rules'        => [
                     [
                         'path'       => 'system',
                         'constraint' => 'Symfony\Component\Validator\Constraints\Count',

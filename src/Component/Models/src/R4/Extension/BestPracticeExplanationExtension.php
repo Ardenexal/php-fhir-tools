@@ -17,7 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
  *
  * @description Explains why an invariant is labelled as a best practice invariant.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-bestpractice-explanation', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-bestpractice-explanation',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.constraint')]
 #[FHIRExtensionContext(type: 'extension', expression: 'http://hl7.org/fhir/StructureDefinition/targetConstraint')]
 class BestPracticeExplanationExtension extends Extension

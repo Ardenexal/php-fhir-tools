@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
  *
  * @description Expresses the linkage between the internal codes used for storage and the codes used for exchange.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/11179-permitted-value-conceptmap', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/11179-permitted-value-conceptmap', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.snapshot.element.binding.valueSet')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.differential.element.binding.valueSet')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerValueSet')]

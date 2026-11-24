@@ -17,7 +17,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @description Identifies the individuals who are candidates for being the owner of the task. The list of candidates that perform a task is now achieved by using Task.requestedPerformer and this element can be implemented using the cross version extension mechanism (i.e., the extension is no longer needed).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/task-candidateList', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/task-candidateList',
+    fhirVersion: 'R4',
+    isModifier: false,
+    endFhirVersion: '4.3',
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]
 class CandidateListExtension extends Extension
 {

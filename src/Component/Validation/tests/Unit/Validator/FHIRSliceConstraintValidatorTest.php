@@ -24,9 +24,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
     sliceName: 'ihiNumber',
     min: 1,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://ihi.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
     groups: [],
 )]
 #[FHIRSliceConstraint(
@@ -34,9 +32,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
     sliceName: 'medicareNumber',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://medicare.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://medicare.example.org']],
     groups: [],
 )]
 #[FHIRSlicingRules(property: 'identifier', rules: 'open')]
@@ -51,9 +47,7 @@ class SliceTestPatientOpen
     sliceName: 'ihiNumber',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://ihi.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
     groups: [],
 )]
 #[FHIRSlicingRules(property: 'identifier', rules: 'closed')]
@@ -68,9 +62,7 @@ class SliceTestPatientClosed
     sliceName: 'ihiNumber',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://ihi.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
     groups: [],
 )]
 #[FHIRSliceConstraint(
@@ -78,9 +70,7 @@ class SliceTestPatientClosed
     sliceName: '@default',
     min: 0,
     max: 2,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: null,
+    discriminators: [['type' => 'value', 'path' => 'system']],
     isDefault: true,
     groups: [],
 )]
@@ -96,13 +86,67 @@ class SliceTestPatientClosedWithDefault
     sliceName: 'ihiNumber',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'system',
-    discriminatorValue: 'http://ihi.example.org',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
     groups: [],
 )]
 #[FHIRSlicingRules(property: 'identifier', rules: 'openAtEnd')]
 class SliceTestPatientOpenAtEnd
+{
+    /** @var object[] */
+    public array $identifier = [];
+}
+
+/**
+ * Ordered slicing: ihiNumber items must come before medicareNumber items.
+ */
+#[FHIRSliceConstraint(
+    property: 'identifier',
+    sliceName: 'ihiNumber',
+    min: 0,
+    max: '*',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
+    groups: [],
+    orderedIndex: 0,
+)]
+#[FHIRSliceConstraint(
+    property: 'identifier',
+    sliceName: 'medicareNumber',
+    min: 0,
+    max: '*',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://medicare.example.org']],
+    groups: [],
+    orderedIndex: 1,
+)]
+#[FHIRSlicingRules(property: 'identifier', rules: 'open', ordered: true)]
+class SliceTestPatientOrdered
+{
+    /** @var object[] */
+    public array $identifier = [];
+}
+
+/**
+ * The same slices without `ordered`: any order is allowed.
+ */
+#[FHIRSliceConstraint(
+    property: 'identifier',
+    sliceName: 'ihiNumber',
+    min: 0,
+    max: '*',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://ihi.example.org']],
+    groups: [],
+    orderedIndex: 0,
+)]
+#[FHIRSliceConstraint(
+    property: 'identifier',
+    sliceName: 'medicareNumber',
+    min: 0,
+    max: '*',
+    discriminators: [['type' => 'value', 'path' => 'system', 'value' => 'http://medicare.example.org']],
+    groups: [],
+    orderedIndex: 1,
+)]
+#[FHIRSlicingRules(property: 'identifier', rules: 'open')]
+class SliceTestPatientUnordered
 {
     /** @var object[] */
     public array $identifier = [];
@@ -117,8 +161,7 @@ class SliceTestPatientOpenAtEnd
     sliceName: 'first',
     min: 1,
     max: 1,
-    discriminatorType: 'exists',
-    discriminatorPath: 'identifier',
+    discriminators: [['type' => 'exists', 'path' => 'identifier']],
     groups: [],
 )]
 #[FHIRSlicingRules(property: 'identifier', rules: 'closed')]
@@ -373,6 +416,74 @@ final class FHIRSliceConstraintValidatorTest extends ConstraintValidatorTestCase
         $obj               = new SliceTestPatientOpenAtEnd();
         $obj->identifier[] = $this->makeIdentifier('http://ihi.example.org');     // matched first
         $obj->identifier[] = $this->makeIdentifier('http://unknown.example.org'); // unmatched after → allowed
+
+        $this->validator->validate($obj, $this->firstConstraintOf($obj));
+
+        $this->assertNoViolation();
+    }
+
+    // ------------------------------------------------------------------
+    // Ordered slicing
+    // ------------------------------------------------------------------
+
+    public function testOrderedSlicingAllowsItemsInSliceOrder(): void
+    {
+        $obj               = new SliceTestPatientOrdered();
+        $obj->identifier[] = $this->makeIdentifier('http://ihi.example.org');
+        $obj->identifier[] = $this->makeIdentifier('http://ihi.example.org');
+        $obj->identifier[] = $this->makeIdentifier('http://medicare.example.org');
+
+        $this->validator->validate($obj, $this->firstConstraintOf($obj));
+
+        $this->assertNoViolation();
+    }
+
+    public function testOrderedSlicingReportsItemOfAnEarlierSliceAfterALaterOne(): void
+    {
+        $obj               = new SliceTestPatientOrdered();
+        $obj->identifier[] = $this->makeIdentifier('http://medicare.example.org');
+        $obj->identifier[] = $this->makeIdentifier('http://unknown.example.org'); // open slicing: ignored
+        $obj->identifier[] = $this->makeIdentifier('http://ihi.example.org');     // ihiNumber after medicareNumber
+
+        $this->validator->validate($obj, $this->firstConstraintOf($obj));
+
+        $this->buildViolation(
+            'Property "{{ property }}" uses ordered slicing: this item matches slice "{{ slice }}", which must come before slice "{{ previous }}" of an earlier item.',
+        )
+            ->setParameters([
+                '{{ property }}' => 'identifier',
+                '{{ slice }}'    => 'ihiNumber',
+                '{{ previous }}' => 'medicareNumber',
+            ])
+            ->atPath('identifier[2]')
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    /** Every out-of-order item is reported against the latest slice before it, which a violation does not lower. */
+    public function testOrderedSlicingReportsEachOutOfOrderItem(): void
+    {
+        $obj               = new SliceTestPatientOrdered();
+        $obj->identifier[] = $this->makeIdentifier('http://medicare.example.org');
+        $obj->identifier[] = $this->makeIdentifier('http://ihi.example.org');
+        $obj->identifier[] = $this->makeIdentifier('http://medicare.example.org');
+        $obj->identifier[] = $this->makeIdentifier('http://ihi.example.org');
+
+        $this->validator->validate($obj, $this->firstConstraintOf($obj));
+
+        $message    = 'Property "{{ property }}" uses ordered slicing: this item matches slice "{{ slice }}", which must come before slice "{{ previous }}" of an earlier item.';
+        $parameters = ['{{ property }}' => 'identifier', '{{ slice }}' => 'ihiNumber', '{{ previous }}' => 'medicareNumber'];
+
+        $this->buildViolation($message)->setParameters($parameters)->atPath('identifier[1]')->setCode(FHIRViolationCode::ERROR)
+            ->buildNextViolation($message)->setParameters($parameters)->atPath('identifier[3]')->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testUnorderedSlicingAllowsAnyItemOrder(): void
+    {
+        $obj               = new SliceTestPatientUnordered();
+        $obj->identifier[] = $this->makeIdentifier('http://medicare.example.org');
+        $obj->identifier[] = $this->makeIdentifier('http://ihi.example.org');
 
         $this->validator->validate($obj, $this->firstConstraintOf($obj));
 

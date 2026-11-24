@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description A hint for authorization requirements used to access content or services.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/authorization-hint', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/authorization-hint', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Endpoint')]
 #[FHIRExtensionContext(type: 'element', expression: 'Organization')]
 #[FHIRExtensionContext(type: 'element', expression: 'SubscriptionStatus.notificationEvent')]

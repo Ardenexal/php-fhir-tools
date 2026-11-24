@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description References a resource or provides a code or text that specifies a substance that is added to a laboratory specimen (part of the container device or added to the specimen indenpendently).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-additive', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-additive', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen')]
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen.container')]
 class SpecimenAdditiveExtension extends Extension implements FHIRComplexExtensionInterface

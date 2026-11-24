@@ -18,7 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  *
  * @description The Current HL7 ballot/Standards status of this artifact.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CanonicalResource')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.context')]

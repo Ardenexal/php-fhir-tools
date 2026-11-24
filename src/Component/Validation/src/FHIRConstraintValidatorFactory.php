@@ -6,8 +6,11 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfiles;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLength;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
@@ -16,12 +19,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAllowedTypesValidator;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAnyOfProfilesValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPathInvariantValidator;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRMaxLengthValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPatternValueValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileBindingValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileInvariantValidator;
+use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileConformance;
+use Ardenexal\FHIRTools\Component\Validation\Profile\TargetProfileBaseTypes;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRTargetProfileValidator;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRValueSetBindingValidator;
@@ -58,6 +66,8 @@ final class FHIRConstraintValidatorFactory implements ConstraintValidatorFactory
         private readonly FHIRAttributeReaderInterface $sliceAttributes,
         private readonly ?FHIRTerminologyClientInterface $terminologyClient,
         private readonly FHIRReferenceResolverInterface $referenceResolver,
+        private readonly ?RuntimeProfileConformance $profileConformance = null,
+        private readonly TargetProfileBaseTypes $targetProfileTypes = new TargetProfileBaseTypes(),
     ) {
         $this->fallback = new ConstraintValidatorFactory();
     }
@@ -70,11 +80,14 @@ final class FHIRConstraintValidatorFactory implements ConstraintValidatorFactory
             $constraint instanceof FHIRValueSetBinding   => new FHIRValueSetBindingValidator($this->messages, self::ENUM_NAMESPACE_ROOTS, $this->terminologyClient),
             $constraint instanceof FHIRFixedValue        => new FHIRFixedValueValidator($this->messages),
             $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->messages),
+            $constraint instanceof FHIRAllowedTypes      => new FHIRAllowedTypesValidator($this->messages),
+            $constraint instanceof FHIRMaxLength         => new FHIRMaxLengthValidator($this->messages),
+            $constraint instanceof FHIRAnyOfProfiles     => new FHIRAnyOfProfilesValidator($this->profileConformance, $this->messages),
             $constraint instanceof FHIRProfileConstraint => new FHIRProfileConstraintValidator($this->accessor),
             $constraint instanceof FHIRProfileInvariant  => new FHIRProfileInvariantValidator($this->pathService, $this->messages, $this->accessor),
             $constraint instanceof FHIRProfileBinding    => new FHIRProfileBindingValidator($this->accessor),
-            $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, new SliceDiscriminatorMatcher($this->accessor), $this->sliceAttributes),
-            $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->referenceResolver, $this->messages),
+            $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, new SliceDiscriminatorMatcher($this->accessor, $this->terminologyClient), $this->sliceAttributes, profiles: $this->profileConformance),
+            $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->referenceResolver, $this->messages, profileTypes: $this->targetProfileTypes),
             default                                      => $this->fallback->getInstance($constraint),
         };
     }

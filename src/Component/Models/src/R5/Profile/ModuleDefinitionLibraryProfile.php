@@ -49,10 +49,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'inputParameters',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-inputParameters',
-    orderedIndex: 0,
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-inputParameters'],
+    ],
+    orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]
 #[FHIRSliceConstraint(
@@ -60,10 +60,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'directReferenceCode',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-directReferenceCode',
-    orderedIndex: 1,
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-directReferenceCode'],
+    ],
+    orderedIndex: 4,
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]
 #[FHIRSliceConstraint(
@@ -71,10 +71,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'logicDefinition',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition',
-    orderedIndex: 2,
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition'],
+    ],
+    orderedIndex: 5,
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],
 )]
 #[FHIRSlicingRules(property: 'relatedArtifact', rules: 'open', groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'])]
@@ -83,9 +83,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'dependency',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'type',
-    discriminatorValue: 'depends-on',
+    discriminators: [['type' => 'value', 'path' => 'type', 'value' => 'depends-on']],
     orderedIndex: 0,
     rules: [
         [
@@ -97,6 +95,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
             'path'       => 'resource',
             'constraint' => 'Symfony\Component\Validator\Constraints\Count',
             'options'    => ['min' => 1, 'max' => 1],
+        ],
+        [
+            'path'       => 'resource',
+            'constraint' => 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+            'options'    => [
+                'targetProfiles' => [
+                    'http://hl7.org/fhir/StructureDefinition/CodeSystem',
+                    'http://hl7.org/fhir/StructureDefinition/ValueSet',
+                    'http://hl7.org/fhir/StructureDefinition/Library',
+                ],
+            ],
         ],
     ],
     groups: ['http://hl7.org/fhir/StructureDefinition/moduledefinitionlibrary'],

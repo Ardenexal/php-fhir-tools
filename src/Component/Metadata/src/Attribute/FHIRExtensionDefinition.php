@@ -17,12 +17,21 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute;
 class FHIRExtensionDefinition
 {
     /**
-     * @param string $url         The canonical URL of the extension StructureDefinition
-     * @param string $fhirVersion The FHIR version (e.g., 'R4', 'R4B', 'R5')
+     * @param string      $url              The canonical URL of the extension StructureDefinition
+     * @param string      $fhirVersion      The FHIR version (e.g., 'R4', 'R4B', 'R5')
+     * @param bool|null   $isModifier       Whether the definition's root `Extension` element is a modifier, so the
+     *                                      extension belongs in `modifierExtension` and never in `extension`;
+     *                                      null when the class does not say, as in classes generated before 0.8
+     * @param string|null $startFhirVersion The earliest FHIR version the extension may be used in, from the
+     *                                      definition's `version-specific-use` extension (e.g. '4.0'); null for no limit
+     * @param string|null $endFhirVersion   The latest FHIR version the extension may be used in (e.g. '4.3'); null for no limit
      */
     public function __construct(
         public readonly string $url,
         public readonly string $fhirVersion,
+        public readonly ?bool $isModifier = null,
+        public readonly ?string $startFhirVersion = null,
+        public readonly ?string $endFhirVersion = null,
     ) {
     }
 }

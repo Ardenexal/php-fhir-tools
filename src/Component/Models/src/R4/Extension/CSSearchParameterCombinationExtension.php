@@ -21,7 +21,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  * - If multiple search parameter combinations are specified, a client may pick between them, and supply the minimal required parameters for any of the combinations.
  * - If no parameters in the set of search parameters are listed as required, then *at least one* of the listed optional parameters must be present.  This shorthand method is the same as repeating the entire extension for each combination of optional and required search parameters.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-search-parameter-combination', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-search-parameter-combination',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource')]
 class CSSearchParameterCombinationExtension extends Extension implements FHIRComplexExtensionInterface
 {

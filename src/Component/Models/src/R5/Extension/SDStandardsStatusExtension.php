@@ -18,7 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @description The Current HL7 ballot/Standards status of this artifact.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status',
+    fhirVersion: 'R5',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CanonicalResource')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition.context')]
@@ -28,9 +32,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type.targetProfile')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter')]
 #[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.type')]
-#[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.allowedType')]
-#[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.targetProfile')]
-#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide.definition.page')]
+#[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.allowedType', startFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition.parameter.targetProfile', startFhirVersion: '4.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide.definition.page', startFhirVersion: '4.0')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://hl7.org/fhir/ValueSet/standards-status', strength: 'required')]
 class SDStandardsStatusExtension extends Extension
 {

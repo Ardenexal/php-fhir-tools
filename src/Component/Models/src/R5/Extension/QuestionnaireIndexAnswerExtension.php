@@ -16,8 +16,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description If present, indicates a request for the server to index QuestionnaireResponses recorded against this Questionnaire by this particular answer value.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-index-answer', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-index-answer', fhirVersion: 'R5', isModifier: false)]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption', startFhirVersion: '4.0')]
 class QuestionnaireIndexAnswerExtension extends Extension
 {
     /**

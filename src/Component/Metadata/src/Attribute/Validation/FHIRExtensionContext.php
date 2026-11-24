@@ -23,6 +23,10 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation;
  *                   extension. Only a confident single boolean `false` denies; empty
  *                   results and FHIRPath engine errors (FHIRPathException) defer.
  *
+ * A context can be limited to a range of FHIR versions by the `version-specific-use` extension on
+ * its `StructureDefinition.context` entry. A context whose range excludes the version being
+ * validated does not apply there.
+ *
  * @see https://www.hl7.org/fhir/structuredefinition-definitions.html#StructureDefinition.context
  *
  * @author Ardenexal
@@ -31,12 +35,16 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation;
 final class FHIRExtensionContext
 {
     /**
-     * @param string $type       Context type: 'element' | 'extension' | 'fhirpath'
-     * @param string $expression Element path, extension canonical URL, or FHIRPath expression
+     * @param string      $type             Context type: 'element' | 'extension' | 'fhirpath'
+     * @param string      $expression       Element path, extension canonical URL, or FHIRPath expression
+     * @param string|null $startFhirVersion The earliest FHIR version this context applies in (e.g. '4.0'); null for no limit
+     * @param string|null $endFhirVersion   The latest FHIR version this context applies in (e.g. '4.3'); null for no limit
      */
     public function __construct(
         public readonly string $type,
         public readonly string $expression,
+        public readonly ?string $startFhirVersion = null,
+        public readonly ?string $endFhirVersion = null,
     ) {
     }
 }

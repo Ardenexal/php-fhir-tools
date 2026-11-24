@@ -1,5 +1,5 @@
 {
-    "errorCount": 36,
+    "errorCount": 38,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
@@ -90,6 +90,10 @@
                 "parameter[31].value — id value '12123/23' is not valid",
                 "parameter[32].value — id value 'asdasdasdasdasddgjhasdkjfgasdfasdfgsadfgsdfaskdfjhasdfjgsdfjhgsdfjhgsadfskadjfhg' is not valid",
                 "parameter[35].value — value cannot be empty"
+            ],
+            "invariant:ele-1": [
+                "parameter[14].value — All FHIR elements must have a @value or children",
+                "parameter[35].value — All FHIR elements must have a @value or children"
             ]
         },
         "warnings": {}

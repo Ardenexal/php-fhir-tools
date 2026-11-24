@@ -1,12 +1,12 @@
 {
-    "errorCount": 1,
+    "errorCount": 2,
     "warningCount": 0,
     "infoCount": 0,
     "java": {
         "errorCount": 2,
         "warningCount": 0,
         "infoCount": 1,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "EQUAL",
         "errors": [
             "Constraint failed: ele-1: 'All FHIR elements must have a @value or children' (defined in http://hl7.org/fhir/StructureDefinition/Element)",
@@ -17,6 +17,9 @@
         "errors": {
             "constraint:PrimitiveFormatChecker": [
                 "entry[0].fullUrl — value cannot be empty"
+            ],
+            "invariant:ele-1": [
+                "entry[0].fullUrl — All FHIR elements must have a @value or children"
             ]
         },
         "warnings": {}

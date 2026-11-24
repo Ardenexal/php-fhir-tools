@@ -1,0 +1,1 @@
+{"resourceType":"StructureDefinition","id":"Base","url":"http://hl7.org/fhir/StructureDefinition/Base","version":"5.0.0","name":"Base","status":"active","fhirVersion":"5.0.0","kind":"complex-type","abstract":true,"type":"Base"}

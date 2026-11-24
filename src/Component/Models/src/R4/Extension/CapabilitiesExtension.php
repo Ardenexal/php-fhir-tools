@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  *
  * @description A set of codes that defines what the server is capable of.
  */
-#[FHIRExtensionDefinition(url: 'http://fhir-registry.smarthealthit.org/StructureDefinition/capabilities', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://fhir-registry.smarthealthit.org/StructureDefinition/capabilities', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.security')]
 #[FHIRProfileBinding(path: 'value[x]', valueSetUrl: 'http://terminology.hl7.org/ValueSet/smart-capabilities', strength: 'required')]
 class CapabilitiesExtension extends Extension

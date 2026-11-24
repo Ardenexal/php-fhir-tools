@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description A complex extension matching the structure of the V2 OG data type.  This is used in the v2-to-fhir mapping IG to capture and preserve the OBX-4 Sub-Id details.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-v2-subid', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-v2-subid', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 class ObsV2SubIdExtension extends Extension implements FHIRComplexExtensionInterface
 {

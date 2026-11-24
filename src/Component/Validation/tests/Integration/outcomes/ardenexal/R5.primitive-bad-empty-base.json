@@ -1,12 +1,12 @@
 {
-    "errorCount": 3,
+    "errorCount": 4,
     "warningCount": 0,
     "infoCount": 16,
     "java": {
         "errorCount": 4,
         "warningCount": 2,
         "infoCount": 0,
-        "classification": "BELOW",
+        "classification": "EQUAL",
         "warningClassification": "BELOW",
         "errors": [
             "Constraint failed: ele-1: 'All FHIR elements must have a @value or children' (defined in http://hl7.org/fhir/StructureDefinition/Element)",
@@ -21,6 +21,9 @@
                 "parameter[6].value — Element value '-0.00000000000000000000000023' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'",
                 "parameter[7].value — Element value '121233786234234234234234.12323' does not meet decimal regex '-?(0|[1-9][0-9]{0,17})(\\.[0-9]{1,17})?([eE](0|[+\\-]?[1-9][0-9]{0,9}))?'",
                 "parameter[10].value — value cannot be empty"
+            ],
+            "invariant:ele-1": [
+                "parameter[10].value — All FHIR elements must have a @value or children"
             ]
         },
         "warnings": {}

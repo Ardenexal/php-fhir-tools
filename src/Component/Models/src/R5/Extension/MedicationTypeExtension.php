@@ -23,7 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * particular code refers to a medicinal product, a medicinal product package, or
  * an extemporaneous preparation.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medication-type', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medication-type', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication')]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication.code.coding')]
 class MedicationTypeExtension extends Extension

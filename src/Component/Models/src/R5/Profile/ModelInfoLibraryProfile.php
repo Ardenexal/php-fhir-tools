@@ -41,9 +41,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'modelInfoXmlContent',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'contentType',
-    discriminatorValue: 'application/xml',
+    discriminators: [['type' => 'value', 'path' => 'contentType', 'value' => 'application/xml']],
     orderedIndex: 0,
     rules: [
         [
@@ -69,9 +67,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules
     sliceName: 'modelInfoJsonContent',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'contentType',
-    discriminatorValue: 'application/json',
+    discriminators: [['type' => 'value', 'path' => 'contentType', 'value' => 'application/json']],
     orderedIndex: 1,
     rules: [
         [

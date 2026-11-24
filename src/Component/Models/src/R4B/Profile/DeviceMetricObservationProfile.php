@@ -40,6 +40,17 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
 )]
 #[FHIRProfileConstraint(
+    path: 'subject',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: [
+        'targetProfiles' => [
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+        ],
+    ],
+    groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
+)]
+#[FHIRProfileConstraint(
     path: 'encounter',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
@@ -61,6 +72,14 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     path: 'value[x]',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
+)]
+#[FHIRProfileConstraint(
+    path: 'value[x]',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAllowedTypes',
+    options: [
+        'types' => ['Quantity', 'CodeableConcept', 'string', 'Range', 'Ratio', 'SampledData', 'time', 'dateTime', 'Period'],
+    ],
     groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
 )]
 #[FHIRProfileConstraint(
@@ -94,15 +113,39 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ObservationResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
 )]
 #[FHIRProfileConstraint(
+    path: 'specimen',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/Specimen']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
+)]
+#[FHIRProfileConstraint(
     path: 'device',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],
     groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
 )]
 #[FHIRProfileConstraint(
+    path: 'device',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/DeviceMetric']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
+)]
+#[FHIRProfileConstraint(
     path: 'referenceRange',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
+)]
+#[FHIRProfileConstraint(
+    path: 'hasMember',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/Observation']],
+    groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
+)]
+#[FHIRProfileConstraint(
+    path: 'derivedFrom',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile',
+    options: ['targetProfiles' => ['http://hl7.org/fhir/StructureDefinition/Observation']],
     groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'],
 )]
 #[FHIRProfileMustSupport(path: 'identifier', groups: ['http://hl7.org/fhir/StructureDefinition/devicemetricobservation'])]

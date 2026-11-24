@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @description Provides the snapshot.element.id of the element within the profile containing this extension to use as the starting point for validation of the element on which the profile is declared. This is used when a backbone element is being profiled, rather than an established type.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-profile-element', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-profile-element', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type.profile')]
 class ProfileElementExtension extends Extension
 {

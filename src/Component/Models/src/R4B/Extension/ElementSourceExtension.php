@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  *
  * This extension functions for an element in the same manner as meta.source functions for an resource.  The source of an element may be finer-grained than the source declared on a resource.  Like meta.source, if more detail is needed, Provenance should be used.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementSource', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementSource', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class ElementSourceExtension extends Extension
 {

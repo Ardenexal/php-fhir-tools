@@ -17,13 +17,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Record details about the anatomical location of a specimen or body part. This resource may be used when a coded concept does not provide the necessary detail needed for the use case.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/bodySite', fhirVersion: 'R5')]
-#[FHIRExtensionContext(type: 'element', expression: 'Condition.bodySite')]
-#[FHIRExtensionContext(type: 'element', expression: 'Observation.bodySite')]
-#[FHIRExtensionContext(type: 'element', expression: 'Procedure.bodySite')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/bodySite', fhirVersion: 'R5', isModifier: false)]
+#[FHIRExtensionContext(type: 'element', expression: 'Condition.bodySite', endFhirVersion: '5.0')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation.bodySite', endFhirVersion: '4.3')]
+#[FHIRExtensionContext(type: 'element', expression: 'Procedure.bodySite', endFhirVersion: '5.0')]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationAdministration.dosage')]
 #[FHIRExtensionContext(type: 'element', expression: 'Dosage.site')]
-#[FHIRExtensionContext(type: 'element', expression: 'Specimen.collection')]
+#[FHIRExtensionContext(type: 'element', expression: 'Specimen.collection', endFhirVersion: '5.0')]
 class BodyStructureReferenceExtension extends Extension
 {
     /**

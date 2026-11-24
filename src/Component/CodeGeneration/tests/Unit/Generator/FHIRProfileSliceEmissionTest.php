@@ -129,11 +129,11 @@ class FHIRProfileSliceEmissionTest extends TestCase
             static fn (array $args) => ($args['sliceName'] ?? '') === 'ihiNumber',
         ))[0] ?? [];
 
-        self::assertSame('value', $ihiAttr['discriminatorType'] ?? null);
-        self::assertSame('system', $ihiAttr['discriminatorPath'] ?? null);
+        self::assertSame('value', $ihiAttr['discriminators'][0]['type'] ?? null);
+        self::assertSame('system', $ihiAttr['discriminators'][0]['path'] ?? null);
         self::assertSame(
             'http://ns.electronichealth.net.au/id/hi/ihi/1.0',
-            $ihiAttr['discriminatorValue'] ?? null,
+            $ihiAttr['discriminators'][0]['value'] ?? null,
         );
     }
 
@@ -150,7 +150,7 @@ class FHIRProfileSliceEmissionTest extends TestCase
 
         self::assertSame(
             'http://ns.electronichealth.net.au/id/medicare-number',
-            $medicareAttr['discriminatorValue'] ?? null,
+            $medicareAttr['discriminators'][0]['value'] ?? null,
         );
     }
 

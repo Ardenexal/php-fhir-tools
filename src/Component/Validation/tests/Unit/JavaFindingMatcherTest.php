@@ -107,6 +107,37 @@ final class JavaFindingMatcherTest extends TestCase
         self::assertSame($java, $this->matcher->unmatched($java, [$this->notBlank('subject')], ['Observation']));
     }
 
+    /**
+     * A profile's cardinality rule is reported in the words of the `Count` it wraps.
+     *
+     * `R4.obs-quantity-us`: the `bp` profile needs `category`, and our `FHIRProfileConstraint` says so
+     * with the Count message. The wrapper family alone says nothing about the rule, so the message does.
+     */
+    public function testAProfileCardinalityFindingPairsWithJavasMinimumRequired(): void
+    {
+        $java = ['Observation.category: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/bp|4.0.1)'];
+        $ours = [$this->profileCount('category', 'This collection should contain 1 element or more.|This collection should contain 1 elements or more.')];
+
+        self::assertSame([], $this->matcher->unmatched($java, $ours, ['Observation']));
+    }
+
+    /** A required primitive the profile wraps in `NotBlank` pairs the same way. */
+    public function testAProfileNotBlankFindingPairsAsCardinality(): void
+    {
+        $java = ['Observation.code: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/bp|4.0.1)'];
+
+        self::assertSame([], $this->matcher->unmatched($java, [$this->profileCount('code', 'This value should not be blank.')], ['Observation']));
+    }
+
+    /** The same wrapper also carries fixed values and patterns, which are not cardinality findings. */
+    public function testAProfileFindingThatIsNotACountDoesNotPairAsCardinality(): void
+    {
+        $java = ['Observation.category: minimum required = 1, but only found 0 (from http://hl7.org/fhir/StructureDefinition/bp|4.0.1)'];
+        $ours = [$this->profileCount('category', 'This value should be identical to string "vital-signs".')];
+
+        self::assertSame($java, $this->matcher->unmatched($java, $ours, ['Observation']));
+    }
+
     /** Both sides take the key from the same StructureDefinition, so agreement is identity. */
     public function testAnInvariantPairsOnItsKey(): void
     {

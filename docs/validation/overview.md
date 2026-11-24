@@ -64,8 +64,9 @@ public function validate(
 ```
 
 `validateWithOptions($resource, new FHIRValidationOptions(...))` takes the same settings plus
-`profilesFromMeta`, which checks each resource against the profiles in its own `meta.profile`. See
-[Runtime Profiles](runtime-profiles.md#validate).
+`profilesFromMeta`, which checks each resource against the profiles in its own `meta.profile`, and
+`profilesFromVitalSignsCodes`, which checks each Observation against the core vital-signs profile its
+code implies. See [Runtime Profiles](runtime-profiles.md#validate).
 
 ## Architecture
 
@@ -99,7 +100,7 @@ rules, modifier extensions, must-support, and obligations.
 | Check | Method | What it enforces |
 |---|---|---|
 | Must-support collection | `collectMustSupportInfo()` | Null/empty must-support properties → INFO (opt-in) |
-| Extension context | `validateExtensionContexts()` | Extension applied outside its declared context → ERROR |
+| Extension context | `validateExtensionContexts()` | Extension applied outside its declared context or FHIR versions, or a modifier extension in `extension` → ERROR |
 | Extension `contextInvariant` | `validateExtensionContexts()` | FHIRPath invariant on the extension's use context |
 | Extension structure | `validateExtensionStructure()` | Missing `url`, non-absolute top-level `url`, or a value type the definition does not allow → ERROR; the extension's own invariants and bindings at their usual severity |
 | Complex extension sub-extensions | `ComplexExtensionChecker` | Missing required or undeclared sub-extension → ERROR |
@@ -112,7 +113,7 @@ rules, modifier extensions, must-support, and obligations.
 | Unknown input | `UnknownInputChecker` | Elements the deserializer read but could not place on the model → ERROR |
 | Bundle `fullUrl` | `BundleEntryFullUrlChecker` | `Bundle.entry.fullUrl` that is not an absolute URL; an `http(s)` `fullUrl` of the form `[base]/[type]/[id]` that does not end with the entry resource's type and id; a missing `fullUrl` outside `transaction`/`batch` bundles and their responses, or on any entry whose resource holds a relative reference → ERROR |
 | Bundle reference resolution | `BundleReferenceResolutionChecker` | Relative reference to an entry the bundle holds that the `fullUrl` rules cannot resolve → ERROR |
-| Modifier extension walk | `validateModifierExtensions()` | Unknown modifier extension URLs → ERROR (needs registry) |
+| Modifier extension walk | `validateModifierExtensions()` | Unknown modifier extension URLs, or a regular extension in `modifierExtension` → ERROR (needs registry) |
 | Obligation enforcement | `collectObligationViolations()` | Actor-scoped populate obligations → ERROR/WARNING/INFO |
 
 The extension, modifier, must-support and obligation checks are documented under
@@ -162,7 +163,7 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Required bindings | Supported | `FHIRValueSetBindingValidator`; enum-backed |
 | FHIRPath invariants | Supported | Engine eval errors emit `fhir:eval-error` INFO (not ERROR) |
 | Fixed / pattern values | Supported | `FHIRFixedValueValidator` / `FHIRPatternValueValidator` |
-| Slicing (closed/open/openAtEnd) | Supported | `FHIRSliceConstraintValidator`; `value`, `pattern` and `exists` discriminators. Closed slicing the validator cannot match is enforced as open |
+| Slicing (closed/open/openAtEnd) | Supported | `FHIRSliceConstraintValidator`; every discriminator type, `$this`, and composite discriminators. Binding slices need a terminology client; paths through `resolve()` are not followed |
 | Profile constraints (generated) | Supported | `FHIRProfileConstraintValidator`; requires pre-generated models |
 | Profile constraints (dynamic/runtime) | Supported | `RuntimeProfileResolver`; StructureDefinitions must carry a snapshot; see [Runtime Profiles](runtime-profiles.md) |
 | Extension contexts (element/fhirpath/extension) | Supported | Recursive walk; defer-not-deny safety; see [Extensions](extensions.md) |
@@ -173,7 +174,7 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 | Quantity range | Supported | `FHIRQuantityRangeValidator` |
 | Temporal range | Supported | `FHIRTemporalRangeValidator`; handles partial dates (YYYY, YYYY-MM) |
 | MustSupport | Supported | Opt-in via `$includeMustSupportInfo = true`; INFO violations |
-| Obligations (populate) | Conditional | `SHALL`/`SHOULD:populate` enforced; filter evaluation deferred |
+| Obligations (populate) | Conditional | `SHALL`/`SHOULD:populate` enforced, including filtered ones, which need an occurrence the FHIRPath `filter` selects |
 | `$validate` operation output | Supported | `validateForOperation()` → `OperationOutcomeResource` |
 | Questionnaire validation | Separate service | `FHIRQuestionnaireValidator`; see [Questionnaire](questionnaire.md) |
 | Narrative / XHTML | Partial | `NarrativeXhtmlChecker`: disallowed elements and attributes, DOCTYPE, undefined entities and unparsable markup. Empty or whitespace-only narratives, the XHTML namespace, link schemes and stray text are not checked |
@@ -190,11 +191,13 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
   `fhir:unchecked-binding` INFO violation (queryable via
   `FHIRValidationReport::hasUncheckedBindings()`). See [Terminology](terminology.md).
 * **Runtime profiles need snapshots.** A profile you have not generated can be validated from its
-  StructureDefinition, but only when it carries a snapshot, and rules inside slices are skipped. All
+  StructureDefinition, but only when it carries a snapshot. All
   HL7 core profiles for R4/R4B/R5 are pre-generated. See [Runtime Profiles](runtime-profiles.md#limits).
-* **Slice discriminators** of type `type` or `profile`, `$this`, and paths through `resolve()` are
-  not evaluated. Closed or openAtEnd slicing that depends on one is enforced as open, and the
-  generator (or the runtime compiler) reports a warning. See [Structural](structural.md#slicing).
+* **Slice discriminators** through `resolve()` are not followed. Closed or openAtEnd slicing that
+  depends on one is enforced as open, and the generator (or the runtime compiler) reports a
+  warning. A slice keyed by a `required` binding needs a terminology client, and one keyed by a
+  profile needs that profile generated or resolvable at runtime; until then its items are not
+  judged. See [Structural](structural.md#slicing).
 * **Narrative XHTML** is checked for disallowed content (`txt-1`) and unparsable markup (`txt-2`).
   A well-formed narrative with no non-whitespace content is not reported, and neither is the XHTML
   namespace: the XML reader drops namespace bindings on `div`, so a correct narrative and a wrong
@@ -202,8 +205,6 @@ Coverage as of the current release (applies to R4, R4B, and R5 unless noted):
 * **Target profile reference validation** requires a `FHIRReferenceResolverInterface`. The
   default `NullFHIRReferenceResolver` returns `null`, silently skipping the check. See
   [References](references.md).
-* **Obligation filter evaluation** is deferred: obligations with a non-null FHIRPath `filter`
-  are skipped; only unconditional obligations fire.
 * **`#[FHIRIsModifier]`** marks modifier properties for introspection only — no active
   enforcement; consumers must check modifier element values themselves.
 * **Questionnaire validation** is a separate `FHIRQuestionnaireValidator` service, not part of

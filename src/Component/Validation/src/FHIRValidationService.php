@@ -38,6 +38,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledExtension;
 use Ardenexal\FHIRTools\Component\Metadata\Profile\CompiledProfile;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileFailure;
 use Ardenexal\FHIRTools\Component\Validation\Profile\RuntimeProfileResolver;
+use Ardenexal\FHIRTools\Component\Validation\Profile\VitalSignsProfiles;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -61,6 +62,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
     /** The invariant ContainedReferenceChecker reports in place of the generated constraint. */
     private const string DOM_3 = 'dom-3';
+
+    /** Extension contexts that name a pattern of resources rather than a type each resource derives from */
+    private const array RESOURCE_PATTERNS = ['CanonicalResource', 'MetadataResource'];
 
     /** @var \WeakMap<CompiledProfile, list<Constraint>> Runtime constraints per compiled profile */
     private \WeakMap $runtimeConstraints;
@@ -98,6 +102,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly AttachmentIntegrityChecker $attachmentChecker = new AttachmentIntegrityChecker(),
         private readonly QuestionnaireDefinitionChecker $questionnaireDefinitionChecker = new QuestionnaireDefinitionChecker(),
         private readonly ContainedReferenceChecker $containedReferenceChecker = new ContainedReferenceChecker(),
+        private readonly BundleReachabilityChecker $bundleReachabilityChecker = new BundleReachabilityChecker(),
     ) {
         $this->runtimeConstraints          = new \WeakMap();
         $this->runtimeExtensionConstraints = new \WeakMap();
@@ -185,9 +190,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // Profiles the resource's class does not declare, checked against StructureDefinitions
         // resolved at runtime. A separate pass because their rules are not attributes on any class:
         // they are handed to the validator explicitly, under the same group names a generated class uses.
-        // Without a resolver the walk still runs for `meta.profile`, whose profiles a nested resource's
-        // generated class may declare without the pass above having run them
-        if (($this->runtimeProfiles !== null && $profileUrls !== []) || $options->profilesFromMeta) {
+        // Without a resolver the walk still runs for `meta.profile` and vital-sign codes, whose profiles
+        // a resource's generated class may declare without the pass above having run them
+        if (($this->runtimeProfiles !== null && $profileUrls !== []) || $options->profilesFromMeta || $options->profilesFromVitalSignsCodes) {
             $walk = ['visited' => [], 'reached' => [], 'mismatched' => [], 'groups' => $groups];
             $this->collectRuntimeProfileViolations($resource, '', $profileUrls, $options, $violations, $walk);
 
@@ -276,6 +281,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         // against the entries already in hand. See BundleReferenceResolutionChecker.
         foreach ($this->bundleReferenceChecker->check($resource) as $bundleReferenceViolation) {
             $violations[] = $bundleReferenceViolation;
+        }
+
+        // Document and message entries the first entry cannot reach by following links. Unconditional
+        // like the passes above, and it too resolves only against the entries in hand. See
+        // BundleReachabilityChecker.
+        foreach ($this->bundleReachabilityChecker->check($resource) as $reachabilityViolation) {
+            $violations[] = $reachabilityViolation;
         }
 
         // `#id` references and the contained resources they point at, including dom-3. Unconditional
@@ -426,14 +438,24 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 }
             }
 
-            /** @var array<string, array{ancestors: bool, fromMeta: bool}> $wanted URL as written => whether its ancestors apply, and whether meta.profile named it */
+            /** @var array<string, array{ancestors: bool, fromMeta: bool, implied: bool}> $wanted URL as written => whether its ancestors apply, whether meta.profile named it, and whether only a vital-sign code implies it */
             $wanted = [];
             foreach ($requested as $url) {
-                $wanted[$url] = ['ancestors' => $topLevel && $options->deriveProfilesFromClass, 'fromMeta' => false];
+                $wanted[$url] = ['ancestors' => $topLevel && $options->deriveProfilesFromClass, 'fromMeta' => false, 'implied' => false];
             }
             if ($options->profilesFromMeta) {
                 foreach ($metaProfiles as $url) {
-                    $wanted[$url] = ['ancestors' => true, 'fromMeta' => true];
+                    $wanted[$url] = ['ancestors' => true, 'fromMeta' => true, 'implied' => false];
+                }
+            }
+            if ($options->profilesFromVitalSignsCodes) {
+                // A vital-sign code implies its profile the way a meta.profile entry claims one. A
+                // profile already wanted under any version is left as it is.
+                $named = array_map(self::canonicalWithoutVersion(...), array_keys($wanted));
+                foreach ($this->impliedVitalSignsProfiles($resource) as $url) {
+                    if (!in_array($url, $named, true)) {
+                        $wanted[$url] = ['ancestors' => true, 'fromMeta' => false, 'implied' => true];
+                    }
                 }
             }
 
@@ -459,11 +481,14 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * @param array<string, array{ancestors: bool, fromMeta: bool}> $wanted     URL as written => whether its constraint ancestors
-     *                                                                          apply, and whether `meta.profile` named it
-     * @param list<string>                                          $mainGroups The groups the pass over the whole resource ran
-     * @param list<FHIRValidationViolation>                         $violations appended to
-     * @param object                                                $root       The object validation started at, which $prefix is relative to
+     * @param array<string, array{ancestors: bool, fromMeta: bool, implied: bool}> $wanted     URL as written => whether its constraint
+     *                                                                                         ancestors apply, whether `meta.profile` named
+     *                                                                                         it, and whether only a vital-sign code implies
+     *                                                                                         it. An implied profile that cannot be checked
+     *                                                                                         is skipped without a warning: nobody asked for it
+     * @param list<string>                                                         $mainGroups The groups the pass over the whole resource ran
+     * @param list<FHIRValidationViolation>                                        $violations appended to
+     * @param object                                                               $root       The object validation started at, which $prefix is relative to
      *
      * @return array<string, FHIRValidationViolation> one error per wanted profile that constrains another type, by canonical
      */
@@ -502,8 +527,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 // The class's attributes check it. A requested URL's group already ran over the whole
                 // resource; a meta.profile URL's group ran only if it was also requested, so a typed
                 // nested instance claiming its profile would otherwise go unchecked. Claiming a
-                // profile claims its ancestors too, so every profile the class declares runs.
-                if ($how['fromMeta'] && !in_array($canonical, $mainGroups, true)) {
+                // profile claims its ancestors too, so every profile the class declares runs. An
+                // implied profile is claimed in the same way.
+                if (($how['fromMeta'] || $how['implied']) && !in_array($canonical, $mainGroups, true)) {
                     foreach ($declared as $group) {
                         if (!in_array($group, $mainGroups, true)) {
                             $classGroups[$group] = true;
@@ -515,8 +541,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             }
 
             if ($this->runtimeProfiles === null) {
-                // Without a resolver a requested URL is ignored, as it always was; a meta.profile URL
-                // is reported, because profilesFromMeta asks for every claimed profile to be checked
+                // Without a resolver a requested URL is ignored, as it always was, and so is an implied
+                // one; a meta.profile URL is reported, because profilesFromMeta asks for every claimed
+                // profile to be checked
                 if ($how['fromMeta']) {
                     $violations[] = new FHIRValidationViolation(
                         severity: 'warning',
@@ -556,6 +583,11 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $checked[$canonical] = $url;
 
             $resolution = $this->runtimeProfiles->resolve($url, $fhirVersion);
+
+            // Nobody named an implied profile, so one that cannot be used here is dropped, not reported.
+            if ($how['implied'] && (!$resolution->isResolved() || $resolution->rootType !== $resourceType)) {
+                continue;
+            }
 
             if (!$resolution->isResolved()) {
                 $violations[] = new FHIRValidationViolation(
@@ -609,6 +641,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 }
             }
             if ($conflict !== null) {
+                if ($how['implied']) {
+                    continue;
+                }
+
                 $violations[] = new FHIRValidationViolation(
                     severity: 'warning',
                     path: rtrim($prefix, '.'),
@@ -712,6 +748,22 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
+     * The invariants every extension carries as an Extension: ext-1, and ele-1 from Element.
+     *
+     * They are declared on the base model classes, which Symfony would apply to any element it
+     * cascades into. It never cascades into an extension, so without this they were never evaluated
+     * on one, and `R5.list-extension2`'s extension with neither a value nor sub-extensions went
+     * unreported. Read from the class hierarchy, so a typed extension class inherits them as a plain
+     * one does; neither a typed class nor a runtime definition declares them again.
+     *
+     * @return list<FHIRPathInvariant>
+     */
+    private function extensionBaseInvariants(object $extension): array
+    {
+        return $this->attributes->classAttributesInHierarchy($extension, FHIRPathInvariant::class);
+    }
+
+    /**
      * The invariants and bindings a typed extension class carries, in the order its generator wrote them.
      *
      * @return list<Constraint>
@@ -744,6 +796,47 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return $this->runtimeExtensionConstraints[$extension] = $constraints;
+    }
+
+    /**
+     * The core vital-signs profiles an Observation's codes imply; nothing for any other resource.
+     *
+     * @return list<string>
+     */
+    private function impliedVitalSignsProfiles(object $resource): array
+    {
+        if ($this->getResourceFhirType($resource) !== 'Observation') {
+            return [];
+        }
+
+        $code = self::readPublic($resource, 'code');
+        if (!is_object($code)) {
+            return [];
+        }
+
+        $codings = [];
+        foreach ((array) self::readPublic($code, 'coding') as $coding) {
+            if (is_object($coding)) {
+                $codings[] = [
+                    'system' => self::primitiveString(self::readPublic($coding, 'system')),
+                    'code'   => self::primitiveString(self::readPublic($coding, 'code')),
+                ];
+            }
+        }
+
+        return VitalSignsProfiles::forCodings($codings);
+    }
+
+    /**
+     * A primitive's string value, whether the model holds it bare or wrapped in a primitive object.
+     */
+    private static function primitiveString(mixed $value): ?string
+    {
+        if (is_object($value)) {
+            $value = self::readPublic($value, 'value');
+        }
+
+        return is_string($value) ? $value : null;
     }
 
     /**
@@ -961,11 +1054,42 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $extensions = $resource->getExtensions();
 
             foreach ($extensions as $extIndex => $extension) {
-                $definition   = $this->extensionDefinitionOf($extension);
-                $contextAttrs = $this->extensionAttributes($extension, $definition, FHIRExtensionContext::class);
+                $definition = $this->extensionDefinitionOf($extension);
+                $usage      = $this->extensionUsage($extension, $definition);
+                $release    = $this->releaseOf($extension);
+
+                // A modifier extension changes the meaning of the element that bears it, so it must sit
+                // where readers look for modifiers
+                if ($usage?->isModifier === true) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'error',
+                        path: $extViolationPath . '[' . $extIndex . ']',
+                        message: sprintf("The Extension '%s' must not be used as an extension (it's a modifierExtension)", $this->readExtensionUrl($extension)),
+                        constraintClass: FHIRExtensionDefinition::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                    );
+                }
+
+                // An extension whose definition excludes this FHIR version is reported once; where it
+                // sits is then beside the point, so its contexts are not checked
+                $outOfRange = $usage !== null && $release !== null ? $this->extensionVersionViolation($extension, $usage, $release, $extViolationPath) : null;
+                if ($outOfRange !== null) {
+                    $violations[] = $outOfRange;
+                }
+
+                $contextAttrs = $outOfRange === null ? $this->extensionAttributes($extension, $definition, FHIRExtensionContext::class) : [];
+
+                // Contexts limited to other FHIR versions do not apply here. When none is left, the
+                // extension is allowed nowhere in this version
+                $versionContexts = $release === null ? $contextAttrs : array_values(array_filter(
+                    $contextAttrs,
+                    static fn (FHIRExtensionContext $context): bool => FHIRVersionRange::includes($release, $context->startFhirVersion, $context->endFhirVersion),
+                ));
 
                 if ($contextAttrs !== []
-                    && $this->classifyExtensionContexts($contextAttrs, $resource, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes, $ancestorExtensionUrls) === self::CONTEXT_DENY
+                    && ($versionContexts                                                                                                                                    === []
+                        || $this->classifyExtensionContexts($versionContexts, $resource, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes, $ancestorExtensionUrls) === self::CONTEXT_DENY)
                 ) {
                     $url          = $this->readExtensionUrl($extension);
                     $violations[] = new FHIRValidationViolation(
@@ -1184,8 +1308,15 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
             // At the resource root the type is definitively known (resolver-independent), so a
             // non-matching bare context is a confident denial. At nested elements the type may be
-            // abstract or unresolvable, so defer rather than risk a false positive.
-            return $isRoot ? self::CONTEXT_DENY : self::CONTEXT_DEFER;
+            // abstract or unresolvable, so defer rather than risk a false positive. CanonicalResource
+            // and MetadataResource name patterns of resources: the reference validator counts
+            // CodeSystem as one, but no generated resource class derives from them in any release,
+            // so they always defer
+            if (!$isRoot || in_array($expr, self::RESOURCE_PATTERNS, true)) {
+                return self::CONTEXT_DEFER;
+            }
+
+            return self::CONTEXT_DENY;
         }
 
         $exprRoot = substr($expr, 0, (int) strpos($expr, '.'));
@@ -1202,8 +1333,11 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
         // Foreign root (e.g. "ElementDefinition.binding" inside StructureDefinition): permitted
         // when a type-rooted candidate matches (a path ancestor is typed with the context root).
-        // Any other non-match is deferred: denying it would require complete type resolution of
-        // every path segment, which we do not guarantee.
+        // Below the root, a non-match is deferred unless the context is rooted in this element's
+        // own concrete type (see the denial after this loop): denying it otherwise would require
+        // complete type resolution of every path segment, which we do not guarantee. A resource
+        // being validated sits at no element path at all, so no dotted context can name it there.
+        // A data type validated on its own may still be meant for such a path, so it defers.
         foreach ($typeCandidates as $candidate) {
             if ($candidate === $expr || str_starts_with($candidate, $expr . '.')) {
                 return self::CONTEXT_PERMIT;
@@ -1221,7 +1355,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             return self::CONTEXT_DENY;
         }
 
-        return self::CONTEXT_DEFER;
+        return $isRoot && $this->isResource($bearingElement) ? self::CONTEXT_DENY : self::CONTEXT_DEFER;
     }
 
     /**
@@ -1353,6 +1487,58 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return $matching;
+    }
+
+    /**
+     * Whether an extension is a modifier and the FHIR versions it may be used in, from its class or the
+     * definition its url names at runtime; null when neither is known.
+     *
+     * @param object|class-string $definition where its rules are declared, from {@see extensionDefinitionOf()}
+     */
+    private function extensionUsage(object $extension, object|string $definition): ?ExtensionUsage
+    {
+        $declared = $this->attributes->classAttributes($definition, FHIRExtensionDefinition::class)[0] ?? null;
+        if ($declared !== null) {
+            return new ExtensionUsage($declared->isModifier, $declared->startFhirVersion, $declared->endFhirVersion);
+        }
+
+        $runtime = $definition === $extension ? $this->runtimeExtensionOf($extension) : null;
+
+        return $runtime === null ? null : new ExtensionUsage($runtime->isModifier, $runtime->startFhirVersion, $runtime->endFhirVersion);
+    }
+
+    /**
+     * The finding for an extension used in a FHIR version its definition's `version-specific-use` excludes; null when the version is allowed.
+     *
+     * Worded as the reference validator words it, naming the bound that is broken.
+     */
+    private function extensionVersionViolation(object $extension, ExtensionUsage $usage, string $release, string $path): ?FHIRValidationViolation
+    {
+        [$template, $bound] = match (true) {
+            FHIRVersionRange::isBefore($release, $usage->startFhirVersion) => ['earliest', $usage->startFhirVersion],
+            FHIRVersionRange::isAfter($release, $usage->endFhirVersion)    => ['latest', $usage->endFhirVersion],
+            default                                                        => [null, null],
+        };
+        if ($template === null || $bound === null) {
+            return null;
+        }
+
+        return new FHIRValidationViolation(
+            severity: 'error',
+            path: $path,
+            message: sprintf(
+                "The definition of the extension '%s' specifies that the %s version it can be used with is %s (v%s), but this context of use is version %s (v%s)",
+                $this->readExtensionUrl($extension),
+                $template,
+                FHIRVersionRange::releaseNameOf($bound),
+                $bound,
+                $release,
+                FHIRVersionRange::versionOf($release),
+            ),
+            constraintClass: FHIRExtensionDefinition::class,
+            profileGroup: null,
+            invariantKey: null,
+        );
     }
 
     /**
@@ -1625,7 +1811,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 // Invariants and bindings from the extension's definition. Symfony does not cascade into
                 // extensions, so a typed class's attributes are run here too, the same way as a plain
                 // extension's runtime definition
-                $rules = $runtime !== null ? $this->runtimeExtensionConstraintsOf($runtime) : $this->extensionRuleAttributes($ext);
+                $rules = [
+                    ...$this->extensionBaseInvariants($ext),
+                    ...($runtime !== null ? $this->runtimeExtensionConstraintsOf($runtime) : $this->extensionRuleAttributes($ext)),
+                ];
                 if ($rules !== []) {
                     $at  = $extPath . '[' . $extIndex . ']';
                     $raw = FHIRPathResourceContext::within(
@@ -1850,7 +2039,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         if (property_exists($resource, 'modifierExtension') && isset($resource->modifierExtension) && is_array($resource->modifierExtension)) {
             $extPath = $path !== '' ? $path . '.modifierExtension' : 'modifierExtension';
 
-            foreach ($resource->modifierExtension as $ext) {
+            foreach ($resource->modifierExtension as $index => $ext) {
                 if (!is_object($ext)) {
                     continue;
                 }
@@ -1874,6 +2063,22 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                         path: $extPath,
                         message: sprintf('Unknown modifier extension: %s — resource cannot be safely processed', $url),
                         constraintClass: FHIRIGTypeRegistry::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                    );
+
+                    continue;
+                }
+
+                // A known extension that is not a modifier does not belong here. A class generated
+                // before 0.8 does not say, so it is not reported
+                $usage = $this->extensionUsage($ext, $this->extensionDefinitionOf($ext));
+                if ($usage?->isModifier === false) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'error',
+                        path: $extPath . '[' . $index . ']',
+                        message: sprintf("The Extension '%s' must not be used as a modifierExtension (it's a regular extension)", $url),
+                        constraintClass: FHIRExtensionDefinition::class,
                         profileGroup: null,
                         invariantKey: null,
                     );
@@ -1909,7 +2114,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * Collects violations for unmet obligation requirements (SHALL_POPULATE, SHOULD_POPULATE, etc.).
      *
      * Reflects over the resource's properties, finds those with #[FHIRObligation] attributes matching
-     * the provided context, and generates violations when required fields are empty.
+     * the provided context, and generates violations when required fields are empty. An obligation
+     * with a FHIRPath filter covers only the property's occurrences the filter selects, so it is met
+     * only when at least one occurrence matches; a filter that cannot be evaluated yields an info
+     * eval-error instead of the obligation's violation.
      *
      * @param object                $resource The FHIR resource to inspect
      * @param FHIRObligationContext $context  The obligation context to match against
@@ -1931,25 +2139,14 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
             // Uninitialized (constructor-bypassed deserialization) counts as absent → empty, so the
             // obligation still fires; the guarded read answers null for uninitialized and for null.
-            $value   = $this->models->readInitializedValue($resource, $name);
-            $isEmpty = $value === null || $value === [];
+            $value = $this->models->readInitializedValue($resource, $name);
 
             foreach ($attrs as $obligation) {
                 if (!$context->matchesObligation($obligation)) {
                     continue;
                 }
 
-                if ($obligation->filter !== null) {
-                    continue; // FHIRPath filter evaluation deferred to backlog
-                }
-
-                $code = ObligationCode::tryFrom($obligation->code);
-
-                if ($code === null || !$isEmpty) {
-                    continue;
-                }
-
-                $severity = match ($code) {
+                $severity = match (ObligationCode::tryFrom($obligation->code)) {
                     ObligationCode::SHALL_POPULATE          => 'error',
                     ObligationCode::SHOULD_POPULATE         => 'warning',
                     ObligationCode::SHALL_POPULATE_IF_KNOWN => 'info',
@@ -1960,10 +2157,37 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     continue;
                 }
 
+                $matched = $this->obligationOccurrences($obligation, $name, $value);
+
+                if ($matched === null) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'info',
+                        path: $name,
+                        message: sprintf(
+                            'Obligation %s on property "%s" not checked: its filter could not be evaluated: %s',
+                            $obligation->code,
+                            $name,
+                            (string) $obligation->filter,
+                        ),
+                        constraintClass: FHIRObligation::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                        code: FHIRViolationCode::EVAL_ERROR,
+                    );
+
+                    continue;
+                }
+
+                if ($matched !== []) {
+                    continue;
+                }
+
                 $violations[] = new FHIRValidationViolation(
                     severity: $severity,
                     path: $name,
-                    message: sprintf('Obligation %s: property "%s" must be populated.', $obligation->code, $name),
+                    message: $obligation->filter === null
+                        ? sprintf('Obligation %s: property "%s" must be populated.', $obligation->code, $name)
+                        : sprintf('Obligation %s: property "%s" must be populated with a value matching %s.', $obligation->code, $name, $obligation->filter),
                     constraintClass: FHIRObligation::class,
                     profileGroup: null,
                     invariantKey: null,
@@ -1975,7 +2199,56 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * Removes fhir:error violations for properties where a matching SHALL:no-error obligation applies.
+     * The paths of a property's occurrences that an obligation covers.
+     *
+     * Without a filter that is every occurrence. With one, as the obligation extension defines it,
+     * the filter is evaluated against each occurrence in turn, and the obligation covers those for
+     * which it returns a single boolean true. A list property's occurrences are `name[i]`; a
+     * single-valued property's only occurrence is `name`. An absent or empty property has none.
+     *
+     * @return list<string>|null null when the filter could not be evaluated for some occurrence: a
+     *                           FHIRPath engine exception, such as a syntax error or an unsupported
+     *                           function. Any other throwable is a bug and propagates.
+     */
+    private function obligationOccurrences(FHIRObligation $obligation, string $name, mixed $value): ?array
+    {
+        if ($value === null || $value === []) {
+            return [];
+        }
+
+        $occurrences = [];
+        if (is_array($value)) {
+            foreach (array_values($value) as $index => $item) {
+                $occurrences[sprintf('%s[%d]', $name, $index)] = $item;
+            }
+        } else {
+            $occurrences[$name] = $value;
+        }
+
+        if ($obligation->filter === null) {
+            return array_keys($occurrences);
+        }
+
+        $matched = [];
+        foreach ($occurrences as $path => $item) {
+            try {
+                $result = $this->pathService->evaluate($obligation->filter, $item);
+            } catch (FHIRPathException) {
+                return null;
+            }
+
+            if ($result->count() === 1 && $result->first() === true) {
+                $matched[] = $path;
+            }
+        }
+
+        return $matched;
+    }
+
+    /**
+     * Removes error-severity violations whose path is a property with a matching SHALL:no-error
+     * obligation, or, for a filtered one, an occurrence `name[i]` its filter selects. Only exact path
+     * matches are removed; a filter that cannot be evaluated removes nothing.
      *
      * @param list<FHIRValidationViolation> $violations
      *
@@ -1987,11 +2260,23 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
         foreach ($this->models->publicPropertyNames($resource) as $name) {
             foreach ($this->attributes->propertyAttributes($resource, $name, FHIRObligation::class) as $obligation) {
-                if ($context->matchesObligation($obligation)
-                    && ObligationCode::tryFrom($obligation->code) === ObligationCode::SHALL_NO_ERROR
+                if (!$context->matchesObligation($obligation)
+                    || ObligationCode::tryFrom($obligation->code) !== ObligationCode::SHALL_NO_ERROR
                 ) {
-                    $suppressedPaths[] = $name;
+                    continue;
                 }
+
+                if ($obligation->filter === null) {
+                    $suppressedPaths[] = $name;
+
+                    continue;
+                }
+
+                // A filtered obligation covers only the occurrences it selects, so only their errors
+                // go. A filter that cannot be evaluated (null) suppresses nothing, so errors stay visible.
+                $value   = $this->models->readInitializedValue($resource, $name);
+                $matched = $this->obligationOccurrences($obligation, $name, $value) ?? [];
+                array_push($suppressedPaths, ...$matched);
             }
         }
 

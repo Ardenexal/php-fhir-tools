@@ -18,7 +18,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
  *
  * @description Period or duration of processing. In R6, this extension is replaced by Specimen.processing.time[x].
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-processingTime', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/specimen-processingTime',
+    fhirVersion: 'R4B',
+    isModifier: false,
+    endFhirVersion: '5.0',
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen.processing')]
 class SpecProcessingTimeExtension extends Extension
 {

@@ -22,7 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * resources, allowing a Medication resource to carry typed key-value pairs that
  * describe observable or defining haracteristics of the medication.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medication-characteristic', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medication-characteristic', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Medication')]
 class MedicationCharacteristicExtension extends Extension implements FHIRComplexExtensionInterface
 {

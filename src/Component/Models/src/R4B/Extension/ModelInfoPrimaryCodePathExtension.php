@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @description Specifies the primary code path for the class constructed in the model info for the profile (i.e. the path to the code-valued element on the resource that should be used as the default terminology filter when no terminology target is specified in a CQL retrieve).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-modelInfo-primaryCodePath', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-modelInfo-primaryCodePath', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class ModelInfoPrimaryCodePathExtension extends Extension
 {

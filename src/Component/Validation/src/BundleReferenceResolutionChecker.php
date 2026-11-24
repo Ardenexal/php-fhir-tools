@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
@@ -75,14 +73,20 @@ use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessorInterface;
  * The bundle is indexed once per validation, not once per reference. Walking every entry for every
  * reference is quadratic in entry count, and `bundle-duplicate-ids-not` is a 39-entry document.
  *
- * @phpstan-type Entry array{fullUrl: string|null, hasFullUrl: bool, resource: object|null, type: string|null, id: string|null, version: string|null}
+ * Which entries a reference resolves to is decided by {@see BundleEntryIndex}, which
+ * {@see BundleReachabilityChecker} shares, so both rules read the bundle the same way.
+ *
+ * @phpstan-import-type IndexedEntry from BundleEntryIndex
  */
 final class BundleReferenceResolutionChecker
 {
+    private readonly BundleEntryReader $reader;
+
     public function __construct(
-        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
-        private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
+        FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
     ) {
+        $this->reader = new BundleEntryReader($models, $attributes);
     }
 
     /** Identifies the root resource we apply to, read from the class attribute. */
@@ -122,35 +126,6 @@ final class BundleReferenceResolutionChecker
      * a reference with an odd character in its id is a different finding and is not guessed at here.
      */
     private const string RELATIVE_SHAPE = '~\A[A-Za-z]+/[^/]+(?:/_history/[^/]+)?\z~';
-
-    /**
-     * A relative reference this class resolves: `[Type]/[id]`, optionally `/_history/[version]`.
-     *
-     * A versioned reference resolves to the entry whose fullUrl matches the unversioned target **and**
-     * whose `meta.versionId` is that version. `bundle-document-versioned-references-good` holds
-     * `_history/1` and `_history/2` against two entries sharing one fullUrl, and the reference validator
-     * accepts both; its `-bad` twin asks for `_history/3`, which is reported.
-     */
-    private const string RELATIVE_REFERENCE = '~\A(?<type>[A-Z][A-Za-z]+)/(?<id>[A-Za-z0-9\-\.]{1,64})(?:/_history/(?<version>[A-Za-z0-9\-\.]{1,64}))?\z~';
-
-    /**
-     * A `fullUrl` that yields a base: `[base]/[type]/[id]`, where `[id]` must be the entry's own.
-     *
-     * The base is allowed to be **empty**, which is not a technicality. `mni-patientOverview-bundle-example1`
-     * identifies its entries relatively, as `Composition/1` and `Patient/1`, which
-     * {@see BundleEntryFullUrlChecker} reports separately. Against an empty base `Patient/1` resolves to
-     * `Patient/1`, which is exactly what that bundle holds, and the reference validator reports nothing
-     * there. Its twin `…example1b` differs in one character, a Composition whose id is `1a` against a
-     * fullUrl saying `1`, and the reference validator reports both of its references. A required
-     * trailing slash collapses that distinction and reports both bundles.
-     */
-    private const string RESTFUL_FULL_URL = '~\A(?<base>(?:.*/)?)(?<type>[A-Za-z]+)/(?<id>[A-Za-z0-9\-\.]{1,64})\z~';
-
-    /** @var array<class-string, string|null> FHIR resource type per class; reflection is not free */
-    private array $resourceTypes = [];
-
-    /** @var array<class-string, bool> whether the class is a `Reference` */
-    private array $isReference = [];
 
     /**
      * Walk every Bundle in the resource, the root and any nested one, and report each reference its
@@ -194,11 +169,11 @@ final class BundleReferenceResolutionChecker
 
         $visited[$id] = true;
 
-        if ($this->resourceType($node) === self::BUNDLE) {
+        if ($this->reader->resourceType($node) === self::BUNDLE) {
             $bundles[$path] = $node;
         }
 
-        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
+        foreach ($this->reader->children($node) as $name => $value) {
             $subPath = $path === '' ? $name : $path . '.' . $name;
 
             if (is_object($value)) {
@@ -220,26 +195,26 @@ final class BundleReferenceResolutionChecker
      */
     private function checkBundle(object $bundle, string $bundlePath): array
     {
-        $entries = $this->entries($bundle);
+        $index = $this->reader->index($bundle);
 
-        if ($entries === []) {
+        if ($index->entries === []) {
             return [];
         }
 
-        $resolves   = in_array($this->readString($bundle, 'type'), self::RESOLVING_BUNDLE_TYPES, true);
+        $resolves   = in_array($this->reader->readString($bundle, 'type'), self::RESOLVING_BUNDLE_TYPES, true);
         $prefix     = $bundlePath === '' ? '' : $bundlePath . '.';
         $violations = [];
 
-        foreach ($entries as $index => $entry) {
+        foreach ($index->entries as $position => $entry) {
             if ($entry['resource'] === null) {
                 continue;
             }
 
             $visited = [];
-            $found   = $this->references($entry['resource'], $prefix . 'entry[' . $index . '].resource', $visited);
+            $found   = $this->references($entry['resource'], $prefix . 'entry[' . $position . '].resource', $visited);
 
             foreach ($found as $path => $reference) {
-                $violation = $this->checkReference($reference, (string) $path, $entry, $entries, $resolves);
+                $violation = $this->checkReference($reference, (string) $path, $position, $index, $resolves);
 
                 if ($violation !== null) {
                     $violations[] = $violation;
@@ -248,43 +223,6 @@ final class BundleReferenceResolutionChecker
         }
 
         return $violations;
-    }
-
-    /**
-     * Index the bundle's entries once: each entry's `fullUrl`, and the type and id of what it holds.
-     *
-     * @return array<int, Entry>
-     */
-    private function entries(object $bundle): array
-    {
-        // Deserializers bypass the constructor, so an absent field is uninitialized rather than null.
-        $value = $this->readPublic($bundle, 'entry');
-
-        if (!is_array($value)) {
-            return [];
-        }
-
-        $entries = [];
-
-        foreach ($value as $index => $entry) {
-            if (!is_int($index) || !is_object($entry)) {
-                continue;
-            }
-
-            $resource = $this->readObject($entry, 'resource');
-
-            $entries[$index] = [
-                'fullUrl'    => $this->readString($entry, 'fullUrl'),
-                // `"fullUrl": ""` is present but empty, which is a different finding from a missing one.
-                'hasFullUrl' => $this->readPublic($entry, 'fullUrl') !== null,
-                'resource'   => $resource,
-                'type'       => $resource === null ? null : $this->resourceType($resource),
-                'id'         => $resource === null ? null : $this->readString($resource, 'id'),
-                'version'    => $resource === null ? null : $this->versionId($resource),
-            ];
-        }
-
-        return $entries;
     }
 
     /**
@@ -307,17 +245,17 @@ final class BundleReferenceResolutionChecker
 
         // A Bundle below the entry resolves its own entries' references; see collectBundles(). An entry
         // whose resource *is* a Bundle holds nothing but those entries, so the same applies to it.
-        if ($this->resourceType($node) === self::BUNDLE) {
+        if ($this->reader->resourceType($node) === self::BUNDLE) {
             return $found;
         }
 
-        if ($this->isReference($node)) {
+        if ($this->reader->typeName($node) === self::REFERENCE) {
             $found[$path] = $node;
 
             return $found;
         }
 
-        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
+        foreach ($this->reader->children($node) as $name => $value) {
             // Contained resources resolve by their own rules, never against the bundle's entries.
             if ($name === 'contained') {
                 continue;
@@ -346,12 +284,11 @@ final class BundleReferenceResolutionChecker
      * {@see RESOLVING_BUNDLE_TYPES}. Absolute references, `#` fragments and conditional references are
      * left alone: none of them resolves against an entry's base, and each has its own rule elsewhere.
      *
-     * @param Entry             $source
-     * @param array<int, Entry> $entries
+     * @param int $source the position of the entry that holds the reference
      */
-    private function checkReference(object $reference, string $path, array $source, array $entries, bool $resolves): ?FHIRValidationViolation
+    private function checkReference(object $reference, string $path, int $source, BundleEntryIndex $index, bool $resolves): ?FHIRValidationViolation
     {
-        $value = $this->readString($reference, 'reference');
+        $value = $this->reader->readString($reference, 'reference');
 
         if ($value === null || str_starts_with($value, '#') || str_contains($value, '?') || preg_match(self::SCHEME, $value) === 1) {
             return null;
@@ -361,23 +298,19 @@ final class BundleReferenceResolutionChecker
             return $this->violation($path, sprintf('Relative URLs must be of the format [ResourceName]/[id]. Encountered %s', $value));
         }
 
-        if (!$source['hasFullUrl']) {
+        $entry = $index->entries[$source];
+
+        if (!$entry['hasFullUrl']) {
             return $this->violation($path, 'Relative Reference appears inside Bundle whose entry is missing a fullUrl');
         }
 
-        if (!$resolves || preg_match(self::RELATIVE_REFERENCE, $value, $parts) !== 1) {
+        $parts = $resolves ? BundleEntryIndex::parseRelative($value) : null;
+
+        if ($parts === null) {
             return null;
         }
 
-        $target  = $this->targetUrl($parts['type'] . '/' . $parts['id'], $source);
-        $version = ($parts['version'] ?? '') === '' ? null : $parts['version'];
-        $matches = 0;
-
-        foreach ($entries as $entry) {
-            if ($target !== null && $entry['fullUrl'] === $target && ($version === null || $entry['version'] === $version)) {
-                ++$matches;
-            }
-        }
+        $matches = count($index->resolveRelative($parts['type'], $parts['id'], $parts['version'], $source));
 
         if ($matches === 1) {
             return null;
@@ -387,13 +320,7 @@ final class BundleReferenceResolutionChecker
             return $this->violation($path, sprintf("Found %d matches for '%s' in the bundle", $matches, $value));
         }
 
-        $candidates = [];
-
-        foreach ($entries as $entry) {
-            if ($entry['type'] === $parts['type'] && $entry['id'] === $parts['id'] && $entry['fullUrl'] !== null) {
-                $candidates[] = $entry['fullUrl'];
-            }
-        }
+        $candidates = $index->fullUrlsOfTypeAndId($parts['type'], $parts['id']);
 
         // Plain absence is an error only from the Composition, whose references are what a document
         // is made of. From any other entry the reference validator reports it as information: a
@@ -403,11 +330,11 @@ final class BundleReferenceResolutionChecker
             return $this->violation(
                 $path,
                 sprintf("Can't find '%s' in the bundle", $value),
-                $source['type'] === self::COMPOSITION ? 'error' : 'information',
+                $entry['type'] === self::COMPOSITION ? 'error' : 'information',
             );
         }
 
-        return $this->violation($path, $this->message($value, $candidates, $source['fullUrl']));
+        return $this->violation($path, $this->message($value, $candidates, $entry['fullUrl']));
     }
 
     private function violation(string $path, string $message, string $severity = 'error'): FHIRValidationViolation
@@ -420,37 +347,6 @@ final class BundleReferenceResolutionChecker
             profileGroup: null,
             invariantKey: null,
         );
-    }
-
-    /** The resource's `meta.versionId`, which a `_history/[version]` reference is resolved against. */
-    private function versionId(object $resource): ?string
-    {
-        $meta = $this->readObject($resource, 'meta');
-
-        return $meta === null ? null : $this->readString($meta, 'versionId');
-    }
-
-    /**
-     * The absolute URL a relative reference resolves to, or null when the source entry yields no base.
-     *
-     * @param Entry $source
-     */
-    private function targetUrl(string $reference, array $source): ?string
-    {
-        $fullUrl = $source['fullUrl'];
-
-        if ($fullUrl === null || preg_match(self::RESTFUL_FULL_URL, $fullUrl, $parts) !== 1) {
-            return null;
-        }
-
-        // The tail is only a `[type]/[id]` to strip when the id is genuinely this resource's own.
-        // `id_in_target_resource` turns on exactly this: the Composition has no id, so its fullUrl
-        // does not decompose, and nothing it holds can resolve.
-        if ($source['id'] === null || $parts['id'] !== $source['id']) {
-            return null;
-        }
-
-        return $parts['base'] . $reference;
     }
 
     /**
@@ -481,85 +377,5 @@ final class BundleReferenceResolutionChecker
             implode(',', $candidates),
             $source,
         );
-    }
-
-    /** Read a string-ish property, which may be a primitive wrapper, a bare string, or absent. */
-    private function readString(object $node, string $property): ?string
-    {
-        $value = $this->readPublic($node, $property);
-
-        if (is_string($value)) {
-            return $value === '' ? null : $value;
-        }
-
-        if ($value instanceof \Stringable) {
-            $string = (string) $value;
-
-            return $string === '' ? null : $string;
-        }
-
-        return null;
-    }
-
-    private function readObject(object $node, string $property): ?object
-    {
-        $value = $this->readPublic($node, $property);
-
-        return is_object($value) ? $value : null;
-    }
-
-    /**
-     * A public property's value, or null when it is absent, non-public or never written.
-     *
-     * Membership of the public-name list covers both "declared" and "public"; an uninitialized
-     * property holds nothing, and reading it directly would throw rather than answer.
-     */
-    private function readPublic(object $node, string $property): mixed
-    {
-        if (!in_array($property, $this->models->publicPropertyNames($node), true)) {
-            return null;
-        }
-
-        if (!$this->models->isPropertyInitialized($node, $property)) {
-            return null;
-        }
-
-        return $this->models->readInitializedValue($node, $property);
-    }
-
-    private function resourceType(object $node): ?string
-    {
-        $key = $node::class;
-
-        if (array_key_exists($key, $this->resourceTypes)) {
-            return $this->resourceTypes[$key];
-        }
-
-        $type       = null;
-        $attributes = $this->attributes->classAttributes($node, FhirResource::class);
-
-        if ($attributes !== []) {
-            $type = $attributes[0]->getResourceType();
-        }
-
-        return $this->resourceTypes[$key] = $type;
-    }
-
-    private function isReference(object $node): bool
-    {
-        $key = $node::class;
-
-        if (isset($this->isReference[$key])) {
-            return $this->isReference[$key];
-        }
-
-        $is         = false;
-        $attributes = $this->attributes->classAttributes($node, FHIRComplexType::class);
-
-        if ($attributes !== []) {
-            $is = $attributes[0]->typeName === self::REFERENCE;
-        }
-
-        return $this->isReference[$key] = $is;
     }
 }

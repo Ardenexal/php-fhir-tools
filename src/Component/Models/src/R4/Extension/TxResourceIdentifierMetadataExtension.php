@@ -18,7 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Additional metadata in identifier elements for terminology resources.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/terminology-resource-identifier-metadata', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(
+    url: 'http://hl7.org/fhir/StructureDefinition/terminology-resource-identifier-metadata',
+    fhirVersion: 'R4',
+    isModifier: false,
+)]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.identifier')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.identifier')]
 #[FHIRExtensionContext(type: 'element', expression: 'ConceptMap.identifier')]

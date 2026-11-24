@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  *
  * @description The FMM level assigned to the artifact. For further information about FMM levels, see [FHIR Maturity Model](https://confluence.hl7.org/spaces/FHIR/pages/35718679/FHIR+Maturity+Model).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm', fhirVersion: 'R4B', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'DomainResource')]
 #[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class FMMLevelExtension extends Extension

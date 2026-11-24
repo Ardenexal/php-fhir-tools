@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @description Allows an indication of whether this parameter can be used to parameterize prefetch templates (i.e. queries that can be used to identify data-of-interest to be sent as part of a triggered request.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-isPrefetchToken', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-isPrefetchToken', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ParameterDefinition')]
 class IsPrefetchTokenExtension extends Extension
 {

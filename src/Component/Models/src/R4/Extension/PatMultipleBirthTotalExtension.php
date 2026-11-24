@@ -21,7 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
  *
  * This value is the 4 in '3 of *4*', and the 3 would be the Patient.multipleBirth value.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-multipleBirthTotal', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-multipleBirthTotal', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'Patient.multipleBirth[x]')]
 class PatMultipleBirthTotalExtension extends Extension
 {

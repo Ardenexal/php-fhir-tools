@@ -41,6 +41,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class PrimitiveFormatCheckerTest extends TestCase
 {
+    private const string ELE_1 = 'All FHIR elements must have a @value or children';
+
     public function testUnparseableInstantIsReportedWithItsOriginalLexeme(): void
     {
         self::assertSame(
@@ -122,8 +124,11 @@ final class PrimitiveFormatCheckerTest extends TestCase
         $checker = new PrimitiveFormatChecker();
 
         $empty = $checker->check(new ListResource(id: ''));
-        self::assertCount(1, $empty, 'an empty id is this rule alone');
-        self::assertSame('value cannot be empty', $empty[0]->message);
+        self::assertSame(
+            [self::ELE_1, 'value cannot be empty'],
+            array_map(static fn (FHIRValidationViolation $v): string => $v->message, $empty),
+            'an empty id is this rule alone, with the ele-1 it breaks',
+        );
 
         // A malformed-but-present id belongs to the generated Regex, so this pass must stay quiet.
         self::assertSame([], $checker->check(new ListResource(id: 'has space')));
@@ -146,9 +151,28 @@ final class PrimitiveFormatCheckerTest extends TestCase
      * `<valueDate><extension url="…data-absent-reason"/></valueDate>` builds a wrapper whose value
      * is absent. The reference validator reports nothing about it.
      */
-    public function testAbsentValueIsNotReported(): void
+    public function testAbsentValueCarryingAnExtensionIsNotReported(): void
     {
-        self::assertSame([], $this->messagesFor(new DatePrimitive()));
+        self::assertSame([], $this->messagesFor(new DatePrimitive(
+            extension: [new Extension(url: 'http://hl7.org/fhir/StructureDefinition/data-absent-reason')],
+        )));
+    }
+
+    /**
+     * A wrapper with no value and no extension breaks ele-1 alone. An `id` does not rescue it, because
+     * ele-1 counts children other than `id`: `R4.patient-id-only` is `<implicitRules id="i1"/>`, and the
+     * reference validator reports ele-1 and nothing else.
+     */
+    public function testAbsentValueWithNoExtensionBreaksEle1(): void
+    {
+        $violations = (new PrimitiveFormatChecker())->check(
+            new ListResource(implicitRules: new UriPrimitive(id: 'i1')),
+        );
+
+        self::assertSame(
+            [['implicitRules', 'ele-1', self::ELE_1]],
+            array_map(static fn (FHIRValidationViolation $v): array => [$v->path, $v->invariantKey, $v->message], $violations),
+        );
     }
 
     public function testDecimalOutsideTheCanonicalRegexIsReported(): void
@@ -343,11 +367,23 @@ final class PrimitiveFormatCheckerTest extends TestCase
         );
     }
 
+    /** The reference validator reports ele-1 beside `value cannot be empty` (`R5.primitive-bad`). */
     public function testPresentButEmptyPrimitiveIsReported(): void
     {
         self::assertSame(
-            ['value cannot be empty', 'value cannot be empty'],
+            [self::ELE_1, 'value cannot be empty', self::ELE_1, 'value cannot be empty'],
             $this->messagesFor(new StringPrimitive(value: ''), new MarkdownPrimitive(value: '')),
+        );
+    }
+
+    /** `R5.bundle-bad-empty`'s `"fullUrl": ""`, a plain scalar with no wrapper. */
+    public function testEmptyPlainScalarAlsoBreaksEle1(): void
+    {
+        $violations = (new PrimitiveFormatChecker())->check(new Extension(url: ''));
+
+        self::assertSame(
+            [['url', 'ele-1'], ['url', null]],
+            array_map(static fn (FHIRValidationViolation $v): array => [$v->path, $v->invariantKey], $violations),
         );
     }
 
@@ -464,6 +500,7 @@ final class PrimitiveFormatCheckerTest extends TestCase
             [
                 ['parameter[0].value', "Boolean values must be 'true' or 'false'"],
                 ['parameter[1].value', "The value '34534536346345345345' is not a valid integer"],
+                ['parameter[2].value', self::ELE_1],
                 ['parameter[2].value', 'Primitive types must have a value or must have child extensions'],
             ],
             array_map(static fn (FHIRValidationViolation $v): array => [$v->path, $v->message], $violations),

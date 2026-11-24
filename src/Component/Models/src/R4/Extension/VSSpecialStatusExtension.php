@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description A special note for implementers about the status of the resource.  This extension is deprecated as Terminology Infrastructure was unable to determine a use for it.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-special-status', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-special-status', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]
 class VSSpecialStatusExtension extends Extension

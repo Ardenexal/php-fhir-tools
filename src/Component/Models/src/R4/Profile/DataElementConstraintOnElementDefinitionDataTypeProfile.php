@@ -86,9 +86,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\ElementDefinition;
     sliceName: 'Question',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-question',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/elementdefinition-question',
+        ],
+    ],
     orderedIndex: 0,
     groups: ['http://hl7.org/fhir/StructureDefinition/elementdefinition-de'],
 )]
@@ -97,9 +101,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\ElementDefinition;
     sliceName: 'AllowedUnits',
     min: 0,
     max: 1,
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-allowedUnits',
+    discriminators: [
+        [
+            'type'  => 'value',
+            'path'  => 'url',
+            'value' => 'http://hl7.org/fhir/StructureDefinition/elementdefinition-allowedUnits',
+        ],
+    ],
     orderedIndex: 1,
     groups: ['http://hl7.org/fhir/StructureDefinition/elementdefinition-de'],
 )]

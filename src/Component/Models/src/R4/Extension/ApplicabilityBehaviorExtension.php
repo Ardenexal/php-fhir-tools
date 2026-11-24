@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  *
  * @description Determines whether child actions are evaluated independently (all) or evaluated in order with the first action that is applicable being performed (any).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-applicabilityBehavior', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-applicabilityBehavior', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action')]

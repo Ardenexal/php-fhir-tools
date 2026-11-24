@@ -57,10 +57,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstra
     sliceName: 'logicDefinition',
     min: 0,
     max: '*',
-    discriminatorType: 'value',
-    discriminatorPath: 'url',
-    discriminatorValue: 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition',
-    orderedIndex: 0,
+    discriminators: [
+        ['type' => 'value', 'path' => 'url', 'value' => 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition'],
+    ],
+    orderedIndex: 3,
     groups: ['http://hl7.org/fhir/StructureDefinition/publishablelibrary'],
 )]
 class PublishableLibraryProfile extends ShareableLibraryProfile

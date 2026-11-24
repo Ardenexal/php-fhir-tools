@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @description Partitions the NutritionOrder into one or more service categories that can be used to filter searching, govern access control, and guide system behavior.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/nutritionorder-serviceCategory', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/nutritionorder-serviceCategory', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
 class NutritionOrderServiceCategoryExtension extends Extension
 {

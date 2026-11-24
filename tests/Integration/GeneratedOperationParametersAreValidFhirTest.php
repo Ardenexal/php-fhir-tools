@@ -8,6 +8,10 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRAnyOfProfiles;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMaxLength;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRAnyOfProfilesValidator;
+use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRMaxLengthValidator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileInvariant;
@@ -290,6 +294,8 @@ final class GeneratedOperationParametersAreValidFhirTest extends TestCase
                     $constraint instanceof FHIRValueSetBinding   => new FHIRValueSetBindingValidator($this->registry, [$this->enumNs]),
                     $constraint instanceof FHIRFixedValue        => new FHIRFixedValueValidator($this->registry),
                     $constraint instanceof FHIRPatternValue      => new FHIRPatternValueValidator($this->registry),
+                    $constraint instanceof FHIRMaxLength         => new FHIRMaxLengthValidator($this->registry),
+                    $constraint instanceof FHIRAnyOfProfiles     => new FHIRAnyOfProfilesValidator(messageRegistry: $this->registry),
                     $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, $this->matcher),
                     $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->resolver, $this->registry),
                     default                                      => $this->default->getInstance($constraint),

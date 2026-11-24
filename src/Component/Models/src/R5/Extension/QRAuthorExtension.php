@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  *
  * @description Allows capturing, on a specific question or group of questions, exactly who was responsible for providing the answer(s).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author', fhirVersion: 'R5', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse.item.item')]
 class QRAuthorExtension extends Extension

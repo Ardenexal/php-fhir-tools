@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @description Indicates where the extension is intended to be used, like StructureDefinition.context, but is merely guidance. E.g An extension might be defined for use on any Element, but an author can use this indicate that the extension is intended to be used on a few particular DataTypes.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/intended-context', fhirVersion: 'R4')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/intended-context', fhirVersion: 'R4', isModifier: false)]
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class IntendedContextExtension extends Extension implements FHIRComplexExtensionInterface
 {

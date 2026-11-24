@@ -1,0 +1,8 @@
+{
+    "name": "php-fhir-tools.au-core-regression",
+    "version": "0.0.0",
+    "description": "Trimmed AU Core 2.0.0, AU Base 6.0.0 and R4 core StructureDefinitions (CC0-1.0) for the AU Core regression test. Written by seed-au-core.php; do not edit.",
+    "fhirVersions": [
+        "4.0.1"
+    ]
+}

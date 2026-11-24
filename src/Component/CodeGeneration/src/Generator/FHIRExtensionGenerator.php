@@ -115,16 +115,23 @@ class FHIRExtensionGenerator
         $name      = $structureDefinition['name'] ?? 'UnknownExtension';
         $className = ClassNameResolver::resolveClassName($url, $name) . 'Extension';
 
+        // Contexts, context invariants, the differential's invariants and bindings, whether the
+        // extension is a modifier and the FHIR versions it may be used in all come from the shared
+        // compiler, so a plain Extension validated against this definition at runtime is held to the
+        // same rules
+        $compiled = $this->compiler->compileExtension($structureDefinition);
+
+        // isModifier is always written, so a class states it either way; an unstated version bound is left out
         $class = new ClassType($className, $namespace);
         $class->addAttribute(FHIRExtensionDefinition::class, [
             'url'         => $url,
             'fhirVersion' => $version,
+            'isModifier'  => $compiled->isModifier,
+            ...array_filter([
+                'startFhirVersion' => $compiled->startFhirVersion,
+                'endFhirVersion'   => $compiled->endFhirVersion,
+            ], static fn (?string $bound): bool => $bound !== null),
         ]);
-
-        // Contexts, context invariants, and the differential's invariants and bindings come from the
-        // shared compiler, so a plain Extension validated against this definition at runtime is held
-        // to the same rules
-        $compiled = $this->compiler->compileExtension($structureDefinition);
         foreach ([...$compiled->contexts, ...$compiled->constraints] as $attribute) {
             $class->addAttribute($attribute->class, $attribute->arguments);
         }
