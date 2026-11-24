@@ -154,7 +154,7 @@ final class BundleEntryFullUrlChecker
         $visited[$id] = true;
         $violations   = $this->isBundleEntry($node) ? $this->checkEntry($node, $path, $bundleType) : [];
 
-        // A primitive holds only its value, id and extensions, and no extension value is a resource.
+        // A primitive holds only its value, id and extensions, and no extension value is a Bundle entry.
         if ($this->isPrimitive[$node::class] ??= $this->attributes->classAttributes($node, FHIRPrimitive::class) !== []) {
             return $violations;
         }

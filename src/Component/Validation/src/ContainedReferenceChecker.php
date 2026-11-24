@@ -101,9 +101,9 @@ final class ContainedReferenceChecker
      * `contained` starts a new container; a contained resource stays in its container's walk, but
      * is still walked for containers of its own, so a contained Bundle's entries are containers.
      *
-     * Two visited sets keep both halves exact when an object is reachable from more than one place:
-     * finding containers visits each object once, as a separate walk would, while collecting values
-     * visits each object once per container, as {@see collectPointers()} does.
+     * An object reachable from more than one place is searched for containers once, tracked in
+     * `$walk->discovered`, but has its values collected once per container, tracked in `$walk->collected`,
+     * so the findings match the two separate walks.
      *
      * @param int|null $container index of the container being collected, null above the first one
      */
@@ -114,7 +114,8 @@ final class ContainedReferenceChecker
 
         if (!$isContained && $this->isResource($node)) {
             if (!$discover) {
-                // Already found as a container from elsewhere, so collected under that one.
+                // Met before, where its place as a container or a contained resource was settled. Either
+                // way its values do not belong to the container being collected.
                 return;
             }
 
@@ -124,13 +125,19 @@ final class ContainedReferenceChecker
             $walk->pointers[$container]     = [];
         }
 
-        $collect = $container !== null && !isset($walk->collected[$container][$id]);
+        if (!$discover) {
+            // Reached again from elsewhere in a container: collect its values for this container
+            // too, as a walk of that container alone would, but find no containers a second time.
+            if ($container !== null) {
+                $walk->collected[$container] ??= [];
+                $this->collectPointers($node, $path, $walk->collected[$container], $walk->references[$container], $walk->pointers[$container]);
+            }
 
-        if (!$discover && !$collect) {
             return;
         }
 
         $walk->discovered[$id] = true;
+        $collect               = $container !== null && !isset($walk->collected[$container][$id]);
 
         if ($collect) {
             $walk->collected[$container][$id] = true;
@@ -148,7 +155,7 @@ final class ContainedReferenceChecker
                 if (is_object($item)) {
                     $this->walk($item, is_array($value) ? $subPath . '[' . $i . ']' : $subPath, $container, $inContained, $walk);
                 } elseif ($collect && is_string($item)) {
-                    $this->collectStringPointer($item, $name, $walk->pointers[$container]);
+                    $this->collectStringPointers($item, $name, $walk->pointers[$container]);
                 }
             }
         }
@@ -209,10 +216,10 @@ final class ContainedReferenceChecker
     }
 
     /**
-     * Collect the `#…` values a container holds, stopping at any resource it holds other than through
+     * Collect the `#…` values held at or under a node, stopping at any resource held other than through
      * `contained`, because that resource is a container of its own.
      *
-     * @param array<int, true>      $visited    spl_object_id keys of already-visited objects (cycle guard)
+     * @param array<int, true>      $visited    spl_object_id keys of objects already collected into these lists (cycle guard)
      * @param array<string, string> $references fragment `Reference.reference` values, keyed by path
      * @param array<string, true>   $pointers   every fragment value found, as a set
      */
@@ -236,7 +243,7 @@ final class ContainedReferenceChecker
 
             foreach ($items as $i => $item) {
                 if (is_string($item)) {
-                    $this->collectStringPointer($item, $name, $pointers);
+                    $this->collectStringPointers($item, $name, $pointers);
                 } elseif (is_object($item) && !$this->isOwnContainer($item, $name, $isResource)) {
                     $this->collectPointers($item, is_array($value) ? $subPath . '[' . $i . ']' : $subPath, $visited, $references, $pointers);
                 }
@@ -289,7 +296,7 @@ final class ContainedReferenceChecker
      *
      * @param array<string, true> $pointers
      */
-    private function collectStringPointer(string $value, string $property, array &$pointers): void
+    private function collectStringPointers(string $value, string $property, array &$pointers): void
     {
         if ($property === 'div') {
             $this->collectNarrativePointers($value, $pointers);
