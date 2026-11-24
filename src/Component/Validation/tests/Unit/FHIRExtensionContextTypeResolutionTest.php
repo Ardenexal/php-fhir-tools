@@ -71,6 +71,43 @@ final class FHIRExtensionContextTypeResolutionTest extends TestCase
         self::assertCount(0, $report->errors(), 'Bare-type context with null resolver must be deferred (no violation)');
     }
 
+    public function testAContextRootedInASupertypeDefersNotDenies(): void
+    {
+        // HumanName's supertypes include Element, but "Element.extension" is rooted in a supertype
+        // rather than the concrete type. An ancestor typed only by a supertype is invisible to the
+        // candidates, so a non-match cannot be confirmed: deferred, not denied.
+        $ext = new #[FHIRExtensionContext(type: 'element', expression: 'Element.extension')] class () implements FHIRExtensionInterface {
+            public function getExtensionUrl(): ?string
+            {
+                return 'http://example.org/ext/supertype-rooted';
+            }
+        };
+
+        $name     = new NestedContactWithExtensionsFixture([$ext]);
+        $resource = new ResourceWithTypedNamePropertyFixture(name: [$name]);
+
+        $report = $this->makeService(withResolver: true)->validate($resource);
+
+        self::assertCount(0, $report->errors(), 'A context rooted in a supertype must defer, not deny');
+    }
+
+    public function testAContextRootedInTheConcreteTypeDefersWithoutResolver(): void
+    {
+        // "HumanName.family" on a HumanName is denied only once a resolver names the concrete type.
+        $ext = new #[FHIRExtensionContext(type: 'element', expression: 'HumanName.family')] class () implements FHIRExtensionInterface {
+            public function getExtensionUrl(): ?string
+            {
+                return 'http://example.org/ext/family-only';
+            }
+        };
+
+        $name     = new NestedContactWithExtensionsFixture([$ext]);
+        $resource = new ResourceWithTypedNamePropertyFixture(name: [$name]);
+
+        self::assertCount(0, $this->makeService(withResolver: false)->validate($resource)->errors());
+        self::assertCount(1, $this->makeService(withResolver: true)->validate($resource)->errors());
+    }
+
     public function testMixedContextsBareTypeMatchWins(): void
     {
         // Extension has contexts ["HumanName" (bare type), "Observation.component" (foreign root)].
