@@ -327,6 +327,7 @@ final class JavaFindingMatcher
             $this->matchesByRequiredSlice($javaText, $ours, $javaExpression)       => 'required-slice',
             $this->matchesBySliceMaximum($javaText, $ours, $javaExpression)        => 'slice-max',
             $this->matchesByClosedChoiceSlice($javaText, $ours, $javaExpression)   => 'closed-choice-slice',
+            $this->matchesByExtensionContext($javaText, $ours, $javaExpression)    => 'extension-context',
             default                                                                => null,
         };
     }
@@ -351,10 +352,29 @@ final class JavaFindingMatcher
         return strcasecmp($m[1], $ours->invariantKey) === 0;
     }
 
-    /** Both sides render the same sentence, give or take punctuation and quoted values. */
+    /**
+     * Both sides render the same sentence, give or take punctuation and quoted values.
+     *
+     * The reference validator appends the package version to a canonical it names
+     * (`patient-animal|5.3.0-ballot`), and the generated models do not carry it. So when our sentence
+     * names no version at all, Java's versions are dropped before comparing. When ours does name one,
+     * the versions must agree, so two findings about different versions never pair.
+     */
     private function matchesByText(string $javaText, FHIRValidationViolation $ours): bool
     {
-        return $this->normalise($javaText) === $this->normalise($ours->message);
+        $mine = $this->normalise($ours->message);
+
+        if ($this->normalise($javaText) === $mine) {
+            return true;
+        }
+
+        if (str_contains($ours->message, '|')) {
+            return false;
+        }
+
+        $unversioned = (string) preg_replace('#(https?://[^\s|]+)\|[0-9][\w.-]*#', '$1', $javaText);
+
+        return $this->normalise($unversioned) === $mine;
     }
 
     /**
@@ -811,6 +831,50 @@ final class JavaFindingMatcher
         return $this->parentPath($choicePath) === $this->parentPath($ours->path);
     }
 
+    /**
+     * Both sides say the same extension may not be used on the same element.
+     *
+     * The reference validator writes `The extension <url> is not allowed to be used at this point (this
+     * element is [HumanName, Patient.name]; allowed for this version = …)`; we write
+     * `Extension "<url>" is not permitted on element "Patient.name".`. Our wording stays our own, so
+     * three agreements are required instead:
+     *
+     *  1. the extension url, which both sides print in full;
+     *  2. the element: ours must be one of the addresses Java lists for it, its type or its path;
+     *  3. the instance: Java's expression names the element carrying the extension
+     *     (`Patient.name[0]`), and ours is reported on that element's `extension` list.
+     *
+     * Corpus cases: `R4.maiden-name-extension`, `R4.patient-extension-complex-bad1`.
+     */
+    private function matchesByExtensionContext(
+        string $javaText,
+        FHIRValidationViolation $ours,
+        string $javaExpression,
+    ): bool {
+        if ($javaExpression === '') {
+            return false;
+        }
+
+        if (preg_match('/^The extension (?<url>\S+) is not allowed to be used at this point \(this element is \[(?<addresses>[^\]]*)\]/', $javaText, $java) !== 1) {
+            return false;
+        }
+
+        if (preg_match('/^Extension "(?<url>[^"]+)" is not permitted on element "(?<element>[^"]+)"\.$/', $ours->message, $mine) !== 1) {
+            return false;
+        }
+
+        if ($java['url'] !== $mine['url']) {
+            return false;
+        }
+
+        $addresses = array_map('trim', explode(',', $java['addresses']));
+        if (!in_array($mine['element'], $addresses, true)) {
+            return false;
+        }
+
+        return $this->instancePath($javaExpression) === $this->parentPath($ours->path);
+    }
+
     /** A path with every repeat index removed, for comparing against a source that carries none. */
     private function withoutIndexes(string $path): string
     {
@@ -848,6 +912,7 @@ final class JavaFindingMatcher
         $out = (string) preg_replace('/"[^"]*"/', '""', $out);
         $out = (string) preg_replace('/\((?:from|defined in|url:|ids:)[^)]*\)/', '', $out);
         $out = (string) preg_replace('/ in the profile \S+$/', '', $out);
+
         $out = (string) preg_replace('/\s+/', ' ', $out);
 
         return trim($out, " \t\n\r.;:");

@@ -1245,8 +1245,11 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * inference — the resource type at the root, same-resource-root path strings, a fhirpath
      * expression that confidently evaluates to boolean false against the bearing element, and a
      * fully-known ancestor-extension chain that excludes a type=extension context's declared
-     * parent URL. Bare and foreign-root contexts that do not match are deferred (never denied),
-     * so wiring a resolver cannot create a false positive; it can only clear one. Element
+     * parent URL. Bare and foreign-root contexts that do not match are deferred, with one
+     * exception: a foreign-root context whose root is this element's concrete type
+     * (`HumanName.family` on a HumanName) names a child of the element and is denied. That denial
+     * needs the resolver to name the concrete type, so it is the one place a resolver can create a
+     * finding; supertypes never trigger it, because candidates do not carry them. Element
      * contexts on an extension nested one level inside another deny on mismatch, because the
      * carrier's path is then known (see classifyNestedElementContext()); deeper levels defer.
      *
@@ -1324,14 +1327,26 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
         // Foreign root (e.g. "ElementDefinition.binding" inside StructureDefinition): permitted
         // when a type-rooted candidate matches (a path ancestor is typed with the context root).
-        // A non-match below the root is deferred, never denied — that would require complete type
-        // resolution of every path segment, which we do not guarantee. A resource being validated
-        // sits at no element path at all, so no dotted context can name it there. A data type
-        // validated on its own may still be meant for such a path, so it defers.
+        // Below the root, a non-match is deferred unless the context is rooted in this element's
+        // own concrete type (see the denial after this loop): denying it otherwise would require
+        // complete type resolution of every path segment, which we do not guarantee. A resource
+        // being validated sits at no element path at all, so no dotted context can name it there.
+        // A data type validated on its own may still be meant for such a path, so it defers.
         foreach ($typeCandidates as $candidate) {
             if ($candidate === $expr || str_starts_with($candidate, $expr . '.')) {
                 return self::CONTEXT_PERMIT;
             }
+        }
+
+        // The element's concrete type, the one candidate with no dot (see childTypeCandidates()), is
+        // the context's root. The context then names one of this element's own children
+        // (`HumanName.family` on a HumanName), which the element is not, and each ancestor whose
+        // concrete type resolved was tried above, so this is a confident denial, as the reference
+        // validator's for `humanname-mothers-family` on `Patient.name`. Supertypes never deny:
+        // candidates carry none, so `DomainResource.contained` on a contained Library could match
+        // through an ancestor this element cannot see, and must defer.
+        if (in_array($exprRoot, $typeCandidates, true)) {
+            return self::CONTEXT_DENY;
         }
 
         return $isRoot && $this->isResource($bearingElement) ? self::CONTEXT_DENY : self::CONTEXT_DEFER;

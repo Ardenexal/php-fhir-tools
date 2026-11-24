@@ -521,6 +521,104 @@ final class JavaFindingMatcherTest extends TestCase
     }
 
     /**
+     * `R4.maiden-name-extension`: the same context denial in each validator's own words.
+     */
+    public function testAnExtensionContextDenialPairsWithOursOnTheSameElement(): void
+    {
+        $java = [
+            'The extension http://hl7.org/fhir/StructureDefinition/humanname-mothers-family is not allowed to be used at this point (this element is [HumanName, Patient.name]; allowed for this version = e:HumanName.family)',
+        ];
+        $ours = $this->plain(
+            'name[0].extension',
+            'Extension "http://hl7.org/fhir/StructureDefinition/humanname-mothers-family" is not permitted on element "Patient.name".',
+        );
+
+        $pairs = $this->matcher->matchedPairs($java, [$ours], ['Patient.name[0]']);
+
+        self::assertCount(1, $pairs);
+        self::assertSame('extension-context', $pairs[0]['rule']);
+    }
+
+    /**
+     * `R4.patient-extension-complex-bad1`: a sub-extension, where both name the carrying extension's path.
+     */
+    public function testANestedExtensionContextDenialPairsOnTheCarrierPath(): void
+    {
+        $java = [
+            'The extension http://hl7.org/fhir/StructureDefinition/bodySite is not allowed to be used at this point (this element is [Extension, Patient.extension]; allowed for this version = e:Condition.bodySite, e:Observation.bodySite, e:Procedure.bodySite, e:MedicationAdministration.dosage, e:Dosage.site, e:Specimen.collection)',
+        ];
+        $ours = $this->plain(
+            'extension[0].extension',
+            'Extension "http://hl7.org/fhir/StructureDefinition/bodySite" is not permitted on element "Patient.extension".',
+        );
+
+        self::assertSame([], $this->matcher->unmatched($java, [$ours], ['Patient.extension[0]']));
+    }
+
+    public function testExtensionContextPairingRefusesAnotherExtension(): void
+    {
+        $java = [
+            'The extension http://hl7.org/fhir/StructureDefinition/humanname-mothers-family is not allowed to be used at this point (this element is [HumanName, Patient.name]; allowed for this version = e:HumanName.family)',
+        ];
+        $ours = $this->plain(
+            'name[0].extension',
+            'Extension "http://hl7.org/fhir/StructureDefinition/humanname-fathers-family" is not permitted on element "Patient.name".',
+        );
+
+        self::assertSame($java, $this->matcher->unmatched($java, [$ours], ['Patient.name[0]']));
+    }
+
+    public function testExtensionContextPairingRefusesAnotherInstance(): void
+    {
+        $java = [
+            'The extension http://hl7.org/fhir/StructureDefinition/humanname-mothers-family is not allowed to be used at this point (this element is [HumanName, Patient.name]; allowed for this version = e:HumanName.family)',
+        ];
+        $ours = $this->plain(
+            'name[1].extension',
+            'Extension "http://hl7.org/fhir/StructureDefinition/humanname-mothers-family" is not permitted on element "Patient.name".',
+        );
+
+        self::assertSame($java, $this->matcher->unmatched($java, [$ours], ['Patient.name[0]']));
+    }
+
+    /**
+     * `R4.patient-extension-complex-bad2`: Java appends the package version to the canonical, the
+     * generated models do not carry it, and the sentence is otherwise ours word for word.
+     */
+    public function testACanonicalVersionSuffixDoesNotStopATextPair(): void
+    {
+        $java = ["Sub-extension url 'species-x' is not defined by the Extension http://hl7.org/fhir/StructureDefinition/patient-animal|5.3.0-ballot"];
+        $ours = $this->plain(
+            'extension[0].extension[1]',
+            "Sub-extension url 'species-x' is not defined by the Extension http://hl7.org/fhir/StructureDefinition/patient-animal",
+        );
+
+        self::assertSame([], $this->matcher->unmatched($java, [$ours]));
+    }
+
+    public function testIgnoringTheVersionSuffixStillComparesTheCanonical(): void
+    {
+        $java = ["Sub-extension url 'species-x' is not defined by the Extension http://hl7.org/fhir/StructureDefinition/patient-animal|5.3.0-ballot"];
+        $ours = $this->plain(
+            'extension[0].extension[1]',
+            "Sub-extension url 'species-x' is not defined by the Extension http://hl7.org/fhir/StructureDefinition/patient-animal-other",
+        );
+
+        self::assertSame($java, $this->matcher->unmatched($java, [$ours]));
+    }
+
+    public function testAVersionOfOursMustAgreeWithJavas(): void
+    {
+        $java = ["Sub-extension url 'species-x' is not defined by the Extension http://hl7.org/fhir/StructureDefinition/patient-animal|5.3.0-ballot"];
+        $ours = $this->plain(
+            'extension[0].extension[1]',
+            "Sub-extension url 'species-x' is not defined by the Extension http://hl7.org/fhir/StructureDefinition/patient-animal|4.0.1",
+        );
+
+        self::assertSame($java, $this->matcher->unmatched($java, [$ours]));
+    }
+
+    /**
      * `bundle-document-versioned-references-bad`: both sides say one reference matches two entries.
      * The reference validator adds a context label we do not reproduce.
      */

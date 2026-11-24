@@ -90,6 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ele-1` on a primitive that is present but has no value and no extension, such as `<implicitRules id="i1"/>` or `"fullUrl": ""`, beside the existing `value cannot be empty`.
   - `txt-2` on a narrative with no text other than whitespace and no image, such as `<div><p></p></div>`.
   - In R4, `que-12` (two `enableWhen` without `enableBehavior`) and `eld-19` (an `ElementDefinition.path` such as `Observation...unit`), which R4 published wrongly, are checked with the expressions R4B corrected them to.
+- [Validation] An extension whose context names a child of a data type is now reported when it sits on that data type itself. `humanname-mothers-family` (context `HumanName.family`) on `Patient.name` is now an error: `Extension "http://hl7.org/fhir/StructureDefinition/humanname-mothers-family" is not permitted on element "Patient.name".` Before, contexts rooted in a data type were only checked when they matched, so a misplaced extension passed (#163)
 
 ### Infrastructure
 - [CI] `package-integrity` stamps sibling path repositories with `0.8.x-dev` to match the new branch aliases, and the Symfony 6.4 and 8.1 compat harnesses pin their path repositories at `0.8.999`
