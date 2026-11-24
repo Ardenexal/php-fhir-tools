@@ -158,6 +158,55 @@ final class ContainedReferenceCheckerTest extends TestCase
         );
     }
 
+    /**
+     * A contained Bundle is not a container, but its entries' resources are, as in
+     * `bundle-ea-testcase`, so the List in the entry reports its own unreferenced contained Patient.
+     */
+    public function testContainedBundleEntriesAreContainers(): void
+    {
+        $bundle = new BundleResource(
+            id: 'b',
+            type: new BundleTypeType(value: 'collection'),
+            entry: [new BundleEntry(resource: new ListResource(contained: [new PatientResource(id: 'x')]))],
+        );
+        $list = new ListResource(contained: [$bundle], subject: new Reference(reference: '#b'));
+
+        self::assertSame(
+            [[
+                'contained[0].entry[0].resource.contained[0]',
+                "The contained resource 'x' is not referenced to from elsewhere in the containing resource nor does it refer to the containing resource (dom-3)",
+            ]],
+            $this->findings($list),
+        );
+    }
+
+    /**
+     * A container reached twice reports its findings at the path where the walk first met it, also
+     * when the graph loops back on itself, as a model built in code can. The looping Bundle is
+     * contained by two containers, so each of them reports it.
+     */
+    public function testObjectReachedTwiceIsReportedAtItsFirstPath(): void
+    {
+        $unreferenced = new PatientResource(id: 'x');
+        $looping      = new PatientResource();
+        $bundle       = new BundleResource(
+            id: 'k',
+            type: new BundleTypeType(value: 'collection'),
+            entry: [
+                new BundleEntry(resource: $looping),
+                new BundleEntry(resource: new PatientResource(contained: [$unreferenced])),
+            ],
+        );
+        $looping->contained = [$bundle];
+
+        $paths = array_column($this->findings(new PatientResource(contained: [$bundle])), 0);
+
+        self::assertSame(
+            ['contained[0]', 'contained[0].entry[0].resource.contained[0]', 'contained[0].entry[1].resource.contained[0]'],
+            $paths,
+        );
+    }
+
     /** The dom-3 finding carries the invariant key, so it reads as that invariant in a report. */
     public function testUnreferencedContainedCarriesTheInvariantKey(): void
     {

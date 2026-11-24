@@ -78,14 +78,13 @@ final class ContainedReferenceChecker
      */
     public function check(object $resource): array
     {
-        $containers = [];
-        $visited    = [];
-        $this->collectContainers($resource, '', false, $visited, $containers);
+        $walk = new ContainedReferenceWalk();
+        $this->walk($resource, '', null, false, $walk);
 
         $violations = [];
 
-        foreach ($containers as $path => $container) {
-            foreach ($this->checkContainer($container, (string) $path) as $violation) {
+        foreach ($walk->containers as $index => [$path, $container]) {
+            foreach ($this->checkContainer($container, $path, $walk->references[$index], $walk->pointers[$index]) as $violation) {
                 $violations[] = $violation;
             }
         }
@@ -94,39 +93,68 @@ final class ContainedReferenceChecker
     }
 
     /**
-     * Find every containing resource in the tree, keyed by its path.
+     * Find every containing resource and collect each one's `#…` values, in one pass over the tree.
      *
-     * A contained resource is not a container itself, but it is still walked: a contained Bundle's
-     * entries are containers of their own.
+     * This does in one walk what {@see collectPointers()} would do once per container, after a
+     * separate walk to find the containers. A resource reached other than through its parent's
+     * `contained` starts a new container; a contained resource stays in its container's walk, but
+     * is still walked for containers of its own, so a contained Bundle's entries are containers.
      *
-     * @param array<int, true>      $visited    spl_object_id keys of already-visited objects (cycle guard)
-     * @param array<string, object> $containers containers found so far, keyed by path
+     * An object reachable from more than one place is searched for containers once, tracked in
+     * `$walk->discovered`, but has its values collected once per container, tracked in `$walk->collected`,
+     * so the findings match the two separate walks.
+     *
+     * @param int|null $container index of the container being collected, null above the first one
      */
-    private function collectContainers(object $node, string $path, bool $isContained, array &$visited, array &$containers): void
+    private function walk(object $node, string $path, ?int $container, bool $isContained, ContainedReferenceWalk $walk): void
     {
-        $id = spl_object_id($node);
+        $id       = spl_object_id($node);
+        $discover = !isset($walk->discovered[$id]);
 
-        if (isset($visited[$id])) {
+        if (!$isContained && $this->isResource($node)) {
+            if (!$discover) {
+                // Met before, where its place as a container or a contained resource was settled. Either
+                // way its values do not belong to the container being collected.
+                return;
+            }
+
+            $container                      = count($walk->containers);
+            $walk->containers[]             = [$path, $node];
+            $walk->references[$container]   = [];
+            $walk->pointers[$container]     = [];
+        }
+
+        if (!$discover) {
+            // Reached again from elsewhere in a container: collect its values for this container
+            // too, as a walk of that container alone would, but find no containers a second time.
+            if ($container !== null) {
+                $walk->collected[$container] ??= [];
+                $this->collectPointers($node, $path, $walk->collected[$container], $walk->references[$container], $walk->pointers[$container]);
+            }
+
             return;
         }
 
-        $visited[$id] = true;
+        $walk->discovered[$id] = true;
+        $collect               = $container !== null && !isset($walk->collected[$container][$id]);
 
-        if (!$isContained && $this->isResource($node)) {
-            $containers[$path] = $node;
+        if ($collect) {
+            $walk->collected[$container][$id] = true;
+            $this->collectNodePointers($node, $path, $walk->references[$container], $walk->pointers[$container]);
         }
+
+        $isResource = $this->isResource($node);
 
         foreach ($this->reader->children($node) as $name => $value) {
             $subPath     = $path === '' ? $name : $path . '.' . $name;
-            $inContained = $name === 'contained' && $this->isResource($node);
+            $inContained = $name === 'contained' && $isResource;
+            $items       = is_array($value) ? $value : [$value];
 
-            if (is_object($value)) {
-                $this->collectContainers($value, $subPath, $inContained, $visited, $containers);
-            } elseif (is_array($value)) {
-                foreach ($value as $i => $item) {
-                    if (is_object($item)) {
-                        $this->collectContainers($item, $subPath . '[' . $i . ']', $inContained, $visited, $containers);
-                    }
+            foreach ($items as $i => $item) {
+                if (is_object($item)) {
+                    $this->walk($item, is_array($value) ? $subPath . '[' . $i . ']' : $subPath, $container, $inContained, $walk);
+                } elseif ($collect && is_string($item)) {
+                    $this->collectStringPointers($item, $name, $walk->pointers[$container]);
                 }
             }
         }
@@ -135,18 +163,15 @@ final class ContainedReferenceChecker
     /**
      * Apply both rules to one containing resource.
      *
+     * @param array<string, string> $references fragment `Reference.reference` values, keyed by path
+     * @param array<string, true>   $pointers   every fragment value in the container, as a set
+     *
      * @return list<FHIRValidationViolation>
      */
-    private function checkContainer(object $container, string $path): array
+    private function checkContainer(object $container, string $path, array $references, array $pointers): array
     {
         $prefix    = $path === '' ? '' : $path . '.';
         $contained = $this->contained($container);
-
-        // Fragment Reference.reference values by path, and every `#…` value anywhere in the container.
-        $references = [];
-        $pointers   = [];
-        $visited    = [];
-        $this->collectPointers($container, $prefix, $visited, $references, $pointers);
 
         $ids = [];
         foreach ($contained as $item) {
@@ -190,10 +215,10 @@ final class ContainedReferenceChecker
     }
 
     /**
-     * Collect the `#…` values a container holds, stopping at any resource it holds other than through
+     * Collect the `#…` values held at or under a node, stopping at any resource held other than through
      * `contained`, because that resource is a container of its own.
      *
-     * @param array<int, true>      $visited    spl_object_id keys of already-visited objects (cycle guard)
+     * @param array<int, true>      $visited    spl_object_id keys of objects already collected into these lists (cycle guard)
      * @param array<string, string> $references fragment `Reference.reference` values, keyed by path
      * @param array<string, true>   $pointers   every fragment value found, as a set
      */
@@ -207,25 +232,7 @@ final class ContainedReferenceChecker
 
         $visited[$id] = true;
 
-        $path = rtrim($path, '.');
-
-        if ($this->isReference($node)) {
-            $value = $this->reader->readString($node, 'reference');
-
-            if ($value !== null && str_starts_with($value, '#')) {
-                $references[$path] = $value;
-                $pointers[$value]  = true;
-            }
-        } else {
-            $type  = $this->primitiveType($node);
-            $value = $type === null ? null : $this->reader->readString($node, 'value');
-
-            if ($value !== null && $type === self::XHTML) {
-                $this->collectNarrativePointers($value, $pointers);
-            } elseif ($value !== null && in_array($type, self::URI_TYPES, true) && str_starts_with($value, '#')) {
-                $pointers[$value] = true;
-            }
-        }
+        $this->collectNodePointers($node, $path, $references, $pointers);
 
         $isResource = $this->isResource($node);
 
@@ -234,17 +241,66 @@ final class ContainedReferenceChecker
             $items   = is_array($value) ? $value : [$value];
 
             foreach ($items as $i => $item) {
-                $itemPath = is_array($value) ? $subPath . '[' . $i . ']' : $subPath;
-
-                if (is_string($item) && $name === 'div') {
-                    $this->collectNarrativePointers($item, $pointers);
-                } elseif (is_string($item) && str_starts_with($item, '#')) {
-                    // A canonical held as a bare string rather than a primitive object.
-                    $pointers[$item] = true;
+                if (is_string($item)) {
+                    $this->collectStringPointers($item, $name, $pointers);
                 } elseif (is_object($item) && !$this->isOwnContainer($item, $name, $isResource)) {
-                    $this->collectPointers($item, $itemPath, $visited, $references, $pointers);
+                    $this->collectPointers($item, is_array($value) ? $subPath . '[' . $i . ']' : $subPath, $visited, $references, $pointers);
                 }
             }
+        }
+    }
+
+    /**
+     * Collect the `#…` value a node itself holds: a `Reference.reference`, a `uri`-like primitive's
+     * value, or the fragments a narrative's markup links to.
+     *
+     * @param array<string, string> $references fragment `Reference.reference` values, keyed by path
+     * @param array<string, true>   $pointers   every fragment value found, as a set
+     */
+    private function collectNodePointers(object $node, string $path, array &$references, array &$pointers): void
+    {
+        if ($this->isReference($node)) {
+            $value = $this->reader->readString($node, 'reference');
+
+            if ($value !== null && str_starts_with($value, '#')) {
+                $references[$path] = $value;
+                $pointers[$value]  = true;
+            }
+
+            return;
+        }
+
+        $type = $this->primitiveType($node);
+
+        // Only narrative and uri-like primitives can point at a contained resource, so no other
+        // primitive's value is read.
+        if ($type === self::XHTML) {
+            $value = $this->reader->readString($node, 'value');
+
+            if ($value !== null) {
+                $this->collectNarrativePointers($value, $pointers);
+            }
+        } elseif ($type !== null && in_array($type, self::URI_TYPES, true)) {
+            $value = $this->reader->readString($node, 'value');
+
+            if ($value !== null && str_starts_with($value, '#')) {
+                $pointers[$value] = true;
+            }
+        }
+    }
+
+    /**
+     * Collect the `#…` values in a bare string property: narrative markup held as a string `div`, or
+     * a canonical held as a bare string rather than a primitive object.
+     *
+     * @param array<string, true> $pointers
+     */
+    private function collectStringPointers(string $value, string $property, array &$pointers): void
+    {
+        if ($property === 'div') {
+            $this->collectNarrativePointers($value, $pointers);
+        } elseif (str_starts_with($value, '#')) {
+            $pointers[$value] = true;
         }
     }
 

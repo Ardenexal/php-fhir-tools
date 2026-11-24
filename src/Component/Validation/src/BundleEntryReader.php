@@ -28,6 +28,9 @@ final class BundleEntryReader
     /** @var array<class-string, string|null> FHIR type of a complex type or primitive, per class */
     private array $typeNames = [];
 
+    /** @var array<class-string, bool> whether a class models a FHIR primitive */
+    private array $primitives = [];
+
     public function __construct(
         private readonly FHIRModelAccessorInterface $models,
         private readonly FHIRAttributeReaderInterface $attributes,
@@ -157,5 +160,11 @@ final class BundleEntryReader
         }
 
         return $this->typeNames[$key] = $type;
+    }
+
+    /** Whether a class models a FHIR primitive, which holds only a value, an id and extensions. */
+    public function isPrimitive(object $node): bool
+    {
+        return $this->primitives[$node::class] ??= $this->attributes->classAttributes($node, FHIRPrimitive::class) !== [];
     }
 }

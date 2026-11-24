@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
@@ -108,6 +109,9 @@ final class BundleEntryFullUrlChecker
     /** @var array<class-string, bool> keyed by class name; the attribute read is cached upstream too, this saves the call */
     private array $isBundleEntry = [];
 
+    /** @var array<class-string, bool> whether a class models a FHIR primitive */
+    private array $isPrimitive = [];
+
     /** @var array<class-string, FhirResource|null> resource attribute per class; reflection is not free */
     private array $resourceAttributes = [];
 
@@ -149,6 +153,11 @@ final class BundleEntryFullUrlChecker
 
         $visited[$id] = true;
         $violations   = $this->isBundleEntry($node) ? $this->checkEntry($node, $path, $bundleType) : [];
+
+        // A primitive holds only its value, id and extensions, and no extension value is a Bundle entry.
+        if ($this->isPrimitive[$node::class] ??= $this->attributes->classAttributes($node, FHIRPrimitive::class) !== []) {
+            return $violations;
+        }
 
         // Only a Bundle's direct children (its entries) learn its type; a nested Bundle sets its own.
         $childBundleType = $this->resourceType($node) === self::BUNDLE

@@ -173,6 +173,11 @@ final class BundleReferenceResolutionChecker
             $bundles[$path] = $node;
         }
 
+        // A primitive holds only its value, id and extensions, and no extension value is a resource.
+        if ($this->reader->isPrimitive($node)) {
+            return;
+        }
+
         foreach ($this->reader->children($node) as $name => $value) {
             $subPath = $path === '' ? $name : $path . '.' . $name;
 
