@@ -15,6 +15,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
  * Validates a FHIR profile constraint at class level.
@@ -123,12 +124,7 @@ final class FHIRProfileConstraintValidator extends ConstraintValidator
     private function reportViolations(iterable $innerViolations, FHIRProfileConstraint $constraint): void
     {
         foreach ($innerViolations as $v) {
-            $innerPath = $v->getPropertyPath();
-            $path      = match (true) {
-                $innerPath    === ''         => $constraint->path,
-                $innerPath[0] === '['        => $constraint->path . $innerPath,
-                default                      => $constraint->path . '.' . $innerPath,
-            };
+            $path = PropertyPath::append($constraint->path, $v->getPropertyPath());
 
             // One differential rule can reach us as several constraints. A profile that declares
             // `category` 1..* and slices it 1..1 generates two Count attributes on the same path, and

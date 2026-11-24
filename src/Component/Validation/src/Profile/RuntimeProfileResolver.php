@@ -105,12 +105,7 @@ final class RuntimeProfileResolver
             return null;
         }
 
-        [$canonical, $version] = self::splitCanonical($url);
-        try {
-            $definition = $this->registry->find($canonical, $release, $version);
-        } catch (UnreadableStructureDefinitionException) {
-            return null;
-        }
+        $definition = $this->findReadable($url, $release);
 
         $type = $definition['type'] ?? null;
 
@@ -214,12 +209,7 @@ final class RuntimeProfileResolver
             return null;
         }
 
-        [$canonical, $version] = self::splitCanonical($url);
-        try {
-            $definition = $this->registry->find($canonical, $release, $version);
-        } catch (UnreadableStructureDefinitionException) {
-            return null;
-        }
+        $definition = $this->findReadable($url, $release);
         if ($definition === null
             || ($definition['type'] ?? null)       !== 'Extension'
             || ($definition['derivation'] ?? null) !== 'constraint'
@@ -346,6 +336,24 @@ final class RuntimeProfileResolver
         return RuntimeProfileResolution::failed($url, $release, RuntimeProfileFailure::Unknown, $url, $version === null
             ? sprintf('No StructureDefinition with URL "%s" is registered for %s.', $canonical, $release)
             : sprintf('No StructureDefinition with URL "%s" and version "%s" is registered for %s.', $canonical, $version, $release));
+    }
+
+    /**
+     * The definition registered for $url in $release, or null when there is none or it cannot be
+     * read: a broken file makes this one lookup fail, never the validation around it.
+     *
+     * @param string $url Canonical URL, optionally with a `|version` suffix
+     *
+     * @return array<string, mixed>|null
+     */
+    private function findReadable(string $url, string $release): ?array
+    {
+        [$canonical, $version] = self::splitCanonical($url);
+        try {
+            return $this->registry->find($canonical, $release, $version);
+        } catch (UnreadableStructureDefinitionException) {
+            return null;
+        }
     }
 
     /**

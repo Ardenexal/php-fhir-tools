@@ -325,6 +325,7 @@ final class JavaFindingMatcher
             $this->matchesByBundleResolution($javaText, $ours)                     => 'bundle-resolution',
             $this->matchesByInvariantParaphrase($javaText, $ours, $javaExpression) => 'invariant-paraphrase',
             $this->matchesByRequiredSlice($javaText, $ours, $javaExpression)       => 'required-slice',
+            $this->matchesBySliceMaximum($javaText, $ours, $javaExpression)        => 'slice-max',
             $this->matchesByClosedChoiceSlice($javaText, $ours, $javaExpression)   => 'closed-choice-slice',
             default                                                                => null,
         };
@@ -712,6 +713,49 @@ final class JavaFindingMatcher
         }
 
         if ($java['slice'] !== $mine['slice']) {
+            return false;
+        }
+
+        $element = $this->leaf($java['element']);
+        if ($element === '' || $element !== $mine['property'] || $element !== $this->leaf($ours->path)) {
+            return false;
+        }
+
+        return $this->instancePath($javaExpression) === $this->parentPath($ours->path);
+    }
+
+    /**
+     * Both sides say more items matched a slice than its maximum allows.
+     *
+     * The reference validator writes `List.entry:slice1: max allowed = 1, but found 2`; we write
+     * `Slice "slice1" on "entry" allows at most 1 item(s), but 2 matched.`. As for
+     * {@see matchesByRequiredSlice()}, the slice name, the sliced element and the instance must agree,
+     * and so must both numbers: a different count is a different breach.
+     *
+     * Corpus case: `R4.profile-slicing-type-example-bad`, whose two Conditions both match `slice1`.
+     */
+    private function matchesBySliceMaximum(
+        string $javaText,
+        FHIRValidationViolation $ours,
+        string $javaExpression,
+    ): bool {
+        if ($javaExpression === '') {
+            return false;
+        }
+
+        if (preg_match('/^(?<element>[^\s:]+):(?<slice>[^:\s]+): max allowed = (?<max>\d+), but found (?<count>\d+)/', $javaText, $java) !== 1) {
+            return false;
+        }
+
+        if ((new ViolationFamilyClassifier())->classify($ours) !== 'constraint:FHIRSliceConstraint') {
+            return false;
+        }
+
+        if (preg_match('/^Slice "(?<slice>[^"]+)" on "(?<property>[^"]+)" allows at most (?<max>\d+) item\(s\), but (?<count>\d+) matched\.$/', $ours->message, $mine) !== 1) {
+            return false;
+        }
+
+        if ($java['slice'] !== $mine['slice'] || $java['max'] !== $mine['max'] || $java['count'] !== $mine['count']) {
             return false;
         }
 

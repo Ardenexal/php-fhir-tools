@@ -172,7 +172,7 @@ joins a slice only when it matches every discriminator of the slicing.
 | `$this` with a fixed or pattern value | Yes | Uses the slice's own value, such as AU Core smoking status's `social-history` category |
 | `$this` with only a `required` binding | With a terminology client | Such as AU Core's `coding:pbs` and `coding:amt`; without a client the slice is not judged |
 | Several discriminators on one slicing | Yes | All must match |
-| A path through `resolve()` | No | Closed or openAtEnd slicing that depends on it is enforced as open. The compiler reports a `CompilerDiagnostic`, and `fhir:generate` reports it as a warning |
+| A path through `resolve()` | When the reference resolves | Follows the reference to a contained resource, a Bundle entry, or the configured `FHIRReferenceResolverInterface`; otherwise the item is not judged. The value comes from the reference's target profiles. With no target profile there is nothing to match on: closed or openAtEnd slicing that depends on it is enforced as open, and the compiler reports a `CompilerDiagnostic` |
 | Slice minimum and maximum | Yes | Not checked for a slice that could not be judged |
 | `closed` and `openAtEnd` | Yes | Items that might belong to a slice that could not be judged are not rejected |
 | Invariants and bindings inside a slice | Yes | Checked on the items in that slice |
@@ -222,8 +222,8 @@ against it instead.
   `resolveExtension($url, 'R4')->diagnostics`; `fhir:generate-ig` reports it as a warning. Rules
   inside a profile's slices, including a data-type profile such as `au-ihi` named on a slice, are
   enforced for the items in that slice, unless no item can be matched to the slice because its
-  discriminator has nothing to match on (a path through `resolve()`, or a value the profile does
-  not state); that is reported as a `CompilerDiagnostic`.
+  discriminator has nothing to match on (a path through `resolve()` whose reference names no target
+  profile, or a value the profile does not state); that is reported as a `CompilerDiagnostic`.
 * **No terminology server, no binding check.** A binding no generated enum covers needs a
   terminology client; without one it is reported as `fhir:unchecked-binding` INFO.
 * **Sub-extension cardinality, fixed and pattern values are not checked**, because the generated

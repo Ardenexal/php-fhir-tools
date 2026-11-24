@@ -86,7 +86,7 @@ final class FHIRConstraintValidatorFactory implements ConstraintValidatorFactory
             $constraint instanceof FHIRProfileConstraint => new FHIRProfileConstraintValidator($this->accessor),
             $constraint instanceof FHIRProfileInvariant  => new FHIRProfileInvariantValidator($this->pathService, $this->messages, $this->accessor),
             $constraint instanceof FHIRProfileBinding    => new FHIRProfileBindingValidator($this->accessor),
-            $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, new SliceDiscriminatorMatcher($this->accessor, $this->terminologyClient), $this->sliceAttributes, profiles: $this->profileConformance),
+            $constraint instanceof FHIRSliceConstraint   => new FHIRSliceConstraintValidator($this->accessor, new SliceDiscriminatorMatcher($this->accessor, $this->terminologyClient), $this->sliceAttributes, profiles: $this->profileConformance, references: $this->referenceResolver),
             $constraint instanceof FHIRTargetProfile     => new FHIRTargetProfileValidator($this->referenceResolver, $this->messages, profileTypes: $this->targetProfileTypes),
             default                                      => $this->fallback->getInstance($constraint),
         };

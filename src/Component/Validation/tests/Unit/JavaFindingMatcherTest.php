@@ -460,6 +460,30 @@ final class JavaFindingMatcherTest extends TestCase
     }
 
     /**
+     * A slice over its maximum, in each validator's own words. Texts verbatim from
+     * `outcomes/java/R4.profile-slicing-type-example-bad-profile.json` and our `FHIRSliceConstraintValidator`.
+     */
+    public function testASliceOverItsMaximumPairsWithOurs(): void
+    {
+        $java = ['List.entry:slice1: max allowed = 1, but found 2 (from http://hl7.org/fhir/test/StructureDefinition/profile-slicing-type-resolve|0.1.0)'];
+        $ours = [$this->slice('entry', 'Slice "slice1" on "entry" allows at most 1 item(s), but 2 matched.')];
+
+        $pairs = $this->matcher->matchedPairs($java, $ours, ['List']);
+
+        self::assertCount(1, $pairs);
+        self::assertSame('slice-max', $pairs[0]['rule']);
+    }
+
+    /** Another slice, or another count, is another breach. */
+    public function testSliceMaximumPairingRefusesADifferentSliceOrCount(): void
+    {
+        $java = ['List.entry:slice1: max allowed = 1, but found 2 (from http://hl7.org/fhir/test/StructureDefinition/profile-slicing-type-resolve|0.1.0)'];
+
+        self::assertSame($java, $this->matcher->unmatched($java, [$this->slice('entry', 'Slice "slice2" on "entry" allows at most 1 item(s), but 2 matched.')], ['List']));
+        self::assertSame($java, $this->matcher->unmatched($java, [$this->slice('entry', 'Slice "slice1" on "entry" allows at most 1 item(s), but 3 matched.')], ['List']));
+    }
+
+    /**
      * Closed type slicing on a choice element, against our cardinality check on the typed element.
      *
      * The R4 `bp` profile slices `value[x]` closed by type and gives its only slice, `valueQuantity`,

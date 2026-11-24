@@ -6,7 +6,6 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReader;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRAttributeReaderInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Type\FHIRModelAccessor;
@@ -57,19 +56,19 @@ final class ContainedReferenceChecker
     /** `src` and `href` attributes in narrative markup whose value is a fragment. */
     private const string NARRATIVE_FRAGMENT = '/(?:src|href)\s*=\s*(["\'])#([^"\'\s>]+)\1/i';
 
-    /** @var array<class-string, bool> whether the class is a resource */
-    private array $isResource = [];
-
     /** @var array<class-string, bool> whether the class is a `Reference` */
     private array $isReference = [];
 
     /** @var array<class-string, string|null> the FHIR primitive type a class models, null for none */
     private array $primitiveTypes = [];
 
+    private readonly BundleEntryReader $reader;
+
     public function __construct(
-        private readonly FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
+        FHIRModelAccessorInterface $models = new FHIRModelAccessor(),
         private readonly FHIRAttributeReaderInterface $attributes = new FHIRAttributeReader(),
     ) {
+        $this->reader = new BundleEntryReader($models, $attributes);
     }
 
     /**
@@ -146,7 +145,7 @@ final class ContainedReferenceChecker
 
         $isResource = $this->isResource($node);
 
-        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
+        foreach ($this->reader->children($node) as $name => $value) {
             $subPath     = $path === '' ? $name : $path . '.' . $name;
             $inContained = $name === 'contained' && $isResource;
             $items       = is_array($value) ? $value : [$value];
@@ -176,7 +175,7 @@ final class ContainedReferenceChecker
 
         $ids = [];
         foreach ($contained as $item) {
-            $id = $this->readString($item, 'id');
+            $id = $this->reader->readString($item, 'id');
 
             if ($id !== null) {
                 $ids[$id] = true;
@@ -196,7 +195,7 @@ final class ContainedReferenceChecker
         }
 
         foreach ($contained as $index => $item) {
-            $id = $this->readString($item, 'id');
+            $id = $this->reader->readString($item, 'id');
 
             if (($id !== null && isset($pointers['#' . $id])) || $this->refersToContainer($item)) {
                 continue;
@@ -237,7 +236,7 @@ final class ContainedReferenceChecker
 
         $isResource = $this->isResource($node);
 
-        foreach ($this->models->initializedPublicValues($node) as $name => $value) {
+        foreach ($this->reader->children($node) as $name => $value) {
             $subPath = $path === '' ? $name : $path . '.' . $name;
             $items   = is_array($value) ? $value : [$value];
 
@@ -261,7 +260,7 @@ final class ContainedReferenceChecker
     private function collectNodePointers(object $node, string $path, array &$references, array &$pointers): void
     {
         if ($this->isReference($node)) {
-            $value = $this->readString($node, 'reference');
+            $value = $this->reader->readString($node, 'reference');
 
             if ($value !== null && str_starts_with($value, '#')) {
                 $references[$path] = $value;
@@ -276,13 +275,13 @@ final class ContainedReferenceChecker
         // Only narrative and uri-like primitives can point at a contained resource, so no other
         // primitive's value is read.
         if ($type === self::XHTML) {
-            $value = $this->readString($node, 'value');
+            $value = $this->reader->readString($node, 'value');
 
             if ($value !== null) {
                 $this->collectNarrativePointers($value, $pointers);
             }
         } elseif ($type !== null && in_array($type, self::URI_TYPES, true)) {
-            $value = $this->readString($node, 'value');
+            $value = $this->reader->readString($node, 'value');
 
             if ($value !== null && str_starts_with($value, '#')) {
                 $pointers[$value] = true;
@@ -340,7 +339,7 @@ final class ContainedReferenceChecker
     /** @return list<object> the container's contained resources, in order */
     private function contained(object $container): array
     {
-        $value = $this->readPublic($container, 'contained');
+        $value = $this->reader->readPublic($container, 'contained');
 
         if (!is_array($value)) {
             return [];
@@ -361,35 +360,9 @@ final class ContainedReferenceChecker
         );
     }
 
-    /** Read a string-ish property, which may be a primitive wrapper, a bare string, or absent. */
-    private function readString(object $node, string $property): ?string
-    {
-        $value = $this->readPublic($node, $property);
-
-        if ($value instanceof \Stringable) {
-            $value = (string) $value;
-        }
-
-        return is_string($value) && $value !== '' ? $value : null;
-    }
-
-    /** A public property's value, or null when it is absent, non-public or never written. */
-    private function readPublic(object $node, string $property): mixed
-    {
-        if (!in_array($property, $this->models->publicPropertyNames($node), true)) {
-            return null;
-        }
-
-        if (!$this->models->isPropertyInitialized($node, $property)) {
-            return null;
-        }
-
-        return $this->models->readInitializedValue($node, $property);
-    }
-
     private function isResource(object $node): bool
     {
-        return $this->isResource[$node::class] ??= $this->attributes->classAttributes($node, FhirResource::class) !== [];
+        return $this->reader->resourceType($node) !== null;
     }
 
     private function isReference(object $node): bool

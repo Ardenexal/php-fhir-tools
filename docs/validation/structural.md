@@ -71,12 +71,19 @@ it matches all of the slicing's discriminators:
   The profile must be declared by the element's generated class or resolvable at runtime.
 * A slice with no fixed or pattern value but a `required` binding at the path, such as AU Core's
   `coding:pbs`, is matched by asking the terminology client whether the code is in the value set.
+* A path through `resolve()`, such as `item.resolve()` or the lipid profile's `resolve().code`,
+  follows each reference to the resource it points at and checks the rest of the path there. A
+  `#id` reference resolves to a contained resource, a reference inside a Bundle entry to the one
+  entry it names, and anything else goes to the configured `FHIRReferenceResolverInterface`. The
+  value comes from the reference's target profiles: their resource types for `type`, the profiles
+  themselves for `profile`, and for `value` or `pattern` the fixed or pattern value the one target
+  profile states at the rest of the path. `ofType(Reference)` in the path keeps only References.
 
-A `profile` or binding discriminator can go unanswered: no terminology client is configured, the
-server gives no answer, or the profile cannot be found. An item that might belong to such a slice is
-neither counted against closed or openAtEnd rules nor given to the default slice, and that slice's
-minimum is not checked. A slice with nothing to match on, such as a path through `resolve()`,
-matches no item, and the generator and the runtime compiler enforce closed or openAtEnd slicing
+A discriminator can go unanswered: no terminology client is configured, the server gives no answer,
+the profile cannot be found, or a reference does not resolve. An item that might belong to such a
+slice is neither counted against closed or openAtEnd rules nor given to the default slice, and that
+slice's minimum is not checked. A slice with nothing to match on, such as a path through `resolve()`
+whose reference names no target profile, matches no item, and the generator and the runtime compiler enforce closed or openAtEnd slicing
 that depends on it as open, with a warning, so a conforming resource is not rejected.
 
 ## Fixed and pattern values
